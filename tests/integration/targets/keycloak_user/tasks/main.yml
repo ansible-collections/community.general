@@ -254,3 +254,69 @@
     that:
       - create_result.changed
       - create_result.end_state.emailVerified == False
+
+- name: Test setting required_actions
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    required_actions:
+      - UPDATE_PASSWORD
+      - VERIFY_EMAIL
+    state: present
+  register: create_result
+
+- name: Assert required_actions are set
+  ansible.builtin.assert:
+    that:
+      - create_result.changed
+      - "'UPDATE_PASSWORD' in create_result.end_state.requiredActions"
+      - "'VERIFY_EMAIL' in create_result.end_state.requiredActions"
+
+- name: Test required_actions unchanged
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+  register: create_result
+
+- name: Assert required_actions are still set
+  ansible.builtin.assert:
+    that:
+      - not create_result.changed
+      - "'UPDATE_PASSWORD' in create_result.end_state.requiredActions"
+      - "'VERIFY_EMAIL' in create_result.end_state.requiredActions"
+
+- name: Test required_actions reset
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+    required_actions: []
+  register: create_result
+
+- name: Assert required_actions are reset
+  ansible.builtin.assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.requiredActions == []
