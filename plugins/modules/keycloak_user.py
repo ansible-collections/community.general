@@ -511,7 +511,7 @@ def main():
             result["msg"] = f"User {before_user['username']} deleted"
             changed = True
     else:
-        if not before_user or force and username is None:
+        if (not before_user or force) and username is None:
             module.fail_json(msg="username must be specified when creating a new user")
 
         if force and before_user and not module.check_mode:  # If the force option is set to true
