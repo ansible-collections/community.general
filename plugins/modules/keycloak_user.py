@@ -513,7 +513,7 @@ def main():
     else:
         if not before_user or force and username is None:
             module.fail_json(msg="username must be specified when creating a new user")
-        
+
         if force and before_user and not module.check_mode:  # If the force option is set to true
             # Delete the existing user
             kc.delete_user(user_id=before_user["id"], realm=realm)
