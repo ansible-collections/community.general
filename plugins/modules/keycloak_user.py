@@ -511,20 +511,15 @@ def main():
             result["msg"] = f"User {before_user['username']} deleted"
             changed = True
     else:
+        if not before_user or force and username is None:
+            module.fail_json(msg="username must be specified when creating a new user")
+        
         if force and before_user and not module.check_mode:  # If the force option is set to true
             # Delete the existing user
             kc.delete_user(user_id=before_user["id"], realm=realm)
 
         if not before_user or force:
             # Create a new user
-            changed = True
-
-            if username is None:
-                module.fail_json(msg="username must be specified when creating a new user")
-
-            if module._diff:
-                result["diff"] = dict(before=before_user, after=desired_user)
-
             if not module.check_mode:
                 # Create the user
                 after_user = kc.create_user(userrep=desired_user, realm=realm)
@@ -534,8 +529,8 @@ def main():
                 after_user = desired_user
 
             result["msg"] = f"User {desired_user['username']} created"
-            # Set user_created flag
             result["user_created"] = True
+            changed = True
         else:
             # Update an existing user
             excludes = [
