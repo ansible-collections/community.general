@@ -143,6 +143,18 @@ options:
     description:
       - A dict of key/value pairs to set as custom attributes for the client_scope.
       - Values may be single values (for example a string) or a list of strings.
+  protocol_mappers_behavior:
+    description:
+      - Determine how O(protocol_mappers) behave when updating an existing client_scope.
+      - 'V(patch): Add missing protocol mappers, do not remove any missing mappers.'
+      - 'V(idempotent): Make the protocol mappers exactly as specified, adding and removing mappers as needed.'
+    aliases:
+      - protocolMappersBehavior
+    type: str
+    choices: ['patch', 'idempotent']
+    default: 'patch'
+    type: str
+    version_added: "13.0.0"
 extends_documentation_fragment:
   - community.general._keycloak
   - community.general._keycloak.actiongroup_keycloak
@@ -366,6 +378,9 @@ def main():
         protocol=dict(type="str", choices=["openid-connect", "saml", "wsfed", "docker-v2"]),
         attributes=dict(type="dict"),
         protocol_mappers=dict(type="list", elements="dict", options=protmapper_spec, aliases=["protocolMappers"]),
+        protocol_mappers_behavior=dict(
+            type="str", aliases=["protocolMappersBehavior"], choices=["patch", "idempotent"], default="patch"
+        ),
     )
 
     argument_spec.update(meta_args)
@@ -398,12 +413,14 @@ def main():
     cid = module.params.get("id")
     name = module.params.get("name")
     protocol_mappers = module.params.get("protocol_mappers")
+    protocol_mappers_behavior = module.params.get("protocol_mappers_behavior")
 
     # Filter and map the parameters names that apply to the client scope
     clientscope_params = [
         x
         for x in module.params
-        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm"] and module.params.get(x) is not None
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "protocol_mappers_behavior"]
+        and module.params.get(x) is not None
     ]
 
     # See if it already exists in Keycloak
@@ -430,6 +447,16 @@ def main():
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_clientscope = before_clientscope.copy()
     desired_clientscope.update(changeset)
+    desired_mappers_names = [x["name"] for x in protocol_mappers]
+
+    if protocol_mappers_behavior == "patch":
+        # add exsisting mappers to desired object
+        if "protocolMappers" in before_clientscope:
+            for mapper in before_clientscope["protocolMappers"]:
+                if mapper["name"] not in desired_mappers_names:
+                    if not "protocolMappers" in desired_clientscope:
+                        desired_clientscope["protocolMappers"] = []
+                    desired_clientscope["protocolMappers"].append(mapper)
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_clientscope:
@@ -502,10 +529,17 @@ def main():
                     )
                     if current_protocolmapper is not None:
                         protocol_mapper["id"] = current_protocolmapper["id"]
-                        kc.update_clientscope_protocolmappers(desired_clientscope["id"], protocol_mapper, realm=realm)
+                        kc.update_clientscope_protocolmapper(desired_clientscope["id"], protocol_mapper, realm=realm)
                     # create otherwise
                     else:
                         kc.create_clientscope_protocolmapper(desired_clientscope["id"], protocol_mapper, realm=realm)
+
+            if protocol_mappers_behavior == "idempotent":
+                # check if we need to delete protocol mappers on the server
+                existing_mappers = kc.get_clientscope_protocolmappers(desired_clientscope["id"], realm=realm)
+                for mapper in existing_mappers:
+                    if mapper["name"] not in desired_mappers_names:
+                        kc.delete_clientscope_protocolmapper(desired_clientscope["id"], mapper["id"], realm=realm)
 
             after_clientscope = kc.get_clientscope_by_clientscopeid(desired_clientscope["id"], realm=realm)
 

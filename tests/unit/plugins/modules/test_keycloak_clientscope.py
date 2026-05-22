@@ -25,7 +25,7 @@ def patch_keycloak_api(
     create_clientscope=None,
     update_clientscope=None,
     get_clientscope_protocolmapper_by_name=None,
-    update_clientscope_protocolmappers=None,
+    update_clientscope_protocolmapper=None,
     create_clientscope_protocolmapper=None,
     delete_clientscope=None,
 ):
@@ -65,8 +65,8 @@ def patch_keycloak_api(
                         side_effect=get_clientscope_protocolmapper_by_name,
                     ) as mock_get_clientscope_protocolmapper_by_name:
                         with patch.object(
-                            obj, "update_clientscope_protocolmappers", side_effect=update_clientscope_protocolmappers
-                        ) as mock_update_clientscope_protocolmappers:
+                            obj, "update_clientscope_protocolmapper", side_effect=update_clientscope_protocolmapper
+                        ) as mock_update_clientscope_protocolmapper:
                             with patch.object(
                                 obj, "create_clientscope_protocolmapper", side_effect=create_clientscope_protocolmapper
                             ) as mock_create_clientscope_protocolmapper:
@@ -79,7 +79,7 @@ def patch_keycloak_api(
                                         mock_create_clientscope,
                                         mock_update_clientscope,
                                         mock_get_clientscope_protocolmapper_by_name,
-                                        mock_update_clientscope_protocolmappers,
+                                        mock_update_clientscope_protocolmapper,
                                         mock_create_clientscope_protocolmapper,
                                         mock_delete_clientscope,
                                     )
@@ -164,7 +164,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_create_clientscope,
                     mock_update_clientscope,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
@@ -177,7 +177,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
@@ -212,7 +212,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_create_clientscope,
                     mock_update_clientscope,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
@@ -225,7 +225,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
@@ -260,7 +260,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_create_clientscope,
                     mock_update_clientscope,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
@@ -273,7 +273,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 1)
 
@@ -306,7 +306,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_create_clientscope,
                     mock_update_clientscope,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
@@ -319,7 +319,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
@@ -441,7 +441,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_create_clientscope,
                     mock_update_clientscope,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
@@ -454,7 +454,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
@@ -629,7 +629,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_create_clientscope,
                     mock_update_clientscope,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
@@ -642,7 +642,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 1)
         self.assertEqual(mock_update_clientscope.call_count, 1)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 3)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 3)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 3)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
