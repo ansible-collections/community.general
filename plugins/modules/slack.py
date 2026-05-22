@@ -176,6 +176,13 @@ options:
           - The name of the file as it should appear in Slack.
           - If not provided, the base name of the С(path) will be used.
     version_added: 13.0.0
+  fail_on_file_error:
+    type: bool
+    description:
+      - If V(true), the module will fail if a file is missing or encounters an upload error.
+      - If V(false), the module will issue a warning and continue processing the next file.
+    default: true
+    version_added: 13.0.0
 """
 
 EXAMPLES = r"""
@@ -292,6 +299,7 @@ EXAMPLES = r"""
   community.general.slack:
     token: "xoxb-1234-56789abcdefghijklmnopqrstuvwxyz"
     channel: "channel-id"
+    fail_on_file_error: false # Optional, defaults to true
     # If you want to sent message to channel without threads,
     # you dont need to use msg parameter
     msg: "Here is the file you asked for"
@@ -503,7 +511,7 @@ def do_notify_slack(module, domain, token, payload):
         return {"webhook": "ok"}
 
 
-def upload_slack_files(module, token, channel, files, thread_ts=None):
+def upload_slack_files(module, token, channel, files, thread_ts=None, fail_on_file_error=True):
     if not files:
         return {"ok": False, "msg": "No files provided"}
 
@@ -515,8 +523,12 @@ def upload_slack_files(module, token, channel, files, thread_ts=None):
         f_name = f_item.get("name", os.path.basename(f_path))
 
         if not os.path.exists(f_path):
-            module.warn(f"File {f_path} not found, skipping.")
-            continue
+            error_msg = f"File {f_path} not found."
+            if fail_on_file_error:
+                module.fail_json(msg=error_msg)
+            else:
+                module.warn(f"{error_msg} Skipping.")
+                continue
 
         file_size = os.path.getsize(f_path)
         url_get = f"https://slack.com/api/files.getUploadURLExternal?filename={f_name}&length={file_size}"
@@ -604,6 +616,7 @@ def main():
             blocks=dict(type="list", elements="dict"),
             message_id=dict(type="str"),
             prepend_hash=dict(type="str", choices=["always", "never", "auto"], default="never"),
+            fail_on_file_error=dict(type="bool", default=True),
             files=dict(
                 type="list",
                 elements="dict",
@@ -631,6 +644,7 @@ def main():
     blocks = module.params["blocks"]
     message_id = module.params["message_id"]
     prepend_hash = module.params["prepend_hash"]
+    fail_on_file_error = module.params["fail_on_file_error"]
     files = module.params["files"]
     is_webhook = re.match(r"^T[A-Z0-9]+/B[A-Z0-9]+/[A-Za-z0-9]+$", token)
     is_api_token = re.match(r"^xox[bpa]-", token)
@@ -696,7 +710,7 @@ def main():
         target_channel = slack_response.get("channel") or channel
         target_thread = slack_response.get("ts") or thread_id
 
-        file_upload_res = upload_slack_files(module, token, target_channel, files, thread_ts=target_thread)
+        file_upload_res = upload_slack_files(module, token, target_channel, files, thread_ts=target_thread, fail_on_file_error=fail_on_file_error)
 
         # If sending only files, overall success depends on the upload result
         if not has_message_content:
