@@ -1,0 +1,4 @@
+---
+gitlab_api_token: glpat-XXXXXXXXXXXXXXXXXXXX
+gitlab_api_url: https://gitlab.com
+gitlab_project_name: ansible_test_project
