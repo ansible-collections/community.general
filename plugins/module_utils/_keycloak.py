@@ -1415,20 +1415,17 @@ class KeycloakAPI:
             self.fail_request(e, msg=f"Unable to delete clientscope {cid}: {e}")
 
     def get_clientscope_protocolmappers(self, cid, realm: str = "master"):
-        """Fetch the name and ID of all clientscopes on the Keycloak server.
-
-        To fetch the full data of the group, make a subsequent call to
-        get_clientscope_by_clientscopeid, passing in the ID of the group you wish to return.
+        """Fetch all protocolmappers in the clientscope.
 
         :param cid: id of clientscope (not name).
         :param realm: Realm in which the clientscope resides; default 'master'.
-        :return The protocolmappers of this realm (default "master")
+        :return The protocolmappers of this clientscope
         """
         protocolmappers_url = URL_CLIENTSCOPE_PROTOCOLMAPPERS.format(id=cid, url=self.baseurl, realm=realm)
         try:
             return self._request_and_deserialize(protocolmappers_url, method="GET")
         except Exception as e:
-            self.fail_request(e, msg=f"Could not fetch list of protocolmappers in realm {realm}: {e}")
+            self.fail_request(e, msg=f"Could not fetch list of protocolmappers for client {cid} in realm {realm}: {e}")
 
     def get_clientscope_protocolmapper_by_protocolmapperid(self, pid, cid, realm: str = "master"):
         """Fetch a keycloak clientscope from the provided realm using the clientscope's unique ID.
@@ -1437,7 +1434,7 @@ class KeycloakAPI:
 
         gid is a UUID provided by the Keycloak API
 
-        :param cid: UUID of the protocolmapper to be returned
+        :param pid: UUID of the protocolmapper to be returned
         :param cid: UUID of the clientscope to be returned
         :param realm: Realm in which the clientscope resides; default 'master'.
         """
@@ -1492,8 +1489,8 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(e, msg=f"Could not create protocolmapper {mapper_rep['name']} in realm {realm}: {e}")
 
-    def update_clientscope_protocolmappers(self, cid, mapper_rep, realm: str = "master"):
-        """Update an existing clientscope.
+    def update_clientscope_protocolmapper(self, cid, mapper_rep, realm: str = "master"):
+        """Update an existing protocolmappe.
 
         :param cid: Id of the clientscope.
         :param mapper_rep: A ProtocolMapperRepresentation of the updated protocolmapper.
@@ -1509,6 +1506,21 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(
                 e, msg=f"Could not update protocolmappers for clientscope {mapper_rep} in realm {realm}: {e}"
+            )
+
+    def delete_clientscope_protocolmapper(self, cid, pid, realm: str = "master"):
+        """Delete an existing protocolmapper.
+
+        :param cid: UUID of the clientscope
+        :param pid: UUID of the protocolmapper to be deleted
+        :return HTTPResponse object on success
+        """
+        protocolmapper_url = URL_CLIENTSCOPE_PROTOCOLMAPPER.format(url=self.baseurl, realm=realm, id=cid, mapper_id=pid)
+        try:
+            return self._request(protocolmapper_url, method="DELETE")
+        except Exception as e:
+            self.fail_request(
+                e, msg=f"Could not delete protocolmappers {pid} for clientscope {cid} in realm {realm}: {e}"
             )
 
     def get_default_clientscopes(self, realm, client_id=None):
