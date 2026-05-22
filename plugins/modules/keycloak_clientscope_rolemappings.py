@@ -274,6 +274,5 @@ def main():
         result["msg"] = f"Clientscope scope mappings for {clientscope_id} have been deleted"
     module.exit_json(**result)
 
-
 if __name__ == "__main__":
     main()
