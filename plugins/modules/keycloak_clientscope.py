@@ -432,6 +432,8 @@ def main():
     if before_clientscope is None:
         before_clientscope = {}
 
+    before_mappers = before_clientscope["protocolMappers"] if "protocolMappers" in before_clientscope else []
+
     # Build a proposed changeset from parameters given to this module
     changeset = {}
 
@@ -447,16 +449,15 @@ def main():
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
     desired_clientscope = before_clientscope.copy()
     desired_clientscope.update(changeset)
-    desired_mappers_names = [x["name"] for x in protocol_mappers]
+    desired_mappers_names = [x["name"] for x in protocol_mappers] if protocol_mappers else []
 
     if protocol_mappers_behavior == "patch":
         # add exsisting mappers to desired object
-        if "protocolMappers" in before_clientscope:
-            for mapper in before_clientscope["protocolMappers"]:
-                if mapper["name"] not in desired_mappers_names:
-                    if not "protocolMappers" in desired_clientscope:
-                        desired_clientscope["protocolMappers"] = []
-                    desired_clientscope["protocolMappers"].append(mapper)
+        for mapper in before_mappers:
+            if mapper["name"] not in desired_mappers_names:
+                if not "protocolMappers" in desired_clientscope:
+                    desired_clientscope["protocolMappers"] = []
+                desired_clientscope["protocolMappers"].append(mapper)
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_clientscope:
@@ -536,9 +537,9 @@ def main():
 
             if protocol_mappers_behavior == "idempotent":
                 # check if we need to delete protocol mappers on the server
-                existing_mappers = kc.get_clientscope_protocolmappers(desired_clientscope["id"], realm=realm)
-                for mapper in existing_mappers:
+                for mapper in before_mappers:
                     if mapper["name"] not in desired_mappers_names:
+                        # raise Exception(mapper)
                         kc.delete_clientscope_protocolmapper(desired_clientscope["id"], mapper["id"], realm=realm)
 
             after_clientscope = kc.get_clientscope_by_clientscopeid(desired_clientscope["id"], realm=realm)
