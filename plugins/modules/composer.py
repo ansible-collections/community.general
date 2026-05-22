@@ -245,13 +245,10 @@ def get_config_files(module):
 
 def hash_config_files(module, files):
     """Return a dict mapping file path to its sha256 hash (or None if the file does not exist)."""
-    hashes = {}
-    for f in files:
-        if os.path.isfile(f):
-            hashes[f] = module.sha256(f)
-        else:
-            hashes[f] = None
-    return hashes
+    return {
+        f: (module.sha256(f) if os.path.isfile(f) else None) 
+        for f in files
+    } 
 
 
 def main():
