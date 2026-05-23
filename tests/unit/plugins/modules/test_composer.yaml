@@ -64,6 +64,22 @@ test_cases:
       run_command:
         - *help_create_project
 
+  - id: composer_as_root
+    input:
+      command: install
+      working_dir: "/var/www/foo"
+    output:
+      changed: true
+    mocks:
+      os_getuid:
+        return_value: 0
+      run_command:
+        - *help_install
+        - command: ["/testbin/php", "/testbin/composer", "install", "--working-dir", "/var/www/foo"]
+          rc: 0
+          out: ''
+          err: ''
+
   - id: create_project_force
     input:
       command: create-project
