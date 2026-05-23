@@ -156,9 +156,9 @@ options:
     description:
       - A list of files to be uploaded to Slack.
       - >
-        Each list item should be a dictionary containing O(files.path)
+        Each list item should be a dictionary containing O(files[].path)
         (absolute or relative path to the file) and optionally
-        O(files.name) (the filename as it will appear in Slack).
+        O(files[].name) (the filename as it will appear in Slack).
       - If O(msg), O(attachments), or O(blocks) are provided, the files are attached as a reply to that message (creating a thread).
       - If no message content is provided, the files are uploaded as a standalone post in the specified O(channel).
       - "Note: File uploading requires a WebAPI token (starting with V(xoxb-) or V(xoxp-))."
@@ -710,7 +710,9 @@ def main():
         target_channel = slack_response.get("channel") or channel
         target_thread = slack_response.get("ts") or thread_id
 
-        file_upload_res = upload_slack_files(module, token, target_channel, files, thread_ts=target_thread, fail_on_file_error=fail_on_file_error)
+        file_upload_res = upload_slack_files(
+            module, token, target_channel, files, thread_ts=target_thread, fail_on_file_error=fail_on_file_error
+        )
 
         # If sending only files, overall success depends on the upload result
         if not has_message_content:
