@@ -617,7 +617,105 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
+802-3-ethernet.mtu:                     auto
 bond.options:                           mode=active-backup,primary=non_existent_primary,xmit_hash_policy=layer3+4
+"""
+
+TESTCASE_BOND_ARP = [
+    {
+        "type": "bond",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "bond_non_existant",
+        "mode": "active-backup",
+        "arp_interval": 100,
+        "arp_ip_target": "192.168.1.1",
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_BOND_ARP_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              bond_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            auto
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+802-3-ethernet.mtu:                     auto
+bond.options:                           mode=active-backup,arp_interval=100,arp_ip_target=192.168.1.1
+"""
+
+TESTCASE_BOND_ARP_MODIFY = [
+    {
+        "type": "bond",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "bond_non_existant",
+        "mode": "active-backup",
+        "arp_interval": 200,
+        "arp_ip_target": "192.168.1.1",
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_BOND_ARP_TARGET_MODIFY = [
+    {
+        "type": "bond",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "bond_non_existant",
+        "mode": "active-backup",
+        "arp_interval": 100,
+        "arp_ip_target": "192.168.1.2",
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_BOND_ARP_CHECK_MODE = [
+    {
+        "type": "bond",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "bond_non_existant",
+        "mode": "active-backup",
+        "arp_interval": 100,
+        "arp_ip_target": "192.168.1.1",
+        "state": "present",
+        "_ansible_check_mode": True,
+    }
+]
+
+TESTCASE_BOND_ARP_ZERO = [
+    {
+        "type": "bond",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "bond_non_existant",
+        "mode": "active-backup",
+        "arp_interval": 0,
+        "arp_ip_target": "192.168.1.1",
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_BOND_ARP_ZERO_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              bond_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            auto
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+802-3-ethernet.mtu:                     auto
+bond.options:                           mode=active-backup,arp_interval=0,arp_ip_target=192.168.1.1
 """
 
 TESTCASE_BRIDGE = [
@@ -1720,6 +1818,29 @@ def mocked_bond_connection_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_bond_arp_connection_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BOND_ARP_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_bond_arp_zero_connection_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BOND_ARP_ZERO_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_bond_arp_connection_modify(mocker):
+    mocker_set(
+        mocker,
+        connection_exists=True,
+        execute_return=None,
+        execute_side_effect=(
+            (0, TESTCASE_BOND_ARP_SHOW_OUTPUT, ""),
+            (0, "", ""),
+        ),
+    )
+
+
+@pytest.fixture
 def mocked_bridge_connection_unchanged(mocker):
     mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BRIDGE_SHOW_OUTPUT, ""))
 
@@ -2142,7 +2263,6 @@ def test_bond_connection_create(mocked_generic_connection_create, capfd):
     assert results["changed"]
 
 
-@pytest.mark.skip(reason="Currently broken")  # TODO: fix me!
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND, indirect=["patch_ansible_module"])
 def test_bond_connection_unchanged(mocked_bond_connection_unchanged, capfd):
     """
@@ -2155,6 +2275,152 @@ def test_bond_connection_unchanged(mocked_bond_connection_unchanged, capfd):
     results = json.loads(out)
     assert not results.get("failed")
     assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP, indirect=["patch_ansible_module"])
+def test_bond_arp_connection_unchanged(mocked_bond_arp_connection_unchanged):
+    """
+    Regression test for #11588:
+    Bond ARP options must not be reported as changed when already configured.
+    """
+    module = nmcli.create_module()
+    nmcli_module = nmcli.Nmcli(module)
+
+    changed, diff = nmcli_module.is_connection_changed()
+
+    mismatches = {
+        key: (diff["before"][key], diff["after"][key])
+        for key in diff["before"]
+        if diff["before"][key] != diff["after"][key]
+    }
+    assert not changed, f"unexpected changes: {mismatches}"
+    assert diff["before"]["arp_interval"] == "100"
+    assert diff["after"]["arp_interval"] == "100"
+    assert diff["before"]["arp_ip_target"] == "192.168.1.1"
+    assert diff["after"]["arp_ip_target"] == "192.168.1.1"
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP, indirect=["patch_ansible_module"])
+def test_bond_arp_connection_unchanged_main(mocked_bond_arp_connection_unchanged, capfd):
+    """
+    Regression test for #11588 via main():
+    Second run of a bond with ARP options must report changed=false.
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP_ZERO, indirect=["patch_ansible_module"])
+def test_bond_arp_interval_zero_unchanged(mocked_bond_arp_zero_connection_unchanged):
+    """
+    arp_interval=0 is a valid value and must not be treated as unset.
+    """
+    module = nmcli.create_module()
+    nmcli_module = nmcli.Nmcli(module)
+
+    changed, diff = nmcli_module.is_connection_changed()
+
+    assert not changed
+    assert diff["before"]["arp_interval"] == "0"
+    assert diff["after"]["arp_interval"] == "0"
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP_MODIFY, indirect=["patch_ansible_module"])
+def test_bond_arp_connection_changed(mocked_bond_arp_connection_unchanged):
+    """
+    When ARP interval differs from the existing connection, a change must be reported.
+    """
+    module = nmcli.create_module()
+    nmcli_module = nmcli.Nmcli(module)
+
+    changed, diff = nmcli_module.is_connection_changed()
+
+    assert changed
+    assert diff["before"]["arp_interval"] == "100"
+    assert diff["after"]["arp_interval"] == "200"
+    assert diff["before"]["arp_ip_target"] == diff["after"]["arp_ip_target"] == "192.168.1.1"
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP_TARGET_MODIFY, indirect=["patch_ansible_module"])
+def test_bond_arp_ip_target_changed(mocked_bond_arp_connection_unchanged):
+    """
+    When only arp_ip_target differs from the existing connection, a change must be reported.
+    """
+    module = nmcli.create_module()
+    nmcli_module = nmcli.Nmcli(module)
+
+    changed, diff = nmcli_module.is_connection_changed()
+
+    assert changed
+    assert diff["before"]["arp_interval"] == diff["after"]["arp_interval"] == "100"
+    assert diff["before"]["arp_ip_target"] == "192.168.1.1"
+    assert diff["after"]["arp_ip_target"] == "192.168.1.2"
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP_CHECK_MODE, indirect=["patch_ansible_module"])
+def test_bond_arp_connection_unchanged_check_mode(mocked_bond_arp_connection_unchanged, capfd):
+    """
+    Check mode must not report changed when bond ARP options already match.
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP_MODIFY, indirect=["patch_ansible_module"])
+def test_bond_arp_connection_modify(mocked_bond_arp_connection_modify, capfd):
+    """
+    Test : Bond connection modify uses bond.options syntax for ARP options
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 2
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    modify_args, modify_kw = arg_list[1]
+
+    modify_args_text = [to_text(x) for x in modify_args[0]]
+    assert modify_args[0][2] == "modify"
+    assert "+bond.options" in modify_args_text
+    assert "arp_interval=200" in modify_args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP, indirect=["patch_ansible_module"])
+def test_bond_arp_connection_create(mocked_generic_connection_create, capfd):
+    """
+    Test : Bond connection with ARP options created via bond.options syntax
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    args_text = [to_text(x) for x in args[0]]
+    assert "+bond.options" in args_text
+    assert "arp_interval=100" in args_text
+    assert "arp_ip_target=192.168.1.1" in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
 
 
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_GENERIC, indirect=["patch_ansible_module"])
