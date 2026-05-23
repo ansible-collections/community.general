@@ -15,7 +15,6 @@ from ansible_collections.community.general.plugins.modules import onepassword_in
 
 from .uthelper import RunCommandMock, TestCaseMock, UTHelper
 
-
 ITEM_JSON = json.dumps(
     {
         "fields": [
