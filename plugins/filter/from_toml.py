@@ -11,7 +11,7 @@ import tomllib
 from ansible.errors import AnsibleFilterError
 
 
-def from_toml(value: t.LiteralString) -> Mapping:
+def from_toml(value: t.Any) -> Mapping:
     if not isinstance(value, str):
         raise AnsibleFilterError("from_toml only accepts strings.")
     return tomllib.loads(value)
