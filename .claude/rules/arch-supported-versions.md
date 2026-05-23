@@ -1,3 +1,9 @@
+<!--
+Copyright (c) Ansible Project
+GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # Architecture and Supported Versions
 
 - Ansible architecture prescribes a controller node, where the Ansible CLI commands are executed, and target nodes, where the Ansible tasks are executed.
