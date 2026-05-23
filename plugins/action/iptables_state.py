@@ -202,8 +202,8 @@ class ActionModule(ActionBase):
                 async_status_args["mode"] = "cleanup"
                 self._async_result(async_status_args, task_vars, 0)
 
-        if not wrap_async:
-            # remove a temporary path we created
-            self._remove_tmp_path(self._connection._shell.tmpdir)
+            if not wrap_async:
+                # remove a temporary path we created
+                self._remove_tmp_path(self._connection._shell.tmpdir)
 
         return result
