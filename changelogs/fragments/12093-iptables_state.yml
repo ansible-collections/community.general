@@ -1,0 +1,2 @@
+bugfixes:
+  - "iptables_state - refactor code to avoid unnecessary unused variables and improve internal state handling (https://github.com/ansible-collections/community.general/pull/12093)."
