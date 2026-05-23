@@ -148,11 +148,7 @@ class ActionModule(ActionBase):
             # 2. Reset connection to ensure a persistent one will not be reused.
             # 3. Confirm the restored state by removing the backup on the remote.
             #    Retrieve the results of the asynchronous task to return them.
-            if "_back" in module_args:
-                # If _back is there, the following two are defined:
-                assert starter_cmd is not None
-                assert confirm_cmd is not None
-
+            if starter_cmd is not None and confirm_cmd is not None:
                 async_status_args["jid"] = result.get("ansible_job_id", None)
                 if async_status_args["jid"] is None:
                     raise AnsibleActionFail("Unable to get 'ansible_job_id'.")
