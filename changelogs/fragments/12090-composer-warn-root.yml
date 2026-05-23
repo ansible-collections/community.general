@@ -1,0 +1,4 @@
+minor_changes:
+  - composer - emit a warning when running as root, pointing to ``COMPOSER_ALLOW_SUPERUSER``
+    (https://github.com/ansible-collections/community.general/issues/2388,
+    https://github.com/ansible-collections/community.general/pull/12090).
