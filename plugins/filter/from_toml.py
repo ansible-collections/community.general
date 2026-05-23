@@ -5,12 +5,13 @@
 from __future__ import annotations
 
 import typing as t
+from collections.abc import Mapping
 
 import tomllib
 from ansible.errors import AnsibleFilterError
 
 
-def from_toml(value: t.LiteralString) -> t.Mapping:
+def from_toml(value: t.LiteralString) -> Mapping:
     if not isinstance(value, str):
         raise AnsibleFilterError("from_toml only accepts strings.")
     return tomllib.loads(value)
