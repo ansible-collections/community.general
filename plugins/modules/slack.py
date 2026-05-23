@@ -519,8 +519,8 @@ def upload_slack_files(module, token, channel, files, thread_ts=None, fail_on_fi
     headers = {"Authorization": f"Bearer {token}"}
 
     for f_item in files:
-        f_path = f_item.get("path")
-        f_name = f_item.get("name", os.path.basename(f_path))
+        f_path = f_item["path"]
+        f_name = f_item["name"] or os.path.basename(f_path)
 
         if not os.path.exists(f_path):
             error_msg = f"File {f_path} not found."
