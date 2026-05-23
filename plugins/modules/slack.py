@@ -156,13 +156,13 @@ options:
     description:
       - A list of files to be uploaded to Slack.
       - >
-        Each list item should be a dictionary containing C(path)
+        Each list item should be a dictionary containing O(files.path)
         (absolute or relative path to the file) and optionally
-        C(name) (the filename as it will appear in Slack).
-      - If O(msg), O(attachments), or O(blocks) are provided, the files will be attached as a reply to that message (creating a thread).
-      - If no message content is provided, the files will be uploaded as a standalone post in the specified O(channel).
+        O(files.name) (the filename as it will appear in Slack).
+      - If O(msg), O(attachments), or O(blocks) are provided, the files are attached as a reply to that message (creating a thread).
+      - If no message content is provided, the files are uploaded as a standalone post in the specified O(channel).
       - "Note: File uploading requires a WebAPI token (starting with V(xoxb-) or V(xoxp-))."
-      - "It will not work with standard Incoming Webhook URLs (the ones with tokens like V(T.../B.../...) )."
+      - "It does not work with standard Incoming Webhook URLs (the ones with tokens like V(T.../B.../...) )."
       - The app must have C(files:write) and C(chat:write) scopes in your Slack App settings and must be invited to the channel.
     suboptions:
       path:
@@ -175,14 +175,14 @@ options:
         description:
           - The name of the file as it should appear in Slack.
           - If not provided, the base name of the С(path) will be used.
-    version_added: 13.0.0
+    version_added: 13.1.0
   fail_on_file_error:
     type: bool
     description:
-      - If V(true), the module will fail if a file is missing or encounters an upload error.
-      - If V(false), the module will issue a warning and continue processing the next file.
+      - If V(true), the module fails if a file is missing or encounters an upload error.
+      - If V(false), the module issues a warning and continue processing the next file.
     default: true
-    version_added: 13.0.0
+    version_added: 13.1.0
 """
 
 EXAMPLES = r"""
