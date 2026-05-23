@@ -90,7 +90,7 @@ def test_get_token_signin(mocker, capfd):
         with pytest.raises(SystemExit):
             onepassword_info.main()
 
-    out, _ = capfd.readouterr()
+    out, dummy = capfd.readouterr()
     result = json.loads(out)
     assert not result.get("failed"), result.get("msg")
     assert result["onepassword"]["My Item"]["password"] == "secret123"
@@ -130,7 +130,7 @@ def test_full_login(mocker, capfd):
         with pytest.raises(SystemExit):
             onepassword_info.main()
 
-    out, _ = capfd.readouterr()
+    out, dummy = capfd.readouterr()
     result = json.loads(out)
     assert not result.get("failed"), result.get("msg")
     assert result["onepassword"]["My Item"]["password"] == "secret123"
