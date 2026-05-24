@@ -7,4 +7,4 @@ ruff
 antsibull-nox
 pre-commit
 ansible-core
-andebox
+andebox>=2.0.0
