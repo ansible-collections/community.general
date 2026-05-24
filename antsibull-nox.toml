@@ -16,7 +16,6 @@ stable_branches = [ "stable-*" ]
 [sessions]
 
 [sessions.lint]
-code_files = ["."]  # consider all Python files in the collection
 run_isort = false
 run_black = false
 run_ruff_autofix = true
