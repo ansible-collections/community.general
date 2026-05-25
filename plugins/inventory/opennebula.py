@@ -90,12 +90,19 @@ except ImportError:
     HAS_PYONE = False
 
 import os
-from collections import namedtuple
+from dataclasses import dataclass
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 
 from ansible_collections.community.general.plugins.plugin_utils._unsafe import make_unsafe
+
+
+@dataclass
+class AuthParams:
+    url: str
+    username: str
+    password: str
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable):
@@ -126,9 +133,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             except Exception as e:
                 raise AnsibleError(f"Error occurs when reading ONE_AUTH file at '{authfile}'") from e
 
-        auth_params = namedtuple("auth", ("url", "username", "password"))
-
-        return auth_params(url=url, username=username, password=password)
+        return AuthParams(url=url, username=username, password=password)
 
     def _get_vm_ipv4(self, vm):
         nic = vm.TEMPLATE.get("NIC")

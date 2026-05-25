@@ -88,6 +88,7 @@ running:
 
 import json
 import typing as t
+from dataclasses import dataclass
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -97,16 +98,15 @@ from ansible_collections.community.general.plugins.module_utils._homebrew import
 )
 
 
-# Stores validated arguments for an instance of an action.
-# See DOCUMENTATION string for argument-specific information.
-class HomebrewServiceArgs(t.NamedTuple):
+@dataclass
+class HomebrewServiceArgs:
     name: str
     state: str
     brew_path: str
 
 
-# Stores the state of a Homebrew service.
-class HomebrewServiceState(t.NamedTuple):
+@dataclass
+class HomebrewServiceState:
     running: bool
     pid: int | None
 

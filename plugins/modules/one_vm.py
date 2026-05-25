@@ -688,12 +688,20 @@ import copy
 import os
 import re
 import time
-from collections import namedtuple
+from dataclasses import dataclass
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
 
 from ansible_collections.community.general.plugins.module_utils._opennebula import flatten, render
+
+
+@dataclass
+class AuthParams:
+    url: str
+    username: str
+    password: str
+
 
 # Updateconf attributes documentation: https://docs.opennebula.io/6.10/integration_and_development/system_interfaces/api.html#one-vm-updateconf
 UPDATECONF_ATTRIBUTES = {
@@ -1632,9 +1640,7 @@ def get_connection_info(module):
     if not url:
         module.fail_json(msg="Opennebula API url (api_url) is not specified")
 
-    auth_params = namedtuple("auth", ("url", "username", "password"))
-
-    return auth_params(url=url, username=username, password=password)
+    return AuthParams(url=url, username=username, password=password)
 
 
 def main():
