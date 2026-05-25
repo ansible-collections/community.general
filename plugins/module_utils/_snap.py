@@ -47,6 +47,8 @@ def snap_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             options=cmd_runner_fmt.as_list(),
             info=cmd_runner_fmt.as_fixed("info"),
             revision=cmd_runner_fmt.as_opt_val("--revision"),
+            hold=cmd_runner_fmt.as_bool("--hold"),
+            unhold=cmd_runner_fmt.as_bool("--unhold"),
             dangerous=cmd_runner_fmt.as_bool("--dangerous"),
             devmode=cmd_runner_fmt.as_bool("--devmode"),
             version=cmd_runner_fmt.as_fixed("version"),
