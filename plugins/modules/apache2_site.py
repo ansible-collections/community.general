@@ -16,7 +16,7 @@ description:
   - Uses C(a2ensite) and C(a2dissite) under the hood.
 version_added: 13.1.0
 notes:
-  - This module is only available on Debian/Ubuntu-based systems,
+  - This module is only supported on Debian/Ubuntu-based systems,
     as it depends on C(a2ensite) and C(a2dissite).
 extends_documentation_fragment:
   - community.general._attributes
