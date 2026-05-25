@@ -92,7 +92,9 @@ options:
     description:
       - Install a specific revision of the snap.
       - This option can only be specified if there is a single snap in the task.
-      - Mutually exclusive with O(channel). Installing a specific revision pins the snap and disables automatic updates.
+      - Mutually exclusive with O(channel).
+      - When a specific revision is set, the snap is held (C(snap refresh --hold)) to prevent automatic updates from
+        overriding the pinned revision.
       - See U(https://snapcraft.io/docs/revisions) for more details about snap revisions.
     type: int
     version_added: 13.0.0
@@ -153,7 +155,7 @@ EXAMPLES = r"""
     name: foo
     channel: latest/edge
 
-# Install a specific revision of a snap
+# Install a specific revision of a snap (automatically held to prevent auto-updates)
 - name: Install revision 481 of "helm"
   community.general.snap:
     name: helm
@@ -224,10 +226,11 @@ class Snap(StateModuleHelper):
     CHANNEL_MISMATCH = 1
     INSTALLED = 2
     REVISION_MISMATCH = 3
+    HOLD_MISMATCH = 4
 
     __disable_re = re.compile(r"(?:\S+\s+){5}(?P<notes>\S+)")
     __set_param_re = re.compile(r"(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)")
-    __list_re = re.compile(r"^(?P<name>\S+)\s+\S+\s+(?P<rev>\S+)\s+(?P<channel>\S+)")
+    __list_re = re.compile(r"^(?P<name>\S+)\s+\S+\s+(?P<rev>\S+)\s+(?P<channel>\S+)\s+\S+\s+(?P<notes>\S+)")
     module = dict(
         argument_spec={
             "name": dict(type="list", elements="str", required=True),
@@ -403,24 +406,30 @@ class Snap(StateModuleHelper):
         return [s if s in _VIRTUAL_SNAPS else next(real_name_iter) for s in snaps]
 
     def snap_status(self, snap_name, channel, revision=None):
+        should_be_held = revision is not None
+
         def _status_check(name, channel, revision, installed):
             if name in _VIRTUAL_SNAPS:
                 return Snap.INSTALLED
-            match = [(r, c) for n, r, c in installed if n == name]
+            match = [(r, c, notes) for n, r, c, notes in installed if n == name]
             if not match:
                 return Snap.NOT_INSTALLED
-            installed_rev, installed_channel = match[0]
+            installed_rev, installed_channel, installed_notes = match[0]
             if revision is not None and str(revision) != installed_rev:
                 return Snap.REVISION_MISMATCH
             if channel and installed_channel not in (channel, f"latest/{channel}"):
                 return Snap.CHANNEL_MISMATCH
+            if should_be_held:
+                is_held = "held" in installed_notes.split(",")
+                if not is_held:
+                    return Snap.HOLD_MISMATCH
             return Snap.INSTALLED
 
         with self.runner("_list") as ctx:
             rc, out, err = ctx.run(check_rc=True)
         list_out = out.split("\n")[1:]
         list_out = [self.__list_re.match(x) for x in list_out]
-        list_out = [(m.group("name"), m.group("rev"), m.group("channel")) for m in list_out if m]
+        list_out = [(m.group("name"), m.group("rev"), m.group("channel"), m.group("notes")) for m in list_out if m]
         self.vars.status_out = list_out
         self.vars.status_run_info = ctx.run_info
 
@@ -474,6 +483,18 @@ class Snap(StateModuleHelper):
             msg = f"Ooops! Snap installation failed while executing '{self.vars.cmd}', please examine logs and error output for more details."
         self.do_raise(msg=msg)
 
+    def _apply_hold(self, snaps):
+        if not snaps:
+            return
+        self.changed = True
+        if self.check_mode:
+            return
+        for snap_name in snaps:
+            with self.runner("state hold name") as ctx:
+                rc, out, err = ctx.run(state="refresh", hold=True, name=snap_name)
+            if rc != 0:
+                self.do_raise(msg=f"Snap hold failed for '{snap_name}': {err}")
+
     def state_present(self):
         self.vars.set_meta("classic", output=True)
         self.vars.set_meta("channel", output=True)
@@ -489,6 +510,10 @@ class Snap(StateModuleHelper):
         actionable_install = [snap for snap in self.vars.name if self.vars.snap_status_map[snap] == Snap.NOT_INSTALLED]
         if actionable_install:
             self._present(actionable_install)
+
+        if self.vars.revision is not None:
+            hold_mismatch = [snap for snap in self.vars.name if self.vars.snap_status_map[snap] == Snap.HOLD_MISMATCH]
+            self._apply_hold(actionable_install + actionable_refresh + hold_mismatch)
 
         self.set_options()
 
