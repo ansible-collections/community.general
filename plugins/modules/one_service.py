@@ -232,10 +232,18 @@ roles:
 
 import os
 import time
-from collections import namedtuple
+from dataclasses import dataclass
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
+
+
+@dataclass
+class AuthParams:
+    url: str
+    user: str
+    password: str
+
 
 STATES = (
     "PENDING",
@@ -728,9 +736,7 @@ def get_connection_info(module):
         module.fail_json(
             msg="One or more connection parameters (api_url, api_username, api_password) were not specified"
         )
-    auth_params = namedtuple("auth", ("url", "user", "password"))
-
-    return auth_params(url=url, user=username, password=password)
+    return AuthParams(url=url, user=username, password=password)
 
 
 def main():

@@ -275,7 +275,8 @@ EXAMPLES = r"""
 
 import re
 import shlex
-from collections import defaultdict, namedtuple
+from collections import defaultdict
+from dataclasses import dataclass
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -296,7 +297,10 @@ class Package:
         return f'Package("{self.name}", "{self.source}", {self.source_is_URL})'
 
 
-VersionTuple = namedtuple("VersionTuple", ["current", "latest"])
+@dataclass
+class VersionTuple:
+    current: str
+    latest: str
 
 
 class Pacman:
@@ -717,7 +721,7 @@ class Pacman:
             "installed_groups": {groupname: set(pkgnames)},
             "available_pkgs": {pkgname: version},
             "available_groups": {groupname: set(pkgnames)},
-            "upgradable_pkgs": {pkgname: (current_version,latest_version)},
+            "upgradable_pkgs": {pkgname: VersionTuple},
             "pkg_reasons": {pkgname: reason},
         }
 
