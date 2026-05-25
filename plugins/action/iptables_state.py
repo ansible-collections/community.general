@@ -148,11 +148,7 @@ class ActionModule(ActionBase):
             # 2. Reset connection to ensure a persistent one will not be reused.
             # 3. Confirm the restored state by removing the backup on the remote.
             #    Retrieve the results of the asynchronous task to return them.
-            if "_back" in module_args:
-                # If _back is there, the following two are defined:
-                assert starter_cmd is not None
-                assert confirm_cmd is not None
-
+            if starter_cmd is not None and confirm_cmd is not None:
                 async_status_args["jid"] = result.get("ansible_job_id", None)
                 if async_status_args["jid"] is None:
                     raise AnsibleActionFail("Unable to get 'ansible_job_id'.")
@@ -164,7 +160,7 @@ class ActionModule(ActionBase):
                 # The module is aware to not process the main iptables-restore
                 # command before finding (and deleting) the 'starter' cookie on
                 # the host, so the previous query will not reach ssh timeout.
-                dummy = self._low_level_execute_command(starter_cmd, sudoable=self.DEFAULT_SUDOABLE)
+                self._low_level_execute_command(starter_cmd, sudoable=self.DEFAULT_SUDOABLE)
 
                 # As the main command is not yet executed on the target, here
                 # 'finished' means 'failed before main command be executed'.
@@ -174,7 +170,7 @@ class ActionModule(ActionBase):
                     except AttributeError:
                         pass
 
-                    for dummy2 in range(max_timeout):
+                    for dummy in range(max_timeout):
                         time.sleep(1)
                         remaining_time -= 1
                         # - AnsibleConnectionFailure covers rejected requests (i.e.
@@ -182,7 +178,7 @@ class ActionModule(ActionBase):
                         # - ansible_timeout is able to cover dropped requests (due
                         #   to a rule or policy DROP) if not lower than async_val.
                         try:
-                            dummy3 = self._low_level_execute_command(confirm_cmd, sudoable=self.DEFAULT_SUDOABLE)
+                            self._low_level_execute_command(confirm_cmd, sudoable=self.DEFAULT_SUDOABLE)
                             break
                         except AnsibleConnectionFailure:
                             continue
@@ -200,10 +196,10 @@ class ActionModule(ActionBase):
                             del result["invocation"]["module_args"][key]
 
                 async_status_args["mode"] = "cleanup"
-                dummy4 = self._async_result(async_status_args, task_vars, 0)
+                self._async_result(async_status_args, task_vars, 0)
 
-        if not wrap_async:
-            # remove a temporary path we created
-            self._remove_tmp_path(self._connection._shell.tmpdir)
+            if not wrap_async:
+                # remove a temporary path we created
+                self._remove_tmp_path(self._connection._shell.tmpdir)
 
         return result
