@@ -721,7 +721,7 @@ class Pacman:
             "installed_groups": {groupname: set(pkgnames)},
             "available_pkgs": {pkgname: version},
             "available_groups": {groupname: set(pkgnames)},
-            "upgradable_pkgs": {pkgname: (current_version,latest_version)},
+            "upgradable_pkgs": {pkgname: VersionTuple},
             "pkg_reasons": {pkgname: reason},
         }
 
