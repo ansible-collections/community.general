@@ -60,6 +60,23 @@
     that:
       - "'held' in snap_list_after_switch.stdout"
 
+- name: Run bare snap refresh to verify hold prevents auto-update
+  ansible.builtin.command: snap refresh
+  register: bare_snap_refresh
+  changed_when: false
+  failed_when: false
+
+- name: Verify snap is still at revision 45 after bare snap refresh
+  ansible.builtin.command: snap list uhttpd
+  register: snap_list_after_bare_refresh
+  changed_when: false
+
+- name: Assert snap did not update past the held revision
+  assert:
+    that:
+      - "'45' in snap_list_after_bare_refresh.stdout"
+      - "'held' in snap_list_after_bare_refresh.stdout"
+
 - name: Remove package (uhttpd)
   community.general.snap:
     name: uhttpd

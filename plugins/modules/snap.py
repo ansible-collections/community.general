@@ -95,6 +95,9 @@ options:
       - Mutually exclusive with O(channel).
       - When a specific revision is set, the snap is held (C(snap refresh --hold)) to prevent automatic updates from
         overriding the pinned revision.
+      - "B(Note:) running C(snap refresh <name>) manually bypasses the hold and will update the snap regardless.
+        The hold only prevents snapd's automatic background refreshes.
+        See U(https://snapcraft.io/docs/how-to-guides/manage-snaps/manage-updates/) for details."
       - See U(https://snapcraft.io/docs/revisions) for more details about snap revisions.
     type: int
     version_added: 13.0.0
