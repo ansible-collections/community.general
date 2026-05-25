@@ -2,13 +2,17 @@
 
 **Topics**
 
-- <a href="#v13-0-0">v13\.0\.0</a>
+- <a href="#v13-0-1">v13\.0\.1</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
+    - <a href="#bugfixes">Bugfixes</a>
+- <a href="#v13-0-0">v13\.0\.0</a>
+    - <a href="#release-summary-1">Release Summary</a>
+    - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
-    - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#callback">Callback</a>
         - <a href="#filter">Filter</a>
@@ -16,15 +20,40 @@
 
 This changelog describes changes after version 12\.0\.0\.
 
-<a id="v13-0-0"></a>
-## v13\.0\.0
+<a id="v13-0-1"></a>
+## v13\.0\.1
 
 <a id="release-summary"></a>
 ### Release Summary
 
-This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-05\-18\.
+Bugfix release for inclusion in Ansible 14\.0\.0rc1\.
 
 <a id="minor-changes"></a>
+### Minor Changes
+
+* homebrew\_services \- replace <code>NamedTuple</code> with dataclass \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
+* one\_service \- replace function\-local <code>namedtuple</code> with module\-level dataclass \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
+* one\_vm \- replace function\-local <code>namedtuple</code> with module\-level dataclass \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
+* opennebula inventory plugin \- replace function\-local <code>namedtuple</code> with module\-level dataclass \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
+* pacman \- replace <code>namedtuple</code> with dataclass for <code>VersionTuple</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* iptables\_state \- refactor code to avoid unnecessary unused variables and improve internal state handling \([https\://github\.com/ansible\-collections/community\.general/pull/12093](https\://github\.com/ansible\-collections/community\.general/pull/12093)\)\.
+* nmcli \- fix check/diff reporting changes for bond <code>arp\_interval</code> and <code>arp\_ip\_target</code> options when they are already configured \([https\://github\.com/ansible\-collections/community\.general/issues/11588](https\://github\.com/ansible\-collections/community\.general/issues/11588)\, [https\://github\.com/ansible\-collections/community\.general/pull/12085](https\://github\.com/ansible\-collections/community\.general/pull/12085)\)\.
+* nmcli \- fix incorrectly reports diff for bond connections when <code>mtu</code> is unset and NetworkManager reports no explicit MTU value \([https\://github\.com/ansible\-collections/community\.general/pull/12085](https\://github\.com/ansible\-collections/community\.general/pull/12085)\)\.
+* snap \- enforce <code>snap refresh \-\-hold</code> after installing at a specific revision \([https\://github\.com/ansible\-collections/community\.general/issues/12088](https\://github\.com/ansible\-collections/community\.general/issues/12088)\, [https\://github\.com/ansible\-collections/community\.general/pull/12097](https\://github\.com/ansible\-collections/community\.general/pull/12097)\)\.
+
+<a id="v13-0-0"></a>
+## v13\.0\.0
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-05\-18\.
+
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * ModuleHelper module utils \- allow to ignore specific exceptions in <code>module\_fails\_on\_exception</code> decorator \([https\://github\.com/ansible\-collections/community\.general/pull/11488](https\://github\.com/ansible\-collections/community\.general/pull/11488)\)\.
@@ -667,7 +696,7 @@ This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-
 * spotinst\_aws\_elastigroup \- the module has been removed\. Use <code>spot\.cloud\_modules\.aws\_elastigroup</code> instead \([https\://github\.com/ansible\-collections/community\.general/pull/11834](https\://github\.com/ansible\-collections/community\.general/pull/11834)\)\.
 * typetalk \- the module has been removed \([https\://github\.com/ansible\-collections/community\.general/pull/11834](https\://github\.com/ansible\-collections/community\.general/pull/11834)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * \_filelock module utils \- add type hints\. Fix bug if <code>set\_lock\(\)</code> is called with <code>lock\_timeout\=None</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11222](https\://github\.com/ansible\-collections/community\.general/pull/11222)\)\.

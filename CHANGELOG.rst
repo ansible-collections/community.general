@@ -6,6 +6,31 @@ Community General Release Notes
 
 This changelog describes changes after version 12.0.0.
 
+v13.0.1
+=======
+
+Release Summary
+---------------
+
+Bugfix release for inclusion in Ansible 14.0.0rc1.
+
+Minor Changes
+-------------
+
+- homebrew_services - replace ``NamedTuple`` with dataclass (https://github.com/ansible-collections/community.general/pull/12094).
+- one_service - replace function-local ``namedtuple`` with module-level dataclass (https://github.com/ansible-collections/community.general/pull/12094).
+- one_vm - replace function-local ``namedtuple`` with module-level dataclass (https://github.com/ansible-collections/community.general/pull/12094).
+- opennebula inventory plugin - replace function-local ``namedtuple`` with module-level dataclass (https://github.com/ansible-collections/community.general/pull/12094).
+- pacman - replace ``namedtuple`` with dataclass for ``VersionTuple`` (https://github.com/ansible-collections/community.general/pull/12094).
+
+Bugfixes
+--------
+
+- iptables_state - refactor code to avoid unnecessary unused variables and improve internal state handling (https://github.com/ansible-collections/community.general/pull/12093).
+- nmcli - fix check/diff reporting changes for bond ``arp_interval`` and ``arp_ip_target`` options when they are already configured (https://github.com/ansible-collections/community.general/issues/11588, https://github.com/ansible-collections/community.general/pull/12085).
+- nmcli - fix incorrectly reports diff for bond connections when ``mtu`` is unset and NetworkManager reports no explicit MTU value (https://github.com/ansible-collections/community.general/pull/12085).
+- snap - enforce ``snap refresh --hold`` after installing at a specific revision (https://github.com/ansible-collections/community.general/issues/12088, https://github.com/ansible-collections/community.general/pull/12097).
+
 v13.0.0
 =======
 
