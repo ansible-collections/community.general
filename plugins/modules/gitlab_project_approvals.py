@@ -189,7 +189,9 @@ def main():
     options = {
         "approvals_before_merge": module.params["approvals_before_merge"],
         "reset_approvals_on_push": module.params["reset_approvals_on_push"],
-        "disable_overriding_approvers_per_merge_request": module.params["disable_overriding_approvers_per_merge_request"],
+        "disable_overriding_approvers_per_merge_request": module.params[
+            "disable_overriding_approvers_per_merge_request"
+        ],
         "merge_requests_author_approval": module.params["merge_requests_author_approval"],
         "merge_requests_disable_committers_approval": module.params["merge_requests_disable_committers_approval"],
         "selective_code_owner_removals": module.params["selective_code_owner_removals"],
