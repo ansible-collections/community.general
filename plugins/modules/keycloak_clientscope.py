@@ -150,7 +150,6 @@ options:
       - 'V(idempotent): Make the protocol mappers exactly as specified, adding and removing mappers as needed.'
     aliases:
       - protocolMappersBehavior
-    type: str
     choices: ['patch', 'idempotent']
     default: 'patch'
     type: str
