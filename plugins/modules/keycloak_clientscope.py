@@ -455,7 +455,7 @@ def main():
         # add exsisting mappers to desired object
         for mapper in before_mappers:
             if mapper["name"] not in desired_mappers_names:
-                if not "protocolMappers" in desired_clientscope:
+                if "protocolMappers" not in desired_clientscope:
                     desired_clientscope["protocolMappers"] = []
                 desired_clientscope["protocolMappers"].append(mapper)
 
