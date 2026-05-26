@@ -1085,6 +1085,35 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(e, msg=f"Could not fetch effective rolemappings for user {uid}, realm {realm}: {e}")
 
+    def get_realm_users(self, realm: str = "master") -> dict[str, t.Any] | None:
+        """Obtain list of users from the realm
+
+        :param realm: realm id
+        :return: list of user representations
+        """
+        return self._get_users(username=None, realm=realm)
+
+    def _get_users(self, username, realm: str = "master"):
+        """Get the user with the given username or all users if username=None"""
+        users_url = URL_USERS.format(url=self.baseurl, realm=realm)
+        if username is not None:
+            users_url += f"?username={quote(username, safe='')}&exact=true"
+        try:
+            users = self._request_and_deserialize(users_url, method="GET")
+            if username is None:
+                return users
+
+            for user in users:
+                if user["username"] == username:
+                    return user
+            return None
+        except ValueError as e:
+            self.module.fail_json(
+                msg=f"API returned incorrect JSON when trying to obtain the user for realm {realm} and username {username}: {e}"
+            )
+        except Exception as e:
+            self.fail_request(e, msg=f"Could not obtain the user for realm {realm} and username {username}: {e}")
+
     def get_user_by_username(self, username, realm: str = "master"):
         """Fetch a keycloak user within a realm based on its username.
 
@@ -1092,23 +1121,8 @@ class KeycloakAPI:
         :param username: Username of the user to fetch.
         :param realm: Realm in which the user resides; default 'master'
         """
-        users_url = URL_USERS.format(url=self.baseurl, realm=realm)
-        users_url += f"?username={quote(username, safe='')}&exact=true"
-        try:
-            userrep = None
-            users = self._request_and_deserialize(users_url, method="GET")
-            for user in users:
-                if user["username"] == username:
-                    userrep = user
-                    break
-            return userrep
-
-        except ValueError as e:
-            self.module.fail_json(
-                msg=f"API returned incorrect JSON when trying to obtain the user for realm {realm} and username {username}: {e}"
-            )
-        except Exception as e:
-            self.fail_request(e, msg=f"Could not obtain the user for realm {realm} and username {username}: {e}")
+        self._get_users(username=username, realm=realm)
+      
 
     def get_service_account_user_by_client_id(self, client_id, realm: str = "master"):
         """Fetch a keycloak service account user within a realm based on its client_id.
