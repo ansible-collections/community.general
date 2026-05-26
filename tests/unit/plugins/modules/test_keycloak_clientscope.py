@@ -639,7 +639,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                         "name": "protocol1",
                         "protocol": "openid-connect",
                         "protocolMapper": "oidc-group-membership-mapper",
-                        
                     },
                 ],
             }
@@ -741,7 +740,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                         },
                         "name": "protocol1",
                         "protocolMapper": "oidc-group-membership-mapper",
-                        "id": "a7f19adb-cc58-41b1-94ce-782dc255139b",
+                        "id": "p1",
                     },
                     {
                         "protocol": "openid-connect",
@@ -754,7 +753,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                         },
                         "name": "protocol2",
                         "protocolMapper": "oidc-group-membership-mapper",
-                        "id": "a7f19adb-cc58-41b1-94ce-782dc255139b",
+                        "id": "p2",
                     },
                     {
                         "protocol": "openid-connect",
@@ -767,7 +766,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                         },
                         "name": "protocol3",
                         "protocolMapper": "oidc-group-membership-mapper",
-                        "id": "a7f19adb-cc58-41b1-94ce-782dc255139b",
+                        "id": "p3",
                     },
                 ],
             }
@@ -782,28 +781,14 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     {
                         "config": {
                             "access.token.claim": "true",
-                            "claim.name": "protocol1_updated",
+                            "claim.name": "protocol2_updated",
                             "full.path": "true",
                             "id.token.claim": "false",
                             "userinfo.token.claim": "false",
                         },
                         "consentRequired": "false",
-                        "id": "a7f19adb-cc58-41b1-94ce-782dc255139b",
+                        "id": "p2",
                         "name": "protocol2",
-                        "protocol": "openid-connect",
-                        "protocolMapper": "oidc-group-membership-mapper",
-                    },
-                    {
-                        "config": {
-                            "access.token.claim": "true",
-                            "claim.name": "protocol1_updated",
-                            "full.path": "true",
-                            "id.token.claim": "false",
-                            "userinfo.token.claim": "false",
-                        },
-                        "consentRequired": "false",
-                        "id": "2103a559-185a-40f4-84ae-9ab311d5b812",
-                        "name": "protocol3",
                         "protocol": "openid-connect",
                         "protocolMapper": "oidc-group-membership-mapper",
                     },
@@ -816,13 +801,13 @@ class TestKeycloakAuthentication(ModuleTestCase):
                             "userinfo.token.claim": "false",
                         },
                         "consentRequired": "false",
-                        "id": "bbf6390f-e95f-4c20-882b-9dad328363b9",
+                        "id": "p1",
                         "name": "protocol1",
                         "protocol": "openid-connect",
                         "protocolMapper": "oidc-group-membership-mapper",
                     },
                 ],
-            }
+            },
         ]
 
         changed = True
@@ -833,7 +818,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
             with mock_good_connection():
                 with patch_keycloak_api(
                     get_clientscope_by_name=return_value_get_clientscope_by_name,
-                    get_clientscope_by_clientscopeid=return_value_get_clientscope_by_clientscopeid
+                    get_clientscope_by_clientscopeid=return_value_get_clientscope_by_clientscopeid,
                 ) as (
                     mock_get_clientscope_by_name,
                     mock_get_clientscope_by_clientscopeid,
@@ -854,12 +839,16 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_create_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 1)
         self.assertEqual(mock_update_clientscope.call_count, 1)
-        self.assertEqual(mock_get_clientscope_protocolmappers.call_count, 1)
+        # will not be called, because mock_get_clientscope_protocolmapper_by_name is patched
+        self.assertEqual(mock_get_clientscope_protocolmappers.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 2)
         self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 2)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 1)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
+        
+        # expect "p3" to be deleted
+        mock_delete_clientscope_protocolmapper.assert_called_with(return_value_get_clientscope_by_name[0]["id"], "p3", realm=module_args["realm"])
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]["changed"], changed)
