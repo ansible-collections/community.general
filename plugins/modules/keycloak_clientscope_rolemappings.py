@@ -12,7 +12,7 @@ module: keycloak_clientscope_rolemappings
 short_description: Allows administration of Keycloak clientscope scope mappings to restrict the usage of certain roles to
   specific clientscopes
 
-version_added: 13.0.0
+version_added: 13.1.0
 
 description:
   - This module allows you to add or remove Keycloak roles from clientscopes using the Keycloak REST API. It requires access
@@ -33,7 +33,7 @@ options:
     description:
       - State of the role mapping.
       - On V(present), all roles in O(role_names) are mapped if not exist yet.
-      - On V(absent), all roles mapping in O(role_names) are removed if it exists.
+      - On V(absent), all roles mapping in O(role_names) are removed if they exist.
     default: 'present'
     type: str
     choices:
@@ -56,7 +56,7 @@ options:
     type: str
     description:
       - If the O(role_names) are client roles, the client ID under which it resides.
-      - If this parameter is absent, the roles are considered a realm role.
+      - If this parameter is absent, the roles are considered realm roles.
 
   role_names:
     required: true
