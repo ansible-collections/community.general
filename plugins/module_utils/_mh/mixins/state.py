@@ -16,7 +16,7 @@ class StateMixin:
     default_state: str | None = None
 
     def _state(self) -> str:
-        state: str = self.module.params.get(self.state_param)  # type: ignore[attr-defined]
+        state: str = self.module.params[self.state_param]  # type: ignore[attr-defined]
         return self.default_state if state is None else state
 
     def _method(self, state: str) -> str:

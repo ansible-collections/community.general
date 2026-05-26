@@ -44,10 +44,10 @@ def get_pritunl_settings(module: AnsibleModule) -> dict[str, t.Any]:
     Helper function to set required Pritunl request params from module arguments.
     """
     return {
-        "api_token": module.params.get("pritunl_api_token"),
-        "api_secret": module.params.get("pritunl_api_secret"),
-        "base_url": module.params.get("pritunl_url"),
-        "validate_certs": module.params.get("validate_certs"),
+        "api_token": module.params["pritunl_api_token"],
+        "api_secret": module.params["pritunl_api_secret"],
+        "base_url": module.params["pritunl_url"],
+        "validate_certs": module.params["validate_certs"],
     }
 
 

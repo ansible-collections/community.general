@@ -206,11 +206,11 @@ def _token_request(module_params: dict[str, t.Any], payload: dict[str, t.Any]) -
     base_url = module_params["auth_keycloak_url"]
     if not base_url.lower().startswith(("http", "https")):
         raise KeycloakError(f"auth_url '{base_url}' should either start with 'http' or 'https'.")
-    auth_realm = module_params.get("auth_realm")
+    auth_realm = module_params["auth_realm"]
     auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
-    http_agent = module_params.get("http_agent")
-    validate_certs = module_params.get("validate_certs")
-    connection_timeout = module_params.get("connection_timeout")
+    http_agent = module_params["http_agent"]
+    validate_certs = module_params["validate_certs"]
+    connection_timeout = module_params["connection_timeout"]
 
     try:
         r = json.loads(
@@ -239,10 +239,10 @@ def _request_token_using_credentials(module_params: dict[str, t.Any]) -> str:
     :param module_params: parameters of the module. Must include 'auth_username' and 'auth_password'.
     :return: connection header
     """
-    client_id = module_params.get("auth_client_id")
-    auth_username = module_params.get("auth_username")
-    auth_password = module_params.get("auth_password")
-    client_secret = module_params.get("auth_client_secret")
+    client_id = module_params["auth_client_id"]
+    auth_username = module_params["auth_username"]
+    auth_password = module_params["auth_password"]
+    client_secret = module_params["auth_client_secret"]
 
     temp_payload = {
         "grant_type": "password",
@@ -263,9 +263,9 @@ def _request_token_using_refresh_token(module_params: dict[str, t.Any]) -> str:
     :param module_params: parameters of the module. Must include 'refresh_token'.
     :return: connection header
     """
-    client_id = module_params.get("auth_client_id")
-    refresh_token = module_params.get("refresh_token")
-    client_secret = module_params.get("auth_client_secret")
+    client_id = module_params["auth_client_id"]
+    refresh_token = module_params["refresh_token"]
+    client_secret = module_params["auth_client_secret"]
 
     temp_payload = {
         "grant_type": "refresh_token",
@@ -288,8 +288,8 @@ def _request_token_using_client_credentials(module_params: dict[str, t.Any]) -> 
     and 'auth_client_secret'..
     :return: connection header
     """
-    client_id = module_params.get("auth_client_id")
-    client_secret = module_params.get("auth_client_secret")
+    client_id = module_params["auth_client_id"]
+    client_secret = module_params["auth_client_secret"]
 
     temp_payload = {
         "grant_type": "client_credentials",
@@ -308,12 +308,12 @@ def get_token(module_params: dict[str, t.Any]) -> dict[str, str]:
     :param module_params: parameters of the module
     :return: connection header
     """
-    token = module_params.get("token")
+    token = module_params["token"]
 
     if token is None:
-        auth_client_id = module_params.get("auth_client_id")
-        auth_client_secret = module_params.get("auth_client_secret")
-        auth_username = module_params.get("auth_username")
+        auth_client_id = module_params["auth_client_id"]
+        auth_client_secret = module_params["auth_client_secret"]
+        auth_username = module_params["auth_username"]
         if auth_client_id is not None and auth_client_secret is not None and auth_username is None:
             token = _request_token_using_client_credentials(module_params)
         else:
@@ -388,11 +388,11 @@ class KeycloakAPI:
 
     def __init__(self, module: AnsibleModule, connection_header: dict[str, str]) -> None:
         self.module = module
-        self.baseurl = self.module.params.get("auth_keycloak_url")
-        self.validate_certs = self.module.params.get("validate_certs")
-        self.connection_timeout = self.module.params.get("connection_timeout")
+        self.baseurl = self.module.params["auth_keycloak_url"]
+        self.validate_certs = self.module.params["validate_certs"]
+        self.connection_timeout = self.module.params["connection_timeout"]
         self.restheaders = connection_header
-        self.http_agent = self.module.params.get("http_agent")
+        self.http_agent = self.module.params["http_agent"]
 
     def _request(
         self, url: str, method: str, data: str | bytes | None = None, *, extra_headers: dict[str, str] | None = None
@@ -436,7 +436,7 @@ class KeycloakAPI:
 
         if isinstance(r, Exception):
             # Try to refresh token and retry, if available
-            refresh_token = self.module.params.get("refresh_token")
+            refresh_token = self.module.params["refresh_token"]
             if refresh_token is not None:
                 try:
                     token = _request_token_using_refresh_token(self.module.params)
@@ -450,8 +450,8 @@ class KeycloakAPI:
 
         if isinstance(r, Exception):
             # Try to re-auth with username/password, if available
-            auth_username = self.module.params.get("auth_username")
-            auth_password = self.module.params.get("auth_password")
+            auth_username = self.module.params["auth_username"]
+            auth_password = self.module.params["auth_password"]
             if auth_username is not None and auth_password is not None:
                 token = _request_token_using_credentials(self.module.params)
                 self.restheaders["Authorization"] = f"Bearer {token}"
@@ -460,8 +460,8 @@ class KeycloakAPI:
 
         if isinstance(r, Exception):
             # Try to re-auth with client_id and client_secret, if available
-            auth_client_id = self.module.params.get("auth_client_id")
-            auth_client_secret = self.module.params.get("auth_client_secret")
+            auth_client_id = self.module.params["auth_client_id"]
+            auth_client_secret = self.module.params["auth_client_secret"]
             if auth_client_id is not None and auth_client_secret is not None:
                 try:
                     token = _request_token_using_client_credentials(self.module.params)

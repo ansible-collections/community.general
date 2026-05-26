@@ -214,8 +214,8 @@ class Response:
 class Scaleway:
     def __init__(self, module: AnsibleModule) -> None:
         self.module = module
-        oauth_token = self.module.params.get("api_token")
-        scw_profile = self.module.params.get("profile")
+        oauth_token = self.module.params["api_token"]
+        scw_profile = self.module.params["profile"]
 
         if scw_profile:
             if YAML_IMPORT_ERROR is not None:
@@ -243,7 +243,7 @@ class Scaleway:
             api_response = results.json if results.json is not None else results.body
             message = api_response.get("message") if isinstance(api_response, dict) else api_response
             raise ScalewayException(
-                f"Error fetching {self.name} ({self.module.params.get('api_url')}/{self.name}) [{results.status_code}: {message}]"
+                f"Error fetching {self.name} ({self.module.params['api_url']}/{self.name}) [{results.status_code}: {message}]"
             )
 
         if results.json is None:
@@ -252,14 +252,14 @@ class Scaleway:
         return results.json.get(self.name)
 
     def _url_builder(self, path, params):
-        d = self.module.params.get("query_parameters")
+        d = self.module.params["query_parameters"]
         if params is not None:
             d.update(params)
         query_string = urlencode(d, doseq=True)
 
         if path[0] == "/":
             path = path[1:]
-        return f"{self.module.params.get('api_url')}/{path}?{query_string}"
+        return f"{self.module.params['api_url']}/{path}?{query_string}"
 
     def send(self, method, path, data=None, headers=None, params=None):
         url = self._url_builder(path=path, params=params)
@@ -277,7 +277,7 @@ class Scaleway:
             data=data,
             headers=self.headers,
             method=method,
-            timeout=self.module.params.get("api_timeout"),
+            timeout=self.module.params["api_timeout"],
         )
 
         # Exceptions in fetch_url may result in a status -1, the ensures a proper error to the user in all cases
