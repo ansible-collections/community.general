@@ -846,9 +846,11 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 1)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
-        
+
         # expect "p3" to be deleted
-        mock_delete_clientscope_protocolmapper.assert_called_with(return_value_get_clientscope_by_name[0]["id"], "p3", realm=module_args["realm"])
+        mock_delete_clientscope_protocolmapper.assert_called_with(
+            return_value_get_clientscope_by_name[0]["id"], "p3", realm=module_args["realm"]
+        )
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]["changed"], changed)
