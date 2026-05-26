@@ -246,9 +246,9 @@ def get_config_files(module):
 def hash_config_files(module, files):
     """Return a dict mapping file path to its sha256 hash (or None if the file does not exist)."""
     return {
-        f: (module.sha256(f) if os.path.isfile(f) else None) 
+        f: (module.sha256(f) if os.path.isfile(f) else None)
         for f in files
-    } 
+    }
 
 
 def main():
