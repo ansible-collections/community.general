@@ -298,6 +298,7 @@ end_state:
       }
     }
 """
+import copy
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -321,7 +322,7 @@ def normalise_cr(clientscoperep, remove_ids=False):
     :return: normalised clientscoperep dict
     """
     # Avoid the dict passed in to be modified
-    clientscoperep = clientscoperep.copy()
+    clientscoperep = copy.deepcopy(clientscoperep)
 
     if "protocolMappers" in clientscoperep:
         clientscoperep["protocolMappers"] = sorted(
@@ -343,7 +344,7 @@ def sanitize_cr(clientscoperep):
     :param clientscoperep: the clientscoperep dict to be sanitized
     :return: sanitized clientrep dict
     """
-    result = clientscoperep.copy()
+    result = copy.deepcopy(clientscoperep)
     if "secret" in result:
         result["secret"] = "no_log"
     if "attributes" in result:
@@ -446,7 +447,7 @@ def main():
         changeset[camel(clientscope_param)] = new_param_value
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
-    desired_clientscope = before_clientscope.copy()
+    desired_clientscope = copy.deepcopy(before_clientscope)
     desired_clientscope.update(changeset)
     desired_mappers_names = [x["name"] for x in protocol_mappers] if protocol_mappers else []
 
