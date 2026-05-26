@@ -1,0 +1,2 @@
+minor_changes:
+  - nagios - clarify in the documentation that the module must run on the Nagios server, and add an example using ``delegate_to`` for the common case where the managed host is not itself the Nagios server (https://github.com/ansible-collections/community.general/issues/9870).
