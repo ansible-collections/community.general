@@ -7,32 +7,23 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: kopia_info
+module: kopia_repository_info
 short_description: Gather information about a Kopia repository
 author:
   - Dexter Le (@munchtoast)
-version_added: "13.0.0"
+version_added: "13.1.0"
 description:
   - Gather read-only information about the current Kopia repository connection and throttle settings.
   - Runs C(kopia repository status) and C(kopia repository throttle get).
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.info_module
-options:
-  password:
-    description:
-      - Repository password used to decrypt repository contents.
-    type: str
-  config:
-    description:
-      - Path to the Kopia config file for this repository connection.
-      - Defaults to the Kopia default config path when not set.
-    type: path
+  - community.general._kopia
 """
 
 EXAMPLES = r"""
-- name: Gather Kopia info
-  community.general.kopia_info:
+- name: Gather Kopia repository info
+  community.general.kopia_repository_info:
     config: /etc/kopia/root.config
   register: result
 
@@ -50,12 +41,17 @@ repository_status:
   description: Output of C(kopia repository status).
   type: str
   returned: always
-  sample: "Connected to repository: s3:/my-bucket/\nConfig file: /etc/kopia/root.config\n..."
+  sample: |-
+    Connected to repository: s3:/my-bucket/
+    Config file: /etc/kopia/root.config
+    ...
 throttle:
   description: Output of C(kopia repository throttle get) showing current throttle limits.
   type: str
   returned: always
-  sample: "upload-bytes-per-second: 0\ndownload-bytes-per-second: 0"
+  sample: |-
+    upload-bytes-per-second: 0
+    download-bytes-per-second: 0
 """
 
 from ansible_collections.community.general.plugins.module_utils._kopia import (
@@ -65,7 +61,7 @@ from ansible_collections.community.general.plugins.module_utils._kopia import (
 from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelper
 
 
-class KopiaInfo(ModuleHelper):
+class KopiaRepositoryInfo(ModuleHelper):
     module = dict(
         argument_spec=dict(**KOPIA_COMMON_ARGUMENT_SPEC),
         supports_check_mode=True,
@@ -85,28 +81,28 @@ class KopiaInfo(ModuleHelper):
 
     def __run__(self):
         with self.runner(
-            "cli_action config",
+            "status config",
             output_process=self._process_command_output("repository status"),
         ) as ctx:
             self.vars.set(
                 "repository_status",
-                ctx.run(cli_action=["repository", "status"]),
+                ctx.run(),
                 output=True,
             )
 
         with self.runner(
-            "cli_action config",
+            "get_throttle config",
             output_process=self._process_command_output("repository throttle get"),
         ) as ctx:
             self.vars.set(
                 "throttle",
-                ctx.run(cli_action=["repository", "throttle", "get"]),
+                ctx.run(),
                 output=True,
             )
 
 
 def main():
-    KopiaInfo.execute()
+    KopiaRepositoryInfo.execute()
 
 
 if __name__ == "__main__":

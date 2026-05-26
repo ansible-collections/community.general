@@ -12,19 +12,27 @@ test_cases:
       config: /etc/kopia/root.config
     output:
       changed: false
-      repository_status: "Connected to repository: s3:/my-bucket/\nConfig file: /etc/kopia/root.config"
-      throttle: "upload-bytes-per-second: 0\ndownload-bytes-per-second: 0"
+      repository_status: |-
+        Connected to repository: s3:/my-bucket/
+        Config file: /etc/kopia/root.config
+      throttle: |-
+        upload-bytes-per-second: 0
+        download-bytes-per-second: 0
     mocks:
       run_command:
         - command: [/testbin/kopia, repository, status, --config-file=/etc/kopia/root.config]
           environ: *env-def
           rc: 0
-          out: "Connected to repository: s3:/my-bucket/\nConfig file: /etc/kopia/root.config"
+          out: |-
+            Connected to repository: s3:/my-bucket/
+            Config file: /etc/kopia/root.config
           err: ''
         - command: [/testbin/kopia, repository, throttle, get, --config-file=/etc/kopia/root.config]
           environ: *env-def
           rc: 0
-          out: "upload-bytes-per-second: 0\ndownload-bytes-per-second: 0"
+          out: |-
+            upload-bytes-per-second: 0
+            download-bytes-per-second: 0
           err: ''
 
   - id: info_not_connected
@@ -46,7 +54,9 @@ test_cases:
     output:
       changed: false
       repository_status: "Connected to repository: filesystem:/mnt/backup/kopia"
-      throttle: "upload-bytes-per-second: 1048576\ndownload-bytes-per-second: 5242880"
+      throttle: |-
+        upload-bytes-per-second: 1048576
+        download-bytes-per-second: 5242880
     mocks:
       run_command:
         - command: [/testbin/kopia, repository, status]
@@ -57,5 +67,7 @@ test_cases:
         - command: [/testbin/kopia, repository, throttle, get]
           environ: *env-def
           rc: 0
-          out: "upload-bytes-per-second: 1048576\ndownload-bytes-per-second: 5242880"
+          out: |-
+            upload-bytes-per-second: 1048576
+            download-bytes-per-second: 5242880
           err: ''

@@ -141,6 +141,8 @@ def kopia_runner(module: AnsibleModule, extra_formats: dict | None = None, **kwa
     """
     formats = dict(
         cli_action=cmd_runner_fmt.as_list(),
+        status=cmd_runner_fmt.as_fixed("repository", "status"),
+        get_throttle=cmd_runner_fmt.as_fixed("repository", "throttle", "get"),
         state=cmd_runner_fmt.as_map(REPOSITORY_STATE_MAP),
         backend=cmd_runner_fmt.as_func(fmt_backend),
         password=cmd_runner_fmt.as_opt_eq_val("--password"),

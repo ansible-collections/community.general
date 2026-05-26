@@ -11,12 +11,13 @@ module: kopia_repository
 short_description: Manage Kopia repository
 author:
   - Dexter Le (@munchtoast)
-version_added: "13.0.0"
+version_added: "13.1.0"
 description:
   - Manage a Kopia repository using the Kopia CLI.
   - Supports creating, connecting, disconnecting, syncing, and throttling repositories.
 extends_documentation_fragment:
   - community.general._attributes
+  - community.general._kopia
 attributes:
   check_mode:
     support: full
@@ -34,11 +35,6 @@ options:
       synced: Synchronizes the current repository to another backend location.
       throttled: Sets throttle limits on the current repository.
     default: created
-  password:
-    description:
-      - Repository password used to encrypt and decrypt repository contents.
-      - Required if O(state=created) or O(state=connected).
-    type: str
   fingerprint_tls:
     description:
       - TLS certificate fingerprint of the Kopia server.
@@ -49,11 +45,6 @@ options:
       - URL of the Kopia server to connect to.
       - Required if O(state=connected) and O(backend.provider=server).
     type: str
-  config:
-    description:
-      - Path to the Kopia config file for this repository connection.
-      - Defaults to the Kopia default config path when not set.
-    type: path
   throttle:
     description:
       - Throttle limits for the repository connection.
@@ -62,11 +53,11 @@ options:
     suboptions:
       download_bytes_per_second:
         description:
-          - Maximum download speed in bytes per second. Set to 0 to disable the limit.
+          - Maximum download speed in bytes per second. Set to V(0) to disable the limit.
         type: int
       upload_bytes_per_second:
         description:
-          - Maximum upload speed in bytes per second. Set to 0 to disable the limit.
+          - Maximum upload speed in bytes per second. Set to V(0) to disable the limit.
         type: int
       read_requests_per_second:
         description:
@@ -170,7 +161,7 @@ options:
         description:
           - Local file system path or remote path for the backend.
           - Required if O(backend.provider=filesystem), O(backend.provider=rclone), or O(backend.provider=sftp).
-        type: str
+        type: path
       host:
         description:
           - SFTP server hostname.
@@ -184,7 +175,7 @@ options:
       port:
         description:
           - SFTP server port.
-          - Optional if O(backend.provider=sftp); defaults to C(22).
+          - Optional if O(backend.provider=sftp); defaults to V(22).
         type: int
       keyfile:
         description:
@@ -280,7 +271,10 @@ RETURN = r"""
 kopia_repository:
   description: Output from the Kopia repository command.
   type: str
-  sample: "Connected to repository: s3:/my-bucket/\nConfig file: /etc/kopia/root.config\n..."
+  sample: |-
+    Connected to repository: s3:/my-bucket/
+    Config file: /etc/kopia/root.config
+    ...
   returned: always
 """
 
@@ -347,7 +341,7 @@ class KopiaRepository(StateModuleHelper):
                     region=dict(type="str"),
                     folder_id=dict(type="str"),
                     credentials_file=dict(type="path"),
-                    path=dict(type="str"),
+                    path=dict(type="path"),
                     host=dict(type="str"),
                     username=dict(type="str"),
                     port=dict(type="int"),
@@ -400,8 +394,8 @@ class KopiaRepository(StateModuleHelper):
         return previous
 
     def _get(self):
-        with self.runner("cli_action config") as ctx:
-            result = ctx.run(cli_action=["repository", "status"])
+        with self.runner("status config") as ctx:
+            result = ctx.run()
             return dict(
                 rc=result[0],
                 out=(result[1].rstrip() if result[1] else None),
