@@ -153,7 +153,7 @@ options:
     choices: ['patch', 'idempotent']
     default: 'patch'
     type: str
-    version_added: "13.0.0"
+    version_added: "13.1.0"
 extends_documentation_fragment:
   - community.general._keycloak
   - community.general._keycloak.actiongroup_keycloak
