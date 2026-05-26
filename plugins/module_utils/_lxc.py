@@ -40,9 +40,9 @@ def create_script(arg_tuple: tuple[str, AnsibleModule]) -> None:
     from within the container.
 
     :param arg_tuple: a tuple of (command, module) where command is the command
-                 to run (this can be a script and can use spacing with
-                 newlines as separation) and module is the AnsibleModule
-                 to run commands with.
+                      to run (this can be a script and can use spacing with
+                      newlines as separation) and module is the AnsibleModule
+                      to run commands with.
     """
 
     command, module = arg_tuple
