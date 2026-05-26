@@ -33,7 +33,7 @@ popd
 """
 
 
-def create_script(arg_tuple: tuple) -> None:
+def create_script(arg_tuple: tuple[str, AnsibleModule]) -> None:
     """Write out a script onto a target.
 
     This method should be backward compatible with Python when executing
@@ -45,8 +45,6 @@ def create_script(arg_tuple: tuple) -> None:
                  to run commands with.
     """
 
-    command: str
-    module: AnsibleModule
     command, module = arg_tuple
 
     script_file = ""
