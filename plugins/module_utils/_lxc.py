@@ -39,7 +39,7 @@ def create_script(arg_tuple: tuple[str, AnsibleModule]) -> None:
     This method should be backward compatible with Python when executing
     from within the container.
 
-    :param args: a tuple of (command, module) where command is the command
+    :param arg_tuple: a tuple of (command, module) where command is the command
                  to run (this can be a script and can use spacing with
                  newlines as separation) and module is the AnsibleModule
                  to run commands with.
