@@ -212,7 +212,7 @@ options:
       - compatibility
       - no_defaults
     default: compatibility
-    version_added: "13.0.0"
+    version_added: "13.1.0"
 extends_documentation_fragment:
   - community.general._keycloak
   - community.general._keycloak.actiongroup_keycloak
@@ -454,7 +454,7 @@ def main():
     ]
 
     # Filter and map the parameters names that apply to the user
-    user_params = [x for x in module.params if x not in ignored_arguments and module.params.get(x) is not None]
+    user_params = [x for x in module.params if x not in ignored_arguments and module.params[x] is not None]
 
     before_user = kc.get_user_by_username(username=username, realm=realm)
 
