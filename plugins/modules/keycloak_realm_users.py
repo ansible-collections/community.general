@@ -38,7 +38,7 @@ extends_documentation_fragment:
   - community.general._attributes
 
 author:
-  - Your Name (@yourgithub)
+  - Felix Grzelka (@felix-grzelka)
 """
 
 EXAMPLES = r"""
