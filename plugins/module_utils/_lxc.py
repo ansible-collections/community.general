@@ -30,16 +30,19 @@ popd
 """
 
 
-def create_script(command: str, module: AnsibleModule) -> None:
+def create_script(arg_tuple: tuple[str, AnsibleModule]) -> None:
     """Write out a script onto a target.
 
     This method should be backward compatible with Python when executing
     from within the container.
 
-    :param command: command to run, this can be a script and can use spacing
-                    with newlines as separation.
-    :param module: AnsibleModule to run commands with.
+    :param arg_tuple: a tuple of (command, module) where command is the command
+                      to run (this can be a script and can use spacing with
+                      newlines as separation) and module is the AnsibleModule
+                      to run commands with.
     """
+
+    command, module = arg_tuple
 
     script_file = ""
     try:
