@@ -1,0 +1,4 @@
+bugfixes:
+  - xml: fix false positive type check failure for string values on Python 2
+    hosts, where ``json_dict_bytes_to_unicode`` guarantees unicode output but
+    ``isinstance(value, str)`` only matches byte strings.
