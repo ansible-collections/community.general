@@ -44,6 +44,7 @@ action_groups:
     - keycloak_realm_keys_metadata_info
     - keycloak_realm_localization
     - keycloak_realm_rolemapping
+    - keycloak_realm_users
     - keycloak_role
     - keycloak_user
     - keycloak_user_federation
