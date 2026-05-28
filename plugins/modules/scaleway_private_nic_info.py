@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: scaleway_ip_info
+module: scaleway_private_nic_info
 short_description: Lists private NICs of the instance.
 description:
   - Lists all private networks that are associated with the provided instance.
