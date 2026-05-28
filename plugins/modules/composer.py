@@ -119,6 +119,8 @@ notes:
     if available.
   - We received reports about issues on macOS if composer was installed by Homebrew. Please use the official install method
     to avoid issues.
+  - Running composer as root is strongly discouraged by the composer project. If you must do it, set the environment
+    variable E(COMPOSER_ALLOW_SUPERUSER=1) to suppress the upstream warning.
 """
 
 EXAMPLES = r"""
@@ -228,6 +230,12 @@ def main():
         supports_check_mode=True,
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
+
+    if os.getuid() == 0:
+        module.warn(
+            "Running composer as root is strongly discouraged by the composer project. "
+            "Set COMPOSER_ALLOW_SUPERUSER=1 to suppress the upstream warning."
+        )
 
     # Get composer command with fallback to default
     command = module.params["command"]
