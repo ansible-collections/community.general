@@ -1121,7 +1121,7 @@ class KeycloakAPI:
         :param username: Username of the user to fetch.
         :param realm: Realm in which the user resides; default 'master'
         """
-        self._get_users(username=username, realm=realm)
+        return self._get_users(username=username, realm=realm)
 
     def get_service_account_user_by_client_id(self, client_id, realm: str = "master"):
         """Fetch a keycloak service account user within a realm based on its client_id.
