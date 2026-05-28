@@ -17,7 +17,8 @@ description:
   - This module retrieves all users from a specified Keycloak realm using the Keycloak REST API.
   - Access to the REST API is performed via OpenID Connect. The user and client used must have the necessary permissions.
   - Authentication can be performed either with username/password or with a token.
-  - The names of module options are snake_case versions of the camelCase ones found in the Keycloak API and its documentation at U(https://www.keycloak.org/docs-api/18.0/rest-api/index.html).
+  - The names of module options are snake_case versions of the camelCase ones found in the Keycloak API
+    and its documentation at U(https://www.keycloak.org/docs-api/18.0/rest-api/index.html).
 
 attributes:
   check_mode:
