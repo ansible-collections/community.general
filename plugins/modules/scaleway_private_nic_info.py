@@ -11,7 +11,7 @@ module: scaleway_private_nic_info
 short_description: Lists private NICs of the instance.
 description:
   - Lists all private networks that are associated with the provided instance.
-version_added: "12.5"
+version_added: "12.5.0"
 author: "Matej Stajduhar (@matej5)"
 extends_documentation_fragment:
   - community.general.scaleway
