@@ -408,19 +408,19 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get("realm")
-    state = module.params.get("state")
-    cid = module.params.get("id")
-    name = module.params.get("name")
-    protocol_mappers = module.params.get("protocol_mappers")
-    protocol_mappers_behavior = module.params.get("protocol_mappers_behavior")
+    realm = module.params["realm"]
+    state = module.params["state"]
+    cid = module.params["id"]
+    name = module.params["name"]
+    protocol_mappers = module.params["protocol_mappers"]
+    protocol_mappers_behavior = module.params["protocol_mappers_behavior"]
 
     # Filter and map the parameters names that apply to the client scope
     clientscope_params = [
         x
         for x in module.params
         if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "protocol_mappers_behavior"]
-        and module.params.get(x) is not None
+        and module.params[x] is not None
     ]
 
     # See if it already exists in Keycloak
@@ -438,7 +438,7 @@ def main():
     changeset = {}
 
     for clientscope_param in clientscope_params:
-        new_param_value = module.params.get(clientscope_param)
+        new_param_value = module.params[clientscope_param]
 
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
