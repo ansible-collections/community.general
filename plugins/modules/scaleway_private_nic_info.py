@@ -1,28 +1,23 @@
 #!/usr/bin/python
-#
-# Copyright (c) 2018, Yanis Guenane <yanis+ansible@guenane.org>
-# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-# SPDX-License-Identifier: GPL-3.0-or-later
+# -*- coding: utf-8 -*-
+
+# Copyright: Contributors to the Ansible project
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: scaleway_private_nic_info
-short_description: List all private NICs
+module: scaleway_ip_info
+short_description: Lists private NICs of the instance.
 description:
-  - List all private NICs of a specified Instance.
-author:
-  - "Yanis Guenane (@Spredzy)"
-  - "Remy Leone (@remyleone)"
+  - Lists all private networks that are associated with the provided instance.
+version_added: "12.5"
+author: "Matej Stajduhar (@matej5)"
 extends_documentation_fragment:
   - community.general.scaleway
   - community.general.attributes
   - community.general.scaleway.actiongroup_scaleway
   - community.general.attributes.info_module
-
-attributes:
-  action_group:
-    version_added: 11.3.0
 
 options:
   region:
@@ -150,7 +145,7 @@ def core(module):
 
     try:
         list = list_strategy(api=api)
-        module.exit_json(private_nics=list["private_nics"])
+        module.exit_json(private_nics=list)
     except ScalewayException as exc:
         module.fail_json(msg=exc.message)
 
