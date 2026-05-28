@@ -1490,7 +1490,7 @@ class KeycloakAPI:
             self.fail_request(e, msg=f"Could not create protocolmapper {mapper_rep['name']} in realm {realm}: {e}")
 
     def update_clientscope_protocolmapper(self, cid, mapper_rep, realm: str = "master"):
-        """Update an existing protocolmappe.
+        """Update an existing protocolmapper.
 
         :param cid: Id of the clientscope.
         :param mapper_rep: A ProtocolMapperRepresentation of the updated protocolmapper.
