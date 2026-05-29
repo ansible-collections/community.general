@@ -242,10 +242,7 @@ def get_config_files(module):
 
 def hash_config_files(module, files):
     """Return a dict mapping file path to its sha256 hash (or None if the file does not exist)."""
-    return {
-        f: (module.sha256(f) if os.path.isfile(f) else None)
-        for f in files
-    }
+    return {f: (module.sha256(f) if os.path.isfile(f) else None) for f in files}
 
 
 def main():
@@ -325,7 +322,7 @@ def main():
             module.exit_json(skipped=True, msg=f"command '{command}' does not support check mode, skipping")
 
     # For 'config' command in non-check mode, use sha256 hashing to detect changes
-    use_hash_detection = (command == "config" and not module.check_mode)
+    use_hash_detection = command == "config" and not module.check_mode
     if use_hash_detection:
         config_files = get_config_files(module)
         hashes_before = hash_config_files(module, config_files)
