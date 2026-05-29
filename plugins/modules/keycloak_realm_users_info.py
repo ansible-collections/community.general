@@ -7,7 +7,7 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: keycloak_realm_users
+module: keycloak_realm_users_info
 
 short_description: Retrieve users from a Keycloak realm using the Keycloak API
 
@@ -44,7 +44,7 @@ author:
 
 EXAMPLES = r"""
 - name: List all users in the "MyCustomRealm" realm using username/password authentication
-  community.general.keycloak_realm_users:
+  community.general.keycloak_realm_users_info:
     realm: MyCustomRealm
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -54,7 +54,7 @@ EXAMPLES = r"""
   delegate_to: localhost
 
 - name: List all users in the "MyCustomRealm" realm using a token
-  community.general.keycloak_realm_users:
+  community.general.keycloak_realm_users_info:
     realm: MyCustomRealm
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
