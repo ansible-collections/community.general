@@ -84,15 +84,7 @@
 
 - name: add missing group info for comparison
   set_fact:
-    user_info_with_groups: "{{ [user_infos.users[0] | combine({'groups': ['test', 'test2']}), user_infos.users[1]] | combine({'groups': []})}}"
-
-- name: debug
-  debug:
-    var: user_info_with_groups
-
-- name: debug
-  debug:
-    msg: "{{ [create_result.end_state, create_result2.end_state] }}"
+    user_info_with_groups: "{{ [user_infos.users[0] | combine({'groups': ['test', 'test2']}), user_infos.users[1] | combine({'groups': []}) ] }}"
 
 - name: Assert user info is returned correctly
   assert:
