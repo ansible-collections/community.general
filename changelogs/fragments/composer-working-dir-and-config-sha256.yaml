@@ -4,7 +4,7 @@
 bugfixes:
   - composer - the ``--working-dir`` option is now always placed first on the command line, before the
     subcommand, to ensure consistent behavior across all composer commands
-    (https://github.com/ansible-collections/community.general/pull/12084).
+    (https://github.com/ansible-collections/community.general/issues/5204, https://github.com/ansible-collections/community.general/pull/12084).
   - composer - use file checksum to determine ``changed`` status when ``command=config``,
     instead of relying on the command return output. The module now compares SHA256 checksums of
     relevant configuration files (``composer.json``, ``auth.json``, or their global equivalents)
