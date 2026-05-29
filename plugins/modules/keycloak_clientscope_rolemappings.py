@@ -17,7 +17,7 @@ version_added: 13.1.0
 description:
   - This module allows you to add or remove Keycloak roles from clientscopes using the Keycloak REST API. It requires access
     to the REST API using OpenID Connect; the user connecting and the client being used must have the requisite access rights.
-    In a default Keycloak installation, admin-cli and an admin user would work, as would a separate client definition with
+    In a default Keycloak installation, C(admin-cli) and an admin user would work, as would a separate client definition with
     the scope tailored to your needs and a user having the expected roles.
   - Attributes are multi-valued in the Keycloak API. All attributes are lists of individual values and are returned that way
     by this module. You may pass single values for attributes when calling the module, and this is translated into a list
