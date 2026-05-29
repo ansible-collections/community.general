@@ -11,7 +11,7 @@ module: keycloak_realm_users_info
 
 short_description: Retrieve users from a Keycloak realm using the Keycloak API
 
-version_added: 8.2.0
+version_added: 13.1.0
 
 description:
   - This module retrieves all users from a specified Keycloak realm using the Keycloak REST API.
