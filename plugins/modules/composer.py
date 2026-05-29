@@ -226,19 +226,16 @@ def get_composer_home(module):
 
 def get_config_files(module):
     """Get list of config files that might be changed by 'composer config'."""
-    files = []
+    files = ["composer.json", "auth.json"]
     global_command = module.params["global_command"]
     working_dir = module.params["working_dir"]
 
     if global_command:
         composer_home = get_composer_home(module)
         if composer_home:
-            for f in ("config.json", "auth.json"):
-                files.append(os.path.join(composer_home, f))
-    else:
-        if working_dir:
-            for f in ("composer.json", "auth.json"):
-                files.append(os.path.join(working_dir, f))
+            files = [os.path.join(composer_home, f) for f in files]
+    elif working_dir:
+        files = [os.path.join(working_dir, f) for f in files]
 
     return files
 
