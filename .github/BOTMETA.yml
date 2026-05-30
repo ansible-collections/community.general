@@ -159,6 +159,10 @@ files:
     maintainers: Ajpantuso
   $filters/from_ini.py:
     maintainers: sscheib
+  $filters/from_toml.py:
+    maintainers: spike77453
+  $filters/from_toml.yml:
+    maintainers: spike77453
   $filters/groupby_as_dict.py:
     maintainers: felixfontein
   $filters/hashids.py:
