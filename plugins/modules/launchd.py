@@ -508,10 +508,9 @@ def main():
     result["status"]["error"] = err
 
     # restarted and reloaded always perform commands unconditionally, so they always change state
-    if action in ("restarted", "reloaded"):
-        result["changed"] = True
-    elif (
-        result["status"]["current_state"] != result["status"]["previous_state"]
+    if (
+        action in ("restarted", "reloaded")
+        or result["status"]["current_state"] != result["status"]["previous_state"]
         or result["status"]["current_pid"] != result["status"]["previous_pid"]
     ):
         result["changed"] = True
