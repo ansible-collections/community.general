@@ -11,7 +11,9 @@
             "size": 10737418240,
             "sr": "Ansible Test Storage 1",
             "sr_uuid": "767b30e4-f8db-a83d-8ba7-f5e6e732e06f",
-            "vbd_userdevice": "0"
+            "uuid": "fa1202b8-326f-4235-802e-fafbed66b26b",
+            "vbd_userdevice": "0",
+            "vdi_type": "vhd"
         },
         {
             "name": "ansible-test-vm-2-mysql",
@@ -20,7 +22,9 @@
             "size": 1073741824,
             "sr": "Ansible Test Storage 1",
             "sr_uuid": "767b30e4-f8db-a83d-8ba7-f5e6e732e06f",
-            "vbd_userdevice": "1"
+            "uuid": "ab3a4d72-f498-4687-86ce-ca937046db76",
+            "vbd_userdevice": "1",
+            "vdi_type": "vhd"
         }
     ],
     "domid": "140",

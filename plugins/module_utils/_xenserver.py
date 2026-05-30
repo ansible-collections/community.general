@@ -454,7 +454,9 @@ def gather_vm_facts(module: AnsibleModule, vm_params):
                 "sr": vm_disk_sr_params["name_label"],
                 "sr_uuid": vm_disk_sr_params["uuid"],
                 "os_device": vm_vbd_params["device"],
+                "uuid": vm_vbd_params["VDI"]["uuid"],
                 "vbd_userdevice": vm_vbd_params["userdevice"],
+                "vdi_type": vm_vbd_params["VDI"].get("sm_config", {}).get("vdi_type", ""),
             }
 
             vm_facts["disks"].append(vm_disk_params)
