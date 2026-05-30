@@ -1,0 +1,2 @@
+minor_changes:
+  - consul_kv lookup plugin - add ``empty_value`` option to control what is returned for null Consul values (https://github.com/ansible-collections/community.general/issues/11039, https://github.com/ansible-collections/community.general/pull/12120).
