@@ -765,9 +765,12 @@ def main():
                 if "esp" in flags and "boot" not in flags:
                     flags.append("boot")
 
-                # Compute only the changes in flags status
-                flags_off = list(set(partition["flags"]) - set(flags))
-                flags_on = list(set(flags) - set(partition["flags"]))
+                # Compute only the changes in flags status.
+                # Some parted builds (e.g., SUSE) include MBR partition type codes (e.g.,
+                # type=8e) in the flags output; these cannot be managed via the 'set' command.
+                current_flags = [f for f in partition["flags"] if not re.match(r"^type=[0-9a-fA-F]+$", f)]
+                flags_off = list(set(current_flags) - set(flags))
+                flags_on = list(set(flags) - set(current_flags))
 
                 for f in flags_on:
                     script += ["set", str(number), f, "on"]
