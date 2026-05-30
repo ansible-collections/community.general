@@ -94,6 +94,13 @@ options:
     ini:
       - section: lookup_consul
         key: url
+  empty_value:
+    description:
+      - Value to return when a key exists in Consul but has a null/empty value.
+      - Set to V('') to return an empty string instead.
+    type: str
+    default: 'None'
+    version_added: 13.1.0
 """
 
 EXAMPLES = r"""
@@ -165,6 +172,7 @@ class LookupModule(LookupBase):
 
         verify = (ca_path or validate_certs) if validate_certs else False
 
+        empty_value = self.get_option("empty_value")
         values = []
         try:
             for term in terms:
@@ -182,9 +190,11 @@ class LookupModule(LookupBase):
                     # responds with a single or list of result maps
                     if isinstance(results[1], list):
                         for r in results[1]:
-                            values.append(to_text(r["Value"]))
+                            v = r["Value"]
+                            values.append(to_text(v) if v is not None else empty_value)
                     else:
-                        values.append(to_text(results[1]["Value"]))
+                        v = results[1]["Value"]
+                        values.append(to_text(v) if v is not None else empty_value)
         except Exception as e:
             raise AnsibleError(f"Error locating '{term}' in kv store. Error was {e}") from e
 
