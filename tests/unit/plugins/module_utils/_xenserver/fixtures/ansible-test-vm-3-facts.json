@@ -11,7 +11,9 @@
             "size": 8589934592,
             "sr": "Ansible Test Storage 1",
             "sr_uuid": "767b30e4-f8db-a83d-8ba7-f5e6e732e06f",
-            "vbd_userdevice": "0"
+            "uuid": "bdd0baeb-5447-4963-9e71-a5ff6e85fa59",
+            "vbd_userdevice": "0",
+            "vdi_type": "qcow2"
         }
     ],
     "domid": "-1",
