@@ -813,9 +813,15 @@ def children_to_nodes(module=None, children=None, type="yaml"):
 
 
 def make_pretty(module, tree):
-    xml_string = etree.tostring(
-        tree, xml_declaration=True, encoding="UTF-8", pretty_print=module.params["pretty_print"]
+    buf = BytesIO()
+    tree.write(
+        buf,
+        xml_declaration=True,
+        encoding="UTF-8",
+        pretty_print=module.params["pretty_print"],
+        doctype=tree.docinfo.doctype or None,
     )
+    xml_string = buf.getvalue()
 
     result = dict(
         changed=False,
@@ -830,7 +836,11 @@ def make_pretty(module, tree):
                     if module.params["backup"]:
                         result["backup_file"] = module.backup_local(module.params["path"])
                     tree.write(
-                        xml_file, xml_declaration=True, encoding="UTF-8", pretty_print=module.params["pretty_print"]
+                        xml_file,
+                        xml_declaration=True,
+                        encoding="UTF-8",
+                        pretty_print=module.params["pretty_print"],
+                        doctype=tree.docinfo.doctype or None,
                     )
 
     elif module.params["xmlstring"]:
@@ -859,10 +869,23 @@ def finish(module, tree, xpath, namespaces, changed=False, msg="", hitcount=0, m
 
     if result["changed"]:
         if module._diff:
-            result["diff"] = dict(
-                before=etree.tostring(orig_doc, xml_declaration=True, encoding="UTF-8", pretty_print=True),
-                after=etree.tostring(tree, xml_declaration=True, encoding="UTF-8", pretty_print=True),
+            before_buf = BytesIO()
+            orig_doc.write(
+                before_buf,
+                xml_declaration=True,
+                encoding="UTF-8",
+                pretty_print=True,
+                doctype=orig_doc.docinfo.doctype or None,
             )
+            after_buf = BytesIO()
+            tree.write(
+                after_buf,
+                xml_declaration=True,
+                encoding="UTF-8",
+                pretty_print=True,
+                doctype=tree.docinfo.doctype or None,
+            )
+            result["diff"] = dict(before=before_buf.getvalue(), after=after_buf.getvalue())
 
         if module.params["path"] and not module.check_mode:
             if module.params["backup"]:
@@ -872,12 +895,19 @@ def finish(module, tree, xpath, namespaces, changed=False, msg="", hitcount=0, m
                 xml_declaration=True,
                 encoding="UTF-8",
                 pretty_print=module.params["pretty_print"],
+                doctype=tree.docinfo.doctype or None,
             )
 
     if module.params["xmlstring"]:
-        result["xmlstring"] = etree.tostring(
-            tree, xml_declaration=True, encoding="UTF-8", pretty_print=module.params["pretty_print"]
+        xmlstring_buf = BytesIO()
+        tree.write(
+            xmlstring_buf,
+            xml_declaration=True,
+            encoding="UTF-8",
+            pretty_print=module.params["pretty_print"],
+            doctype=tree.docinfo.doctype or None,
         )
+        result["xmlstring"] = xmlstring_buf.getvalue()
 
     module.exit_json(**result)
 
