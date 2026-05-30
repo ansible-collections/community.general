@@ -144,6 +144,13 @@ auth       requisite pam_succeed_if.so uid
 auth       required pam_deny.so
 """
 
+        self.authselect_system_auth_string = """{imply "with-smartcard" if "with-smartcard-required"}
+auth        required                                     pam_env.so
+auth        required                                     pam_faildelay.so delay=2000000
+password    sufficient                                   pam_unix.so yescrypt shadow use_authtok
+password    required                                     pam_deny.so
+"""
+
         self.pamd = PamdService(self.system_auth_string)
 
     def test_properly_parsed(self):
@@ -157,6 +164,11 @@ auth       required pam_deny.so
 
     def test_doesnt_have_rule(self):
         self.assertFalse(self.pamd.has_rule("account", "requisite", "pam_permit.so"))
+
+    def test_authselect_directive_line_does_not_crash(self):
+        pamd = PamdService(self.authselect_system_auth_string)
+        self.assertTrue(pamd.has_rule("password", "sufficient", "pam_unix.so"))
+        self.assertIn('{imply "with-smartcard" if "with-smartcard-required"}', str(pamd))
 
     # Test Update
     def test_update_rule_type(self):
