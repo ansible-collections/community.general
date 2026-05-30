@@ -501,23 +501,22 @@ def main():
     # Run the requested task
     if not module.check_mode:
         state, pid, status_code, err = tasks[action].run()
-        # restarted and reloaded always perform commands unconditionally, so they always change state
-        if action in ("restarted", "reloaded"):
-            result["changed"] = True
 
     result["status"]["current_state"] = ServiceState.to_string(state)
     result["status"]["current_pid"] = pid
     result["status"]["status_code"] = status_code
     result["status"]["error"] = err
 
-    if (
+    # restarted and reloaded always perform commands unconditionally, so they always change state
+    if action in ("restarted", "reloaded"):
+        result["changed"] = True
+    elif (
         result["status"]["current_state"] != result["status"]["previous_state"]
         or result["status"]["current_pid"] != result["status"]["previous_pid"]
     ):
         result["changed"] = True
-    if module.check_mode:
-        if result["status"]["current_state"] != action:
-            result["changed"] = True
+    elif module.check_mode and result["status"]["current_state"] != action:
+        result["changed"] = True
     module.exit_json(**result)
 
 
