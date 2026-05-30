@@ -22,4 +22,31 @@ class OsPathExistsMock(TestCaseMock):
         pass
 
 
-UTHelper.from_module(composer, __name__, mocks=[RunCommandMock, OsPathExistsMock])
+class OsPathIsfileMock(TestCaseMock):
+    name = "os_path_isfile"
+
+    def setup(self, mocker):
+        mocker.patch("os.path.isfile", return_value=self.mock_specs.get("return_value", False))
+
+    def check(self, test_case, results):
+        pass
+
+
+class Sha256Mock(TestCaseMock):
+    name = "sha256"
+
+    def setup(self, mocker):
+        values = list(self.mock_specs.get("return_values", []))
+
+        def _sha256_side_effect(path):
+            if values:
+                return values.pop(0)
+            return "default_hash"
+
+        mocker.patch("ansible.module_utils.basic.AnsibleModule.sha256", side_effect=_sha256_side_effect)
+
+    def check(self, test_case, results):
+        pass
+
+
+UTHelper.from_module(composer, __name__, mocks=[RunCommandMock, OsPathExistsMock, OsPathIsfileMock, Sha256Mock])
