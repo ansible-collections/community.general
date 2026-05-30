@@ -674,6 +674,8 @@ files:
     maintainers: pixslx
   $modules/gitlab_project_access_token.py:
     maintainers: pixslx
+  $modules/gitlab_project_approvals.py:
+    maintainers: masa-orca
   $modules/grove.py:
     maintainers: zimbatm
   $modules/gunicorn.py:
