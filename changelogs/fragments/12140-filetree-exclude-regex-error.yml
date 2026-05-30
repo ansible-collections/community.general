@@ -1,2 +1,2 @@
 bugfixes:
-  - filetree lookup - raise ``AnsibleError`` when the ``exclude`` option contains an invalid regular expression instead of an uncaught ``re.error`` (https://github.com/ansible-collections/community.general/pull/12140).
+  - filetree lookup - raise `AnsibleError` when the `exclude` option contains an invalid regular expression instead of an uncaught `re.error` (https://github.com/ansible-collections/community.general/pull/12140).
