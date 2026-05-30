@@ -348,6 +348,8 @@ class PamdRule(PamdLine):
     @classmethod
     def rule_from_string(cls, line):
         rule_match = RULE_REGEX.search(line)
+        if rule_match is None:
+            return None
         rule_args = parse_module_arguments(rule_match.group("args"))
         return cls(rule_match.group("rule_type"), rule_match.group("control"), rule_match.group("path"), rule_args)
 
@@ -432,7 +434,7 @@ class PamdService:
             elif line.strip() == "":
                 pamd_line = PamdEmptyLine(line)
             else:
-                pamd_line = PamdRule.rule_from_string(line)
+                pamd_line = PamdRule.rule_from_string(line) or PamdLine(line)
 
             self.append(pamd_line)
 
