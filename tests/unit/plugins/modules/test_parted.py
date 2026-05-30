@@ -143,6 +143,59 @@ parted_dict3 = {
 }
 
 
+# Simulates SUSE-patched parted that exposes MBR type codes as flags.
+# Partition 1 has "lvm" set + SUSE adds "type=8e" as a pseudo-flag.
+parted_dict_suse_lvm = {
+    "generic": {
+        "dev": "/dev/sdb",
+        "size": 286061.0,
+        "unit": "mb",
+        "table": "msdos",
+        "model": "ATA TOSHIBA THNSFJ25",
+        "logical_block": 512,
+        "physical_block": 512,
+    },
+    "partitions": [
+        {
+            "num": 1,
+            "begin": 1.05,
+            "end": 106.0,
+            "size": 105.0,
+            "fstype": "",
+            "name": "",
+            "flags": ["lvm", "type=8e"],
+            "unit": "mb",
+        }
+    ],
+}
+
+# Simulates SUSE-patched parted where partition has no logical flags yet,
+# but SUSE reports "type=83" (Linux MBR type code) as a pseudo-flag.
+parted_dict_suse_noflag = {
+    "generic": {
+        "dev": "/dev/sdb",
+        "size": 286061.0,
+        "unit": "mb",
+        "table": "msdos",
+        "model": "ATA TOSHIBA THNSFJ25",
+        "logical_block": 512,
+        "physical_block": 512,
+    },
+    "partitions": [
+        {
+            "num": 1,
+            "begin": 1.05,
+            "end": 106.0,
+            "size": 105.0,
+            "fstype": "",
+            "name": "",
+            "flags": ["type=83"],
+            "unit": "mb",
+        }
+    ],
+}
+
+
 class TestParted(ModuleTestCase):
     def setUp(self):
         super().setUp()
@@ -452,6 +505,45 @@ class TestParted(ModuleTestCase):
                 return_value=parted_dict3,
             ):
                 self.execute_module(changed=True)
+
+    def test_suse_msdos_type_code_with_lvm_already_set(self):
+        # When SUSE parted reports "type=8e" alongside "lvm" in the flags output,
+        # the module must not try to unset the pseudo-flag (issue #6292).
+        with set_module_args(
+            {
+                "device": "/dev/sdb",
+                "number": 1,
+                "state": "present",
+                "flags": ["lvm"],
+            }
+        ):
+            with patch(
+                "ansible_collections.community.general.plugins.modules.parted.get_device_info",
+                return_value=parted_dict_suse_lvm,
+            ):
+                self.execute_module(changed=False)
+
+    def test_suse_msdos_type_code_set_lvm_flag(self):
+        # When SUSE parted only reports "type=83" (no logical flags) and the user
+        # requests lvm, the module must set lvm without trying to unset type=83.
+        with set_module_args(
+            {
+                "device": "/dev/sdb",
+                "number": 1,
+                "state": "present",
+                "flags": ["lvm"],
+            }
+        ):
+            with patch(
+                "ansible_collections.community.general.plugins.modules.parted.get_device_info",
+                return_value=parted_dict_suse_noflag,
+            ):
+                self.parted.reset_mock()
+                self.execute_module(changed=True)
+                self.assertEqual(
+                    self.parted.mock_calls,
+                    [call(["unit", "KiB", "set", "1", "lvm", "on"], "/dev/sdb", "optimal")],
+                )
 
     def test_version_info(self):
         """Test that the parse_parted_version returns the expected tuple"""
