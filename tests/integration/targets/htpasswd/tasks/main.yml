@@ -8,10 +8,12 @@
     # (https://foss.heptapod.net/python-libs/passlib/-/work_items/196)
     - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_version is version('26.04', '<')
   block:
-    - name: install passlib
+    - name: install passlib and bcrypt
       ansible.builtin.pip:
-        name: passlib
-      notify: remove passlib
+        name:
+          - passlib
+          - bcrypt
+      notify: remove passlib and bcrypt
 
     - name: add bob (check mode)
       community.general.htpasswd:
@@ -122,3 +124,6 @@
           - del_bob_check is changed
           - del_bob is changed
           - del_bob_idempot is not changed
+
+    - name: test non-standard hash schemes (issue 6135)
+      ansible.builtin.include_tasks: test_schemes.yml
