@@ -51,32 +51,66 @@
       - scheme_portable is changed
       - scheme_portable_idempot is not changed
 
-- name: add user with bcrypt scheme
-  community.general.htpasswd:
-    path: "{{ htpasswd_schemes_path }}"
-    name: user_bcrypt
-    password: testpass
-    hash_scheme: bcrypt
-  register: scheme_bcrypt
+- name: bcrypt scheme tests (requires bcrypt<4.2 to be compatible with passlib 1.7.x)
+  block:
+    - name: install compatible bcrypt
+      ansible.builtin.pip:
+        name: bcrypt<4.2
+      register: bcrypt_pip_install
+      ignore_errors: true
 
-- name: add user with bcrypt scheme (idempotency)
-  community.general.htpasswd:
-    path: "{{ htpasswd_schemes_path }}"
-    name: user_bcrypt
-    password: testpass
-    hash_scheme: bcrypt
-  register: scheme_bcrypt_idempot
+    - name: check if passlib can use bcrypt
+      ansible.builtin.command:
+        cmd: >-
+          python3 -c "
+          from passlib.apache import HtpasswdFile;
+          import tempfile, os;
+          f = tempfile.mktemp();
+          ht = HtpasswdFile(f, new=True, default_scheme='bcrypt');
+          ht.set_password('t', 'p');
+          ht.save();
+          os.unlink(f)"
+      register: bcrypt_usable
+      ignore_errors: true
+      changed_when: false
 
-- name: read htpasswd file to verify bcrypt hash prefix
-  ansible.builtin.slurp:
-    src: "{{ htpasswd_schemes_path }}"
-  register: htpasswd_contents
+    - name: run bcrypt tests
+      when: bcrypt_usable is not failed
+      block:
+        - name: add user with bcrypt scheme
+          community.general.htpasswd:
+            path: "{{ htpasswd_schemes_path }}"
+            name: user_bcrypt
+            password: testpass
+            hash_scheme: bcrypt
+          register: scheme_bcrypt
 
-- name: assert bcrypt scheme
-  ansible.builtin.assert:
-    that:
-      - scheme_bcrypt is changed
-      - scheme_bcrypt_idempot is not changed
-      # Apache requires $2y$ prefix; passlib's CryptContext produces $2b$ — verify the fix
-      - >-
-        htpasswd_contents.content | b64decode | regex_search('^user_bcrypt:\$2y\$', multiline=True) is not none
+        - name: add user with bcrypt scheme (idempotency)
+          community.general.htpasswd:
+            path: "{{ htpasswd_schemes_path }}"
+            name: user_bcrypt
+            password: testpass
+            hash_scheme: bcrypt
+          register: scheme_bcrypt_idempot
+
+        - name: read htpasswd file to verify bcrypt hash prefix
+          ansible.builtin.slurp:
+            src: "{{ htpasswd_schemes_path }}"
+          register: htpasswd_contents
+
+        - name: assert bcrypt scheme
+          ansible.builtin.assert:
+            that:
+              - scheme_bcrypt is changed
+              - scheme_bcrypt_idempot is not changed
+              # Apache requires $2y$ prefix; passlib's CryptContext produces $2b$ — verify the fix
+              - >-
+                htpasswd_contents.content | b64decode | regex_search('^user_bcrypt:\$2y\$', multiline=True) is not none
+
+  always:
+    - name: remove bcrypt if installed by pip
+      ansible.builtin.pip:
+        name: bcrypt
+        state: absent
+      when: bcrypt_pip_install is not failed
+      ignore_errors: true

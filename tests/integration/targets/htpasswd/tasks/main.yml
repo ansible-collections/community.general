@@ -8,12 +8,10 @@
     # (https://foss.heptapod.net/python-libs/passlib/-/work_items/196)
     - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_version is version('26.04', '<')
   block:
-    - name: install passlib and bcrypt
+    - name: install passlib
       ansible.builtin.pip:
-        name:
-          - passlib
-          - bcrypt<4.2
-      notify: remove passlib and bcrypt
+        name: passlib
+      notify: remove passlib
 
     - name: add bob (check mode)
       community.general.htpasswd:
