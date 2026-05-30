@@ -79,4 +79,4 @@
       - scheme_bcrypt_idempot is not changed
       # Apache requires $2y$ prefix; passlib's CryptContext produces $2b$ — verify the fix
       - >-
-        htpasswd_contents.content | b64decode | regex_search('^user_bcrypt:\$2y\$', multiline=True)
+        htpasswd_contents.content | b64decode | regex_search('^user_bcrypt:\$2y\$', multiline=True) is not none

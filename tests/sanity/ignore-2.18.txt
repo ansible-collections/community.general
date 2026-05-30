@@ -1,6 +1,8 @@
 plugins/module_utils/_crypt.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/module_utils/_crypt.py import-3.12  # Uses deprecated stdlib library 'crypt'
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
+plugins/modules/htpasswd.py import-3.11  # imports module_utils/_crypt.py which uses deprecated stdlib library 'crypt'
+plugins/modules/htpasswd.py import-3.12  # imports module_utils/_crypt.py which uses deprecated stdlib library 'crypt'
 plugins/modules/iptables_state.py validate-modules:undocumented-parameter             # params _back and _timeout used by action plugin
 plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice

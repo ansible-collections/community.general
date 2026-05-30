@@ -12,7 +12,7 @@
       ansible.builtin.pip:
         name:
           - passlib
-          - bcrypt
+          - bcrypt<4.2
       notify: remove passlib and bcrypt
 
     - name: add bob (check mode)

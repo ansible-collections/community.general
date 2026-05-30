@@ -16,11 +16,7 @@ try:
 except ImportError:
     try:
         try:
-            import warnings as _warnings
-
-            with _warnings.catch_warnings():
-                _warnings.simplefilter("ignore", DeprecationWarning)
-                import crypt as _crypt_mod
+            import crypt as _crypt_mod
         except ImportError:
             import legacycrypt as _crypt_mod
 

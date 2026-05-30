@@ -66,6 +66,8 @@ notes:
   - 'On Debian < 11, Ubuntu <= 20.04, or Fedora: install C(python-passlib).'
   - 'On Debian, Ubuntu: install C(python3-passlib).'
   - 'On RHEL or CentOS: Enable EPEL, then install C(python-passlib).'
+  - To use V(bcrypt) as O(hash_scheme), the C(bcrypt) Python library must also be installed.
+    Due to incompatibilities in C(passlib) 1.7.x, use C(bcrypt<4.2).
 requirements: [passlib>=1.6]
 author: "Ansible Core Team"
 extends_documentation_fragment:
