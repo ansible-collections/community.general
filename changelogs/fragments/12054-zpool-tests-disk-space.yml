@@ -1,0 +1,2 @@
+bugfixes:
+  - "zpool integration tests - use sparse files instead of zero-filled disk images to reduce disk space usage (https://github.com/ansible-collections/community.general/issues/12054)."
