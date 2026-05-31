@@ -125,7 +125,7 @@ def _normalize_ip(value: str) -> str:
 
 
 def _normalize_data_ips(data: dict) -> dict:
-    result = {}
+    result: dict = {}
     for key, value in data.items():
         if isinstance(value, list):
             result[key] = [_normalize_ip(v) if isinstance(v, str) else v for v in value]
