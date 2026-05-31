@@ -96,10 +96,13 @@ options:
         key: url
   empty_value:
     description:
-      - Value to return when a key exists in Consul but has a null/empty value.
-      - Set to V('') to return an empty string instead.
+      - Controls what is returned when a Consul value is null.
+      - V(textual_none) returns the string V(None), which is the legacy behavior.
+      - V(python_none) returns a Python V(null)/V(None) value.
+      - V(empty_string) returns an empty string.
     type: str
-    default: 'None'
+    default: 'textual_none'
+    choices: ['textual_none', 'python_none', 'empty_string']
     version_added: 13.1.0
 """
 
@@ -143,6 +146,13 @@ except ImportError:
     HAS_CONSUL = False
 
 
+_EMPTY_VALUE_MAP = {
+    "textual_none": "None",
+    "python_none": None,
+    "empty_string": "",
+}
+
+
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         if not HAS_CONSUL:
@@ -172,7 +182,7 @@ class LookupModule(LookupBase):
 
         verify = (ca_path or validate_certs) if validate_certs else False
 
-        empty_value = self.get_option("empty_value")
+        empty_value = _EMPTY_VALUE_MAP[self.get_option("empty_value")]
         values = []
         try:
             for term in terms:
