@@ -97,12 +97,12 @@ options:
   empty_value:
     description:
       - Controls what is returned when a Consul value is null.
-      - V(textual_none) returns the string V(None), which is the legacy behavior.
-      - V(python_none) returns a Python V(null)/V(None) value.
-      - V(empty_string) returns an empty string.
     type: str
     default: 'textual_none'
-    choices: ['textual_none', 'python_none', 'empty_string']
+    choices:
+      textual_none: Return the string V(None). This is the legacy behavior.
+      python_none: Return a Python V(null)/V(None) value.
+      empty_string: Return an empty string.
     version_added: 13.1.0
 """
 
