@@ -114,6 +114,28 @@ with deps.declare("ipaddress"):
     import ipaddress
 
 
+def _normalize_ip(value: str) -> str:
+    try:
+        addr = ipaddress.ip_address(value)
+        if isinstance(addr, ipaddress.IPv6Address):
+            return addr.exploded
+    except ValueError:
+        pass
+    return value
+
+
+def _normalize_data_ips(data: dict) -> dict:
+    result = {}
+    for key, value in data.items():
+        if isinstance(value, list):
+            result[key] = [_normalize_ip(v) if isinstance(v, str) else v for v in value]
+        elif isinstance(value, str):
+            result[key] = _normalize_ip(value)
+        else:
+            result[key] = value
+    return result
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -185,7 +207,7 @@ def main():
             else:
                 obj["name"] = name
 
-            obj.update(data)
+            obj.update(_normalize_data_ips(data))
             diff = obj.diff()
             changed = obj.diff() != []
             if not module.check_mode:
