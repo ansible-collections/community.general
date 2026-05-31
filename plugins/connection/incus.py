@@ -83,7 +83,7 @@ from subprocess import PIPE, Popen, call
 
 from ansible.errors import AnsibleConnectionFailure, AnsibleError, AnsibleFileNotFound
 from ansible.module_utils.common.process import get_bin_path
-from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.connection import ConnectionBase
 
 
@@ -169,7 +169,13 @@ class Connection(ConnectionBase):
                     exec_cmd.append(post_args.strip())
             else:
                 # For anything else using -EncodedCommand or else, just split on space.
-                exec_cmd.extend(cmd.split(" "))
+                # Ansible's PowerShell module wrapper can quote the encoded payload;
+                # since Incus receives an argv list directly, keep those quotes from
+                # becoming literal PowerShell argument content.
+                if re.search(r"\s-EncodedCommand\s", cmd, re.IGNORECASE):
+                    exec_cmd.extend(part.strip("'\"") for part in cmd.split(" ") if part)
+                else:
+                    exec_cmd.extend(cmd.split(" "))
         else:
             if self.get_option("remote_user") != "root":
                 self._display.vvv(
@@ -203,25 +209,22 @@ class Connection(ConnectionBase):
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate(in_data)
 
-        stdout = to_text(stdout)
-        stderr = to_text(stderr)
-
-        if stderr.startswith("Error: ") and stderr.rstrip().endswith(": Instance is not running"):
+        if stderr.startswith(b"Error: ") and stderr.rstrip().endswith(b": Instance is not running"):
             raise AnsibleConnectionFailure(
                 f"instance not running: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if stderr.startswith("Error: ") and stderr.rstrip().endswith(": Instance not found"):
+        if stderr.startswith(b"Error: ") and stderr.rstrip().endswith(b": Instance not found"):
             raise AnsibleConnectionFailure(
                 f"instance not found: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if stderr.startswith("Error: ") and ": User does not have permission " in stderr:
+        if stderr.startswith(b"Error: ") and b": User does not have permission " in stderr:
             raise AnsibleConnectionFailure(
                 f"instance access denied: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if stderr.startswith("Error: ") and ": User does not have entitlement " in stderr:
+        if stderr.startswith(b"Error: ") and b": User does not have entitlement " in stderr:
             raise AnsibleConnectionFailure(
                 f"instance access denied: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )

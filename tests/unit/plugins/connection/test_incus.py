@@ -104,6 +104,22 @@ BUILD_CMD_TEST_CASES: list[dict[str, t.Any]] = [
         ),
         output=[r"C:\CMD", "/c", "some-command /flag1 /flag2"],
     ),
+    dict(
+        id="powershell encoded command strips quotes",
+        input=dict(
+            cmd="""powershell -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -EncodedCommand 'cABhAHIAYQBtAA=='""",
+            shell="powershell",
+        ),
+        output=[
+            "powershell",
+            "-NoProfile",
+            "-NonInteractive",
+            "-ExecutionPolicy",
+            "Unrestricted",
+            "-EncodedCommand",
+            "cABhAHIAYQBtAA==",
+        ],
+    ),
 ]
 
 
