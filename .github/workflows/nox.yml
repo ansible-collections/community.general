@@ -22,12 +22,7 @@ concurrency:
 
 jobs:
   nox:
-    runs-on: ubuntu-latest
-    name: "Run extra sanity tests"
-    steps:
-      - name: Check out collection
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - name: Run nox
-        uses: ansible-community/antsibull-nox@main
+    uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-run.yml@main
+    with:
+      session-name: Run extra sanity tests
+      change-detection-in-prs: true
