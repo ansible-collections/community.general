@@ -66,6 +66,8 @@ notes:
   - 'On Debian < 11, Ubuntu <= 20.04, or Fedora: install C(python-passlib).'
   - 'On Debian, Ubuntu: install C(python3-passlib).'
   - 'On RHEL or CentOS: Enable EPEL, then install C(python-passlib).'
+  - To use V(bcrypt) as O(hash_scheme), the C(bcrypt) Python library must also be installed.
+    Due to incompatibilities in C(passlib) 1.7.x, use C(bcrypt<4.2).
 requirements: [passlib>=1.6]
 author: "Ansible Core Team"
 extends_documentation_fragment:
@@ -109,7 +111,7 @@ with deps.declare("passlib"):
     # Apparently the type infos don't know htpasswd_context, which *does* exist
     # (but isn't mentioned in the documentation for some reason)
     from passlib.apache import HtpasswdFile, htpasswd_context  # type: ignore[attr-defined]
-    from passlib.context import CryptContext
+    from passlib.context import CryptContext  # type: ignore[assignment]
 
 
 apache_hashes = ["apr_md5_crypt", "des_crypt", "ldap_sha1", "plaintext"]
@@ -121,14 +123,24 @@ def create_missing_directories(dest):
         os.makedirs(destpath)
 
 
+def obtain_crypt_context(hash_scheme):
+    if hash_scheme in apache_hashes or hash_scheme in htpasswd_context.schemes():
+        # Use htpasswd_context for all officially-supported schemes, including bcrypt
+        # (htpasswd_context produces Apache-compatible $2y$ bcrypt, not $2b$)
+        return htpasswd_context
+    try:
+        return CryptContext(schemes=[hash_scheme] + apache_hashes)
+    except KeyError:
+        # hash_scheme is a HtpasswdFile alias (e.g. portable, portable_apache_24)
+        # that is not a valid passlib scheme name; let HtpasswdFile resolve it natively
+        return htpasswd_context
+
+
 def present(dest, username, password, hash_scheme, create, check_mode):
     """Ensures user is present
 
     Returns (msg, changed)"""
-    if hash_scheme in apache_hashes:
-        context = htpasswd_context
-    else:
-        context = CryptContext(schemes=[hash_scheme] + apache_hashes)
+    context = obtain_crypt_context(hash_scheme)
     if not os.path.exists(dest):
         if not create:
             raise ValueError(f"Destination {dest} does not exist")

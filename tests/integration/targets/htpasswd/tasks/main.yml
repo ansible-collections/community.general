@@ -122,3 +122,6 @@
           - del_bob_check is changed
           - del_bob is changed
           - del_bob_idempot is not changed
+
+    - name: test non-standard hash schemes (issue 6135)
+      ansible.builtin.include_tasks: test_schemes.yml
