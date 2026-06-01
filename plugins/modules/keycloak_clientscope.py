@@ -146,11 +146,14 @@ options:
   protocol_mappers_behavior:
     description:
       - Determine how O(protocol_mappers) behave when updating an existing client_scope.
-      - 'V(patch): Add missing protocol mappers, do not remove any missing mappers.'
-      - 'V(idempotent): Make the protocol mappers exactly as specified, adding and removing mappers as needed.'
+needed.'
+    choices:
+      patch:
+        - Add missing protocol mappers, do not remove any missing mappers.'
+      idempotent:
+        - Make the protocol mappers exactly as specified, adding and removing mappers as needed.
     aliases:
       - protocolMappersBehavior
-    choices: ['patch', 'idempotent']
     default: 'patch'
     type: str
     version_added: "13.1.0"
@@ -298,6 +301,7 @@ end_state:
       }
     }
 """
+
 import copy
 
 from ansible.module_utils.basic import AnsibleModule
