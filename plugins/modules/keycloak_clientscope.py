@@ -148,13 +148,13 @@ options:
       - Determine how O(protocol_mappers) behave when updating an existing client_scope.
 needed.'
     choices:
-      patch:
+      subset:
         - Add missing protocol mappers, do not remove any missing mappers.'
-      idempotent:
+      exact:
         - Make the protocol mappers exactly as specified, adding and removing mappers as needed.
     aliases:
       - protocolMappersBehavior
-    default: 'patch'
+    default: 'subset'
     type: str
     version_added: "13.1.0"
 extends_documentation_fragment:
@@ -383,7 +383,7 @@ def main():
         attributes=dict(type="dict"),
         protocol_mappers=dict(type="list", elements="dict", options=protmapper_spec, aliases=["protocolMappers"]),
         protocol_mappers_behavior=dict(
-            type="str", aliases=["protocolMappersBehavior"], choices=["patch", "idempotent"], default="patch"
+            type="str", aliases=["protocolMappersBehavior"], choices=["subset", "exact"], default="subset"
         ),
     )
 
@@ -455,7 +455,7 @@ def main():
     desired_clientscope.update(changeset)
     desired_mappers_names = [x["name"] for x in protocol_mappers] if protocol_mappers else []
 
-    if protocol_mappers_behavior == "patch":
+    if protocol_mappers_behavior == "subset":
         # add exsisting mappers to desired object
         for mapper in before_mappers:
             if mapper["name"] not in desired_mappers_names:
@@ -539,7 +539,7 @@ def main():
                     else:
                         kc.create_clientscope_protocolmapper(desired_clientscope["id"], protocol_mapper, realm=realm)
 
-            if protocol_mappers_behavior == "idempotent":
+            if protocol_mappers_behavior == "exact":
                 # check if we need to delete protocol mappers on the server
                 for mapper in before_mappers:
                     if mapper["name"] not in desired_mappers_names:
