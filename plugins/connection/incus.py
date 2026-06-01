@@ -173,6 +173,13 @@ class Connection(ConnectionBase):
 
                     # Keep quotes from becoming literal PowerShell argument content.
                     if len(post_args) >= 2 and post_args[0] == post_args[-1] and post_args[0] in ("'", '"'):
+                        self._display.v(
+                            "WARNING: PowerShell -Command argument is wrapped in outer quotes; "
+                            "this connection plugin strips those quotes and behavior may differ "
+                            "from a direct shell run. Prefer passing -Command without extra "
+                            "outer quoting.",
+                            host=self._instance(),
+                        )
                         post_args = post_args[1:-1]
 
                     exec_cmd.append(post_args)
