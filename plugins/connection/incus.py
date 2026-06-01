@@ -164,10 +164,10 @@ class Connection(ConnectionBase):
                 exec_cmd.append(regex_match.group("executable"))
                 if args := regex_match.group("args"):
                     exec_cmd.extend(args.strip().split(" "))
-                
+
                 # Set the command argument depending on cmd or powershell and the rest of it
                 exec_cmd.append(regex_match.group("command"))
-                
+
                 if post_args := regex_match.group("post_args"):
                     post_args = post_args.strip()
 
