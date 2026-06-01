@@ -23,11 +23,11 @@
             gather_facts: false
             tasks:
               - name: First task
-                debug:
-                  msg: task 1
+                set_fact:
+                  counter_test: first
               - name: Second task
-                debug:
-                  msg: task 2
+                set_fact:
+                  counter_test: second
         expected_output:
           - ""
           - "PLAY [testhost] ****************************************************************"
@@ -46,13 +46,13 @@
           ANSIBLE_NOCOLOR: 'true'
           ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.counter_enabled
-        playbook: |
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
               - name: Loop task
-                debug:
-                  msg: "{{ item }}"
+                set_fact:
+                  dummy_fact: "{{ item }}"
                 loop:
                   - item_a
                   - item_b
@@ -74,13 +74,13 @@
           ANSIBLE_NOCOLOR: 'true'
           ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.counter_enabled
-        playbook: |
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
               - name: Delegated loop task
-                debug:
-                  msg: "{{ item }}"
+                set_fact:
+                  dummy_fact: "{{ item }}"
                 loop:
                   - item_a
                   - item_b
