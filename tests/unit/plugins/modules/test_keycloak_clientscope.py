@@ -694,7 +694,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
             "realm": "realm-name",
             "state": "present",
             "name": "my-new-kc-clientscope",
-            "protocol_mappers_behavior": "idempotent",
+            "protocol_mappers_behavior": "exact",
             "protocolMappers": [
                 {
                     "protocol": "openid-connect",
