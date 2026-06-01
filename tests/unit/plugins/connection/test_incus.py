@@ -120,6 +120,60 @@ BUILD_CMD_TEST_CASES: list[dict[str, t.Any]] = [
             "cABhAHIAYQBtAA==",
         ],
     ),
+    dict(
+        id="powershell encoded command strips double quotes",
+        input=dict(
+            cmd='''powershell -NoProfile -EncodedCommand "cABhAHIAYQBtAA=="''',
+            shell="powershell",
+        ),
+        output=[
+            "powershell",
+            "-NoProfile",
+            "-EncodedCommand",
+            "cABhAHIAYQBtAA==",
+        ],
+    ),
+    dict(
+        id="powershell encoded command case-insensitive keyword",
+        input=dict(
+            cmd="""powershell -NoProfile -eNcOdEdCoMmAnD 'cABhAHIAYQBtAA=='""",
+            shell="powershell",
+        ),
+        output=[
+            "powershell",
+            "-NoProfile",
+            "-eNcOdEdCoMmAnD",
+            "cABhAHIAYQBtAA==",
+        ],
+    ),
+    dict(
+        id="powershell encoded command keeps surrounding flags",
+        input=dict(
+            cmd="""powershell -NoProfile -EncodedCommand 'cABhAHIAYQBtAA==' -InputFormat None""",
+            shell="powershell",
+        ),
+        output=[
+            "powershell",
+            "-NoProfile",
+            "-EncodedCommand",
+            "cABhAHIAYQBtAA==",
+            "-InputFormat",
+            "None",
+        ],
+    ),
+    dict(
+        id="powershell -enc alias strips quotes",
+        input=dict(
+            cmd="""powershell -NoProfile -enc 'cABhAHIAYQBtAA=='""",
+            shell="powershell",
+        ),
+        output=[
+            "powershell",
+            "-NoProfile",
+            "-enc",
+            "cABhAHIAYQBtAA==",
+        ],
+    ),
 ]
 
 

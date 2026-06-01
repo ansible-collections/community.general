@@ -87,6 +87,36 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.connection import ConnectionBase
 
 
+def split_powershell_cmd(cmd: str) -> list[str]:
+    """Split a PowerShell command line into argv tokens, preserving quoted
+    strings as single tokens and stripping the surrounding quotes.
+    Only single and double quotes are treated as delimiters; backslashes
+    are not escape characters (Windows paths are passed through as-is)."""
+    parts = []
+    current = []
+    in_quote = None
+
+    for char in cmd:
+        if char in ('"', "'") and in_quote is None:
+            # Opening quote
+            in_quote = char
+        elif char == in_quote:
+            # Closing quote
+            in_quote = None
+        elif char == " " and in_quote is None:
+            # Unquoted space
+            if current:
+                parts.append("".join(current))
+                current = []
+        else:
+            current.append(char)
+
+    if current:
+        parts.append("".join(current))
+
+    return parts
+
+
 class Connection(ConnectionBase):
     """Incus based connections"""
 
@@ -168,14 +198,12 @@ class Connection(ConnectionBase):
                 if post_args := regex_match.group("post_args"):
                     exec_cmd.append(post_args.strip())
             else:
-                # For anything else using -EncodedCommand or else, just split on space.
-                # Ansible's PowerShell module wrapper can quote the encoded payload;
-                # since Incus receives an argv list directly, keep those quotes from
-                # becoming literal PowerShell argument content.
-                if re.search(r"\s-EncodedCommand\s", cmd, re.IGNORECASE):
-                    exec_cmd.extend(part.strip("'\"") for part in cmd.split(" ") if part)
-                else:
-                    exec_cmd.extend(cmd.split(" "))
+                # Ansible's PowerShell module wrapper may quote the payload with single
+                # or double quotes; since Incus receives an argv list directly, those
+                # quotes would become literal argument content rather than shell syntax,
+                # so strip them here.
+                parts = split_powershell_cmd(cmd)
+                exec_cmd.extend(parts)
         else:
             if self.get_option("remote_user") != "root":
                 self._display.vvv(
