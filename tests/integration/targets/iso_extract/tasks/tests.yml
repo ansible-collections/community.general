@@ -12,6 +12,7 @@
     files:
       - 1.txt
       - 2.txt
+    executable: '{{ iso_extract_7zip_executable | default(omit) }}'
   register: iso_extract_test0
 
 - assert:
@@ -25,6 +26,7 @@
     files:
       - 1.txt
       - 2.txt
+    executable: '{{ iso_extract_7zip_executable | default(omit) }}'
   register: iso_extract_test0_again
 
 - name: Test iso_extract_test0_again (normal mode)
@@ -47,6 +49,7 @@
       - /1.txt
       - /2.txt
     force: true
+    executable: '{{ iso_extract_7zip_executable | default(omit) }}'
   register: iso_extract_leading_slash
 
 - name: Test iso_extract with leading slash succeeds (normal mode)
