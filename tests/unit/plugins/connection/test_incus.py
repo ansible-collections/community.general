@@ -174,6 +174,86 @@ BUILD_CMD_TEST_CASES: list[dict[str, t.Any]] = [
             "cABhAHIAYQBtAA==",
         ],
     ),
+    dict(
+        id="powershell -Command with spaces in path",
+        input=dict(
+            cmd="""powershell.exe -NonInteractive -Command 'Write-Host "hello"; & \\'C:\\My Scripts\\run me.ps1\\''""",
+            shell="powershell",
+        ),
+        output=[
+            "powershell.exe",
+            "-NonInteractive",
+            "-Command",
+            """Write-Host "hello"; & \\'C:\\My Scripts\\run me.ps1\\'""",
+        ],
+    ),
+    dict(
+        id="powershell -File with spaces in path",
+        input=dict(
+            cmd='''powershell.exe -NonInteractive -File "C:\\My Scripts\\run me.ps1"''',
+            shell="powershell",
+        ),
+        output=[
+            "powershell.exe",
+            "-NonInteractive",
+            "-File",
+            r"C:\My Scripts\run me.ps1",
+        ],
+    ),
+    dict(
+        id="powershell -File single quoted path with trailing args",
+        input=dict(
+            cmd="""powershell.exe -NoProfile -File 'C:\\My Scripts\\run me.ps1' -Arg1 value""",
+            shell="powershell",
+        ),
+        output=[
+            "powershell.exe",
+            "-NoProfile",
+            "-File",
+            r"C:\My Scripts\run me.ps1",
+            "-Arg1",
+            "value",
+        ],
+    ),
+    dict(
+        id="powershell -F alias with spaces in path",
+        input=dict(
+            cmd='''powershell.exe -NoProfile -F "C:\\My Scripts\\run me.ps1"''',
+            shell="powershell",
+        ),
+        output=[
+            "powershell.exe",
+            "-NoProfile",
+            "-F",
+            r"C:\My Scripts\run me.ps1",
+        ],
+    ),
+    dict(
+        id="powershell -Command outer double quotes",
+        input=dict(
+            cmd='''powershell.exe -NoProfile -Command "Write-Host 'hello world'"''',
+            shell="powershell",
+        ),
+        output=[
+            "powershell.exe",
+            "-NoProfile",
+            "-Command",
+            "Write-Host 'hello world'",
+        ],
+    ),
+    dict(
+        id="powershell -Command empty quoted payload",
+        input=dict(
+            cmd='''powershell.exe -NoProfile -Command ""''',
+            shell="powershell",
+        ),
+        output=[
+            "powershell.exe",
+            "-NoProfile",
+            "-Command",
+            "",
+        ],
+    ),
 ]
 
 

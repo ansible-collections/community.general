@@ -79,42 +79,13 @@ options:
 
 import os
 import re
+import shlex
 from subprocess import PIPE, Popen, call
 
 from ansible.errors import AnsibleConnectionFailure, AnsibleError, AnsibleFileNotFound
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.connection import ConnectionBase
-
-
-def split_powershell_cmd(cmd: str) -> list[str]:
-    """Split a PowerShell command line into argv tokens, preserving quoted
-    strings as single tokens and stripping the surrounding quotes.
-    Only single and double quotes are treated as delimiters; backslashes
-    are not escape characters (Windows paths are passed through as-is)."""
-    parts = []
-    current = []
-    in_quote = None
-
-    for char in cmd:
-        if char in ('"', "'") and in_quote is None:
-            # Opening quote
-            in_quote = char
-        elif char == in_quote:
-            # Closing quote
-            in_quote = None
-        elif char == " " and in_quote is None:
-            # Unquoted space
-            if current:
-                parts.append("".join(current))
-                current = []
-        else:
-            current.append(char)
-
-    if current:
-        parts.append("".join(current))
-
-    return parts
 
 
 class Connection(ConnectionBase):
@@ -193,16 +164,29 @@ class Connection(ConnectionBase):
                 exec_cmd.append(regex_match.group("executable"))
                 if args := regex_match.group("args"):
                     exec_cmd.extend(args.strip().split(" "))
+                
                 # Set the command argument depending on cmd or powershell and the rest of it
                 exec_cmd.append(regex_match.group("command"))
+                
                 if post_args := regex_match.group("post_args"):
-                    exec_cmd.append(post_args.strip())
+                    post_args = post_args.strip()
+
+                    # Keep quotes from becoming literal PowerShell argument content.
+                    if len(post_args) >= 2 and post_args[0] == post_args[-1] and post_args[0] in ("'", '"'):
+                        post_args = post_args[1:-1]
+
+                    exec_cmd.append(post_args)
             else:
-                # Ansible's PowerShell module wrapper may quote the payload with single
-                # or double quotes; since Incus receives an argv list directly, those
-                # quotes would become literal argument content rather than shell syntax,
-                # so strip them here.
-                parts = split_powershell_cmd(cmd)
+                # Keep quotes from becoming literal PowerShell argument content.
+                # shlex is not a full PowerShell/Windows command-line parser,
+                # but with posix=False it reliably keeps quoted segments (for
+                # example, paths with spaces) as single argv items, which is
+                # what we need before passing arguments to incus exec.
+                parts = shlex.split(cmd, posix=False)
+                for i, part in enumerate(parts[:-1]):
+                    if part.lower() in {"-enc", "-encodedcommand", "-file", "-f"}:
+                        parts[i + 1] = parts[i + 1].strip("'\"")
+                        break
                 exec_cmd.extend(parts)
         else:
             if self.get_option("remote_user") != "root":
