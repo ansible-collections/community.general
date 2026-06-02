@@ -79,11 +79,12 @@ options:
 
 import os
 import re
+import shlex
 from subprocess import PIPE, Popen, call
 
 from ansible.errors import AnsibleConnectionFailure, AnsibleError, AnsibleFileNotFound
 from ansible.module_utils.common.process import get_bin_path
-from ansible.module_utils.common.text.converters import to_bytes, to_text
+from ansible.module_utils.common.text.converters import to_bytes
 from ansible.plugins.connection import ConnectionBase
 
 
@@ -163,13 +164,37 @@ class Connection(ConnectionBase):
                 exec_cmd.append(regex_match.group("executable"))
                 if args := regex_match.group("args"):
                     exec_cmd.extend(args.strip().split(" "))
+
                 # Set the command argument depending on cmd or powershell and the rest of it
                 exec_cmd.append(regex_match.group("command"))
+
                 if post_args := regex_match.group("post_args"):
-                    exec_cmd.append(post_args.strip())
+                    post_args = post_args.strip()
+
+                    # Keep quotes from becoming literal PowerShell argument content.
+                    if len(post_args) >= 2 and post_args[0] == post_args[-1] and post_args[0] in ("'", '"'):
+                        self._display.v(
+                            "WARNING: PowerShell -Command argument is wrapped in outer quotes; "
+                            "this connection plugin strips those quotes and behavior may differ "
+                            "from a direct shell run. Prefer passing -Command without extra "
+                            "outer quoting.",
+                            host=self._instance(),
+                        )
+                        post_args = post_args[1:-1]
+
+                    exec_cmd.append(post_args)
             else:
-                # For anything else using -EncodedCommand or else, just split on space.
-                exec_cmd.extend(cmd.split(" "))
+                # Keep quotes from becoming literal PowerShell argument content.
+                # shlex is not a full PowerShell/Windows command-line parser,
+                # but with posix=False it reliably keeps quoted segments (for
+                # example, paths with spaces) as single argv items, which is
+                # what we need before passing arguments to incus exec.
+                parts = shlex.split(cmd, posix=False)
+                for i, part in enumerate(parts[:-1]):
+                    if part.lower() in {"-enc", "-encodedcommand", "-file", "-f"}:
+                        parts[i + 1] = parts[i + 1].strip("'\"")
+                        break
+                exec_cmd.extend(parts)
         else:
             if self.get_option("remote_user") != "root":
                 self._display.vvv(
@@ -203,25 +228,22 @@ class Connection(ConnectionBase):
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate(in_data)
 
-        stdout = to_text(stdout)
-        stderr = to_text(stderr)
-
-        if stderr.startswith("Error: ") and stderr.rstrip().endswith(": Instance is not running"):
+        if stderr.startswith(b"Error: ") and stderr.rstrip().endswith(b": Instance is not running"):
             raise AnsibleConnectionFailure(
                 f"instance not running: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if stderr.startswith("Error: ") and stderr.rstrip().endswith(": Instance not found"):
+        if stderr.startswith(b"Error: ") and stderr.rstrip().endswith(b": Instance not found"):
             raise AnsibleConnectionFailure(
                 f"instance not found: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if stderr.startswith("Error: ") and ": User does not have permission " in stderr:
+        if stderr.startswith(b"Error: ") and b": User does not have permission " in stderr:
             raise AnsibleConnectionFailure(
                 f"instance access denied: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )
 
-        if stderr.startswith("Error: ") and ": User does not have entitlement " in stderr:
+        if stderr.startswith(b"Error: ") and b": User does not have entitlement " in stderr:
             raise AnsibleConnectionFailure(
                 f"instance access denied: {self._instance()} (remote={self.get_option('remote')}, project={self.get_option('project')})"
             )

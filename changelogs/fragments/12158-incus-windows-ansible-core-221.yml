@@ -1,0 +1,3 @@
+bugfixes:
+  - "incus connection plugin - improve Windows PowerShell argv handling by stripping wrapper quotes from payload arguments for ``-enc``, ``-encodedcommand``, ``-command``, ``-c``, ``-file`` and ``-f`` (https://github.com/ansible-collections/community.general/issues/12161, https://github.com/ansible-collections/community.general/pull/12158)."
+  - "incus connection plugin - return ``stdout``/``stderr`` as bytes instead of strings to restore compatibility with ansible-core 2.21 module execution (https://github.com/ansible-collections/community.general/issues/12161, https://github.com/ansible-collections/community.general/pull/12158)."
