@@ -1,0 +1,2 @@
+bugfixes:
+  - "portage - fix ``depclean: true`` crashing with ``AnsibleModule.fail_json() missing 1 required positional argument: 'msg'`` instead of reporting the actual emerge failure (https://github.com/ansible-collections/community.general/pull/12168)."
