@@ -625,8 +625,6 @@ files:
     maintainers: $team_ansible_core johanwiren
   $modules/gio_mime.py:
     maintainers: russoz
-  $modules/golang_package.py:
-    maintainers: shrbhosa
   $modules/git_config.py:
     maintainers: djmattyg007 mgedmin
   $modules/git_config_info.py:
@@ -678,6 +676,8 @@ files:
     maintainers: pixslx
   $modules/gitlab_project_approvals.py:
     maintainers: masa-orca
+  $modules/golang_package.py:
+    maintainers: shrbhosa
   $modules/grove.py:
     maintainers: zimbatm
   $modules/gunicorn.py:

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (c) 2025 Shreyash Bhosale <shreyashbhosale02@gmail.com>
+# Copyright (c) 2026 Shreyash Bhosale <shreyashpb16@gmail.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
