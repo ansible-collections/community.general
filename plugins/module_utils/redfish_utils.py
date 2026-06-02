@@ -3685,7 +3685,7 @@ class RedfishUtils:
         nic_info["ethernet_setting"] = target_ethernet_current_setting
 
         if target_ethernet_uri is None:
-            return {}
+            return {"ret": False, "msg": f"Manager NIC with address '{nic_addr}' not found"}
         else:
             return nic_info
 
