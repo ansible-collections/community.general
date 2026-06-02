@@ -1,0 +1,33 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: print_match returns matching xpath paths in matches
+  xml_info:
+    path: /tmp/ansible-xml-info-beers.xml
+    xpath: /business/beers/beer
+    print_match: true
+  register: print_match_result
+
+- name: Test expected result
+  assert:
+    that:
+      - print_match_result is not changed
+      - print_match_result.matches | length == 3
+      - "'/business/beers/beer[1]' in print_match_result.matches"
+      - "'/business/beers/beer[2]' in print_match_result.matches"
+      - "'/business/beers/beer[3]' in print_match_result.matches"
+
+- name: print_match with no matches returns empty matches list
+  xml_info:
+    path: /tmp/ansible-xml-info-beers.xml
+    xpath: /business/nonexistent
+    print_match: true
+  register: print_match_empty
+
+- name: Test expected result for no matches
+  assert:
+    that:
+      - print_match_empty is not changed
+      - print_match_empty.matches | length == 0

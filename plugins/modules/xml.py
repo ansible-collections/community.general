@@ -16,35 +16,13 @@ description:
   - A CRUD-like interface to managing bits of XML files.
 extends_documentation_fragment:
   - community.general._attributes
+  - community.general._xml
 attributes:
   check_mode:
     support: full
   diff_mode:
     support: full
 options:
-  path:
-    description:
-      - Path to the file to operate on.
-      - This file must exist ahead of time.
-      - This parameter is required, unless O(xmlstring) is given.
-    type: path
-    aliases: [dest, file]
-  xmlstring:
-    description:
-      - A string containing XML on which to operate.
-      - This parameter is required, unless O(path) is given.
-    type: str
-  xpath:
-    description:
-      - A valid XPath expression describing the item(s) you want to manipulate.
-      - Operates on the document root, V(/), by default.
-    type: str
-  namespaces:
-    description:
-      - The namespace C(prefix:uri) mapping for the XPath expression.
-      - Needs to be a C(dict), not a C(list) of items.
-    type: dict
-    default: {}
   state:
     description:
       - Set or remove an xpath selection (node(s), attribute(s)).
@@ -80,29 +58,11 @@ options:
       - This parameter requires O(xpath) to be set.
     type: list
     elements: raw
-  count:
-    description:
-      - Search for a given O(xpath) and provide the count of any matches.
-      - This parameter requires O(xpath) to be set.
-    type: bool
-    default: false
-  print_match:
-    description:
-      - Search for a given O(xpath) and print out any matches.
-      - This parameter requires O(xpath) to be set.
-    type: bool
-    default: false
   pretty_print:
     description:
       - Pretty print XML output.
     type: bool
     default: false
-  content:
-    description:
-      - Search for a given O(xpath) and get content.
-      - This parameter requires O(xpath) to be set.
-    type: str
-    choices: [attribute, text]
   input_type:
     description:
       - Type of input for O(add_children) and O(set_children).
@@ -115,18 +75,7 @@ options:
         it incorrectly.
     type: bool
     default: false
-  strip_cdata_tags:
-    description:
-      - Remove CDATA tags surrounding text values.
-      - Note that this might break your XML file if text values contain characters that could be interpreted as XML.
-    type: bool
-    default: false
   huge_tree:
-    description:
-      - Disable libxml2 security restrictions on XML node size or document depth, allowing processing of very large XML files.
-      - This option should only be activated when needed, as it disables internal safety limits.
-    type: bool
-    default: false
     version_added: "13.0.0"
   insertbefore:
     description:
@@ -151,15 +100,9 @@ options:
     type: bool
     default: true
     version_added: "13.0.0"
-requirements:
-  - lxml >= 2.3.0
 notes:
   - Use the C(--check) and C(--diff) options when testing your expressions.
   - The diff output is automatically pretty-printed, so may not reflect the actual file content, only the file structure.
-  - This module does not handle complicated xpath expressions, so limit xpath selectors to simple expressions.
-  - Beware that in case your XML elements are namespaced, you need to use the O(namespaces) parameter, see the examples.
-  - Namespaces prefix should be used for all children of an element where namespace is defined, unless another namespace is
-    defined for them.
 seealso:
   - name: XML module development community wiki (archived)
     description: More information related to the development of this xml module.
@@ -370,27 +313,33 @@ xmlstring:
 """
 
 import copy
-import json
-import os
 import re
 import traceback
+import typing as t
 from collections.abc import MutableMapping
 from io import BytesIO
 
-from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
-
-LXML_IMP_ERR = None
-try:
-    from lxml import etree, objectify
-
-    LXML_VERSION_STR = ".".join(str(f) for f in etree.LXML_VERSION)
-    HAS_LXML = True
-except ImportError:
-    LXML_IMP_ERR = traceback.format_exc()
-    HAS_LXML = False
-
-from ansible.module_utils.basic import AnsibleModule, json_dict_bytes_to_unicode, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule, json_dict_bytes_to_unicode
 from ansible.module_utils.common.text.converters import to_bytes
+
+from ansible_collections.community.general.plugins.module_utils._xml import (
+    check_lxml,
+    collect_element_attr,
+    collect_element_text,
+    count_matches,
+    etree,
+    get_matches,
+    is_node,
+    parse_xml_doc,
+    validate_xpath,
+    xpath_matches,
+)
+
+objectify: t.Any = None
+try:
+    from lxml import objectify  # type: ignore[no-redef]
+except ImportError:
+    pass
 
 _IDENT = r"[a-zA-Z-][a-zA-Z0-9_\-\.]*"
 _NSIDENT = f"{_IDENT}|{_IDENT}:{_IDENT}"
@@ -413,33 +362,14 @@ def has_changed(doc):
 
 
 def do_print_match(module, tree, xpath, namespaces):
-    match = tree.xpath(xpath, namespaces=namespaces)
-    match_xpaths = []
-    for m in match:
-        match_xpaths.append(tree.getpath(m))
-    match_str = json.dumps(match_xpaths)
-    msg = f"selector '{xpath}' match: {match_str}"
-    finish(module, tree, xpath, namespaces, changed=False, msg=msg, matches=match_xpaths)
+    result = get_matches(tree, xpath, namespaces)
+    finish(module, tree, xpath, namespaces, changed=False, msg=result["msg"], matches=result["matches"])
 
 
 def count_nodes(module, tree, xpath, namespaces):
     """Return the count of nodes matching the xpath"""
-    hits = tree.xpath(f"count(/{xpath})", namespaces=namespaces)
-    msg = f"found {hits} nodes"
-    finish(module, tree, xpath, namespaces, changed=False, msg=msg, hitcount=int(hits))
-
-
-def is_node(tree, xpath, namespaces):
-    """Test if a given xpath matches anything and if that match is a node.
-
-    For now we just assume you're only searching for one specific thing."""
-    if xpath_matches(tree, xpath, namespaces):
-        # OK, it found something
-        match = tree.xpath(xpath, namespaces=namespaces)
-        if isinstance(match[0], etree._Element):
-            return True
-
-    return False
+    result = count_matches(tree, xpath, namespaces)
+    finish(module, tree, xpath, namespaces, changed=False, msg=result["msg"], hitcount=result["count"])
 
 
 def is_attribute(tree, xpath, namespaces):
@@ -455,14 +385,9 @@ def is_attribute(tree, xpath, namespaces):
         match = tree.xpath(xpath, namespaces=namespaces)
         if isinstance(match[0], etree._ElementUnicodeResult):
             return True
-        elif ElementStringResult is not None and isinstance(match[0], ElementStringResult):
+        elif ElementStringResult is not None and isinstance(match[0], ElementStringResult):  # pylint: disable=isinstance-second-argument-not-valid-type
             return True
     return False
-
-
-def xpath_matches(tree, xpath, namespaces):
-    """Test if a node exists"""
-    return bool(tree.xpath(xpath, namespaces=namespaces))
 
 
 def delete_xpath_target(module, tree, xpath, namespaces):
@@ -737,28 +662,16 @@ def set_target(module, tree, xpath, namespaces, attribute, value, create_if_miss
 
 
 def get_element_text(module, tree, xpath, namespaces):
-    if not is_node(tree, xpath, namespaces):
+    elements = collect_element_text(tree, xpath, namespaces)
+    if elements is None:
         module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
-
-    elements = []
-    for element in tree.xpath(xpath, namespaces=namespaces):
-        elements.append({element.tag: element.text})
-
     finish(module, tree, xpath, namespaces, changed=False, msg=len(elements), hitcount=len(elements), matches=elements)
 
 
 def get_element_attr(module, tree, xpath, namespaces):
-    if not is_node(tree, xpath, namespaces):
+    elements = collect_element_attr(tree, xpath, namespaces)
+    if elements is None:
         module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
-
-    elements = []
-    for element in tree.xpath(xpath, namespaces=namespaces):
-        child = {}
-        for key in element.keys():
-            value = element.get(key)
-            child.update({key: value})
-        elements.append({element.tag: child})
-
     finish(module, tree, xpath, namespaces, changed=False, msg=len(elements), hitcount=len(elements), matches=elements)
 
 
@@ -951,42 +864,19 @@ def main():
     insertafter = module.params["insertafter"]
     create_if_missing = module.params["create_if_missing"]
 
-    # Check if we have lxml 2.3.0 or newer installed
-    if not HAS_LXML:
-        module.fail_json(msg=missing_required_lib("lxml"), exception=LXML_IMP_ERR)
-    elif LooseVersion(LXML_VERSION_STR) < LooseVersion("2.3.0"):
-        module.fail_json(msg="The xml ansible module requires lxml 2.3.0 or newer installed on the managed machine")
-    elif LooseVersion(LXML_VERSION_STR) < LooseVersion("3.0.0"):
-        module.warn("Using lxml version lower than 3.0.0 does not guarantee predictable element attribute order.")
+    check_lxml(module)
 
-    infile = None
-    try:
-        # Check if the file exists
-        if xml_string:
-            infile = BytesIO(to_bytes(xml_string, errors="surrogate_or_strict"))
-        elif os.path.isfile(xml_file):
-            infile = open(xml_file, "rb")
-        else:
-            module.fail_json(msg=f"The target XML source '{xml_file}' does not exist.")
+    if xpath is not None:
+        validate_xpath(module, xpath)
 
-        # Parse and evaluate xpath expression
-        if xpath is not None:
-            try:
-                etree.XPath(xpath)
-            except etree.XPathSyntaxError as e:
-                module.fail_json(msg=f"Syntax error in xpath expression: {xpath} ({e})")
-            except etree.XPathEvalError as e:
-                module.fail_json(msg=f"Evaluation error in xpath expression: {xpath} ({e})")
-
-        # Try to parse in the target XML file
-        try:
-            parser = etree.XMLParser(remove_blank_text=pretty_print, strip_cdata=strip_cdata_tags, huge_tree=huge_tree)
-            doc = etree.parse(infile, parser)
-        except etree.XMLSyntaxError as e:
-            module.fail_json(msg=f"Error while parsing document: {xml_file or 'xml_string'} ({e})")
-    finally:
-        if infile:
-            infile.close()
+    doc = parse_xml_doc(
+        module,
+        xml_file=xml_file,
+        xml_string=xml_string,
+        strip_cdata_tags=strip_cdata_tags,
+        huge_tree=huge_tree,
+        remove_blank_text=pretty_print,
+    )
 
     # Ensure we have the original copy to compare
     global orig_doc
