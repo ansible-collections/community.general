@@ -1,0 +1,2 @@
+bugfixes:
+  - opkg - correctly set executable search path (https://github.com/ansible-collections/community.general/pull/12182).
