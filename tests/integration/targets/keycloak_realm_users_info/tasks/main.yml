@@ -1,14 +1,23 @@
-# Copyright (c) 2022, Dušan Marković (@bratwurzt)
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+- name: Wait for Keycloak
+  uri:
+    url: "{{ url }}/admin/"
+    status_code: 200
+    validate_certs: false
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 10
 
-- name: Delete realm
+- name: Delete realm if exists
   community.general.keycloak_realm:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
     auth_username: "{{ admin_user }}"
     auth_password: "{{ admin_password }}"
-    id: "{{ realm }}"
     realm: "{{ realm }}"
     state: absent
 
