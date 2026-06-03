@@ -143,7 +143,7 @@ try:
 except ImportError:
     pass
 
-from ansible.errors import AnsibleError
+from ansible.errors import AnsibleLookupError
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
@@ -232,7 +232,7 @@ class LookupModule(LookupBase):
             try:
                 exclude_pattern = re.compile(exclude)
             except re.error as e:
-                raise AnsibleError(f"Invalid exclude regular expression {exclude!r}: {e}") from e
+                raise AnsibleLookupError(f"Invalid exclude regular expression {exclude!r}: {e}") from e
         else:
             exclude_pattern = None
 
