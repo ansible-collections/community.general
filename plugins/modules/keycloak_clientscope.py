@@ -146,7 +146,6 @@ options:
   protocol_mappers_behavior:
     description:
       - Determine how O(protocol_mappers) behave when updating an existing client_scope.
-needed.'
     choices:
       subset:
         - Add missing protocol mappers, do not remove any missing mappers.'
