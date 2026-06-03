@@ -1103,7 +1103,7 @@ class KeycloakAPI:
 
     def get_user_by_username(self, username: str, realm: str = "master") -> dict[str, t.Any] | None:
         """Fetch a keycloak user within a realm based on its username.
-        
+
         If the username is not found, None is returned.
         :param username: Username of the user to fetch.
         :param realm: Realm in which the user resides; default 'master'"""
@@ -1122,7 +1122,6 @@ class KeycloakAPI:
             )
         except Exception as e:
             self.fail_request(e, msg=f"Could not obtain the user for realm {realm} and username {username}: {e}")
-
 
     def get_service_account_user_by_client_id(self, client_id, realm: str = "master"):
         """Fetch a keycloak service account user within a realm based on its client_id.

@@ -63,12 +63,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-msg:
-  description: Status message about the action performed.
-  returned: always
-  type: str
-  sample: "Got users in realm MyCustomRealm"
-
 users:
   description: List of users in the specified realm.
   returned: always
@@ -81,12 +75,6 @@ users:
     - id: "2345-6789-01"
       username: "user2"
       email: "user2@example.com"
-
-changed:
-  description: Indicates if any changes were made (always False, as this is a read-only operation).
-  returned: always
-  type: bool
-  sample: false
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -100,17 +88,9 @@ from ansible_collections.community.general.plugins.module_utils._keycloak import
 
 
 def main():
-    """
-    Module execution
-
-    :return:
-    """
     argument_spec = keycloak_argument_spec()
-    meta_args = dict(
-        realm=dict(default="master"),
-    )
 
-    argument_spec.update(meta_args)
+    argument_spec["realm"] = dict(default="master")
 
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -134,10 +114,7 @@ def main():
 
     realm = module.params.get("realm")
 
-    users = kc.get_realm_users(realm=realm)
-
-    result["users"] = users
-    result["msg"] = f"Got users in realm {realm}"
+    result["users"] = kc.get_realm_users(realm=realm)
     module.exit_json(**result)
 
 
