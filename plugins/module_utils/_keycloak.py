@@ -1085,22 +1085,6 @@ class KeycloakAPI:
         except Exception as e:
             self.fail_request(e, msg=f"Could not fetch effective rolemappings for user {uid}, realm {realm}: {e}")
 
-    def get_realm_users(self, realm: str = "master") -> list[dict[str, t.Any]]:
-        """Obtain list of users from the realm
-
-        :param realm: realm id
-        :return: list of user representations
-        """
-        users_url = URL_USERS.format(url=self.baseurl, realm=realm)
-        try:
-            return self._request_and_deserialize(users_url, method="GET")
-        except ValueError as e:
-            self.module.fail_json(
-                msg=f"API returned incorrect JSON when trying to obtain the users for realm {realm}: {e}"
-            )
-        except Exception as e:
-            self.fail_request(e, msg=f"Could not obtain the users for realm {realm}: {e}")
-
     def get_user_by_username(self, username: str, realm: str = "master") -> dict[str, t.Any] | None:
         """Fetch a keycloak user within a realm based on its username.
 
@@ -1122,6 +1106,22 @@ class KeycloakAPI:
             )
         except Exception as e:
             self.fail_request(e, msg=f"Could not obtain the user for realm {realm} and username {username}: {e}")
+
+    def get_realm_users(self, realm: str = "master") -> list[dict[str, t.Any]]:
+        """Obtain list of users from the realm
+
+        :param realm: realm id
+        :return: list of user representations
+        """
+        users_url = URL_USERS.format(url=self.baseurl, realm=realm)
+        try:
+            return self._request_and_deserialize(users_url, method="GET")
+        except ValueError as e:
+            self.module.fail_json(
+                msg=f"API returned incorrect JSON when trying to obtain the users for realm {realm}: {e}"
+            )
+        except Exception as e:
+            self.fail_request(e, msg=f"Could not obtain the users for realm {realm}: {e}")
 
     def get_service_account_user_by_client_id(self, client_id, realm: str = "master"):
         """Fetch a keycloak service account user within a realm based on its client_id.
