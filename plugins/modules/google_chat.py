@@ -1,0 +1,220 @@
+#!/usr/bin/python
+
+# Copyright (c) 2026, Tom Scholz <tomscholz@outlook.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: google_chat
+short_description: Send Google Chat notifications
+version_added: "13.1.0"
+description:
+  - Sends notifications to a Google Chat space using an incoming webhook.
+  - Incoming webhooks are one-way. They send messages but cannot receive or respond to them.
+author:
+  - Tom Scholz (@tomscholz)
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+    description: Can run in C(check_mode) and return changed status prediction without modifying target.
+  diff_mode:
+    support: none
+    description: Will return details on what has changed (or possibly needs changing in C(check_mode)), when in diff mode.
+options:
+  webhook_url:
+    type: str
+    required: true
+    description:
+      - The incoming webhook URL for the Chat space, including the C(key) and C(token) query parameters.
+      - Keep this value secret as it grants the ability to post to the space.
+  text:
+    type: str
+    required: true
+    description:
+      - The text of the message to send.
+      - 'Emoji must be supplied as Unicode characters (for example V(🚀)). The Chat API does not
+        render C(:shortcode:) style emoji in plain text messages; they appear as literal text.'
+  thread_key:
+    type: str
+    description:
+      - An arbitrary key used to start or reply to a message thread.
+      - When set, O(message_reply_option) controls the behavior when the thread is not found.
+  message_reply_option:
+    type: str
+    description:
+      - Behavior when O(thread_key) is supplied but no matching thread exists.
+      - Only used when O(thread_key) is set.
+    choices:
+      - REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD
+      - REPLY_MESSAGE_OR_FAIL
+  validate_certs:
+    type: bool
+    default: true
+    description:
+      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using
+        self-signed certificates.
+seealso:
+  - name: Google Chat incoming webhooks
+    description: Google's reference for sending messages to Chat with incoming webhooks.
+    link: https://developers.google.com/workspace/chat/quickstart/webhooks
+"""
+
+EXAMPLES = r"""
+- name: Send a notification to Google Chat
+  community.general.google_chat:
+    webhook_url: "https://chat.googleapis.com/v1/spaces/SPACE_ID/messages?key=KEY&token=TOKEN"
+    text: '{{ inventory_hostname }} completed'
+  delegate_to: localhost
+
+- name: Start a thread
+  community.general.google_chat:
+    webhook_url: "https://chat.googleapis.com/v1/spaces/SPACE_ID/messages?key=KEY&token=TOKEN"
+    text: 'Starting a thread'
+    thread_key: 'deploy-2026-06-01'
+    message_reply_option: REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD
+
+# Post each deploy step into a single thread. The first message creates the thread
+# with REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD; follow-ups use REPLY_MESSAGE_OR_FAIL so
+# they only post if the opening message landed, rather than leaving orphan threads.
+# Note: webhooks are rate-limited to 1 request per second per space.
+- name: Announce deploy start (starts the thread)
+  community.general.google_chat:
+    webhook_url: "{{ chat_webhook }}"
+    text: "🚀 Starting deploy of *{{ app_version | default('latest') }}* to {{ inventory_hostname }}"
+    thread_key: "{{ deploy_thread }}"
+    message_reply_option: REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD
+  delegate_to: localhost
+  run_once: true
+  # deploy_thread is defined once for the play, for example:
+  #   deploy_thread: "deploy-{{ inventory_hostname }}-{{ ansible_date_time.iso8601_basic_short }}"
+
+- name: Report a step into the same thread
+  community.general.google_chat:
+    webhook_url: "{{ chat_webhook }}"
+    text: "✅ Step 1/3 — code checked out"
+    thread_key: "{{ deploy_thread }}"
+    message_reply_option: REPLY_MESSAGE_OR_FAIL
+  delegate_to: localhost
+  run_once: true
+
+# Wrap risky tasks so a failure posts to the same thread before a play aborts.
+- name: Deploy with failure notification
+  block:
+    - name: Restart service
+      ansible.builtin.systemd:
+        name: app
+        state: restarted
+
+    - name: Report success
+      community.general.google_chat:
+        webhook_url: "{{ chat_webhook }}"
+        text: "🎉 Deploy to {{ inventory_hostname }} complete"
+        thread_key: "{{ deploy_thread }}"
+        message_reply_option: REPLY_MESSAGE_OR_FAIL
+      delegate_to: localhost
+      run_once: true
+  rescue:
+    - name: Report failure into the thread
+      community.general.google_chat:
+        webhook_url: "{{ chat_webhook }}"
+        text: "❌ Deploy to {{ inventory_hostname }} *failed* — {{ ansible_failed_task.name }}"
+        thread_key: "{{ deploy_thread }}"
+        message_reply_option: REPLY_MESSAGE_OR_FAIL
+      delegate_to: localhost
+      run_once: true
+
+    - name: Re-raise the failure
+      ansible.builtin.fail:
+        msg: "Deploy failed at {{ ansible_failed_task.name }}"
+"""
+
+RETURN = r"""
+name:
+  description: Resource name of the created message, returned by the Chat API.
+  returned: success
+  type: str
+  sample: "spaces/AAAA/messages/BBBB.BBBB"
+thread_name:
+  description: Resource name of the thread the message belongs to.
+  returned: when the response includes a thread
+  type: str
+  sample: "spaces/AAAA/threads/CCCC"
+"""
+
+from urllib.parse import urlencode
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
+
+
+def build_payload(text, thread_key):
+    payload = {"text": text}
+    if thread_key is not None:
+        payload["thread"] = {"threadKey": thread_key}
+    return payload
+
+
+def build_url(webhook_url, message_reply_option):
+    if message_reply_option is None:
+        return webhook_url
+    sep = "&" if "?" in webhook_url else "?"
+    return f"{webhook_url}{sep}{urlencode({'messageReplyOption': message_reply_option})}"
+
+
+def do_notify(module, url, payload):
+    headers = {
+        "Content-Type": "application/json; charset=UTF-8",
+        "Accept": "application/json",
+    }
+    data = module.jsonify(payload)
+    response, info = fetch_url(module=module, url=url, headers=headers, method="POST", data=data)
+
+    if info["status"] != 200:
+        body = info.get("body")
+        if hasattr(body, "decode"):
+            body = body.decode("utf-8", errors="replace")
+        module.fail_json(
+            msg=f"Failed to send message to Google Chat (HTTP {info['status']}): {body or info.get('msg')}"
+        )
+
+    return module.from_json(response.read())
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            webhook_url=dict(type="str", required=True, no_log=True),
+            text=dict(type="str", required=True),
+            thread_key=dict(type="str", no_log=False),
+            message_reply_option=dict(
+                type="str",
+                choices=["REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD", "REPLY_MESSAGE_OR_FAIL"],
+            ),
+            validate_certs=dict(type="bool", default=True),
+        ),
+        supports_check_mode=True,
+    )
+
+    if module.check_mode:
+        module.exit_json(changed=True)
+
+    payload = build_payload(module.params["text"], module.params["thread_key"])
+    url = build_url(module.params["webhook_url"], module.params["message_reply_option"])
+
+    response = do_notify(module, url, payload)
+
+    result = {"changed": True}
+    if "name" in response:
+        result["name"] = response["name"]
+    if isinstance(response.get("thread"), dict) and "name" in response["thread"]:
+        result["thread_name"] = response["thread"]["name"]
+
+    module.exit_json(**result)
+
+
+if __name__ == "__main__":
+    main()
