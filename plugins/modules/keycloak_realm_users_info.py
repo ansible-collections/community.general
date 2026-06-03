@@ -35,8 +35,8 @@ options:
 
 extends_documentation_fragment:
   - community.general._keycloak
-  - community.general._keycloak.actiongroup_keycloak
   - community.general._attributes
+  - community.general._attributes.info_module
 
 author:
   - Felix Grzelka (@felix-grzelka)
