@@ -1090,7 +1090,8 @@ class KeycloakAPI:
 
         If the username is not found, None is returned.
         :param username: Username of the user to fetch.
-        :param realm: Realm in which the user resides; default 'master'"""
+        :param realm: Realm in which the user resides; default 'master'
+        """
         users_url = URL_USERS.format(url=self.baseurl, realm=realm)
         if username is not None:
             users_url += f"?username={quote(username, safe='')}&exact=true"
