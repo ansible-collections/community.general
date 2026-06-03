@@ -1093,8 +1093,7 @@ class KeycloakAPI:
         :param realm: Realm in which the user resides; default 'master'
         """
         users_url = URL_USERS.format(url=self.baseurl, realm=realm)
-        if username is not None:
-            users_url += f"?username={quote(username, safe='')}&exact=true"
+        users_url += f"?username={quote(username, safe='')}&exact=true"
         try:
             users = self._request_and_deserialize(users_url, method="GET")
             for user in users:
