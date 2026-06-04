@@ -1,0 +1,315 @@
+# Copyright (c) 2026, Dexter Le <dextersydney2001@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  users_list_ok: &users-list-ok
+    command: [/testbin/kopia, server, users, list, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: "alice@backuphost"
+    err: ''
+  users_list_empty: &users-list-empty
+    command: [/testbin/kopia, server, users, list, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
+
+test_cases:
+  - id: add_user
+    input:
+      state: user_present
+      username: alice@backuphost
+      user_password: secretpassword
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *users-list-empty
+        - command:
+            - /testbin/kopia
+            - server
+            - users
+            - set
+            - alice@backuphost
+            - --user-password
+            - secretpassword
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *users-list-ok
+
+  - id: add_user_with_hash
+    input:
+      state: user_present
+      username: alice@backuphost
+      user_password_hash: "$2a$12$hashedvalue"
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *users-list-empty
+        - command:
+            - /testbin/kopia
+            - server
+            - users
+            - set
+            - alice@backuphost
+            - --user-password-hash
+            - "$2a$12$hashedvalue"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *users-list-ok
+
+  - id: remove_user
+    input:
+      state: user_absent
+      username: alice@backuphost
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - users
+            - delete
+            - alice@backuphost
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *users-list-empty
+
+  - id: remove_user_no_such_user
+    input:
+      state: user_absent
+      username: alice@backuphost
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-empty
+        - command:
+            - /testbin/kopia
+            - server
+            - users
+            - delete
+            - alice@backuphost
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'no such user'
+        - *users-list-empty
+
+  - id: list_users
+    input:
+      state: users_listed
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - users
+            - list
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "alice@backuphost"
+          err: ''
+        - *users-list-ok
+
+  - id: enable_acl
+    input:
+      state: acl_enabled
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - acl
+            - enable
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *users-list-ok
+
+  - id: add_acl_entry
+    input:
+      state: acl_present
+      acl_user: alice@backuphost
+      acl_access: FULL
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - acl
+            - add
+            - --user
+            - alice@backuphost
+            - --access
+            - FULL
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *users-list-ok
+
+  - id: add_targeted_acl_entry
+    input:
+      state: acl_present
+      acl_user: bob@backuphost
+      acl_access: READ
+      acl_target: "type:snapshot,username:bob"
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - acl
+            - add
+            - --user
+            - bob@backuphost
+            - --access
+            - READ
+            - --target
+            - "type:snapshot,username:bob"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *users-list-ok
+
+  - id: delete_acl_entry
+    input:
+      state: acl_absent
+      acl_user: alice@backuphost
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - acl
+            - delete
+            - --user
+            - alice@backuphost
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *users-list-ok
+
+  - id: list_acl_entries
+    input:
+      state: acl_listed
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - acl
+            - list
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "alice@backuphost FULL"
+          err: ''
+        - *users-list-ok
+
+  - id: add_acl_entry_no_overwrite
+    input:
+      state: acl_present
+      acl_user: alice@backuphost
+      acl_access: FULL
+      acl_no_overwrite: true
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - acl
+            - add
+            - --user
+            - alice@backuphost
+            - --access
+            - FULL
+            - --no-overwrite
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *users-list-ok
+
+  - id: delete_acl_entry_no_such_rule
+    input:
+      state: acl_absent
+      acl_user: alice@backuphost
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *users-list-ok
+        - command:
+            - /testbin/kopia
+            - server
+            - acl
+            - delete
+            - --user
+            - alice@backuphost
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'no such rule'
+        - *users-list-ok
