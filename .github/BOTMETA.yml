@@ -909,6 +909,8 @@ files:
     maintainers: munchtoast
   $modules/kopia_repository.py:
     maintainers: munchtoast
+  $modules/kopia_server.py:
+    maintainers: munchtoast
   $modules/krb_ticket.py:
     maintainers: abakanovskii
   $modules/launchd.py:
