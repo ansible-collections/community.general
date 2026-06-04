@@ -88,6 +88,16 @@ options:
       - The name of the user for the sudoers rule.
       - This option cannot be used in conjunction with O(group).
     type: str
+  defaults:
+    description:
+      - A list of C(Defaults) directives to include in the sudoers rule file.
+      - Each entry is written as a C(Defaults) line scoped to the user or group specified in the rule.
+      - For example, V(!targetpw) becomes C(Defaults:%group !targetpw) for a group rule
+        or C(Defaults:user !targetpw) for a user rule.
+      - The directives are placed before the privilege rule in the generated file.
+    type: list
+    elements: str
+    version_added: 13.1.0
   validation:
     description:
       - If V(absent), the sudoers rule is added without validation.
@@ -155,6 +165,15 @@ EXAMPLES = r"""
     user: alice
     commands: /usr/bin/less
     noexec: true
+
+- name: Allow members of the operators group to sudo with their user password, overriding targetpw default
+  community.general.sudoers:
+    name: operators
+    group: operators
+    commands: ALL
+    nopassword: false
+    defaults:
+      - "!targetpw"
 """
 
 import os
@@ -180,6 +199,7 @@ class Sudoers:
         self.sudoers_path = module.params["sudoers_path"]
         self.file = os.path.join(self.sudoers_path, self.name)
         self.commands = module.params["commands"]
+        self.defaults = module.params["defaults"]
         self.validation = module.params["validation"]
 
     def write(self):
@@ -215,12 +235,18 @@ class Sudoers:
         elif self.group:
             owner = f"%{self.group}"
 
+        if self.defaults:
+            defaults_lines = [f"Defaults:{owner} {d}" for d in self.defaults]
+            defaults_str = "\n".join(defaults_lines) + "\n"
+        else:
+            defaults_str = ""
+
         commands_str = ", ".join(self.commands)
         noexec_str = "NOEXEC:" if self.noexec else ""
         nopasswd_str = "NOPASSWD:" if self.nopassword else ""
         setenv_str = "SETENV:" if self.setenv else ""
         runas_str = f"({self.runas})" if self.runas is not None else ""
-        return f"{owner} {self.host}={runas_str}{noexec_str}{nopasswd_str}{setenv_str} {commands_str}\n"
+        return f"{defaults_str}{owner} {self.host}={runas_str}{noexec_str}{nopasswd_str}{setenv_str} {commands_str}\n"
 
     def validate(self):
         if self.validation == "absent":
@@ -258,6 +284,10 @@ class Sudoers:
 def main():
     argument_spec = {
         "commands": {
+            "type": "list",
+            "elements": "str",
+        },
+        "defaults": {
             "type": "list",
             "elements": "str",
         },
