@@ -20,10 +20,8 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-    description: Can run in C(check_mode) and return changed status prediction without modifying target.
   diff_mode:
     support: none
-    description: Will return details on what has changed (or possibly needs changing in C(check_mode)), when in diff mode.
 options:
   webhook_url:
     type: str
