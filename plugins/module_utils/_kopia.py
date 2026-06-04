@@ -14,14 +14,20 @@ from ansible_collections.community.general.plugins.module_utils._cmd_runner impo
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
-# Maps kopia_repository module state values to kopia CLI subcommands.
+# Maps kopia module state values to kopia CLI subcommands.
 # Used with cmd_runner_fmt.as_map() for the 'state' arg format.
 REPOSITORY_STATE_MAP = {
+    # kopia_repository
     "created": "create",
     "connected": "connect",
     "disconnected": "disconnect",
     "synced": "sync-to",
     "throttled": "throttle",
+    # kopia_policy
+    "set": "set",
+    "shown": "show",
+    "listed": "list",
+    "deleted": "delete",
 }
 
 # Maps backend provider names to their CLI flag names.

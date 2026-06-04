@@ -46,6 +46,11 @@ def test_repository_state_map_entries():
     assert REPOSITORY_STATE_MAP["throttled"] == "throttle"
 
 
+def test_repository_state_map_policy_entries():
+    assert REPOSITORY_STATE_MAP["set"] == "set"
+    assert REPOSITORY_STATE_MAP["shown"] == "show"
+
+
 # ---------------------------------------------------------------------------
 # fmt_backend
 # ---------------------------------------------------------------------------
