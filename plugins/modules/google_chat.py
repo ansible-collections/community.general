@@ -23,11 +23,24 @@ attributes:
   diff_mode:
     support: none
 options:
-  webhook_url:
+  space:
     type: str
     required: true
     description:
-      - The incoming webhook URL for the Chat space, including the C(key) and C(token) query parameters.
+      - The identifier of the Chat space to post to, taken from the incoming webhook URL.
+      - For a webhook URL of the form C(https://chat.googleapis.com/v1/spaces/AAAA/messages?key=...&token=...),
+        this is the C(AAAA) part.
+  key:
+    type: str
+    required: true
+    description:
+      - The C(key) request parameter from the incoming webhook URL.
+      - Keep this value secret as it grants the ability to post to the space.
+  token:
+    type: str
+    required: true
+    description:
+      - The C(token) request parameter from the incoming webhook URL.
       - Keep this value secret as it grants the ability to post to the space.
   text:
     type: str
@@ -64,13 +77,17 @@ seealso:
 EXAMPLES = r"""
 - name: Send a notification to Google Chat
   community.general.google_chat:
-    webhook_url: "https://chat.googleapis.com/v1/spaces/SPACE_ID/messages?key=KEY&token=TOKEN"
+    space: SPACE_ID
+    key: KEY
+    token: TOKEN
     text: '{{ inventory_hostname }} completed'
   delegate_to: localhost
 
 - name: Start a thread
   community.general.google_chat:
-    webhook_url: "https://chat.googleapis.com/v1/spaces/SPACE_ID/messages?key=KEY&token=TOKEN"
+    space: SPACE_ID
+    key: KEY
+    token: TOKEN
     text: 'Starting a thread'
     thread_key: 'deploy-2026-06-01'
     create_new_thread: true
@@ -81,7 +98,9 @@ EXAMPLES = r"""
 # Note: webhooks are rate-limited to 1 request per second per space.
 - name: Announce deploy start (starts the thread)
   community.general.google_chat:
-    webhook_url: "{{ chat_webhook }}"
+    space: "{{ chat_space }}"
+    key: "{{ chat_key }}"
+    token: "{{ chat_token }}"
     text: "🚀 Starting deploy of *{{ app_version | default('latest') }}* to {{ inventory_hostname }}"
     thread_key: "{{ deploy_thread }}"
     create_new_thread: true
@@ -92,8 +111,10 @@ EXAMPLES = r"""
 
 - name: Report a step into the same thread
   community.general.google_chat:
-    webhook_url: "{{ chat_webhook }}"
-    text: "✅ Step 1/3 – code checked out"
+    space: "{{ chat_space }}"
+    key: "{{ chat_key }}"
+    token: "{{ chat_token }}"
+    text: "✅ Step 1/3 — code checked out"
     thread_key: "{{ deploy_thread }}"
     create_new_thread: false
   delegate_to: localhost
@@ -109,7 +130,9 @@ EXAMPLES = r"""
 
     - name: Report success
       community.general.google_chat:
-        webhook_url: "{{ chat_webhook }}"
+        space: "{{ chat_space }}"
+        key: "{{ chat_key }}"
+        token: "{{ chat_token }}"
         text: "🎉 Deploy to {{ inventory_hostname }} complete"
         thread_key: "{{ deploy_thread }}"
         create_new_thread: false
@@ -118,8 +141,10 @@ EXAMPLES = r"""
   rescue:
     - name: Report failure into the thread
       community.general.google_chat:
-        webhook_url: "{{ chat_webhook }}"
-        text: "❌ Deploy to {{ inventory_hostname }} *failed* – {{ ansible_failed_task.name }}"
+        space: "{{ chat_space }}"
+        key: "{{ chat_key }}"
+        token: "{{ chat_token }}"
+        text: "❌ Deploy to {{ inventory_hostname }} *failed* — {{ ansible_failed_task.name }}"
         thread_key: "{{ deploy_thread }}"
         create_new_thread: false
       delegate_to: localhost
@@ -148,6 +173,8 @@ from urllib.parse import urlencode
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
+BASE_URL = "https://chat.googleapis.com/v1/spaces"
+
 
 def build_payload(text, thread_key):
     payload = {"text": text}
@@ -156,14 +183,13 @@ def build_payload(text, thread_key):
     return payload
 
 
-def build_url(webhook_url, thread_key, create_new_thread):
-    params = {}
+def build_url(space, key, token, thread_key, create_new_thread):
+    params = {"key": key, "token": token}
     if thread_key is not None:
         params["messageReplyOption"] = (
             "REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD" if create_new_thread else "REPLY_MESSAGE_OR_FAIL"
         )
-    sep = "&" if "?" in webhook_url else "?"
-    return f"{webhook_url}{sep}{urlencode(params)}"
+    return f"{BASE_URL}/{space}/messages?{urlencode(params)}"
 
 
 def do_notify(module, url, payload):
@@ -188,7 +214,9 @@ def do_notify(module, url, payload):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            webhook_url=dict(type="str", required=True, no_log=True),
+            space=dict(type="str", required=True),
+            key=dict(type="str", required=True, no_log=True),
+            token=dict(type="str", required=True, no_log=True),
             text=dict(type="str", required=True),
             thread_key=dict(type="str", no_log=False),
             create_new_thread=dict(type="bool", default=True),
@@ -202,7 +230,9 @@ def main():
 
     payload = build_payload(module.params["text"], module.params["thread_key"])
     url = build_url(
-        module.params["webhook_url"],
+        module.params["space"],
+        module.params["key"],
+        module.params["token"],
         module.params["thread_key"],
         module.params["create_new_thread"],
     )

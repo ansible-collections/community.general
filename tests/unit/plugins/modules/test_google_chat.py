@@ -17,7 +17,10 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 
 from ansible_collections.community.general.plugins.modules import google_chat
 
-WEBHOOK = "https://chat.googleapis.com/v1/spaces/SPACE_ID/messages?key=KEY&token=TOKEN"
+SPACE = "SPACE_ID"
+KEY = "KEY"
+TOKEN = "TOKEN"
+BASE = "https://chat.googleapis.com/v1/spaces/SPACE_ID/messages"
 
 
 def make_response(payload):
@@ -42,20 +45,20 @@ class TestGoogleChatModule(ModuleTestCase):
                 self.module.main()
 
     def test_missing_text(self):
-        """Failure when webhook_url is given but text is missing"""
-        with set_module_args({"webhook_url": WEBHOOK}):
+        """Failure when connection params are given but text is missing"""
+        with set_module_args({"space": SPACE, "key": KEY, "token": TOKEN}):
             with self.assertRaises(AnsibleFailJson):
                 self.module.main()
 
-    def test_missing_webhook_url(self):
-        """Failure when text is given but webhook_url is missing"""
-        with set_module_args({"text": "test"}):
+    def test_missing_space(self):
+        """Failure when text is given but space is missing"""
+        with set_module_args({"key": KEY, "token": TOKEN, "text": "test"}):
             with self.assertRaises(AnsibleFailJson):
                 self.module.main()
 
     def test_successful_message(self):
         """tests sending a plain message"""
-        with set_module_args({"webhook_url": WEBHOOK, "text": "test"}):
+        with set_module_args({"space": SPACE, "key": KEY, "token": TOKEN, "text": "test"}):
             with patch.object(google_chat, "fetch_url") as fetch_url_mock:
                 fetch_url_mock.return_value = (
                     make_response({"name": "spaces/AAAA/messages/BBBB.BBBB"}),
@@ -68,14 +71,18 @@ class TestGoogleChatModule(ModuleTestCase):
         call_data = json.loads(fetch_url_mock.call_args[1]["data"])
         assert call_data["text"] == "test"
         assert "thread" not in call_data
-        assert fetch_url_mock.call_args[1]["url"] == WEBHOOK
+        url = fetch_url_mock.call_args[1]["url"]
+        assert url.startswith(BASE + "?")
+        assert "key=KEY" in url
+        assert "token=TOKEN" in url
+        assert "messageReplyOption" not in url
         assert fetch_url_mock.call_args[1]["method"] == "POST"
         assert result.exception.args[0]["changed"]
         assert result.exception.args[0]["name"] == "spaces/AAAA/messages/BBBB.BBBB"
 
     def test_failed_message(self):
         """tests failing to send a message (non-200 response)"""
-        with set_module_args({"webhook_url": WEBHOOK, "text": "test"}):
+        with set_module_args({"space": SPACE, "key": KEY, "token": TOKEN, "text": "test"}):
             with patch.object(google_chat, "fetch_url") as fetch_url_mock:
                 fetch_url_mock.return_value = (
                     None,
@@ -89,7 +96,7 @@ class TestGoogleChatModule(ModuleTestCase):
 
     def test_message_with_thread(self):
         """tests sending a message with a thread_key and reading back the thread name"""
-        with set_module_args({"webhook_url": WEBHOOK, "text": "test", "thread_key": "deploy-1"}):
+        with set_module_args({"space": SPACE, "key": KEY, "token": TOKEN, "text": "test", "thread_key": "deploy-1"}):
             with patch.object(google_chat, "fetch_url") as fetch_url_mock:
                 fetch_url_mock.return_value = (
                     make_response(
@@ -109,14 +116,16 @@ class TestGoogleChatModule(ModuleTestCase):
         assert call_data["thread"]["threadKey"] == "deploy-1"
         assert result.exception.args[0]["thread_name"] == "spaces/AAAA/threads/CCCC"
 
-    def test_create_new_thread_option(self):
-        """message_reply_option must be added as a query parameter with & (webhook already has ?)"""
+    def test_create_new_thread_false_appends_reply_or_fail(self):
+        """create_new_thread=false must map to REPLY_MESSAGE_OR_FAIL in the URL"""
         with set_module_args(
             {
-                "webhook_url": WEBHOOK,
+                "space": SPACE,
+                "key": KEY,
+                "token": TOKEN,
                 "text": "test",
                 "thread_key": "deploy-1",
-                "message_reply_option": "REPLY_MESSAGE_OR_FAIL",
+                "create_new_thread": False,
             }
         ):
             with patch.object(google_chat, "fetch_url") as fetch_url_mock:
@@ -132,7 +141,7 @@ class TestGoogleChatModule(ModuleTestCase):
 
     def test_check_mode(self):
         """check mode reports changed and never calls the API"""
-        with set_module_args({"webhook_url": WEBHOOK, "text": "test", "_ansible_check_mode": True}):
+        with set_module_args({"space": SPACE, "key": KEY, "token": TOKEN, "text": "test", "_ansible_check_mode": True}):
             with patch.object(google_chat, "fetch_url") as fetch_url_mock:
                 with self.assertRaises(AnsibleExitJson) as result:
                     self.module.main()
@@ -153,16 +162,18 @@ def test_build_payload_with_thread():
 
 
 def test_build_url_without_thread():
-    url = google_chat.build_url(WEBHOOK, None, True)
-    assert url.startswith(WEBHOOK + "?")
+    url = google_chat.build_url(SPACE, KEY, TOKEN, None, True)
+    assert url.startswith(BASE + "?")
+    assert "key=KEY" in url
+    assert "token=TOKEN" in url
     assert "messageReplyOption" not in url
 
 
 def test_build_url_create_new_thread_true():
-    url = google_chat.build_url(WEBHOOK, "deploy-1", True)
+    url = google_chat.build_url(SPACE, KEY, TOKEN, "deploy-1", True)
     assert "messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD" in url
 
 
 def test_build_url_create_new_thread_false():
-    url = google_chat.build_url(WEBHOOK, "deploy-1", False)
+    url = google_chat.build_url(SPACE, KEY, TOKEN, "deploy-1", False)
     assert "messageReplyOption=REPLY_MESSAGE_OR_FAIL" in url
