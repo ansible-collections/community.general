@@ -145,10 +145,10 @@ The following commands show how to run unit tests:
 ansible-test units --docker -v
 
 # Run all unit tests for one Python version (a lot faster):
-ansible-test units --docker -v --python 3.8
+ansible-test units --docker -v --python 3.14
 
 # Run a specific unit test (for the nmcli module) for one Python version:
-ansible-test units --docker -v --python 3.8 tests/unit/plugins/modules/net_tools/test_nmcli.py
+ansible-test units --docker -v --python 3.14 tests/unit/plugins/modules/net_tools/test_nmcli.py
 ```
 
 ### Integration tests
