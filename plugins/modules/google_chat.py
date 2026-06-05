@@ -62,12 +62,6 @@ options:
       - When V(true), a new thread is started if no matching thread is found.
       - When V(false), the message is only posted if a matching thread already exists, otherwise it fails.
       - Only used when O(thread_key) is set.
-  validate_certs:
-    type: bool
-    default: true
-    description:
-      - If V(false), SSL certificates are not validated. This should only be used on personally controlled sites using
-        self-signed certificates.
 seealso:
   - name: Google Chat incoming webhooks
     description: Google's reference for sending messages to Chat with incoming webhooks.
@@ -220,7 +214,6 @@ def main():
             text=dict(type="str", required=True),
             thread_key=dict(type="str", no_log=False),
             create_new_thread=dict(type="bool", default=True),
-            validate_certs=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
     )
