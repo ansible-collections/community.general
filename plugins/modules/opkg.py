@@ -168,7 +168,7 @@ class Opkg(StateModuleHelper):
                 update_cache=cmd_runner_fmt.as_bool("update"),
                 version=cmd_runner_fmt.as_fixed("--version"),
             ),
-            path_prefix=dir,
+            path_prefix=[dir],
         )
 
         with self.runner("version") as ctx:
