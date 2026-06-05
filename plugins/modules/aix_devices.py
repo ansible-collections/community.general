@@ -235,7 +235,7 @@ def change_device_attr(module, attributes, device, force):
             if not module.check_mode:
                 rc, chdev_out, err = module.run_command(cmd)
                 if rc != 0:
-                    module.exit_json(msg="Failed to run chdev.", rc=rc, err=err)
+                    module.fail_json(msg="Failed to run chdev.", rc=rc, err=err)
 
             attr_changed.append(attributes[attr])
         else:
