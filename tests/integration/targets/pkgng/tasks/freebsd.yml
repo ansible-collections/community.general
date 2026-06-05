@@ -498,21 +498,6 @@
 ## pkgng - example - Install single package in jail
 ##
 - name: Test within jail
-  # NOTE: FreeBSD 13.0 fails to update the package catalogue for unknown reasons (someone with FreeBSD
-  #       knowledge has to take a look)
-  #
-  # NOTE: FreeBSD 13.1 fails to update the package catalogue for unknown reasons (someone with FreeBSD
-  #       knowledge has to take a look)
-  #
-  # NOTE: FreeBSD 13.2 fails to update the package catalogue for unknown reasons (someone with FreeBSD
-  #       knowledge has to take a look)
-  #
-  # NOTE: FreeBSD 13.3 fails to update the package catalogue for unknown reasons (someone with FreeBSD
-  #       knowledge has to take a look)
-  #
-  # NOTE: FreeBSD 13.4 fails to update the package catalogue for unknown reasons (someone with FreeBSD
-  #       knowledge has to take a look)
-  #
   # NOTE: FreeBSD 13.5 fails to update the package catalogue for unknown reasons (someone with FreeBSD
   #       knowledge has to take a look)
   #
