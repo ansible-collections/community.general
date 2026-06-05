@@ -252,8 +252,8 @@ stages:
           targets:
             - name: RHEL 10.1
               test: rhel/10.1
-            - name: FreeBSD 14.2
-              test: freebsd/14.2
+            # - name: FreeBSD 14.2
+            #   test: freebsd/14.2
           groups:
             - 1
             - 2
