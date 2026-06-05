@@ -35,20 +35,20 @@ options:
     description:
       - The text of the message to send.
       - 'Emoji must be supplied as Unicode characters (for example V(🚀)). The Chat API does not
-        render C(:shortcode:) style emoji in plain text messages; they appear as literal text.'
+        render C(:shortcode:) style emoji in plain text messages as they appear as literal text.'
   thread_key:
     type: str
     description:
       - An arbitrary key used to start or reply to a message thread.
-      - When set, O(message_reply_option) controls the behavior when the thread is not found.
-  message_reply_option:
-    type: str
+      - When set, O(create_new_thread) controls the behavior when the thread is not found.
+  create_new_thread:
+    type: bool
+    default: true
     description:
-      - Behavior when O(thread_key) is supplied but no matching thread exists.
+      - Controls behavior when O(thread_key) is set but no matching thread exists.
+      - When V(true), a new thread is started if no matching thread is found.
+      - When V(false), the message is only posted if a matching thread already exists, otherwise it fails.
       - Only used when O(thread_key) is set.
-    choices:
-      - REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD
-      - REPLY_MESSAGE_OR_FAIL
   validate_certs:
     type: bool
     default: true
@@ -73,18 +73,18 @@ EXAMPLES = r"""
     webhook_url: "https://chat.googleapis.com/v1/spaces/SPACE_ID/messages?key=KEY&token=TOKEN"
     text: 'Starting a thread'
     thread_key: 'deploy-2026-06-01'
-    message_reply_option: REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD
+    create_new_thread: true
 
 # Post each deploy step into a single thread. The first message creates the thread
-# with REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD; follow-ups use REPLY_MESSAGE_OR_FAIL so
-# they only post if the opening message landed, rather than leaving orphan threads.
+# with create_new_thread=true. Follow-ups use create_new_thread=false so they only
+# post if the opening message went through, rather than leaving orphan threads.
 # Note: webhooks are rate-limited to 1 request per second per space.
 - name: Announce deploy start (starts the thread)
   community.general.google_chat:
     webhook_url: "{{ chat_webhook }}"
     text: "🚀 Starting deploy of *{{ app_version | default('latest') }}* to {{ inventory_hostname }}"
     thread_key: "{{ deploy_thread }}"
-    message_reply_option: REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD
+    create_new_thread: true
   delegate_to: localhost
   run_once: true
   # deploy_thread is defined once for the play, for example:
@@ -93,9 +93,9 @@ EXAMPLES = r"""
 - name: Report a step into the same thread
   community.general.google_chat:
     webhook_url: "{{ chat_webhook }}"
-    text: "✅ Step 1/3 — code checked out"
+    text: "✅ Step 1/3 – code checked out"
     thread_key: "{{ deploy_thread }}"
-    message_reply_option: REPLY_MESSAGE_OR_FAIL
+    create_new_thread: false
   delegate_to: localhost
   run_once: true
 
@@ -112,16 +112,16 @@ EXAMPLES = r"""
         webhook_url: "{{ chat_webhook }}"
         text: "🎉 Deploy to {{ inventory_hostname }} complete"
         thread_key: "{{ deploy_thread }}"
-        message_reply_option: REPLY_MESSAGE_OR_FAIL
+        create_new_thread: false
       delegate_to: localhost
       run_once: true
   rescue:
     - name: Report failure into the thread
       community.general.google_chat:
         webhook_url: "{{ chat_webhook }}"
-        text: "❌ Deploy to {{ inventory_hostname }} *failed* — {{ ansible_failed_task.name }}"
+        text: "❌ Deploy to {{ inventory_hostname }} *failed* – {{ ansible_failed_task.name }}"
         thread_key: "{{ deploy_thread }}"
-        message_reply_option: REPLY_MESSAGE_OR_FAIL
+        create_new_thread: false
       delegate_to: localhost
       run_once: true
 
@@ -156,11 +156,14 @@ def build_payload(text, thread_key):
     return payload
 
 
-def build_url(webhook_url, message_reply_option):
-    if message_reply_option is None:
-        return webhook_url
+def build_url(webhook_url, thread_key, create_new_thread):
+    params = {}
+    if thread_key is not None:
+        params["messageReplyOption"] = (
+            "REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD" if create_new_thread else "REPLY_MESSAGE_OR_FAIL"
+        )
     sep = "&" if "?" in webhook_url else "?"
-    return f"{webhook_url}{sep}{urlencode({'messageReplyOption': message_reply_option})}"
+    return f"{webhook_url}{sep}{urlencode(params)}"
 
 
 def do_notify(module, url, payload):
@@ -188,10 +191,7 @@ def main():
             webhook_url=dict(type="str", required=True, no_log=True),
             text=dict(type="str", required=True),
             thread_key=dict(type="str", no_log=False),
-            message_reply_option=dict(
-                type="str",
-                choices=["REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD", "REPLY_MESSAGE_OR_FAIL"],
-            ),
+            create_new_thread=dict(type="bool", default=True),
             validate_certs=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
@@ -201,7 +201,11 @@ def main():
         module.exit_json(changed=True)
 
     payload = build_payload(module.params["text"], module.params["thread_key"])
-    url = build_url(module.params["webhook_url"], module.params["message_reply_option"])
+    url = build_url(
+        module.params["webhook_url"],
+        module.params["thread_key"],
+        module.params["create_new_thread"],
+    )
 
     response = do_notify(module, url, payload)
 

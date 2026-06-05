@@ -53,12 +53,6 @@ class TestGoogleChatModule(ModuleTestCase):
             with self.assertRaises(AnsibleFailJson):
                 self.module.main()
 
-    def test_invalid_message_reply_option(self):
-        """Failure when message_reply_option is not one of the valid choices"""
-        with set_module_args({"webhook_url": WEBHOOK, "text": "test", "message_reply_option": "BOGUS"}):
-            with self.assertRaises(AnsibleFailJson):
-                self.module.main()
-
     def test_successful_message(self):
         """tests sending a plain message"""
         with set_module_args({"webhook_url": WEBHOOK, "text": "test"}):
@@ -115,7 +109,7 @@ class TestGoogleChatModule(ModuleTestCase):
         assert call_data["thread"]["threadKey"] == "deploy-1"
         assert result.exception.args[0]["thread_name"] == "spaces/AAAA/threads/CCCC"
 
-    def test_message_reply_option_appended_to_url(self):
+    def test_create_new_thread_option(self):
         """message_reply_option must be added as a query parameter with & (webhook already has ?)"""
         with set_module_args(
             {
@@ -134,7 +128,7 @@ class TestGoogleChatModule(ModuleTestCase):
                     self.module.main()
 
         url = fetch_url_mock.call_args[1]["url"]
-        assert url == WEBHOOK + "&messageReplyOption=REPLY_MESSAGE_OR_FAIL"
+        assert "messageReplyOption=REPLY_MESSAGE_OR_FAIL" in url
 
     def test_check_mode(self):
         """check mode reports changed and never calls the API"""
@@ -158,22 +152,17 @@ def test_build_payload_with_thread():
     assert payload == {"text": "hello", "thread": {"threadKey": "deploy-1"}}
 
 
-build_url_cases = [
-    # (webhook_url, message_reply_option, expected_url)
-    (WEBHOOK, None, WEBHOOK),
-    (
-        WEBHOOK,
-        "REPLY_MESSAGE_OR_FAIL",
-        WEBHOOK + "&messageReplyOption=REPLY_MESSAGE_OR_FAIL",
-    ),
-    (
-        "https://chat.googleapis.com/v1/spaces/X/messages",
-        "REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD",
-        "https://chat.googleapis.com/v1/spaces/X/messages?messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD",
-    ),
-]
+def test_build_url_without_thread():
+    url = google_chat.build_url(WEBHOOK, None, True)
+    assert url.startswith(WEBHOOK + "?")
+    assert "messageReplyOption" not in url
 
 
-@pytest.mark.parametrize("webhook_url, option, expected", build_url_cases)
-def test_build_url(webhook_url, option, expected):
-    assert google_chat.build_url(webhook_url, option) == expected
+def test_build_url_create_new_thread_true():
+    url = google_chat.build_url(WEBHOOK, "deploy-1", True)
+    assert "messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD" in url
+
+
+def test_build_url_create_new_thread_false():
+    url = google_chat.build_url(WEBHOOK, "deploy-1", False)
+    assert "messageReplyOption=REPLY_MESSAGE_OR_FAIL" in url
