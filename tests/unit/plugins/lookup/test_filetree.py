@@ -13,7 +13,6 @@ from unittest.mock import patch
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.loader import lookup_loader
 from ansible.template import Templar
-
 from ansible_collections.community.internal_test_tools.tests.unit.mock.loader import DictDataLoader
 
 
