@@ -281,6 +281,8 @@ files:
     maintainers: jantari
   $lookups/bitwarden.py:
     maintainers: lungj
+  $lookups/proton_pass.py:
+    maintainers: jeankhawand
   $lookups/cartesian.py: {}
   $lookups/chef_databag.py: {}
   $lookups/collection_version.py:
