@@ -9,5 +9,11 @@ skip/docker             # kernel modules not loadable
 skip/freebsd            # no iptables/netfilter (Linux specific)
 skip/macos              # no iptables/netfilter (Linux specific)
 
-skip/ubuntu22.04  # TODO there's a problem here!
-skip/rhel10.0     # TODO there's a problem here!
+# This test doesn't seem to work with split-controller testing.
+# That's the case when the target's Python version doesn't support
+# ansible-core's controller. (Would be good to debug this and try
+# to figure out **why** that's the case, because the module should
+# also work when that's **not** the case.)
+
+# The following makes sure that the test is only run if target == controller:
+context/controller
