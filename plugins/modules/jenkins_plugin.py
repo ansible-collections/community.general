@@ -350,7 +350,7 @@ class FailedInstallingWithPluginManager(Exception):
 
 
 class JenkinsPlugin:
-    def __init__(self, module):
+    def __init__(self, module, installed_plugins=None):
         # To be able to call fail_json
         self.module = module
 
@@ -381,6 +381,7 @@ class JenkinsPlugin:
             self._get_crumb()
 
         # Get list of installed plugins
+        self.installed_plugins = installed_plugins
         self._get_installed_plugins()
 
     def _csrf_enabled(self):
@@ -488,19 +489,22 @@ class JenkinsPlugin:
             self.module.fail_json(msg="Required fields not found in the Crum response.", details=crumb_data)
 
     def _get_installed_plugins(self):
-        plugins_data = self._get_json_data(f"{self.url}/pluginManager/api/json?depth=1", "list of plugins")
+        # list may have been passed down from calling JenkinsPlugin instance
+        if self.installed_plugins is None:
+            plugins_data = self._get_json_data(f"{self.url}/pluginManager/api/json?depth=1", "list of plugins")
 
-        # Check if we got valid data
-        if "plugins" not in plugins_data:
-            self.module.fail_json(msg="No valid plugin data found.")
+            # Check if we got valid data
+            if "plugins" not in plugins_data:
+                self.module.fail_json(msg="No valid plugin data found.")
+
+            self.installed_plugins = plugins_data["plugins"]
 
         # Create final list of installed/pined plugins
         self.is_installed = False
         self.is_pinned = False
         self.is_enabled = False
-        self.installed_plugins = plugins_data["plugins"]
 
-        for p in plugins_data["plugins"]:
+        for p in self.installed_plugins:
             if p["shortName"] == self.params["name"]:
                 self.is_installed = True
 
@@ -525,7 +529,8 @@ class JenkinsPlugin:
                     argument_spec=self.module.argument_spec, supports_check_mode=self.module.check_mode
                 )
                 dep_module.params = dep_params
-                dep_plugin = JenkinsPlugin(dep_module)
+                dep_plugin = JenkinsPlugin(dep_module, installed_plugins=self.installed_plugins)
+                self.installed_plugins.append({"shortName": dep_name, "version": dep_version})
                 if not dep_plugin.install():
                     self.dependencies_states.append({"name": dep_name, "version": dep_version, "state": "absent"})
                 else:
