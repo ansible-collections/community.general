@@ -508,10 +508,11 @@ class JenkinsPlugin:
             if p["shortName"] == self.params["name"]:
                 self.is_installed = True
 
-                if p["pinned"]:
+                # cached entries don't carry metadata, fail gracefully on missing fields
+                if p.get("pinned"):
                     self.is_pinned = True
 
-                if p["enabled"]:
+                if p.get("enabled"):
                     self.is_enabled = True
 
                 break
