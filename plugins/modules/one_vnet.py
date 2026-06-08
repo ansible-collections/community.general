@@ -11,7 +11,7 @@ DOCUMENTATION = r"""
 module: one_vnet
 short_description: Manages OpenNebula virtual networks
 version_added: 9.4.0
-author: "Alexander Bakanovskii (@abakanovskii)"
+author: "Alexander Bakanovskii (@bakanovskii)"
 requirements:
   - pyone
 description:
