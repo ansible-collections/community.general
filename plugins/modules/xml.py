@@ -93,6 +93,25 @@ options:
       - This parameter requires O(xpath) to be set.
     type: bool
     default: false
+  count:
+    description:
+      - Search for a given O(xpath) and provide the count of any matches.
+      - This parameter requires O(xpath) to be set.
+    type: bool
+    default: false
+  print_match:
+    description:
+      - Search for a given O(xpath) and return the XPath paths of any matches.
+      - This parameter requires O(xpath) to be set.
+    type: bool
+    default: false
+  content:
+    description:
+      - Search for a given O(xpath) and get content.
+      - If V(attribute), return the attributes of matched elements.
+      - If V(text), return the text content of matched elements.
+    type: str
+    choices: [attribute, text]
   create_if_missing:
     description:
       - When using O(value) and the O(xpath) matches no nodes, create the node.
@@ -328,6 +347,7 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
     collect_element_text,
     count_matches,
     etree,
+    get_common_argument_spec,
     get_matches,
     is_node,
     parse_xml_doc,
@@ -796,29 +816,25 @@ def finish(module, tree, xpath, namespaces, changed=False, msg="", hitcount=0, m
 
 
 def main():
+    argument_spec = get_common_argument_spec()
+    argument_spec.update(
+        count=dict(type="bool", default=False),
+        print_match=dict(type="bool", default=False),
+        content=dict(type="str", choices=["attribute", "text"]),
+        state=dict(type="str", default="present", choices=["absent", "present"], aliases=["ensure"]),
+        value=dict(type="raw"),
+        attribute=dict(type="raw"),
+        add_children=dict(type="list", elements="raw"),
+        set_children=dict(type="list", elements="raw"),
+        pretty_print=dict(type="bool", default=False),
+        input_type=dict(type="str", default="yaml", choices=["xml", "yaml"]),
+        backup=dict(type="bool", default=False),
+        insertbefore=dict(type="bool", default=False),
+        insertafter=dict(type="bool", default=False),
+        create_if_missing=dict(type="bool", default=True),
+    )
     module = AnsibleModule(
-        argument_spec=dict(
-            path=dict(type="path", aliases=["dest", "file"]),
-            xmlstring=dict(type="str"),
-            xpath=dict(type="str"),
-            namespaces=dict(type="dict", default={}),
-            state=dict(type="str", default="present", choices=["absent", "present"], aliases=["ensure"]),
-            value=dict(type="raw"),
-            attribute=dict(type="raw"),
-            add_children=dict(type="list", elements="raw"),
-            set_children=dict(type="list", elements="raw"),
-            count=dict(type="bool", default=False),
-            print_match=dict(type="bool", default=False),
-            pretty_print=dict(type="bool", default=False),
-            content=dict(type="str", choices=["attribute", "text"]),
-            input_type=dict(type="str", default="yaml", choices=["xml", "yaml"]),
-            backup=dict(type="bool", default=False),
-            strip_cdata_tags=dict(type="bool", default=False),
-            huge_tree=dict(type="bool", default=False),
-            insertbefore=dict(type="bool", default=False),
-            insertafter=dict(type="bool", default=False),
-            create_if_missing=dict(type="bool", default=True),
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True,
         required_by=dict(
             add_children=["xpath"],

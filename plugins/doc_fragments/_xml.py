@@ -38,25 +38,6 @@ options:
       - Needs to be a C(dict), not a C(list) of items.
     type: dict
     default: {}
-  count:
-    description:
-      - Search for a given O(xpath) and provide the count of any matches.
-      - This parameter requires O(xpath) to be set.
-    type: bool
-    default: false
-  print_match:
-    description:
-      - Search for a given O(xpath) and return the XPath paths of any matches.
-      - This parameter requires O(xpath) to be set.
-    type: bool
-    default: false
-  content:
-    description:
-      - Search for a given O(xpath) and get content.
-      - If V(attribute), return the attributes of matched elements.
-      - If V(text), return the text content of matched elements.
-    type: str
-    choices: [attribute, text]
   strip_cdata_tags:
     description:
       - Remove CDATA tags surrounding text values.

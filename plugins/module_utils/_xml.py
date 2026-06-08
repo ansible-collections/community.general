@@ -29,6 +29,18 @@ with deps.declare("lxml"):
     from lxml import etree  # type: ignore[no-redef]
 
 
+def get_common_argument_spec(*, xpath_required: bool = False) -> dict[str, t.Any]:
+    """Return the argument spec shared by xml and xml_info modules."""
+    return dict(
+        path=dict(type="path", aliases=["dest", "file"]),
+        xmlstring=dict(type="str"),
+        xpath=dict(type="str", required=xpath_required),
+        namespaces=dict(type="dict", default={}),
+        strip_cdata_tags=dict(type="bool", default=False),
+        huge_tree=dict(type="bool", default=False),
+    )
+
+
 def check_lxml(module: AnsibleModule) -> None:
     deps.validate(module, "lxml")
     version_str = ".".join(str(f) for f in etree.LXML_VERSION)
@@ -82,12 +94,12 @@ def parse_xml_doc(
     return doc
 
 
-def xpath_matches(tree: t.Any, xpath: str, namespaces: dict) -> bool:
+def xpath_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> bool:
     """Test if a node exists."""
     return bool(tree.xpath(xpath, namespaces=namespaces))
 
 
-def is_node(tree: t.Any, xpath: str, namespaces: dict) -> bool:
+def is_node(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> bool:
     """Test if a given xpath matches anything and if that match is a node."""
     if xpath_matches(tree, xpath, namespaces):
         match = tree.xpath(xpath, namespaces=namespaces)
@@ -96,34 +108,34 @@ def is_node(tree: t.Any, xpath: str, namespaces: dict) -> bool:
     return False
 
 
-def get_matches(tree: t.Any, xpath: str, namespaces: dict) -> dict:
+def get_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> dict[str, t.Any]:
     """Return matched XPath paths."""
     match = tree.xpath(xpath, namespaces=namespaces)
-    match_xpaths = [tree.getpath(m) for m in match]
+    match_xpaths: list[str] = [tree.getpath(m) for m in match]
     match_str = json.dumps(match_xpaths)
     msg = f"selector '{xpath}' match: {match_str}"
     return {"msg": msg, "matches": match_xpaths}
 
 
-def count_matches(tree: t.Any, xpath: str, namespaces: dict) -> dict:
+def count_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> dict[str, t.Any]:
     """Return the count of nodes matching the xpath."""
     hits = len(tree.xpath(xpath, namespaces=namespaces))
     msg = f"found {hits} nodes"
     return {"msg": msg, "count": hits}
 
 
-def collect_element_text(tree: t.Any, xpath: str, namespaces: dict) -> list | None:
+def collect_element_text(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> list[dict[str, t.Any]] | None:
     """Get text content of matched elements. Returns None if xpath does not match a node."""
     if not is_node(tree, xpath, namespaces):
         return None
     return [{element.tag: element.text} for element in tree.xpath(xpath, namespaces=namespaces)]
 
 
-def collect_element_attr(tree: t.Any, xpath: str, namespaces: dict) -> list | None:
+def collect_element_attr(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> list[dict[str, t.Any]] | None:
     """Get attributes of matched elements. Returns None if xpath does not match a node."""
     if not is_node(tree, xpath, namespaces):
         return None
-    elements = []
+    elements: list[dict[str, t.Any]] = []
     for element in tree.xpath(xpath, namespaces=namespaces):
         elements.append({element.tag: dict(element.attrib)})
     return elements

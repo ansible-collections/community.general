@@ -24,6 +24,25 @@ extends_documentation_fragment:
 options:
   xpath:
     required: true
+  count:
+    description:
+      - Search for a given O(xpath) and provide the count of any matches.
+      - This parameter requires O(xpath) to be set.
+    type: bool
+    default: false
+  print_match:
+    description:
+      - Search for a given O(xpath) and return the XPath paths of any matches.
+      - This parameter requires O(xpath) to be set.
+    type: bool
+    default: false
+  content:
+    description:
+      - Search for a given O(xpath) and get content.
+      - If V(attribute), return the attributes of matched elements.
+      - If V(text), return the text content of matched elements.
+    type: str
+    choices: [attribute, text]
 seealso:
   - module: community.general.xml
     description: Manage bits and pieces of XML files or strings.
@@ -142,6 +161,7 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
     collect_element_attr,
     collect_element_text,
     count_matches,
+    get_common_argument_spec,
     get_matches,
     parse_xml_doc,
     validate_xpath,
@@ -149,18 +169,14 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
 
 
 def main():
+    argument_spec = get_common_argument_spec(xpath_required=True)
+    argument_spec.update(
+        count=dict(type="bool", default=False),
+        print_match=dict(type="bool", default=False),
+        content=dict(type="str", choices=["attribute", "text"]),
+    )
     module = AnsibleModule(
-        argument_spec=dict(
-            path=dict(type="path", aliases=["dest", "file"]),
-            xmlstring=dict(type="str"),
-            xpath=dict(type="str", required=True),
-            namespaces=dict(type="dict", default={}),
-            count=dict(type="bool", default=False),
-            print_match=dict(type="bool", default=False),
-            content=dict(type="str", choices=["attribute", "text"]),
-            strip_cdata_tags=dict(type="bool", default=False),
-            huge_tree=dict(type="bool", default=False),
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True,
         required_one_of=[
             ["path", "xmlstring"],
