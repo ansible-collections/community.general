@@ -2,4 +2,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 minor_changes:
-  - filesystem - adds GFS2 support
+  - filesystem - adds GFS2 support (https://github.com/ansible-collections/community.general/pull/12218)
