@@ -1,0 +1,2 @@
+bugfixes:
+  - lvol - ``resizefs`` now resizes the filesystem even when the logical volume already has the requested size (https://github.com/ansible-collections/community.general/issues/11620).

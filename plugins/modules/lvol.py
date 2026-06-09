@@ -90,6 +90,8 @@ options:
       - Resize the underlying filesystem together with the logical volume.
       - Supported for C(ext2), C(ext3), C(ext4), C(reiserfs) and C(XFS) filesystems. Attempts to resize other filesystem types
         result in failure.
+      - When the logical volume already has the requested size, the filesystem will still be resized to fill the logical volume
+        if needed.
     type: bool
     default: false
 notes:
@@ -661,6 +663,18 @@ def main():
                     )
                 else:
                     module.fail_json(msg=f"Unable to resize {lv} to {size}{size_unit}", rc=rc, err=err)
+
+        if resizefs and not changed and size:
+            lv_path = f"/dev/{vg}/{this_lv['name']}"
+            if module.check_mode:
+                changed = True
+            else:
+                fsadm = module.get_bin_path("fsadm", required=True)
+                rc, out, err = module.run_command([fsadm, "resize", lv_path])
+                if rc == 0:
+                    changed = True
+                else:
+                    module.fail_json(msg=f"Failed to resize filesystem on {lv_path}", rc=rc, err=err, out=out)
 
     if this_lv is not None:
         if active:
