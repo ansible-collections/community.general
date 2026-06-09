@@ -616,6 +616,7 @@ class GFS2(Filesystem):
     MKFS_FORCE_FLAGS = ["-O"]
     MKFS_SET_UUID_OPTIONS = ["-U"]
 
+
 FILESYSTEMS = {
     "bcachefs": Bcachefs,
     "ext2": Ext2,
