@@ -1,0 +1,5 @@
+minor_changes:
+  - consul_kv - migrate to the shared ``community.general._consul`` module utility and documentation fragment, dropping
+    the runtime dependency on ``py-consul`` and ``requests`` in favour of ``ansible.module_utils.urls.open_url``. The
+    module is now part of the ``community.general.consul`` action group and accepts the same connection arguments as
+    every other module in the group. Behaviour, return shape, and existing options are unchanged.
