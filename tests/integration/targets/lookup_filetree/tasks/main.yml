@@ -33,7 +33,7 @@
 
 - name: Lookup filetree without exclude
   ansible.builtin.set_fact:
-    filetree_all: "{{ lookup('community.general.filetree', 'data') }}"
+    filetree_all: "{{ lookup('community.general.filetree', 'data/') }}"
 
 - name: Verify all entries are listed
   ansible.builtin.assert:
@@ -45,7 +45,7 @@
 
 - name: Lookup filetree with valid exclude regex
   ansible.builtin.set_fact:
-    filetree_filtered: "{{ lookup('community.general.filetree', 'data', exclude='^\\.git$') }}"
+    filetree_filtered: "{{ lookup('community.general.filetree', 'data/', exclude='^\\.git$') }}"
 
 - name: Verify exclude filters matching basenames
   ansible.builtin.assert:
@@ -65,7 +65,7 @@
 
 - name: Lookup filetree with invalid exclude regex
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.filetree', 'data', exclude='temp[1') }}"
+    msg: "{{ lookup('community.general.filetree', 'data/', exclude='temp[1') }}"
   ignore_errors: true
   register: invalid_exclude
 
