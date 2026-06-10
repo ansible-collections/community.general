@@ -148,7 +148,7 @@ options:
       - Determine how O(protocol_mappers) behave when updating an existing client_scope.
     choices:
       subset:
-        - Add missing protocol mappers, do not remove any missing mappers.'
+        - Add missing protocol mappers, do not remove any missing mappers.
       exact:
         - Make the protocol mappers exactly as specified, adding and removing mappers as needed.
     aliases:
