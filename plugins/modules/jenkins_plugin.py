@@ -709,7 +709,7 @@ class JenkinsPlugin:
 
         return self.plugin_versions_data
 
-    def _get_latest_compatible_plugin_version(self, plugin_name=None):
+    def _get_latest_compatible_plugin_version(self, plugin_name=None, resolve_latest_to_version=False):
         if not hasattr(self, "jenkins_version"):
             self.module.params["force_basic_auth"] = True
             resp, info = fetch_url(self.module, self.url)
@@ -727,7 +727,12 @@ class JenkinsPlugin:
         for idx, (version_title, version_info) in enumerate(sorted_versions):
             required_core = version_info.get("requiredCore", "0.0")
             if self.parse_version(required_core) <= self.jenkins_version:
-                return "latest" if idx == 0 else version_title
+                # "latest" means both "the user doesn't care about the version"
+                # and "latest == latest compatible" (allows using plugin manager).
+                # let the caller decide which interpretation they need
+                if idx == 0 and not resolve_latest_to_version:
+                    return "latest"
+                return version_title
 
         self.module.warn(f"No compatible version found for plugin '{name}'. Installing latest version.")
         return "latest"
@@ -753,7 +758,7 @@ class JenkinsPlugin:
         plugin_data = self._download_updates()["dependencies"]
 
         dependencies_info = {
-            dep["name"]: self._get_latest_compatible_plugin_version(dep["name"])
+            dep["name"]: self._get_latest_compatible_plugin_version(dep["name"], resolve_latest_to_version=True)
             for dep in plugin_data
             if not dep.get("optional", False)
         }
