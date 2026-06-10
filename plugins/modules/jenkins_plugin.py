@@ -350,7 +350,7 @@ class FailedInstallingWithPluginManager(Exception):
 
 
 class JenkinsPlugin:
-    def __init__(self, module, installed_plugins=None):
+    def __init__(self, module, installed_plugins=None, plugin_versions_data=None):
         # To be able to call fail_json
         self.module = module
 
@@ -383,6 +383,8 @@ class JenkinsPlugin:
         # Get list of installed plugins
         self.installed_plugins = installed_plugins
         self._get_installed_plugins()
+
+        self.plugin_versions_data = plugin_versions_data
 
     def _csrf_enabled(self):
         csrf_data = self._get_json_data(f"{self.url}/api/json", "CSRF")
@@ -530,7 +532,11 @@ class JenkinsPlugin:
                     argument_spec=self.module.argument_spec, supports_check_mode=self.module.check_mode
                 )
                 dep_module.params = dep_params
-                dep_plugin = JenkinsPlugin(dep_module, installed_plugins=self.installed_plugins)
+                dep_plugin = JenkinsPlugin(
+                    dep_module,
+                    installed_plugins=self.installed_plugins,
+                    plugin_versions_data=self.plugin_versions_data,
+                )
                 self.installed_plugins.append({"shortName": dep_name, "version": dep_version})
                 if not dep_plugin.install():
                     self.dependencies_states.append({"name": dep_name, "version": dep_version, "state": "absent"})
@@ -665,13 +671,10 @@ class JenkinsPlugin:
                 urls.append(f"{base_url}/{update_segment}/{self.params['name']}.hpi")
         return urls
 
-    def _get_latest_compatible_plugin_version(self, plugin_name=None):
-        if not hasattr(self, "jenkins_version"):
-            self.module.params["force_basic_auth"] = True
-            resp, info = fetch_url(self.module, self.url)
-            raw_version = info.get("x-jenkins")
-            self.jenkins_version = self.parse_version(raw_version)
-        name = plugin_name or self.params["name"]
+    def _get_plugin_versions_data(self):
+        if self.plugin_versions_data is not None:
+            return self.plugin_versions_data
+
         cache_path = f"{self.params['jenkins_home']}/ansible_jenkins_plugin_cache.json"
         plugin_version_urls = []
         for base_url in self.params["updates_url"]:
@@ -687,20 +690,32 @@ class JenkinsPlugin:
             now = time.time()
             if now - file_mtime >= 86400:
                 response = self._get_urls_data(plugin_version_urls, what="plugin-versions.json")
-                plugin_data = json.loads(response.read(), object_pairs_hook=OrderedDict)
+                self.plugin_versions_data = json.loads(response.read(), object_pairs_hook=OrderedDict)
 
                 # Save it to file for next time
                 with open(cache_path, "w") as f:
-                    json.dump(plugin_data, f)
+                    json.dump(self.plugin_versions_data, f)
 
             with open(cache_path) as f:
-                plugin_data = json.load(f)
+                self.plugin_versions_data = json.load(f)
+                return self.plugin_versions_data
 
         except Exception as e:
             if os.path.exists(cache_path):
                 os.remove(cache_path)
             self.module.fail_json(msg="Failed to parse plugin-versions.json", details=f"{e}")
 
+        return self.plugin_versions_data
+
+    def _get_latest_compatible_plugin_version(self, plugin_name=None):
+        if not hasattr(self, "jenkins_version"):
+            self.module.params["force_basic_auth"] = True
+            resp, info = fetch_url(self.module, self.url)
+            raw_version = info.get("x-jenkins")
+            self.jenkins_version = self.parse_version(raw_version)
+        name = plugin_name or self.params["name"]
+
+        plugin_data = self._get_plugin_versions_data()
         plugin_versions = plugin_data.get("plugins", {}).get(name)
         if not plugin_versions:
             self.module.fail_json(msg=f"Plugin '{name}' not found.")
