@@ -350,7 +350,7 @@ class FailedInstallingWithPluginManager(Exception):
 
 
 class JenkinsPlugin:
-    def __init__(self, module, installed_plugins=None, plugin_versions_data=None):
+    def __init__(self, module, installed_plugins=None, plugin_versions_data=None, crumb=None, cookies=None):
         # To be able to call fail_json
         self.module = module
 
@@ -366,19 +366,19 @@ class JenkinsPlugin:
                 self.params["updates_url_username"], self.params["updates_url_password"]
             )
 
-        # Crumb
-        self.crumb = {}
+        self.crumb = crumb
+        if self.crumb is None:
+            # Crumb
+            self.crumb = {}
 
-        # Authentication for Jenkins calls
-        if self.params.get("url_username") and self.params.get("url_password"):
-            self.crumb["Authorization"] = basic_auth_header(self.params["url_username"], self.params["url_password"])
+            # Authentication for Jenkins calls
+            if self.params.get("url_username") and self.params.get("url_password"):
+                self.crumb["Authorization"] = basic_auth_header(self.params["url_username"], self.params["url_password"])
 
         # Cookie jar for crumb session
-        self.cookies = None
-
-        if self._csrf_enabled():
+        self.cookies = cookies
+        if self.cookies is None and self._csrf_enabled():
             self.cookies = cookiejar.LWPCookieJar()
-            self._get_crumb()
 
         # Get list of installed plugins
         self.installed_plugins = installed_plugins
@@ -536,6 +536,8 @@ class JenkinsPlugin:
                     dep_module,
                     installed_plugins=self.installed_plugins,
                     plugin_versions_data=self.plugin_versions_data,
+                    crumb=self.crumb,
+                    cookies=self.cookies,
                 )
                 self.installed_plugins.append({"shortName": dep_name, "version": dep_version})
                 if not dep_plugin.install():
