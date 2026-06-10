@@ -40,6 +40,7 @@ options:
       - Filesystem type to be created. This option is required with O(state=present) (or if O(state) is omitted).
       - V(ufs) support has been added in community.general 3.4.0.
       - V(bcachefs) support has been added in community.general 8.6.0.
+      . V(gfs2) support has been added in community.general 13.1.0.
     type: str
     aliases: [type]
   dev:
