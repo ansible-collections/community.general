@@ -58,10 +58,9 @@
   when:
     - ansible_facts.distribution == 'Fedora' and (ansible_facts.distribution_major_version | int < 35)
 
-- name: "Install reiserfs and util-linux-systemd (for findmnt) (OpenSuse)"
+- name: "Install util-linux-systemd (for findmnt) (OpenSuse)"
   ansible.builtin.package:
     name:
-      - reiserfs
       - util-linux-systemd
     state: present
   when:

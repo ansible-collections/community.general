@@ -15,11 +15,10 @@
         - "{{ role_path }}/vars"
 
 - name: Install package
-  action: "{{ ansible_facts.pkg_mgr }}"
-  args:
+  ansible.builtin.package:
     name: "{{ passwordstore_packages }}"
     state: present
-  when: ansible_facts.pkg_mgr in ['apt', 'dnf', 'yum', 'pkgng', 'community.general.pkgng']
+  when: ansible_facts.pkg_mgr in ['apt', 'dnf', 'yum', 'pkgng', 'community.general.pkgng'] or ansible_facts.distribution == 'openSUSE Tumbleweed'
 
 - block:
   # OpenSUSE Leap>=15.0 don't include password-store in main repo
@@ -34,7 +33,7 @@
         state: present
         update_cache: true
         disable_gpg_check: true
-  when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
+  when: ansible_facts.distribution == 'openSUSE Leap'
 
 # See https://github.com/gopasspw/gopass/issues/1849#issuecomment-802789285
 - name: Install gopass on Debian

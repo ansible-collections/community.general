@@ -15,6 +15,8 @@ redis_packages:
     - redis-server
   openSUSE Leap:
     - redis
+  openSUSE Tumbleweed:
+    - redis
   Fedora:
     - redis
   CentOS:
@@ -28,6 +30,7 @@ redis_user:
   Debian: redis
   Ubuntu: redis
   openSUSE Leap: redis
+  openSUSE Tumbleweed: redis
   Fedora: "{{ '998' if ansible_facts.distribution_major_version is version('41', '>=') else 'redis' }}"
   CentOS: redis
   FreeBSD: redis
@@ -38,6 +41,7 @@ redis_bin:
   Debian: /usr/bin/redis-server
   Ubuntu: /usr/bin/redis-server
   openSUSE Leap: /usr/sbin/redis-server
+  openSUSE Tumbleweed: /usr/sbin/redis-server
   Fedora: "/usr/bin/{{ 'valkey-server' if ansible_facts.distribution_major_version is version('41', '>=') else 'redis-server' }}"
   CentOS: /usr/bin/redis-server
   FreeBSD: /usr/local/bin/redis-server
