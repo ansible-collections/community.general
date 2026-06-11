@@ -3,6 +3,18 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- set_fact:
+    os_repository_name_videolan: Leap_{{ ansible_facts.distribution_version }}
+    os_repository_name: "openSUSE_Leap_{{ ansible_facts.distribution_version }}"
+    os_release_ver: "{{ ansible_facts.distribution.replace(' ', '_') }}"
+  when: ansible_facts.distribution == 'openSUSE Leap'
+
+- set_fact:
+    os_repository_name_videolan: Tumbleweed
+    os_repository_name: openSUSE_Tumbleweed
+    os_release_ver: "{{ ansible_facts.distribution.replace(' ', '_') }}"
+  when: ansible_facts.distribution == 'openSUSE Tumbleweed'
+
 - name: Delete test repo
   community.general.zypper_repository:
     name: test
@@ -42,7 +54,7 @@
   community.general.zypper_repository:
     name: test
     state: present
-    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_facts.distribution_version }}/
+    repo: http://download.videolan.org/pub/vlc/SuSE/{{ os_repository_name_videolan }}/
   register: zypper_result
 
 - name: Verify change on URL only change
@@ -55,7 +67,7 @@
     name: testrefresh
     refresh: false
     state: present
-    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_facts.distribution_version }}/
+    repo: http://download.videolan.org/pub/vlc/SuSE/{{ os_repository_name_videolan }}/
 
 - name: check refreshoption
   command: zypper -x lr testrefresh
@@ -71,7 +83,7 @@
     name: testprio
     priority: 55
     state: present
-    repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_facts.distribution_version }}/
+    repo: http://download.videolan.org/pub/vlc/SuSE/{{ os_repository_name_videolan }}/
 
 - name: check refreshoption
   command: zypper -x lr testprio
@@ -114,8 +126,8 @@
     state: present
     repo: "{{ item }}"
   with_items:
-    - http://download.opensuse.org/repositories/science/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
-    - http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
+    - http://download.opensuse.org/repositories/science/{{ os_repository_name }}/
+    - http://download.opensuse.org/repositories/devel:/languages:/ruby/{{ os_repository_name }}/
 
 - name: check repo is updated by name
   command: zypper lr samename
@@ -129,7 +141,7 @@
 
 - name: remove last added repos (by URL to test that)
   community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/{{ os_repository_name }}/
     state: absent
 
 # FIXME: this currently fails with `Repository 'Apache_PHP_Modules' is invalid.`
@@ -141,46 +153,48 @@
 #     auto_import_keys: true
 #     state: "present"
 
-- name: add a repo by releasever
-  community.general.zypper_repository:
-    name: releaseverrepo
-    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
-    state: present
-  register: add_repo
+- when: ansible_facts.distribution == 'openSUSE Leap'
+  block:
+    - name: add a repo by releasever
+      community.general.zypper_repository:
+        name: releaseverrepo
+        repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+        state: present
+      register: add_repo
 
-- name: add a repo by releasever again
-  community.general.zypper_repository:
-    name: releaseverrepo
-    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
-    state: present
-  register: add_repo_again
+    - name: add a repo by releasever again
+      community.general.zypper_repository:
+        name: releaseverrepo
+        repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+        state: present
+      register: add_repo_again
 
-- name: no update in case of $releasever usage in url
-  assert:
-    that:
-      - add_repo is changed
-      - add_repo_again is not changed
+    - name: no update in case of $releasever usage in url
+      assert:
+        that:
+          - add_repo is changed
+          - add_repo_again is not changed
 
-- name: remove added repo
-  community.general.zypper_repository:
-    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
-    state: absent
-  register: remove_repo
+    - name: remove added repo
+      community.general.zypper_repository:
+        repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/{{ os_repository_name }}/
+        state: absent
+      register: remove_repo
 
-- name: verify repo was removed
-  assert:
-    that:
-      - remove_repo is changed
+    - name: verify repo was removed
+      assert:
+        that:
+          - remove_repo is changed
 
-- name: get list of files in /etc/zypp/repos.d/
-  command: ls /etc/zypp/repos.d/
-  changed_when: false
-  register: releaseverrepo_etc_zypp_reposd
+    - name: get list of files in /etc/zypp/repos.d/
+      command: ls /etc/zypp/repos.d/
+      changed_when: false
+      register: releaseverrepo_etc_zypp_reposd
 
-- name: verify removal of file releaseverrepo.repo in /etc/zypp/repos.d/
-  assert:
-    that:
-      - "'releaseverrepo' not in releaseverrepo_etc_zypp_reposd.stdout"
+    - name: verify removal of file releaseverrepo.repo in /etc/zypp/repos.d/
+      assert:
+        that:
+          - "'releaseverrepo' not in releaseverrepo_etc_zypp_reposd.stdout"
 
 - name: add a repo by basearch
   community.general.zypper_repository:
@@ -220,7 +234,7 @@
   block:
     - name: add new repository via url to .repo file
       community.general.zypper_repository:
-        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_facts.distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/{{ os_repository_name }}/systemsmanagement:Uyuni:Stable.repo
         state: present
       register: added_by_repo_file
 
@@ -237,7 +251,7 @@
 
     - name: add same repository via url to .repo file again to verify idempotency
       community.general.zypper_repository:
-        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_facts.distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/{{ os_repository_name }}/systemsmanagement:Uyuni:Stable.repo
         state: present
       register: added_again_by_repo_file
 
@@ -248,7 +262,7 @@
 
     - name: remove repository via url to .repo file
       community.general.zypper_repository:
-        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/openSUSE_Leap_{{ ansible_facts.distribution_version }}/systemsmanagement:Uyuni:Stable.repo
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/{{ os_repository_name }}/systemsmanagement:Uyuni:Stable.repo
         state: absent
       register: removed_by_repo_file
 
