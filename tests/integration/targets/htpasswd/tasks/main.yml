@@ -7,6 +7,7 @@
     # passlib is dead and doesn't work with recent bcrypt versions anymore
     # (https://foss.heptapod.net/python-libs/passlib/-/work_items/196)
     - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_version is version('26.04', '<')
+    - ansible_facts.os_family != 'Suse'
   block:
     - name: install passlib
       ansible.builtin.pip:
