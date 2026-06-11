@@ -348,6 +348,8 @@ stages:
               test: debian-bookworm/3.11
             - name: Debian 13 Trixie
               test: debian-13-trixie/3.13
+            - name: OpenSuSE Tumbleweed
+              test: opensuse-tumbleweed/3.13
             - name: ArchLinux
               test: archlinux/3.14
           groups:
