@@ -14,7 +14,8 @@
   # TODO: remove Ubuntu 24.04 or newer from the list
   # TODO: remove Debian 13 (Trixie) from the list
   when: >
-    ansible_facts.distribution in ('Alpine', 'openSUSE Leap', 'CentOS', 'Fedora', 'Archlinux')
+    ansible_facts.distribution in ('Alpine', 'openSUSE Leap', 'openSUSE Tumbleweed', 'CentOS', 'Fedora', 'Archlinux', 'Suse')
+    or ansible_facts.os_family == 'Suse'
     or (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version | int >= 24)
     or (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version == '13')
 
