@@ -104,11 +104,6 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-msg:
-  description: Textual description of whether we succeeded or failed.
-  returned: always
-  type: str
-
 clientsecret_info:
   description: Representation of the client secret.
   returned: on success
