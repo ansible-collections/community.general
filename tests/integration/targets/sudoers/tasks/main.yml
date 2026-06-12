@@ -173,6 +173,39 @@
     src: "{{ sudoers_path }}/my-sudo-rule-9"
   register: rule_9_contents
 
+- name: Create rule with defaults directives for a group
+  community.general.sudoers:
+    name: my-sudo-rule-10
+    state: present
+    group: operators
+    commands: ALL
+    nopassword: false
+    defaults:
+      - "!targetpw"
+  register: rule_10
+
+- name: Grab contents of my-sudo-rule-10
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-10"
+  register: rule_10_contents
+
+- name: Create rule with defaults directives for a user
+  community.general.sudoers:
+    name: my-sudo-rule-11
+    state: present
+    user: alice
+    commands: ALL
+    nopassword: false
+    defaults:
+      - "!targetpw"
+      - "env_reset"
+  register: rule_11
+
+- name: Grab contents of my-sudo-rule-11
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-11"
+  register: rule_11_contents
+
 - name: Revoke rule 1
   community.general.sudoers:
     name: my-sudo-rule-1
@@ -261,6 +294,14 @@
       - revoke_non_existing_rule is not changed
 
 - name: Check contents
+  vars:
+    expected_result_rule10: |
+      Defaults:%operators !targetpw
+      %operators ALL= ALL
+    expected_result_rule11: |
+      Defaults:alice !targetpw
+      Defaults:alice env_reset
+      alice ALL= ALL
   ansible.builtin.assert:
     that:
       - "rule_1_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
@@ -272,6 +313,8 @@
       - "rule_7_contents['content'] | b64decode == 'alice host-1=NOPASSWD: /usr/local/bin/command\n'"
       - "rule_8_contents['content'] | b64decode == 'alice ALL=NOPASSWD:SETENV: /usr/local/bin/command\n'"
       - "rule_9_contents['content'] | b64decode == 'alice ALL=NOEXEC:NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_10_contents['content'] | b64decode == expected_result_rule10"
+      - "rule_11_contents['content'] | b64decode == expected_result_rule11"
 
 - name: Check revocation stat
   ansible.builtin.assert:
