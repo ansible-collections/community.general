@@ -143,6 +143,19 @@ options:
     description:
       - A dict of key/value pairs to set as custom attributes for the client_scope.
       - Values may be single values (for example a string) or a list of strings.
+  protocol_mappers_behavior:
+    description:
+      - Determine how O(protocol_mappers) behave when updating an existing client_scope.
+    choices:
+      subset:
+        - Add missing protocol mappers, do not remove any missing mappers.
+      exact:
+        - Make the protocol mappers exactly as specified, adding and removing mappers as needed.
+    aliases:
+      - protocolMappersBehavior
+    default: 'subset'
+    type: str
+    version_added: "13.1.0"
 extends_documentation_fragment:
   - community.general._keycloak
   - community.general._keycloak.actiongroup_keycloak
@@ -288,6 +301,8 @@ end_state:
     }
 """
 
+import copy
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils._keycloak import (
@@ -310,7 +325,7 @@ def normalise_cr(clientscoperep, remove_ids=False):
     :return: normalised clientscoperep dict
     """
     # Avoid the dict passed in to be modified
-    clientscoperep = clientscoperep.copy()
+    clientscoperep = copy.deepcopy(clientscoperep)
 
     if "protocolMappers" in clientscoperep:
         clientscoperep["protocolMappers"] = sorted(
@@ -332,7 +347,7 @@ def sanitize_cr(clientscoperep):
     :param clientscoperep: the clientscoperep dict to be sanitized
     :return: sanitized clientrep dict
     """
-    result = clientscoperep.copy()
+    result = copy.deepcopy(clientscoperep)
     if "secret" in result:
         result["secret"] = "no_log"
     if "attributes" in result:
@@ -366,6 +381,9 @@ def main():
         protocol=dict(type="str", choices=["openid-connect", "saml", "wsfed", "docker-v2"]),
         attributes=dict(type="dict"),
         protocol_mappers=dict(type="list", elements="dict", options=protmapper_spec, aliases=["protocolMappers"]),
+        protocol_mappers_behavior=dict(
+            type="str", aliases=["protocolMappersBehavior"], choices=["subset", "exact"], default="subset"
+        ),
     )
 
     argument_spec.update(meta_args)
@@ -393,17 +411,19 @@ def main():
 
     kc = KeycloakAPI(module, connection_header)
 
-    realm = module.params.get("realm")
-    state = module.params.get("state")
-    cid = module.params.get("id")
-    name = module.params.get("name")
-    protocol_mappers = module.params.get("protocol_mappers")
+    realm = module.params["realm"]
+    state = module.params["state"]
+    cid = module.params["id"]
+    name = module.params["name"]
+    protocol_mappers = module.params["protocol_mappers"]
+    protocol_mappers_behavior = module.params["protocol_mappers_behavior"]
 
     # Filter and map the parameters names that apply to the client scope
     clientscope_params = [
         x
         for x in module.params
-        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm"] and module.params.get(x) is not None
+        if x not in list(keycloak_argument_spec().keys()) + ["state", "realm", "protocol_mappers_behavior"]
+        and module.params[x] is not None
     ]
 
     # See if it already exists in Keycloak
@@ -415,11 +435,13 @@ def main():
     if before_clientscope is None:
         before_clientscope = {}
 
+    before_mappers = before_clientscope["protocolMappers"] if "protocolMappers" in before_clientscope else []
+
     # Build a proposed changeset from parameters given to this module
     changeset = {}
 
     for clientscope_param in clientscope_params:
-        new_param_value = module.params.get(clientscope_param)
+        new_param_value = module.params[clientscope_param]
 
         # Unfortunately, the ansible argument spec checker introduces variables with null values when
         # they are not specified
@@ -428,8 +450,17 @@ def main():
         changeset[camel(clientscope_param)] = new_param_value
 
     # Prepare the desired values using the existing values (non-existence results in a dict that is save to use as a basis)
-    desired_clientscope = before_clientscope.copy()
+    desired_clientscope = copy.deepcopy(before_clientscope)
     desired_clientscope.update(changeset)
+    desired_mappers_names = [x["name"] for x in protocol_mappers] if protocol_mappers else []
+
+    if protocol_mappers_behavior == "subset":
+        # add exsisting mappers to desired object
+        for mapper in before_mappers:
+            if mapper["name"] not in desired_mappers_names:
+                if "protocolMappers" not in desired_clientscope:
+                    desired_clientscope["protocolMappers"] = []
+                desired_clientscope["protocolMappers"].append(mapper)
 
     # Cater for when it doesn't exist (an empty dict)
     if not before_clientscope:
@@ -502,10 +533,17 @@ def main():
                     )
                     if current_protocolmapper is not None:
                         protocol_mapper["id"] = current_protocolmapper["id"]
-                        kc.update_clientscope_protocolmappers(desired_clientscope["id"], protocol_mapper, realm=realm)
+                        kc.update_clientscope_protocolmapper(desired_clientscope["id"], protocol_mapper, realm=realm)
                     # create otherwise
                     else:
                         kc.create_clientscope_protocolmapper(desired_clientscope["id"], protocol_mapper, realm=realm)
+
+            if protocol_mappers_behavior == "exact":
+                # check if we need to delete protocol mappers on the server
+                for mapper in before_mappers:
+                    if mapper["name"] not in desired_mappers_names:
+                        # raise Exception(mapper)
+                        kc.delete_clientscope_protocolmapper(desired_clientscope["id"], mapper["id"], realm=realm)
 
             after_clientscope = kc.get_clientscope_by_clientscopeid(desired_clientscope["id"], realm=realm)
 
