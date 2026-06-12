@@ -1,0 +1,102 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Wait for Keycloak
+  uri:
+    url: "{{ url }}/admin/"
+    status_code: 200
+    validate_certs: false
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 10
+
+- name: Delete realm if exists
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    state: absent
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create new groups
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ item.name }}"
+    state: present
+  with_items: "{{ keycloak_user_groups }}"
+
+- name: Create user
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    state: present
+  register: create_result
+
+- name: Assert user is created
+  assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.username == 'test'
+      - create_result.end_state.groups | length == 2
+
+- name: Create another user
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "testuser2"
+    realm: "{{ realm }}"
+    first_name: Ceciestes2
+    last_name: Untestes2
+    email: ceciestuntestes2@test.com
+    state: present
+  register: create_result2
+
+- name: Get user info
+  community.general.keycloak_realm_users_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    realm: "{{ realm }}"
+  register: user_infos
+
+- name: debug
+  debug:
+    var: user_infos
+
+- name: add missing group info for comparison
+  set_fact:
+    user_info_with_groups: "{{ [user_infos.users[0] | combine({'groups': ['test', 'test2']}), user_infos.users[1] | combine({'groups': []}) ] }}"
+
+- name: Assert user info is returned correctly
+  assert:
+    that:
+      - not user_infos.changed
+      - " user_info_with_groups == [create_result.end_state, create_result2.end_state]"
