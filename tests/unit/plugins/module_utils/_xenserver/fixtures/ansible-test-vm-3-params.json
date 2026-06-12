@@ -139,7 +139,7 @@
             "sharable": false,
             "sm_config": {
                 "image-format": "qcow2",
-                "vdi_type": "qcow2"
+                "vdi_type": "vhd"
             },
             "snapshot_of": "OpaqueRef:NULL",
             "snapshot_time": "19700101T00:00:00Z",
