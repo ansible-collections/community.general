@@ -24,9 +24,11 @@ def patch_keycloak_api(
     get_clientscope_by_clientscopeid=None,
     create_clientscope=None,
     update_clientscope=None,
+    get_clientscope_protocolmappers=None,
     get_clientscope_protocolmapper_by_name=None,
-    update_clientscope_protocolmappers=None,
+    update_clientscope_protocolmapper=None,
     create_clientscope_protocolmapper=None,
+    delete_clientscope_protocolmapper=None,
     delete_clientscope=None,
 ):
     """Mock context manager for patching the methods in PwPolicyIPAClient that contact the IPA server
@@ -65,24 +67,36 @@ def patch_keycloak_api(
                         side_effect=get_clientscope_protocolmapper_by_name,
                     ) as mock_get_clientscope_protocolmapper_by_name:
                         with patch.object(
-                            obj, "update_clientscope_protocolmappers", side_effect=update_clientscope_protocolmappers
-                        ) as mock_update_clientscope_protocolmappers:
+                            obj, "update_clientscope_protocolmapper", side_effect=update_clientscope_protocolmapper
+                        ) as mock_update_clientscope_protocolmapper:
                             with patch.object(
                                 obj, "create_clientscope_protocolmapper", side_effect=create_clientscope_protocolmapper
                             ) as mock_create_clientscope_protocolmapper:
                                 with patch.object(
                                     obj, "delete_clientscope", side_effect=delete_clientscope
                                 ) as mock_delete_clientscope:
-                                    yield (
-                                        mock_get_clientscope_by_name,
-                                        mock_get_clientscope_by_clientscopeid,
-                                        mock_create_clientscope,
-                                        mock_update_clientscope,
-                                        mock_get_clientscope_protocolmapper_by_name,
-                                        mock_update_clientscope_protocolmappers,
-                                        mock_create_clientscope_protocolmapper,
-                                        mock_delete_clientscope,
-                                    )
+                                    with patch.object(
+                                        obj,
+                                        "delete_clientscope_protocolmapper",
+                                        side_effect=delete_clientscope_protocolmapper,
+                                    ) as mock_delete_clientscope_protocolmapper:
+                                        with patch.object(
+                                            obj,
+                                            "get_clientscope_protocolmappers",
+                                            side_effect=get_clientscope_protocolmappers,
+                                        ) as mock_get_clientscope_protocolmappers:
+                                            yield (
+                                                mock_get_clientscope_by_name,
+                                                mock_get_clientscope_by_clientscopeid,
+                                                mock_create_clientscope,
+                                                mock_update_clientscope,
+                                                mock_get_clientscope_protocolmappers,
+                                                mock_get_clientscope_protocolmapper_by_name,
+                                                mock_update_clientscope_protocolmapper,
+                                                mock_create_clientscope_protocolmapper,
+                                                mock_delete_clientscope_protocolmapper,
+                                                mock_delete_clientscope,
+                                            )
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -163,9 +177,11 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_get_clientscope_by_clientscopeid,
                     mock_create_clientscope,
                     mock_update_clientscope,
+                    mock_get_clientscope_protocolmappers,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
+                    mock_delete_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
                     with self.assertRaises(AnsibleExitJson) as exec_info:
@@ -177,8 +193,9 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
+        self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
         # Verify that the module's changed status matches what is expected
@@ -211,9 +228,11 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_get_clientscope_by_clientscopeid,
                     mock_create_clientscope,
                     mock_update_clientscope,
+                    mock_get_clientscope_protocolmappers,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
+                    mock_delete_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
                     with self.assertRaises(AnsibleExitJson) as exec_info:
@@ -225,8 +244,9 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
+        self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
         # Verify that the module's changed status matches what is expected
@@ -259,9 +279,11 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_get_clientscope_by_clientscopeid,
                     mock_create_clientscope,
                     mock_update_clientscope,
+                    mock_get_clientscope_protocolmappers,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
+                    mock_delete_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
                     with self.assertRaises(AnsibleExitJson) as exec_info:
@@ -273,8 +295,9 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
+        self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 1)
 
         # Verify that the module's changed status matches what is expected
@@ -305,9 +328,11 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_get_clientscope_by_clientscopeid,
                     mock_create_clientscope,
                     mock_update_clientscope,
+                    mock_get_clientscope_protocolmappers,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
+                    mock_delete_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
                     with self.assertRaises(AnsibleExitJson) as exec_info:
@@ -319,8 +344,9 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
+        self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
         # Verify that the module's changed status matches what is expected
@@ -440,9 +466,11 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_get_clientscope_by_clientscopeid,
                     mock_create_clientscope,
                     mock_update_clientscope,
+                    mock_get_clientscope_protocolmappers,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
+                    mock_delete_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
                     with self.assertRaises(AnsibleExitJson) as exec_info:
@@ -454,8 +482,9 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 0)
         self.assertEqual(mock_update_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 0)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
+        self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
 
         # Verify that the module's changed status matches what is expected
@@ -508,6 +537,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     },
                     "name": "protocol3",
                     "protocolMapper": "oidc-group-membership-mapper",
+                    "id": "a7f19adb-cc58-41b1-94ce-782dc255139b",
                 },
             ],
         }
@@ -628,9 +658,11 @@ class TestKeycloakAuthentication(ModuleTestCase):
                     mock_get_clientscope_by_clientscopeid,
                     mock_create_clientscope,
                     mock_update_clientscope,
+                    mock_get_clientscope_protocolmappers,
                     mock_get_clientscope_protocolmapper_by_name,
-                    mock_update_clientscope_protocolmappers,
+                    mock_update_clientscope_protocolmapper,
                     mock_create_clientscope_protocolmapper,
+                    mock_delete_clientscope_protocolmapper,
                     mock_delete_clientscope,
                 ):
                     with self.assertRaises(AnsibleExitJson) as exec_info:
@@ -641,10 +673,184 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(mock_create_clientscope.call_count, 0)
         self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 1)
         self.assertEqual(mock_update_clientscope.call_count, 1)
+        self.assertEqual(mock_get_clientscope_protocolmappers.call_count, 0)
         self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 3)
-        self.assertEqual(mock_update_clientscope_protocolmappers.call_count, 3)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 3)
         self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
+        self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 0)
         self.assertEqual(mock_delete_clientscope.call_count, 0)
+
+        # Verify that the module's changed status matches what is expected
+        self.assertIs(exec_info.exception.args[0]["changed"], changed)
+
+    def test_update_clientscope_with_deleted_protocolmappers(self):
+        """Add a new authentication flow from copy of an other flow"""
+
+        module_args = {
+            "auth_keycloak_url": "http://keycloak.url/auth",
+            "auth_username": "admin",
+            "auth_password": "admin",
+            "auth_realm": "master",
+            "realm": "realm-name",
+            "state": "present",
+            "name": "my-new-kc-clientscope",
+            "protocol_mappers_behavior": "exact",
+            "protocolMappers": [
+                {
+                    "protocol": "openid-connect",
+                    "config": {
+                        "full.path": "false",
+                        "id.token.claim": "false",
+                        "access.token.claim": "false",
+                        "userinfo.token.claim": "false",
+                        "claim.name": "protocol1_updated",
+                    },
+                    "name": "protocol1",
+                    "protocolMapper": "oidc-group-membership-mapper",
+                },
+                {
+                    "protocol": "openid-connect",
+                    "config": {
+                        "full.path": "true",
+                        "id.token.claim": "false",
+                        "access.token.claim": "false",
+                        "userinfo.token.claim": "false",
+                        "claim.name": "protocol2_updated",
+                    },
+                    "name": "protocol2",
+                    "protocolMapper": "oidc-group-membership-mapper",
+                },
+            ],
+        }
+        # before
+        return_value_get_clientscope_by_name = [
+            {
+                "attributes": {},
+                "id": "890ec72e-fe1d-4308-9f27-485ef7eaa182",
+                "name": "my-new-kc-clientscope",
+                "protocolMappers": [
+                    {
+                        "protocol": "openid-connect",
+                        "config": {
+                            "full.path": "false",
+                            "id.token.claim": "false",
+                            "access.token.claim": "false",
+                            "userinfo.token.claim": "false",
+                            "claim.name": "protocol1_updated",
+                        },
+                        "name": "protocol1",
+                        "protocolMapper": "oidc-group-membership-mapper",
+                        "id": "p1",
+                    },
+                    {
+                        "protocol": "openid-connect",
+                        "config": {
+                            "full.path": "true",
+                            "id.token.claim": "false",
+                            "access.token.claim": "false",
+                            "userinfo.token.claim": "false",
+                            "claim.name": "protocol2_updated",
+                        },
+                        "name": "protocol2",
+                        "protocolMapper": "oidc-group-membership-mapper",
+                        "id": "p2",
+                    },
+                    {
+                        "protocol": "openid-connect",
+                        "config": {
+                            "full.path": "true",
+                            "id.token.claim": "true",
+                            "access.token.claim": "true",
+                            "userinfo.token.claim": "true",
+                            "claim.name": "protocol3_updated",
+                        },
+                        "name": "protocol3",
+                        "protocolMapper": "oidc-group-membership-mapper",
+                        "id": "p3",
+                    },
+                ],
+            }
+        ]
+        # after
+        return_value_get_clientscope_by_clientscopeid = [
+            {
+                "attributes": {},
+                "id": "2286032f-451e-44d5-8be6-e45aac7983a1",
+                "name": "my-new-kc-clientscope",
+                "protocolMappers": [
+                    {
+                        "config": {
+                            "access.token.claim": "true",
+                            "claim.name": "protocol2_updated",
+                            "full.path": "true",
+                            "id.token.claim": "false",
+                            "userinfo.token.claim": "false",
+                        },
+                        "consentRequired": "false",
+                        "id": "p2",
+                        "name": "protocol2",
+                        "protocol": "openid-connect",
+                        "protocolMapper": "oidc-group-membership-mapper",
+                    },
+                    {
+                        "config": {
+                            "access.token.claim": "false",
+                            "claim.name": "protocol1_updated",
+                            "full.path": "false",
+                            "id.token.claim": "false",
+                            "userinfo.token.claim": "false",
+                        },
+                        "consentRequired": "false",
+                        "id": "p1",
+                        "name": "protocol1",
+                        "protocol": "openid-connect",
+                        "protocolMapper": "oidc-group-membership-mapper",
+                    },
+                ],
+            },
+        ]
+
+        changed = True
+
+        # Run the module
+
+        with set_module_args(module_args):
+            with mock_good_connection():
+                with patch_keycloak_api(
+                    get_clientscope_by_name=return_value_get_clientscope_by_name,
+                    get_clientscope_by_clientscopeid=return_value_get_clientscope_by_clientscopeid,
+                ) as (
+                    mock_get_clientscope_by_name,
+                    mock_get_clientscope_by_clientscopeid,
+                    mock_create_clientscope,
+                    mock_update_clientscope,
+                    mock_get_clientscope_protocolmappers,
+                    mock_get_clientscope_protocolmapper_by_name,
+                    mock_update_clientscope_protocolmapper,
+                    mock_create_clientscope_protocolmapper,
+                    mock_delete_clientscope_protocolmapper,
+                    mock_delete_clientscope,
+                ):
+                    with self.assertRaises(AnsibleExitJson) as exec_info:
+                        self.module.main()
+
+        # Verify number of call on each mock
+        self.assertEqual(mock_get_clientscope_by_name.call_count, 1)
+        self.assertEqual(mock_create_clientscope.call_count, 0)
+        self.assertEqual(mock_get_clientscope_by_clientscopeid.call_count, 1)
+        self.assertEqual(mock_update_clientscope.call_count, 1)
+        # will not be called, because mock_get_clientscope_protocolmapper_by_name is patched
+        self.assertEqual(mock_get_clientscope_protocolmappers.call_count, 0)
+        self.assertEqual(mock_get_clientscope_protocolmapper_by_name.call_count, 2)
+        self.assertEqual(mock_update_clientscope_protocolmapper.call_count, 2)
+        self.assertEqual(mock_create_clientscope_protocolmapper.call_count, 0)
+        self.assertEqual(mock_delete_clientscope_protocolmapper.call_count, 1)
+        self.assertEqual(mock_delete_clientscope.call_count, 0)
+
+        # expect "p3" to be deleted
+        mock_delete_clientscope_protocolmapper.assert_called_with(
+            return_value_get_clientscope_by_name[0]["id"], "p3", realm=module_args["realm"]
+        )
 
         # Verify that the module's changed status matches what is expected
         self.assertIs(exec_info.exception.args[0]["changed"], changed)
