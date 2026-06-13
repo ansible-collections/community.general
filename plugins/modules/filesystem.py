@@ -35,11 +35,12 @@ options:
     default: present
     version_added: 1.3.0
   fstype:
-    choices: [bcachefs, btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs]
+    choices: [bcachefs, btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs, gfs2]
     description:
       - Filesystem type to be created. This option is required with O(state=present) (or if O(state) is omitted).
       - V(ufs) support has been added in community.general 3.4.0.
       - V(bcachefs) support has been added in community.general 8.6.0.
+      - V(gfs2) support has been added in community.general 13.1.0.
     type: str
     aliases: [type]
   dev:
@@ -611,6 +612,12 @@ class UFS(Filesystem):
         return fragmentsize * providersize
 
 
+class GFS2(Filesystem):
+    MKFS = "mkfs.gfs2"
+    MKFS_FORCE_FLAGS = ["-O"]
+    MKFS_SET_UUID_OPTIONS = ["-U"]
+
+
 FILESYSTEMS = {
     "bcachefs": Bcachefs,
     "ext2": Ext2,
@@ -626,6 +633,7 @@ FILESYSTEMS = {
     "LVM2_member": LVM,
     "swap": Swap,
     "ufs": UFS,
+    "gfs2": GFS2,
 }
 
 
