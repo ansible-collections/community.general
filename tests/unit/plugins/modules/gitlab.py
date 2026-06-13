@@ -5,8 +5,8 @@
 from __future__ import annotations
 
 import json
+import typing as t
 import unittest
-from typing import Any
 from unittest.mock import Mock
 
 import gitlab
@@ -45,7 +45,7 @@ def python_gitlab_version_match_requirement():
 
 
 deleted_user_key_ids: list[str] = []
-created_user_keys: list[dict[str, Any]] = []
+created_user_keys: list[dict[str, t.Any]] = []
 
 
 """
