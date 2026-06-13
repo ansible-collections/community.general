@@ -5,7 +5,7 @@
 
 # UUID set at creation with opts for XFS is not supported
 - when:
-    - new_uuid | default(False)
+    - (new_uuid | default(false)) is truthy
     - fstype != "xfs"
   block:
 
