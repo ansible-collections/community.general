@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_repository - fix ``enabled``, ``autorefresh``, and ``gpgcheck`` module parameters being overridden by values read from a ``.repo`` file (https://github.com/ansible-collections/community.general/issues/8783, https://github.com/ansible-collections/community.general/pull/12022).
