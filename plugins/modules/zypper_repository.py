@@ -45,13 +45,13 @@ options:
     description:
       - Whether to disable GPG signature checking of all packages. Has an effect only if O(state=present).
       - Needs C(zypper) version >= 1.6.2.
+      - When not specified, the value from the C(.repo) file is used if available, otherwise it defaults to V(false).
     type: bool
-    default: false
   autorefresh:
     description:
       - Enable autorefresh of the repository.
+      - When not specified, the value from the C(.repo) file is used if available, otherwise it defaults to V(true).
     type: bool
-    default: true
     aliases: ["refresh"]
   priority:
     description:
@@ -81,8 +81,8 @@ options:
   enabled:
     description:
       - Set repository to enabled (or disabled).
+      - When not specified, the value from the C(.repo) file is used if available, otherwise it defaults to V(true).
     type: bool
-    default: true
 
 
 requirements:
@@ -328,10 +328,10 @@ def main():
             state=dict(choices=["present", "absent"], default="present"),
             runrefresh=dict(default=False, type="bool"),
             description=dict(),
-            disable_gpg_check=dict(default=False, type="bool"),
-            autorefresh=dict(default=True, type="bool", aliases=["refresh"]),
+            disable_gpg_check=dict(type="bool"),
+            autorefresh=dict(type="bool", aliases=["refresh"]),
             priority=dict(type="int"),
-            enabled=dict(default=True, type="bool"),
+            enabled=dict(type="bool"),
             overwrite_multiple=dict(default=False, type="bool"),
             auto_import_keys=dict(default=False, type="bool"),
         ),
@@ -356,18 +356,13 @@ def main():
         "priority": module.params["priority"],
     }
     # rewrite bools in the language that zypper lr -x provides for easier comparison
-    if module.params["enabled"]:
-        repodata["enabled"] = "1"
-    else:
-        repodata["enabled"] = "0"
-    if module.params["disable_gpg_check"]:
-        repodata["gpgcheck"] = "0"
-    else:
-        repodata["gpgcheck"] = "1"
-    if module.params["autorefresh"]:
-        repodata["autorefresh"] = "1"
-    else:
-        repodata["autorefresh"] = "0"
+    # only set if the user explicitly provided the parameter (None means unset)
+    if module.params["enabled"] is not None:
+        repodata["enabled"] = "1" if module.params["enabled"] else "0"
+    if module.params["disable_gpg_check"] is not None:
+        repodata["gpgcheck"] = "0" if module.params["disable_gpg_check"] else "1"
+    if module.params["autorefresh"] is not None:
+        repodata["autorefresh"] = "1" if module.params["autorefresh"] else "0"
 
     def exit_unchanged():
         module.exit_json(changed=False, repodata=repodata, state=state)
@@ -451,12 +446,15 @@ def main():
             # Map additional values, if available
             if "name" in repofile_items:
                 repodata["name"] = repofile_items["name"]
-            if "enabled" in repofile_items:
-                repodata["enabled"] = repofile_items["enabled"]
-            if "autorefresh" in repofile_items:
-                repodata["autorefresh"] = repofile_items["autorefresh"]
-            if "gpgcheck" in repofile_items:
-                repodata["gpgcheck"] = repofile_items["gpgcheck"]
+            # Use .repo file values only for settings the user did not explicitly provide
+            for key in ("enabled", "autorefresh", "gpgcheck"):
+                if key not in repodata and key in repofile_items:
+                    repodata[key] = repofile_items[key]
+
+    # Apply defaults for any settings not provided by the user or the .repo file
+    repodata.setdefault("enabled", "1")
+    repodata.setdefault("gpgcheck", "1")
+    repodata.setdefault("autorefresh", "1")
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
