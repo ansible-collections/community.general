@@ -96,8 +96,14 @@ call_get_repo_states_dnf4 = call(["/usr/bin/dnf", "repolist", "--all", "--verbos
 call_get_repo_states_dnf5 = call(["/usr/bin/dnf", "repo", "info", "--all"], check_rc=True)
 call_disable_dnf4 = call(["/usr/bin/dnf", "config-manager", "--assumeyes", "--set-disabled", "crb"], check_rc=True)
 call_enable_repo_dnf4 = call(["/usr/bin/dnf", "config-manager", "--assumeyes", "--set-enabled", "crb"], check_rc=True)
-call_disable_dnf5 = call(["/usr/bin/dnf", "config-manager", "setopt", "copr:copr.fedorainfracloud.org:phracek:PyCharm.enabled=0"], check_rc=True)
-call_enable_repo_dnf5 = call(["/usr/bin/dnf", "config-manager", "setopt", "copr:copr.fedorainfracloud.org:phracek:PyCharm.enabled=1"], check_rc=True)
+call_disable_dnf5 = call(
+    ["/usr/bin/dnf", "config-manager", "setopt", "copr:copr.fedorainfracloud.org:phracek:PyCharm.enabled=0"],
+    check_rc=True,
+)
+call_enable_repo_dnf5 = call(
+    ["/usr/bin/dnf", "config-manager", "setopt", "copr:copr.fedorainfracloud.org:phracek:PyCharm.enabled=1"],
+    check_rc=True,
+)
 
 
 class TestDNFConfigManager(ModuleTestCase):
@@ -156,11 +162,14 @@ class TestDNFConfigManager(ModuleTestCase):
 
     def test_get_repo_states_dnf4(self):
         with set_module_args({}):
-            side_effects = [(0, self.mock_dnf4_version, ""), (0, self.mock_dnf4_states_repo_enabled, ""),
-                            (0, self.mock_dnf4_states_repo_enabled, "")]
+            side_effects = [
+                (0, self.mock_dnf4_version, ""),
+                (0, self.mock_dnf4_states_repo_enabled, ""),
+                (0, self.mock_dnf4_states_repo_enabled, ""),
+            ]
             self.set_command_mock(
-                execute_side_effect=side_effects,
-                execute_return=(0, self.mock_dnf4_states_repo_enabled, ""))
+                execute_side_effect=side_effects, execute_return=(0, self.mock_dnf4_states_repo_enabled, "")
+            )
             result = self.execute_module(changed=False)
         self.assertEqual(result["repo_states_pre"], expected_states_enabled_repo_dnf4)
         self.assertEqual(result["repo_states_post"], expected_states_enabled_repo_dnf4)
@@ -171,11 +180,14 @@ class TestDNFConfigManager(ModuleTestCase):
 
     def test_get_repo_states_dnf5(self):
         with set_module_args({}):
-            side_effects = [(0, self.mock_dnf5_version, ""), (0, self.mock_dnf5_states_repo_enabled, ""),
-                            (0, self.mock_dnf5_states_repo_enabled, "")]
+            side_effects = [
+                (0, self.mock_dnf5_version, ""),
+                (0, self.mock_dnf5_states_repo_enabled, ""),
+                (0, self.mock_dnf5_states_repo_enabled, ""),
+            ]
             self.set_command_mock(
-                execute_side_effect=side_effects,
-                execute_return=(0, self.mock_dnf5_states_repo_enabled, ""))
+                execute_side_effect=side_effects, execute_return=(0, self.mock_dnf5_states_repo_enabled, "")
+            )
             result = self.execute_module(changed=False)
         self.assertEqual(result["repo_states_pre"], expected_states_enabled_repo_dnf5)
         self.assertEqual(result["repo_states_post"], expected_states_enabled_repo_dnf5)
@@ -186,34 +198,55 @@ class TestDNFConfigManager(ModuleTestCase):
 
     def test_enable_disabled_repo_dnf4(self):
         with set_module_args({"name": ["crb"], "state": "enabled"}):
-            side_effects = [(0, self.mock_dnf4_version, ""), (0, self.mock_dnf4_states_repo_disabled, ""),
-                            (0, "", ""), (0, self.mock_dnf4_states_repo_enabled, "")]
+            side_effects = [
+                (0, self.mock_dnf4_version, ""),
+                (0, self.mock_dnf4_states_repo_disabled, ""),
+                (0, "", ""),
+                (0, self.mock_dnf4_states_repo_enabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(changed=True)
         self.assertEqual(result["repo_states_pre"], expected_states_disabled_repo_dnf4)
         self.assertEqual(result["repo_states_post"], expected_states_enabled_repo_dnf4)
         self.assertEqual(result["changed_repos"], ["crb"])
 
-        expected_calls = [call_get_dnf_version, call_get_repo_states_dnf4, call_enable_repo_dnf4, call_get_repo_states_dnf4]
+        expected_calls = [
+            call_get_dnf_version,
+            call_get_repo_states_dnf4,
+            call_enable_repo_dnf4,
+            call_get_repo_states_dnf4,
+        ]
         self.run_command.assert_has_calls(calls=expected_calls, any_order=False)
 
     def test_enable_disabled_repo_dnf5(self):
         with set_module_args({"name": ["copr:copr.fedorainfracloud.org:phracek:PyCharm"], "state": "enabled"}):
-            side_effects = [(0, self.mock_dnf5_version, ""), (0, self.mock_dnf5_states_repo_disabled, ""),
-                            (0, "", ""), (0, self.mock_dnf5_states_repo_enabled, "")]
+            side_effects = [
+                (0, self.mock_dnf5_version, ""),
+                (0, self.mock_dnf5_states_repo_disabled, ""),
+                (0, "", ""),
+                (0, self.mock_dnf5_states_repo_enabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(changed=True)
         self.assertEqual(result["repo_states_pre"], expected_states_disabled_repo_dnf5)
         self.assertEqual(result["repo_states_post"], expected_states_enabled_repo_dnf5)
         self.assertEqual(result["changed_repos"], ["copr:copr.fedorainfracloud.org:phracek:PyCharm"])
 
-        expected_calls = [call_get_dnf_version, call_get_repo_states_dnf5, call_enable_repo_dnf5, call_get_repo_states_dnf5]
+        expected_calls = [
+            call_get_dnf_version,
+            call_get_repo_states_dnf5,
+            call_enable_repo_dnf5,
+            call_get_repo_states_dnf5,
+        ]
         self.run_command.assert_has_calls(calls=expected_calls, any_order=False)
 
     def test_enable_disabled_repo_check_mode_dnf4(self):
         with set_module_args({"name": ["crb"], "state": "enabled", "_ansible_check_mode": True}):
-            side_effects = [(0, self.mock_dnf4_version, ""), (0, self.mock_dnf4_states_repo_disabled, ""),
-                            (0, self.mock_dnf4_states_repo_disabled, "")]
+            side_effects = [
+                (0, self.mock_dnf4_version, ""),
+                (0, self.mock_dnf4_states_repo_disabled, ""),
+                (0, self.mock_dnf4_states_repo_disabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(changed=True)
         self.assertEqual(result["changed_repos"], ["crb"])
@@ -222,8 +255,18 @@ class TestDNFConfigManager(ModuleTestCase):
         self.run_command.assert_has_calls(calls=expected_calls, any_order=False)
 
     def test_enable_disabled_repo_check_mode_dnf5(self):
-        with set_module_args({"name": ["copr:copr.fedorainfracloud.org:phracek:PyCharm"], "state": "enabled", "_ansible_check_mode": True}):
-            side_effects = [(0, self.mock_dnf5_version, ""), (0, self.mock_dnf5_states_repo_disabled, ""), (0, self.mock_dnf5_states_repo_enabled, "")]
+        with set_module_args(
+            {
+                "name": ["copr:copr.fedorainfracloud.org:phracek:PyCharm"],
+                "state": "enabled",
+                "_ansible_check_mode": True,
+            }
+        ):
+            side_effects = [
+                (0, self.mock_dnf5_version, ""),
+                (0, self.mock_dnf5_states_repo_disabled, ""),
+                (0, self.mock_dnf5_states_repo_enabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(changed=True)
         self.assertEqual(result["changed_repos"], ["copr:copr.fedorainfracloud.org:phracek:PyCharm"])
@@ -233,8 +276,12 @@ class TestDNFConfigManager(ModuleTestCase):
 
     def test_disable_enabled_repo_dnf4(self):
         with set_module_args({"name": ["crb"], "state": "disabled"}):
-            side_effects = [(0, self.mock_dnf4_version, ""), (0, self.mock_dnf4_states_repo_enabled, ""),
-                            (0, "", ""), (0, self.mock_dnf4_states_repo_disabled, "")]
+            side_effects = [
+                (0, self.mock_dnf4_version, ""),
+                (0, self.mock_dnf4_states_repo_enabled, ""),
+                (0, "", ""),
+                (0, self.mock_dnf4_states_repo_disabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(changed=True)
         self.assertEqual(result["repo_states_pre"], expected_states_enabled_repo_dnf4)
@@ -245,8 +292,12 @@ class TestDNFConfigManager(ModuleTestCase):
 
     def test_disable_enabled_repo_dnf5(self):
         with set_module_args({"name": ["copr:copr.fedorainfracloud.org:phracek:PyCharm"], "state": "disabled"}):
-            side_effects = [(0, self.mock_dnf5_version, ""), (0, self.mock_dnf5_states_repo_enabled, ""),
-                            (0, "", ""), (0, self.mock_dnf5_states_repo_disabled, "")]
+            side_effects = [
+                (0, self.mock_dnf5_version, ""),
+                (0, self.mock_dnf5_states_repo_enabled, ""),
+                (0, "", ""),
+                (0, self.mock_dnf5_states_repo_disabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(changed=True)
         self.assertEqual(result["repo_states_pre"], expected_states_enabled_repo_dnf5)
@@ -257,25 +308,35 @@ class TestDNFConfigManager(ModuleTestCase):
 
     def test_crb_already_enabled_dnf4(self):
         with set_module_args({"name": ["crb"], "state": "enabled"}):
-            side_effects = [(0, self.mock_dnf4_version, ""), (0, self.mock_dnf4_states_repo_enabled, ""),
-                            (0, self.mock_dnf4_states_repo_enabled, "")]
+            side_effects = [
+                (0, self.mock_dnf4_version, ""),
+                (0, self.mock_dnf4_states_repo_enabled, ""),
+                (0, self.mock_dnf4_states_repo_enabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(changed=False)
         self.assertEqual(result["repo_states_pre"], expected_states_enabled_repo_dnf4)
         self.assertEqual(result["repo_states_post"], expected_states_enabled_repo_dnf4)
         self.assertEqual(result["changed_repos"], [])
-        self.run_command.assert_has_calls(calls=[call_get_dnf_version, call_get_repo_states_dnf4, call_get_repo_states_dnf4], any_order=False)
+        self.run_command.assert_has_calls(
+            calls=[call_get_dnf_version, call_get_repo_states_dnf4, call_get_repo_states_dnf4], any_order=False
+        )
 
     def test_crb_already_enabled_dnf5(self):
         with set_module_args({"name": ["copr:copr.fedorainfracloud.org:phracek:PyCharm"], "state": "enabled"}):
-            side_effects = [(0, self.mock_dnf5_version, ""), (1, self.mock_dnf5_states_repo_enabled, ""),
-                            (0, self.mock_dnf5_states_repo_enabled, "")]
+            side_effects = [
+                (0, self.mock_dnf5_version, ""),
+                (1, self.mock_dnf5_states_repo_enabled, ""),
+                (0, self.mock_dnf5_states_repo_enabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(changed=False)
         self.assertEqual(result["repo_states_pre"], expected_states_enabled_repo_dnf5)
         self.assertEqual(result["repo_states_post"], expected_states_enabled_repo_dnf5)
         self.assertEqual(result["changed_repos"], [])
-        self.run_command.assert_has_calls(calls=[call_get_dnf_version, call_get_repo_states_dnf5, call_get_repo_states_dnf5], any_order=False)
+        self.run_command.assert_has_calls(
+            calls=[call_get_dnf_version, call_get_repo_states_dnf5, call_get_repo_states_dnf5], any_order=False
+        )
 
     def test_get_repo_states_fail_no_status(self):
         with set_module_args({}):
@@ -300,10 +361,19 @@ class TestDNFConfigManager(ModuleTestCase):
 
     def test_failed_state_change_ineffective(self):
         with set_module_args({"name": ["crb"], "state": "enabled"}):
-            side_effects = [(0, self.mock_dnf4_version, ""), (0, self.mock_dnf4_states_repo_disabled, ""),
-                            (0, "", ""), (0, self.mock_dnf4_states_repo_disabled, "")]
+            side_effects = [
+                (0, self.mock_dnf4_version, ""),
+                (0, self.mock_dnf4_states_repo_disabled, ""),
+                (0, "", ""),
+                (0, self.mock_dnf4_states_repo_disabled, ""),
+            ]
             self.set_command_mock(execute_side_effect=side_effects)
             result = self.execute_module(failed=True)
         self.assertEqual(result["msg"], "dnf config-manager failed to make 'crb' enabled")
-        expected_calls = [call_get_dnf_version, call_get_repo_states_dnf4, call_enable_repo_dnf4, call_get_repo_states_dnf4]
+        expected_calls = [
+            call_get_dnf_version,
+            call_get_repo_states_dnf4,
+            call_enable_repo_dnf4,
+            call_get_repo_states_dnf4,
+        ]
         self.run_command.assert_has_calls(calls=expected_calls, any_order=False)

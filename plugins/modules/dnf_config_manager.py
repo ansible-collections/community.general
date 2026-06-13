@@ -121,8 +121,8 @@ changed_repos:
 
 import os
 import re
+import typing as t
 
-from typing import Literal
 from ansible.module_utils.basic import AnsibleModule
 
 DNF_BIN = "/usr/bin/dnf"
@@ -130,7 +130,7 @@ REPO_ID_RE = re.compile(r"^Repo[-\s]id\s*:\s*(\S+)$", re.IGNORECASE)
 REPO_STATUS_RE = re.compile(r"^(?:Repo-)?status\s*:\s*(disabled|enabled)$", re.IGNORECASE)
 
 
-def get_dnf_version(module) -> Literal[4, 5]:
+def get_dnf_version(module) -> t.Literal[4, 5]:
     rc, out, err = module.run_command([DNF_BIN, "--version"], check_rc=True)
     line, separator, rest = out.partition("\n")
 
