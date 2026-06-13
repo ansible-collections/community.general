@@ -165,4 +165,5 @@
     # using the entire block device.
     force_creation: "{{ e2fsprogs_version is version('1.43', '<') }}"
     # Earlier versions have a segfault bug
-    resize_vfat: "{{ fatresize_version|default('0.0') is version('1.0.4', '>=') }}"
+    # Also there's an assertion bug on Ubuntu
+    resize_vfat: "{{ fatresize_version|default('0.0') is version('1.0.4', '>=') and ansible_facts.distribution != 'Ubuntu' }}"
