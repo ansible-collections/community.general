@@ -78,6 +78,7 @@
     - include_tasks: test-print-match.yml
     - include_tasks: test-xmlstring.yml
     - include_tasks: test-children-elements-xml.yml
+    - include_tasks: test-preserve-doctype.yml
 
     # Unicode tests
     - include_tasks: test-add-children-elements-unicode.yml
