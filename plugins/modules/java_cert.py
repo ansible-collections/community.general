@@ -279,7 +279,7 @@ def _get_digest_from_x509_file(module, pem_certificate_file, openssl_bin):
 
 def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, password, dest):
     """Runs keytools to extract the public cert from a PKCS12 archive and write it to a file."""
-    export_cmd = [executable, "-list", "-noprompt", "-keystore", pkcs_file, "-storetype", "pkcs12", "-rfc"]
+    export_cmd = [executable, "-list", "-keystore", pkcs_file, "-storetype", "pkcs12", "-rfc"]
     # Append optional alias
     if alias:
         export_cmd.extend(["-alias", alias])
