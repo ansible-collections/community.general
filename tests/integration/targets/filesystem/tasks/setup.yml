@@ -21,8 +21,10 @@
   when:
     # bcachefs only on Alpine > 3.18 and Arch Linux for now
     # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
-    - ansible_facts.distribution == "Alpine" and ansible_facts.distribution_version is version("3.18", ">")
-    - ansible_facts.distribution == "Archlinux"
+    - >-
+      (ansible_facts.distribution == "Alpine" and ansible_facts.distribution_version is version("3.18", ">"))
+      or
+      ansible_facts.distribution == "Archlinux"
 
 - name: "Install btrfs progs"
   ansible.builtin.package:
