@@ -29,8 +29,6 @@ tested_filesystems:
   lvm: {fssize: 20, grow: true, new_uuid: 'something'}
   swap: {fssize: 10, grow: false, new_uuid: null}  # grow not implemented
   ufs: {fssize: 10, grow: true, new_uuid: null}
-  # TODO: tests seem to be generally broken
-  # gfs2: {fssize: 10, grow: false, new_uuid: null}
 
 
 get_uuid_any: "blkid -c /dev/null -o value -s UUID {{ dev }}"
