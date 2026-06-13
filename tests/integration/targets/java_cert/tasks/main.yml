@@ -32,6 +32,23 @@
         that:
           - result_success is successful
 
+    - name: import pkcs12 again to verify idempotency (tests password via stdin in _export_public_cert_from_pkcs12)
+      community.general.java_cert:
+        pkcs12_path: "{{ remote_tmp_dir }}/{{ test_pkcs12_path }}"
+        pkcs12_password: changeit
+        pkcs12_alias: default
+        cert_alias: default
+        keystore_path: "{{ remote_tmp_dir }}/{{ test_keystore_path }}"
+        keystore_pass: changeme_keystore
+        keystore_create: true
+        state: present
+      register: result_idempotent
+
+    - name: verify idempotency
+      ansible.builtin.assert:
+        that:
+          - result_idempotent is not changed
+
     - name: import pkcs12 without alias params
       community.general.java_cert:
         pkcs12_path: "{{ remote_tmp_dir }}/{{ test_pkcs12_path }}"
