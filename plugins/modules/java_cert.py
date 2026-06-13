@@ -411,6 +411,14 @@ def import_pkcs12_path(
     if import_rc != 0 or not os.path.exists(keystore_path):
         module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
 
+    check_alias = keystore_alias or pkcs12_alias
+    if check_alias:
+        alias_exists, _ = _check_cert_present(
+            module, executable, keystore_path, keystore_pass, check_alias, keystore_type
+        )
+        if not alias_exists:
+            module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
+
     return dict(
         changed=True, msg=import_out, rc=import_rc, cmd=import_cmd, stdout=import_out, error=import_err, diff=diff
     )
@@ -431,7 +439,11 @@ def import_cert_path(module, executable, path, keystore_path, keystore_pass, ali
     )
     diff = {"before": "\n", "after": f"{alias}\n"}
 
-    if import_rc != 0:
+    if import_rc != 0 or not os.path.exists(keystore_path):
+        module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
+
+    alias_exists, _ = _check_cert_present(module, executable, keystore_path, keystore_pass, alias, keystore_type)
+    if not alias_exists:
         module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
 
     return dict(
