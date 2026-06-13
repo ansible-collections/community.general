@@ -311,6 +311,12 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
+    - name: "Trust tap (TODO: let homebrew_tap do this)"
+      ansible.builtin.command:
+        cmd: brew trust hashicorp/tap
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
     - name: Install terraform from tap
       community.general.homebrew:
         name: hashicorp/tap/terraform
@@ -355,6 +361,12 @@
     - name: Tap ascii-image-converter homebrew repository
       community.general.homebrew_tap:
         name: TheZoraiz/ascii-image-converter
+      become: true
+      become_user: "{{ brew_stat.stat.pw_name }}"
+
+    - name: "Trust tap (TODO: let homebrew_tap do this)"
+      ansible.builtin.command:
+        cmd: brew trust thezoraiz/ascii-image-converter
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
