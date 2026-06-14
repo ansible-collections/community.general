@@ -1,0 +1,4 @@
+bugfixes:
+  - "java_cert - detect silent ``keytool`` failures by verifying the import outcome after the command exits with ``rc=0``
+    (https://github.com/ansible-collections/community.general/issues/6685,
+    https://github.com/ansible-collections/community.general/pull/12238)."

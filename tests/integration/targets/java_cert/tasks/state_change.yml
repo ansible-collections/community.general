@@ -93,6 +93,40 @@
 # Run tests
 #
 
+- name: import cert with too-short keystore password should fail
+  community.general.java_cert:
+    cert_alias: test_cert
+    cert_path: "{{ test_cert_path }}"
+    keystore_path: "{{ remote_tmp_dir }}/keystore_short_pass.jks"
+    keystore_pass: ""
+    keystore_create: true
+    state: present
+  ignore_errors: true
+  register: result_short_pass_cert
+
+- name: verify failure with too-short keystore password for cert import
+  ansible.builtin.assert:
+    that:
+      - result_short_pass_cert is failed
+
+- name: import pkcs12 with too-short keystore password should fail
+  community.general.java_cert:
+    cert_alias: test_pkcs12_cert
+    pkcs12_alias: test_pkcs12_cert
+    pkcs12_path: "{{ test_pkcs_path }}"
+    pkcs12_password: "{{ test_keystore2_password }}"
+    keystore_path: "{{ remote_tmp_dir }}/keystore_short_pass_pkcs12.jks"
+    keystore_pass: ""
+    keystore_create: true
+    state: present
+  ignore_errors: true
+  register: result_short_pass_pkcs12
+
+- name: verify failure with too-short keystore password for pkcs12 import
+  ansible.builtin.assert:
+    that:
+      - result_short_pass_pkcs12 is failed
+
 - name: try to create the test keystore based on the just created pkcs12, keystore_create flag not enabled
   community.general.java_cert:
     cert_alias: test_pkcs12_cert
