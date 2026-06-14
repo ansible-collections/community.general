@@ -1,0 +1,13 @@
+Repo-id            : appstream-debuginfo
+Repo-name          : AlmaLinux 9 - AppStream - Debug
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/appstream-debug
+Repo-expire        : 86,400 second(s) (last: unknown)
+Repo-filename      : /etc/yum.repos.d/almalinux-appstream.repo
+
+Repo-id            : appstream-source
+Repo-name          : AlmaLinux 9 - AppStream - Source
+Repo-status        : disabled
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/appstream-source
+Repo-expire        : 86,400 second(s) (last: unknown)
+Repo-filename      : /etc/yum.repos.d/almalinux-appstream.repo
+

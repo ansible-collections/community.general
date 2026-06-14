@@ -1,0 +1,46 @@
+dnf5 version 5.4.2.1
+dnf5 plugin API version 2.0
+libdnf5 version 5.4.2.1
+libdnf5 plugin API version 2.2
+
+Loaded dnf5 plugins:
+  name: builddep
+  version: 1.0.0
+  API version: 2.0
+
+  name: changelog
+  version: 1.0.0
+  API version: 2.0
+
+  name: config-manager
+  version: 0.1.0
+  API version: 2.0
+
+  name: copr
+  version: 0.1.0
+  API version: 2.0
+
+  name: needs_restarting
+  version: 1.0.0
+  API version: 2.0
+
+  name: repoclosure
+  version: 1.0.0
+  API version: 2.0
+
+  name: repomanage
+  version: 1.0.0
+  API version: 2.0
+
+  name: reposync
+  version: 1.0.0
+  API version: 2.0
+
+Loaded libdnf5 plugins:
+  name: appstream
+  version: 1.0.0
+  API version: 2.0
+
+  name: expired-pgp-keys
+  version: 1.0.0
+  API version: 2.1

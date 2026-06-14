@@ -1,0 +1,99 @@
+Loaded plugins: builddep, changelog, config-manager, copr, debug, debuginfo-install
+DNF version: 4.14.0
+cachedir: /var/cache/dnf
+Last metadata expiration check: 1:20:49 ago on Fri 22 Dec 2023 06:05:13 PM UTC.
+Repo-id            : appstream
+Repo-name          : AlmaLinux 9 - AppStream
+Repo-status        : enabled
+Repo-revision      : 1703240474
+Repo-updated       : Fri 22 Dec 2023 10:21:14 AM UTC
+Repo-pkgs          : 5,897
+Repo-available-pkgs: 5,728
+Repo-size          : 9.5 G
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/appstream
+Repo-baseurl       : http://mirror.cogentco.com/pub/linux/almalinux/9.3/AppStream/x86_64/os/ (9 more)
+Repo-expire        : 86,400 second(s) (last: Fri 22 Dec 2023 06:05:11 PM UTC)
+Repo-filename      : /etc/yum.repos.d/almalinux-appstream.repo
+
+Repo-id            : appstream-debuginfo
+Repo-name          : AlmaLinux 9 - AppStream - Debug
+Repo-status        : disabled
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/appstream-debug
+Repo-expire        : 86,400 second(s) (last: unknown)
+Repo-filename      : /etc/yum.repos.d/almalinux-appstream.repo
+
+Repo-id            : appstream-source
+Repo-name          : AlmaLinux 9 - AppStream - Source
+Repo-status        : disabled
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/appstream-source
+Repo-expire        : 86,400 second(s) (last: unknown)
+Repo-filename      : /etc/yum.repos.d/almalinux-appstream.repo
+
+Repo-id            : baseos
+Repo-name          : AlmaLinux 9 - BaseOS
+Repo-status        : enabled
+Repo-revision      : 1703240561
+Repo-updated       : Fri 22 Dec 2023 10:22:41 AM UTC
+Repo-pkgs          : 1,244
+Repo-available-pkgs: 1,244
+Repo-size          : 1.3 G
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/baseos
+Repo-baseurl       : http://mirror.cogentco.com/pub/linux/almalinux/9.3/BaseOS/x86_64/os/ (9 more)
+Repo-expire        : 86,400 second(s) (last: Fri 22 Dec 2023 06:05:11 PM UTC)
+Repo-filename      : /etc/yum.repos.d/almalinux-baseos.repo
+
+Repo-id            : baseos-debuginfo
+Repo-name          : AlmaLinux 9 - BaseOS - Debug
+Repo-status        : disabled
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/baseos-debug
+Repo-expire        : 86,400 second(s) (last: unknown)
+Repo-filename      : /etc/yum.repos.d/almalinux-baseos.repo
+
+Repo-id            : baseos-source
+Repo-name          : AlmaLinux 9 - BaseOS - Source
+Repo-status        : disabled
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/baseos-source
+Repo-expire        : 86,400 second(s) (last: unknown)
+Repo-filename      : /etc/yum.repos.d/almalinux-baseos.repo
+
+Repo-id            : copr:copr.fedorainfracloud.org:uriesk:dracut-crypt-ssh
+Repo-name          : Copr repo for dracut-crypt-ssh owned by uriesk
+Repo-status        : enabled
+Repo-revision      : 1698291016
+Repo-updated       : Thu 26 Oct 2023 03:30:16 AM UTC
+Repo-pkgs          : 4
+Repo-available-pkgs: 4
+Repo-size          : 102 k
+Repo-baseurl       : https://download.copr.fedorainfracloud.org/results/uriesk/dracut-crypt-ssh/epel-9-x86_64/
+Repo-expire        : 172,800 second(s) (last: Fri 22 Dec 2023 06:05:10 PM UTC)
+Repo-filename      : /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:uriesk:dracut-crypt-ssh.repo
+
+Repo-id            : crb
+Repo-name          : AlmaLinux 9 - CRB
+Repo-status        : enabled
+Repo-revision      : 1703240590
+Repo-updated       : Fri 22 Dec 2023 10:23:10 AM UTC
+Repo-pkgs          : 1,730
+Repo-available-pkgs: 1,727
+Repo-size          : 13 G
+Repo-mirrors       : https://mirrors.almalinux.org/mirrorlist/9/crb
+Repo-baseurl       : http://mirror.cogentco.com/pub/linux/almalinux/9.3/CRB/x86_64/os/ (9 more)
+Repo-expire        : 86,400 second(s) (last: Fri 22 Dec 2023 06:05:11 PM UTC)
+Repo-filename      : /etc/yum.repos.d/almalinux-crb.repo
+
+Repo-id            : rpmfusion-nonfree-updates
+Repo-name          : RPM Fusion for EL 9 - Nonfree - Updates
+Repo-status        : enabled
+Repo-revision      : 1703248251
+Repo-tags          : binary-x86_64
+Repo-updated       : Fri 22 Dec 2023 12:30:53 PM UTC
+Repo-pkgs          : 65
+Repo-available-pkgs: 65
+Repo-size          : 944 M
+Repo-metalink      : http://mirrors.rpmfusion.org/metalink?repo=nonfree-el-updates-released-9&arch=x86_64
+  Updated          : Fri 22 Dec 2023 06:05:13 PM UTC
+Repo-baseurl       : http://uvermont.mm.fcix.net/rpmfusion/nonfree/el/updates/9/x86_64/ (33 more)
+Repo-expire        : 172,800 second(s) (last: Fri 22 Dec 2023 06:05:13 PM UTC)
+Repo-filename      : /etc/yum.repos.d/rpmfusion-nonfree-updates.repo
+Total packages: 28,170
+
