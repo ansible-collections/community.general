@@ -413,7 +413,7 @@ def import_pkcs12_path(
 
     check_alias = keystore_alias or pkcs12_alias
     if check_alias:
-        alias_exists, _ = _check_cert_present(
+        alias_exists, dummy = _check_cert_present(
             module, executable, keystore_path, keystore_pass, check_alias, keystore_type
         )
         if not alias_exists:
@@ -442,7 +442,7 @@ def import_cert_path(module, executable, path, keystore_path, keystore_pass, ali
     if import_rc != 0 or not os.path.exists(keystore_path):
         module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
 
-    alias_exists, _ = _check_cert_present(module, executable, keystore_path, keystore_pass, alias, keystore_type)
+    alias_exists, dummy = _check_cert_present(module, executable, keystore_path, keystore_pass, alias, keystore_type)
     if not alias_exists:
         module.fail_json(msg=import_out, rc=import_rc, cmd=import_cmd, error=import_err)
 
