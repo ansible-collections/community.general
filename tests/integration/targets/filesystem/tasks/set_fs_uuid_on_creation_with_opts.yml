@@ -30,4 +30,5 @@
 
     - name: "Assert that filesystem UUID is the one set on creation with opt"
       ansible.builtin.assert:
-        that: (random_uuid2 | replace('-','')) == ( uuid2.stdout | replace('-',''))
+        that: >-
+          (random_uuid2 | replace('-','')) == ( uuid2.stdout | ansible.builtin.regex_replace('.*\\bUUID="?([^"\\s]+)"?.*', '\\1') | replace('-',''))

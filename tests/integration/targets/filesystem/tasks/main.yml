@@ -53,6 +53,8 @@
     #       which breaks Bcachefs.get_fs_size(). This seems to be related to the C -> Rust conversion of the CLI tools.
     #       It also seems that it is now impossible to know whether base 2 or 10 units are used... :(
     - 'not (ansible_facts.distribution in ["Archlinux"] and item.0.key == "bcachefs")'
+    # TODO: bcachefs on Alpine doesn't seem to work for unknown reasons, debug this!
+    - 'not (ansible_facts.distribution in ["Alpine"] and item.0.key == "bcachefs")'
     # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
     - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs"])'
     - 'not (ansible_facts.os_family == "RedHat" and item.0.key == "btrfs")'
@@ -80,10 +82,8 @@
       # TODO: figure out why it fails, fix it!
     # btrfs-progs cannot be installed on ArchLinux
     - 'not (item.0.key == "btrfs" and ansible_facts.distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
-
-
-    # TODO: something seems to be broken on Alpine
-    - 'not (ansible_facts.distribution == "Alpine")'
+    # swap does not work on Alpine due to no -f support in mkswap
+    - 'not (item.0.key == "swap" and ansible_facts.distribution == "Alpine")'
 
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'reset_fs_uuid', 'overwrite_another_fs', 'remove_fs', 'set_fs_uuid_on_creation', 'set_fs_uuid_on_creation_with_opts'])|list }}"
 
