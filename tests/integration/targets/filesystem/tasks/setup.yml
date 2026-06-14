@@ -99,6 +99,12 @@
     state: present
   when: ansible_facts.os_family == 'Debian'
 
+- name: "Install GFS2"
+  ansible.builtin.package:
+    name: gfs2-utils
+    state: present
+  when: ansible_facts.os_family in ['Debian', 'Suse', 'Ubuntu'] or ansible_facts.distribution == 'Fedora'
+
 - name: "Install f2fs tools and get version"
   when:
     - ansible_facts.os_family != 'RedHat' or ansible_facts.distribution == 'Fedora'

@@ -35,11 +35,12 @@ options:
     default: present
     version_added: 1.3.0
   fstype:
-    choices: [bcachefs, btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs]
+    choices: [bcachefs, btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap, ufs, gfs2]
     description:
       - Filesystem type to be created. This option is required with O(state=present) (or if O(state) is omitted).
       - V(ufs) support has been added in community.general 3.4.0.
       - V(bcachefs) support has been added in community.general 8.6.0.
+      - V(gfs2) support has been added in community.general 13.1.0.
     type: str
     aliases: [type]
   dev:
@@ -79,11 +80,19 @@ options:
       - The UUID options specified in O(opts) take precedence over this value.
       - See xfs_admin(8) (C(xfs)), tune2fs(8) (C(ext2), C(ext3), C(ext4), C(ext4dev)) for possible values.
       - For O(fstype=lvm) the value is ignored, it resets the PV UUID if set.
-      - Supported for O(fstype) being one of V(bcachefs), V(ext2), V(ext3), V(ext4), V(ext4dev), V(lvm), or V(xfs).
+      - Supported for O(fstype) being one of V(bcachefs), V(ext2), V(ext3), V(ext4), V(ext4dev), V(lvm), V(gfs2) or V(xfs).
       - This is B(not idempotent). Specifying this option always results in a change.
       - Mutually exclusive with O(resizefs).
     type: str
     version_added: 7.1.0
+  label:
+    description:
+      - Set filesystem's label to the given value
+      - The label options specified in O(opts) take precedence over this value.
+      - Supported for O(fstype) being one of V(gfs2).
+      - On GFS2 this sets the lock table with the -t option of mkfs.gfs2(8). It has to be in the form C(CLUSTERNAME:LOCKSPACE).
+    type: str
+    version_added: 13.1.0
 requirements:
   - Uses specific tools related to the O(fstype) for creating or resizing a filesystem (from packages e2fsprogs, xfsprogs,
     dosfstools, and so on).
@@ -205,6 +214,7 @@ class Filesystem:
     MKFS_FORCE_FLAGS: list[str] | None = []
     MKFS_SET_UUID_OPTIONS: list[str] | None = None
     MKFS_SET_UUID_EXTRA_OPTIONS: list[str] | None = []
+    MKFS_SET_LABEL_OPTIONS: list[str] | None = None
     INFO: str | None = None
     GROW: str | None = None
     GROW_SLACK: int = 0
@@ -231,13 +241,16 @@ class Filesystem:
         """
         raise NotImplementedError()
 
-    def create(self, opts, dev, uuid=None):
+    def create(self, opts, dev, uuid=None, label=None):
         if self.module.check_mode:
             return
 
         if uuid and self.MKFS_SET_UUID_OPTIONS:
             if not (set(self.MKFS_SET_UUID_OPTIONS) & set(opts)):
                 opts += [self.MKFS_SET_UUID_OPTIONS[0], uuid] + self.MKFS_SET_UUID_EXTRA_OPTIONS
+        if label and self.MKFS_SET_LABEL_OPTIONS:
+            if not (set(self.MKFS_SET_LABEL_OPTIONS) & set(opts)):
+                opts += [self.MKFS_SET_LABEL_OPTIONS[0], label]
 
         mkfs = self.module.get_bin_path(self.MKFS, required=True)
         cmd = [mkfs] + self.MKFS_FORCE_FLAGS + opts + [str(dev)]
@@ -611,6 +624,13 @@ class UFS(Filesystem):
         return fragmentsize * providersize
 
 
+class GFS2(Filesystem):
+    MKFS = "mkfs.gfs2"
+    MKFS_FORCE_FLAGS = ["-O"]
+    MKFS_SET_UUID_OPTIONS = ["-U"]
+    MKFS_SET_LABEL_OPTIONS = ["-t"]
+
+
 FILESYSTEMS = {
     "bcachefs": Bcachefs,
     "ext2": Ext2,
@@ -626,6 +646,7 @@ FILESYSTEMS = {
     "LVM2_member": LVM,
     "swap": Swap,
     "ufs": UFS,
+    "gfs2": GFS2,
 }
 
 
@@ -646,6 +667,7 @@ def main():
             force=dict(type="bool", default=False),
             resizefs=dict(type="bool", default=False),
             uuid=dict(type="str"),
+            label=dict(type="str"),
         ),
         required_if=[("state", "present", ["fstype"])],
         mutually_exclusive=[
@@ -661,6 +683,7 @@ def main():
     force = module.params["force"]
     resizefs = module.params["resizefs"]
     uuid = module.params["uuid"]
+    label = module.params["label"]
 
     mkfs_opts = []
     if opts is not None:
@@ -723,7 +746,7 @@ def main():
             module.fail_json(msg=f"'{dev}' is already used as {fs}, use force=true to overwrite", rc=rc, err=err)
 
         # create fs
-        filesystem.create(opts=mkfs_opts, dev=dev, uuid=uuid)
+        filesystem.create(opts=mkfs_opts, dev=dev, uuid=uuid, label=label)
         changed = True
 
     elif fs:
