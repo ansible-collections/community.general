@@ -68,68 +68,71 @@ file_digest:
 """
 
 import hashlib
-import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
 
 
-def get_exports(module: AnsibleModule) -> tuple[dict, dict]:
-    output_format = module.params["output_format"]
-    file_path = module.params["file_path"]
+def get_exports(module: AnsibleModule, output_format: str | None = None, file_path: str | None = None) -> dict:
+    if output_format is None:
+        output_format = module.params["output_format"]
+    if file_path is None:
+        file_path = module.params.get("file_path", "/etc/exports")
 
     shares_per_ip = {}
     ips_per_share = {}
     file_digest = {}
 
     try:
-        if not os.path.exists(file_path):
-            module.fail_json(msg=f"{file_path} file not found")
+        with open(file_path, "rb") as f:
+            content_bytes = f.read()
+        content = content_bytes.decode("utf-8", errors="ignore")
+    except FileNotFoundError:
+        module.fail_json(msg=f"{file_path} file not found")
+    except OSError as e:
+        module.fail_json(msg=f"Could not read {file_path}: {str(e)}")
 
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
+    for algo in ["md5", "sha1", "sha256"]:
+        try:
+            hasher = hashlib.new(algo)
+            hasher.update(content_bytes)
+            file_digest[algo] = hasher.hexdigest()
+        except ValueError:
+            continue
 
-        for algo in ["md5", "sha1", "sha256"]:
-            try:
-                hasher = hashlib.new(algo)
-                hasher.update(content.encode("utf-8"))
-                file_digest[algo] = hasher.hexdigest()
-            except ValueError:
-                continue
+    for line in content.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
 
-        for line in content.splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
+        parts = re.split(r"\s+", line)
+        if len(parts) < 2:
+            continue
 
-            parts = re.split(r"\s+", line)
-            if len(parts) < 2:
-                continue
+        folder = parts[0]
+        for client_part in parts[1:]:
+            match = re.match(r"^([^\(]+)\(([^\)]+)\)$", client_part)
+            if match:
+                ip = match.group(1)
+                options = [opt.strip() for opt in match.group(2).split(",")]
+            else:
+                ip = client_part
+                options = []
 
-            folder = parts[0]
-            for client_part in parts[1:]:
-                match = re.match(r"^([^\(]+)\(([^\)]+)\)$", client_part)
-                if match:
-                    ip = match.group(1)
-                    options = [opt.strip() for opt in match.group(2).split(",")]
-                else:
-                    ip = client_part
-                    options = []
+            if ip not in shares_per_ip:
+                shares_per_ip[ip] = []
+            shares_per_ip[ip].append({"folder": folder, "options": options})
 
-                if ip not in shares_per_ip:
-                    shares_per_ip[ip] = []
-                shares_per_ip[ip].append({"folder": folder, "options": options})
+            if folder not in ips_per_share:
+                ips_per_share[folder] = []
+            ips_per_share[folder].append({"ip": ip, "options": options})
 
-                if folder not in ips_per_share:
-                    ips_per_share[folder] = []
-                ips_per_share[folder].append({"ip": ip, "options": options})
+    exports_info = ips_per_share if output_format == "ips_per_share" else shares_per_ip
 
-    except Exception as e:
-        module.fail_json(msg=f"Failed to process {file_path}: {str(e)}")
-
-    if output_format == "ips_per_share":
-        return ips_per_share, file_digest
-    return shares_per_ip, file_digest
+    return {
+        "exports_info": exports_info,
+        "file_digest": file_digest
+    }
 
 
 def main() -> None:
@@ -143,12 +146,12 @@ def main() -> None:
         supports_check_mode=True
     )
 
-    exports_info, file_digest = get_exports(module)
+    result = get_exports(module)
 
     module.exit_json(
         changed=False,
-        exports_info=exports_info,
-        file_digest=file_digest
+        exports_info=result["exports_info"],
+        file_digest=result["file_digest"]
     )
 
 
