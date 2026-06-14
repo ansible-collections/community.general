@@ -90,7 +90,7 @@ options:
       - Set filesystem's label to the given value.
       - The label options specified in O(opts) take precedence over this value.
       - Supported for O(fstype) being one of V(gfs2). Support for other filesystems might be added later.
-      - On GFS2 this sets the lock table with the -t option of mkfs.gfs2(8). It has to be in the form C(CLUSTERNAME:LOCKSPACE).
+      - On GFS2 this sets the lock table with the C(-t) option of mkfs.gfs2(8). It has to be in the form V(CLUSTERNAME:LOCKSPACE).
     type: str
     version_added: 13.1.0
 requirements:
