@@ -48,8 +48,11 @@
 
     # bcachefs only on Alpine > 3.18 and Arch Linux for now
     # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
-    - 'ansible_distribution == "Alpine" and ansible_distribution_version is version("3.18", ">") and item.0.key == "bcachefs"'
-    - 'ansible_distribution == "Archlinux" and item.0.key == "bcachefs"'
+    - 'not (ansible_facts.distribution not in ["Alpine", "Archlinux"] and item.0.key == "bcachefs")'
+    # TODO: bcachefs on Arch uses a different output format; instead of 'Size: 20.0 MiB' it now prints 'Size: 20.0M',
+    #       which breaks Bcachefs.get_fs_size(). This seems to be related to the C -> Rust conversion of the CLI tools.
+    #       It also seems that it is now impossible to know whether base 2 or 10 units are used... :(
+    - 'not (ansible_facts.distribution in ["Archlinux"] and item.0.key == "bcachefs")'
     # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
     - 'not (ansible_distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs"])'
     - 'not (ansible_os_family == "RedHat" and ansible_distribution_major_version is version("8", ">=") and
