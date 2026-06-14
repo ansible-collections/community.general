@@ -102,6 +102,7 @@
     fstype: '{{ item.0.key }}'
     fssize: '{{ item.0.value.fssize }}'
     grow: '{{ item.0.value.grow }}'
+    label: '{{ item.0.value.label }}'
     action: '{{ item.1 }}'
   when:
     - 'ansible_facts.system == "FreeBSD"'
