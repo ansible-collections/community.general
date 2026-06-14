@@ -683,6 +683,11 @@ def main():
     cmd = module.get_bin_path("blkid", required=True)
     rc, raw_fs, err = module.run_command([cmd, "-c", os.devnull, "-o", "value", "-s", "TYPE", str(dev)])
     fs = raw_fs.strip()
+    # BusyBox blkid may ignore -o/-s flags and output the full device info line,
+    # e.g. '/dev/sda2: UUID="..." TYPE="btrfs"' instead of just 'btrfs'
+    if fs and " " in fs:
+        type_match = re.search(r'\bTYPE="?([^"\s]+)"?', raw_fs)
+        fs = type_match.group(1) if type_match else ""
     if not fs and platform.system() == "FreeBSD":
         cmd = module.get_bin_path("fstyp", required=True)
         rc, raw_fs, err = module.run_command([cmd, str(dev)])
