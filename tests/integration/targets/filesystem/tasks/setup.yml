@@ -46,6 +46,18 @@
     - not (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_version is version('24.04', '<'))
     - not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_version is version('12', '<'))
 
+- name: "Install Alpine specific packages"
+  ansible.builtin.package:
+    name:
+      - e2fsprogs-extra
+      - findmnt
+      - util-linux-misc
+      - wipefs
+      - xfsprogs-extra
+    state: present
+  when:
+    - ansible_facts.distribution == 'Alpine'
+
 - name: "Install btrfs tools (Ubuntu <= 16.04)"
   ansible.builtin.package:
     name: btrfs-tools
