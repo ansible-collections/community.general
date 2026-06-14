@@ -1,0 +1,6 @@
+4.23.0
+  Installed: dnf-0:4.23.0-1.fc40.1.noarch at Tue May 13 07:48:45 2025
+  Built    : Fedora Project at Fri Apr 11 12:21:43 2025
+
+  Installed: rpm-0:4.19.1.1-1.fc40.x86_64 at Tue May 13 07:48:45 2025
+  Built    : Fedora Project at Wed Feb  7 15:55:53 2024

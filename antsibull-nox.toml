@@ -83,6 +83,7 @@ no_trailing_whitespace_skip_paths = [
     "tests/integration/targets/setup_flatpak_remote/files/repo.tar.xz",
 ]
 no_trailing_whitespace_skip_directories = [
+    "tests/unit/plugins/modules/dnf_config_manager/fixtures/",
     "tests/unit/plugins/modules/interfaces_file/interfaces_file_fixtures/golden_output/",
     "tests/unit/plugins/modules/interfaces_file/interfaces_file_fixtures/input/",
 ]

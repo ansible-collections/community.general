@@ -1,0 +1,304 @@
+Repo ID              : copr:copr.fedorainfracloud.org:phracek:PyCharm
+Name                 : Copr repo for PyCharm owned by phracek
+Status               : enabled
+Priority             : 99
+Cost                 : 1000
+Type                 : available
+Metadata expire      : 172800 seconds (last: 2026-06-08 03:33:15)
+Skip if unavailable  : true
+Config file          : /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:phracek:PyCharm.repo
+URLs                 : 
+  Base URL           : https://download.copr.fedorainfracloud.org/results/phracek/PyCharm/fedora-44-x86_64/
+OpenPGP              : 
+  Keys               : https://download.copr.fedorainfracloud.org/results/phracek/PyCharm/pubkey.gpg
+  Verify repodata    : false
+  Verify packages    : true
+Repodata info        : 
+  Available packages : 5
+  Total packages     : 5
+  Size               : 1.8 GiB
+  Revision           : 1771912250
+  Updated            : 2026-02-24 05:51:20
+
+Repo ID              : fedora
+Name                 : Fedora 44 - x86_64
+Status               : enabled
+Priority             : 99
+Cost                 : 1000
+Type                 : available
+Metadata expire      : 604800 seconds (last: 2026-06-08 03:33:15)
+Skip if unavailable  : false
+Config file          : /etc/yum.repos.d/fedora.repo
+URLs                 : 
+  Base URL           : https://distrohub.kyiv.ua/fedora/fedora/linux/releases/44/Everything/x86_64/os/ (103 more)
+  Metalink           : https://mirrors.fedoraproject.org/metalink?repo=fedora-44&arch=x86_64
+OpenPGP              : 
+  Keys               : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata    : false
+  Verify packages    : true
+Repodata info        : 
+  Available packages : 76354
+  Total packages     : 76354
+  Size               : 113.1 GiB
+  Revision           : 1776864872
+  Updated            : 2026-04-22 13:34:32
+
+Repo ID              : fedora-cisco-openh264
+Name                 : Fedora 44 openh264 (From Cisco) - x86_64
+Status               : enabled
+Priority             : 99
+Cost                 : 1000
+Type                 : available
+Metadata expire      : 1209600 seconds (last: 2026-06-08 03:33:15)
+Skip if unavailable  : true
+Config file          : /etc/yum.repos.d/fedora-cisco-openh264.repo
+URLs                 : 
+  Base URL           : https://codecs.fedoraproject.org/openh264/44/x86_64/ (1 more)
+  Metalink           : https://mirrors.fedoraproject.org/metalink?repo=fedora-cisco-openh264-44&arch=x86_64
+OpenPGP              : 
+  Keys               : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata    : false
+  Verify packages    : true
+Repodata info        : 
+  Available packages : 3
+  Total packages     : 3
+  Size               : 901.3 KiB
+  Revision           : 1774348624
+  Updated            : 2026-03-24 10:37:04
+
+Repo ID             : fedora-cisco-openh264-debuginfo
+Name                : Fedora 44 openh264 (From Cisco) - x86_64 - Debug
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 1209600 seconds (last: unknown)
+Skip if unavailable : true
+Config file         : /etc/yum.repos.d/fedora-cisco-openh264.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=fedora-cisco-openh264-debug-44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : fedora-cisco-openh264-source
+Name                : Fedora 44 openh264 (From Cisco) - x86_64 - Source
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 1209600 seconds (last: unknown)
+Skip if unavailable : true
+Config file         : /etc/yum.repos.d/fedora-cisco-openh264.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=fedora-cisco-openh264-source-44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : fedora-debuginfo
+Name                : Fedora 44 - x86_64 - Debug
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 604800 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=fedora-debug-44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : fedora-source
+Name                : Fedora 44 - Source
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 604800 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=fedora-source-44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID              : google-chrome
+Name                 : google-chrome
+Status               : enabled
+Priority             : 99
+Cost                 : 1000
+Type                 : available
+Metadata expire      : 172800 seconds (last: 2026-06-08 03:33:15)
+Skip if unavailable  : true
+Config file          : /etc/yum.repos.d/google-chrome.repo
+URLs                 : 
+  Base URL           : https://dl.google.com/linux/chrome/rpm/stable/x86_64
+OpenPGP              : 
+  Keys               : https://dl.google.com/linux/linux_signing_key.pub
+  Verify repodata    : false
+  Verify packages    : true
+Repodata info        : 
+  Available packages : 4
+  Total packages     : 4
+  Size               : 519.9 MiB
+  Revision           : 1780771125
+  Updated            : 2026-06-06 18:38:45
+
+Repo ID             : rawhide
+Name                : Fedora - Rawhide - Developmental packages for the next Fedora release
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 21600 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora-rawhide.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=rawhide&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-rawhide-x86_64 file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-46-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : rawhide-debuginfo
+Name                : Fedora - Rawhide - Debug
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 21600 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora-rawhide.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=rawhide-debug&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-rawhide-x86_64 file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-46-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : rawhide-source
+Name                : Fedora - Rawhide - Source
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 21600 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora-rawhide.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=rawhide-source&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-rawhide-x86_64 file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-46-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID              : updates
+Name                 : Fedora 44 - x86_64 - Updates
+Status               : enabled
+Priority             : 99
+Cost                 : 1000
+Type                 : available
+Metadata expire      : 21600 seconds (last: 2026-06-08 23:37:59)
+Skip if unavailable  : false
+Config file          : /etc/yum.repos.d/fedora-updates.repo
+URLs                 : 
+  Base URL           : https://distrohub.kyiv.ua/fedora/fedora/linux/updates/44/Everything/x86_64/ (30 more)
+  Metalink           : https://mirrors.fedoraproject.org/metalink?repo=updates-released-f44&arch=x86_64
+OpenPGP              : 
+  Keys               : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata    : false
+  Verify packages    : true
+Repodata info        : 
+  Available packages : 17879
+  Total packages     : 17879
+  Size               : 42.9 GiB
+  Revision           : 1780878040
+  Updated            : 2026-06-08 01:19:51
+
+Repo ID             : updates-debuginfo
+Name                : Fedora 44 - x86_64 - Updates - Debug
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 21600 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora-updates.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=updates-released-debug-f44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : updates-source
+Name                : Fedora 44 - Updates Source
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 21600 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora-updates.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=updates-released-source-f44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : updates-testing
+Name                : Fedora 44 - x86_64 - Test Updates
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 21600 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora-updates-testing.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=updates-testing-f44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : updates-testing-debuginfo
+Name                : Fedora 44 - x86_64 - Test Updates Debug
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 21600 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora-updates-testing.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=updates-testing-debug-f44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
+
+Repo ID             : updates-testing-source
+Name                : Fedora 44 - Test Updates Source
+Status              : disabled
+Priority            : 99
+Cost                : 1000
+Type                : available
+Metadata expire     : 21600 seconds (last: unknown)
+Skip if unavailable : false
+Config file         : /etc/yum.repos.d/fedora-updates-testing.repo
+URLs                : 
+  Metalink          : https://mirrors.fedoraproject.org/metalink?repo=updates-testing-source-f44&arch=x86_64
+OpenPGP             : 
+  Keys              : file:///etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-44-x86_64
+  Verify repodata   : false
+  Verify packages   : true
