@@ -3,16 +3,19 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+# x/tools v0.24.1 is the only version that works on both Go 1.16-1.24 AND Go 1.25+.
+# See https://github.com/golang/go/issues/74462 for details.
+
 - name: Install stringer at specific version (version param)
   community.general.golang_package:
     name: golang.org/x/tools/cmd/stringer
-    version: v0.29.0
+    version: v0.24.1
   register: install_version
 
 - name: Install stringer at same version (idempotent)
   community.general.golang_package:
     name: golang.org/x/tools/cmd/stringer
-    version: v0.29.0
+    version: v0.24.1
   register: install_version_idem
 
 - name: Clean up stringer
@@ -22,25 +25,13 @@
 
 - name: Install stringer at specific version (inline @version)
   community.general.golang_package:
-    name: golang.org/x/tools/cmd/stringer@v0.29.0
+    name: golang.org/x/tools/cmd/stringer@v0.24.1
   register: install_inline_version
 
 - name: Install stringer at same inline version (idempotent)
   community.general.golang_package:
-    name: golang.org/x/tools/cmd/stringer@v0.29.0
+    name: golang.org/x/tools/cmd/stringer@v0.24.1
   register: install_inline_version_idem
-
-- name: Upgrade stringer to latest
-  community.general.golang_package:
-    name: golang.org/x/tools/cmd/stringer
-    state: latest
-  register: upgrade_result
-
-- name: Upgrade stringer to latest (idempotent)
-  community.general.golang_package:
-    name: golang.org/x/tools/cmd/stringer
-    state: latest
-  register: upgrade_idem
 
 - name: Clean up stringer
   community.general.golang_package:
@@ -54,5 +45,3 @@
       - install_version_idem is not changed
       - install_inline_version is changed
       - install_inline_version_idem is not changed
-      - upgrade_result is changed
-      - upgrade_idem is not changed

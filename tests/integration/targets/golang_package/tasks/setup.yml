@@ -3,23 +3,25 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- block:
-    - name: Install golang
-      package:
-        name: golang
-        state: present
-    - set_fact:
-        has_go: true
-  when:
-    - ansible_facts.system != 'FreeBSD'
-    - ansible_facts.distribution != 'MacOSX'
+- name: Determine Go package name
+  set_fact:
+    golang_package_name: >-
+      {{ 'go' if ansible_facts.os_family in ('Alpine', 'Archlinux', 'FreeBSD') else 'golang' }}
 
 - block:
-    - name: Install go (FreeBSD)
+    - name: Install Go
       package:
-        name: go
+        name: "{{ golang_package_name }}"
         state: present
-    - set_fact:
+
+    - name: Check Go version
+      command: go version
+      register: go_version_output
+      changed_when: false
+
+    - name: Set has_go if Go >= 1.16
+      set_fact:
         has_go: true
+      when: go_version_output.stdout | regex_search('go(\d+\.\d+)', '\\1') | first | float >= 1.16
   when:
-    - ansible_facts.system == 'FreeBSD'
+    - ansible_facts.distribution != 'MacOSX'

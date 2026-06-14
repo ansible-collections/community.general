@@ -55,7 +55,7 @@ requirements:
   - Go >= 1.16
 notes:
   - The Go binary directory is determined by C(go env GOBIN). To customize the install location,
-    set the E(GOBIN) environment variable using the task's O(ignore:environment) directive.
+    set the E(GOBIN) environment variable using the task's C(environment) directive.
   - Go does not provide a native uninstall command. When O(state=absent), the module removes the
     binary file from E(GOBIN) directly.
 """
