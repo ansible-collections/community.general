@@ -248,7 +248,7 @@ class Filesystem:
         if uuid and self.MKFS_SET_UUID_OPTIONS:
             if not (set(self.MKFS_SET_UUID_OPTIONS) & set(opts)):
                 opts += [self.MKFS_SET_UUID_OPTIONS[0], uuid] + self.MKFS_SET_UUID_EXTRA_OPTIONS
-        if label and self.MKFS_SET_LABEL_OPTIONS:
+        if label is not None and self.MKFS_SET_LABEL_OPTIONS:
             if not (set(self.MKFS_SET_LABEL_OPTIONS) & set(opts)):
                 opts += [self.MKFS_SET_LABEL_OPTIONS[0], label]
 
