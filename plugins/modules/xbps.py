@@ -160,11 +160,13 @@ stdout:
   returned: when a package manager command was executed
   type: str
   sample: ''
+  version_added: 13.1.0
 stderr:
   description: Standard error of the last executed command.
   returned: when a package manager command was executed
   type: str
   sample: ''
+  version_added: 13.1.0
 """
 
 
