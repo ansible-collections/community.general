@@ -54,15 +54,15 @@
     #       which breaks Bcachefs.get_fs_size(). This seems to be related to the C -> Rust conversion of the CLI tools.
     #       It also seems that it is now impossible to know whether base 2 or 10 units are used... :(
     - 'not (ansible_facts.distribution in ["Archlinux"] and item.0.key == "bcachefs")'
-    # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
-    - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs"])'
+    # f2fs-tools, gfs2-utils and reiserfs-utils packages not available with RHEL/CentOS on CI
+    - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs", "gfs2"])'
     - 'not (ansible_facts.os_family == "RedHat" and item.0.key == "btrfs")'
     # reiserfs-utils package not available with Fedora 35 on CI
     - 'not (ansible_facts.distribution == "Fedora" and (ansible_facts.distribution_major_version | int >= 35) and
             item.0.key == "reiserfs")'
-    # reiserfs packages apparently not available with Alpine
+    # reiserfs and gfs2 packages apparently not available with Alpine
     - 'not (ansible_facts.distribution == "Alpine" and item.0.key in ["reiserfs", "gfs2"])'
-    # reiserfsprogs packages no longer available with Arch Linux
+    # reiserfsprogs and gfs2 packages no longer available with Arch Linux
     - 'not (ansible_facts.distribution == "Archlinux" and item.0.key in ["reiserfs", "gfs2"])'
     # reiserfsprogs packages no longer available with OpenSuSE
     - 'not (ansible_facts.os_family == "Suse" and item.0.key == "reiserfs")'
