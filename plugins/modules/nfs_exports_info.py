@@ -5,13 +5,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-import hashlib
-import os
-import re
-
-from ansible.module_utils.basic import AnsibleModule
-
-
 DOCUMENTATION = r"""
 ---
 module: nfs_exports_info
@@ -74,6 +67,12 @@ file_digest:
   returned: always
 """
 
+import hashlib
+import os
+import re
+
+from ansible.module_utils.basic import AnsibleModule
+
 
 def get_exports(module: AnsibleModule) -> tuple[dict, dict]:
     output_format = module.params["output_format"]
@@ -98,7 +97,6 @@ def get_exports(module: AnsibleModule) -> tuple[dict, dict]:
             except ValueError:
                 continue
 
-        # پردازش خطوط فایل exports
         for line in content.splitlines():
             line = line.strip()
             if not line or line.startswith("#"):
