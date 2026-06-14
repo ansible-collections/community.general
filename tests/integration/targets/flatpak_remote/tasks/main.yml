@@ -45,5 +45,4 @@
       vars:
         method: system
 
-  when: |
-      ansible_facts.distribution in ['Fedora', 'Ubuntu']
+  when: ansible_facts.distribution in ['Fedora', 'Ubuntu']

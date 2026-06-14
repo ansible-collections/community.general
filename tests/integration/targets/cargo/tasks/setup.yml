@@ -22,7 +22,7 @@
     - set_fact:
         has_cargo: true
   when:
-    - ansible_facts.system == 'FreeBSD' and ansible_facts.distribution_version is version('13.0', '>')
+    - ansible_facts.system == 'FreeBSD'
 
 - block:
     - name: Download rustup
