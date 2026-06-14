@@ -676,6 +676,8 @@ files:
     maintainers: pixslx
   $modules/gitlab_project_approvals.py:
     maintainers: masa-orca
+  $modules/golang_package.py:
+    maintainers: shrbhosa
   $modules/grove.py:
     maintainers: zimbatm
   $modules/gunicorn.py:
