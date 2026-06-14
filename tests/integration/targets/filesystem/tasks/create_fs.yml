@@ -7,6 +7,7 @@
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
+    label: '{{ label }}'
   register: fs_result
 
 - name: "Assert that results are as expected"
@@ -25,6 +26,7 @@
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
+    label: '{{ label }}'
   register: fs2_result
 
 - name: "Get UUID of the filesystem"
@@ -44,6 +46,7 @@
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
+    label: '{{ label }}'
     force: true
   register: fs3_result
 

@@ -30,13 +30,14 @@
     fssize: '{{ item.0.value.fssize }}'
     grow: '{{ item.0.value.grow }}'
     new_uuid: '{{ item.0.value.new_uuid }}'
+    label: '{{ item.0.value.label }}'
     action: '{{ item.1 }}'
   when:
     # FreeBSD limited support
     # Not available: btrfs, lvm, f2fs, ocfs2
     # All BSD systems use swap fs, but only Linux needs mkswap
     # Supported: ext2/3/4 (e2fsprogs), xfs (xfsprogs), reiserfs (progsreiserfs), vfat
-    - 'not (ansible_facts.system == "FreeBSD" and item.0.key in ["bcachefs", "btrfs", "f2fs", "swap", "lvm", "ocfs2"])'
+    - 'not (ansible_facts.system == "FreeBSD" and item.0.key in ["bcachefs", "btrfs", "f2fs", "swap", "lvm", "ocfs2", "gfs2"])'
     # Available on FreeBSD but not on testbed (util-linux conflicts with e2fsprogs): wipefs, mkfs.minix
     - 'not (ansible_facts.system == "FreeBSD" and item.1 in ["overwrite_another_fs", "remove_fs"])'
 
@@ -53,16 +54,16 @@
     #       which breaks Bcachefs.get_fs_size(). This seems to be related to the C -> Rust conversion of the CLI tools.
     #       It also seems that it is now impossible to know whether base 2 or 10 units are used... :(
     - 'not (ansible_facts.distribution in ["Archlinux"] and item.0.key == "bcachefs")'
-    # TODO: bcachefs on Alpine doesn't seem to work for unknown reasons, debug this!
-    - 'not (ansible_facts.distribution in ["Alpine"] and item.0.key == "bcachefs")'
-    # btrfs packages not available on RHEL/CentOS/Fedora
+    # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
+    - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs", "gfs2"])'
     - 'not (ansible_facts.os_family == "RedHat" and item.0.key == "btrfs")'
-    # btrfs-progs cannot be installed on ArchLinux
-    - 'not (item.0.key == "btrfs" and ansible_facts.distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
-    # f2fs-tools package not available with RHEL/CentOS on CI
-    - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key == "f2fs")'
-    # reiserfs not available with RHEL/CentOS/Fedora/Alpine/Arch Liux
-    - 'not (ansible_facts.distribution in ["CentOS", "RedHat", "Fedora", "Alpine", "Archlinux"] and item.0.key == "reiserfs")'
+    # reiserfs-utils package not available with Fedora 35 on CI
+    - 'not (ansible_facts.distribution == "Fedora" and (ansible_facts.distribution_major_version | int >= 35) and
+            item.0.key == "reiserfs")'
+    # reiserfs packages apparently not available with Alpine
+    - 'not (ansible_facts.distribution == "Alpine" and item.0.key in ["reiserfs", "gfs2"])'
+    # reiserfsprogs packages no longer available with Arch Linux
+    - 'not (ansible_facts.distribution == "Archlinux" and item.0.key in ["reiserfs", "gfs2"])'
     # reiserfsprogs packages no longer available with OpenSuSE
     - 'not (ansible_facts.os_family == "Suse" and item.0.key == "reiserfs")'
     # reiserfsprogs packages no longer available with Ubuntu 26.04
