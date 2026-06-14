@@ -1,5 +1,0 @@
-bugfixes:
-  - xml - fix false positive type check failure for string values on Python 2
-    hosts, where ``json_dict_bytes_to_unicode`` guarantees unicode output but
-    ``isinstance(value, str)`` only matches byte strings
-    (https://github.com/ansible-collections/community.general/issues/12107, https://github.com/ansible-collections/community.general/pull/12108).

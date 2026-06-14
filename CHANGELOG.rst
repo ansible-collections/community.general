@@ -6,6 +6,21 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.9
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- opkg - correctly set executable search path (https://github.com/ansible-collections/community.general/pull/12182).
+- portage - fix ``depclean: true`` crashing with ``AnsibleModule.fail_json() missing 1 required positional argument: 'msg'`` instead of reporting the actual emerge failure (https://github.com/ansible-collections/community.general/pull/12168).
+- xml - fix false positive type check failure for string values on Python 2 hosts, where ``json_dict_bytes_to_unicode`` guarantees unicode output but ``isinstance(value, str)`` only matches byte strings (https://github.com/ansible-collections/community.general/issues/12107, https://github.com/ansible-collections/community.general/pull/12108).
+
 v11.4.8
 =======
 
