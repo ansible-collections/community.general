@@ -50,12 +50,7 @@ redis_module: redis
 
 redis_password: PASS
 
-old_redis: >-
-  {{
-    (ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version|int <= 7) or
-    (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version|int <= 18) or
-    (ansible_facts.os_family == 'FreeBSD' and ansible_facts.distribution_major_version|int <= 12)
-  }}
+old_redis: false
 
 # Master
 master_port: 6379

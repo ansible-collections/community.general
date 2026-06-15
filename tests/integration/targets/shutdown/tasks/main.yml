@@ -95,24 +95,24 @@
       - '"-d 0" in shutdown_result_minus["shutdown_command"]'
   when: ansible_facts.system == 'VMKernel'
 
-- name: Ensure that systemd-sysv is absent in Ubuntu 18 and Debian
+- name: Ensure that systemd-sysv is absent in Ubuntu and Debian
   apt:
     name: sytemd-sysv
     state: absent
-  when: (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version is version('18', '>=')) or (ansible_facts.distribution == 'Debian')
+  when: ansible_facts.distribution in ['Ubuntu', 'Debian']
   register: systemd_sysv_install
 
 - name: Gather package facts
   package_facts:
     manager: apt
-  when: (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version is version('18', '>=')) or (ansible_facts.distribution == 'Debian')
+  when: ansible_facts.distribution in ['Ubuntu', 'Debian']
 
 - name: Execute shutdown if no systemd-sysv
   community.general.shutdown:
   register: shutdown_result
   check_mode: true
   when:
-    - "(ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version is version('18', '>=')) or (ansible_facts.distribution == 'Debian')"
+    - "ansible_facts.distribution in ['Ubuntu', 'Debian']"
     - '"systemd-sysv" not in ansible_facts.packages'
 
 - name: Install systemd_sysv in case it has been removed in test
@@ -120,5 +120,5 @@
     name: systemd-sysv
     state: present
   when:
-    - "(ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version is version('18', '>=')) or (ansible_facts.distribution == 'Debian')"
+    - "ansible_facts.distribution in ['Ubuntu', 'Debian']"
     - "systemd_sysv_install is changed"
