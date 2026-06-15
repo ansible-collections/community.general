@@ -111,9 +111,9 @@ class TestDNFConfigManager(ModuleTestCase):
         super().setUp()
         self.mock_run_command = patch("ansible.module_utils.basic.AnsibleModule.run_command")
         self.run_command = self.mock_run_command.start()
-        self.mock_path_exists = patch("os.path.exists")
-        self.path_exists = self.mock_path_exists.start()
-        self.path_exists.return_value = True
+        self.mock_get_bin_path = patch("ansible.module_utils.basic.AnsibleModule.get_bin_path")
+        self.get_bin_path = self.mock_get_bin_path.start()
+        self.get_bin_path.return_value = "/usr/bin/dnf"
         self.module = dnf_config_manager_module
         self.mock_dnf4_version = fixture("mock_dnf4_version.txt")
         self.mock_dnf5_version = fixture("mock_dnf5_version.txt")
@@ -127,7 +127,7 @@ class TestDNFConfigManager(ModuleTestCase):
     def tearDown(self):
         super().tearDown()
         self.mock_run_command.stop()
-        self.mock_path_exists.stop()
+        self.mock_get_bin_path.stop()
 
     def set_command_mock(self, execute_return=(0, "", ""), execute_side_effect=None):
         self.run_command.reset_mock()

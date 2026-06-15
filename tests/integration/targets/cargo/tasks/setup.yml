@@ -13,7 +13,6 @@
   when:
     - ansible_facts.system != 'FreeBSD'
     - ansible_facts.distribution != 'MacOSX'
-    - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_version is version('18', '>=')
 
 - block:
     - name: Install rust (containing cargo)
@@ -23,7 +22,7 @@
     - set_fact:
         has_cargo: true
   when:
-    - ansible_facts.system == 'FreeBSD' and ansible_facts.distribution_version is version('13.0', '>')
+    - ansible_facts.system == 'FreeBSD'
 
 - block:
     - name: Download rustup

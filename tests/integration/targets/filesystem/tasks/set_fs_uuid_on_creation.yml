@@ -27,7 +27,8 @@
 
     - name: "Assert that filesystem UUID is the random UUID set on creation"
       ansible.builtin.assert:
-        that: (random_uuid | replace('-','')) == ( uuid.stdout | replace('-',''))
+        that: >-
+          (random_uuid | replace('-','')) == ( uuid.stdout | ansible.builtin.regex_replace('.*\\bUUID="?([^"\\s]+)"?.*', '\\1') | replace('-',''))
 
 - when: (new_uuid | default(false)) is not truthy
   block:

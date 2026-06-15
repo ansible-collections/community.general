@@ -32,7 +32,6 @@
     state: present
   when:
     - ansible_facts.os_family != 'Suse'
-    - not (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_version is version('16.04', '<='))
     - ansible_facts.system != "FreeBSD"
     - not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version is version('8', '>='))
     - ansible_facts.os_family != 'Archlinux'  # TODO
@@ -46,13 +45,17 @@
     - not (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_version is version('24.04', '<'))
     - not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_version is version('12', '<'))
 
-- name: "Install btrfs tools (Ubuntu <= 16.04)"
+- name: "Install Alpine specific packages"
   ansible.builtin.package:
-    name: btrfs-tools
+    name:
+      - e2fsprogs-extra
+      - findmnt
+      - util-linux-misc
+      - wipefs
+      - xfsprogs-extra
     state: present
   when:
-    - ansible_facts.distribution == 'Ubuntu'
-    - ansible_facts.distribution_version is version('16.04', '<=')
+    - ansible_facts.distribution == 'Alpine'
 
 - name: "Install btrfs progs (OpenSuse)"
   ansible.builtin.package:
@@ -108,7 +111,6 @@
 - name: "Install f2fs tools and get version"
   when:
     - ansible_facts.os_family != 'RedHat' or ansible_facts.distribution == 'Fedora'
-    - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_version is version('16.04', '>=')
     - ansible_facts.system != "FreeBSD"
   block:
     - name: "Install f2fs tools"

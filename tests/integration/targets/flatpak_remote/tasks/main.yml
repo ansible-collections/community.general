@@ -45,6 +45,4 @@
       vars:
         method: system
 
-  when: |
-      ansible_facts.distribution == 'Fedora' or
-      ansible_facts.distribution == 'Ubuntu' and not ansible_facts.distribution_major_version | int < 16
+  when: ansible_facts.distribution in ['Fedora', 'Ubuntu']
