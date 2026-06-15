@@ -148,6 +148,8 @@ cluster_resources:
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     get_pacemaker_maintenance_mode,
+    get_pacemaker_resource_config,
+    is_resource_cloned,
     pacemaker_runner,
     wait_for_resource,
 )
@@ -252,6 +254,8 @@ class PacemakerResource(StateModuleHelper):
             wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait)
 
     def state_cloned(self):
+        if self._is_already_cloned():
+            return
         with self.runner(
             "cli_action state name resource_clone_ids resource_clone_meta",
             output_process=self._process_command_output(
@@ -265,6 +269,23 @@ class PacemakerResource(StateModuleHelper):
             )
         if not self.module.check_mode and self.vars.wait and not get_pacemaker_maintenance_mode(self.runner):
             wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait)
+
+    def _is_already_cloned(self):
+        """Return True if the named resource (or group) is already part of a clone set.
+
+        Queries ``pcs resource config <name> --output-format=json`` and checks whether
+        any clone object's ``member_id`` matches the requested name. This avoids the
+        previous fragile approach of inspecting pcs stderr for a hard-coded substring,
+        which only matched the "resource is already cloned" wording and not the
+        "cannot clone a group that has already been cloned" wording.
+        """
+        name = self.module.params["name"]
+        if not name:
+            return False
+        config = get_pacemaker_resource_config(self.runner)
+        if config is None:
+            return False
+        return is_resource_cloned(config, name)
 
     def state_enabled(self):
         with self.runner(
