@@ -119,26 +119,24 @@ changed_repos:
   sample: ["crb"]
 """
 
-import os
 import re
 import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
-DNF_BIN = "/usr/bin/dnf"
 REPO_ID_RE = re.compile(r"^Repo[-\s]id\s*:\s*(\S+)$", re.IGNORECASE)
 REPO_STATUS_RE = re.compile(r"^(?:Repo-)?status\s*:\s*(disabled|enabled)$", re.IGNORECASE)
 
 
-def get_dnf_version(module) -> t.Literal[4, 5]:
-    rc, out, err = module.run_command([DNF_BIN, "--version"], check_rc=True)
+def get_dnf_version(module, dnf) -> t.Literal[4, 5]:
+    rc, out, err = module.run_command([dnf, "--version"], check_rc=True)
     line, separator, rest = out.partition("\n")
 
     return 5 if re.match(r"^dnf5\s*", line) else 4
 
 
-def get_repo_states(module, dnf_v):
-    command = [DNF_BIN]
+def get_repo_states(module, dnf, dnf_v):
+    command = [dnf]
     if dnf_v == 4:
         command.extend(["repolist", "--all", "--verbose"])
     else:
@@ -164,13 +162,13 @@ def get_repo_states(module, dnf_v):
     return repos
 
 
-def set_repo_states(module, dnf_v, repo_ids, state):
+def set_repo_states(module, dnf, dnf_v, repo_ids, state):
     if dnf_v == 4:
-        module.run_command([DNF_BIN, "config-manager", "--assumeyes", f"--set-{state}"] + repo_ids, check_rc=True)
+        module.run_command([dnf, "config-manager", "--assumeyes", f"--set-{state}"] + repo_ids, check_rc=True)
     else:
         state = "1" if state == "enabled" else "0"
         opts = map(lambda v: f"{v}.enabled={state}", repo_ids)
-        module.run_command([DNF_BIN, "config-manager", "setopt"] + list(opts), check_rc=True)
+        module.run_command([dnf, "config-manager", "setopt"] + list(opts), check_rc=True)
 
 
 def pack_repo_states_for_return(states):
@@ -200,12 +198,11 @@ def main():
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
-    if not os.path.exists(DNF_BIN):
-        module.fail_json(msg=f"{DNF_BIN} was not found")
+    dnf = module.get_bin_path("dnf", True)
 
-    dnf_v = get_dnf_version(module)
+    dnf_v = get_dnf_version(module, dnf)
 
-    repo_states = get_repo_states(module, dnf_v)
+    repo_states = get_repo_states(module, dnf, dnf_v)
     result["repo_states_pre"] = pack_repo_states_for_return(repo_states)
 
     desired_repo_state = module.params["state"]
@@ -224,9 +221,9 @@ def main():
         module.exit_json(**result)
 
     if len(to_change) > 0:
-        set_repo_states(module, dnf_v, to_change, desired_repo_state)
+        set_repo_states(module, dnf, dnf_v, to_change, desired_repo_state)
 
-    repo_states_post = get_repo_states(module, dnf_v)
+    repo_states_post = get_repo_states(module, dnf, dnf_v)
     result["repo_states_post"] = pack_repo_states_for_return(repo_states_post)
 
     for repo_id in to_change:
