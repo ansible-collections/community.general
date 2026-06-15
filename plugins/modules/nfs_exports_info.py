@@ -79,9 +79,10 @@ def get_exports(module: AnsibleModule, output_format: str | None = None, file_pa
     if file_path is None:
         file_path = module.params.get("file_path", "/etc/exports")
 
-    shares_per_ip = {}
-    ips_per_share = {}
-    file_digest = {}
+    # افزودن تایپ دقیق متغیرها برای حل خطای Mypy
+    shares_per_ip: dict[str, list[dict[str, str | list[str]]]] = {}
+    ips_per_share: dict[str, list[dict[str, str | list[str]]]] = {}
+    file_digest: dict[str, str] = {}
 
     try:
         with open(file_path, "rb") as f:
