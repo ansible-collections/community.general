@@ -162,6 +162,7 @@ thread_name:
   sample: "spaces/AAAA/threads/CCCC"
 """
 
+import typing as t
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule
@@ -169,15 +170,18 @@ from ansible.module_utils.urls import fetch_url
 
 BASE_URL = "https://chat.googleapis.com/v1/spaces"
 
+Payload = dict[str, t.Any]
+Response = dict[str, t.Any]
 
-def build_payload(text, thread_key):
-    payload = {"text": text}
+def build_payload(text: str, thread_key: str | None) -> Payload:
+    payload: Payload = {"text": text}
+
     if thread_key is not None:
         payload["thread"] = {"threadKey": thread_key}
     return payload
 
 
-def build_url(space, key, token, thread_key, create_new_thread):
+def build_url(space: str, key: str, token: str, thread_key: str | None, create_new_thread: bool) -> str:
     params = {"key": key, "token": token}
     if thread_key is not None:
         params["messageReplyOption"] = (
@@ -186,7 +190,7 @@ def build_url(space, key, token, thread_key, create_new_thread):
     return f"{BASE_URL}/{space}/messages?{urlencode(params)}"
 
 
-def do_notify(module, url, payload):
+def do_notify(module: AnsibleModule, url: str, payload: Payload) -> Response:
     headers = {
         "Content-Type": "application/json; charset=UTF-8",
         "Accept": "application/json",
@@ -205,7 +209,7 @@ def do_notify(module, url, payload):
     return module.from_json(response.read())
 
 
-def main():
+def main() -> None:
     module = AnsibleModule(
         argument_spec=dict(
             space=dict(type="str", required=True),
