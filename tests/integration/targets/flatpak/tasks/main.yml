@@ -15,7 +15,6 @@
       become: true
 
     # executable override
-
     - name: Test executable override
       flatpak:
         name: com.dummy.App1
@@ -59,6 +58,4 @@
       command: >-
         pkill -f -- '{{ remote_tmp_dir }}/serve.py'
 
-  when: |
-      ansible_facts.distribution == 'Fedora' or
-      ansible_facts.distribution == 'Ubuntu' and not ansible_facts.distribution_major_version | int < 16
+  when: ansible_facts.distribution in ['Fedora', 'Ubuntu']
