@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# SPDX-FileCopyrightText: (c) 2025, Samaneh Yousefnezhad <s-yousefenzhad@um.ac.ir>
+# SPDX-FileCopyrightText: (c) 2025, Samaneh Yousefnezhad <s-yousefnezhad@um.ac.ir>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
@@ -27,8 +27,8 @@ options:
   output_format:
     description:
       - The format of the returned mapping.
-      - If set to C(ips_per_share), output maps shared folders to IPs and options.
-      - If set to C(shares_per_ip), output maps IPs to shared folders and options.
+      - If set to V(ips_per_share), output maps shared folders to IPs and options.
+      - If set to V(shares_per_ip), output maps IPs to shared folders and options.
     required: true
     type: str
     choices: ['ips_per_share', 'shares_per_ip']
@@ -79,7 +79,6 @@ def get_exports(module: AnsibleModule, output_format: str | None = None, file_pa
     if file_path is None:
         file_path = module.params.get("file_path", "/etc/exports")
 
-    # افزودن تایپ دقیق متغیرها برای حل خطای Mypy
     shares_per_ip: dict[str, list[dict[str, str | list[str]]]] = {}
     ips_per_share: dict[str, list[dict[str, str | list[str]]]] = {}
     file_digest: dict[str, str] = {}
@@ -91,7 +90,7 @@ def get_exports(module: AnsibleModule, output_format: str | None = None, file_pa
     except FileNotFoundError:
         module.fail_json(msg=f"{file_path} file not found")
     except OSError as e:
-        module.fail_json(msg=f"Could not read {file_path}: {str(e)}")
+        module.fail_json(msg=f"Could not read {file_path}: {e}")
 
     for algo in ["md5", "sha1", "sha256"]:
         try:
