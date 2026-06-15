@@ -9,6 +9,7 @@
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
+    label: '{{ label }}'
 
 - name: "Get filesystem UUID with 'blkid'"
   ansible.builtin.shell:

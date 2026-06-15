@@ -30,13 +30,14 @@
     fssize: '{{ item.0.value.fssize }}'
     grow: '{{ item.0.value.grow }}'
     new_uuid: '{{ item.0.value.new_uuid }}'
+    label: '{{ item.0.value.label }}'
     action: '{{ item.1 }}'
   when:
     # FreeBSD limited support
     # Not available: btrfs, lvm, f2fs, ocfs2
     # All BSD systems use swap fs, but only Linux needs mkswap
     # Supported: ext2/3/4 (e2fsprogs), xfs (xfsprogs), reiserfs (progsreiserfs), vfat
-    - 'not (ansible_facts.system == "FreeBSD" and item.0.key in ["bcachefs", "btrfs", "f2fs", "swap", "lvm", "ocfs2"])'
+    - 'not (ansible_facts.system == "FreeBSD" and item.0.key in ["bcachefs", "btrfs", "f2fs", "swap", "lvm", "ocfs2", "gfs2"])'
     # Available on FreeBSD but not on testbed (util-linux conflicts with e2fsprogs): wipefs, mkfs.minix
     - 'not (ansible_facts.system == "FreeBSD" and item.1 in ["overwrite_another_fs", "remove_fs"])'
 
@@ -80,6 +81,8 @@
       # TODO: figure out why it fails, fix it!
     # swap does not work on Alpine due to no -f support in mkswap
     - 'not (item.0.key == "swap" and ansible_facts.distribution == "Alpine")'
+    # GFS2 not available on these distributions
+    - 'not (item.0.key == "gfs2" and ansible_facts.distribution in ["Alpine", "Archlinux", "CentOS", "RedHat"])'
 
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'reset_fs_uuid', 'overwrite_another_fs', 'remove_fs', 'set_fs_uuid_on_creation', 'set_fs_uuid_on_creation_with_opts'])|list }}"
 
@@ -97,6 +100,7 @@
     fstype: '{{ item.0.key }}'
     fssize: '{{ item.0.value.fssize }}'
     grow: '{{ item.0.value.grow }}'
+    label: '{{ item.0.value.label }}'
     action: '{{ item.1 }}'
   when:
     - 'ansible_facts.system == "FreeBSD"'
