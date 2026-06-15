@@ -23,6 +23,7 @@
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
+    label: '{{ label }}'
   register: fs_result
   ignore_errors: true
 
@@ -42,6 +43,7 @@
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
+    label: '{{ label }}'
     force: true
   register: fs_result2
 
