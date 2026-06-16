@@ -6,6 +6,73 @@ Community General Release Notes
 
 This changelog describes changes after version 12.0.0.
 
+v13.1.0
+=======
+
+Release Summary
+---------------
+
+Regular bugfix and feature release.
+
+Minor Changes
+-------------
+
+- consul_kv lookup plugin - add ``empty_value`` option to control what is returned for null Consul values (https://github.com/ansible-collections/community.general/issues/11039, https://github.com/ansible-collections/community.general/pull/12120).
+- dnf_config_manager - lookup path to the ``dnf`` binary in ``PATH``. It used to be fixed to ``/usr/bin/dnf`` (https://github.com/ansible-collections/community.general/pull/12219).
+- filesystem - adds GFS2 support (https://github.com/ansible-collections/community.general/pull/12285).
+- keycloak_realm - add ``max_secondary_auth_failures`` parameter to configure brute force detection for secondary authentication mechanisms (https://github.com/ansible-collections/community.general/pull/12087).
+- slack - added support for uploading files to channels and threads using the new Slack WebAPI (https://github.com/ansible-collections/community.general/pull/12032).
+- sudoers - add ``defaults`` parameter to allow specifying ``Defaults`` directives scoped to the user or group in the generated sudoers file (https://github.com/ansible-collections/community.general/pull/12186).
+- xbps - include ``stdout`` and ``stderr`` from the last executed command in module output (https://github.com/ansible-collections/community.general/issues/2478, https://github.com/ansible-collections/community.general/pull/12234).
+- xenserver_guest_info - add VDI ``uuid`` and ``vdi_type`` (VHD/QCOW2) fields to disk info output (https://github.com/ansible-collections/community.general/issues/11998, https://github.com/ansible-collections/community.general/pull/12119).
+
+Bugfixes
+--------
+
+- aix_devices - fix ``chdev`` command failures being incorrectly reported as successful results, now properly fails the task when device attribute changes cannot be applied (https://github.com/ansible-collections/community.general/pull/12185).
+- composer - the ``--working-dir`` option is now always placed first on the command line, before the subcommand, to ensure consistent behavior across all composer commands (https://github.com/ansible-collections/community.general/issues/5204, https://github.com/ansible-collections/community.general/pull/12084).
+- composer - use file checksum to determine ``changed`` status when ``command=config``, instead of relying on the command return output. The module now compares SHA256 checksums of relevant configuration files (``composer.json``, ``auth.json``, or their global equivalents) before and after running the command (https://github.com/ansible-collections/community.general/pull/12084).
+- counter_enabled callback - fix missing output for looped tasks, including tasks using ``delegate_to`` (https://github.com/ansible-collections/community.general/issues/8187, https://github.com/ansible-collections/community.general/pull/12067).
+- dnf_config_manager - fix incompatibility with DNF5. The module was crashing on systems with DNF5 due to CLI changes since DNF4 (https://github.com/ansible-collections/community.general/issues/9127, https://github.com/ansible-collections/community.general/pull/12206).
+- filesystem - handle BusyBox ``blkid`` output to correctly detect existing filesystems on systems like Alpine Linux (https://github.com/ansible-collections/community.general/issues/7283, https://github.com/ansible-collections/community.general/pull/12235).
+- filetree lookup plugin - raise ``AnsibleLookupError`` when the ``exclude`` option contains an invalid regular expression instead of an uncaught ``re.error`` (https://github.com/ansible-collections/community.general/pull/12140).
+- htpasswd - fix ``hash_scheme`` aliases and Apache-compatible ``bcrypt`` hashes (https://github.com/ansible-collections/community.general/issues/6135, https://github.com/ansible-collections/community.general/pull/12123).
+- incus connection plugin - improve Windows PowerShell argv handling by stripping wrapper quotes from payload arguments for ``-enc``, ``-encodedcommand``, ``-command``, ``-c``, ``-file`` and ``-f`` (https://github.com/ansible-collections/community.general/issues/12161, https://github.com/ansible-collections/community.general/pull/12158).
+- incus connection plugin - return ``stdout``/``stderr`` as bytes instead of strings to restore compatibility with ansible-core 2.21 module execution (https://github.com/ansible-collections/community.general/issues/12161, https://github.com/ansible-collections/community.general/pull/12158).
+- java_cert - detect silent ``keytool`` failures by verifying the import outcome after the command exits with ``rc=0`` (https://github.com/ansible-collections/community.general/issues/6685, https://github.com/ansible-collections/community.general/pull/12238).
+- java_cert - fix ``NullPointerException`` when importing from a PKCS12 file with a password on Java 8 (https://github.com/ansible-collections/community.general/issues/3023, https://github.com/ansible-collections/community.general/pull/12151).
+- launchd - fix ``restarted`` and ``reloaded`` states always reporting ``changed=False`` (https://github.com/ansible-collections/community.general/issues/6199, https://github.com/ansible-collections/community.general/pull/12122).
+- lxc_container - fix ``create_script`` to accept a single tuple argument, resolving a ``TypeError`` that silently prevented ``container_command`` from being executed (https://github.com/ansible-collections/community.general/issues/11360, https://github.com/ansible-collections/community.general/pull/12106).
+- opkg - correctly set executable search path (https://github.com/ansible-collections/community.general/pull/12182).
+- pamd - handle non-PAM lines such as authselect template directives without crashing (https://github.com/ansible-collections/community.general/issues/5850, https://github.com/ansible-collections/community.general/pull/12137).
+- parted - ignore MBR partition type codes (for example ``type=8e``) reported as flags by some parted builds (for example on SUSE), which cannot be managed via the ``set`` command (https://github.com/ansible-collections/community.general/issues/6292, https://github.com/ansible-collections/community.general/pull/12121).
+- portage - fix ``depclean: true`` crashing with ``AnsibleModule.fail_json() missing 1 required positional argument: 'msg'`` instead of reporting the actual emerge failure (https://github.com/ansible-collections/community.general/pull/12168).
+- redfish_config - fix ``KeyError: 'ret'`` when ``SetManagerNic`` cannot find a matching NIC (https://github.com/ansible-collections/community.general/issues/5892, https://github.com/ansible-collections/community.general/pull/12124).
+- udm_dns_record - normalize IPv6 addresses in ``data`` to expanded form to fix idempotency (https://github.com/ansible-collections/community.general/issues/317, https://github.com/ansible-collections/community.general/pull/12149).
+- unixy callback - handle missing ``ansible_host`` in delegated vars when a task is delegated to a host without it set, such as ``localhost`` (https://github.com/ansible-collections/community.general/issues/12112, https://github.com/ansible-collections/community.general/pull/12113).
+- xenserver_guest_info - use fallback chain for determining VDI format from ``sm_config`` keys ``image-format``, ``vdi_type``, ``type``, defaulting to ``raw`` (https://github.com/ansible-collections/community.general/pull/12119, https://github.com/ansible-collections/community.general/pull/12215).
+- xml - preserve DOCTYPE declaration when writing modified XML files (https://github.com/ansible-collections/community.general/issues/2762, https://github.com/ansible-collections/community.general/pull/12148).
+- zypper_repository - fix ``enabled``, ``autorefresh``, and ``gpgcheck`` module parameters being overridden by values read from a ``.repo`` file (https://github.com/ansible-collections/community.general/issues/8783, https://github.com/ansible-collections/community.general/pull/12022).
+
+New Plugins
+-----------
+
+Filter
+~~~~~~
+
+- community.general.from_toml - Convert TOML string into dictionary.
+
+New Modules
+-----------
+
+- community.general.gitlab_project_approvals - Manage project\-level merge request approvals settings on GitLab Server.
+- community.general.golang_package - Manage Go packages with :literal:`go install`.
+- community.general.google_chat - Send Google Chat notifications.
+- community.general.keycloak_clientscope_rolemappings - Allows administration of Keycloak clientscope scope mappings to restrict the usage of certain roles to specific clientscopes.
+- community.general.keycloak_realm_users_info - Retrieve users from a Keycloak realm using the Keycloak API.
+- community.general.kopia_repository - Manage Kopia repository.
+- community.general.kopia_repository_info - Gather information about a Kopia repository.
+
 v13.0.1
 =======
 
