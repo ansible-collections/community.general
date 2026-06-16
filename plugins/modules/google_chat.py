@@ -170,8 +170,9 @@ from ansible.module_utils.urls import fetch_url
 
 BASE_URL = "https://chat.googleapis.com/v1/spaces"
 
-Payload = dict[str, t.Any]
-Response = dict[str, t.Any]
+if t.TYPE_CHECKING:
+    Payload = dict[str, t.Any]
+    Response = dict[str, t.Any]
 
 
 def build_payload(text: str, thread_key: str | None) -> Payload:
