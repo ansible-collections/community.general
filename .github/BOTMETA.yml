@@ -678,6 +678,8 @@ files:
     maintainers: masa-orca
   $modules/golang_package.py:
     maintainers: shrbhosa
+  $modules/google_chat.py:
+    maintainers: tomscholz
   $modules/grove.py:
     maintainers: zimbatm
   $modules/gunicorn.py:
