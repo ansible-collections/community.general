@@ -602,3 +602,101 @@ test_cases:
           rc: 0
           out: "  * Clone Set: locking-clone [locking]:\n    * Started: [ md-nds-smb01 md-nds-smb02 md-nds-smb03 ]"
           err: ""
+  - id: test_clone_when_other_resource_is_cloned
+    # Defensive: another resource in the cluster is cloned but our target is not.
+    # The pre-check must NOT short-circuit just because clones[] is non-empty.
+    input:
+      state: cloned
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, config, virtual-ip, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: |
+            {"primitives": [{"id": "virtual-ip", "agent_name": {"standard": "ocf", "provider": "heartbeat", "type": "IPaddr2"},
+            "description": null, "operations": [], "meta_attributes": [], "instance_attributes": [], "utilization": []}],
+            "clones": [{"id": "other-clone", "description": null, "member_id": "other",
+            "meta_attributes": [], "instance_attributes": []}], "groups": [], "bundles": []}
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
+          err: ""
+        - command: [/testbin/pcs, resource, clone, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+  - id: test_clone_when_resource_config_returns_invalid_json
+    # Defensive: pcs resource config returns garbage. The pre-check must NOT crash
+    # and must fall through to attempting the clone, letting pcs report the real error.
+    input:
+      state: cloned
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, config, virtual-ip, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: "not-valid-json"
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
+          err: ""
+        - command: [/testbin/pcs, resource, clone, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
