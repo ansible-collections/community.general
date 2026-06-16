@@ -7,10 +7,9 @@ from __future__ import annotations
 import hashlib
 import sys
 
-import pytest
-
 from ansible_collections.community.general.plugins.modules.nfs_exports_info import get_exports
 from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock, mock_open, patch
+import pytest
 
 
 @pytest.fixture
