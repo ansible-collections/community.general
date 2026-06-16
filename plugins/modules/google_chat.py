@@ -108,7 +108,7 @@ EXAMPLES = r"""
     space: "{{ chat_space }}"
     key: "{{ chat_key }}"
     token: "{{ chat_token }}"
-    text: "✅ Step 1/3 — code checked out"
+    text: "✅ Step 1/3 – code checked out"
     thread_key: "{{ deploy_thread }}"
     create_new_thread: false
   delegate_to: localhost
@@ -138,7 +138,7 @@ EXAMPLES = r"""
         space: "{{ chat_space }}"
         key: "{{ chat_key }}"
         token: "{{ chat_token }}"
-        text: "❌ Deploy to {{ inventory_hostname }} *failed* — {{ ansible_failed_task.name }}"
+        text: "❌ Deploy to {{ inventory_hostname }} *failed* – {{ ansible_failed_task.name }}"
         thread_key: "{{ deploy_thread }}"
         create_new_thread: false
       delegate_to: localhost
@@ -172,6 +172,7 @@ BASE_URL = "https://chat.googleapis.com/v1/spaces"
 
 Payload = dict[str, t.Any]
 Response = dict[str, t.Any]
+
 
 def build_payload(text: str, thread_key: str | None) -> Payload:
     payload: Payload = {"text": text}
