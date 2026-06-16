@@ -1,6 +1,0 @@
-minor_changes:
-  - "consul module_utils - the shared ``_ConsulModule`` request layer now passes ``bytes`` and ``bytearray`` request
-    bodies through to the underlying HTTP call without JSON encoding, and exposes a new ``request()`` method that
-    returns the response headers alongside the parsed body. ``RequestError`` exceptions also carry the response
-    headers. This unblocks modules whose Consul endpoints return meaningful response headers (for example
-    ``X-Consul-Index`` for blocking queries) or accept raw bodies."

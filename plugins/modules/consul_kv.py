@@ -127,10 +127,6 @@ from ansible_collections.community.general.plugins.module_utils._consul import (
     _ConsulModule,
 )
 
-# Sentinel marking "the caller did not pass a value" - distinct from None/empty
-# string, which are legitimate states for a KV entry.
-NOT_SET = None
-
 
 def _decode_value(entry):
     if entry.get("Value") is not None:
@@ -195,12 +191,12 @@ def _has_value_changed(consul_module, key, target_value):
 
 
 def execute(module, consul_module):
-    state = module.params.get("state")
+    state = module.params["state"]
 
     if state == "acquire" or state == "release":
         lock(module, consul_module, state)
     elif state == "present":
-        if module.params.get("value") is NOT_SET:
+        if module.params["value"] is None:
             get_value(module, consul_module)
         else:
             set_value(module, consul_module)
@@ -211,10 +207,10 @@ def execute(module, consul_module):
 
 
 def lock(module, consul_module, state):
-    session = module.params.get("session")
-    key = module.params.get("key")
-    value = module.params.get("value")
-    dc = module.params.get("datacenter")
+    session = module.params["session"]
+    key = module.params["key"]
+    value = module.params["value"]
+    dc = module.params["datacenter"]
 
     if not session:
         module.fail_json(msg=f"{state} of lock for {key} requested but no session supplied")
@@ -223,8 +219,8 @@ def lock(module, consul_module, state):
 
     if changed and not module.check_mode:
         kwargs = {
-            "cas": module.params.get("cas"),
-            "flags": module.params.get("flags"),
+            "cas": module.params["cas"],
+            "flags": module.params["flags"],
             "dc": dc,
         }
         if state == "acquire":
@@ -237,23 +233,23 @@ def lock(module, consul_module, state):
 
 
 def get_value(module, consul_module):
-    key = module.params.get("key")
+    key = module.params["key"]
     index, existing = _kv_get(
         consul_module,
         key,
-        recurse=module.params.get("recurse"),
-        dc=module.params.get("datacenter"),
+        recurse=module.params["recurse"],
+        dc=module.params["datacenter"],
     )
     module.exit_json(changed=False, index=index, data=existing)
 
 
 def set_value(module, consul_module):
-    key = module.params.get("key")
-    value = module.params.get("value")
-    dc = module.params.get("datacenter")
+    key = module.params["key"]
+    value = module.params["value"]
+    dc = module.params["datacenter"]
 
-    if value is NOT_SET:
-        raise AssertionError(f'Cannot set value of "{key}" to `NOT_SET`')
+    if value is None:
+        raise AssertionError(f'Cannot set value of "{key}" to None')
 
     index, changed = _has_value_changed(consul_module, key, value)
 
@@ -262,13 +258,13 @@ def set_value(module, consul_module):
             consul_module,
             key,
             value,
-            cas=module.params.get("cas"),
-            flags=module.params.get("flags"),
+            cas=module.params["cas"],
+            flags=module.params["flags"],
             dc=dc,
         )
 
     stored = None
-    if module.params.get("retrieve"):
+    if module.params["retrieve"]:
         index, stored = _kv_get(consul_module, key, dc=dc)
 
     module.exit_json(changed=changed, index=index, key=key, data=stored)
@@ -277,9 +273,9 @@ def set_value(module, consul_module):
 def remove_value(module, consul_module):
     """Remove the value associated with the given key. If the recurse parameter
     is set then any key prefixed with the given key will be removed."""
-    key = module.params.get("key")
-    dc = module.params.get("datacenter")
-    recurse = module.params.get("recurse")
+    key = module.params["key"]
+    dc = module.params["datacenter"]
+    recurse = module.params["recurse"]
 
     index, existing = _kv_get(consul_module, key, recurse=recurse, dc=dc)
 
@@ -300,7 +296,7 @@ def main():
             recurse=dict(type="bool"),
             retrieve=dict(type="bool", default=True),
             state=dict(type="str", default="present", choices=["absent", "acquire", "present", "release"]),
-            value=dict(type="str", default=NOT_SET),
+            value=dict(type="str"),
             session=dict(type="str"),
             **AUTH_ARGUMENTS_SPEC,
         ),
