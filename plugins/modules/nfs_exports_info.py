@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# SPDX-FileCopyrightText: (c) 2026, Samaneh Yousefnezhad <s-yousefnezhad@um.ac.ir>
+# SPDX-FileCopyrightText: (c) 2026, Samaneh Yousefnezhad <s-yousefenzhad@um.ac.ir>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
@@ -73,7 +73,11 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-def get_exports(module: AnsibleModule, output_format: str | None = None, file_path: str | None = None) -> dict:
+def get_exports(
+    module: AnsibleModule,
+    output_format: str | None = None,
+    file_path: str | None = None,
+) -> dict:
     if output_format is None:
         output_format = module.params["output_format"]
     if file_path is None:
@@ -129,10 +133,7 @@ def get_exports(module: AnsibleModule, output_format: str | None = None, file_pa
 
     exports_info = ips_per_share if output_format == "ips_per_share" else shares_per_ip
 
-    return {
-        "exports_info": exports_info,
-        "file_digest": file_digest
-    }
+    return {"exports_info": exports_info, "file_digest": file_digest}
 
 
 def main() -> None:
@@ -148,17 +149,14 @@ def main() -> None:
         },
     }
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
     result = get_exports(module)
 
     module.exit_json(
         changed=False,
         exports_info=result["exports_info"],
-        file_digest=result["file_digest"]
+        file_digest=result["file_digest"],
     )
 
 
