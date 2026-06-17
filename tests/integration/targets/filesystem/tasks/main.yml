@@ -50,10 +50,6 @@
     # bcachefs only on Alpine > 3.18 and Arch Linux for now
     # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
     - 'not (ansible_facts.distribution not in ["Alpine", "Archlinux"] and item.0.key == "bcachefs")'
-    # TODO: bcachefs on Arch uses a different output format; instead of 'Size: 20.0 MiB' it now prints 'Size: 20.0M',
-    #       which breaks Bcachefs.get_fs_size(). This seems to be related to the C -> Rust conversion of the CLI tools.
-    #       It also seems that it is now impossible to know whether base 2 or 10 units are used... :(
-    - 'not (ansible_facts.distribution in ["Archlinux"] and item.0.key == "bcachefs")'
     # TODO: bcachefs on Alpine doesn't seem to work for unknown reasons, debug this!
     - 'not (ansible_facts.distribution in ["Alpine"] and item.0.key == "bcachefs")'
     # btrfs packages not available on RHEL/CentOS/Fedora

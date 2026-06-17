@@ -1,0 +1,4 @@
+bugfixes:
+  - filesystem - fix ``Bcachefs.get_fs_size()`` to handle the new compact output format
+    used by recent versions of bcachefs-tools, where value and unit are no longer
+    space-separated (https://github.com/ansible-collections/community.general/issues/12259).
