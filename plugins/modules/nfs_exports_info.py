@@ -27,8 +27,8 @@ options:
   output_format:
     description:
       - The format of the returned mapping.
-      - If set to C(ips_per_share), output maps shared folders to IPs and options.
-      - If set to C(shares_per_ip), output maps IPs to shared folders and options.
+      - If set to V(ips_per_share), output maps shared folders to IPs and options.
+      - If set to V(shares_per_ip), output maps IPs to shared folders and options.
     required: true
     type: str
     choices: ['ips_per_share', 'shares_per_ip']
@@ -94,7 +94,7 @@ def get_exports(
     except FileNotFoundError:
         module.fail_json(msg=f"{file_path} file not found")
     except OSError as e:
-        module.fail_json(msg=f"Could not read {file_path}: {str(e)}")
+        module.fail_json(msg=f"Could not read {file_path}: {e}")
 
     for algo in ["md5", "sha1", "sha256"]:
         try:
