@@ -63,9 +63,7 @@ def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
     dependent text formatting cannot affect the result.
     """
     with runner("cli_action config output_format") as ctx:
-        rc, out, err = ctx.run(cli_action="property", output_format="json")
-    if not out:
-        return False
+        rc, out, err = ctx.run(cli_action="property")
     try:
         data = json.loads(out)
     except (TypeError, ValueError):
@@ -85,7 +83,7 @@ def get_pacemaker_resource_config(runner: CmdRunner) -> t.Optional[dict]:
     Requires pcs >= 0.11.3.
     """
     with runner("cli_action state name output_format") as ctx:
-        rc, out, err = ctx.run(cli_action="resource", state="config", output_format="json")
+        rc, out, err = ctx.run(cli_action="resource", state="config")
     if rc != 0 or not out:
         return None
     try:
@@ -99,8 +97,6 @@ def is_resource_cloned(config: t.Mapping, name: str) -> bool:
     config DTO. Matches both directly-cloned primitives and cloned groups, since pcs
     represents cloned-group membership the same way (``clones[].member_id == <group_id>``).
     """
-    if not name:
-        return False
     return any(clone.get("member_id") == name for clone in config.get("clones") or [])
 
 
@@ -142,7 +138,7 @@ def pacemaker_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             config=cmd_runner_fmt.as_fixed("config"),
             force=cmd_runner_fmt.as_bool("--force"),
             version=cmd_runner_fmt.as_fixed("--version"),
-            output_format=cmd_runner_fmt.as_opt_eq_val("--output-format"),
+            output_format=cmd_runner_fmt.as_fixed("--output-format=json"),
         ),
         **kwargs,
     )
