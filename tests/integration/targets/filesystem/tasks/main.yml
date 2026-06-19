@@ -77,6 +77,8 @@
       # TODO: figure out why it fails, fix it!
     # swap does not work on Alpine due to no -f support in mkswap
     - 'not (item.0.key == "swap" and ansible_facts.distribution == "Alpine")'
+    # bcachefs does not support UUID reset on existing filesystems (no CHANGE_UUID tool)
+    - 'not (item.0.key == "bcachefs" and item.1 == "reset_fs_uuid")'
     # GFS2 not available on these distributions
     - 'not (item.0.key == "gfs2" and ansible_facts.distribution in ["Alpine", "Archlinux", "CentOS", "RedHat"])'
 
