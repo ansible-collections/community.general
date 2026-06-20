@@ -12,7 +12,7 @@ version_added: 9.5.0
 description:
   - Manage keytab file with C(ipa-getkeytab) utility.
   - See U(https://manpages.ubuntu.com/manpages/jammy/man1/ipa-getkeytab.1.html) for reference.
-author: "Alexander Bakanovskii (@abakanovskii)"
+author: "Alexander Bakanovskii (@bakanovskii)"
 attributes:
   check_mode:
     support: full

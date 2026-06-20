@@ -775,7 +775,7 @@ files:
     maintainers: $team_ipa
     ignore: fxfitz
   $modules/ipa_getkeytab.py:
-    maintainers: abakanovskii
+    maintainers: bakanovskii
   $modules/ipa_dnsrecord.py:
     maintainers: $team_ipa jwbernin
   $modules/ipa_pwpolicy.py:
@@ -906,7 +906,7 @@ files:
   $modules/kibana_plugin.py:
     maintainers: barryib
   $modules/krb_ticket.py:
-    maintainers: abakanovskii
+    maintainers: bakanovskii
   $modules/launchd.py:
     maintainers: martinm82
   $modules/layman.py:
@@ -1071,7 +1071,7 @@ files:
   $modules/one_host.py:
     maintainers: rvalle
   $modules/one_vnet.py:
-    maintainers: abakanovskii
+    maintainers: bakanovskii
   $modules/oneandone_:
     maintainers: aajdinov edevenport
   $modules/onepassword_info.py:

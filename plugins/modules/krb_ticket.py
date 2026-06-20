@@ -12,7 +12,7 @@ version_added: 10.0.0
 description:
   - Manage Kerberos tickets with C(kinit), C(klist) and C(kdestroy) base utilities.
   - See U(https://web.mit.edu/kerberos/krb5-1.12/doc/user/user_commands/index.html) for reference.
-author: "Alexander Bakanovskii (@abakanovskii)"
+author: "Alexander Bakanovskii (@bakanovskii)"
 attributes:
   check_mode:
     support: full
