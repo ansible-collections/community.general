@@ -25,6 +25,10 @@ options:
       - If O(backend=gopass), then the default is the C(path) field in C(~/.config/gopass/config.yml), falling back to V(~/.local/share/gopass/stores/root)
         if C(path) is not defined in the gopass config.
     type: path
+    ini:
+      - section: passwordstore_lookup
+        key: directory
+        version_added: 13.2.0
     vars:
       - name: passwordstore
     env:
