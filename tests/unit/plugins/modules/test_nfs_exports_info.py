@@ -9,14 +9,8 @@ import sys
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.nfs_exports_info import (
-    get_exports,
-)
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
-    MagicMock,
-    mock_open,
-    patch,
-)
+from ansible_collections.community.general.plugins.modules.nfs_exports_info import get_exports
+from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import MagicMock, mock_open, patch
 
 
 @pytest.fixture
@@ -49,9 +43,7 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
     mock_module.fail_json.side_effect = Exception("fail_json called")
     patch_target = "builtins.open" if sys.version_info[0] == 3 else "__builtin__.open"
 
-    with patch(
-        patch_target, mock_open(read_data=fake_exports_content.encode("utf-8"))
-    ):
+    with patch(patch_target, mock_open(read_data=fake_exports_content.encode("utf-8"))):
         result = get_exports(mock_module, "ips_per_share")
 
     expected_exports_info = {
@@ -77,9 +69,7 @@ def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
     mock_module.fail_json.side_effect = Exception("fail_json called")
     patch_target = "builtins.open" if sys.version_info[0] == 3 else "__builtin__.open"
 
-    with patch(
-        patch_target, mock_open(read_data=fake_exports_content.encode("utf-8"))
-    ):
+    with patch(patch_target, mock_open(read_data=fake_exports_content.encode("utf-8"))):
         result = get_exports(mock_module, "shares_per_ip")
 
     expected_exports_info = {
