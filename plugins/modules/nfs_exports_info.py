@@ -94,7 +94,7 @@ def get_exports(
     for algo in ["md5", "sha1", "sha256"]:
         try:
             hasher = hashlib.new(algo)
-            hasher.update(content_bytes)
+            hasher.update(content.encode("utf-8"))
             file_digest[algo] = hasher.hexdigest()
         except ValueError:
             continue
