@@ -422,7 +422,7 @@ class Bcachefs(Filesystem):
     GROW = "bcachefs"
     GROW_MAX_SPACE_FLAGS = ["device", "resize"]
 
-    SIZE_PATTERN = re.compile(r"Size:\s+([\d.]+)\s*(\S+)")
+    SIZE_PATTERN = re.compile(r"Size:\s+(?P<value>[\d.]+)\s*(?P<unit>\S+)")
 
     UNIT_FACTORS = {
         "B": 1,
@@ -461,8 +461,8 @@ class Bcachefs(Filesystem):
         for line in stdout.splitlines():
             match = self.SIZE_PATTERN.search(line)
             if match:
-                value_str = match.group(1)
-                unit = match.group(2)
+                value_str = match.group("value")
+                unit = match.group("unit")
                 factor = self.UNIT_FACTORS.get(unit)
                 if factor is None:
                     raise ValueError(repr(stdout))
