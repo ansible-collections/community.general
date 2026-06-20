@@ -945,7 +945,3 @@ class TestLogrotateConfig(unittest.TestCase):
                     self.mock_module.run_command.assert_called_once()
                     call_args = self.mock_module.run_command.call_args[0][0]
                     self.assertEqual(call_args[0], test_logrotate_path)
-
-
-if __name__ == "__main__":
-    unittest.main()
