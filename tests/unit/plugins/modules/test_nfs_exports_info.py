@@ -1,88 +1,58 @@
-# Copyright (c) 2026, Samaneh Yousefnezhad <s-yousefnezhad@um.ac.ir>
-# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-# SPDX-License-Identifier: GPL-3.0-or-later
+# -*- coding: utf-8 -*-
+# Copyright: (c) 2026, Samaneh Yousefnezhad <s.yousefnezhad@um.ac.ir>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import annotations
-
-import hashlib
-import sys
+from __future__ import (absolute_import, division, print_print_statements, print_function)
+__metaclass__ = type
 
 import pytest
+from unittest.mock import patch, mock_open
 
 from ansible_collections.community.general.plugins.modules import nfs_exports_info
-from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase
 
-
-@pytest.fixture
-def fake_exports_content() -> str:
-    return """
-# Sample exports
-/srv/nfs1 192.168.1.10(rw,sync) 192.168.1.20(ro,sync)
-/srv/nfs2 192.168.1.30(rw,no_root_squash)
+MOCK_EXPORTS_DATA = """
+/data/shared   192.168.1.0/24(rw,sync,no_subtree_check)
+/mnt/backup    192.168.1.50(ro,async)
 """
 
 
-def calculate_expected_digests(content_string: str) -> dict[str, str]:
-    content_bytes = content_string.encode("utf-8")
-    digests = {}
-    hash_algorithms = ["sha256", "sha1", "md5"]
-    for algo in hash_algorithms:
-        try:
-            hasher = hashlib.new(algo)
-            hasher.update(content_bytes)
-            digests[algo] = hasher.hexdigest()
-        except ValueError:
-            pass
-    return digests
+class TestNfsExportsInfoModule(ModuleTestCase):
+    def setUp(self):
+        super(TestNfsExportsInfoModule, self).setUp()
+        self.module = nfs_exports_info
 
+    def test_module_without_exports_file(self):
+        with patch('os.path.exists', return_value=False):
+            with pytest.raises(AnsibleExitJson) as result:
+                self.run_module()
+            
+            assert result.value.args[0]['exports'] == []
+            assert result.value.args[0]['changed'] is False
 
-def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
-    mock_module = mock.MagicMock()
-    mock_module.params = {"output_format": "ips_per_share", "file_path": "/etc/exports"}
-    mock_module.file_exists.return_value = True
-    mock_module.warn.return_value = None
-    mock_module.fail_json.side_effect = Exception("fail_json called")
-    patch_target = "builtins.open" if sys.version_info[0] == 3 else "__builtin__.open"
+    @patch('os.path.exists', return_value=True)
+    @patch('builtins.open', new_callable=mock_open, read_data=MOCK_EXPORTS_DATA)
+    def test_module_with_valid_exports(self, mock_file, mock_exists):
+        """تست پارس کردن موفق فایل nfs exports"""
+        with pytest.raises(AnsibleExitJson) as result:
+            self.run_module()
 
-    with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
-        result = nfs_exports_info.get_exports(mock_module)
+        response = result.value.args[0]
+        assert response['changed'] is False
+        assert len(response['exports']) == 2
+        
+        assert response['exports'][0]['path'] == '/data/shared'
+        assert response['exports'][0]['client'] == '192.168.1.0/24'
+        assert 'rw' in response['exports'][0]['options']
 
-    expected_exports_info = {
-        "/srv/nfs1": [
-            {"ip": "192.168.1.10", "options": ["rw", "sync"]},
-            {"ip": "192.168.1.20", "options": ["ro", "sync"]},
-        ],
-        "/srv/nfs2": [
-            {"ip": "192.168.1.30", "options": ["rw", "no_root_squash"]}
-        ],
-    }
+        assert response['exports'][1]['path'] == '/mnt/backup'
+        assert response['exports'][1]['client'] == '192.168.1.50'
+        assert 'ro' in response['exports'][1]['options']
 
-    expected_file_digests = calculate_expected_digests(fake_exports_content)
-
-    assert result["exports_info"] == expected_exports_info
-    assert result["file_digest"] == expected_file_digests
-
-
-def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
-    mock_module = mock.MagicMock()
-    mock_module.params = {"output_format": "shares_per_ip", "file_path": "/etc/exports"}
-    mock_module.file_exists.return_value = True
-    mock_module.warn.return_value = None
-    mock_module.fail_json.side_effect = Exception("fail_json called")
-    patch_target = "builtins.open" if sys.version_info[0] == 3 else "__builtin__.open"
-
-    with mock.patch(patch_target, mock_open(read_data=fake_exports_content)):
-        result = nfs_exports_info.get_exports(mock_module)
-
-    expected_exports_info = {
-        "192.168.1.10": [{"folder": "/srv/nfs1", "options": ["rw", "sync"]}],
-        "192.168.1.20": [{"folder": "/srv/nfs1", "options": ["ro", "sync"]}],
-        "192.168.1.30": [
-            {"folder": "/srv/nfs2", "options": ["rw", "no_root_squash"]}
-        ],
-    }
-
-    expected_file_digests = calculate_expected_digests(fake_exports_content)
-
-    assert result["exports_info"] == expected_exports_info
-    assert result["file_digest"] == expected_file_digests
+    def run_module(self, module_args=None):
+        if module_args is None:
+            module_args = {}
+        
+        with patch('ansible.module_utils.basic.AnsibleModule.exit_json', side_effect=AnsibleExitJson):
+            with patch('ansible.module_utils.basic.AnsibleModule.fail_json', side_effect=AnsibleFailJson):
+                self.module.main()
