@@ -75,22 +75,17 @@ from ansible.module_utils.basic import AnsibleModule
 
 def get_exports(
     module: AnsibleModule,
-    output_format: str | None = None,
-    file_path: str | None = None,
 ) -> dict:
-    if output_format is None:
-        output_format = module.params["output_format"]
-    if file_path is None:
-        file_path = module.params.get("file_path", "/etc/exports")
+    output_format = module.params["output_format"]
+    file_path = module.params["file_path"]
 
     shares_per_ip: dict[str, list[dict[str, str | list[str]]]] = {}
     ips_per_share: dict[str, list[dict[str, str | list[str]]]] = {}
     file_digest: dict[str, str] = {}
 
     try:
-        with open(file_path, "rb") as f:
-            content_bytes = f.read()
-        content = content_bytes.decode("utf-8", errors="ignore")
+        with open(file_path, "r") as f:
+            content = f.read()
     except FileNotFoundError:
         module.fail_json(msg=f"{file_path} file not found")
     except OSError as e:
@@ -115,7 +110,7 @@ def get_exports(
 
         folder = parts[0]
         for client_part in parts[1:]:
-            match = re.match(r"^([^\(]+)\(([^\)]+)\)$", client_part)
+            match = re.match(r"^(?P<client>.+)\((?P<client_opts>.+)\)$", client_part)
             if match:
                 ip = match.group(1)
                 options = [opt.strip() for opt in match.group(2).split(",")]
