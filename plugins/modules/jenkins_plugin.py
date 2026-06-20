@@ -136,7 +136,9 @@ options:
 notes:
   - Jenkins plugins are required to have I(unique identifiers based on their name), which are used in Plugin Index webpage and
     URL slug, C(update-center.json), and C(plugin-versions.json). E.g.: "C(role-strategy)" for the plugin named Role-based
-    Authentication Strategy (https://plugins.jenkins.io/role-strategy).
+  - "Jenkins plugins are required to have I(unique identifiers based on their name), which are used in Plugin Index webpage and
+    URL slug, C(update-center.json), and C(plugin-versions.json). For example: "C(role-strategy)" for the plugin named Role-based
+    Authentication Strategy (U(https://plugins.jenkins.io/role-strategy))."
   - Plugin installation should be run under root or the same user which owns the plugin files on the disk. Only if the plugin
     is not installed yet and no version is specified, the API installation is performed which requires only the Web UI credentials.
   - It is necessary to notify the handler or call the M(ansible.builtin.service) module to restart the Jenkins service after
