@@ -1,4 +1,4 @@
-# Copyright (c) 2025, Samaneh Yousefnezhad <s-yousefnezhad@um.ac.ir>
+# Copyright (c) 2026, Samaneh Yousefnezhad <s-yousefnezhad@um.ac.ir>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -9,14 +9,8 @@ import sys
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.nfs_exports_info import (
-    get_exports,
-)
-from ansible_collections.community.internal_test_tools.tests.unit.compat.mock import (
-    MagicMock,
-    mock_open,
-    patch,
-)
+from ansible_collections.community.general.plugins.modules import nfs_exports_info
+from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 
 
 @pytest.fixture
@@ -43,15 +37,15 @@ def calculate_expected_digests(content_string: str) -> dict[str, str]:
 
 
 def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
-    mock_module = MagicMock()
+    mock_module = mock.MagicMock()
     mock_module.params = {"output_format": "ips_per_share", "file_path": "/etc/exports"}
     mock_module.file_exists.return_value = True
     mock_module.warn.return_value = None
     mock_module.fail_json.side_effect = Exception("fail_json called")
     patch_target = "builtins.open" if sys.version_info[0] == 3 else "__builtin__.open"
 
-    with patch(patch_target, mock_open(read_data=fake_exports_content)):
-        result = get_exports(mock_module)
+    with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
+        result = nfs_exports_info.get_exports(mock_module)
 
     expected_exports_info = {
         "/srv/nfs1": [
@@ -70,15 +64,15 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
 
 
 def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
-    mock_module = MagicMock()
+    mock_module = mock.MagicMock()
     mock_module.params = {"output_format": "shares_per_ip", "file_path": "/etc/exports"}
     mock_module.file_exists.return_value = True
     mock_module.warn.return_value = None
     mock_module.fail_json.side_effect = Exception("fail_json called")
     patch_target = "builtins.open" if sys.version_info[0] == 3 else "__builtin__.open"
 
-    with patch(patch_target, mock_open(read_data=fake_exports_content)):
-        result = get_exports(mock_module)
+    with mock.patch(patch_target, mock_open(read_data=fake_exports_content)):
+        result = nfs_exports_info.get_exports(mock_module)
 
     expected_exports_info = {
         "192.168.1.10": [{"folder": "/srv/nfs1", "options": ["rw", "sync"]}],
