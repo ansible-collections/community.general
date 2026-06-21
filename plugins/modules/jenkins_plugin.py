@@ -38,6 +38,7 @@ options:
     type: str
     description:
       - Unique plugin ID obtained from L(Jenkins Plugin Index, https://plugins.jenkins.io).
+        See the notes for more information.
     required: true
   owner:
     type: str
