@@ -42,8 +42,6 @@ jobs:
           coverage: ${{ github.event_name == 'schedule' && 'always' || 'never' }}
           pull-request-change-detection: 'true'
           testing-type: sanity
-          pre-test-cmd: >-
-            git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git ../../community/internal_test_tools
 
   units:
     runs-on: ubuntu-latest
