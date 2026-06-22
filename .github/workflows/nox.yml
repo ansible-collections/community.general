@@ -21,11 +21,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  nox:
-    uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-run.yml@main
-    with:
-      session-name: Run extra sanity tests
-      change-detection-in-prs: true
   ansible-test:
     uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-matrix.yml@main
     with:
