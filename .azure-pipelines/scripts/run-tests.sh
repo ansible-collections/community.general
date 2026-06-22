@@ -10,11 +10,13 @@ set -o pipefail -eu
 entry_point="$1"
 test="$2"
 read -r -a coverage_branches <<< "$3"  # space separated list of branches to run code coverage on for scheduled builds
+agent_temp_directory="$4"
 
 export COMMIT_MESSAGE
 export COMPLETE
 export COVERAGE
 export IS_PULL_REQUEST
+export COVERAGE_DESTINATION_DIRECTORY="${agent_temp_directory}/coverage"
 
 if [ "${SYSTEM_PULLREQUEST_TARGETBRANCH:-}" ]; then
     IS_PULL_REQUEST=true
