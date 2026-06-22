@@ -11,9 +11,11 @@ name: nox
       - stable-*
     paths:
       - docs/**
+      - .github/workflows/docs.yml
   pull_request:
     paths:
       - docs/**
+      - .github/workflows/docs.yml
   # Run CI once per day (at 08:00 UTC)
   schedule:
     - cron: '0 8 * * *'
@@ -21,14 +23,7 @@ name: nox
 
 jobs:
   nox:
-    runs-on: ubuntu-latest
-    name: "Validate generated Ansible output"
-    steps:
-      - name: Check out collection
-        uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - name: Run nox
-        uses: ansible-community/antsibull-nox@main
-        with:
-          sessions: ansible-output
+    uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-run.yml@main
+    with:
+      session-name: Run extra sanity tests
+      sessions: ansible-output
