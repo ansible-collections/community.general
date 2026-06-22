@@ -208,7 +208,12 @@
       - not diversion_6.stat.exists
       - diversion_7.stat.exists
       - diversion_7.stat.checksum == foobarrc_oldsha1
-      - diversion_0 == diversion_1
+      # Note that `--display-traceback error` results in failing task results having a traceback included as `exception`,
+      # which makes the comparison fail since both module invocations use a different random path to extract the AnsiballZ into.
+      - >-
+        (diversion_0 | ansible.builtin.dict2items | rejectattr("key", "eq", "exception") | ansible.builtin.items2dict)
+        ==
+        (diversion_1 | ansible.builtin.dict2items | rejectattr("key", "eq", "exception") | ansible.builtin.items2dict)
       - diversion_2.diversion == diversion_3.diversion
       - diversion_4.diversion == diversion_5.diversion
       - diversion_2.commands == diversion_3.commands
@@ -376,7 +381,12 @@
       - diversion_6.stat.checksum == foobarrc_oldsha1
       - not diversion_7.stat.exists
       - not diversion_8.stat.exists
-      - diversion_0 == diversion_1
+      # Note that `--display-traceback error` results in failing task results having a traceback included as `exception`,
+      # which makes the comparison fail since both module invocations use a different random path to extract the AnsiballZ into.
+      - >-
+        (diversion_0 | ansible.builtin.dict2items | rejectattr("key", "eq", "exception") | ansible.builtin.items2dict)
+        ==
+        (diversion_1 | ansible.builtin.dict2items | rejectattr("key", "eq", "exception") | ansible.builtin.items2dict)
       - diversion_2.diversion == diversion_3.diversion
       - diversion_4.diversion == diversion_5.diversion
       - diversion_2.commands == diversion_3.commands
