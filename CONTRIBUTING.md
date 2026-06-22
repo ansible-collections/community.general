@@ -8,6 +8,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 We follow [Ansible Code of Conduct](https://docs.ansible.com/projects/ansible/latest/community/code_of_conduct.html) in all our contributions and interactions within this repository.
 
+**Please note the [Ansible Community Policy for AI-Assisted Contributions](https://docs.ansible.com/projects/ansible/devel/community/ai_policy.html)**!
+
 If you are a committer, also refer to the [collection's committer guidelines](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md).
 
 ## Issue tracker
