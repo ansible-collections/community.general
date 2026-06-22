@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - "tss lookup plugin - cache the ``TSSClient`` per process and credential identity so OAuth2 token grants are reused across lookups, instead of minting a fresh grant on every ``lookup()`` call (https://github.com/ansible-collections/community.general/pull/12328)."
+  - "tss lookup plugin - on a client error (4xx) from Secret Server, such as an expired cached token, invalidate the cached ``TSSClient`` for that credential identity, rebuild it, and retry the lookup once; server errors (5xx) propagate unchanged (https://github.com/ansible-collections/community.general/pull/12328)."

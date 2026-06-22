@@ -108,7 +108,11 @@ options:
     required: false
   token_path_uri:
     default: /oauth2/token
-    description: The path to append to the base URL to form a valid OAuth2 Access Grant request.
+    description:
+      - The path to append to the base URL to form a valid OAuth2 Access Grant request.
+      - Set this to an empty string V("") to let C(python-tss-sdk) auto-detect whether the host is Secret Server or the Delinea
+        Platform and select the correct token endpoint. This is required for Delinea Platform authentication with O(username)
+        and O(password), because the Platform token endpoint differs from the Secret Server V(/oauth2/token) endpoint.
     type: string
     env:
       - name: TSS_TOKEN_PATH_URI
@@ -269,7 +273,8 @@ EXAMPLES = r"""
           102,
           base_url='https://platform.delinea.app/',
           username='platform_service_username',
-          password='platform_service_user_password'
+          password='platform_service_user_password',
+          token_path_uri=''
         )
       }}
   tasks:
@@ -300,6 +305,7 @@ EXAMPLES = r"""
 
 import abc
 import os
+import typing as t
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
@@ -341,6 +347,28 @@ except ImportError:
         DomainPasswordGrantAuthorizer = None
         AccessTokenAuthorizer = None
         HAS_TSS_AUTHORIZER = False
+
+
+# SecretServerClientError (4xx) is exported by newer python-tss-sdk builds. When
+# present it lets us distinguish auth/permission failures from 5xx service errors
+# so a stale cached client can be invalidated and the lookup retried once. On
+# older SDKs the import is absent and the retry is simply skipped.
+try:
+    from delinea.secrets.server import SecretServerClientError
+
+    HAS_SS_CLIENT_ERROR = True
+except ImportError:
+    try:
+        from thycotic.secrets.server import SecretServerClientError
+
+        HAS_SS_CLIENT_ERROR = True
+    except ImportError:
+        SecretServerClientError = None
+        HAS_SS_CLIENT_ERROR = False
+
+
+if t.TYPE_CHECKING:
+    CacheKey = tuple[str | None, str | None, str | None, str | None, str | None]
 
 
 display = Display()
@@ -461,6 +489,53 @@ class TSSClientV1(TSSClient):
         )
 
 
+# Module-scope cache of TSSClient instances, keyed on credential identity. Each
+# TSSClient holds an authorizer whose internal token cache is only useful if the
+# client is reused; without this, every lookup() call mints a fresh OAuth2 token
+# grant, which can overload the token endpoint on lookup-heavy playbooks.
+_client_cache: dict[CacheKey, TSSClient] = {}
+
+
+def _credential_key(server_parameters: dict[str, str | None]) -> CacheKey | None:
+    # Token-based auth makes no token-endpoint call, so caching adds nothing.
+    if server_parameters.get("token"):
+        return None
+    # password is intentionally excluded from the key: the cached client holds
+    # the password on its authorizer, so a second lookup with the same username
+    # but a different password would not be "fixed" by keying separately - it
+    # would just split the cache while the first authorizer's password is what
+    # actually gets used.
+    return (
+        server_parameters.get("base_url"),
+        server_parameters.get("username"),
+        server_parameters.get("domain"),
+        server_parameters.get("api_path_uri"),
+        server_parameters.get("token_path_uri"),
+    )
+
+
+def _get_or_build_client(server_parameters: dict[str, str | None]) -> TSSClient:
+    key = _credential_key(server_parameters)
+    if key is None:
+        return TSSClient.from_params(**server_parameters)
+    # On a cache miss, build the client (from_params makes the token-endpoint
+    # network call) and setdefault to insert it. setdefault resolves the case
+    # where two builds for the same key happen concurrently: the first insert
+    # wins and the later client is discarded.
+    tss = _client_cache.get(key)
+    if tss is not None:
+        return tss
+    new_tss = TSSClient.from_params(**server_parameters)
+    return _client_cache.setdefault(key, new_tss)
+
+
+def _drop_cached_client(server_parameters: dict[str, str | None]) -> None:
+    key = _credential_key(server_parameters)
+    if key is None:
+        return
+    _client_cache.pop(key, None)
+
+
 class LookupModule(LookupBase):
     def run(self, terms, variables, **kwargs):
         if not HAS_TSS_SDK:
@@ -469,31 +544,43 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
         check_for_wrong_terms(self, direct=kwargs)
 
-        tss = TSSClient.from_params(
-            base_url=self.get_option("base_url"),
-            username=self.get_option("username"),
-            password=self.get_option("password"),
-            domain=self.get_option("domain"),
-            token=self.get_option("token"),
-            api_path_uri=self.get_option("api_path_uri"),
-            token_path_uri=self.get_option("token_path_uri"),
-        )
+        params = {
+            "base_url": self.get_option("base_url"),
+            "username": self.get_option("username"),
+            "password": self.get_option("password"),
+            "domain": self.get_option("domain"),
+            "token": self.get_option("token"),
+            "api_path_uri": self.get_option("api_path_uri"),
+            "token_path_uri": self.get_option("token_path_uri"),
+        }
 
         try:
-            if self.get_option("fetch_secret_ids_from_folder"):
-                if HAS_DELINEA_SS_SDK:
-                    return [tss.get_secret_ids_by_folderid(term) for term in terms]
-                else:
-                    raise AnsibleError("latest python-tss-sdk must be installed to use this plugin")
-            else:
-                return [
-                    tss.get_secret(
-                        term,
-                        self.get_option("secret_path"),
-                        self.get_option("fetch_attachments"),
-                        self.get_option("file_download_path"),
-                    )
-                    for term in terms
-                ]
+            return self._lookup(terms, _get_or_build_client(params))
         except SecretServerError as error:
+            # A 4xx is often a stale cached token: drop the cached client so the
+            # rebuild mints a fresh grant, then retry once. 5xx and anything else
+            # propagate unchanged. The retry re-runs the lookup for all terms,
+            # not just the one that raised; reads are idempotent so that is safe,
+            # though it can produce duplicate reads in the Secret Server audit log.
+            if HAS_SS_CLIENT_ERROR and isinstance(error, SecretServerClientError):
+                _drop_cached_client(params)
+                try:
+                    return self._lookup(terms, _get_or_build_client(params))
+                except SecretServerError as retry_error:
+                    raise AnsibleError(f"Secret Server lookup failure: {retry_error.message}") from retry_error
             raise AnsibleError(f"Secret Server lookup failure: {error.message}") from error
+
+    def _lookup(self, terms, tss):
+        if self.get_option("fetch_secret_ids_from_folder"):
+            if HAS_DELINEA_SS_SDK:
+                return [tss.get_secret_ids_by_folderid(term) for term in terms]
+            raise AnsibleError("latest python-tss-sdk must be installed to use this plugin")
+        return [
+            tss.get_secret(
+                term,
+                self.get_option("secret_path"),
+                self.get_option("fetch_attachments"),
+                self.get_option("file_download_path"),
+            )
+            for term in terms
+        ]
