@@ -11,9 +11,11 @@ name: nox
       - stable-*
     paths:
       - docs/**
+      - .github/workflows/docs.yml
   pull_request:
     paths:
       - docs/**
+      - .github/workflows/docs.yml
   # Run CI once per day (at 08:00 UTC)
   schedule:
     - cron: '0 8 * * *'
