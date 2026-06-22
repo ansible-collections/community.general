@@ -26,3 +26,15 @@ jobs:
     with:
       session-name: Run extra sanity tests
       change-detection-in-prs: true
+  ansible-test:
+    uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-matrix.yml@main
+    with:
+      change-detection-in-prs: true
+      upload-codecov: true
+      upload-codecov-pr: false
+      upload-codecov-push: false
+      upload-codecov-schedule: true
+      allow-coverage-cd-override: true
+      max-ansible-core: "2.18"
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
