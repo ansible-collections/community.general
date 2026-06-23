@@ -12,6 +12,7 @@ short_description: Gather PowerEdge server information through iDRAC using Redfi
 description:
   - Builds Redfish URIs locally and sends them to remote iDRAC controllers to get information back.
   - For use with Dell EMC iDRAC operations that require Redfish OEM extensions.
+  - This module is limited to retrieving iDRAC-specific data. For standard Redfish attributes, use M(community.general.redfish_info) instead.
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.info_module
@@ -24,12 +25,12 @@ options:
   category:
     required: true
     description:
-      - Category to execute on iDRAC.
+      - Category to execute on iDRAC. V(Manager) is currently the only supported category.
     type: str
   command:
     required: true
     description:
-      - List of commands to execute on iDRAC.
+      - List of commands to execute on iDRAC. Currently, only V(GetManagerAttributes) is supported.
       - V(GetManagerAttributes) returns the list of dicts containing iDRAC, LifecycleController and System attributes.
     type: list
     elements: str
