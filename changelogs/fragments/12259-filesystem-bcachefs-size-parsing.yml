@@ -1,0 +1,4 @@
+bugfixes:
+  - filesystem - the module now also handles the output format of bcachefs-tools
+    v1.38.4 and above (https://github.com/ansible-collections/community.general/issues/12259,
+    https://github.com/ansible-collections/community.general/pull/12291).

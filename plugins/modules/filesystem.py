@@ -422,6 +422,36 @@ class Bcachefs(Filesystem):
     GROW = "bcachefs"
     GROW_MAX_SPACE_FLAGS = ["device", "resize"]
 
+    SIZE_PATTERN = re.compile(r"Size:\s+(?P<value>[\d.]+)\s*(?P<unit>\S+)")
+
+    UNIT_FACTORS = {
+        "B": 1,
+        "k": 1024,
+        "M": 1024**2,
+        "G": 1024**3,
+        "T": 1024**4,
+        "P": 1024**5,
+        "E": 1024**6,
+        "Z": 1024**7,
+        "Y": 1024**8,
+        "KiB": 1024,
+        "MiB": 1024**2,
+        "GiB": 1024**3,
+        "TiB": 1024**4,
+        "PiB": 1024**5,
+        "EiB": 1024**6,
+        "ZiB": 1024**7,
+        "YiB": 1024**8,
+        "kB": 1000,
+        "MB": 1000**2,
+        "GB": 1000**3,
+        "TB": 1000**4,
+        "PB": 1000**5,
+        "EB": 1000**6,
+        "ZB": 1000**7,
+        "YB": 1000**8,
+    }
+
     def get_fs_size(self, dev):
         """Return size in bytes of filesystem on device (integer)."""
         dummy, stdout, dummy = self.module.run_command(
@@ -429,30 +459,15 @@ class Bcachefs(Filesystem):
         )
 
         for line in stdout.splitlines():
-            if "Size: " in line:
-                parts = line.split()
-                unit = parts[2]
-
-                base = None
-                exp = None
-
-                units_2 = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"]
-                units_10 = ["B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-
-                try:
-                    exp = units_2.index(unit)
-                    base = 1024
-                except ValueError:
-                    exp = units_10.index(unit)
-                    base = 1000
-
-                if exp == 0:
-                    value = int(parts[1])
-                else:
-                    value = float(parts[1])
-
-                if base is not None and exp is not None:
-                    return int(value * pow(base, exp))
+            match = self.SIZE_PATTERN.search(line)
+            if match:
+                value_str = match.group("value")
+                unit = match.group("unit")
+                factor = self.UNIT_FACTORS.get(unit)
+                if factor is None:
+                    raise ValueError(repr(stdout))
+                value = int(value_str) if factor == 1 else float(value_str)
+                return int(value * factor)
 
         raise ValueError(repr(stdout))
 
