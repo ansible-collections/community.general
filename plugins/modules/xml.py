@@ -58,11 +58,29 @@ options:
       - This parameter requires O(xpath) to be set.
     type: list
     elements: raw
+  count:
+    description:
+      - Search for a given O(xpath) and provide the count of any matches.
+      - This parameter requires O(xpath) to be set.
+    type: bool
+    default: false
+  print_match:
+    description:
+      - Search for a given O(xpath) and print out any matches.
+      - This parameter requires O(xpath) to be set.
+    type: bool
+    default: false
   pretty_print:
     description:
       - Pretty print XML output.
     type: bool
     default: false
+  content:
+    description:
+      - Search for a given O(xpath) and get content.
+      - This parameter requires O(xpath) to be set.
+    type: str
+    choices: [attribute, text]
   input_type:
     description:
       - Type of input for O(add_children) and O(set_children).
@@ -93,25 +111,6 @@ options:
       - This parameter requires O(xpath) to be set.
     type: bool
     default: false
-  count:
-    description:
-      - Search for a given O(xpath) and provide the count of any matches.
-      - This parameter requires O(xpath) to be set.
-    type: bool
-    default: false
-  print_match:
-    description:
-      - Search for a given O(xpath) and return the XPath paths of any matches.
-      - This parameter requires O(xpath) to be set.
-    type: bool
-    default: false
-  content:
-    description:
-      - Search for a given O(xpath) and get content.
-      - If V(attribute), return the attributes of matched elements.
-      - If V(text), return the text content of matched elements.
-    type: str
-    choices: [attribute, text]
   create_if_missing:
     description:
       - When using O(value) and the O(xpath) matches no nodes, create the node.
@@ -382,14 +381,14 @@ def has_changed(doc):
 
 
 def do_print_match(module, tree, xpath, namespaces):
-    result = get_matches(tree, xpath, namespaces)
-    finish(module, tree, xpath, namespaces, changed=False, msg=result["msg"], matches=result["matches"])
+    match_xpaths, msg = get_matches(tree, xpath, namespaces)
+    finish(module, tree, xpath, namespaces, changed=False, msg=msg, matches=match_xpaths)
 
 
 def count_nodes(module, tree, xpath, namespaces):
     """Return the count of nodes matching the xpath"""
-    result = count_matches(tree, xpath, namespaces)
-    finish(module, tree, xpath, namespaces, changed=False, msg=result["msg"], hitcount=result["count"])
+    hits, msg = count_matches(tree, xpath, namespaces)
+    finish(module, tree, xpath, namespaces, changed=False, msg=msg, hitcount=hits)
 
 
 def is_attribute(tree, xpath, namespaces):
@@ -682,16 +681,18 @@ def set_target(module, tree, xpath, namespaces, attribute, value, create_if_miss
 
 
 def get_element_text(module, tree, xpath, namespaces):
-    elements = collect_element_text(tree, xpath, namespaces)
-    if elements is None:
+    raw = collect_element_text(tree, xpath, namespaces)
+    if raw is None:
         module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
+    elements = [{tag: text} for tag, text in raw]
     finish(module, tree, xpath, namespaces, changed=False, msg=len(elements), hitcount=len(elements), matches=elements)
 
 
 def get_element_attr(module, tree, xpath, namespaces):
-    elements = collect_element_attr(tree, xpath, namespaces)
-    if elements is None:
+    raw = collect_element_attr(tree, xpath, namespaces)
+    if raw is None:
         module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
+    elements = [{tag: attribs} for tag, attribs in raw]
     finish(module, tree, xpath, namespaces, changed=False, msg=len(elements), hitcount=len(elements), matches=elements)
 
 

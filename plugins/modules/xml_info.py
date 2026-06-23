@@ -24,25 +24,16 @@ extends_documentation_fragment:
 options:
   xpath:
     required: true
-  count:
+  what:
     description:
-      - Search for a given O(xpath) and provide the count of any matches.
-      - This parameter requires O(xpath) to be set.
-    type: bool
-    default: false
-  print_match:
-    description:
-      - Search for a given O(xpath) and return the XPath paths of any matches.
-      - This parameter requires O(xpath) to be set.
-    type: bool
-    default: false
-  content:
-    description:
-      - Search for a given O(xpath) and get content.
-      - If V(attribute), return the attributes of matched elements.
-      - If V(text), return the text content of matched elements.
+      - Select what kind of information to return for the given O(xpath).
+    required: true
     type: str
-    choices: [attribute, text]
+    choices:
+      count: Returns the number of matches as RV(count).
+      paths: Return the XPath paths for all matched elements as RV(matches).
+      content_text: Return the text content of the matched elements as RV(matches).
+      content_attributes: Return the attributes of the matched elements as RV(matches).
 seealso:
   - module: community.general.xml
     description: Manage bits and pieces of XML files or strings.
@@ -81,7 +72,7 @@ EXAMPLES = r"""
   community.general.xml_info:
     path: /foo/bar.xml
     xpath: /business/beers/beer
-    count: true
+    what: count
   register: hits
 
 - ansible.builtin.debug:
@@ -92,42 +83,42 @@ EXAMPLES = r"""
   community.general.xml_info:
     path: /foo/bar.xml
     xpath: /business/beers/beer
-    print_match: true
+    what: paths
   register: hits
 
 - ansible.builtin.debug:
     var: hits.matches
 
-# How to read an attribute value and access it in Ansible
+# How to read attribute values and access them in Ansible
 - name: Read an element's attribute values
   community.general.xml_info:
     path: /foo/bar.xml
     xpath: /business/rating
-    content: attribute
+    what: content_attributes
   register: xmlresp
 
 - name: Show an attribute value
   ansible.builtin.debug:
-    var: xmlresp.matches[0].rating.subjective
+    var: xmlresp.matches[0].attributes.subjective
 
 # How to read text content
 - name: Read an element's text content
   community.general.xml_info:
     path: /foo/bar.xml
     xpath: /business/rating
-    content: text
+    what: content_text
   register: xmlresp
 
 - name: Show text content
   ansible.builtin.debug:
-    var: xmlresp.matches[0].rating
+    var: xmlresp.matches[0].text
 
 # Using an XML string instead of a file
 - name: Count nodes in an XML string
   community.general.xml_info:
     xmlstring: "<config><item>1</item><item>2</item></config>"
     xpath: /config/item
-    count: true
+    what: count
   register: hits
 
 # Using namespaces
@@ -138,7 +129,7 @@ EXAMPLES = r"""
     namespaces:
       x: http://x.test
       y: http://y.test
-    count: true
+    what: count
   register: hits
 """
 
@@ -146,12 +137,16 @@ RETURN = r"""
 count:
   description: The count of xpath matches.
   type: int
-  returned: when parameter O(count) is set
+  returned: when O(what=count)
   sample: 2
 matches:
   description: The xpath matches found.
   type: list
-  returned: when parameter O(print_match) or O(content) is set
+  returned: when O(what=paths), O(what=content_text), or O(what=content_attributes)
+  elements: dict
+  sample:
+    - tag: beer
+      text: Rochefort 10
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -171,19 +166,15 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
 def main():
     argument_spec = get_common_argument_spec(xpath_required=True)
     argument_spec.update(
-        count=dict(type="bool", default=False),
-        print_match=dict(type="bool", default=False),
-        content=dict(type="str", choices=["attribute", "text"]),
+        what=dict(type="str", required=True, choices=["count", "paths", "content_text", "content_attributes"]),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
         required_one_of=[
             ["path", "xmlstring"],
-            ["count", "print_match", "content"],
         ],
         mutually_exclusive=[
-            ["count", "print_match", "content"],
             ["path", "xmlstring"],
         ],
     )
@@ -192,9 +183,7 @@ def main():
     xml_string = module.params["xmlstring"]
     xpath = module.params["xpath"]
     namespaces = module.params["namespaces"]
-    content = module.params["content"]
-    print_match = module.params["print_match"]
-    count = module.params["count"]
+    what = module.params["what"]
     strip_cdata_tags = module.params["strip_cdata_tags"]
     huge_tree = module.params["huge_tree"]
 
@@ -209,24 +198,27 @@ def main():
         resolve_entities=False,
     )
 
-    if print_match:
-        result = get_matches(doc, xpath, namespaces)
-        module.exit_json(**result)
+    if what == "count":
+        hits, _msg = count_matches(doc, xpath, namespaces)
+        module.exit_json(count=hits)
 
-    if count:
-        result = count_matches(doc, xpath, namespaces)
-        module.exit_json(**result)
+    if what == "paths":
+        match_xpaths, _msg = get_matches(doc, xpath, namespaces)
+        module.exit_json(matches=match_xpaths)
 
-    if content == "attribute":
-        elements = collect_element_attr(doc, xpath, namespaces)
-        if elements is None:
+    if what == "content_text":
+        raw = collect_element_text(doc, xpath, namespaces)
+        if raw is None:
             module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
-        module.exit_json(count=len(elements), matches=elements)
-    elif content == "text":
-        elements = collect_element_text(doc, xpath, namespaces)
-        if elements is None:
+        matches = [{"tag": tag, "text": text} for tag, text in raw]
+        module.exit_json(matches=matches)
+
+    if what == "content_attributes":
+        raw = collect_element_attr(doc, xpath, namespaces)
+        if raw is None:
             module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
-        module.exit_json(count=len(elements), matches=elements)
+        matches = [{"tag": tag, "attributes": attribs} for tag, attribs in raw]
+        module.exit_json(matches=matches)
 
 
 if __name__ == "__main__":

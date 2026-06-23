@@ -7,7 +7,7 @@
   xml_info:
     xmlstring: "{{ xml_info_test_xml }}"
     xpath: /business/beers/beer
-    count: true
+    what: count
   register: count_result
 
 - name: Test expected result
@@ -20,20 +20,21 @@
   xml_info:
     xmlstring: "{{ xml_info_test_xml }}"
     xpath: /business/rating
-    content: text
+    what: content_text
   register: text_result
 
 - name: Test expected result
   assert:
     that:
       - text_result is not changed
-      - text_result.matches[0]['rating'] == '10'
+      - text_result.matches[0].tag == 'rating'
+      - text_result.matches[0].text == '10'
 
-- name: Print match from an XML string
+- name: Get paths from an XML string
   xml_info:
     xmlstring: "{{ xml_info_test_xml }}"
     xpath: /business/beers/beer
-    print_match: true
+    what: paths
   register: match_result
 
 - name: Test expected result

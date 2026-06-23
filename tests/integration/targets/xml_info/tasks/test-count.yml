@@ -7,7 +7,7 @@
   xml_info:
     path: /tmp/ansible-xml-info-beers.xml
     xpath: /business/beers/beer
-    count: true
+    what: count
   register: beers
 
 - name: Test expected result

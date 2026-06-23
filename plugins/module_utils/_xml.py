@@ -108,34 +108,33 @@ def is_node(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> bool:
     return False
 
 
-def get_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> dict[str, t.Any]:
-    """Return matched XPath paths."""
+def get_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> tuple[list[str], str]:
+    """Return matched XPath paths as (match_xpaths, message)."""
     match = tree.xpath(xpath, namespaces=namespaces)
     match_xpaths: list[str] = [tree.getpath(m) for m in match]
     match_str = json.dumps(match_xpaths)
     msg = f"selector '{xpath}' match: {match_str}"
-    return {"msg": msg, "matches": match_xpaths}
+    return match_xpaths, msg
 
 
-def count_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> dict[str, t.Any]:
-    """Return the count of nodes matching the xpath."""
+def count_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> tuple[int, str]:
+    """Return the count of nodes matching the xpath as (count, message)."""
     hits = len(tree.xpath(xpath, namespaces=namespaces))
     msg = f"found {hits} nodes"
-    return {"msg": msg, "count": hits}
+    return hits, msg
 
 
-def collect_element_text(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> list[dict[str, t.Any]] | None:
-    """Get text content of matched elements. Returns None if xpath does not match a node."""
+def collect_element_text(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> list[tuple[str, str | None]] | None:
+    """Get text content of matched elements as (tag, text) tuples. Returns None if xpath does not match a node."""
     if not is_node(tree, xpath, namespaces):
         return None
-    return [{element.tag: element.text} for element in tree.xpath(xpath, namespaces=namespaces)]
+    return [(element.tag, element.text) for element in tree.xpath(xpath, namespaces=namespaces)]
 
 
-def collect_element_attr(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> list[dict[str, t.Any]] | None:
-    """Get attributes of matched elements. Returns None if xpath does not match a node."""
+def collect_element_attr(
+    tree: t.Any, xpath: str, namespaces: dict[str, str]
+) -> list[tuple[str, dict[str, str]]] | None:
+    """Get attributes of matched elements as (tag, attributes) tuples. Returns None if xpath does not match a node."""
     if not is_node(tree, xpath, namespaces):
         return None
-    elements: list[dict[str, t.Any]] = []
-    for element in tree.xpath(xpath, namespaces=namespaces):
-        elements.append({element.tag: dict(element.attrib)})
-    return elements
+    return [(element.tag, dict(element.attrib)) for element in tree.xpath(xpath, namespaces=namespaces)]

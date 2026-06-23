@@ -1,0 +1,2 @@
+minor_changes:
+  - xml_info - new module to query XML files or strings using XPath expressions (https://github.com/ansible-collections/community.general/pull/12150).
