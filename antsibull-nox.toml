@@ -7,6 +7,7 @@
 "community.crypto" = "git+https://github.com/ansible-collections/community.crypto.git,main"
 "community.docker" = "git+https://github.com/ansible-collections/community.docker.git,main"
 "community.internal_test_tools" = "git+https://github.com/ansible-collections/community.internal_test_tools.git,main"
+"community.library_inventory_filtering_v1" = "git+https://github.com/ansible-collections/community.library_inventory_filtering.git,stable-1"
 
 [vcs]
 vcs = "git"
