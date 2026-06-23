@@ -19,10 +19,11 @@ def main():
 
     allowed_targets = {"azp/generic/1"}
     for stage in azp["stages"]:
-        if stage["stage"].startswith(("Sanity", "Unit", "Generic", "Summary")):
+        if stage["stage"].startswith(("sanity", "unit", "Summary")):
             continue
         for job in stage["jobs"]:
-            for group in job["parameters"]["groups"]:
+            for param in job["parameters"]["targets"]:
+                group = param["test"].rsplit("-", 1)[-1]
                 allowed_targets.add(f"azp/posix/{group}")
 
     paths = glob.glob("tests/integration/targets/*/aliases")
