@@ -251,7 +251,7 @@ target = [ "azp/posix/vm/" ]
 remote = [
     "alpine/3.23",
     # "fedora/43",
-    "ubuntu/26.04",
+    "ubuntu/22.04",
     "ubuntu/24.04",
 ]
 
