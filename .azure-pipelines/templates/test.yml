@@ -23,14 +23,16 @@ jobs:
           - checkout: self
             fetchDepth: $(fetchDepth)
             path: $(checkoutPath)
-          - bash: .azure-pipelines/scripts/run-tests.sh "$(entryPoint)" "${{ job.test }}" "$(coverageBranches)"
+          - bash: .azure-pipelines/scripts/run-tests.sh "$(prepareEntryPoint)" "${{ job.test }}" "$(coverageBranches)" "$(Agent.TempDirectory)"
+            displayName: Prepare Tests
+          - bash: .azure-pipelines/scripts/run-tests.sh "$(entryPoint)" "${{ job.test }}" "$(coverageBranches)" "$(Agent.TempDirectory)"
             displayName: Run Tests
           - bash: .azure-pipelines/scripts/process-results.sh
             condition: succeededOrFailed()
             displayName: Process Results
-          - bash: .azure-pipelines/scripts/aggregate-coverage.sh "$(Agent.TempDirectory)"
-            condition: eq(variables.haveCoverageData, 'true')
-            displayName: Aggregate Coverage Data
+          # - bash: .azure-pipelines/scripts/aggregate-coverage.sh "$(Agent.TempDirectory)"
+          #   condition: eq(variables.haveCoverageData, 'true')
+          #   displayName: Aggregate Coverage Data
           - task: PublishTestResults@2
             condition: eq(variables.haveTestResults, 'true')
             inputs:

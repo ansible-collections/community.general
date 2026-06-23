@@ -17,6 +17,7 @@ IN_CI = os.environ.get("CI") == "true"
 
 try:
     import antsibull_nox  # type: ignore[import-not-found]
+    from antsibull_nox.cli import run as run_antsibull_nox  # type: ignore[import-not-found]
 except ImportError:
     print("You need to install antsibull-nox in the same Python environment as nox.")
     sys.exit(1)
@@ -51,6 +52,24 @@ def ansible_output(session: nox.Session) -> None:
     if IN_CI:
         args.append("--check")
     session.run("antsibull-docs", "ansible-output", *args, *session.posargs)
+
+
+@nox.session(name="update-azp-config", python=False)
+def update_azp_config(session: nox.Session) -> None:
+    command = [
+        "antsibull-nox",
+        "update-azp-config",
+        "--min-ansible-core",
+        "2.19",
+        "--extra-session",
+        '{"group": "Sanity", "title": "Extra sanity tests", "session": "extra-sanity-tests"}',
+    ]
+    if antsibull_nox.IN_CI:
+        command.extend(["--show-diff", "--fail-on-change"])
+    session.debug(" ".join(command))
+    result = run_antsibull_nox(command)
+    if result != 0:
+        session.error(f"Execution failed with status code {result}")
 
 
 # Allow to run the noxfile with `python noxfile.py`, `pipx run noxfile.py`, or similar.
