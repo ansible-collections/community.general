@@ -75,7 +75,8 @@ EXAMPLES = r"""
     what: count
   register: hits
 
-- ansible.builtin.debug:
+- name: Show count
+  ansible.builtin.debug:
     var: hits.count
 
 # Retrieve and display the matching XPath paths
@@ -86,7 +87,8 @@ EXAMPLES = r"""
     what: paths
   register: hits
 
-- ansible.builtin.debug:
+- name: Show matching paths
+  ansible.builtin.debug:
     var: hits.matches
 
 # How to read attribute values and access them in Ansible
@@ -137,17 +139,35 @@ RETURN = r"""
 count:
   description: The count of xpath matches.
   type: int
-  returned: when O(what=count)
+  returned: always
   sample: 2
 matches:
-  description: The xpath matches found.
+  description:
+    - The xpath matches found.
+    - When O(what=paths), each element is a string with the XPath path to the matched node.
+    - When O(what=content_text) or O(what=content_attributes), each element is a dictionary
+      with the fields documented below.
   type: list
-  returned: when O(what=paths), O(what=content_text), or O(what=content_attributes)
-  elements: dict
+  returned: when O(what) is V(paths), V(content_text), or V(content_attributes)
   sample:
     - tag: beer
       text: Rochefort 10
+  contains:
+    tag:
+      description: The tag name of the matched element.
+      type: str
+      returned: when O(what=content_text) or O(what=content_attributes)
+    text:
+      description: The text content of the matched element.
+      type: str
+      returned: when O(what=content_text)
+    attributes:
+      description: The attributes of the matched element as key-value pairs.
+      type: dict
+      returned: when O(what=content_attributes)
 """
+
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -163,7 +183,7 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
 )
 
 
-def main():
+def main() -> None:
     argument_spec = get_common_argument_spec(xpath_required=True)
     argument_spec.update(
         what=dict(type="str", required=True, choices=["count", "paths", "content_text", "content_attributes"]),
@@ -183,7 +203,7 @@ def main():
     xml_string = module.params["xmlstring"]
     xpath = module.params["xpath"]
     namespaces = module.params["namespaces"]
-    what = module.params["what"]
+    what: t.Literal["count", "paths", "content_text", "content_attributes"] = module.params["what"]
     strip_cdata_tags = module.params["strip_cdata_tags"]
     huge_tree = module.params["huge_tree"]
 
@@ -204,21 +224,21 @@ def main():
 
     if what == "paths":
         match_xpaths, _msg = get_matches(doc, xpath, namespaces)
-        module.exit_json(matches=match_xpaths)
+        module.exit_json(count=len(match_xpaths), matches=match_xpaths)
 
     if what == "content_text":
         raw = collect_element_text(doc, xpath, namespaces)
         if raw is None:
             module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
         matches = [{"tag": tag, "text": text} for tag, text in raw]
-        module.exit_json(matches=matches)
+        module.exit_json(count=len(matches), matches=matches)
 
     if what == "content_attributes":
         raw = collect_element_attr(doc, xpath, namespaces)
         if raw is None:
             module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
         matches = [{"tag": tag, "attributes": attribs} for tag, attribs in raw]
-        module.exit_json(matches=matches)
+        module.exit_json(count=len(matches), matches=matches)
 
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@
   assert:
     that:
       - paths_result is not changed
+      - paths_result.count == 3
       - paths_result.matches | length == 3
       - "'/business/beers/beer[1]' in paths_result.matches"
       - "'/business/beers/beer[2]' in paths_result.matches"
@@ -30,4 +31,5 @@
   assert:
     that:
       - paths_empty is not changed
+      - paths_empty.count == 0
       - paths_empty.matches | length == 0

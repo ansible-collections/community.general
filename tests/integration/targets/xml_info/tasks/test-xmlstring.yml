@@ -27,6 +27,7 @@
   assert:
     that:
       - text_result is not changed
+      - text_result.count == 1
       - text_result.matches[0].tag == 'rating'
       - text_result.matches[0].text == '10'
 
@@ -41,4 +42,5 @@
   assert:
     that:
       - match_result is not changed
+      - match_result.count == 3
       - match_result.matches | length == 3

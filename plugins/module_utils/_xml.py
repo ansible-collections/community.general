@@ -29,7 +29,7 @@ with deps.declare("lxml"):
     from lxml import etree  # type: ignore[no-redef]
 
 
-def get_common_argument_spec(*, xpath_required: bool = False) -> dict[str, t.Any]:
+def get_common_argument_spec(*, xpath_required: bool = False) -> dict[str, dict[str, t.Any]]:
     """Return the argument spec shared by xml and xml_info modules."""
     return dict(
         path=dict(type="path", aliases=["dest", "file"]),
@@ -72,21 +72,26 @@ def parse_xml_doc(
     try:
         if xml_string:
             infile = BytesIO(to_bytes(xml_string, errors="surrogate_or_strict"))
-        elif xml_file and os.path.isfile(xml_file):
+        elif xml_file:
+            if not os.path.isfile(xml_file):
+                module.fail_json(msg=f"The target XML source '{xml_file}' does not exist.")
+            if not os.access(xml_file, os.R_OK):
+                module.fail_json(msg=f"The target XML source '{xml_file}' is not readable.")
             infile = open(xml_file, "rb")  # noqa: SIM115
         else:
             module.fail_json(msg=f"The target XML source '{xml_file}' does not exist.")
 
-        try:
-            parser = etree.XMLParser(
-                remove_blank_text=remove_blank_text,
-                strip_cdata=strip_cdata_tags,
-                huge_tree=huge_tree,
-                resolve_entities=resolve_entities,
-            )
-            doc = etree.parse(infile, parser)
-        except etree.XMLSyntaxError as e:
-            module.fail_json(msg=f"Error while parsing document: {xml_file or 'xml_string'} ({e})")
+        parser = etree.XMLParser(
+            remove_blank_text=remove_blank_text,
+            strip_cdata=strip_cdata_tags,
+            huge_tree=huge_tree,
+            resolve_entities=resolve_entities,
+        )
+        doc = etree.parse(infile, parser)
+    except etree.XMLSyntaxError as e:
+        module.fail_json(msg=f"Error while parsing document: {xml_file or 'xml_string'} ({e})")
+    except OSError as e:
+        module.fail_json(msg=f"Error reading XML source: {xml_file or 'xml_string'} ({e})")
     finally:
         if infile:
             infile.close()
