@@ -221,24 +221,21 @@ def main() -> None:
     if what == "count":
         hits, _msg = count_matches(doc, xpath, namespaces)
         module.exit_json(count=hits)
-
-    if what == "paths":
+    elif what == "paths":
         match_xpaths, _msg = get_matches(doc, xpath, namespaces)
         module.exit_json(count=len(match_xpaths), matches=match_xpaths)
-
-    if what == "content_text":
-        raw = collect_element_text(doc, xpath, namespaces)
-        if raw is None:
+    elif what == "content_text":
+        raw_text = collect_element_text(doc, xpath, namespaces)
+        if raw_text is None:
             module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
-        matches = [{"tag": tag, "text": text} for tag, text in raw]
-        module.exit_json(count=len(matches), matches=matches)
-
-    if what == "content_attributes":
-        raw = collect_element_attr(doc, xpath, namespaces)
-        if raw is None:
+        text_matches = [{"tag": tag, "text": text} for tag, text in raw_text]
+        module.exit_json(count=len(text_matches), matches=text_matches)
+    elif what == "content_attributes":
+        raw_attr = collect_element_attr(doc, xpath, namespaces)
+        if raw_attr is None:
             module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
-        matches = [{"tag": tag, "attributes": attribs} for tag, attribs in raw]
-        module.exit_json(count=len(matches), matches=matches)
+        attr_matches = [{"tag": tag, "attributes": attribs} for tag, attribs in raw_attr]
+        module.exit_json(count=len(attr_matches), matches=attr_matches)
 
 
 if __name__ == "__main__":
