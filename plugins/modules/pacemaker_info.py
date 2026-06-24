@@ -95,7 +95,7 @@ class PacemakerInfo(ModuleHelper):
         with self.runner(
             "cli_action config output_format", output_process=self._process_command_output(cli_action)
         ) as ctx:
-            return ctx.run(cli_action=cli_action, output_format="json")
+            return ctx.run(cli_action=cli_action)
 
     def __run__(self):
         for key, cli_action in sorted(self.info_vars.items()):
