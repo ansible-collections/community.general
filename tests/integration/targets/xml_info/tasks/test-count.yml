@@ -15,3 +15,17 @@
     that:
       - beers is not changed
       - beers.count == 3
+
+- name: Count beer elements with xpath count mode
+  xml_info:
+    path: /tmp/ansible-xml-info-beers.xml
+    xpath: /business/beers/beer
+    what: count
+    count_mode: xpath
+  register: beers_xpath
+
+- name: Test expected result for xpath count mode
+  assert:
+    that:
+      - beers_xpath is not changed
+      - beers_xpath.count == 3
