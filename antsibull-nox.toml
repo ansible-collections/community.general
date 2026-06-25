@@ -287,8 +287,8 @@ ansible_core = "devel"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 remote = [
     "macos/26.3",
-    "rhel/10.1",
-    "rhel/9.7",
+    "rhel/10.2",
+    "rhel/9.8",
     # TODO: enable this ASAP!
     # "freebsd/15.0",
     # TODO: enable this ASAP!
