@@ -5,24 +5,24 @@
 ---
 anchors:
   help_install: &help_install
-    command: ["/testbin/php", "/testbin/composer", "--working-dir", "/var/www/foo", "help", "install", "--no-interaction", "--format=json"]
+    command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "help", "install", "--no-interaction", "--format=json"]
     rc: 0
     out: |
       {"definition": {"options": ["a", "b", "c"]}}
     err: ''
   help_create_project: &help_create_project
-    command: ["/testbin/php", "/testbin/composer", "--working-dir", "/var/www/foo", "help", "create-project", "--no-interaction", "--format=json"]
+    command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "help", "create-project", "--no-interaction", "--format=json"]
     rc: 0
     out: |
       {"definition": {"options": ["a", "b", "c"]}}
     err: ''
   run_create_project: &run_create_project
-    command: ["/testbin/php", "/testbin/composer", "--working-dir", "/var/www/foo", "create-project", "vendor/package"]
+    command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "create-project", "vendor/package"]
     rc: 0
     out: ''
     err: ''
   help_config: &help_config
-    command: ["/testbin/php", "/testbin/composer", "--working-dir", "/var/www/foo", "help", "config", "--no-interaction", "--format=json"]
+    command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "help", "config", "--no-interaction", "--format=json"]
     rc: 0
     out: |
       {"definition": {"options": ["a", "b", "c"]}}
@@ -38,7 +38,7 @@ test_cases:
     mocks:
       run_command:
         - *help_install
-        - command: ["/testbin/php", "/testbin/composer", "--working-dir", "/var/www/foo", "install"]
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "install"]
           rc: 0
           out: ''
           err: ''
@@ -99,7 +99,7 @@ test_cases:
         return_values: ["hash1", "hash2", "hash1", "hash2"]
       run_command:
         - *help_config
-        - command: ["/testbin/php", "/testbin/composer", "--working-dir", "/var/www/foo", "config", "setting-key", "setting-value"]
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "config", "setting-key", "setting-value"]
           rc: 0
           out: ''
           err: ''
@@ -118,7 +118,7 @@ test_cases:
         return_values: ["hash1", "hash2", "hash1_changed", "hash2"]
       run_command:
         - *help_config
-        - command: ["/testbin/php", "/testbin/composer", "--working-dir", "/var/www/foo", "config", "setting-key", "setting-value"]
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "config", "setting-key", "setting-value"]
           rc: 0
           out: ''
           err: ''

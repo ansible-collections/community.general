@@ -189,7 +189,7 @@ def composer_command(module, command, arguments=None, options=None):
         working_dir_option = []
     else:
         global_arg = []
-        working_dir_option = ["--working-dir", module.params["working_dir"]]
+        working_dir_option = [f"--working-dir={module.params['working_dir']}"]
 
     if module.params["executable"] is None:
         php_path = module.get_bin_path("php", True, ["/usr/local/bin"])
