@@ -1,0 +1,2 @@
+bugfixes:
+  - "composer - restore compatibility with older compose versions when using ``working_dir`` (https://github.com/ansible-collections/community.general/issues/12293, https://github.com/ansible-collections/community.general/pull/12339)."
