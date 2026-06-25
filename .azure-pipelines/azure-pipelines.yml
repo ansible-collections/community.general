@@ -363,18 +363,18 @@ stages:
               test: ansible-test-integration-devel-macos-26.3-azp-posix-2
             - name: macOS 26.3 + group 3
               test: ansible-test-integration-devel-macos-26.3-azp-posix-3
-            - name: RHEL 10.1 + group 1
-              test: ansible-test-integration-devel-rhel-10.1-azp-posix-1
-            - name: RHEL 10.1 + group 2
-              test: ansible-test-integration-devel-rhel-10.1-azp-posix-2
-            - name: RHEL 10.1 + group 3
-              test: ansible-test-integration-devel-rhel-10.1-azp-posix-3
-            - name: RHEL 9.7 + group 1
-              test: ansible-test-integration-devel-rhel-9.7-azp-posix-1
-            - name: RHEL 9.7 + group 2
-              test: ansible-test-integration-devel-rhel-9.7-azp-posix-2
-            - name: RHEL 9.7 + group 3
-              test: ansible-test-integration-devel-rhel-9.7-azp-posix-3
+            - name: RHEL 10.2 + group 1
+              test: ansible-test-integration-devel-rhel-10.2-azp-posix-1
+            - name: RHEL 10.2 + group 2
+              test: ansible-test-integration-devel-rhel-10.2-azp-posix-2
+            - name: RHEL 10.2 + group 3
+              test: ansible-test-integration-devel-rhel-10.2-azp-posix-3
+            - name: RHEL 9.8 + group 1
+              test: ansible-test-integration-devel-rhel-9.8-azp-posix-1
+            - name: RHEL 9.8 + group 2
+              test: ansible-test-integration-devel-rhel-9.8-azp-posix-2
+            - name: RHEL 9.8 + group 3
+              test: ansible-test-integration-devel-rhel-9.8-azp-posix-3
             - name: Ubuntu 24.04 + extra VMs
               test: ansible-test-integration-devel-ubuntu-24.04-azp-posix-vm
             - name: Ubuntu 26.04 + extra VMs

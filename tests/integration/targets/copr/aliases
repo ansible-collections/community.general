@@ -8,3 +8,4 @@ skip/macos
 skip/freebsd
 skip/rhel10.0  # FIXME
 skip/rhel10.1  # FIXME
+skip/rhel10.2  # FIXME
