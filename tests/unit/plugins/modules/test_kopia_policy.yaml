@@ -1,0 +1,359 @@
+# Copyright (c) 2026, Dexter Le <dextersydney2001@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  list_ok: &list-ok
+    command: [/testbin/kopia, policy, list, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: "user@host:/home/user"
+    err: ''
+  list_empty: &list-empty
+    command: [/testbin/kopia, policy, list, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
+
+test_cases:
+  - id: set_retention_policy
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      retention:
+        keep_latest: "10"
+        keep_daily: "7"
+        keep_weekly: "4"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-empty
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --keep-latest
+            - "10"
+            - --keep-daily
+            - "7"
+            - --keep-weekly
+            - "4"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-ok
+
+  - id: set_global_policy_with_compression
+    input:
+      state: set
+      global_policy: true
+      config: /etc/kopia/root.config
+      compression: zstd
+      files:
+        add_ignore:
+          - "*.tmp"
+          - ".cache"
+        ignore_cache_dirs: "true"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-empty
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - --global
+            - --add-ignore
+            - "*.tmp"
+            - --add-ignore
+            - .cache
+            - --ignore-cache-dirs
+            - "true"
+            - --compression
+            - zstd
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-ok
+
+  - id: set_scheduling_policy
+    input:
+      state: set
+      target: "user@hostname:/var/www"
+      config: /etc/kopia/root.config
+      scheduling:
+        times:
+          - "02:00"
+          - "14:00"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-empty
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/var/www
+            - --snapshot-time
+            - "02:00,14:00"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-ok
+
+  - id: show_policy
+    input:
+      state: shown
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *list-ok
+        - command:
+            - /testbin/kopia
+            - policy
+            - show
+            - user@hostname:/home/user
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "Policy for user@hostname:/home/user"
+          err: ''
+        - *list-ok
+
+  - id: list_policies
+    input:
+      state: listed
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *list-ok
+        - command:
+            - /testbin/kopia
+            - policy
+            - list
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "user@host:/home/user"
+          err: ''
+        - *list-ok
+
+  - id: delete_policy
+    input:
+      state: deleted
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-ok
+        - command:
+            - /testbin/kopia
+            - policy
+            - delete
+            - user@hostname:/home/user
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-empty
+
+  - id: delete_policy_no_such_policy
+    input:
+      state: deleted
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *list-empty
+        - command:
+            - /testbin/kopia
+            - policy
+            - delete
+            - user@hostname:/home/user
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'no such policy'
+        - *list-empty
+
+  - id: set_scheduling_interval
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      scheduling:
+        interval: "1h"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-empty
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --snapshot-interval
+            - "1h"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-ok
+
+  - id: set_scheduling_manual
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      scheduling:
+        manual: true
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-empty
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --manual
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-ok
+
+  - id: set_policy_files_remove_ignore
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      files:
+        remove_ignore:
+          - "*.tmp"
+        max_file_size: "100MB"
+        one_file_system: "true"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-empty
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --remove-ignore
+            - "*.tmp"
+            - --max-file-size
+            - 100MB
+            - --one-file-system
+            - "true"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-ok
+
+  - id: set_retention_policy_inherit
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      retention:
+        keep_daily: inherit
+        keep_weekly: inherit
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-empty
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --keep-daily
+            - inherit
+            - --keep-weekly
+            - inherit
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-ok
+
+  - id: delete_global_policy
+    input:
+      state: deleted
+      global_policy: true
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *list-ok
+        - command:
+            - /testbin/kopia
+            - policy
+            - delete
+            - --global
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *list-empty
+
+  - id: show_global_policy
+    input:
+      state: shown
+      global_policy: true
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *list-ok
+        - command:
+            - /testbin/kopia
+            - policy
+            - show
+            - --global
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "Global policy settings"
+          err: ''
+        - *list-ok
