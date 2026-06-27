@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# fmt: skip
 
 # SPDX-FileCopyrightText: (c) 2026, Samaneh Yousefnezhad <s-yousefnezhad@um.ac.ir>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
