@@ -9,9 +9,6 @@ import sys
 
 import pytest
 
-from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
-from ansible_collections.community.general.plugins.modules import nfs_exports_info
-
 
 @pytest.fixture
 def fake_exports_content() -> str:
@@ -37,6 +34,9 @@ def calculate_expected_digests(content_string: str) -> dict:
 
 
 def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
+    from ansible_collections.community.general.plugins.modules import nfs_exports_info
+    from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
+
     mock_module = mock.MagicMock()
     mock_module.params = {"output_format": "ips_per_share", "file_path": "/etc/exports"}
     mock_module.file_exists.return_value = True
@@ -64,6 +64,9 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
 
 
 def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
+    from ansible_collections.community.general.plugins.modules import nfs_exports_info
+    from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
+
     mock_module = mock.MagicMock()
     mock_module.params = {"output_format": "shares_per_ip", "file_path": "/etc/exports"}
     mock_module.file_exists.return_value = True
