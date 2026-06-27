@@ -6,24 +6,22 @@ from __future__ import annotations
 
 import hashlib
 import sys
-
 import pytest
 
 
 @pytest.fixture
 def fake_exports_content() -> str:
-    return """
-# Sample exports
-/srv/nfs1 192.168.1.10(rw,sync) 192.168.1.20(ro,sync)
-/srv/nfs2 192.168.1.30(rw,no_root_squash)
-"""
+    return (
+        "\n# Sample exports\n"
+        "/srv/nfs1 192.168.1.10(rw,sync) 192.168.1.20(ro,sync)\n"
+        "/srv/nfs2 192.168.1.30(rw,no_root_squash)\n"
+    )
 
 
 def calculate_expected_digests(content_string: str) -> dict:
     content_bytes = content_string.encode("utf-8")
     digests = {}
-    hash_algorithms = ["sha256", "sha1", "md5"]
-    for algo in hash_algorithms:
+    for algo in ["sha256", "sha1", "md5"]:
         try:
             hasher = hashlib.new(algo)
             hasher.update(content_bytes)
@@ -47,7 +45,7 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
         result = nfs_exports_info.get_exports(mock_module)
 
-    expected_exports_info = {
+    expected_info = {
         "/srv/nfs1": [
             {"ip": "192.168.1.10", "options": ["rw", "sync"]},
             {"ip": "192.168.1.20", "options": ["ro", "sync"]},
@@ -57,10 +55,9 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
         ],
     }
 
-    expected_file_digests = calculate_expected_digests(fake_exports_content)
-
-    assert result["exports_info"] == expected_exports_info
-    assert result["file_digest"] == expected_file_digests
+    expected_digests = calculate_expected_digests(fake_exports_content)
+    assert result["exports_info"] == expected_info
+    assert result["file_digest"] == expected_digests
 
 
 def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
@@ -77,7 +74,7 @@ def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
         result = nfs_exports_info.get_exports(mock_module)
 
-    expected_exports_info = {
+    expected_info = {
         "192.168.1.10": [{"folder": "/srv/nfs1", "options": ["rw", "sync"]}],
         "192.168.1.20": [{"folder": "/srv/nfs1", "options": ["ro", "sync"]}],
         "192.168.1.30": [
@@ -85,7 +82,6 @@ def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
         ],
     }
 
-    expected_file_digests = calculate_expected_digests(fake_exports_content)
-
-    assert result["exports_info"] == expected_exports_info
-    assert result["file_digest"] == expected_file_digests
+    expected_digests = calculate_expected_digests(fake_exports_content)
+    assert result["exports_info"] == expected_info
+    assert result["file_digest"] == expected_digests
