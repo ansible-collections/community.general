@@ -17,7 +17,7 @@ description:
     mapping folders to their corresponding IP addresses and access options.
 
 author:
-  - Samaneh Yousefnezhad (@yousefenzhad)
+  - Samaneh Yousefnezhad (@yousefnezhad)
 version_added: "13.2.0"
 
 extends_documentation_fragment:
@@ -78,9 +78,9 @@ def get_exports(module: AnsibleModule) -> dict:
     output_format = module.params["output_format"]
     file_path = module.params["file_path"]
 
-    shares_per_ip: dict[str, list[dict[str, str | list[str]]]] = {}
-    ips_per_share: dict[str, list[dict[str, str | list[str]]]] = {}
-    file_digest: dict[str, str] = {}
+    shares_per_ip = {}
+    ips_per_share = {}
+    file_digest = {}
 
     try:
         with open(file_path, "r") as f:
