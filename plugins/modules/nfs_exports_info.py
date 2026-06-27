@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-# SPDX-FileCopyrightText: (c) 2026, Samaneh Yousefnezhad <s-yousefenzhad@um.ac.ir>
+# SPDX-FileCopyrightText: (c) 2026, Samaneh Yousefnezhad <s-yousefnezhad@um.ac.ir>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
 from __future__ import annotations
 
 DOCUMENTATION = r"""
@@ -73,9 +74,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-def get_exports(
-    module: AnsibleModule,
-) -> dict:
+def get_exports(module: AnsibleModule) -> dict:
     output_format = module.params["output_format"]
     file_path = module.params["file_path"]
 
