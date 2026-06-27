@@ -987,7 +987,7 @@ files:
   $modules/nexmo.py:
     maintainers: sivel
   $modules/nfs_exports_info.py:
-    maintainers: yousefenzhad
+    maintainers: yousefnezhad
   $modules/nginx_status_info.py:
     maintainers: resmo
   $modules/nictagadm.py:
