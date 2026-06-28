@@ -77,12 +77,12 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def get_exports(module: AnsibleModule) -> dict:
-    output_format = module.params["output_format"]
     file_path = module.params["file_path"]
+    output_format = module.params["output_format"]
 
-    shares_per_ip = {}
-    ips_per_share = {}
     file_digest = {}
+    ips_per_share = {}
+    shares_per_ip = {}
 
     try:
         with open(file_path, "r") as f:
