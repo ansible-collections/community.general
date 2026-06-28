@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# SPDX-FileCopyrightText: (c) 2026, Samaneh Yousefnezhad <s-yousefnezhad@um.ac.ir>
+# SPDX-FileCopyrightText: (c) 2026, Samaneh Yousefnezhad <s-yousefenzhad@um.ac.ir>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -37,7 +37,9 @@ options:
       - If set to V(shares_per_ip), output maps IPs to shared folders and options.
     required: true
     type: str
-    choices: ['ips_per_share', 'shares_per_ip']
+    choices:
+      - ips_per_share
+      - shares_per_ip
 """
 
 EXAMPLES = r"""
