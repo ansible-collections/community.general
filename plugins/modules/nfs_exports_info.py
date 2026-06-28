@@ -25,6 +25,11 @@ extends_documentation_fragment:
   - community.general._attributes.info_module
 
 options:
+  file_path:
+    description:
+      - The path to the NFS exports configurations file.
+    type: path
+    default: /etc/exports
   output_format:
     description:
       - The format of the returned mapping.
@@ -33,11 +38,6 @@ options:
     required: true
     type: str
     choices: ['ips_per_share', 'shares_per_ip']
-  file_path:
-    description:
-      - The path to the NFS exports configurations file.
-    type: path
-    default: /etc/exports
 """
 
 EXAMPLES = r"""
@@ -132,14 +132,14 @@ def get_exports(module: AnsibleModule) -> dict:
 
 def main() -> None:
     module_args = {
+        "file_path": {
+            "type": "path",
+            "default": "/etc/exports",
+        },
         "output_format": {
             "type": "str",
             "required": True,
             "choices": ["ips_per_share", "shares_per_ip"],
-        },
-        "file_path": {
-            "type": "path",
-            "default": "/etc/exports",
         },
     }
 
