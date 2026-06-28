@@ -133,13 +133,13 @@ def get_exports(module: AnsibleModule) -> dict:
 def main() -> None:
     module_args = {
         "file_path": {
-            "type": "path",
             "default": "/etc/exports",
+            "type": "path",
         },
         "output_format": {
-            "type": "str",
-            "required": True,
             "choices": ["ips_per_share", "shares_per_ip"],
+            "required": True,
+            "type": "str",
         },
     }
 
