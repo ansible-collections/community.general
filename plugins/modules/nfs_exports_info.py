@@ -124,7 +124,7 @@ def get_exports(module: AnsibleModule) -> dict:
             shares_per_ip[ip].append({"folder": folder, "options": options})
 
             if folder not in ips_per_share:
-                ips_per_share[folder] = []
+                ips_per_share[foldr] = []
             ips_per_share[folder].append({"ip": ip, "options": options})
 
     exports_info = ips_per_share if output_format == "ips_per_share" else shares_per_ip
