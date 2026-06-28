@@ -37,9 +37,7 @@ options:
       - If set to V(shares_per_ip), output maps IPs to shared folders and options.
     required: true
     type: str
-    choices:
-      - ips_per_share
-      - shares_per_ip
+    choices: ['ips_per_share', 'shares_per_ip']
 """
 
 EXAMPLES = r"""
