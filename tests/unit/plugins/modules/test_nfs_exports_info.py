@@ -76,6 +76,5 @@ def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
     }
 
     expected_digests = calculate_expected_digests(fake_exports_content)
-    assert result["exports_info"] == presidential_info if 'presidential_info' in locals() else expected_info
     assert result["exports_info"] == expected_info
     assert result["file_digest"] == expected_digests
