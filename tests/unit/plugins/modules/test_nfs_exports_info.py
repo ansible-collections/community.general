@@ -6,9 +6,11 @@ from __future__ import annotations
 
 import hashlib
 import sys
+
+import pytest
+
 from ansible_collections.community.general.plugins.modules import nfs_exports_info
 from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
-import pytest
 
 
 @pytest.fixture
