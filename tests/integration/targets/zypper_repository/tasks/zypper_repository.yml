@@ -1,0 +1,303 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- set_fact:
+    os_repository_name_videolan: Leap_{{ ansible_facts.distribution_version }}
+    os_repository_name: "openSUSE_Leap_{{ ansible_facts.distribution_version }}"
+    os_release_ver: "{{ ansible_facts.distribution.replace(' ', '_') }}"
+  when: ansible_facts.distribution == 'openSUSE Leap'
+
+- set_fact:
+    os_repository_name_videolan: Tumbleweed
+    os_repository_name: openSUSE_Tumbleweed
+    os_release_ver: "{{ ansible_facts.distribution.replace(' ', '_') }}"
+  when: ansible_facts.distribution == 'openSUSE Tumbleweed'
+
+- name: Delete test repo
+  community.general.zypper_repository:
+    name: test
+    state: absent
+  register: zypper_result
+
+- name: verify no change on test repo deletion
+  assert:
+    that:
+      - "not zypper_result.changed"
+
+- name: Add test repo
+  community.general.zypper_repository:
+    name: test
+    state: present
+    repo: http://dl.google.com/linux/chrome/rpm/stable/x86_64
+  register: zypper_result
+
+- name: verify repo addition
+  assert:
+    that:
+      - "zypper_result.changed"
+
+- name: Add same repo again
+  community.general.zypper_repository:
+    name: test
+    state: present
+    repo: http://dl.google.com/linux/chrome/rpm/stable/x86_64
+  register: zypper_result
+
+- name: verify no change on second install
+  assert:
+    that:
+      - "not zypper_result.changed"
+
+- name: Change repo URL
+  community.general.zypper_repository:
+    name: test
+    state: present
+    repo: http://download.videolan.org/pub/vlc/SuSE/{{ os_repository_name_videolan }}/
+  register: zypper_result
+
+- name: Verify change on URL only change
+  assert:
+    that:
+      - "zypper_result.changed"
+
+- name: use refresh option
+  community.general.zypper_repository:
+    name: testrefresh
+    refresh: false
+    state: present
+    repo: http://download.videolan.org/pub/vlc/SuSE/{{ os_repository_name_videolan }}/
+
+- name: check refreshoption
+  command: zypper -x lr testrefresh
+  register: zypper_result
+
+- name: verify autorefresh option set properly
+  assert:
+    that:
+      - '"autorefresh=\"0\"" in zypper_result.stdout'
+
+- name: set repo priority
+  community.general.zypper_repository:
+    name: testprio
+    priority: 55
+    state: present
+    repo: http://download.videolan.org/pub/vlc/SuSE/{{ os_repository_name_videolan }}/
+
+- name: check refreshoption
+  command: zypper -x lr testprio
+  register: zypper_result
+
+- name: verify priority option set properly
+  assert:
+    that:
+      - '"priority=\"55\"" in zypper_result.stdout'
+
+- name: add two repos with same url
+  community.general.zypper_repository:
+    name: "{{item}}"
+    state: present
+    repo: http://dl.google.com/linux/chrome/rpm/stable/x86_64
+  with_items:
+    - chrome1
+    - chrome2
+
+- name: check repo is updated by url
+  command: zypper lr chrome1
+  register: zypper_result1
+  ignore_errors: true
+
+- name: check repo is updated by url
+  command: zypper lr chrome2
+  register: zypper_result2
+
+- name: ensure same url cause update of existing repo even if name differ
+  assert:
+    that:
+      - "zypper_result1.rc != 0"
+      - "'not found' in zypper_result1.stderr"
+      - "zypper_result2.rc == 0"
+      - "'http://dl.google.com/linux/chrome/rpm/stable/x86_64' in zypper_result2.stdout"
+
+- name: add two repos with same name
+  community.general.zypper_repository:
+    name: samename
+    state: present
+    repo: "{{ item }}"
+  with_items:
+    - http://download.opensuse.org/repositories/science/{{ os_repository_name }}/
+    - http://download.opensuse.org/repositories/devel:/languages:/ruby/{{ os_repository_name }}/
+
+- name: check repo is updated by name
+  command: zypper lr samename
+  register: zypper_result
+
+- name: ensure url get updated on repo with same name
+  assert:
+    that:
+      - "'/science/' not in zypper_result.stdout"
+      - "'/devel:/languages:/ruby/' in zypper_result.stdout"
+
+- name: remove last added repos (by URL to test that)
+  community.general.zypper_repository:
+    repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/{{ os_repository_name }}/
+    state: absent
+
+# FIXME: this currently fails with `Repository 'Apache_PHP_Modules' is invalid.`
+# - name: "Test adding a repo with custom GPG key"
+#   community.general.zypper_repository:
+#     name: "Apache_PHP_Modules"
+#     repo: "http://download.opensuse.org/repositories/server:/php:/applications/openSUSE_Tumbleweed/"
+#     priority: 100
+#     auto_import_keys: true
+#     state: "present"
+
+- when: ansible_facts.distribution == 'openSUSE Leap'
+  block:
+    - name: add a repo by releasever
+      community.general.zypper_repository:
+        name: releaseverrepo
+        repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+        state: present
+      register: add_repo
+
+    - name: add a repo by releasever again
+      community.general.zypper_repository:
+        name: releaseverrepo
+        repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_$releasever/
+        state: present
+      register: add_repo_again
+
+    - name: no update in case of $releasever usage in url
+      assert:
+        that:
+          - add_repo is changed
+          - add_repo_again is not changed
+
+    - name: remove added repo
+      community.general.zypper_repository:
+        repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/{{ os_repository_name }}/
+        state: absent
+      register: remove_repo
+
+    - name: verify repo was removed
+      assert:
+        that:
+          - remove_repo is changed
+
+    - name: get list of files in /etc/zypp/repos.d/
+      command: ls /etc/zypp/repos.d/
+      changed_when: false
+      register: releaseverrepo_etc_zypp_reposd
+
+    - name: verify removal of file releaseverrepo.repo in /etc/zypp/repos.d/
+      assert:
+        that:
+          - "'releaseverrepo' not in releaseverrepo_etc_zypp_reposd.stdout"
+
+- name: add a repo by basearch
+  community.general.zypper_repository:
+    name: basearchrepo
+    repo: https://packagecloud.io/netdata/netdata/opensuse/13.2/$basearch
+    state: present
+  register: add_repo
+
+- name: add a repo by basearch again
+  community.general.zypper_repository:
+    name: basearchrepo
+    repo: https://packagecloud.io/netdata/netdata/opensuse/13.2/$basearch
+    state: present
+  register: add_repo_again
+
+- name: no update in case of $basearch usage in url
+  assert:
+    that:
+      - add_repo is changed
+      - add_repo_again is not changed
+
+- name: remove added repo
+  community.general.zypper_repository:
+    repo: https://packagecloud.io/netdata/netdata/opensuse/13.2/x86_64
+    state: absent
+  register: remove_repo
+
+- name: verify repo was removed
+  assert:
+    that:
+      - remove_repo is changed
+
+# For now, the URL does not work for 15.4
+# FIXME: Try to get this working with newer versions
+#        (Maybe 'Uyuni' needs to be replaced with something else?)
+- when: ansible_facts.distribution_version is version('15.4', '<')
+  block:
+    - name: add new repository via url to .repo file
+      community.general.zypper_repository:
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/{{ os_repository_name }}/systemsmanagement:Uyuni:Stable.repo
+        state: present
+      register: added_by_repo_file
+
+    - name: get repository details from zypper
+      command: zypper lr systemsmanagement_Uyuni_Stable
+      register: get_repository_details_from_zypper
+
+    - name: verify adding via .repo file was successful
+      assert:
+        that:
+          - "added_by_repo_file is changed"
+          - "get_repository_details_from_zypper.rc == 0"
+          - "'/systemsmanagement:/Uyuni:/Stable/' in get_repository_details_from_zypper.stdout"
+
+    - name: add same repository via url to .repo file again to verify idempotency
+      community.general.zypper_repository:
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/{{ os_repository_name }}/systemsmanagement:Uyuni:Stable.repo
+        state: present
+      register: added_again_by_repo_file
+
+    - name: verify nothing was changed adding a repo with the same .repo file
+      assert:
+        that:
+          - added_again_by_repo_file is not changed
+
+    - name: remove repository via url to .repo file
+      community.general.zypper_repository:
+        repo: http://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable/{{ os_repository_name }}/systemsmanagement:Uyuni:Stable.repo
+        state: absent
+      register: removed_by_repo_file
+
+    - name: get list of files in /etc/zypp/repos.d/
+      command: ls /etc/zypp/repos.d/
+      changed_when: false
+      register: etc_zypp_reposd
+
+    - name: verify removal via .repo file was successful, including cleanup of local .repo file in /etc/zypp/repos.d/
+      assert:
+        that:
+          - "removed_by_repo_file"
+          - "'/systemsmanagement:/Uyuni:/Stable/' not in etc_zypp_reposd.stdout"
+
+# FIXME: THIS DOESN'T SEEM TO WORK ANYMORE WITH ANY OPENSUSE VERSION IN CI!
+- when: false
+  block:
+    - name: Copy test .repo file
+      copy:
+        src: 'files/systemsmanagement_Uyuni_Utils.repo'
+        dest: '{{ remote_tmp_dir }}'
+
+    - name: add new repository via local path to .repo file
+      community.general.zypper_repository:
+        repo: "{{ remote_tmp_dir }}/systemsmanagement_Uyuni_Utils.repo"
+        state: present
+      register: added_by_repo_local_file
+
+    - name: get repository details for systemsmanagement_Uyuni_Utils from zypper
+      command: zypper lr systemsmanagement_Uyuni_Utils
+      register: get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils
+
+    - name: verify adding repository via local .repo file was successful
+      assert:
+        that:
+          - "added_by_repo_local_file is changed"
+          - "get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.rc == 0"
+          - "'/systemsmanagement:/Uyuni:/Utils/' in get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.stdout"

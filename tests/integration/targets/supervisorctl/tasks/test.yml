@@ -1,0 +1,18 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: generate supervisor configuration
+  template:
+    src: supervisord.conf
+    dest: '{{ remote_dir }}/supervisord.conf'
+  diff: true
+
+- block:
+    - import_tasks: start_supervisord.yml
+
+    - import_tasks: test_start.yml
+    - import_tasks: test_stop.yml
+  always:
+    - import_tasks: stop_supervisord.yml

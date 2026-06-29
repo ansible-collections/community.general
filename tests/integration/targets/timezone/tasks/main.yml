@@ -1,0 +1,90 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+##
+## set path to timezone config files
+##
+
+- name: set config file path on Debian
+  set_fact:
+    timezone_config_file: '/etc/timezone'
+  when: ansible_facts.os_family == 'Debian'
+
+- name: set config file path on RedHat
+  set_fact:
+    timezone_config_file: '/etc/sysconfig/clock'
+  when: ansible_facts.os_family == 'RedHat'
+
+##
+## set path to hwclock config files
+##
+
+- name: set config file path on Debian
+  set_fact:
+    hwclock_config_file: '/etc/default/rcS'
+  when: ansible_facts.os_family == 'Debian'
+
+- name: set config file path on RedHat
+  set_fact:
+    hwclock_config_file: '/etc/sysconfig/clock'
+  when: ansible_facts.os_family == 'RedHat'
+
+####
+#### timezone tests
+####
+
+- name: make sure diffutils are installed on ArchLinux
+  package:
+    name: diffutils
+    state: present
+  when: ansible_facts.distribution == 'Archlinux'
+
+- name: make sure util-linux-extra are installed on Debian 13+
+  package:
+    name: util-linux-extra
+    state: present
+  when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version|int >= 13
+
+- name: make sure tzdata is installed on Alpine
+  package:
+    name: tzdata
+    state: present
+  when: ansible_facts.distribution == 'Alpine'
+
+- name: make sure hwclock is installed in Ubuntu 24.04
+  package:
+    name: util-linux-extra
+    state: present
+  when:
+    - ansible_facts.distribution == 'Ubuntu'
+    - ansible_facts.distribution_major_version is version('24', '>=')
+
+
+- name: Run tests
+  when:
+    - not (ansible_facts.os_family == 'Alpine')  # TODO
+    - not (ansible_facts.distribution == 'Archlinux')  # TODO
+  block:
+    - name: set timezone to Etc/UTC
+      timezone:
+        name: Etc/UTC
+      register: original_timezone
+
+    - name: Value of original_timezone
+      debug:
+        msg: "{{ original_timezone }}"
+
+    - block:
+        - include_tasks: test.yml
+      always:
+        - name: Restore original system timezone - {{ original_timezone.diff.before.name }}
+          timezone:
+            name: "{{ original_timezone.diff.before.name }}"
+          when: original_timezone is changed and original_timezone.diff.before.name != 'n/a'

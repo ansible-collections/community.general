@@ -1,0 +1,52 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Copy a compressed file
+  copy:
+    src: "{{ item.orig }}"
+    dest: "{{ item.new }}"
+    remote_src: true
+  loop:
+    - { orig: "{{ remote_tmp_dir }}/file.txt.gz", new: "{{ remote_tmp_dir }}/dest.txt.gz" }
+    - { orig: "{{ remote_tmp_dir }}/file.txt.gz", new: "{{ remote_tmp_dir }}/dest" }
+
+- name: Decompress a file without specifying destination
+  decompress:
+    src: "{{ remote_tmp_dir }}/dest.txt.gz"
+    remove: true
+
+- name: Decompress a file which lacks extension without specifying destination
+  decompress:
+    src: "{{ remote_tmp_dir }}/dest"
+    remove: true
+
+- name: Stat result files
+  stat:
+    path: "{{ remote_tmp_dir }}/{{ filename }}"
+  loop:
+    - dest.txt
+    - dest_decompressed
+  loop_control:
+    loop_var: filename
+  register: result_files_stat
+
+- name: Test that file exists
+  assert:
+    that:
+      - item.stat.exists
+    quiet: true
+  loop: "{{ result_files_stat.results }}"
+  loop_control:
+    label: "{{ item.stat.path }}"
+
+- name: Delete test files
+  file:
+    path: "{{ filename }}"
+    state: absent
+  loop:
+    - "dest.txt"
+    - "dest_decompressed"
+  loop_control:
+    loop_var: filename

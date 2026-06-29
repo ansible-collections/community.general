@@ -1,0 +1,19 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+azp/posix/1
+azp/posix/vm
+destructive
+skip/docker             # kernel modules not loadable
+skip/freebsd            # no iptables/netfilter (Linux specific)
+skip/macos              # no iptables/netfilter (Linux specific)
+
+# This test doesn't seem to work with split-controller testing.
+# That's the case when the target's Python version doesn't support
+# ansible-core's controller. (Would be good to debug this and try
+# to figure out **why** that's the case, because the module should
+# also work when that's **not** the case.)
+
+# The following makes sure that the test is only run if target == controller:
+context/controller

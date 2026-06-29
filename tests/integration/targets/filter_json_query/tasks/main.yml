@@ -1,0 +1,33 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test json_query filter
+  assert:
+    that:
+      - >-
+        users | community.general.json_query('[*].hosts[].host') == ['host_a', 'host_b', 'host_c', 'host_d']
+      - >-
+        ports | json_query("[?contains(ports, `22`)]") == [ports[0]]
+      - >-
+        ports | json_query("[?contains(rule_desc, `ssh`)]") == [ports[0]]
+      - >-
+        my_complex_data | json_query('users[?id==`1`]') == [my_complex_data['users'][0]]
+  vars:
+    my_complex_data:
+      users:
+        - id: 1
+          name: Alice
+          roles: ["admin", "dev"]
+          status: active
+    ports:
+      - ports: [22]
+        rule_desc: "ssh"
+      - ports: [80]
+        rule_desc: "http"

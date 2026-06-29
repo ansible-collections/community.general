@@ -1,0 +1,36 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# test code for the git_config module
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: setup
+  import_tasks: setup.yml
+
+- block:
+    - import_tasks: set_value.yml
+    # testing get/set option without state
+    - import_tasks: get_set_no_state.yml
+    # testing get/set option with state=present
+    - import_tasks: get_set_state_present.yml
+    # testing get/set option with state=present and scope=file
+    - import_tasks: get_set_state_present_file.yml
+    # testing state=absent without value to delete
+    - import_tasks: unset_no_value.yml
+    # testing state=absent with value to delete
+    - import_tasks: unset_value.yml
+    # testing state=absent with value to delete and a defined value parameter
+    - import_tasks: precedence_between_unset_and_value.yml
+    # testing state=absent with check mode
+    - import_tasks: unset_check_mode.yml
+    # testing for case in issue #1776
+    - import_tasks: set_value_with_tilde.yml
+    - import_tasks: set_multi_value.yml
+    - import_tasks: unset_multi_value.yml
+  when: git_installed is succeeded and git_version.stdout is version(git_version_supporting_includes, ">=")
+...

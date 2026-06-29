@@ -1,0 +1,68 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# This is more convoluted that one might expect, because:
+#   - yay is not available or installation in ArchLinux (as it is in Manjaro - issue 6184 reports using it)
+#   - to install yay in ArchLinux requires building the package
+#   - makepkg cannot be run as root, but the user running it must have sudo to install the resulting package
+
+- name: create user
+  ansible.builtin.user:
+    name: yaybuilder
+    state: present
+  notify: Remove user yaybuilder
+
+- name: grant sudo powers to builder
+  community.general.sudoers:
+    name: yaybuilder
+    user: yaybuilder
+    commands: ALL
+    nopassword: true
+
+- name: Install base packages
+  ansible.builtin.package:
+    name:
+      - base-devel
+      - git
+      - go
+    state: present
+  notify: Remove packages for yay-become
+
+- name: Hack permissions for the remote_tmp_dir
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}"
+    mode: '0777'
+
+- name: Create temp directory for builder
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}/builder"
+    owner: yaybuilder
+    state: directory
+    mode: '0755'
+
+- name: clone yay git repo
+  become: true
+  become_user: yaybuilder
+  ansible.builtin.git:
+    depth: 1
+    dest: "{{ remote_tmp_dir  }}/builder/yay"
+    repo: https://github.com/archlinux/aur.git
+    single_branch: true
+    version: yay
+
+- name: make package
+  become: true
+  become_user: yaybuilder
+  ansible.builtin.command:
+    chdir: "{{ remote_tmp_dir  }}/builder/yay"
+    cmd: makepkg -si --noconfirm
+  notify: Remove yay
+
+- name: Install nmap
+  community.general.pacman:
+    name: nmap
+    state: present
+    executable: yay
+    extra_args: --builddir /var/cache/yay

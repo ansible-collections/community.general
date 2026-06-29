@@ -1,0 +1,55 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# A series of package tests that check all the
+# different ways that "brew info" can refer to a package.
+#
+# The homebrew module must mimic what brew info supports,
+# or else errors will occur.
+
+- name: Find brew binary
+  command: which brew
+  register: brew_which
+
+- name: Get owner of brew binary
+  stat:
+    path: "{{ brew_which.stdout }}"
+  register: brew_stat
+
+# Note: We no longer use sqlite3 for "formula alias" tests, because mac
+# ships with old python3 and if we use python3 from homebrew, sqlite3
+# cannot be uninstalled, which is part of the alias test.  We use mandoc
+# instead.
+
+# An example of a case were old_tokens support is important: User has an
+# ansible task that installs homebrew/cask/docker (the tap prefix is
+# required, or else one gets the formula ansible/core/docker). Homebrew
+# recently changed the name of the cask to docker-desktop, moving
+# "docker" into its old_tokens array. At that point
+# community.general.homebrew stopped working, because it succeeds in
+# running "brew info" on the name "homebrew/cask/docker", which adds
+# docker-desktop to the list of affected packages. But, later, when it
+# asks which user name entry corresponds to the affected cask, it
+# failed, because the code didn't think to consider old_tokens as one of
+# the valid ways of referring to a cask. That is issue #10804, herein
+# fixed.
+
+- name: Test brew uninstall/install using various names accepted by "brew info"
+  vars:
+    packages:
+      # All packages are carefully selected to have no dependencies, to reduce install time
+      # homebrew/cask/kitty crashed on 4867eb4 - Ref: issue #9777
+      - [kitty, homebrew/cask/kitty, "cask by name with tap prefix"]
+      # mdocml test replaces old sqlite3 test, see above.
+      - [mandoc, mdocml, "formula alias"]
+      - [mandoc, homebrew/core/mdocml, "formula alias with tap prefix"]
+      # These all crash on f772bcd - Ref: issue #10804
+      - [cmark, commonmark, "formula with oldnames"]
+      - [cmark, homebrew/core/commonmark, "formula with oldnames and tap prefix"]
+      - [sipgate, clinq, "cask with old_tokens"]
+      - [sipgate, homebrew/cask/clinq, "cask with old_tokens and tap prefix"]
+  include_tasks: package_names_item.yml
+  loop: "{{ packages }}"
+  loop_control:
+    loop_var: package

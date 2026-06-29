@@ -1,0 +1,85 @@
+# Copyright (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: test msimple (set a=80)
+  msimple:
+    a: 80
+  register: simple1
+
+- name: assert simple1
+  assert:
+    that:
+      - simple1.a == 80
+      - simple1.abc == "abc"
+      - simple1 is not changed
+      - simple1.value is none
+
+- name: test msimple 2
+  msimple:
+    a: 101
+  ignore_errors: true
+  register: simple2
+
+- name: assert simple2
+  assert:
+    that:
+      - simple2.a == 101
+      - 'simple2.msg == "Module failed with exception: a >= 100"'
+      - simple2.abc == "abc"
+      - simple2 is failed
+      - simple2 is not changed
+      - simple2.value is none
+
+- name: test msimple 3
+  msimple:
+    a: 2
+    b: potatoes
+  register: simple3
+
+- name: assert simple3
+  assert:
+    that:
+      - simple3.a == 2
+      - simple3.b == "potatoespotatoes"
+      - simple3.c == "NoneNone"
+      - simple3 is not changed
+
+- name: test msimple 4
+  msimple:
+    c: abc change
+  register: simple4
+
+- name: assert simple4
+  assert:
+    that:
+      - simple4.c == "abc change"
+      - simple4.abc == "changed abc"
+      - simple4 is changed
+
+- name: test msimple 5a
+  msimple:
+    a: 3   # should triple b and c
+    b: oh
+    c: my
+  register: simple5a
+
+- name: test msimple 5b
+  check_mode: true
+  msimple:
+    a: 3   # should triple b and c
+    b: oh
+    c: my
+  register: simple5b
+
+- name: assert simple5
+  assert:
+    that:
+      - simple5a.a == 3
+      - simple5a.b == "ohohoh"
+      - simple5a.c == "mymymy"
+      - simple5a is not changed
+      - simple5b.a == 3
+      - simple5b.b == "oh"
+      - simple5b.c == "my"
+      - simple5b is not changed

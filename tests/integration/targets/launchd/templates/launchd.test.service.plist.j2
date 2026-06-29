@@ -1,0 +1,18 @@
+{#
+Copyright (c) Ansible Project
+GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+SPDX-License-Identifier: GPL-3.0-or-later
+#}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>{{ launchd_service_name }}</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/usr/local/sbin/ansible_test_service</string>
+      <string>21212</string>
+    </array>
+  </dict>
+</plist>

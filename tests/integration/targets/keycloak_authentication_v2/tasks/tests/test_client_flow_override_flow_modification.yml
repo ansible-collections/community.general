@@ -1,0 +1,69 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Setup Test
+  ansible.builtin.include_tasks:
+    file: test_setup.yml
+
+- name: Create the new flow <Integration Test Flow>
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v1.yml
+
+- name: Create a client with browser override <Integration Test Flow>
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "test_client"
+    state: present
+    authentication_flow_binding_overrides:
+      browser_name: "Integration Test Flow"
+
+- name: Modify the flow <Integration Test Flow> although it is bound as client override flow
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v2.yml
+
+- name: Assert the flow modification result
+  ansible.builtin.assert:
+    that:
+      - flow_v2_result is changed
+      - flow_v2_result.diff is defined
+    msg: "Expected changes and a diff but got: changed={{ flow_v2_result.changed }}, diff={{ flow_v2_result.get('diff') }}"
+
+- name: Assert the flow <Integration Test Flow> after the modifications
+  ansible.builtin.include_tasks:
+    file: ../assertions/assertion_flow_v2.yml
+
+- name: Fetch client data
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "test_client"
+    state: present
+  register: client_result
+
+- name: Retrieve access token
+  ansible.builtin.include_tasks:
+    file: ../actions/fetch_access_token.yml
+
+- name: Fetch authentication flow (browser override={{ client_result.end_state.authenticationFlowBindingOverrides.browser }})
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/authentication/flows/{{ client_result.end_state.authenticationFlowBindingOverrides.browser }}"
+    method: GET
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    return_content: true
+  register: flow_response
+
+- name: Assert client flow override binding
+  ansible.builtin.assert:
+    that:
+      - flow_response.json is defined
+      - flow_response.json.alias == "Integration Test Flow"

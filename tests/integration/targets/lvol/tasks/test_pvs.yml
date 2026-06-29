@@ -1,0 +1,64 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create logical volume (testlv1) with pvs set as comma separated string
+  lvol:
+    vg: testvg1
+    lv: testlv1
+    size: 50%PVS
+    pvs: "{{ loop_device1 }},{{ loop_device2 }}"
+  register: css_pvs_create_testlv1_result
+
+- name: Assert logical volume (testlv1) created with pvs set as comma separated string
+  assert:
+    that:
+      - css_pvs_create_testlv1_result is success
+      - css_pvs_create_testlv1_result is changed
+
+- name: Create logical volume (testlv1) with pvs set as list
+  lvol:
+    vg: testvg1
+    lv: testlv1
+    size: 50%PVS
+    pvs:
+      - "{{ loop_device1 }}"
+      - "{{ loop_device2 }}"
+  register: list_pvs_create_testlv1_result
+
+- name: Assert logical volume (testlv1) creation idempotency with pvs set as list on second execution
+  assert:
+    that:
+      - list_pvs_create_testlv1_result is success
+      - list_pvs_create_testlv1_result is not changed
+
+- name: Create logical volume (testlv2) with pvs set as list
+  lvol:
+    vg: testvg2
+    lv: testlv2
+    size: 50%PVS
+    pvs:
+      - "{{ loop_device3 }}"
+      - "{{ loop_device4 }}"
+  register: list_pvs_create_testlv2_result
+
+- name: Assert logical volume (testlv2) created with pvs set as list
+  assert:
+    that:
+      - list_pvs_create_testlv2_result is success
+      - list_pvs_create_testlv2_result is changed
+
+- name: Create logical volume (testlv2) with pvs set as comma separated string
+  lvol:
+    vg: testvg2
+    lv: testlv2
+    size: 50%PVS
+    pvs: "{{ loop_device3 }},{{ loop_device4 }}"
+  register: css_pvs_create_testlv2_result
+
+- name: Assert logical volume (testlv2) creation idempotency with pvs set as comma separated string on second execution
+  assert:
+    that:
+      - css_pvs_create_testlv2_result is success
+      - css_pvs_create_testlv2_result is not changed

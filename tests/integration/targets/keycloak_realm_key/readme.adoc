@@ -1,0 +1,27 @@
+// Copyright (c) Ansible Project
+// GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+To be able to run these integration tests a keycloak server must be
+reachable under a specific url with a specific admin user and password.
+The exact values expected for these parameters can be found in
+'vars/main.yml' file. A simple way to do this is to use the official
+keycloak docker images like this:
+
+----
+docker run --name mykeycloak -p 8080:8080 -e KC_HTTP_RELATIVE_PATH=<url-path> -e KEYCLOAK_ADMIN=<admin_user> -e KEYCLOAK_ADMIN_PASSWORD=<admin_password> quay.io/keycloak/keycloak:20.0.2 start-dev
+----
+
+Example with concrete values inserted:
+
+----
+docker run --name mykeycloak -p 8080:8080 -e KC_HTTP_RELATIVE_PATH=/auth -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=password quay.io/keycloak/keycloak:20.0.2 start-dev
+----
+
+This test suite can run against a fresh unconfigured server instance
+(no preconfiguration required) and cleans up after itself (undoes all
+its config changes) as long as it runs through completely. While its active
+it changes the server configuration in the following ways:
+
+  * creating, modifying and deleting some keycloak groups
+

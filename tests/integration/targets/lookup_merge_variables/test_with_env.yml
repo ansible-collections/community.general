@@ -1,0 +1,44 @@
+---
+# Copyright (c) 2020, Thales Netherlands
+# Copyright (c) 2021, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test merge_variables lookup plugin
+  hosts: localhost
+  tasks:
+    - name: Include test data
+      include_vars: vars.yml
+
+    # Test the pattern option using the environment variable
+    - name: Test merge list (pattern_type = regex)
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 2"
+              - "'item1' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', '__merge_list') }}"
+
+    # Test whether the pattern option can be overridden
+    - name: Test merge list (pattern_type = suffix)
+      block:
+        - name: Print the merged list
+          debug:
+            msg: "{{ merged_list }}"
+
+        - name: Validate that the list is complete
+          assert:
+            that:
+              - "(merged_list | length) == 3"
+              - "'item1' in merged_list"
+              - "'item2' in merged_list"
+              - "'item3' in merged_list"
+      vars:
+        merged_list: "{{ lookup('community.general.merge_variables', '^testlist[0-9].*', pattern_type='regex') }}"

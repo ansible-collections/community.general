@@ -1,0 +1,42 @@
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
+  - id: test_simple_element_get
+    input:
+      key: /desktop/gnome/background/picture_filename
+    output:
+      value: '100'
+    mocks:
+      run_command:
+        - command: [/testbin/gconftool-2, --version]
+          environ: *env-def
+          rc: 0
+          out: "3.2.6\n"
+          err: ''
+        - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
+          environ: *env-def
+          rc: 0
+          out: "100\n"
+          err: ''
+  - id: test_simple_element_get_not_found
+    input:
+      key: /desktop/gnome/background/picture_filename
+    output:
+      value:
+    mocks:
+      run_command:
+        - command: [/testbin/gconftool-2, --version]
+          environ: *env-def
+          rc: 0
+          out: "3.2.6\n"
+          err: ''
+        - command: [/testbin/gconftool-2, --get, /desktop/gnome/background/picture_filename]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: "No value set for `/desktop/gnome/background/picture_filename'\n"

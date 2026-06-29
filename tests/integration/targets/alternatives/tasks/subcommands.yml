@@ -1,0 +1,222 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Try with subcommands
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy1'
+    link: '/usr/bin/dummymain'
+    subcommands:
+      - name: dummysubcmd
+        path: '/usr/bin/dummy2'
+        link: '/usr/bin/dummysubcmd'
+  register: alternative
+
+- name: Check expected command was executed
+  assert:
+    that:
+      - 'alternative is changed'
+
+- name: Execute the current dummymain command
+  command: dummymain
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy1"
+
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy2"
+
+- name: Get dummymain alternatives output
+  command:
+    cmd: '{{ alternatives_command }} --display dummymain'
+  register: result
+
+- name: Print result
+  debug:
+    var: result.stdout_lines
+
+- name: Subcommands are not removed if not specified
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy1'
+    link: '/usr/bin/dummymain'
+  register: alternative
+
+- name: Check expected command was executed
+  assert:
+    that:
+      - 'alternative is not changed'
+
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy2"
+
+- name: Subcommands are removed if set to an empty list
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy1'
+    link: '/usr/bin/dummymain'
+    subcommands: []
+  register: alternative
+
+- name: Check expected command was executed
+  assert:
+    that:
+      - 'alternative is changed'
+
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
+  register: cmd
+  ignore_errors: true
+
+- name: Ensure that the subcommand is gone
+  assert:
+    that:
+      - cmd.rc == 2
+      - '"No such file" in cmd.msg or "Error executing command." == cmd.msg'
+
+- name: Get dummymain alternatives output
+  command:
+    cmd: '{{ alternatives_command }} --display dummymain'
+  register: result
+
+- name: Print result
+  debug:
+    var: result.stdout_lines
+
+- name: Install other alternative with subcommands
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy3'
+    link: '/usr/bin/dummymain'
+    subcommands:
+      - name: dummysubcmd
+        path: '/usr/bin/dummy4'
+        link: '/usr/bin/dummysubcmd'
+  register: alternative
+
+- name: Check expected command was executed
+  assert:
+    that:
+      - 'alternative is changed'
+
+- name: Execute the current dummymain command
+  command: dummymain
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy3"
+
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy4"
+
+- name: Get dummymain alternatives output
+  command:
+    cmd: '{{ alternatives_command }} --display dummymain'
+  register: result
+
+- name: Print result
+  debug:
+    var: result.stdout_lines
+
+- name: Switch to first alternative
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy1'
+  register: alternative
+
+- name: Check expected command was executed
+  assert:
+    that:
+      - 'alternative is changed'
+
+- name: Execute the current dummymain command
+  command: dummymain
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy1"
+
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
+  register: cmd
+  ignore_errors: true
+
+- name: Ensure that the subcommand is gone
+  assert:
+    that:
+      - cmd.rc == 2
+      - '"No such file" in cmd.msg or "Error executing command." == cmd.msg'
+
+- name: Get dummymain alternatives output
+  command:
+    cmd: '{{ alternatives_command }} --display dummymain'
+  register: result
+
+- name: Print result
+  debug:
+    var: result.stdout_lines
+
+- name: Switch to second alternative
+  alternatives:
+    name: dummymain
+    path: '/usr/bin/dummy3'
+  register: alternative
+
+- name: Check expected command was executed
+  assert:
+    that:
+      - 'alternative is changed'
+
+- name: Execute the current dummymain command
+  command: dummymain
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy3"
+
+- name: Execute the current dummysubcmd command
+  command: dummysubcmd
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy4"
+
+- name: Get dummymain alternatives output
+  command:
+    cmd: '{{ alternatives_command }} --display dummymain'
+  register: result
+
+- name: Print result
+  debug:
+    var: result.stdout_lines

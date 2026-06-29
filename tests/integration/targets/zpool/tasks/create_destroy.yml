@@ -1,0 +1,123 @@
+---
+# Copyright (c) 2025, Tom Hesse <contact@tomhesse.xyz>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test single disk pool creation
+  block:
+    - name: Ensure single disk pool exists
+      community.general.zpool:
+        name: "{{ zpool_single_disk_pool_name }}"
+        vdevs:
+          - disks: "{{ zpool_single_disk_config }}"
+
+    - name: Check if single disk pool exists
+      ansible.builtin.command:
+        cmd: "zpool list -H -o name,health {{ zpool_single_disk_pool_name }}"
+      register: single_disk_pool_check
+      changed_when: false
+
+    - name: Assert that single disk pool is online
+      ansible.builtin.assert:
+        that:
+          - "zpool_single_disk_pool_name in single_disk_pool_check.stdout"
+          - "'ONLINE' in single_disk_pool_check.stdout"
+
+- name: Test mirror disk pool creation
+  block:
+    - name: Ensure mirror disk pool exists
+      community.general.zpool:
+        name: "{{ zpool_mirror_disk_pool_name }}"
+        vdevs:
+          - type: mirror
+            disks: "{{ zpool_mirror_disk_config }}"
+
+    - name: Check if mirror disk pool exists
+      ansible.builtin.command:
+        cmd: "zpool list -H -o name,health {{ zpool_mirror_disk_pool_name }}"
+      register: mirror_disk_pool_check
+      changed_when: false
+
+    - name: Assert that mirror disk pool is online
+      ansible.builtin.assert:
+        that:
+          - "zpool_mirror_disk_pool_name in mirror_disk_pool_check.stdout"
+          - "'ONLINE' in mirror_disk_pool_check.stdout"
+
+- name: Test raidz disk pool creation
+  block:
+    - name: Ensure raidz disk pool exists
+      community.general.zpool:
+        name: "{{ zpool_raidz_disk_pool_name }}"
+        vdevs:
+          - type: raidz
+            disks: "{{ zpool_raidz_disk_config }}"
+
+    - name: Check if raidz disk pool exists
+      ansible.builtin.command:
+        cmd: "zpool list -H -o name,health {{ zpool_raidz_disk_pool_name }}"
+      register: raidz_disk_pool_check
+      changed_when: false
+
+    - name: Assert that raidz disk pool is online
+      ansible.builtin.assert:
+        that:
+          - "zpool_raidz_disk_pool_name in raidz_disk_pool_check.stdout"
+          - "'ONLINE' in raidz_disk_pool_check.stdout"
+
+- name: Test single disk pool deletion
+  block:
+    - name: Ensure single disk pool is absent
+      community.general.zpool:
+        name: "{{ zpool_single_disk_pool_name }}"
+        state: absent
+
+    - name: Check if single disk pool is absent
+      ansible.builtin.command:
+        cmd: "zpool list -H -o name,health {{ zpool_single_disk_pool_name }}"
+      register: single_disk_pool_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Assert that single disk pool is online
+      ansible.builtin.assert:
+        that:
+          - "'no such pool' in single_disk_pool_check.stderr"
+
+- name: Test mirror disk pool deletion
+  block:
+    - name: Ensure mirror disk pool is absent
+      community.general.zpool:
+        name: "{{ zpool_mirror_disk_pool_name }}"
+        state: absent
+
+    - name: Check if mirror disk pool is absent
+      ansible.builtin.command:
+        cmd: "zpool list -H -o name,health {{ zpool_mirror_disk_pool_name }}"
+      register: mirror_disk_pool_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Assert that mirror disk pool is online
+      ansible.builtin.assert:
+        that:
+          - "'no such pool' in mirror_disk_pool_check.stderr"
+
+- name: Test raidz disk pool deletion
+  block:
+    - name: Ensure raidz disk pool is absent
+      community.general.zpool:
+        name: "{{ zpool_raidz_disk_pool_name }}"
+        state: absent
+
+    - name: Check if raidz disk pool is absent
+      ansible.builtin.command:
+        cmd: "zpool list -H -o name,health {{ zpool_raidz_disk_pool_name }}"
+      register: raidz_disk_pool_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Assert that raidz disk pool is online
+      ansible.builtin.assert:
+        that:
+          - "'no such pool' in raidz_disk_pool_check.stderr"

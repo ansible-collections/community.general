@@ -1,0 +1,22 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+postgresql_service: postgresql
+
+postgresql_packages:
+  - postgresql-server
+  - python-psycopg2
+
+pg_user: postgres
+pg_group: root
+
+locale_latin_suffix:
+locale_utf8_suffix:
+
+# defaults for test SSL
+ssl_db: 'ssl_db'
+ssl_user: 'ssl_user'
+ssl_pass: 'ssl_pass'
+ssl_rootcert: '~{{ pg_user }}/root.crt'

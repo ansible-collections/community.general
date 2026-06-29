@@ -1,0 +1,135 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# state=present
+
+- name: Test addition - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+    state: present
+    method: "{{ method }}"
+  register: addition_result
+
+- name: Verify addition test result - {{ method }}
+  assert:
+    that:
+      - addition_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of addition - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+    state: present
+    method: "{{ method }}"
+  register: double_addition_result
+
+- name: Verify idempotency of addition test result - {{ method }}
+  assert:
+    that:
+      - double_addition_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+- name: Test updating remote url does not do anything - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    flatpakrepo_url: https://a.different/repo.flatpakrepo
+    state: present
+    method: "{{ method }}"
+  register: url_update_result
+
+- name: Verify updating remote url does not do anything - {{ method }}
+  assert:
+    that:
+      - url_update_result is not changed
+    msg: "Trying to update the URL of an existing flatpak remote shall not do anything"
+
+
+# enabled=false
+
+- name: Test deactivation - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    enabled: false
+    method: "{{ method }}"
+  register: deactivation_result
+
+- name: Verify deactivation test result - {{ method }}
+  assert:
+    that:
+      - deactivation_result is changed
+    msg: "enable=false shall disable flatpak remote when enabled"
+
+- name: Test idempotency of deactivation - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    enabled: false
+    method: "{{ method }}"
+  register: double_deactivation_result
+
+- name: Verify idempotency of deactivation test result - {{ method }}
+  assert:
+    that:
+      - double_deactivation_result is not changed
+    msg: "enabled=false shall not do anything when flatpak remote is already disabled"
+
+
+# enabled=false
+
+- name: Test activation - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    enabled: true
+    method: "{{ method }}"
+  register: activation_result
+
+- name: Verify activation test result - {{ method }}
+  assert:
+    that:
+      - activation_result is changed
+    msg: "enable=true shall enable flatpak remote when disabled"
+
+- name: Test idempotency of activation - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    enabled: true
+    method: "{{ method }}"
+  register: double_activation_result
+
+- name: Verify idempotency of activation test result - {{ method }}
+  assert:
+    that:
+      - double_activation_result is not changed
+    msg: "enabled=true shall not do anything when flatpak remote is already enabled"
+
+
+# state=absent
+
+- name: Test removal - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    state: absent
+    method: "{{ method }}"
+  register: removal_result
+
+- name: Verify removal test result - {{ method }}
+  assert:
+    that:
+      - removal_result is changed
+    msg: "state=absent shall remove flatpak when present"
+
+- name: Test idempotency of removal - {{ method }}
+  flatpak_remote:
+    name: flatpak-test
+    state: absent
+    method: "{{ method }}"
+  register: double_removal_result
+
+- name: Verify idempotency of removal test result - {{ method }}
+  assert:
+    that:
+      - double_removal_result is not changed
+    msg: "state=absent shall not do anything when flatpak is not present"

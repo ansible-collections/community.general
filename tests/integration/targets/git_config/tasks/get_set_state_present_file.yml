@@ -1,0 +1,31 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- import_tasks: setup_no_value.yml
+
+- name: setting value with state=present
+  git_config:
+    name: "{{ option_name }}"
+    value: "{{ option_value }}"
+    scope: "file"
+    file: "{{ remote_tmp_dir }}/gitconfig_file"
+    state: present
+  register: result
+
+- name: getting value with state=present
+  git_config_info:
+    name: "{{ option_name }}"
+    scope: "file"
+    path: "{{ remote_tmp_dir }}/gitconfig_file"
+  register: get_result
+
+- name: assert set changed and value is correct with state=present
+  assert:
+    that:
+      - set_result is changed
+      - set_result.diff.before == "\n"
+      - set_result.diff.after == option_value + "\n"
+      - get_result.config_value == option_value
+...

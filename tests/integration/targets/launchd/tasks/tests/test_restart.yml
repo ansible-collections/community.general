@@ -1,0 +1,46 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# -----------------------------------------------------------
+
+- name: "[{{ item }}] Given a started service..."
+  launchd:
+    name: "{{ launchd_service_name }}"
+    state: started
+  become: true
+  register: "test_1_launchd_start_result"
+
+
+- name: "[{{ item }}] When restarting the service in check mode"
+  launchd:
+    name: "{{ launchd_service_name }}"
+    state: restarted
+  become: true
+  register: "test_1_launchd_restart_result_check_mode"
+  check_mode: true
+
+- name: "[{{ item }}] Validate that service was restarted in check mode"
+  assert:
+    that:
+      - test_1_launchd_restart_result_check_mode is success
+      - test_1_launchd_restart_result_check_mode is changed
+
+- name: "[{{ item }}] When restarting the service..."
+  launchd:
+    name: "{{ launchd_service_name }}"
+    state: restarted
+  become: true
+  register: "test_1_launchd_restart_result"
+
+- name: "[{{ item }}] Validate that service was restarted"
+  assert:
+    that:
+      - test_1_launchd_restart_result is success
+      - test_1_launchd_restart_result is changed
+      - test_1_launchd_restart_result.status.previous_pid == test_1_launchd_start_result.status.current_pid
+      - test_1_launchd_restart_result.status.previous_state == test_1_launchd_start_result.status.current_state
+      - test_1_launchd_restart_result.status.current_state == 'started'
+      - test_1_launchd_restart_result.status.current_pid != '-'
+      - test_1_launchd_restart_result.status.status_code == '0'

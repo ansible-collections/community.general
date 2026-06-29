@@ -1,0 +1,25 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install nodejs and yarn via apk
+  community.general.apk:
+    name:
+      - sqlite-libs
+      - nodejs
+      - yarn
+    state: latest
+    update_cache: true
+
+# Clean up before running tests
+- name: Remove any previous Nodejs modules
+  file:
+    path: '{{ remote_tmp_dir }}/node_modules'
+    state: absent
+
+- include_tasks: tests.yml
+  vars:
+    node_bin_path: /usr/bin
+    yarn_bin_path: /usr/bin
+    package: 'iconv-lite'

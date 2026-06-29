@@ -1,0 +1,238 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a backup (Check)
+  check_mode: true
+  scaleway_database_backup:
+    name: '{{ scaleway_name }}'
+    state: present
+    region: '{{ scaleway_region }}'
+    database_name: '{{ scaleway_database_name }}'
+    instance_id: '{{ scaleway_instance_id }}'
+
+  register: backup_creation_check_task
+
+- debug: var=backup_creation_check_task
+
+- assert:
+    that:
+      - backup_creation_check_task is success
+      - backup_creation_check_task is changed
+
+- name: Create a backup
+  scaleway_database_backup:
+    name: '{{ scaleway_name }}'
+    state: present
+    region: '{{ scaleway_region }}'
+    database_name: '{{ scaleway_database_name }}'
+    instance_id: '{{ scaleway_instance_id }}'
+    wait: true
+
+  register: backup_creation_task
+
+- debug: var=backup_creation_task
+
+- assert:
+    that:
+      - backup_creation_task is success
+      - backup_creation_task is changed
+
+- name: Create a backup (Confirmation)
+  scaleway_database_backup:
+    name: '{{ scaleway_name }}'
+    state: present
+    region: '{{ scaleway_region }}'
+    database_name: '{{ scaleway_database_name }}'
+    instance_id: '{{ scaleway_instance_id }}'
+    id: '{{ backup_creation_task.metadata.id }}'
+
+  register: backup_creation_confirmation_task
+
+- debug: var=backup_creation_confirmation_task
+
+- assert:
+    that:
+      - backup_creation_confirmation_task is success
+      - backup_creation_confirmation_task is not changed
+
+- name: Patch backup name (Check)
+  check_mode: true
+  scaleway_database_backup:
+    name: '{{ scaleway_name }}-changed'
+    state: present
+    region: '{{ scaleway_region }}'
+    database_name: '{{ scaleway_database_name }}'
+    instance_id: '{{ scaleway_instance_id }}'
+    id: '{{ backup_creation_task.metadata.id }}'
+  register: backup_patching_check_task
+
+- debug: var=backup_patching_check_task
+
+- assert:
+    that:
+      - backup_patching_check_task is success
+      - backup_patching_check_task is changed
+
+- name: Patch backup name
+  scaleway_database_backup:
+    name: '{{ scaleway_name }}-changed'
+    state: present
+    region: '{{ scaleway_region }}'
+    database_name: '{{ scaleway_database_name }}'
+    instance_id: '{{ scaleway_instance_id }}'
+    id: '{{ backup_creation_task.metadata.id }}'
+  register: backup_patching_task
+
+- debug: var=backup_patching_task
+
+- assert:
+    that:
+      - backup_patching_task is success
+      - backup_patching_task is changed
+
+- name: Patch backup name (Confirmation)
+  scaleway_database_backup:
+    name: '{{ scaleway_name }}-changed'
+    state: present
+    region: '{{ scaleway_region }}'
+    database_name: '{{ scaleway_database_name }}'
+    instance_id: '{{ scaleway_instance_id }}'
+    id: '{{ backup_creation_task.metadata.id }}'
+  register: backup_patching_confirmation_task
+
+- debug: var=backup_patching_confirmation_task
+
+- assert:
+    that:
+      - backup_patching_confirmation_task is success
+      - backup_patching_confirmation_task is not changed
+
+- name: Export backup (Check)
+  check_mode: true
+  scaleway_database_backup:
+    id: '{{ backup_creation_task.metadata.id }}'
+    state: exported
+    region: '{{ scaleway_region }}'
+  register: backup_export_check_task
+
+- debug: var=backup_export_check_task
+
+- assert:
+    that:
+      - backup_export_check_task is success
+      - backup_export_check_task is changed
+
+- name: Export backup
+  scaleway_database_backup:
+    id: '{{ backup_creation_task.metadata.id }}'
+    state: exported
+    region: '{{ scaleway_region }}'
+    wait: true
+  register: backup_export_task
+
+- debug: var=backup_export_task
+
+- assert:
+    that:
+      - backup_export_task is success
+      - backup_export_task is changed
+      - backup_export_task.metadata.download_url != ""
+
+- name: Export backup (Confirmation)
+  scaleway_database_backup:
+    id: '{{ backup_creation_task.metadata.id }}'
+    state: exported
+    region: '{{ scaleway_region }}'
+  register: backup_export_confirmation_task
+
+- debug: var=backup_export_confirmation_task
+
+- assert:
+    that:
+      - backup_export_confirmation_task is success
+      - backup_export_confirmation_task is not changed
+      - backup_export_confirmation_task.metadata.download_url != ""
+
+- name: Restore backup (Check)
+  check_mode: true
+  scaleway_database_backup:
+    id: '{{ backup_creation_task.metadata.id }}'
+    state: restored
+    region: '{{ scaleway_region }}'
+    database_name: '{{ scaleway_database_name }}'
+    instance_id: '{{ scaleway_instance_id }}'
+  register: backup_restore_check_task
+
+- debug: var=backup_restore_check_task
+
+- assert:
+    that:
+      - backup_restore_check_task is success
+      - backup_restore_check_task is changed
+
+- name: Restore backup
+  scaleway_database_backup:
+    id: '{{ backup_creation_task.metadata.id }}'
+    state: restored
+    region: '{{ scaleway_region }}'
+    database_name: '{{ scaleway_database_name }}'
+    instance_id: '{{ scaleway_instance_id }}'
+    wait: true
+  register: backup_restore_task
+
+- debug: var=backup_restore_task
+
+- assert:
+    that:
+      - backup_restore_task is success
+      - backup_restore_task is changed
+
+- name: Delete backup (Check)
+  check_mode: true
+  scaleway_database_backup:
+    id: '{{ backup_creation_task.metadata.id }}'
+    state: absent
+    region: '{{ scaleway_region }}'
+  register: backup_delete_check_task
+
+- debug: var=backup_delete_check_task
+
+- assert:
+    that:
+      - backup_delete_check_task is success
+      - backup_delete_check_task is changed
+
+- name: Delete backup
+  scaleway_database_backup:
+    id: '{{ backup_creation_task.metadata.id }}'
+    state: absent
+    region: '{{ scaleway_region }}'
+  register: backup_delete_task
+
+- debug: var=backup_delete_task
+
+- assert:
+    that:
+      - backup_delete_task is success
+      - backup_delete_task is changed
+
+- name: Delete backup (Confirmation)
+  scaleway_database_backup:
+    id: '{{ backup_creation_task.metadata.id }}'
+    state: absent
+    region: '{{ scaleway_region }}'
+  register: backup_delete_confirmation_task
+
+- debug: var=backup_delete_confirmation_task
+
+- assert:
+    that:
+      - backup_delete_confirmation_task is success
+      - backup_delete_confirmation_task is not changed

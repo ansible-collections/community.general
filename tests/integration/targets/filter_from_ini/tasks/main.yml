@@ -1,0 +1,60 @@
+---
+# Copyright (c) 2023, Steffen Scheib <steffen@scheib.me>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Basic test
+  ansible.builtin.assert:
+    that:
+      - ini_file_content | community.general.from_ini == ini_test_dict
+  vars:
+    ini_file_content: |
+      [section_name]
+      key_name = key value
+
+      [another_section]
+      connection = ssh
+
+      [empty section]
+
+      [interpolate_test]
+      interpolate_test_key = %
+    ini_test_dict:
+      section_name:
+        key_name: key value
+
+      another_section:
+        connection: ssh
+
+      empty section: {}
+
+      interpolate_test:
+        interpolate_test_key: '%'
+
+- name: Test delimiters
+  ansible.builtin.assert:
+    that:
+      - ini_file_content | community.general.from_ini(delimiters=["="]) == ini_test_dict
+  vars:
+    ini_file_content: |
+      [section_name]
+      key_name * : with spaces = key value
+    ini_test_dict:
+      section_name:
+        'key_name * : with spaces': 'key value'
+
+- name: Try parsing the bad file with from_ini
+  ansible.builtin.debug:
+    var: ini_bad_file_content | community.general.from_ini
+  vars:
+    ini_bad_file_content: |
+      Testing a not INI formatted file.
+  register: ini_bad_file_debug
+  ignore_errors: true
+
+- name: 'Ensure from_ini raised the correct exception'
+  ansible.builtin.assert:
+    that:
+      - ini_bad_file_debug is failed
+      - "'from_ini failed to parse given string' in ini_bad_file_debug.msg"
+      - "'File contains no section headers' in ini_bad_file_debug.msg"

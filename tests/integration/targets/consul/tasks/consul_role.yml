@@ -1,0 +1,194 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a policy with rules
+  consul_policy:
+    name: foo-access-for-role
+    rules: |
+        key "foo" {
+            policy = "read"
+        }
+        key "private/foo" {
+            policy = "deny"
+        }
+  register: policy_result
+
+- name: Create another policy with rules
+  consul_policy:
+    name: bar-access-for-role
+    rules: |
+        key "bar" {
+            policy = "read"
+        }
+        key "private/bar" {
+            policy = "deny"
+        }
+  register: policy_result
+
+- name: Create a role with policy
+  consul_role:
+    name: foo-role-with-policy
+    policies:
+      - name: "foo-access-for-role"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.Name == 'foo-role-with-policy'
+      - result.operation == 'create'
+
+- name: Update policy description, in check mode
+  consul_role:
+    name: foo-role-with-policy
+    description: "Testing updating description"
+  check_mode: true
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.Description == "Testing updating description"
+      - result.role.Policies.0.Name == 'foo-access-for-role'
+      - result.operation == 'update'
+
+- name: Update policy to add the description
+  consul_role:
+    name: foo-role-with-policy
+    description: "Role for testing policies"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.Description == "Role for testing policies"
+      - result.role.Policies.0.Name == 'foo-access-for-role'
+      - result.operation == 'update'
+
+- name: Update the role with another policy, also testing leaving description blank
+  consul_role:
+    name: foo-role-with-policy
+    policies:
+      - name: "foo-access-for-role"
+      - name: "bar-access-for-role"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.Policies.0.Name == 'foo-access-for-role'
+      - result.role.Policies.1.Name == 'bar-access-for-role'
+      - result.role.Description == "Role for testing policies"
+      - result.operation == 'update'
+
+- name: Create a role with service identity
+  consul_role:
+    name: role-with-service-identity
+    service_identities:
+      - name: web
+        datacenters:
+          - dc1
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc1"
+
+- name: Update the role with service identity in check mode
+  consul_role:
+    name: role-with-service-identity
+    service_identities:
+      - name: web
+        datacenters:
+          - dc2
+  register: result
+  check_mode: true
+
+- assert:
+    that:
+      - result is changed
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc2"
+
+- name: Update the role with service identity to add a policy, leaving the service id unchanged
+  consul_role:
+    name: role-with-service-identity
+    policies:
+      - name: "foo-access-for-role"
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc1"
+      - result.role.Policies.0.Name == 'foo-access-for-role'
+
+- name: Update the role with service identity to remove the policies
+  consul_role:
+    name: role-with-service-identity
+    policies: []
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc1"
+      - result.role.Policies is not defined
+
+- name: Update the role with service identity to remove the node identities, in check mode
+  consul_role:
+    name: role-with-service-identity
+    node_identities: []
+  register: result
+  check_mode: true
+
+- assert:
+    that:
+      - result is changed
+      - result.role.ServiceIdentities.0.ServiceName == "web"
+      - result.role.ServiceIdentities.0.Datacenters.0 == "dc1"
+      - result.role.Policies is not defined
+      - result.role.NodeIdentities == [] # in check mode the cleared field is returned as an empty array
+
+- name: Update the role with service identity to remove the service identities
+  consul_role:
+    name: role-with-service-identity
+    service_identities: []
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.ServiceIdentities is not defined # in normal mode the dictionary is removed from the result
+      - result.role.Policies is not defined
+
+- name: Create a role with node identity
+  consul_role:
+    name: role-with-node-identity
+    node_identities:
+      - name: node-1
+        datacenter: dc2
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.role.NodeIdentities.0.NodeName == "node-1"
+      - result.role.NodeIdentities.0.Datacenter == "dc2"
+
+- name: Remove the last role
+  consul_role:
+    name: role-with-node-identity
+    state: absent
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.operation == 'remove'

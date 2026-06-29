@@ -1,0 +1,29 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install https transport for apt
+  apt:
+    name: apt-transport-https
+    state: latest
+    force: true
+
+- name: Install Mosquitto Server
+  apt:
+    name: mosquitto
+    state: latest
+  register: result
+  until: result is success
+  delay: 3
+  retries: 10
+
+- name: Ensure TLS config
+  copy:
+    src: mosquitto.conf
+    dest: /etc/mosquitto/mosquitto.conf
+
+- name: Start Mosquitto service
+  service:
+    name: mosquitto
+    state: restarted

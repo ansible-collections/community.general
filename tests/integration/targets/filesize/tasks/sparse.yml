@@ -1,0 +1,283 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Test module with sparse files
+
+- name: Create a huge sparse file of 2TB (check mode)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2TB
+    sparse: true
+  register: filesize_test_sparse_01
+  check_mode: true
+
+- name: Stat the file (should not exist)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_01
+
+
+- name: Create a huge sparse file of 2TB
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2TB
+    sparse: true
+  register: filesize_test_sparse_02
+
+- name: Stat the resulting file (should exist now)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_02
+
+
+- name: Create a huge sparse file of 2TB (2000GB) (check mode, idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2000GB
+    sparse: true
+  register: filesize_test_sparse_03
+  check_mode: true
+
+- name: Create a huge sparse file of 2TB (2000GB) (idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2000GB
+    sparse: true
+  register: filesize_test_sparse_04
+
+- name: Create a huge sparse file of 2TB (2000000 × 1MB) (check mode, idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2000000
+    blocksize: 1MB
+    sparse: true
+  register: filesize_test_sparse_05
+  check_mode: true
+
+- name: Create a huge sparse file of 2TB (2000000 × 1MB) (idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2000000
+    blocksize: 1MB
+    sparse: true
+  register: filesize_test_sparse_06
+
+- name: Stat the file again (should remain the same)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_06
+
+
+- name: Assert that results are as expected
+  ansible.builtin.assert:
+    that:
+      - filesize_test_sparse_01 is changed
+      - filesize_test_sparse_02 is changed
+      - filesize_test_sparse_03 is not changed
+      - filesize_test_sparse_04 is not changed
+      - filesize_test_sparse_05 is not changed
+      - filesize_test_sparse_06 is not changed
+
+      - filesize_test_sparse_02.cmd == filesize_test_sparse_01.cmd
+      - filesize_test_sparse_03.cmd is undefined
+      - filesize_test_sparse_04.cmd is undefined
+      - filesize_test_sparse_05.cmd is undefined
+      - filesize_test_sparse_06.cmd is undefined
+
+      - filesize_test_sparse_01.filesize.bytes == 2*1000**4
+      - filesize_test_sparse_02.filesize.bytes == 2*1000**4
+      - filesize_test_sparse_03.filesize.bytes == 2*1000**4
+      - filesize_test_sparse_04.filesize.bytes == 2*1000**4
+      - filesize_test_sparse_05.filesize.bytes == 2*1000**4
+      - filesize_test_sparse_06.filesize.bytes == 2*1000**4
+
+      - filesize_test_sparse_01.size_diff == 2*1000**4
+      - filesize_test_sparse_02.size_diff == 2*1000**4
+      - filesize_test_sparse_03.size_diff == 0
+      - filesize_test_sparse_04.size_diff == 0
+      - filesize_test_sparse_05.size_diff == 0
+      - filesize_test_sparse_06.size_diff == 0
+
+      - filesize_test_sparse_01.state is undefined
+      - filesize_test_sparse_02.state in ["file"]
+      - filesize_test_sparse_01.size is undefined
+      - filesize_test_sparse_02.size == 2*1000**4
+      - filesize_test_sparse_03.size == 2*1000**4
+      - filesize_test_sparse_04.size == 2*1000**4
+      - filesize_test_sparse_05.size == 2*1000**4
+      - filesize_test_sparse_06.size == 2*1000**4
+
+      - not filesize_stat_sparse_01.stat.exists
+      - filesize_stat_sparse_02.stat.exists
+      - filesize_stat_sparse_02.stat.isreg
+      - filesize_stat_sparse_02.stat.size == 2*1000**4
+      - filesize_stat_sparse_06.stat.size == 2*1000**4
+
+
+- name: Change sparse file size to 2TiB (check mode)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2TiB
+    sparse: true
+  register: filesize_test_sparse_11
+  check_mode: true
+
+- name: Stat the file again (should remain the same)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_11
+
+
+- name: Change sparse file size to 2TiB
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2TiB
+    sparse: true
+  register: filesize_test_sparse_12
+
+- name: Stat the file again (should have grown)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_12
+
+
+- name: Change sparse file size to 2TiB (2048GiB) (check mode, idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2048GiB
+    sparse: true
+  register: filesize_test_sparse_13
+  check_mode: true
+
+- name: Change sparse file size to 2TiB (2048GiB) (idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2048GiB
+    sparse: true
+  register: filesize_test_sparse_14
+
+- name: Stat the file again (should remain the same)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_14
+
+
+- name: Assert that results are as expected
+  ansible.builtin.assert:
+    that:
+      - filesize_test_sparse_11 is changed
+      - filesize_test_sparse_12 is changed
+      - filesize_test_sparse_13 is not changed
+      - filesize_test_sparse_14 is not changed
+
+      - filesize_test_sparse_12.cmd == filesize_test_sparse_11.cmd
+      - filesize_test_sparse_13.cmd is undefined
+      - filesize_test_sparse_14.cmd is undefined
+
+      - filesize_test_sparse_11.size_diff == 199023255552
+      - filesize_test_sparse_12.size_diff == 199023255552
+      - filesize_test_sparse_13.size_diff == 0
+      - filesize_test_sparse_14.size_diff == 0
+
+      - filesize_test_sparse_11.size == 2000000000000
+      - filesize_test_sparse_12.size == 2199023255552
+      - filesize_test_sparse_13.size == 2199023255552
+      - filesize_test_sparse_14.size == 2199023255552
+
+      - filesize_stat_sparse_11.stat.size == 2000000000000
+      - filesize_stat_sparse_12.stat.size == 2199023255552
+      - filesize_stat_sparse_14.stat.size == 2199023255552
+
+
+- name: Change sparse file size to 2.321TB (check mode)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2.321TB
+    sparse: true
+  register: filesize_test_sparse_21
+  check_mode: true
+
+- name: Stat the file again (should remain the same)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_21
+
+
+- name: Change sparse file size to 2.321TB
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2.321TB
+    sparse: true
+  register: filesize_test_sparse_22
+
+- name: Stat the file again (should have been reduced)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_22
+
+
+- name: Change sparse file size to 2321×1GB (check mode, idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2321
+    blocksize: 1GB
+    sparse: true
+  register: filesize_test_sparse_23
+  check_mode: true
+
+- name: Change sparse file size to 2321×1GB (idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 2321
+    blocksize: 1GB
+    sparse: true
+  register: filesize_test_sparse_24
+
+- name: Stat the file again (should remain the same)
+  ansible.builtin.stat:
+    path: "{{ filesize_testfile }}"
+    get_checksum: false
+  register: filesize_stat_sparse_24
+
+
+- name: Assert that results are as expected
+  ansible.builtin.assert:
+    that:
+      - filesize_test_sparse_21 is changed
+      - filesize_test_sparse_22 is changed
+      - filesize_test_sparse_23 is not changed
+      - filesize_test_sparse_24 is not changed
+
+      - filesize_test_sparse_22.cmd == filesize_test_sparse_21.cmd
+      - filesize_test_sparse_23.cmd is undefined
+      - filesize_test_sparse_24.cmd is undefined
+
+      - filesize_test_sparse_21.size_diff == 2321*1000**3 - 2*1024**4
+      - filesize_test_sparse_22.size_diff == 2321*1000**3 - 2*1024**4
+      - filesize_test_sparse_23.size_diff == 0
+      - filesize_test_sparse_24.size_diff == 0
+
+      - filesize_test_sparse_21.size == 2199023255552
+      - filesize_test_sparse_22.size == 2321000000000
+      - filesize_test_sparse_23.size == 2321000000000
+      - filesize_test_sparse_24.size == 2321000000000
+
+      - filesize_stat_sparse_21.stat.size == 2199023255552
+      - filesize_stat_sparse_22.stat.size == 2321000000000
+      - filesize_stat_sparse_24.stat.size == 2321000000000
+
+
+- name: Remove test file
+  ansible.builtin.file:
+    path: "{{ filesize_testfile }}"
+    state: absent

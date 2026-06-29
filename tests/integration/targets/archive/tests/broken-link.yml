@@ -1,0 +1,35 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- block:
+    - name: Create link - broken link ({{ format }})
+      file:
+        src: /nowhere
+        dest: "{{ remote_tmp_dir }}/nowhere.txt"
+        state: link
+        force: true
+
+    - name: Archive - broken link ({{ format }})
+      archive:
+        path: "{{ remote_tmp_dir }}/*.txt"
+        dest: "{{ remote_tmp_dir }}/archive_broken_link.{{ format }}"
+        format: "{{ format }}"
+
+    - name: Verify archive exists - broken link ({{ format }})
+      file:
+        path: "{{ remote_tmp_dir }}/archive_broken_link.{{ format }}"
+        state: file
+
+    - name: Remove archive - broken link ({{ format }})
+      file:
+        path: "{{ remote_tmp_dir }}/archive_broken_link.{{ format }}"
+        state: absent
+
+    - name: Remove link - broken link ({{ format }})
+      file:
+        path: "{{ remote_tmp_dir }}/nowhere.txt"
+        state: absent
+  # 'zip' does not support symlink's
+  when: format != 'zip'

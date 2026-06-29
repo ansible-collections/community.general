@@ -1,0 +1,18 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Prepare VG for missing PV"
+  lvg:
+    vg: vg_with_missing_pv
+    pvs:
+      - "{{ loop_device3 }}"
+      - "{{ loop_device4 }}"
+
+- name: Save loop_device4 pvid
+  shell: "pvs -ouuid --noheadings {{ loop_device4 }} | xargs -n1 | tr -d '-'"
+  register: loop_device4_pvid_result
+
+- name: Detach loop_device4
+  command: "losetup -d {{ loop_device4 }}"

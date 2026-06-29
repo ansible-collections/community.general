@@ -1,0 +1,210 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Checks for existence
+- name: Make sure image is present by ID
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: present
+  register: result
+
+- name: Assert that image is present
+  assert:
+    that:
+      - result is not changed
+
+- name: Make sure image is present by ID
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: my_image
+    state: present
+  register: result
+
+- name: Assert that image is present
+  assert:
+    that:
+      - result is not changed
+
+# Updating an image
+- name: Clone image without name
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: cloned
+  register: result
+
+- name: Assert that image is cloned
+  assert:
+    that:
+      - result is changed
+
+- name: Clone image with name
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: renamed
+    new_name: new_image
+  register: result
+
+- name: Assert that image is cloned
+  assert:
+    that:
+      - result is changed
+
+- name: Disable image
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    enabled: false
+  register: result
+
+- name: Assert that network is disabled
+  assert:
+    that:
+      - result is changed
+
+- name: Enable image
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    enabled: true
+  register: result
+
+- name: Assert that network is enabled
+  assert:
+    that:
+      - result is changed
+
+- name: Make image persistent
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    persistent: true
+  register: result
+
+- name: Assert that network is persistent
+  assert:
+    that:
+      - result is changed
+
+- name: Make image non-persistent
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    persistent: false
+  register: result
+
+- name: Assert that network is non-persistent
+  assert:
+    that:
+      - result is changed
+
+# Testing idempotence using the same tasks
+- name: Make image non-persistent
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    persistent: false
+    enabled: true
+  register: result
+
+- name: Assert that network not changed
+  assert:
+    that:
+      - result is not changed
+
+# Delete images
+- name: Deleting non-existing image
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 228
+    state: absent
+  register: result
+
+- name: Assert that network not changed
+  assert:
+    that:
+      - result is not changed
+
+- name: Delete an existing image
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: absent
+  register: result
+
+- name: Assert that image was deleted
+  assert:
+    that:
+      - result is changed
+
+# Trying to run with wrong arguments
+- name: Try to use name and ID at the same time
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    name: name
+  register: result
+  ignore_errors: true
+
+- name: Assert that task failed
+  assert:
+    that:
+      - result is failed
+
+- name: Try to rename image without specifying new name
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: rename
+  register: result
+  ignore_errors: true
+
+- name: Assert that task failed
+  assert:
+    that:
+      - result is failed
+
+- name: Try to rename image without specifying new name
+  one_image:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: rename
+  register: result
+  ignore_errors: true

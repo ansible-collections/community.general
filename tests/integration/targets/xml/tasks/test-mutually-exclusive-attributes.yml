@@ -1,0 +1,26 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-beers.xml
+    dest: /tmp/ansible-xml-beers.xml
+
+
+- name: Specify both children to add and a value
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    add_children:
+      - child01
+      - child02
+    value: conflict!
+  register: module_output
+  ignore_errors: true
+
+- name: Test expected result
+  assert:
+    that:
+      - module_output is not changed
+      - module_output is failed

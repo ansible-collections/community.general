@@ -1,0 +1,576 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Reset ssh_config before testing options
+- name: Copy sample config file
+  copy:
+    src: 'files/ssh_config_test'
+    dest: '{{ ssh_config_test }}'
+
+- name: Options - Add in check mode
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh jumphost.example.com -W %h:%p"
+    forward_agent: true
+    add_keys_to_agent: true
+    host_key_algorithms: "+ssh-rsa"
+    identities_only: true
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: "yes"
+    dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet"
+    state: present
+  register: options_add
+  check_mode: true
+
+- name: Options - Check if changes are made in check mode
+  assert:
+    that:
+      - options_add.changed
+      - "'options.example.com' in options_add.hosts_added"
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Options - Verify that nothing was added to {{ ssh_config_test }} during change mode"
+  assert:
+    that:
+      - "'options.example.com' not in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Add a host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh jumphost.example.com -W %h:%p"
+    forward_agent: true
+    add_keys_to_agent: true
+    host_key_algorithms: "+ssh-rsa"
+    identities_only: true
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: "yes"
+    dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet"
+    state: present
+  register: options_add
+
+- name: Options - Check if changes are made
+  assert:
+    that:
+      - options_add.changed
+      - "'options.example.com' in options_add.hosts_added"
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+
+- name: Options - Add same host again for idempotency
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh jumphost.example.com -W %h:%p"
+    forward_agent: true
+    add_keys_to_agent: true
+    host_key_algorithms: "+ssh-rsa"
+    identities_only: true
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: "yes"
+    dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet"
+    state: present
+  register: options_add_again
+
+- name: Options - Check for idempotency
+  assert:
+    that:
+      - not options_add_again.changed
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+      - options_add.hosts_added is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} contains added options"
+  assert:
+    that:
+      - "'proxycommand ssh jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
+      - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent yes' in slurp_ssh_config['content'] | b64decode"
+      - "'hostkeyalgorithms +ssh-rsa' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly yes' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster auto' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 10080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet' in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Update host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh new-jumphost.example.com -W %h:%p"
+    forward_agent: false
+    add_keys_to_agent: false
+    host_key_algorithms: "+ssh-ed25519"
+    identities_only: false
+    controlmaster: "no"
+    controlpath: "~/.ssh/new-sockets/%r@%h-%p"
+    controlpersist: "600"
+    dynamicforward: '11080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet6"
+    state: present
+  register: options_update
+
+- name: Options - Check for update operation
+  assert:
+    that:
+      - options_update.changed
+      - options_update.hosts_changed is defined
+      - "'options.example.com' in options_update.hosts_changed"
+      - options_update.hosts_removed is defined
+      - options_update.hosts_added is defined
+      - options_update.hosts_change_diff is defined
+
+- name: Options - Update host again
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxycommand: "ssh new-jumphost.example.com -W %h:%p"
+    forward_agent: false
+    add_keys_to_agent: false
+    host_key_algorithms: "+ssh-ed25519"
+    identities_only: false
+    controlmaster: "no"
+    controlpath: "~/.ssh/new-sockets/%r@%h-%p"
+    controlpersist: "600"
+    dynamicforward: '11080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet6"
+    state: present
+  register: options_update
+
+- name: Options - Check update operation for idempotency
+  assert:
+    that:
+      - not options_update.changed
+      - options_update.hosts_changed is defined
+      - options_update.hosts_removed is defined
+      - options_update.hosts_added is defined
+      - options_update.hosts_change_diff is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} contains changed options"
+  assert:
+    that:
+      - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
+      - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    state: present
+  register: options_no_update
+
+- name: Options - Check that no update took place
+  assert:
+    that:
+      - not options_update.changed
+      - options_update.hosts_changed is defined
+      - options_update.hosts_removed is defined
+      - options_update.hosts_added is defined
+      - options_update.hosts_change_diff is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} wasn't changed"
+  assert:
+    that:
+      - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
+      - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
+
+- name: Debug
+  debug:
+    msg: "{{ slurp_ssh_config['content'] | b64decode }}"
+
+- name: Options - Delete a host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    state: absent
+  register: options_delete
+
+- name: Options - Check if host was removed
+  assert:
+    that:
+      - options_delete.changed
+      - "'options.example.com' in options_delete.hosts_removed"
+      - options_delete.hosts_changed is defined
+      - options_delete.hosts_added is defined
+
+- name: Options - Delete same host again for idempotency
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    state: absent
+  register: options_delete_again
+
+- name: Options - Check delete operation for idempotency
+  assert:
+    that:
+      - not options_delete_again.changed
+      - options_delete_again.hosts_changed is defined
+      - options_delete_again.hosts_removed is defined
+      - options_delete_again.hosts_added is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} does not contains deleted options"
+  assert:
+    that:
+      - "'proxycommand ssh new-jumphost.example.com -W %h:%p' not in slurp_ssh_config['content'] | b64decode"
+      - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' not in slurp_ssh_config['content'] | b64decode"
+      - "'hostkeyalgorithms +ssh-ed25519' not in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster auto' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/sockets/%r@%h-%p' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 10080' not in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' not in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet' not in slurp_ssh_config['content'] | b64decode"
+
+# Proxycommand and ProxyJump are mutually exclusive.
+# Reset ssh_config before testing options with proxyjump
+
+- name: Copy sample config file
+  copy:
+    src: 'files/ssh_config_test'
+    dest: '{{ ssh_config_test }}'
+
+- name: Options - Add in check mode
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxyjump: "jumphost.example.com"
+    forward_agent: true
+    add_keys_to_agent: true
+    host_key_algorithms: "+ssh-rsa"
+    identities_only: true
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: "yes"
+    dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet"
+    state: present
+  register: options_add
+  check_mode: true
+
+- name: Options - Check if changes are made in check mode
+  assert:
+    that:
+      - options_add.changed
+      - "'options.example.com' in options_add.hosts_added"
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Options - Verify that nothing was added to {{ ssh_config_test }} during change mode"
+  assert:
+    that:
+      - "'options.example.com' not in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Add a host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxyjump: "jumphost.example.com"
+    forward_agent: true
+    add_keys_to_agent: true
+    host_key_algorithms: "+ssh-rsa"
+    identities_only: true
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: "yes"
+    dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet"
+    state: present
+  register: options_add
+
+- name: Options - Check if changes are made
+  assert:
+    that:
+      - options_add.changed
+      - "'options.example.com' in options_add.hosts_added"
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+
+- name: Options - Add same host again for idempotency
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxyjump: "jumphost.example.com"
+    forward_agent: true
+    add_keys_to_agent: true
+    host_key_algorithms: "+ssh-rsa"
+    identities_only: true
+    controlmaster: "auto"
+    controlpath: "~/.ssh/sockets/%r@%h-%p"
+    controlpersist: "yes"
+    dynamicforward: '10080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet"
+    state: present
+  register: options_add_again
+
+- name: Options - Check for idempotency
+  assert:
+    that:
+      - not options_add_again.changed
+      - options_add.hosts_changed is defined
+      - options_add.hosts_removed is defined
+      - options_add.hosts_added is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} contains added options"
+  assert:
+    that:
+      - "'proxyjump jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
+      - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent yes' in slurp_ssh_config['content'] | b64decode"
+      - "'hostkeyalgorithms +ssh-rsa' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly yes' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster auto' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist yes' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 10080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet' in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Update host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxyjump: "new-jumphost.example.com"
+    forward_agent: false
+    add_keys_to_agent: false
+    host_key_algorithms: "+ssh-ed25519"
+    identities_only: false
+    controlmaster: "no"
+    controlpath: "~/.ssh/new-sockets/%r@%h-%p"
+    controlpersist: "600"
+    dynamicforward: '11080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet6"
+    state: present
+  register: options_update
+
+- name: Options - Check for update operation
+  assert:
+    that:
+      - options_update.changed
+      - options_update.hosts_changed is defined
+      - "'options.example.com' in options_update.hosts_changed"
+      - options_update.hosts_removed is defined
+      - options_update.hosts_added is defined
+      - options_update.hosts_change_diff is defined
+
+- name: Options - Update host again
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    proxyjump: "new-jumphost.example.com"
+    forward_agent: false
+    add_keys_to_agent: false
+    host_key_algorithms: "+ssh-ed25519"
+    identities_only: false
+    controlmaster: "no"
+    controlpath: "~/.ssh/new-sockets/%r@%h-%p"
+    controlpersist: "600"
+    dynamicforward: '11080'
+    other_options:
+      serveraliveinterval: '30'
+    address_family: "inet6"
+    state: present
+  register: options_update
+
+- name: Options - Check update operation for idempotency
+  assert:
+    that:
+      - not options_update.changed
+      - options_update.hosts_changed is defined
+      - options_update.hosts_removed is defined
+      - options_update.hosts_added is defined
+      - options_update.hosts_change_diff is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} contains changed options"
+  assert:
+    that:
+      - "'proxyjump new-jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
+      - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
+
+- name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    state: present
+  register: options_no_update
+
+- name: Options - Check that no update took place
+  assert:
+    that:
+      - not options_update.changed
+      - options_update.hosts_changed is defined
+      - options_update.hosts_removed is defined
+      - options_update.hosts_added is defined
+      - options_update.hosts_change_diff is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} wasn't changed"
+  assert:
+    that:
+      - "'proxyjump new-jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
+      - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' in slurp_ssh_config['content'] | b64decode"
+      - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster no' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/new-sockets/%r@%h-%p' in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist 600' in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 11080' in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
+
+- name: Debug
+  debug:
+    msg: "{{ slurp_ssh_config['content'] | b64decode }}"
+
+- name: Options - Delete a host
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    state: absent
+  register: options_delete
+
+- name: Options - Check if host was removed
+  assert:
+    that:
+      - options_delete.changed
+      - "'options.example.com' in options_delete.hosts_removed"
+      - options_delete.hosts_changed is defined
+      - options_delete.hosts_added is defined
+
+- name: Options - Delete same host again for idempotency
+  community.general.ssh_config:
+    ssh_config_file: "{{ ssh_config_test }}"
+    host: "options.example.com"
+    state: absent
+  register: options_delete_again
+
+- name: Options - Check delete operation for idempotency
+  assert:
+    that:
+      - not options_delete_again.changed
+      - options_delete_again.hosts_changed is defined
+      - options_delete_again.hosts_removed is defined
+      - options_delete_again.hosts_added is defined
+
+- name: "Options - Get content of {{ ssh_config_test }}"
+  slurp:
+    src: "{{ ssh_config_test }}"
+  register: slurp_ssh_config
+
+- name: "Verify that {{ ssh_config_test }} does not contains deleted options"
+  assert:
+    that:
+      - "'proxyjump new-jumphost.example.com' not in slurp_ssh_config['content'] | b64decode"
+      - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
+      - "'addkeystoagent no' not in slurp_ssh_config['content'] | b64decode"
+      - "'hostkeyalgorithms +ssh-ed25519' not in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlmaster auto' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlpath ~/.ssh/sockets/%r@%h-%p' not in slurp_ssh_config['content'] | b64decode"
+      - "'controlpersist yes' not in slurp_ssh_config['content'] | b64decode"
+      - "'dynamicforward 10080' not in slurp_ssh_config['content'] | b64decode"
+      - "'serveraliveinterval 30' not in slurp_ssh_config['content'] | b64decode"
+      - "'addressfamily inet' not in slurp_ssh_config['content'] | b64decode"

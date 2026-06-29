@@ -1,0 +1,23 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+- name: Install application helloworld
+  community.general.cargo:
+    executable: "{{ rustup_cargo_bin }}"
+    name: helloworld
+  register: rustup_install_absent_helloworld
+
+- name: Uninstall application helloworld
+  community.general.cargo:
+    executable: "{{ rustup_cargo_bin }}"
+    state: absent
+    name: helloworld
+  register: rustup_uninstall_present_helloworld
+
+- name: Check assertions helloworld
+  assert:
+    that:
+      - rustup_install_absent_helloworld is changed
+      - rustup_uninstall_present_helloworld is changed

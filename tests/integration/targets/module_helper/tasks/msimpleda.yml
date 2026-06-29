@@ -1,0 +1,62 @@
+# Copyright (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- set_fact:
+    attr2_depr_dict:
+      msg: Attribute attr2 is deprecated
+      version: 9.9.9
+      collection_name: community.general
+    # With Data Tagging, the deprecation dict looks a bit different:
+    attr2_depr_dict_dt:
+      msg: Attribute attr2 is deprecated
+      version: 9.9.9
+      collection_name: community.general
+      deprecator:
+        resolved_name: community.general
+        type: collection
+    # Latest version:
+    attr2_depr_dict_dt2:
+      msg: Attribute attr2 is deprecated
+      version: 9.9.9
+      collection_name: community.general
+      deprecator:
+        resolved_name: community.general
+        type: ~
+
+- name: test msimpleda 1
+  msimpleda:
+    a: 1
+  register: simple1
+
+- name: assert simple1
+  assert:
+    that:
+      - simple1.a == 1
+      - simple1.attr1 == "abc"
+      - >-
+        ("deprecations" not in simple1) or (
+          attr2_depr_dict not in simple1.deprecations and
+          attr2_depr_dict_dt not in simple1.deprecations and
+          attr2_depr_dict_dt2 not in simple1.deprecations
+        )
+
+- name: test msimpleda 2
+  msimpleda:
+    a: 2
+  register: simple2
+
+- name: Show results
+  debug:
+    var: simple2
+
+- name: assert simple2
+  assert:
+    that:
+      - simple2.a == 2
+      - simple2.attr2 == "def"
+      - '"deprecations" in simple2'
+      - >-
+        attr2_depr_dict in simple2.deprecations or
+        attr2_depr_dict_dt in simple2.deprecations or
+        attr2_depr_dict_dt2 in simple2.deprecations

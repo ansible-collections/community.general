@@ -1,0 +1,135 @@
+#!/usr/bin/python
+
+# Copyright (c) 2018, Dag Wieers (dagwieers) <dag@wieers.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: cobbler_sync
+short_description: Sync Cobbler
+description:
+  - Sync Cobbler to commit changes.
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  host:
+    description:
+      - The name or IP address of the Cobbler system.
+    default: 127.0.0.1
+    type: str
+  port:
+    description:
+      - Port number to be used for REST connection.
+      - The default value depends on parameter O(use_ssl).
+    type: int
+  username:
+    description:
+      - The username to log in to Cobbler.
+    default: cobbler
+    type: str
+  password:
+    description:
+      - The password to log in to Cobbler.
+    type: str
+  use_ssl:
+    description:
+      - If V(false), an HTTP connection is used instead of the default HTTPS connection.
+    type: bool
+    default: true
+  validate_certs:
+    description:
+      - If V(false), SSL certificates are not validated.
+      - This should only set to V(false) when used on personally controlled sites using self-signed certificates.
+    type: bool
+    default: true
+author:
+  - Dag Wieers (@dagwieers)
+todo:
+notes:
+  - Concurrently syncing Cobbler is bound to fail with weird errors.
+"""
+
+EXAMPLES = r"""
+- name: Commit Cobbler changes
+  community.general.cobbler_sync:
+    host: cobbler01
+    username: cobbler
+    password: MySuperSecureP4sswOrd
+  run_once: true
+  delegate_to: localhost
+"""
+
+RETURN = r"""
+# Default return values
+"""
+
+import ssl
+import xmlrpc.client as xmlrpc_client
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils._datetime import (
+    now,
+)
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            host=dict(type="str", default="127.0.0.1"),
+            port=dict(type="int"),
+            username=dict(type="str", default="cobbler"),
+            password=dict(type="str", no_log=True),
+            use_ssl=dict(type="bool", default=True),
+            validate_certs=dict(type="bool", default=True),
+        ),
+        supports_check_mode=True,
+    )
+
+    username = module.params["username"]
+    password = module.params["password"]
+    port = module.params["port"]
+    use_ssl = module.params["use_ssl"]
+    validate_certs = module.params["validate_certs"]
+
+    proto = "https" if use_ssl else "http"
+    if not port:
+        port = "443" if use_ssl else "80"
+
+    result = dict(
+        changed=True,
+    )
+
+    start = now()
+
+    ssl_context = None if validate_certs or not use_ssl else ssl._create_unverified_context()
+
+    url = f"{proto}://{module.params['host']}:{port}/cobbler_api"
+    conn = xmlrpc_client.ServerProxy(url, context=ssl_context)
+
+    try:
+        token = conn.login(username, password)
+    except xmlrpc_client.Fault as e:
+        module.fail_json(msg=f"Failed to log in to Cobbler '{url}' as '{username}'. {e}")
+    except Exception as e:
+        module.fail_json(msg=f"Connection to '{url}' failed. {e}")
+
+    if not module.check_mode:
+        try:
+            conn.sync(token)
+        except Exception as e:
+            module.fail_json(msg=f"Failed to sync Cobbler. {e}")
+
+    elapsed = now() - start
+    module.exit_json(elapsed=elapsed.seconds, **result)
+
+
+if __name__ == "__main__":
+    main()

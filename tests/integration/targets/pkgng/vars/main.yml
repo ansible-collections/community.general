@@ -1,0 +1,9 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+pkgng_test_outofdate_pkg_path: "/tmp/ansible_pkgng_test_package.pkg"
+pkgng_test_pkg_name: zsh
+pkgng_test_pkg_category: shells
+pkgng_test_pkg_sentinelfile_path: /usr/local/bin/zsh

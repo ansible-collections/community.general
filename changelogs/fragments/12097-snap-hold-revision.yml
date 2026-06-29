@@ -1,0 +1,2 @@
+bugfixes:
+  - snap - enforce ``snap refresh --hold`` after installing at a specific revision (https://github.com/ansible-collections/community.general/issues/12088, https://github.com/ansible-collections/community.general/pull/12097).

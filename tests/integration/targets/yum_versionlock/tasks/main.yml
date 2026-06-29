@@ -1,0 +1,86 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Update procps-ng temporary until issue (#2539) is fixed
+  yum:
+    name: procps-ng
+    state: latest
+  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '34'
+
+- block:
+    - name: Install necessary packages to test yum_versionlock
+      yum:
+        name: yum-plugin-versionlock
+        state: present
+      register: yum_versionlock_install
+
+    - name: Yum checkupdate
+      yum:
+        list: updates
+      register: yum_updates
+
+    - block:
+        - name: Lock all packages
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | list }}"
+            state: present
+          register: lock_all_packages
+
+        - name: Lock all packages again
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | list }}"
+            state: present
+          register: lock_all_packages_again
+
+        - name: Lock packages wildcard
+          community.general.yum_versionlock:
+            name: "nss*"
+            state: present
+          register: lock_nss_wildcard
+
+          # This should fail when it needs user interaction and missing -y is on purpose.
+        - name: Update all packages (not really)
+          command: yum update --setopt=obsoletes=0
+          register: update_all_locked_packages
+          changed_when:
+            - '"No packages marked for update" not in update_all_locked_packages.stdout'
+            - '"Nothing to do" not in update_all_locked_packages.stdout'
+
+        - name: Unlock all packages
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | list }}"
+            state: absent
+          register: unlock_all_packages
+
+        - name: Update all packages
+          yum:
+            name: '*'
+            state: latest
+          check_mode: true
+          register: update_all_packages
+          when: yum_updates.results | length != 0
+
+        - name: Assert everything is fine
+          assert:
+            that:
+              - lock_all_packages is changed
+              - lock_all_packages_again is not changed
+              - lock_nss_wildcard is not changed
+              - update_all_locked_packages is not changed
+              - unlock_all_packages is changed
+              - update_all_packages is changed
+      when: yum_updates.results | length != 0
+
+    - name: Remove installed packages in case it was not installed
+      yum:
+        name: yum-plugin-versionlock
+        state: absent
+      when: yum_versionlock_install is changed
+  when: ansible_facts.distribution in ['CentOS', 'RedHat', 'Fedora']

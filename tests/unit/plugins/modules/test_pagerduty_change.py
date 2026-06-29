@@ -1,0 +1,88 @@
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+import json
+from unittest.mock import patch
+
+import pytest
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    AnsibleFailJson,
+    ModuleTestCase,
+    set_module_args,
+)
+
+from ansible_collections.community.general.plugins.modules import pagerduty_change
+
+
+class TestPagerDutyChangeModule(ModuleTestCase):
+    def setUp(self):
+        super().setUp()
+        self.module = pagerduty_change
+
+    def tearDown(self):
+        super().tearDown()
+
+    @pytest.fixture
+    def fetch_url_mock(self, mocker):
+        return mocker.patch("ansible.module_utils.monitoring.pagerduty_change.fetch_url")
+
+    def test_module_fail_when_required_args_missing(self):
+        with self.assertRaises(AnsibleFailJson):
+            with set_module_args({}):
+                self.module.main()
+
+    def test_ensure_change_event_created_with_minimal_data(self):
+        with set_module_args({"integration_key": "test", "summary": "Testing"}):
+            with patch.object(pagerduty_change, "fetch_url") as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 202})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
+
+            assert fetch_url_mock.call_count == 1
+            url = fetch_url_mock.call_args[0][1]
+            json_data = fetch_url_mock.call_args[1]["data"]
+            data = json.loads(json_data)
+
+            assert url == "https://events.pagerduty.com/v2/change/enqueue"
+            assert data["routing_key"] == "test"
+            assert data["payload"]["summary"] == "Testing"
+            assert data["payload"]["source"] == "Ansible"
+
+    def test_ensure_change_event_created_with_full_data(self):
+        with set_module_args(
+            {
+                "integration_key": "test",
+                "summary": "Testing",
+                "source": "My Ansible Script",
+                "user": "ansible",
+                "repo": "github.com/ansible/ansible",
+                "revision": "8c67432",
+                "environment": "production",
+                "link_url": "https://pagerduty.com",
+                "link_text": "PagerDuty",
+            }
+        ):
+            with patch.object(pagerduty_change, "fetch_url") as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 202})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
+
+            assert fetch_url_mock.call_count == 1
+            url = fetch_url_mock.call_args[0][1]
+            json_data = fetch_url_mock.call_args[1]["data"]
+            data = json.loads(json_data)
+
+            assert url == "https://events.pagerduty.com/v2/change/enqueue"
+            assert data["routing_key"] == "test"
+            assert data["payload"]["summary"] == "Testing"
+            assert data["payload"]["source"] == "My Ansible Script"
+            assert data["payload"]["custom_details"]["user"] == "ansible"
+            assert data["payload"]["custom_details"]["repo"] == "github.com/ansible/ansible"
+            assert data["payload"]["custom_details"]["revision"] == "8c67432"
+            assert data["payload"]["custom_details"]["environment"] == "production"
+            assert data["links"][0]["href"] == "https://pagerduty.com"
+            assert data["links"][0]["text"] == "PagerDuty"

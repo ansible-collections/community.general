@@ -1,0 +1,27 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- import_tasks: setup_no_value.yml
+
+- name: unsetting value
+  git_config:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+    state: absent
+  register: unset_result
+
+- name: getting value
+  git_config_info:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+  register: get_result
+
+- name: assert unsetting didn't change
+  assert:
+    that:
+      - unset_result is not changed
+      - unset_result.msg == 'no setting to unset'
+      - get_result.config_value == ''
+...

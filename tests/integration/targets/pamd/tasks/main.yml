@@ -1,0 +1,74 @@
+# Copyright (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set value for temp limit configuration
+  set_fact:
+    test_pamd_file: "/tmp/pamd_file"
+
+- name: Create temporary pam.d file
+  copy:
+    content: "session required pam_lastlog.so silent showfailed"
+    dest: "{{ test_pamd_file }}"
+- name: Test working on a single-line file works (2925)
+  community.general.pamd:
+    path: /tmp
+    name: pamd_file
+    type: session
+    control: required
+    module_path: pam_lastlog.so
+    module_arguments: silent
+    state: args_absent
+  register: pamd_file_output
+- name: Check if changes made
+  assert:
+    that:
+      - pamd_file_output is changed
+
+- name: Test removing all arguments from an entry (3260)
+  community.general.pamd:
+    path: /tmp
+    name: pamd_file
+    type: session
+    control: required
+    module_path: pam_lastlog.so
+    module_arguments: ""
+    state: updated
+  register: pamd_file_output_noargs
+- name: Read back the file (3260)
+  slurp:
+    src: "{{ test_pamd_file }}"
+  register: pamd_file_slurp_noargs
+- name: Check if changes made (3260)
+  vars:
+    line_array: "{{ (pamd_file_slurp_noargs.content|b64decode).split('\n')[2].split() }}"
+  assert:
+    that:
+      - pamd_file_output_noargs is changed
+      - line_array == ['session', 'required', 'pam_lastlog.so']
+
+- name: Create temporary pam.d file
+  copy:
+    content: ""
+    dest: "{{ test_pamd_file }}"
+# This test merely demonstrates that, as-is, module will not perform any changes on an empty file
+# All the existing values for "state" will first search for a rule matching type, control, module_path
+# and will not perform any change whatsoever if no existing rules match.
+- name: Test working on a empty file works (2925)
+  community.general.pamd:
+    path: /tmp
+    name: pamd_file
+    type: session
+    control: required
+    module_path: pam_lastlog.so
+    module_arguments: silent
+  register: pamd_file_output_empty
+- name: Read back the file
+  slurp:
+    src: "{{ test_pamd_file }}"
+  register: pamd_file_slurp
+- name: Check if changes made
+  assert:
+    that:
+      - pamd_file_output_empty is not changed
+      - pamd_file_slurp.content|b64decode == ''

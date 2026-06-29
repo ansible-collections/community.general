@@ -1,0 +1,49 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Clean up {{ gitlab_project_name }}
+  gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: absent
+
+- name: Create {{ gitlab_project_name }}
+  gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    initialize_with_readme: true
+    state: present
+  register: gitlab_project_state
+
+- assert:
+    that:
+      - gitlab_project_state is changed
+
+- name: Create {{ gitlab_project_name }} (Test idempotency)
+  gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: present
+  register: gitlab_project_state_again
+
+- assert:
+    that:
+      - gitlab_project_state_again is not changed

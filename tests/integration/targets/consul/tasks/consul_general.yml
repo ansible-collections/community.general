@@ -1,0 +1,76 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: ensure unknown scheme fails
+  consul_session:
+    state: info
+    id: dummy
+    scheme: non_existent
+    token: "{{ consul_management_token }}"
+  register: result
+  ignore_errors: true
+
+- assert:
+    that:
+      - result is failed
+
+- name: ensure SSL certificate is checked
+  consul_session:
+    state: info
+    id: dummy
+    port: 8501
+    scheme: https
+    token: "{{ consul_management_token }}"
+  register: result
+  ignore_errors: true
+
+- name: previous task should fail since certificate is not known
+  assert:
+    that:
+      - result is failed
+      - "'certificate verify failed' in result.msg"
+
+- name: ensure SSL certificate isn't checked when validate_certs is disabled
+  consul_session:
+    state: info
+    id: dummy
+    port: 8501
+    scheme: https
+    token: "{{ consul_management_token }}"
+    validate_certs: false
+  register: result
+
+- name: previous task should succeed since certificate isn't checked
+  assert:
+    that:
+      - result is changed
+
+- name: ensure a secure connection is possible
+  consul_session:
+    state: info
+    id: dummy
+    port: 8501
+    scheme: https
+    token: "{{ consul_management_token }}"
+    ca_path: '{{ remote_dir }}/cert.pem'
+  register: result
+
+- assert:
+    that:
+      - result is changed
+
+- name: ensure connection errors are handled properly
+  consul_session:
+    state: info
+    id: dummy
+    token: "{{ consul_management_token }}"
+    port: 1234
+  register: result
+  ignore_errors: true
+
+- assert:
+    that:
+      - result is failed
+      - result.msg.startswith('Could not connect to consul agent at localhost:1234, error was')

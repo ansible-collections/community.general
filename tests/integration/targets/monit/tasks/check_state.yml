@@ -1,0 +1,21 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "{{ reason }} ('up')"
+  command: "curl -sf http://localhost:8082/hello"
+  when: service_state == 'up'
+  register: curl_result
+  until: not curl_result.failed
+  retries: 5
+  delay: 1
+
+- name: "{{ reason }} ('down')"
+  command: "curl -sf http://localhost:8082/hello"
+  register: curl_result
+  failed_when: curl_result == 0
+  when: service_state == 'down'
+  until: not curl_result.failed
+  retries: 5
+  delay: 1

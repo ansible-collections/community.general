@@ -1,0 +1,33 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Call random_words plugin
+      set_fact:
+        result1: "{{ query('community.general.random_words') }}"
+        result2: "{{ query('community.general.random_words', min_length=5, max_length=5) }}"
+        result3: "{{ query('community.general.random_words', delimiter='!') }}"
+        result4: "{{ query('community.general.random_words', numwords=3, delimiter='-', case='capitalize') }}"
+        result5: "{{ query('community.general.random_words', min_length=5, max_length=5, numwords=3, delimiter='') }}"
+
+    - name: Check results
+      assert:
+        that:
+          - result1 | length == 1
+          - result1[0] | length >= 35
+          - result2 | length == 1
+          - result2[0] | length == 35
+          - result3 | length == 1
+          - result3[0].count("!") == 5
+          - result4 | length == 1
+          - result4[0] | length >= 17
+          - result4[0] | length <= 29
+          - result4[0] | regex_findall("[A-Z]") | length == 3
+          # If one of the random words is 't-shirt', there are more than 2 dashes...
+          - result4[0].count("-") == 2 or "t-shirt" in result4[0].lower()
+          - result5 | length == 1
+          - result5[0] | length == 15

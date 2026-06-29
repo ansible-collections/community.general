@@ -1,0 +1,35 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Remove test volume group
+  lvg:
+    vg: testvg
+    force: true
+    state: absent
+
+- name: Remove LVM devices
+  loop:
+    - "{{ loop_device1 | default('') }}"
+    - "{{ loop_device2 | default('') }}"
+    - "{{ loop_device3 | default('') }}"
+  when:
+    - item|length > 0
+  command: "lvmdevices --deldev {{ item }}"
+  ignore_errors: true
+
+- name: Detach loop devices
+  command: "losetup -d {{ item }}"
+  loop:
+    - "{{ loop_device1 | default('') }}"
+    - "{{ loop_device2 | default('') }}"
+    - "{{ loop_device3 | default('') }}"
+  when:
+    - item != ''
+
+- name: Remove device files
+  file:
+    path: "{{ remote_tmp_dir }}/img{{ item }}"
+    state: absent
+  with_sequence: 'count=4'

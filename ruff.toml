@@ -1,0 +1,72 @@
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2025 Felix Fontein <felix@fontein.de>
+
+line-length = 120
+
+[lint]
+# https://docs.astral.sh/ruff/rules/
+
+select = ["A", "B", "E", "F", "FA", "FLY", "UP", "SIM", "I", "RUF022"]
+ignore = [
+    # Better keep ignored (for now)
+    "F811",  # Redefinition of unused `xxx` (happens a lot for fixtures in unit tests)
+    "E402",  # Module level import not at top of file
+    "E741",  # Ambiguous variable name
+    "UP012",  # unnecessary-encode-utf8
+    "UP015",  # Unnecessary mode argument
+    "SIM105",  # suppressible-exception
+    "SIM108",  # if-else-block-instead-of-if-exp
+    # To fix later:
+    "B905",  # zip-without-explicit-strict - needs Python 3.10+
+    "UP045",  # Use `X | None` for type annotations - needs Python 3.10+
+    # To fix:
+    "B026",  # star-arg-unpacking-after-keyword-arg
+    "SIM102",  # collapsible-if
+    "SIM114",  # if-with-same-arms
+    "SIM115",  # open-file-with-context-handler
+    "SIM116",  # if-else-block-instead-of-dict-lookup
+    "SIM117",  # multiple-with-statements
+    "SIM118",  # in-dict-keys
+    "SIM210",  # if-expr-with-true-false
+    "SIM401",  # if-else-block-instead-of-dict-get
+    "A001",  # builtin-variable-shadowing
+    "A002",  # builtin-argument-shadowing
+    "A004",  # builtin-import-shadowing
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed or starting with dummy
+dummy-variable-rgx = "^(_|dummy).*$"
+
+[lint.pycodestyle]
+max-line-length = 160
+
+[format]
+# https://docs.astral.sh/ruff/formatter/#configuration
+
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+line-ending = "lf"
+
+# Disable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+docstring-code-format = false
+
+[lint.isort]
+known-first-party = [
+    "ansible_collections.community.general",
+]
+known-third-party = [
+    "ansible_collections.community.internal_test_tools",
+]

@@ -1,0 +1,182 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# By installing e2fsprogs on FreeBSD, we get a usable blkid command, but this
+# package conflicts with util-linux, that provides blkid too, but also wipefs
+# (required for filesystem state=absent).
+- name: "Install filesystem tools"
+  ansible.builtin.package:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - e2fsprogs
+    - xfsprogs
+
+- name: "Install bcachefs tools"
+  ansible.builtin.package:
+    name: bcachefs-tools
+    state: present
+  when:
+    # bcachefs only on Alpine > 3.18 and Arch Linux for now
+    # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
+    - >-
+      (ansible_facts.distribution == "Alpine" and ansible_facts.distribution_version is version("3.18", ">"))
+      or
+      ansible_facts.distribution == "Archlinux"
+
+- name: "Install btrfs progs"
+  ansible.builtin.package:
+    name: btrfs-progs
+    state: present
+  when:
+    - ansible_facts.os_family != 'Suse'
+    - ansible_facts.system != "FreeBSD"
+    - not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version is version('8', '>='))
+    - ansible_facts.os_family != 'Archlinux'  # TODO
+
+- name: "Install util-linux-extra"
+  ansible.builtin.package:
+    name: util-linux-extra
+    state: present
+  when:
+    - ansible_facts.os_family == 'Debian'
+    - not (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_version is version('24.04', '<'))
+    - not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_version is version('12', '<'))
+
+- name: "Install Alpine specific packages"
+  ansible.builtin.package:
+    name:
+      - e2fsprogs-extra
+      - findmnt
+      - util-linux-misc
+      - wipefs
+      - xfsprogs-extra
+    state: present
+  when:
+    - ansible_facts.distribution == 'Alpine'
+
+- name: "Install btrfs progs (OpenSuse)"
+  ansible.builtin.package:
+    name:
+      - python3-xml
+      - btrfsprogs
+    state: present
+  when: ansible_facts.os_family == 'Suse'
+
+- name: "Install reiserfs utils (Fedora)"
+  ansible.builtin.package:
+    name: reiserfs-utils
+    state: present
+  when:
+    - ansible_facts.distribution == 'Fedora' and (ansible_facts.distribution_major_version | int < 35)
+
+- name: "Install util-linux-systemd (for findmnt) (OpenSuse)"
+  ansible.builtin.package:
+    name:
+      - util-linux-systemd
+    state: present
+  when:
+    - ansible_facts.os_family == 'Suse'
+
+- name: "Install reiserfs progs (Debian and more)"
+  ansible.builtin.package:
+    name: reiserfsprogs
+    state: present
+  when:
+    - ansible_facts.system == 'Linux'
+    - ansible_facts.os_family not in ['Suse', 'RedHat', 'Alpine', 'Archlinux']
+    - ansible_facts.distribution != "Ubuntu" or (ansible_facts.distribution_major_version | int < 26)
+
+- name: "Install reiserfs progs (FreeBSD)"
+  ansible.builtin.package:
+    name: progsreiserfs
+    state: present
+  when:
+    - ansible_facts.system == 'FreeBSD'
+
+- name: "Install ocfs2 (Debian)"
+  ansible.builtin.package:
+    name: ocfs2-tools
+    state: present
+  when: ansible_facts.os_family == 'Debian'
+
+- name: "Install GFS2"
+  ansible.builtin.package:
+    name: gfs2-utils
+    state: present
+  when: ansible_facts.os_family in ['Debian', 'Suse', 'Ubuntu'] or ansible_facts.distribution == 'Fedora'
+
+- name: "Install f2fs tools and get version"
+  when:
+    - ansible_facts.os_family != 'RedHat' or ansible_facts.distribution == 'Fedora'
+    - ansible_facts.system != "FreeBSD"
+  block:
+    - name: "Install f2fs tools"
+      ansible.builtin.package:
+        name: f2fs-tools
+        state: present
+
+    - name: "Fetch f2fs version"
+      ansible.builtin.command:
+        cmd: mkfs.f2fs /dev/null
+      changed_when: false
+      ignore_errors: true
+      register: mkfs_f2fs
+
+    - name: "Record f2fs_version"
+      ansible.builtin.set_fact:
+        f2fs_version: '{{ mkfs_f2fs.stdout
+          | regex_search("F2FS-tools: mkfs.f2fs Ver:.*")
+          | regex_replace("F2FS-tools: mkfs.f2fs Ver: ([0-9.]+) .*", "\1") }}'
+
+- name: "Install dosfstools and lvm2 (Linux)"
+  ansible.builtin.package:
+    name:
+      - dosfstools
+      - lvm2
+  when: ansible_facts.system == 'Linux'
+
+- name: "Install fatresize and get version"
+  when:
+    - ansible_facts.system == 'Linux'
+    - ansible_facts.os_family != 'Suse'
+    - ansible_facts.os_family != 'RedHat'
+    - ansible_facts.os_family != 'Alpine'
+  block:
+    - name: "Install fatresize"
+      ansible.builtin.package:
+        name: fatresize
+        state: present
+
+    - name: "Fetch fatresize version"
+      ansible.builtin.command:
+        cmd: fatresize --help
+      changed_when: false
+      register: fatresize
+
+    - name: "Record fatresize_version"
+      ansible.builtin.set_fact:
+        fatresize_version: '{{ fatresize.stdout_lines[0] | regex_search("[0-9]+\.[0-9]+\.[0-9]+")  }}'
+
+- name: "Fetch e2fsprogs version"
+  ansible.builtin.command:
+    cmd: mke2fs -V
+  changed_when: false
+  register: mke2fs
+
+- name: "Record e2fsprogs_version"
+  ansible.builtin.set_fact:
+    # mke2fs 1.43.6 (29-Aug-2017)
+    e2fsprogs_version: '{{ mke2fs.stderr_lines[0] | regex_search("[0-9]{1,2}\.[0-9]{1,2}(\.[0-9]{1,2})?") }}'
+
+- name: "Set version-related facts to skip further tasks"
+  ansible.builtin.set_fact:
+    # http://e2fsprogs.sourceforge.net/e2fsprogs-release.html#1.43
+    # Mke2fs no longer complains if the user tries to create a file system
+    # using the entire block device.
+    force_creation: "{{ e2fsprogs_version is version('1.43', '<') }}"
+    # Earlier versions have a segfault bug
+    # Also there's an assertion bug on Ubuntu
+    resize_vfat: "{{ fatresize_version|default('0.0') is version('1.0.4', '>=') and ansible_facts.distribution != 'Ubuntu' }}"

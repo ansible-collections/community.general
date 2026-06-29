@@ -1,0 +1,107 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- ansible.builtin.debug:
+    msg: '{{ role_name }}'
+- ansible.builtin.debug:
+    msg: '{{ role_path|basename }}'
+- import_tasks: setup.yml
+
+- include_vars: "{{ lookup('first_found', search) }}"
+  vars:
+    search:
+      files:
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml'
+        - 'default.yml'
+      paths:
+        - '../vars/'
+
+- include_tasks: create_device.yml
+  vars:
+    image_file: '{{ remote_tmp_dir }}/img'
+    fstype: '{{ item.0.key }}'
+    fssize: '{{ item.0.value.fssize }}'
+    grow: '{{ item.0.value.grow }}'
+    new_uuid: '{{ item.0.value.new_uuid }}'
+    label: '{{ item.0.value.label }}'
+    action: '{{ item.1 }}'
+  when:
+    # FreeBSD limited support
+    # Not available: btrfs, lvm, f2fs, ocfs2
+    # All BSD systems use swap fs, but only Linux needs mkswap
+    # Supported: ext2/3/4 (e2fsprogs), xfs (xfsprogs), reiserfs (progsreiserfs), vfat
+    - 'not (ansible_facts.system == "FreeBSD" and item.0.key in ["bcachefs", "btrfs", "f2fs", "swap", "lvm", "ocfs2", "gfs2"])'
+    # Available on FreeBSD but not on testbed (util-linux conflicts with e2fsprogs): wipefs, mkfs.minix
+    - 'not (ansible_facts.system == "FreeBSD" and item.1 in ["overwrite_another_fs", "remove_fs"])'
+
+    # Linux limited support
+    # Not available: ufs (this is FreeBSD's native fs)
+    - 'not (ansible_facts.system == "Linux" and item.0.key == "ufs")'
+
+    # Other limitations and corner cases
+
+    # bcachefs only on Alpine > 3.18 and Arch Linux for now
+    # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
+    - 'not (ansible_facts.distribution not in ["Alpine", "Archlinux"] and item.0.key == "bcachefs")'
+    # TODO: bcachefs on Alpine doesn't seem to work for unknown reasons, debug this!
+    - 'not (ansible_facts.distribution in ["Alpine"] and item.0.key == "bcachefs")'
+    # btrfs packages not available on RHEL/CentOS/Fedora
+    - 'not (ansible_facts.os_family == "RedHat" and item.0.key == "btrfs")'
+    # btrfs-progs cannot be installed on ArchLinux
+    - 'not (item.0.key == "btrfs" and ansible_facts.distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
+    # f2fs-tools package not available with RHEL/CentOS on CI
+    - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key == "f2fs")'
+    # reiserfs not available with RHEL/CentOS/Fedora/Alpine/Arch Liux
+    - 'not (ansible_facts.distribution in ["CentOS", "RedHat", "Fedora", "Alpine", "Archlinux"] and item.0.key == "reiserfs")'
+    # reiserfsprogs packages no longer available with OpenSuSE
+    - 'not (ansible_facts.os_family == "Suse" and item.0.key == "reiserfs")'
+    # reiserfsprogs packages no longer available with Ubuntu 26.04
+    - 'not (item.0.key == "reiserfs" and ansible_facts.distribution == "Ubuntu" and (ansible_facts.distribution_major_version | int >= 26))'
+    # ocfs2 only available on Debian based distributions
+    - 'not (item.0.key == "ocfs2" and ansible_facts.os_family != "Debian")'
+    # Tests use losetup which can not be used inside unprivileged container
+    - 'not (item.0.key == "lvm" and ansible_facts.virtualization_type in ["podman", "docker", "container", "containerd"])'
+    # vfat resizing fails on Debian (but not Ubuntu)
+    - 'not (item.0.key == "vfat" and ansible_facts.distribution == "Debian")'  # TODO: figure out why it fails, fix it!
+    # vfat resizing fails on ArchLinux
+    - 'not (item.0.key == "vfat" and ansible_facts.distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
+    # vfat resizing fails on Ubuntu 22.04
+    - 'not (item.0.key == "vfat" and ansible_facts.distribution == "Ubuntu" and (ansible_facts.distribution_major_version | int == 22))'
+      # TODO: figure out why it fails, fix it!
+    # swap does not work on Alpine due to no -f support in mkswap
+    - 'not (item.0.key == "swap" and ansible_facts.distribution == "Alpine")'
+    # bcachefs does not support UUID reset on existing filesystems (no CHANGE_UUID tool)
+    - 'not (item.0.key == "bcachefs" and item.1 == "reset_fs_uuid")'
+    # GFS2 not available on these distributions
+    - 'not (item.0.key == "gfs2" and ansible_facts.distribution in ["Alpine", "Archlinux", "CentOS", "RedHat"])'
+
+  loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'reset_fs_uuid', 'overwrite_another_fs', 'remove_fs', 'set_fs_uuid_on_creation', 'set_fs_uuid_on_creation_with_opts'])|list }}"
+
+
+# With FreeBSD extended support (util-linux is not available before 12.2)
+
+- include_tasks: freebsd_setup.yml
+  when:
+    - 'ansible_facts.system == "FreeBSD"'
+    - 'ansible_facts.distribution_version is version("12.2", ">=")'
+
+- include_tasks: create_device.yml
+  vars:
+    image_file: '{{ remote_tmp_dir }}/img'
+    fstype: '{{ item.0.key }}'
+    fssize: '{{ item.0.value.fssize }}'
+    grow: '{{ item.0.value.grow }}'
+    label: '{{ item.0.value.label }}'
+    action: '{{ item.1 }}'
+  when:
+    - 'ansible_facts.system == "FreeBSD"'
+    - 'ansible_facts.distribution_version is version("12.2", ">=")'
+    - 'item.0.key in ["xfs", "vfat"]'
+  loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"

@@ -1,0 +1,257 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Clean up gitlab user
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    name: ansible_test_user
+    username: ansible_test_user
+    password: Secr3tPassw00rd
+    email: root@localhost
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: absent
+
+
+- name: Create gitlab user
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check user has been created correctly
+  assert:
+    that:
+      - gitlab_user_state is changed
+
+- name: Create gitlab user again
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: root@localhost
+    name: ansible_test_user
+    username: ansible_test_user
+    password: Secr3tPassw00rd
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state_again
+
+- name: Check state is not changed
+  assert:
+    that:
+      - gitlab_user_state_again is not changed
+      - gitlab_user_state_again.user.is_admin == False
+
+
+- name: Update User Test => Make User Admin
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    isadmin: true
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check if user is admin now
+  assert:
+    that:
+      - gitlab_user_state is changed
+      - gitlab_user_state.user.is_admin == True
+
+- name: Update User Test => Make User Admin (Again)
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    isadmin: true
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check state is not changed
+  assert:
+    that:
+      - gitlab_user_state is not changed
+      - gitlab_user_state.user.is_admin == True
+
+- name: Update User Test => Remove Admin Rights
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    isadmin: false
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check if user is not admin anymore
+  assert:
+    that:
+      - gitlab_user_state is changed
+      - gitlab_user_state.user.is_admin == False
+
+
+- name: Update User Test => Try Changing Mail without Confirmation Skipping
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: foo@bar.baz
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    confirm: true
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check that eMail is unchanged (Only works with confirmation skipping)
+  assert:
+    that:
+      - gitlab_user_state is changed
+      - gitlab_user_state.user.email == gitlab_user_email
+
+- name: Update User Test => Change Mail with Confirmation Skip
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: foo@bar.baz
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    confirm: false
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check that mail has changed now
+  assert:
+    that:
+      - gitlab_user_state is changed
+      - gitlab_user_state.user.email == 'foo@bar.baz'
+
+- name: Update User Test => Change Mail with Confirmation Skip (Again)
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: foo@bar.baz
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    confirm: false
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check state is not changed
+  assert:
+    that:
+      - gitlab_user_state is not changed
+      - gitlab_user_state.user.email == 'foo@bar.baz'
+
+- name: Update User Test => Revert to original Mail Address
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    confirm: false
+    validate_certs: false
+    api_token: "{{ gitlab_login_token }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check that reverting mail back to original has worked
+  assert:
+    that:
+      - gitlab_user_state is changed
+      - gitlab_user_state.user.email == gitlab_user_email
+
+
+- name: Update User Test => Change User Password
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    validate_certs: false
+
+    # note: the only way to check if a password really is what it is expected
+    #   to be is to use it for login, so we use it here instead of the
+    #   default token assuming that a user can always change its own password
+    api_username: "{{ gitlab_user }}"
+    api_password: "{{ gitlab_user_pass }}"
+
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: new-super-password
+    state: present
+  register: gitlab_user_state
+
+- name: Check PW setting return state
+  assert:
+    that:
+        # note: there is no way to determine if a password has changed or
+        #   not, so it can only be always yellow or always green, we
+        #   decided for always green for now
+      - gitlab_user_state is not changed
+
+- name: Update User Test => Reset User Password
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    validate_certs: false
+
+    api_username: "{{ gitlab_user }}"
+    api_password: new-super-password
+
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check PW setting return state (Again)
+  assert:
+    that:
+      - gitlab_user_state is not changed
+
+- name: Update User Test => Check that password was reset
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    validate_certs: false
+
+    api_username: "{{ gitlab_user }}"
+    api_password: "{{ gitlab_user_pass }}"
+
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    state: present
+  register: gitlab_user_state
+
+- name: Check PW setting return state (Reset)
+  assert:
+    that:
+      - gitlab_user_state is not changed
+
+- include_tasks: sshkey.yml

@@ -1,0 +1,31 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+valid_comma_separated: |
+  id,name,role
+  1,foo,bar
+  2,bar,baz
+valid_comma_separated_spaces: |
+  id,name,role
+  1, foo, bar
+  2, bar, baz
+valid_comma_separated_no_headers: |
+  1,foo,bar
+  2,bar,baz
+valid_pipe_separated: |
+  id|name|role
+  1|foo|bar
+  2|bar|baz
+invalid_comma_separated: |
+  id,name,role
+  1,foo,bar
+  2,"b"ar",baz
+expected_result:
+  - id: '1'
+    name: foo
+    role: bar
+  - id: '2'
+    name: bar
+    role: baz

@@ -1,0 +1,24 @@
+{#
+Copyright (c) Ansible Project
+GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+SPDX-License-Identifier: GPL-3.0-or-later
+#}
+
+Summary:   Duplicate{{ item }} RPM. Installs one file that is a duplicate of other Duplicate# RPMs
+Name:      duplicate{{ item }}
+Version:   1
+Release:   0
+License:   GPLv3
+Group:     Applications/System
+BuildArch: noarch
+
+%description
+Duplicate {{ item }} RPM. Package one file that will be a duplicate of other Duplicate RPM contents.
+This is only for testing of the replacefiles zypper option.
+
+%install
+mkdir -p "%{buildroot}/usr/lib/duplicate"
+echo "%{name}" > "%{buildroot}/usr/lib/duplicate/duplicate.txt"
+
+%files
+/usr/lib/duplicate/duplicate.txt

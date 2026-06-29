@@ -1,0 +1,124 @@
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
+  - id: test_set_handler
+    input:
+      handler: google-chrome.desktop
+      mime_type: x-scheme-handler/http
+    output:
+      handler: google-chrome.desktop
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/gio, --version]
+          environ: *env-def
+          rc: 0
+          out: "2.80.0\n"
+          err: ''
+        - command: [/testbin/gio, mime, x-scheme-handler/http]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: >
+            No default applications for “x-scheme-handler/http”
+        - command: [/testbin/gio, mime, x-scheme-handler/http, google-chrome.desktop]
+          environ: *env-def
+          rc: 0
+          out: "Set google-chrome.desktop as the default for x-scheme-handler/http\n"
+          err: ''
+  - id: test_set_handler_check
+    input:
+      handler: google-chrome.desktop
+      mime_type: x-scheme-handler/http
+    output:
+      handler: google-chrome.desktop
+      changed: true
+      stdout: Module executed in check mode
+      diff:
+        before:
+          handler: null
+        after:
+          handler: google-chrome.desktop
+    flags:
+      check: true
+      diff: true
+    mocks:
+      run_command:
+        - command: [/testbin/gio, --version]
+          environ: *env-def
+          rc: 0
+          out: "2.80.0\n"
+          err: ''
+        - command: [/testbin/gio, mime, x-scheme-handler/http]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: >
+            No default applications for “x-scheme-handler/http”
+  - id: test_set_handler_idempot
+    input:
+      handler: google-chrome.desktop
+      mime_type: x-scheme-handler/http
+    output:
+      handler: google-chrome.desktop
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/gio, --version]
+          environ: *env-def
+          rc: 0
+          out: "2.80.0\n"
+          err: ''
+        - command: [/testbin/gio, mime, x-scheme-handler/http]
+          environ: *env-def
+          rc: 0
+          out: |
+            Default application for “x-scheme-handler/https”: google-chrome.desktop
+            Registered applications:
+              brave-browser.desktop
+              firefox.desktop
+              google-chrome.desktop
+              firefox_firefox.desktop
+            Recommended applications:
+              brave-browser.desktop
+              firefox.desktop
+              google-chrome.desktop
+              firefox_firefox.desktop
+          err: ''
+  - id: test_set_handler_idempot_check
+    input:
+      handler: google-chrome.desktop
+      mime_type: x-scheme-handler/http
+    output:
+      handler: google-chrome.desktop
+      changed: false
+    flags:
+      check: true
+    mocks:
+      run_command:
+        - command: [/testbin/gio, --version]
+          environ: *env-def
+          rc: 0
+          out: "2.80.0\n"
+          err: ''
+        - command: [/testbin/gio, mime, x-scheme-handler/http]
+          environ: *env-def
+          rc: 0
+          out: |
+            Default application for “x-scheme-handler/https”: google-chrome.desktop
+            Registered applications:
+              brave-browser.desktop
+              firefox.desktop
+              google-chrome.desktop
+              firefox_firefox.desktop
+            Recommended applications:
+              brave-browser.desktop
+              firefox.desktop
+              google-chrome.desktop
+              firefox_firefox.desktop
+          err: ''

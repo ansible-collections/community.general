@@ -1,0 +1,34 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: query API with invalid API key
+  memset_server_info:
+    api_key: 'wa9aerahhie0eekee9iaphoorovooyia'
+    name: 'testyaa1'
+  ignore_errors: true
+  register: result
+
+- name: check API response with invalid API key
+  assert:
+    that:
+      - "'Memset API returned a 403 response (ApiErrorForbidden, Bad api_key)' in result.msg"
+      - result is not successful
+
+- name: request server infos
+  memset_server_info:
+    api_key: "{{ api_key }}"
+    name: 'testyaa1'
+  register: result
+
+- name: check the request succeeded
+  assert:
+    that:
+      - result is not changed
+      - result is successful

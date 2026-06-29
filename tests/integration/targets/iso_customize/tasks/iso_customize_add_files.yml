@@ -1,0 +1,34 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Customize ISO file: add file"
+  community.general.iso_customize:
+    src_iso: "{{ test_dir }}/test1.iso"
+    dest_iso: "{{ test_dir }}/{{ dest_iso_name }}"
+    add_files:
+      - src_file: "{{ test_dir }}/test01.cfg"
+        dest_file: "preseed/ubuntu.seed"
+
+
+- include_tasks: iso_mount.yml
+  vars:
+    iso_name: "{{ dest_iso_name }}"
+
+- debug: var=mount_root_dir
+
+- name: Check the file /preseed/ubuntu.seed is added
+  stat:
+    path: "{{ mount_root_dir }}/preseed/ubuntu.seed"
+  register: check_file
+
+- assert:
+    that:
+      - check_file.stat.exists == True
+
+- name: Umount ISO
+  mount:
+    path: "{{ mount_root_dir }}"
+    fstab: "{{ test_dir }}/temp.fstab"
+    state: unmounted

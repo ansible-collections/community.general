@@ -1,0 +1,8 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+gitlab_project_name: ansible_test_project
+gitlab_deploy_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJnTYY7CYk1F/wBklpdRxudxN6KeXgfhutkiCigSfPhe ansible_test"
+gitlab_deploy_key_new: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDL1TDkIY2uu6NYRD0G5qGeHTd/AoqQpCw1XENXDnTLDN5DNZVCO1+7xfA5DR5V2tcR691Q005BKxoCo+uUBd1aAM7JWyuXl050rZCXBj4oaUF7urjDANQ7FzYuvqp9h8NGkvzfBYz5YBfu4vh43ajnF0daSyZy4RlxeG9G44vnHElXTQ0igaOCSta/23FdERIYzKxuX4Ul42AwtSmCRwbkN4fC86o0UwW2q0zkgFOUoojtS/Avh0aX8UQyeagaPJFXCc/ldG1mMK020GQAEa8aQcUpysnEzZdq6no5Zyn/WQSobpnJ9CraHhdb1QQytg/+c+CgjSN0cERhTvLn0WsQ043jo5g1kSHNu+OiYXmVwTxe95nXCsoYmCNF/DmezjYVxe9BGlKRAEuHsNi87Il84nBnzKVHGlkq8eJNTR8ASjNkjI7pGS0zxCDB55c3LHh4Aa1xU+nwINRurn/TEDpDZc43/XOnt+aqbxkeWbMtOD/r2gfMj8lNZJ/IyamWy7HcFgGpTZJln4WxVLF+Cz56qa8Hf9WzJL+8Lq7eE3sJKOagn/zPgqeybXbTIPSr3fshq3yE8FYHpFKS4aLvQC/XSLCywrhr25DKBn9UHIZmgC9hxMnVJCKux+ltwGJOKIaoj+5n3+DvM+E3fK3fkADo5+Frzay6/rLTwKWUrzfjQQ== ansible_test_new"

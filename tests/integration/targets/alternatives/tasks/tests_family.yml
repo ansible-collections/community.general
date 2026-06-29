@@ -1,0 +1,65 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Add an alternative with a family
+  alternatives:
+    name: dummy
+    path: /usr/bin/dummy1
+    link: /usr/bin/dummy
+    family: family1
+    priority: 100
+    state: selected
+
+- name: Ensure that the alternative has family assigned
+  shell: 'grep family1 {{ alternatives_dir }}/dummy'
+
+- name: Add two alternatives with different families
+  alternatives:
+    name: dummy
+    path: '/usr/bin/dummy{{ item.n }}'
+    link: /usr/bin/dummy
+    family: family2
+    priority: "{{ item.priority }}"
+    state: present
+  loop:
+    - { n: 2, priority: 20 }
+    - { n: 3, priority: 10 }
+    - { n: 4, priority: 5 }
+
+# Here we select the whole family of alternatives
+- name: Set family as an alternatives
+  alternatives:
+    name: dummy
+    family: family2
+    state: selected
+
+- name: Ensure manual mode
+  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual"'
+
+- name: Execute the current dummy command
+  shell: dummy
+  register: cmd
+
+# Despite the fact that there is alternative with higher priority (/usr/bin/dummy1),
+# it is not chosen as it doesn't belong to the selected family
+- name: Ensure that the alternative from the selected family is used
+  assert:
+    that:
+      - cmd.stdout == "dummy2"
+
+- name: Remove the alternative with the highest priority that belongs to the family
+  alternatives:
+    name: dummy
+    path: '/usr/bin/dummy2'
+    state: absent
+
+- name: Execute the current dummy command
+  shell: dummy
+  register: cmd
+
+- name: Ensure that the next alternative is selected as having the highest priority from the family
+  assert:
+    that:
+      - cmd.stdout == "dummy3"

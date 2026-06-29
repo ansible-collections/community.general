@@ -1,0 +1,15 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: verify that git is installed so this test can continue
+  command: which git
+  register: git_installed
+  ignore_errors: true
+
+- name: get git version, only newer than {{git_version_supporting_includes}} has includes option
+  shell: "git --version | grep 'git version' | sed 's/git version //'"
+  register: git_version
+  ignore_errors: true
+...

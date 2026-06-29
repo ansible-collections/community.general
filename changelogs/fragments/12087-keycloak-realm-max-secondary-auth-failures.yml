@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_realm - add ``max_secondary_auth_failures`` parameter to configure brute force detection for secondary authentication mechanisms (https://github.com/ansible-collections/community.general/pull/12087).

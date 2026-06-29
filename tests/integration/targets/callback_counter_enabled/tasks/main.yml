@@ -1,0 +1,102 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Run tests
+  include_role:
+    name: callback
+  vars:
+    tests:
+      - name: Task and host counters shown in N/M format
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.counter_enabled
+        playbook: |
+          - hosts: testhost
+            gather_facts: false
+            tasks:
+              - name: First task
+                set_fact:
+                  counter_test: first
+              - name: Second task
+                set_fact:
+                  counter_test: second
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK 1/2 [First task] **********************************************************"
+          - "ok: 1/1 [testhost]"
+          - ""
+          - "TASK 2/2 [Second task] *********************************************************"
+          - "ok: 1/1 [testhost]"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=2    changed=0    unreachable=0    failed=0    rescued=0    ignored=0   "
+
+      - name: Loop task items are displayed (regression for issue 8187)
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.counter_enabled
+        playbook: !unsafe |
+          - hosts: testhost
+            gather_facts: false
+            tasks:
+              - name: Loop task
+                set_fact:
+                  dummy_fact: "{{ item }}"
+                loop:
+                  - item_a
+                  - item_b
+                  - item_c
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK 1/1 [Loop task] ***********************************************************"
+          - "ok: [testhost] => (item=item_a)"
+          - "ok: [testhost] => (item=item_b)"
+          - "ok: [testhost] => (item=item_c)"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    rescued=0    ignored=0   "
+
+      - name: Delegated loop task items show delegation target (regression for issue 8187)
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.counter_enabled
+        playbook: !unsafe |
+          - hosts: testhost
+            gather_facts: false
+            tasks:
+              - name: Delegated loop task
+                set_fact:
+                  dummy_fact: "{{ item }}"
+                loop:
+                  - item_a
+                  - item_b
+                  - item_c
+                delegate_to: localhost
+        expected_output:
+          - ""
+          - "PLAY [testhost] ****************************************************************"
+          - ""
+          - "TASK 1/1 [Delegated loop task] *************************************************"
+          - - "ok: [testhost -> localhost] => (item=item_a)"
+            - "ok: [testhost -> localhost(127.0.0.1)] => (item=item_a)"
+          - - "ok: [testhost -> localhost] => (item=item_b)"
+            - "ok: [testhost -> localhost(127.0.0.1)] => (item=item_b)"
+          - - "ok: [testhost -> localhost] => (item=item_c)"
+            - "ok: [testhost -> localhost(127.0.0.1)] => (item=item_c)"
+          - ""
+          - "PLAY RECAP *********************************************************************"
+          - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    rescued=0    ignored=0   "

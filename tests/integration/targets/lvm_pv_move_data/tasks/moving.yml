@@ -1,0 +1,36 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Creating a 50MB file on the mounted LV
+  ansible.builtin.command: dd if=/dev/zero of={{ remote_tmp_dir }}/tmp_mount/test_file bs=1M count=50
+  args:
+    creates: "{{ remote_tmp_dir }}/tmp_mount/test_file"
+
+- name: Growing the second loop device file to 1500MB
+  ansible.builtin.shell: truncate -s 1500M {{ remote_tmp_dir }}/test_lvm_pv_02.img
+
+- name: Refreshing the second loop device
+  ansible.builtin.shell: losetup -c {{ loop_device_02.stdout }}
+
+- name: Resizing the second physical volume
+  community.general.lvm_pv:
+    device: "{{ loop_device_02.stdout }}"
+    resize: true
+
+- name: Moving data from between PVs (both in same VG)
+  community.general.lvm_pv_move_data:
+    source: "{{ loop_device_01.stdout }}"
+    destination: "{{ loop_device_02.stdout }}"
+  register: move_result
+
+- name: Debugging move result
+  ansible.builtin.debug:
+    var: move_result
+
+- name: Asserting data was moved successfully
+  ansible.builtin.assert:
+    that:
+      - move_result is changed
+      - "'moved data from' in move_result.msg"

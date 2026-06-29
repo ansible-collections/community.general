@@ -1,0 +1,266 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Wait for Keycloak
+  uri:
+    url: "{{ url }}/admin/"
+    status_code: 200
+    validate_certs: false
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 10
+
+- name: Delete realm if exists
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    state: absent
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Retrive ldap info when absent
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ federation }}"
+    provider_type: "org.keycloak.storage.UserStorageProvider"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert ldap is missing
+  assert:
+    that:
+      - result is not changed
+      - result.components | length == 0
+
+- name: Create new user federation
+  community.general.keycloak_user_federation:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ federation }}"
+    state: present
+    provider_id: ldap
+    provider_type: org.keycloak.storage.UserStorageProvider
+    config:
+      enabled: true
+      priority: 0
+      fullSyncPeriod: -1
+      changedSyncPeriod: -1
+      cachePolicy: DEFAULT
+      batchSizeForSync: 1000
+      editMode: READ_ONLY
+      importEnabled: true
+      syncRegistrations: false
+      vendor: other
+      usernameLDAPAttribute: uid
+      rdnLDAPAttribute: uid
+      uuidLDAPAttribute: entryUUID
+      userObjectClasses: "inetOrgPerson, organizationalPerson"
+      connectionUrl: "ldap://ldap.example.com"
+      usersDn: "ou=Users,dc=example,dc=com"
+      authType: simple
+      bindDn: cn=directory reader
+      bindCredential: secret
+      searchScope: 1
+      validatePasswordPolicy: false
+      trustEmail: false
+      useTruststoreSpi: "ldapsOnly"
+      connectionPooling: true
+      pagination: true
+      allowKerberosAuthentication: false
+      useKerberosForPasswordAuthentication: false
+      debug: false
+
+- name: Retrive ldap info
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ federation }}"
+    provider_type: "org.keycloak.storage.UserStorageProvider"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert ldap exists
+  assert:
+    that:
+      - result is not changed
+      - result.components | length == 1
+      - result.components[0].name == federation
+
+- name: Save ldap id
+  set_fact:
+    myLdapId: "{{ result.components[0].id }}"
+
+- name: Retrive ldap subcomponents info
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    parent_id: "{{ myLdapId }}"
+  register: result
+
+- name: Assert components exists
+  assert:
+    that:
+      - result is not changed
+      - result.components | length > 0
+
+- name: Retrive ldap subcomponents filter by name
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    parent_id: "{{ myLdapId }}"
+    name: "email"
+  register: result
+
+- name: Assert sub component with name "email" exists
+  assert:
+    that:
+      - result is not changed
+      - result.components | length == 1
+      - result.components[0].name == "email"
+
+- name: Retrive ldap subcomponents filter by type
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    parent_id: "{{ myLdapId }}"
+    provider_type: "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+  register: result
+
+- name: Assert ldap sub components filter by type
+  assert:
+    that:
+      - result is not changed
+      - result.components | length > 0
+      - result.components[0].providerType == "org.keycloak.storage.ldap.mappers.LDAPStorageMapper"
+
+- name: Retrive key info when absent
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ realm_key_name }}"
+    provider_type: "org.keycloak.keys.KeyProvider"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert key is missing
+  assert:
+    that:
+      - result is not changed
+      - result.components | length == 0
+
+- name: Create custom realm key
+  community.general.keycloak_realm_key:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ realm_key_name }}"
+    state: present
+    parent_id: "{{ realm }}"
+    config:
+      private_key: "{{ realm_private_key }}"
+      certificate: ""
+      enabled: true
+      active: true
+      priority: 150
+  register: result
+
+- name: Retrive key info
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ realm_key_name }}"
+    provider_type: "org.keycloak.keys.KeyProvider"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert key exists
+  assert:
+    that:
+      - result is not changed
+      - result.components | length == 1
+
+- name: Retrive all realm components
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert key exists
+  assert:
+    that:
+      - result is not changed
+      - result.components | length > 0
+
+- name: Retrive all ldap in realm
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    provider_type: "org.keycloak.storage.UserStorageProvider"
+  register: result
+
+- name: Assert key exists
+  assert:
+    that:
+      - result is not changed
+      - result.components | length == 1
+      - result.components[0].providerType == "org.keycloak.storage.UserStorageProvider"
+      - result.components[0].name == "myldap"
+
+- name: Retrive component by name only
+  community.general.keycloak_component_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ realm_key_name }}"
+  register: result
+
+- name: Assert key exists
+  assert:
+    that:
+      - result is not changed
+      - result.components | length == 1
+      - result.components[0].providerType == "org.keycloak.keys.KeyProvider"
+      - result.components[0].name == realm_key_name

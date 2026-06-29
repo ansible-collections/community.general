@@ -1,0 +1,78 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Create {{ gitlab_project_name }}
+  gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: present
+
+- name: Cleanup deploy key to {{ gitlab_project_name }}
+  gitlab_deploy_key:
+    login_token: "{{ gitlab_login_token }}"
+    project: "{{ gitlab_project_name }}"
+    server_url: "{{ gitlab_host }}"
+    title: "{{ gitlab_project_name }}"
+    key: "{{ gitlab_deploy_key }}"
+    state: absent
+
+
+- name: Add deploy key to {{ gitlab_project_name }}
+  gitlab_deploy_key:
+    login_token: "{{ gitlab_login_token }}"
+    project: "root/{{ gitlab_project_name }}"
+    server_url: "{{ gitlab_host }}"
+    title: "{{ gitlab_project_name }}"
+    key: "{{ gitlab_deploy_key }}"
+    state: present
+  register: deploy_key_status
+
+- assert:
+    that:
+      - deploy_key_status is changed
+      - deploy_key_status.deploy_key.key == gitlab_deploy_key
+
+
+- name: Update public key {{ gitlab_project_name }}  (change expected)
+  gitlab_deploy_key:
+    login_token: "{{ gitlab_login_token }}"
+    project: "root/{{ gitlab_project_name }}"
+    server_url: "{{ gitlab_host }}"
+    title: "{{ gitlab_project_name }}"
+    key: "{{ gitlab_deploy_key_new }}"
+    state: present
+  register: deploy_key_status
+
+- assert:
+    that:
+      - deploy_key_status is changed
+      - deploy_key_status.deploy_key.key == gitlab_deploy_key_new
+
+- name: Update public key {{ gitlab_project_name }}  (no change expected)
+  gitlab_deploy_key:
+    login_token: "{{ gitlab_login_token }}"
+    project: "root/{{ gitlab_project_name }}"
+    server_url: "{{ gitlab_host }}"
+    title: "{{ gitlab_project_name }}"
+    key: "{{ gitlab_deploy_key_new }}"
+    state: present
+  register: deploy_key_status
+
+- assert:
+    that:
+      - not deploy_key_status.changed
+      - deploy_key_status.deploy_key.key == gitlab_deploy_key_new

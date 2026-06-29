@@ -1,0 +1,177 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the archive module.
+# Copyright (c) 2017, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Make sure we start fresh
+
+# Core functionality tests
+- name: Archive - no options ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_no_opts.{{ format }}"
+    format: "{{ format }}"
+  register: archive_no_options
+
+- name: Verify that archive exists - no options ({{ format }})
+  file:
+    path: "{{remote_tmp_dir}}/archive_no_opts.{{ format }}"
+    state: file
+
+- name: Verify that archive result is changed and includes all files - no options ({{ format }})
+  assert:
+    that:
+      - archive_no_options is changed
+      - "archive_no_options.dest_state == 'archive'"
+      - "archive_no_options.archived | length == 3"
+
+- name: Remove the archive - no options ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_no_options.{{ format }}"
+    state: absent
+
+- name: Archive - file options ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
+    format: "{{ format }}"
+    mode: "u+rwX,g-rwx,o-rwx"
+  register: archive_file_options
+
+- name: Retrieve archive file information - file options ({{ format }})
+  stat:
+    path: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
+  register: archive_file_options_stat
+
+- name: Test that the file modes were changed
+  assert:
+    that:
+      - archive_file_options_stat is not changed
+      - "archive_file_options.mode == '0600'"
+      - "archive_file_options.archived | length == 3"
+
+- name: Remove the archive - file options ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
+    state: absent
+
+- name: Archive - non-ascii ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
+    format: "{{ format }}"
+  register: archive_nonascii
+
+- name: Retrieve archive file information - non-ascii ({{ format }})
+  stat:
+    path: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
+  register: archive_nonascii_stat
+
+- name: Test that archive exists - non-ascii ({{ format }})
+  assert:
+    that:
+      - archive_nonascii is changed
+      - archive_nonascii_stat.stat.exists == true
+
+- name: Remove the archive - non-ascii ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
+    state: absent
+
+- name: Archive - single target ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_target.{{ format }}"
+    format: "{{ format }}"
+  register: archive_single_target
+
+- name: Assert archive has correct state - single target ({{ format }})
+  assert:
+    that:
+      - archive_single_target.dest_state == state_map[format]
+  vars:
+    state_map:
+      tar: archive
+      zip: archive
+      gz: compress
+      bz2: compress
+      xz: compress
+
+- block:
+    - name: Retrieve contents of archive - single target ({{ format }})
+      ansible.builtin.unarchive:
+        src: "{{ remote_tmp_dir }}/archive_single_target.{{ format }}"
+        dest: .
+        list_files: true
+      check_mode: true
+      ignore_errors: true
+      register: archive_single_target_contents
+
+    - name: Assert that file names are preserved - single target ({{ format }})
+      assert:
+        that:
+          - "'oo.txt' not in archive_single_target_contents.files"
+          - "'foo.txt' in archive_single_target_contents.files"
+      # ``unarchive`` fails for RHEL and FreeBSD on ansible 2.x
+      when: archive_single_target_contents is success and archive_single_target_contents is not skipped
+  when: "format == 'zip'"
+
+- name: Remove archive - single target ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_single_target.{{ format }}"
+    state: absent
+
+- name: Archive - path list ({{ format }})
+  archive:
+    path:
+      - "{{ remote_tmp_dir }}/empty.txt"
+      - "{{ remote_tmp_dir }}/foo.txt"
+      - "{{ remote_tmp_dir }}/bar.txt"
+    dest: "{{ remote_tmp_dir }}/archive_path_list.{{ format }}"
+    format: "{{ format }}"
+  register: archive_path_list
+
+- name: Verify that archive exists - path list ({{ format }})
+  file:
+    path: "{{remote_tmp_dir}}/archive_path_list.{{ format }}"
+    state: file
+
+- name: Assert that archive contains all files - path list ({{ format }})
+  assert:
+    that:
+      - archive_path_list is changed
+      - "archive_path_list.archived | length == 3"
+
+- name: Remove archive - path list ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_path_list.{{ format }}"
+    state: absent
+
+- name: Archive - missing paths ({{ format }})
+  archive:
+    path:
+      - "{{ remote_tmp_dir }}/*.txt"
+      - "{{ remote_tmp_dir }}/dne.txt"
+    exclude_path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_missing_paths.{{ format }}"
+    format: "{{ format }}"
+  register: archive_missing_paths
+
+- name: Assert that incomplete archive has incomplete state - missing paths ({{ format }})
+  assert:
+    that:
+      - archive_missing_paths is changed
+      - "archive_missing_paths.dest_state == 'incomplete'"
+      - "(remote_tmp_dir ~ '/dne.txt') in archive_missing_paths.missing"
+      - "(remote_tmp_dir ~ '/foo.txt') not in archive_missing_paths.missing"
+
+- name: Remove archive - missing paths ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_missing_paths.{{ format }}"
+    state: absent

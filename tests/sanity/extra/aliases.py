@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""Check extra collection docs with antsibull-docs."""
+
+from __future__ import annotations
+
+import glob
+import sys
+
+import yaml
+
+
+def main():
+    """Main entry point."""
+    with open(".azure-pipelines/azure-pipelines.yml", "rb") as f:
+        azp = yaml.safe_load(f)
+
+    allowed_targets = {"azp/generic/1"}
+    for stage in azp["stages"]:
+        if stage["stage"].startswith(("sanity", "unit", "Summary")):
+            continue
+        for job in stage["jobs"]:
+            for param in job["parameters"]["targets"]:
+                group = param["test"].rsplit("-", 1)[-1]
+                allowed_targets.add(f"azp/posix/{group}")
+
+    paths = glob.glob("tests/integration/targets/*/aliases")
+
+    has_errors = False
+    for path in paths:
+        targets = []
+        skip = False
+        with open(path) as f:
+            for line in f:
+                if "#" in line:
+                    line = line[: line.find("#")]
+                line = line.strip()
+                if line.startswith("needs/"):
+                    continue
+                if line.startswith("skip/"):
+                    continue
+                if line.startswith("cloud/"):
+                    continue
+                if line.startswith("context/"):
+                    continue
+                if line in ("unsupported", "disabled", "hidden"):
+                    skip = True
+                if line in ("destructive",):
+                    continue
+                if "/" not in line:
+                    continue
+                targets.append(line)
+        if skip:
+            continue
+        if not targets:
+            if "targets/setup_" in path:
+                continue
+            print(f"{path}: found no targets")
+            has_errors = True
+        for target in targets:
+            if target not in allowed_targets:
+                print(f'{path}: found invalid target "{target}"')
+                has_errors = True
+
+    return 1 if has_errors else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

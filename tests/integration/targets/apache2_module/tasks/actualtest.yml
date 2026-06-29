@@ -1,0 +1,212 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: disable userdir module
+  community.general.apache2_module:
+    name: userdir
+    state: absent
+  register: userdir_first_disable
+
+- name: disable userdir module, second run
+  community.general.apache2_module:
+    name: userdir
+    state: absent
+  register: disable
+
+- name: ensure community.general.apache2_module is idempotent
+  assert:
+    that:
+      - disable is not changed
+
+- name: enable userdir module
+  community.general.apache2_module:
+    name: userdir
+    state: present
+  register: enable
+
+- name: ensure changed on successful enable
+  assert:
+    that:
+      - enable is changed
+
+- name: enable userdir module, second run
+  community.general.apache2_module:
+    name: userdir
+    state: present
+  register: enabletwo
+
+- name: ensure community.general.apache2_module is idempotent
+  assert:
+    that:
+      - 'not enabletwo.changed'
+
+- name: disable userdir module, final run
+  community.general.apache2_module:
+    name: userdir
+    state: absent
+  register: disablefinal
+
+- name: ensure changed on successful disable
+  assert:
+    that:
+      - 'disablefinal.changed'
+
+- name: set userdir to original state
+  community.general.apache2_module:
+    name: userdir
+    state: present
+  when: userdir_first_disable is changed
+
+- name: ensure autoindex enabled
+  community.general.apache2_module:
+    name: autoindex
+    state: present
+
+- name: Debian/Ubuntu specific tests
+  when: "ansible_facts.os_family == 'Debian'"
+  block:
+    - name: force disable of autoindex  # bug #2499
+      community.general.apache2_module:
+        name: autoindex
+        state: absent
+        force: true
+
+    - name: re-enable autoindex
+      community.general.apache2_module:
+        name: autoindex
+        state: present
+
+    # mod_evasive is enabled by default upon the installation, so disable first and enable second, to preserve the config
+    - name: disable evasive module
+      community.general.apache2_module:
+        name: evasive
+        state: absent
+
+    - name: enable evasive module, test https://github.com/ansible/ansible/issues/22635
+      community.general.apache2_module:
+        name: evasive
+        state: present
+      when:
+        # TODO: fix for Debian 13 (Trixie)!
+        - ansible_facts.distribution != 'Debian' or ansible_facts.distribution_major_version is version('13', '<')
+        # TODO: fix for Ubuntu 26.04!
+        - ansible_facts.distribution != 'Ubuntu' or ansible_facts.distribution_major_version is version('26', '<')
+
+    - name: use identifier to enable module, fix for https://github.com/ansible/ansible/issues/33669
+      community.general.apache2_module:
+        name: dump_io
+        state: present
+      ignore_errors: true
+      register: enable_dumpio_wrong
+
+    - name: disable dump_io
+      community.general.apache2_module:
+        name: dump_io
+        identifier: dumpio_module
+        state: absent
+
+    - name: use identifier to enable module, fix for https://github.com/ansible/ansible/issues/33669
+      community.general.apache2_module:
+        name: dump_io
+        identifier: dumpio_module
+        state: present
+      register: enable_dumpio_correct_1
+
+    - name: ensure idempotency with identifier
+      community.general.apache2_module:
+        name: dump_io
+        identifier: dumpio_module
+        state: present
+      register: enable_dumpio_correct_2
+
+    - name: disable dump_io
+      community.general.apache2_module:
+        name: dump_io
+        identifier: dumpio_module
+        state: absent
+
+    - assert:
+        that:
+          - enable_dumpio_wrong is failed
+          - enable_dumpio_correct_1 is changed
+          - enable_dumpio_correct_2 is not changed
+
+    - name: disable mpm modules
+      community.general.apache2_module:
+        name: "{{ item }}"
+        state: absent
+        ignore_configcheck: true
+      with_items:
+        - mpm_worker
+        - mpm_event
+        - mpm_prefork
+
+    - name: enabled mpm_event
+      community.general.apache2_module:
+        name: mpm_event
+        state: present
+        ignore_configcheck: true
+      register: enabledmpmevent
+
+    - name: ensure changed mpm_event
+      assert:
+        that:
+          - 'enabledmpmevent.changed'
+
+    - name: switch between mpm_event and mpm_worker
+      community.general.apache2_module:
+        name: "{{ item.name }}"
+        state: "{{ item.state }}"
+        ignore_configcheck: true
+      with_items:
+        - name: mpm_event
+          state: absent
+        - name: mpm_worker
+          state: present
+
+    - name: ensure mpm_worker is already enabled
+      community.general.apache2_module:
+        name: mpm_worker
+        state: present
+      register: enabledmpmworker
+
+    - name: ensure mpm_worker unchanged
+      assert:
+        that:
+          - 'not enabledmpmworker.changed'
+
+    - name: try to disable all mpm modules with configcheck
+      community.general.apache2_module:
+        name: "{{item}}"
+        state: absent
+      with_items:
+        - mpm_worker
+        - mpm_event
+        - mpm_prefork
+      ignore_errors: true
+      register: remove_with_configcheck
+
+    - name: ensure configcheck fails task with when run without mpm modules
+      assert:
+        that:
+          - item is failed
+      with_items: "{{ remove_with_configcheck.results }}"
+
+    - name: try to disable all mpm modules without configcheck
+      community.general.apache2_module:
+        name: "{{item}}"
+        state: absent
+        ignore_configcheck: true
+      with_items:
+        - mpm_worker
+        - mpm_event
+        - mpm_prefork
+
+    - name: enabled mpm_event to restore previous state
+      community.general.apache2_module:
+        name: mpm_event
+        state: present
+        ignore_configcheck: true
+      register: enabledmpmevent

@@ -1,0 +1,154 @@
+#!/usr/bin/python
+# Copyright (c) 2018, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# started out with AWX's scan_packages module
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: pip_package_info
+short_description: Pip package information
+description:
+  - Return information about installed pip packages.
+extends_documentation_fragment:
+  - community.general._attributes
+  - community.general._attributes.info_module
+options:
+  clients:
+    description:
+      - A list of the pip executables that are used to get the packages. They can be supplied with the full path or just the
+        executable name, for example V(pip3.7).
+    default: ['pip']
+    type: list
+    elements: path
+requirements:
+  - pip >= 20.3b1 (necessary for the C(--format) option)
+  - The requested C(pip) executables must be installed on the target.
+author:
+  - Matthew Jones (@matburt)
+  - Brian Coca (@bcoca)
+  - Adam Miller (@maxamillion)
+"""
+
+EXAMPLES = r"""
+- name: Just get the list from default pip
+  community.general.pip_package_info:
+
+- name: Get the facts for default pip, pip2 and pip3.6
+  community.general.pip_package_info:
+    clients: ['pip', 'pip2', 'pip3.6']
+
+- name: Get from specific paths (virtualenvs?)
+  community.general.pip_package_info:
+    clients: '/home/me/projec42/python/pip3.5'
+"""
+
+RETURN = r"""
+packages:
+  description: A dictionary of installed package data.
+  returned: always
+  type: dict
+  contains:
+    python:
+      description: A dictionary with each pip client which then contains a list of dicts with python package information.
+      returned: always
+      type: dict
+      sample:
+        {
+          "packages": {
+            "pip": {
+              "Babel": [
+                {
+                  "name": "Babel",
+                  "source": "pip",
+                  "version": "2.6.0"
+                }
+              ],
+              "Flask": [
+                {
+                  "name": "Flask",
+                  "source": "pip",
+                  "version": "1.0.2"
+                }
+              ],
+              "Flask-SQLAlchemy": [
+                {
+                  "name": "Flask-SQLAlchemy",
+                  "source": "pip",
+                  "version": "2.3.2"
+                }
+              ],
+              "Jinja2": [
+                {
+                  "name": "Jinja2",
+                  "source": "pip",
+                  "version": "2.10"
+                }
+              ]
+            }
+          }
+        }
+"""
+
+import json
+import os
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.facts.packages import CLIMgr
+
+
+class PIP(CLIMgr):
+    def __init__(self, pip, module):
+        self.CLI = pip
+        self.module = module
+
+    def list_installed(self):
+        rc, out, err = self.module.run_command([self._cli, "list", "-l", "--format=json"])
+        if rc != 0:
+            raise Exception(f"Unable to list packages rc={rc} : {err}")
+        return json.loads(out)
+
+    def get_package_details(self, package):
+        package["source"] = self.CLI
+        return package
+
+
+def main():
+    # start work
+    module = AnsibleModule(
+        argument_spec=dict(
+            clients=dict(type="list", elements="path", default=["pip"]),
+        ),
+        supports_check_mode=True,
+    )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
+    packages = {}
+    results = {"packages": {}}
+    clients = module.params["clients"]
+
+    found = 0
+    for pip in clients:
+        if not os.path.basename(pip).startswith("pip"):
+            module.warn(f"Skipping invalid pip client: {pip}")
+            continue
+        try:
+            pip_mgr = PIP(pip, module)
+            if pip_mgr.is_available():
+                found += 1
+                packages[pip] = pip_mgr.get_packages()
+        except Exception as e:
+            module.warn(f"Failed to retrieve packages with {pip}: {e}")
+            continue
+
+    if found == 0:
+        module.fail_json(msg=f"Unable to use any of the supplied pip clients: {clients}")
+
+    # return info
+    results["packages"] = packages
+    module.exit_json(**results)
+
+
+if __name__ == "__main__":
+    main()

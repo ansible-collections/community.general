@@ -1,0 +1,11 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Test dict filter"
+  assert:
+    that:
+      - "[['a', 'b']] | community.general.dict == dict([['a', 'b']])"
+      - "[['a', 'b'], [1, 2]] | community.general.dict == dict([['a', 'b'], [1, 2]])"
+      - "[] | community.general.dict == dict([])"

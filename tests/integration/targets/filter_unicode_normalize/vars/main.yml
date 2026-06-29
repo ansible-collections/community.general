@@ -1,0 +1,9 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+u_umlaut: "{{ '\u00fc' }}"
+u_umlaut_combining: "{{ 'u' + '\u0308' }}"
+roman_numeral_one: "{{ '\u2160' }}"
+latin_capital_i: "{{ '\u0049' }}"

@@ -1,0 +1,120 @@
+# Copyright (c) 2025, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+anchors:
+  sync_db: &sync_db
+    command: [/testbin/xbps-install, -S]
+    environ: {check_rc: false, data: "n\n"}
+    rc: 0
+    out: ''
+    err: ''
+  query_foo_absent: &query_foo_absent
+    command: [/testbin/xbps-query, foo]
+    environ: {check_rc: false}
+    rc: 1
+    out: ''
+    err: ''
+  query_foo_present: &query_foo_present
+    command: [/testbin/xbps-query, foo]
+    environ: {check_rc: false}
+    rc: 0
+    out: "foo-1.0_1 Description: Test package\n"
+    err: ''
+  check_updates_clean: &check_updates_clean
+    command: [/testbin/xbps-install, -Sun]
+    environ: {check_rc: false}
+    rc: 0
+    out: ''
+    err: ''
+  install_foo: &install_foo
+    command: [/testbin/xbps-install, -y, foo]
+    environ: {check_rc: false}
+    rc: 0
+    out: "foo-1.0_1: installing ...\n"
+    err: ''
+  remove_foo: &remove_foo
+    command: [/testbin/xbps-remove, -y, foo]
+    environ: {check_rc: false}
+    rc: 0
+    out: "foo-1.0_1: removing ...\n"
+    err: ''
+
+test_cases:
+  - id: test_install_new_package
+    input:
+      name: [foo]
+      state: present
+    output:
+      changed: true
+      packages: [foo]
+      stdout: "foo-1.0_1: installing ...\n"
+      stderr: ''
+    mocks:
+      run_command:
+        - *sync_db
+        - *query_foo_absent
+        - *install_foo
+
+  - id: test_install_already_present
+    input:
+      name: [foo]
+      state: present
+    output:
+      changed: false
+      msg: Nothing to Install
+    mocks:
+      run_command:
+        - *sync_db
+        - *query_foo_present
+        - *check_updates_clean
+
+  - id: test_install_fails
+    input:
+      name: [nonexistent]
+      state: present
+    output:
+      failed: true
+      packages: [nonexistent]
+      stderr: "ERROR: nonexistent: not found in repository pool.\n"
+    mocks:
+      run_command:
+        - *sync_db
+        - command: [/testbin/xbps-query, nonexistent]
+          environ: {check_rc: false}
+          rc: 1
+          out: ''
+          err: ''
+        - command: [/testbin/xbps-install, -y, nonexistent]
+          environ: {check_rc: false}
+          rc: 1
+          out: ''
+          err: "ERROR: nonexistent: not found in repository pool.\n"
+
+  - id: test_remove_installed_package
+    input:
+      name: [foo]
+      state: absent
+    output:
+      changed: true
+      packages: [foo]
+      stdout: "foo-1.0_1: removing ...\n"
+      stderr: ''
+    mocks:
+      run_command:
+        - *sync_db
+        - *query_foo_present
+        - *check_updates_clean
+        - *remove_foo
+
+  - id: test_remove_absent_package
+    input:
+      name: [foo]
+      state: absent
+    output:
+      changed: false
+      msg: "package(s) already absent"
+    mocks:
+      run_command:
+        - *sync_db
+        - *query_foo_absent

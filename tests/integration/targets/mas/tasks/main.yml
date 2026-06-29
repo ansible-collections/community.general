@@ -1,0 +1,158 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the mas module.
+# Copyright (c) 2020, Lukas Bestle <project-ansible@lukasbestle.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Test preparation
+- name: Uninstall Rested to ensure consistent starting point
+  mas:
+    id: 421879749
+    state: absent
+  become: true
+
+- name: Determine whether the app is installed
+  stat:
+    path: /Applications/Rested.app
+  register: install_status
+
+- name: Ensure the app is uninstalled
+  assert:
+    that:
+      - install_status.stat.exists == false
+
+- name: Wait until the OS-internal cache was updated
+  pause:
+    seconds: 5
+
+# Installation
+- name: Check if Rested needs to be installed
+  mas:
+    id: 421879749
+    state: present
+  register: install_check
+  check_mode: true
+
+- name: Ensure that the status would have changed
+  assert:
+    that:
+      - install_check is changed
+      - install_check.msg == "Installed 1 app(s)"
+
+- name: Determine whether the app is installed
+  stat:
+    path: /Applications/Rested.app
+  register: install_status
+
+- name: Ensure the app is not yet installed
+  assert:
+    that:
+      - install_status.stat.exists == false
+
+- name: Install Rested
+  mas:
+    id: 421879749
+    state: present
+  register: install
+
+- name: Ensure that the status changed
+  assert:
+    that:
+      - install is changed
+      - install.msg == "Installed 1 app(s)"
+
+- name: Determine whether the app is installed
+  stat:
+    path: /Applications/Rested.app
+  register: install_status
+
+- name: Ensure the app is installed
+  assert:
+    that:
+      - install_status.stat.exists == true
+
+- name: Wait until the OS-internal cache was updated
+  pause:
+    seconds: 5
+
+- name: Install Rested again
+  mas:
+    id: 421879749
+    state: present
+  register: install_again
+
+- name: Ensure that the status is unchanged (already installed)
+  assert:
+    that:
+      - install_again is not changed
+      - "'msg' not in install_again"
+
+# Uninstallation
+- name: Check if Rested needs to be uninstalled
+  mas:
+    id: 421879749
+    state: absent
+  register: uninstall_check
+  become: true
+  check_mode: true
+
+- name: Ensure that the status would have changed
+  assert:
+    that:
+      - uninstall_check is changed
+      - uninstall_check.msg == "Uninstalled 1 app(s)"
+
+- name: Determine whether the app is installed
+  stat:
+    path: /Applications/Rested.app
+  register: install_status
+
+- name: Ensure the app is not yet uninstalled
+  assert:
+    that:
+      - install_status.stat.exists == true
+
+- name: Uninstall Rested
+  mas:
+    id: 421879749
+    state: absent
+  register: uninstall
+  become: true
+
+- name: Ensure that the status changed
+  assert:
+    that:
+      - uninstall is changed
+      - uninstall.msg == "Uninstalled 1 app(s)"
+
+- name: Determine whether the app is installed
+  stat:
+    path: /Applications/Rested.app
+  register: uninstall_status
+
+- name: Ensure the app is uninstalled
+  assert:
+    that:
+      - uninstall_status.stat.exists == false
+
+- name: Wait until the OS-internal cache was updated
+  pause:
+    seconds: 5
+
+- name: Uninstall Rested again
+  mas:
+    id: 421879749
+    state: absent
+  register: uninstall_again
+  become: true
+
+- name: Ensure that the status is unchanged (already uninstalled)
+  assert:
+    that:
+      - uninstall_again is not changed
+      - "'msg' not in uninstall_again"

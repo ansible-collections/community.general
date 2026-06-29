@@ -1,0 +1,9 @@
+---
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+scaleway_region: fr-par
+name: cr_ansible_test
+description: Container registry used for testing scaleway_container_registry_info ansible module
+updated_description: Container registry used for testing scaleway_container_registry_info ansible module (Updated description)

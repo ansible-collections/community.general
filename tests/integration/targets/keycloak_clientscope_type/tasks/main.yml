@@ -1,0 +1,164 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+
+# Fixtures
+- name: Create keycloak realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: ""
+    state: present
+    enabled: true
+
+- name: Create keycloak client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    enabled: true
+
+- name: Create a scope1 client scope
+  community.general.keycloak_clientscope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: scope1
+    description: "test 1"
+    protocol: openid-connect
+
+- name: Create a scope2 client scope
+  community.general.keycloak_clientscope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: scope2
+    description: "test 2"
+    protocol: openid-connect
+
+### Tests
+### Realm
+- name: adjust client-scope types in realm
+  community.general.keycloak_clientscope_type:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    default_clientscopes: ['scope1', 'scope2']
+    optional_clientscopes: []
+  register: result
+
+- name: Assert that client scope types are set
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - '"scope1" in result.end_state.default_clientscopes'
+      - '"scope2" in result.end_state.default_clientscopes'
+      - result.end_state.default_clientscopes|length == 2
+      - result.end_state.optional_clientscopes|length == 0
+
+- name: adjust client-scope types in realm again
+  community.general.keycloak_clientscope_type:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    default_clientscopes: ['scope1', 'scope2']
+    optional_clientscopes: []
+  register: result
+  failed_when: result is changed
+
+- name: adjust client-scope types in realm move scope 2 to optional
+  community.general.keycloak_clientscope_type:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    default_clientscopes: ['scope1']
+    optional_clientscopes: ['scope2']
+  register: result
+
+- name: Assert that client scope types are set
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - '"scope1" in result.end_state.default_clientscopes'
+      - '"scope2" in result.end_state.optional_clientscopes'
+      - result.end_state.default_clientscopes|length == 1
+      - result.end_state.optional_clientscopes|length == 1
+
+### Client
+- name: adjust client-scope types in client
+  community.general.keycloak_clientscope_type:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    default_clientscopes: ['scope1', 'scope2']
+    optional_clientscopes: []
+  register: result
+
+- name: Assert that client scope types are set
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - '"scope1" in result.end_state.default_clientscopes'
+      - '"scope2" in result.end_state.default_clientscopes'
+      - result.end_state.default_clientscopes|length == 2
+      - result.end_state.optional_clientscopes|length == 0
+
+- name: adjust client-scope types in client again
+  community.general.keycloak_clientscope_type:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    default_clientscopes: ['scope1', 'scope2']
+    optional_clientscopes: []
+  register: result
+  failed_when: result is changed
+
+- name: adjust client-scope types in client move scope 2 to optional
+  community.general.keycloak_clientscope_type:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    default_clientscopes: ['scope1']
+    optional_clientscopes: ['scope2']
+  register: result
+
+- name: Assert that client scope types are set
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - '"scope1" in result.end_state.default_clientscopes'
+      - '"scope2" in result.end_state.optional_clientscopes'
+      - result.end_state.default_clientscopes|length == 1
+      - result.end_state.optional_clientscopes|length == 1

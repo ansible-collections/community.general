@@ -1,0 +1,123 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## testing ignore_spaces option
+
+- name: test-ignore_spaces 1 (commented line updated) - create test file
+  copy:
+    dest: "{{ output_file }}"
+    content: "[foo]\n; bar=baz\n"
+
+- name: test-ignore_spaces 1 - set new value
+  ini_file:
+    path: "{{ output_file }}"
+    section: foo
+    option: bar
+    value: frelt
+    ignore_spaces: true
+  register: result
+
+- name: test-ignore_spaces 1 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-ignore_spaces 1 - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: "[foo]\nbar = frelt\n"
+  assert:
+    that:
+      - actual_content == expected_content
+      - result is changed
+      - result.msg == 'option changed'
+
+- name: test-ignore_spaces 2 (uncommented line updated) - create test file
+  copy:
+    dest: "{{ output_file }}"
+    content: "[foo]\nbar=baz\n"
+
+- name: test-ignore_spaces 2 - set new value
+  ini_file:
+    path: "{{ output_file }}"
+    section: foo
+    option: bar
+    value: frelt
+    ignore_spaces: true
+  register: result
+
+- name: test-ignore_spaces 2 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-ignore_spaces 2 - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: "[foo]\nbar = frelt\n"
+  assert:
+    that:
+      - actual_content == expected_content
+      - result is changed
+      - result.msg == 'option changed'
+
+- name: test-ignore_spaces 3 (spaces on top of no spaces) - create test file
+  copy:
+    dest: "{{ output_file }}"
+    content: "[foo]\nbar=baz\n"
+
+- name: test-ignore_spaces 3 - try to set value
+  ini_file:
+    path: "{{ output_file }}"
+    section: foo
+    option: bar
+    value: baz
+    ignore_spaces: true
+  register: result
+
+- name: test-ignore_spaces 3 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-ignore_spaces 3 - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: "[foo]\nbar=baz\n"
+  assert:
+    that:
+      - actual_content == expected_content
+      - result is not changed
+      - result.msg == "OK"
+
+- name: test-ignore_spaces 4 (no spaces on top of spaces) - create test file
+  copy:
+    dest: "{{ output_file }}"
+    content: "[foo]\nbar = baz\n"
+
+- name: test-ignore_spaces 4 - try to set value
+  ini_file:
+    path: "{{ output_file }}"
+    section: foo
+    option: bar
+    value: baz
+    ignore_spaces: true
+    no_extra_spaces: true
+  register: result
+
+- name: test-ignore_spaces 4 - read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-ignore_spaces 4 - verify results
+  vars:
+    actual_content: "{{ output_content.content | b64decode }}"
+    expected_content: "[foo]\nbar = baz\n"
+  assert:
+    that:
+      - actual_content == expected_content
+      - result is not changed
+      - result.msg == "OK"

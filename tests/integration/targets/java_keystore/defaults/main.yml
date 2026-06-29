@@ -1,0 +1,20 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+java_keystore_certs:
+  - name: cert
+    commonName: example.com
+  - name: cert-pw
+    passphrase: hunter2
+    commonName: example.com
+
+java_keystore_new_certs:
+  - name: cert2
+    keyname: cert
+    commonName: example.org
+  - name: cert2-pw
+    keyname: cert-pw
+    passphrase: hunter2
+    commonName: example.org

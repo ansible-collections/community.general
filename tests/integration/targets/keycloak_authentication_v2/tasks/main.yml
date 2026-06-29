@@ -1,0 +1,38 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Install required packages
+  pip:
+    name:
+      - jmespath
+      - requests
+  register: result
+  until: result is success
+
+- name: Executing flow creation tests
+  ansible.builtin.include_tasks:
+    file: tests/test_flow_creation.yml
+
+- name: Executing unused flow modification tests
+  ansible.builtin.include_tasks:
+    file: tests/test_unused_flow_modification.yml
+
+- name: Executing used default browser flow modification tests
+  ansible.builtin.include_tasks:
+    file: tests/test_used_default_browser_flow_modification.yml
+
+- name: Executing client flow override flow modification tests
+  ansible.builtin.include_tasks:
+    file: tests/test_client_flow_override_flow_modification.yml
+
+- name: Executing identity provider first and post flow override flow modification tests
+  ansible.builtin.include_tasks:
+    file: tests/test_identity_provider_flow_overrides_flow_modification.yml
+
+- name: Executing flow deletion tests
+  ansible.builtin.include_tasks:
+    file: tests/test_flow_deletion.yml
+
+- name: Invalid providerIds in execution tests
+  ansible.builtin.include_tasks:
+    file: tests/test_invalid_poviderid_flow_creation.yml

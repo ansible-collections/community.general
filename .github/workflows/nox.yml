@@ -1,0 +1,35 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: nox
+'on':
+  push:
+    branches:
+      - main
+      - stable-*
+  pull_request:
+  # Run CI once per day (at 08:00 UTC)
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+concurrency:
+  # Make sure there is at most one active run per PR, but do not cancel any non-PR runs
+  group: ${{ github.workflow }}-${{ (github.head_ref && github.event.number) || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  ansible-test:
+    uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-matrix.yml@main
+    with:
+      change-detection-in-prs: true
+      upload-codecov: true
+      upload-codecov-pr: false
+      upload-codecov-push: false
+      upload-codecov-schedule: true
+      allow-coverage-cd-override: true
+      max-ansible-core: "2.18"
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

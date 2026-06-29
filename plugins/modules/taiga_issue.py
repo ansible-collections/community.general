@@ -1,0 +1,334 @@
+#!/usr/bin/python
+
+# Copyright (c) 2015, Alejandro Guirao <lekumberri@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: taiga_issue
+short_description: Creates/deletes an issue in a Taiga Project Management Platform
+description:
+  - Creates/deletes an issue in a Taiga Project Management Platform (U(https://taiga.io)).
+  - An issue is identified by the combination of project, issue subject and issue type.
+  - This module implements the creation or deletion of issues (not the update).
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  taiga_host:
+    type: str
+    description:
+      - The hostname of the Taiga instance.
+    default: https://api.taiga.io
+  project:
+    type: str
+    description:
+      - Name of the project containing the issue. Must exist previously.
+    required: true
+  subject:
+    type: str
+    description:
+      - The issue subject.
+    required: true
+  issue_type:
+    type: str
+    description:
+      - The issue type. Must exist previously.
+    required: true
+  priority:
+    type: str
+    description:
+      - The issue priority. Must exist previously.
+    default: Normal
+  status:
+    type: str
+    description:
+      - The issue status. Must exist previously.
+    default: New
+  severity:
+    type: str
+    description:
+      - The issue severity. Must exist previously.
+    default: Normal
+  description:
+    type: str
+    description:
+      - The issue description.
+    default: ""
+  attachment:
+    type: path
+    description:
+      - Path to a file to be attached to the issue.
+  attachment_description:
+    type: str
+    description:
+      - A string describing the file to be attached to the issue.
+    default: ""
+  tags:
+    type: list
+    elements: str
+    description:
+      - A lists of tags to be assigned to the issue.
+    default: []
+  state:
+    type: str
+    description:
+      - Whether the issue should be present or not.
+    choices: ["present", "absent"]
+    default: present
+author: Alejandro Guirao (@lekum)
+requirements: [python-taiga]
+notes:
+  - The authentication is achieved either by the environment variable E(TAIGA_TOKEN) or by the pair of environment variables
+    E(TAIGA_USERNAME) and E(TAIGA_PASSWORD).
+"""
+
+EXAMPLES = r"""
+- name: Create an issue in the my hosted Taiga environment and attach an error log
+  community.general.taiga_issue:
+    taiga_host: https://mytaigahost.example.com
+    project: myproject
+    subject: An error has been found
+    issue_type: Bug
+    priority: High
+    status: New
+    severity: Important
+    description: An error has been found. Please check the attached error log for details.
+    attachment: /path/to/error.log
+    attachment_description: Error log file
+    tags:
+      - Error
+      - Needs manual check
+    state: present
+
+- name: Deletes the previously created issue
+  community.general.taiga_issue:
+    taiga_host: https://mytaigahost.example.com
+    project: myproject
+    subject: An error has been found
+    issue_type: Bug
+    state: absent
+"""
+
+RETURN = """#"""
+import traceback
+from os import getenv
+from os.path import isfile
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+TAIGA_IMP_ERR = None
+try:
+    from taiga import TaigaAPI
+    from taiga.exceptions import TaigaException
+
+    TAIGA_MODULE_IMPORTED = True
+except ImportError:
+    TAIGA_IMP_ERR = traceback.format_exc()
+    TAIGA_MODULE_IMPORTED = False
+
+
+def manage_issue(
+    taiga_host,
+    project_name,
+    issue_subject,
+    issue_priority,
+    issue_status,
+    issue_type,
+    issue_severity,
+    issue_description,
+    issue_attachment,
+    issue_attachment_description,
+    issue_tags,
+    state,
+    check_mode=False,
+):
+    """
+    Method that creates/deletes issues depending whether they exist and the state desired
+
+    The credentials should be passed via environment variables:
+        - TAIGA_TOKEN
+        - TAIGA_USERNAME and TAIGA_PASSWORD
+
+    Returns a tuple with these elements:
+        - A boolean representing the success of the operation
+        - A descriptive message
+        - A dict with the issue attributes, in case of issue creation, otherwise empty dict
+    """
+
+    changed = False
+
+    try:
+        token = getenv("TAIGA_TOKEN")
+        if token:
+            api = TaigaAPI(host=taiga_host, token=token)
+        else:
+            api = TaigaAPI(host=taiga_host)
+            username = getenv("TAIGA_USERNAME")
+            password = getenv("TAIGA_PASSWORD")
+            if not any([username, password]):
+                return False, changed, "Missing credentials", {}
+            api.auth(username=username, password=password)
+
+        user_id = api.me().id
+        project_list = [x for x in api.projects.list(member=user_id) if x.name == project_name]
+        if len(project_list) != 1:
+            return False, changed, f"Unable to find project {project_name}", {}
+        project = project_list[0]
+        project_id = project.id
+
+        priority_list = [x for x in api.priorities.list(project=project_id) if x.name == issue_priority]
+        if len(priority_list) != 1:
+            return False, changed, f"Unable to find issue priority {issue_priority} for project {project_name}", {}
+        priority_id = priority_list[0].id
+
+        status_list = [x for x in api.issue_statuses.list(project=project_id) if x.name == issue_status]
+        if len(status_list) != 1:
+            return False, changed, f"Unable to find issue status {issue_status} for project {project_name}", {}
+        status_id = status_list[0].id
+
+        type_list = [x for x in project.list_issue_types() if x.name == issue_type]
+        if len(type_list) != 1:
+            return False, changed, f"Unable to find issue type {issue_type} for project {project_name}", {}
+        type_id = type_list[0].id
+
+        severity_list = [x for x in project.list_severities() if x.name == issue_severity]
+        if len(severity_list) != 1:
+            return False, changed, f"Unable to find severity {issue_severity} for project {project_name}", {}
+        severity_id = severity_list[0].id
+
+        issue = {
+            "project": project_name,
+            "subject": issue_subject,
+            "priority": issue_priority,
+            "status": issue_status,
+            "type": issue_type,
+            "severity": issue_severity,
+            "description": issue_description,
+            "tags": issue_tags,
+        }
+
+        # An issue is identified by the project_name, the issue_subject and the issue_type
+        matching_issue_list = [x for x in project.list_issues() if x.subject == issue_subject and x.type == type_id]
+        matching_issue_list_len = len(matching_issue_list)
+
+        if matching_issue_list_len == 0:
+            # The issue does not exist in the project
+            if state == "present":
+                # This implies a change
+                changed = True
+                if not check_mode:
+                    # Create the issue
+                    new_issue = project.add_issue(
+                        issue_subject,
+                        priority_id,
+                        status_id,
+                        type_id,
+                        severity_id,
+                        tags=issue_tags,
+                        description=issue_description,
+                    )
+                    if issue_attachment:
+                        new_issue.attach(issue_attachment, description=issue_attachment_description)
+                        issue["attachment"] = issue_attachment
+                        issue["attachment_description"] = issue_attachment_description
+                return True, changed, "Issue created", issue
+
+            else:
+                # If does not exist, do nothing
+                return True, changed, "Issue does not exist", {}
+
+        elif matching_issue_list_len == 1:
+            # The issue exists in the project
+            if state == "absent":
+                # This implies a change
+                changed = True
+                if not check_mode:
+                    # Delete the issue
+                    matching_issue_list[0].delete()
+                return True, changed, "Issue deleted", {}
+
+            else:
+                # Do nothing
+                return True, changed, "Issue already exists", {}
+
+        else:
+            # More than 1 matching issue
+            return False, changed, f"More than one issue with subject {issue_subject} in project {project_name}", {}
+
+    except TaigaException as exc:
+        msg = f"An exception happened: {exc}"
+        return False, changed, msg, {}
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            taiga_host=dict(type="str", default="https://api.taiga.io"),
+            project=dict(type="str", required=True),
+            subject=dict(type="str", required=True),
+            issue_type=dict(type="str", required=True),
+            priority=dict(type="str", default="Normal"),
+            status=dict(type="str", default="New"),
+            severity=dict(type="str", default="Normal"),
+            description=dict(type="str", default=""),
+            attachment=dict(type="path"),
+            attachment_description=dict(type="str", default=""),
+            tags=dict(default=[], type="list", elements="str"),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
+        ),
+        supports_check_mode=True,
+    )
+
+    if not TAIGA_MODULE_IMPORTED:
+        module.fail_json(msg=missing_required_lib("python-taiga"), exception=TAIGA_IMP_ERR)
+
+    taiga_host = module.params["taiga_host"]
+    project_name = module.params["project"]
+    issue_subject = module.params["subject"]
+    issue_priority = module.params["priority"]
+    issue_status = module.params["status"]
+    issue_type = module.params["issue_type"]
+    issue_severity = module.params["severity"]
+    issue_description = module.params["description"]
+    issue_attachment = module.params["attachment"]
+    issue_attachment_description = module.params["attachment_description"]
+    if issue_attachment:
+        if not isfile(issue_attachment):
+            msg = f"{issue_attachment} is not a file"
+            module.fail_json(msg=msg)
+    issue_tags = module.params["tags"]
+    state = module.params["state"]
+
+    return_status, changed, msg, issue_attr_dict = manage_issue(
+        taiga_host,
+        project_name,
+        issue_subject,
+        issue_priority,
+        issue_status,
+        issue_type,
+        issue_severity,
+        issue_description,
+        issue_attachment,
+        issue_attachment_description,
+        issue_tags,
+        state,
+        check_mode=module.check_mode,
+    )
+    if return_status:
+        if issue_attr_dict:
+            module.exit_json(changed=changed, msg=msg, issue=issue_attr_dict)
+        else:
+            module.exit_json(changed=changed, msg=msg)
+    else:
+        module.fail_json(msg=msg)
+
+
+if __name__ == "__main__":
+    main()

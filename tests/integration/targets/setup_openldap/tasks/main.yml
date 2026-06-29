@@ -1,0 +1,92 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Setup OpenLDAP on Debian or Ubuntu
+  block:
+    - name: Include OS-specific variables
+      include_vars: '{{ ansible_facts.os_family }}.yml'
+
+    - name: Install OpenLDAP server and tools
+      become: true
+      package:
+        name: '{{ item }}'
+      loop: '{{ openldap_packages_name }}'
+
+    - name: Install python-ldap
+      become: true
+      package:
+        name: '{{ python_ldap_package_name_python3 }}'
+
+    - name: Make sure OpenLDAP service is stopped
+      become: true
+      shell: 'cat /var/run/slapd/slapd.pid | xargs -r kill -9 '
+
+    - name: Debconf
+      shell: 'echo "slapd {{ item.question }} {{ item.vtype }} {{ item.value }}" >> /root/debconf-slapd.conf'
+      loop: "{{ openldap_debconfs }}"
+
+    - name: Dpkg reconfigure
+      shell:
+        cmd: "export DEBIAN_FRONTEND=noninteractive; cat /root/debconf-slapd.conf | debconf-set-selections; dpkg-reconfigure -f noninteractive slapd"
+        creates: "/root/slapd_configured"
+
+    - name: Enable secure ldap
+      lineinfile:
+        path: /etc/default/slapd
+        regexp: "^SLAPD_SERVICES"
+        line: 'SLAPD_SERVICES="ldap:/// ldaps:/// ldapi:///"'
+
+    - name: Create certificates
+      shell: |
+        openssl req -x509 -batch -sha256 -days 1825 -newkey rsa:2048 -nodes -keyout /root/ca.key -out /usr/local/share/ca-certificates/ca.crt
+        openssl req -batch -sha256 -days 365 -newkey rsa:2048 -subj "/CN=$(hostname)" -addext "subjectAltName = DNS:localhost" -nodes -keyout /etc/ldap/localhost.key -out /etc/ldap/localhost.csr
+        openssl x509 -req  -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -CAcreateserial -in /etc/ldap/localhost.csr -out /etc/ldap/localhost.crt
+        chgrp openldap /etc/ldap/localhost.key
+        chmod 0640 /etc/ldap/localhost.key
+        openssl req -batch -sha256 -days 365 -newkey rsa:2048 -subj "/UID=ldaptest" -nodes -keyout /root/user.key -out /root/user.csr
+        openssl x509 -req  -CA /usr/local/share/ca-certificates/ca.crt -CAkey /root/ca.key -CAcreateserial -in /root/user.csr -out /root/user.crt
+
+    - name: Start OpenLDAP service
+      become: true
+      service:
+        name: '{{ openldap_service_name }}'
+        enabled: true
+        state: started
+
+    - name: Copy initial config ldif file
+      become: true
+      copy:
+        src: 'files/{{ item }}'
+        dest: '/tmp/{{ item }}'
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - rootpw_cnconfig.ldif
+        - cert_cnconfig.ldif
+        - initial_config.ldif
+        - inc_schema_cnconfig.ldif
+        - ldap_inc_config.ldif
+
+    - name: Configure admin password for cn=config
+      shell: "ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/{{ item }}"
+      loop:
+        - rootpw_cnconfig.ldif
+        - cert_cnconfig.ldif
+        - inc_schema_cnconfig.ldif
+
+    - name: Add initial config
+      become: true
+      shell: 'ldapadd -H ldapi:/// -x -D "cn=admin,dc=example,dc=com" -w Test1234! -f /tmp/{{ item }}'
+      loop:
+        - initial_config.ldif
+        - ldap_inc_config.ldif
+
+  when: ansible_facts.os_family in ['Ubuntu', 'Debian']

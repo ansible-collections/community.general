@@ -1,0 +1,36 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# - import_tasks: setup_no_value.yml
+
+- name: setting value
+  git_config:
+    name: core.hooksPath
+    value: '~/foo/bar'
+    state: present
+    scope: global
+  register: set_result1
+
+- name: setting value again
+  git_config:
+    name: core.hooksPath
+    value: '~/foo/bar'
+    state: present
+    scope: global
+  register: set_result2
+
+- name: getting value
+  git_config_info:
+    name: core.hooksPath
+    scope: global
+  register: get_result
+
+- name: assert set changed and value is correct
+  assert:
+    that:
+      - set_result1 is changed
+      - set_result2 is not changed
+      - get_result.config_value == '~/foo/bar'
+...

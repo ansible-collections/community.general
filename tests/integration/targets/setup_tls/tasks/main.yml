@@ -1,0 +1,30 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Generated certificate with: https://github.com/michaelklishin/tls-gen
+# ~/tls-gen/basic# make PASSWORD=bunnies CN=ansible.tls.tests
+# verify with: make info
+
+- name: ensure target directory is present
+  file:
+    path: /tls
+    state: directory
+
+- name: ensure TLS files are present
+  copy:
+    src: "{{ item }}"
+    dest: "/tls/{{ item }}"
+  loop:
+    - ca_certificate.pem
+    - ca_key.pem
+    - client_certificate.pem
+    - client_key.pem
+    - server_certificate.pem
+    - server_key.pem

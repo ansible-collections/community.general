@@ -1,0 +1,163 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright © Thorsten Glaser <tglaser@b1-systems.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: Install prerequisites
+  ansible.builtin.apt:
+    name:
+      - iproute2
+    state: present
+    install_recommends: false
+    update_cache: true
+
+- name: Networking setup, interface
+  ansible.builtin.command:
+    cmd: "ip link add eth666 type dummy"
+    creates: /proc/sys/net/ipv4/conf/eth666/forwarding
+  changed_when: true
+
+- name: Networking setup, IPv4
+  ansible.builtin.command:
+    cmd: "ip addr change 192.0.2.1/24 dev eth666"
+  changed_when: true
+
+- name: Networking setup, link
+  ansible.builtin.command:
+    cmd: "ip link set up dev eth666"
+  changed_when: true
+
+- name: Install KEA servers for DHCP and DHCPv6
+  ansible.builtin.apt:
+    name:
+      - kea-dhcp4-server
+      - kea-dhcp6-server
+    state: present
+    install_recommends: false
+
+- name: Set up dhcp4 server, network
+  ansible.builtin.lineinfile:
+    firstmatch: true
+    insertafter: '"interfaces-config": [{]'
+    line: '"interfaces": [ "eth666" ]'
+    path: /etc/kea/kea-dhcp4.conf
+    search_string: '"interfaces": ['
+
+- name: Set up dhcp4 server, hooks
+  ansible.builtin.lineinfile:
+    firstmatch: true
+    insertbefore: '"subnet4": '
+    # note: this will fail on architectures other than amd64, but Ubuntu 24.04 does need the full path (Debian trixie is content with just the filename)
+    line: '"hooks-libraries": [ { "library": "/usr/lib/x86_64-linux-gnu/kea/hooks/libdhcp_lease_cmds.so" } ],'
+    path: /etc/kea/kea-dhcp4.conf
+    regexp: '^ *"hooks-libraries":'
+
+- name: Ensure the dhcp4 server is (re)started
+  ansible.builtin.service:
+    name: kea-dhcp4-server
+    state: restarted
+
+- name: Ensure the dhcp6 server is (re)started
+  ansible.builtin.service:
+    name: kea-dhcp6-server
+    state: restarted
+
+# the next tasks are for debugging this integration test if needed
+- name: Show dhcp4 server config
+  ansible.builtin.command:
+    cmd: "cat /etc/kea/kea-dhcp4.conf"
+  changed_when: true
+
+- name: Show dhcp4 server log
+  ansible.builtin.command:
+    cmd: "journalctl -b -u kea-dhcp4-server"
+  changed_when: true
+
+- name: Show dhcp6 server log
+  ansible.builtin.command:
+    cmd: "journalctl -b -u kea-dhcp6-server"
+  changed_when: true
+
+# an example for a request acquiring information
+- name: Get KEA DHCP6 status
+  kea_command:
+    command: status-get
+    rv_unchanged: [0]
+    socket: /run/kea/kea6-ctrl-socket
+  register: kea6_status
+  ignore_errors: true
+
+- name: Display registered status result
+  ansible.builtin.debug:
+    msg: KEA DHCP6 running on PID {{ kea6_status.response.arguments.pid }}
+
+# ensure socket option works
+- name: Get KEA DHCP4 status
+  kea_command:
+    command: status-get
+    rv_unchanged: [0]
+    socket: /run/kea/kea4-ctrl-socket
+  register: kea4_status
+  ignore_errors: true
+
+# an example for requests modifying state
+- name: Remove existing leases for 192.0.2.66, if any
+  kea_command:
+    command: lease4-del
+    arguments:
+      ip-address: "192.0.2.66"
+    rv_changed: [0]
+    rv_unchanged: [3]
+  register: lease_del
+  ignore_errors: true
+
+- name: Add DHCP lease for 192.0.2.66
+  kea_command:
+    command: lease4-add
+    arguments:
+      ip-address: "192.0.2.66"
+      hw-address: "00:00:5E:00:53:00"
+    rv_changed: [0]
+  register: lease_add
+  ignore_errors: true
+
+# these all ignore_errors so the network teardown runs in all cases
+- name: An unknown command
+  kea_command:
+    command: get-status
+    rv_unchanged: [0]
+  register: uc_status
+  ignore_errors: true
+
+- name: Networking setup, teardown
+  ansible.builtin.command:
+    cmd: "ip link del eth666"
+  changed_when: true
+
+- name: Ensure dhcp4 and dhcp6 PIDs are different
+  ansible.builtin.assert:
+    that:
+      - kea4_status.response.arguments.pid is integer
+      - kea4_status.response.arguments.pid > 0
+      - kea6_status.response.arguments.pid is integer
+      - kea6_status.response.arguments.pid > 0
+      - kea4_status.response.arguments.pid != kea6_status.response.arguments.pid
+    fail_msg: 'PIDs are invalid or do not differ (4: {{ kea4_status.response.arguments.pid | default("unknown") }}, 6: {{ kea6_status.response.arguments.pid | default("unknown") }})'
+    success_msg: 'PIDs differ (4: {{ kea4_status.response.arguments.pid | default("unknown") }}, 6: {{ kea6_status.response.arguments.pid | default("unknown") }})'
+
+- name: Check results
+  ansible.builtin.assert:
+    that:
+      - kea6_status is not changed
+      - kea6_status is not failed
+      - kea4_status is not changed
+      - kea4_status is not failed
+      - lease_del is not failed
+      - lease_add is changed
+      - lease_add is not failed
+      - uc_status is failed

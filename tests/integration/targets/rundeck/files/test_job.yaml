@@ -1,0 +1,28 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- defaultTab: nodes
+  description: ''
+  executionEnabled: true
+  id: 3b8a6e54-69fb-42b7-b98f-f82e59238478
+  loglevel: INFO
+  name: test_job
+  nodeFilterEditable: false
+  options:
+    - label: Exit Code
+      name: exit_code
+      value: '0'
+    - label: Sleep
+      name: sleep
+      value: '1'
+  plugins:
+    ExecutionLifecycle: null
+  scheduleEnabled: true
+  sequence:
+    commands:
+      - exec: sleep $RD_OPTION_SLEEP && echo "Test done!" && exit $RD_OPTION_EXIT_CODE
+    keepgoing: false
+    strategy: node-first
+  uuid: 3b8a6e54-69fb-42b7-b98f-f82e59238478

@@ -1,0 +1,173 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Create a new template
+- name: Create a new network
+  one_vnet:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: bridge-network
+    template: |
+      VN_MAD  = "bridge"
+      BRIDGE  = "br0"
+      BRIDGE_TYPE  = "linux"
+      AR=[
+        TYPE  = "IP4",
+        IP    = "192.0.2.2",
+        SIZE  = "20"
+      ]
+      DNS     = "192.0.2.1"
+      GATEWAY = "192.0.2.1"
+  register: result
+
+- name: Assert that network is created
+  assert:
+    that:
+      - result is changed
+
+
+# Updating a network
+- name: Update an existing network
+  one_vnet:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: bridge-network
+    template: |
+      VN_MAD  = "bridge"
+      BRIDGE  = "br0"
+      BRIDGE_TYPE  = "linux"
+      AR=[
+        TYPE  = "IP4",
+        IP    = "192.0.2.2",
+        SIZE  = "20"
+      ]
+      DNS     = "192.0.2.220"
+      GATEWAY = "192.0.2.1"
+  register: result
+
+- name: Assert that network is changed
+  assert:
+    that:
+      - result is changed
+
+# Testing idempotence using the same template as in previous task
+- name: Update an existing network with the same changes again
+  one_vnet:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: bridge-network
+    template: |
+      VN_MAD  = "bridge"
+      BRIDGE  = "br0"
+      BRIDGE_TYPE  = "linux"
+      AR=[
+        TYPE  = "IP4",
+        IP    = "192.0.2.2",
+        SIZE  = "20"
+      ]
+      DNS     = "192.0.2.220"
+      GATEWAY = "192.0.2.1"
+  register: result
+
+- name: Assert that network is not changed
+  assert:
+    that:
+      - result is not changed
+
+
+# Deletion of networks
+- name: Delete a nonexisting network
+  one_vnet:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: i-do-not-exists
+    state: absent
+  register: result
+
+- name: Assert that network is not changed
+  assert:
+    that:
+      - result is not changed
+
+- name: Delete an existing network
+  one_vnet:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: bridge-network
+    state: absent
+  register: result
+
+- name: Assert that network was deleted
+  assert:
+    that:
+      - result is changed
+
+# Trying to run with wrong arguments
+- name: Try to create use network with state=present and without the template parameter
+  one_vnet:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: bridge-network
+    state: present
+  register: result
+  ignore_errors: true
+
+- name: Assert that it failed because network is missing
+  assert:
+    that:
+      - result is failed
+
+- name: Try to create network with template but without specifying the name parameter
+  one_vnet:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: present
+    template: |
+      VN_MAD  = "bridge"
+      BRIDGE  = "br0"
+      BRIDGE_TYPE  = "linux"
+      AR=[
+        TYPE  = "IP4",
+        IP    = "192.0.2.2",
+        SIZE  = "20"
+      ]
+      DNS     = "192.0.2.220"
+      GATEWAY = "192.0.2.1"
+  register: result
+  ignore_errors: true
+
+- name: Assert that it failed because name is required for initial creation
+  assert:
+    that:
+      - result is failed
+
+- name: Try to use both ID and name at the same time
+  one_vnet:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name:
+    id: 0
+    state: present
+  register: result
+  ignore_errors: true
+
+- name: Assert that it failed because you can use only one at the time
+  assert:
+    that:
+      - result is failed

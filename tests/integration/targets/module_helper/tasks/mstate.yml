@@ -1,0 +1,83 @@
+# Copyright (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: test mstate 1
+  mstate:
+    a: 80
+    b: banana
+    c: cashew
+    state: nop
+  register: state1
+
+- name: assert state1
+  assert:
+    that:
+      - state1.a == 80
+      - state1.b == "banana"
+      - state1.c == "cashew"
+      - state1.result == "abc"
+      - state1 is not changed
+
+- name: test mstate 2
+  mstate:
+    a: 80
+    b: banana
+    c: cashew
+  register: state2
+
+- name: assert state2
+  assert:
+    that:
+      - state2.a == 80
+      - state2.b == "banana"
+      - state2.c == "cashew"
+      - state2.result == "80bananacashew"
+      - state2 is changed
+
+- name: test mstate 3
+  mstate:
+    a: 3
+    b: banana
+    state: b_x_a
+  register: state3
+
+- name: assert state3
+  assert:
+    that:
+      - state3.a == 3
+      - state3.b == "banana"
+      - state3.result == "bananabananabanana"
+      - state3 is changed
+
+- name: test mstate 4
+  mstate:
+    a: 4
+    c: cashew
+    state: c_x_a
+  register: state4
+
+- name: assert state4
+  assert:
+    that:
+      - state4.a == 4
+      - state4.c == "cashew"
+      - state4.result == "cashewcashewcashewcashew"
+      - state4 is changed
+
+- name: test mstate 5
+  mstate:
+    a: 5
+    b: foo
+    c: bar
+    state: both_x_a
+  register: state5
+
+- name: assert state5
+  assert:
+    that:
+      - state5.a == 5
+      - state5.b == "foo"
+      - state5.c == "bar"
+      - state5.result == "foobarfoobarfoobarfoobarfoobar"
+      - state5 is changed

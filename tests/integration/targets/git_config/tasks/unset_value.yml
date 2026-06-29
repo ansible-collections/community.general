@@ -1,0 +1,52 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- import_tasks: setup_value.yml
+
+- name: unsetting value
+  git_config:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+    state: absent
+  register: unset_result
+
+- name: getting value
+  git_config_info:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+  register: get_result
+
+- name: assert unset changed and deleted value
+  assert:
+    that:
+      - unset_result is changed
+      - unset_result.diff.before == option_value + "\n"
+      - unset_result.diff.after == "\n"
+      - get_result.config_value == ''
+
+- import_tasks: setup_value.yml
+
+- name: unsetting value with value specified
+  git_config:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+    value: "{{ option_value }}"
+    state: absent
+  register: unset_result
+
+- name: getting value
+  git_config_info:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+  register: get_result
+
+- name: assert unset changed and deleted value
+  assert:
+    that:
+      - unset_result is changed
+      - unset_result.diff.before == option_value + "\n"
+      - unset_result.diff.after == "\n"
+      - get_result.config_value == ''
+...

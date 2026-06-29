@@ -1,0 +1,15 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# test code for the zypper module
+# Copyright 2015, Guido Günther <agx@sigxcpu.org>
+# heavily based on the yum tests which are
+# Copyright 2014, James Tanner <tanner.jc@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- include_tasks: 'zypper.yml'
+  when: ansible_facts.os_family == 'Suse'

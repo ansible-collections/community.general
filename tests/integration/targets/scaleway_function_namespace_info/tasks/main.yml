@@ -1,0 +1,43 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create function_namespace
+  community.general.scaleway_function_namespace:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ description }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+
+- name: Get function namespace info
+  community.general.scaleway_function_namespace_info:
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+  register: fn_info_task
+
+- ansible.builtin.debug:
+    var: fn_info_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_info_task is success
+      - fn_info_task is not changed
+      - "'hashed_value' in fn_info_task.function_namespace.secret_environment_variables[0]"
+
+- name: Delete function namespace
+  community.general.scaleway_function_namespace:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    project_id: '{{ scw_project }}'

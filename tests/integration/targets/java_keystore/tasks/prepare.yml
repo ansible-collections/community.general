@@ -1,0 +1,37 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create test directory
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}"
+    state: directory
+
+- name: Create private keys
+  community.crypto.openssl_privatekey:
+    path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    size: 2048  # this should work everywhere
+    # The following is more efficient, but might not work everywhere:
+    # type: ECC
+    # curve: secp384r1
+    cipher: "{{ 'auto' if item.passphrase is defined else omit }}"
+    passphrase: "{{ item.passphrase | default(omit) }}"
+  loop: "{{ java_keystore_certs }}"
+
+- name: Create CSRs
+  community.crypto.openssl_csr:
+    path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.csr' }}"
+    privatekey_path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
+    commonName: "{{ item.commonName }}"
+  loop: "{{ java_keystore_certs + java_keystore_new_certs }}"
+
+- name: Create certificates
+  community.crypto.x509_certificate:
+    path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+    csr_path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.csr' }}"
+    privatekey_path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
+    provider: selfsigned
+  loop: "{{ java_keystore_certs + java_keystore_new_certs }}"

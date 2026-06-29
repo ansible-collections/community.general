@@ -1,0 +1,48 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2020, Pavlo Bashynskyi (@levonet) <levonet@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: redis_info - connect to master with default host/port
+  community.general.redis_info:
+    login_password: "{{ redis_password }}"
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.info is defined
+      - result.info.tcp_port == master_port
+      - result.info.role == 'master'
+
+- name: redis_info - connect to master (check)
+  community.general.redis_info:
+    login_host: 127.0.0.1
+    login_port: "{{ master_port }}"
+    login_password: "{{ redis_password }}"
+  check_mode: true
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.info is defined
+      - result.info.tcp_port == master_port
+      - result.info.role == 'master'
+
+- name: redis_info - connect to replica
+  community.general.redis_info:
+    login_port: "{{ replica_port }}"
+    login_password: "{{ redis_password }}"
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.info is defined
+      - result.info.tcp_port == replica_port
+      - result.info.role == 'slave'

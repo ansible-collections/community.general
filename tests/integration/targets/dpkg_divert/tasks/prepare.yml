@@ -1,0 +1,43 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "set variables for the entire playbook"
+  set_fact:
+    foobarrc: "{{ foobarrc }}"
+    foobarrc_ansible: "{{ foobarrc }}.ansible"
+    foobarrc_distrib: "{{ foobarrc }}.distrib"
+    foobarrc_oldtext: "# foobar configuration file\n# Please refer to the documentation for details\n"
+    foobarrc_oldsha1: "e1c54c36d2fd1b8d67d1826e49b95ac8c0f24c0a"
+    foobarrc_newtext: "# Custom foobar configuration file\nFOO=bar\nBAR=foo"
+    foobarrc_newsha1: "3fe6c890519fb48e27c1b0e3e37afb11357d5cac"
+  vars:
+    foobarrc: "/etc/foobarrc"
+
+- name: "remove foobarrc diversion"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: absent
+  become: true
+
+- name: "remove test files"
+  file:
+    path: "{{ dpkg_divert_item }}"
+    state: absent
+  loop:
+    - "{{ foobarrc_ansible }}"
+    - "{{ foobarrc_distrib }}"
+  loop_control:
+    loop_var: dpkg_divert_item
+  become: true
+
+
+- block:
+    - name: "include tasks to perform basic tests (create, remove, update)"
+      include_tasks: tests/01-basic.yml
+
+    - name: "include tasks to perform other tests (rename)"
+      include_tasks: tests/02-rename.yml
+  become: true
+  diff: true

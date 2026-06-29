@@ -1,0 +1,85 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Copy expected results to remote
+  copy:
+    src: "results/{{ item }}"
+    dest: "/tmp/{{ item }}"
+  with_items:
+    - test-pretty-print.xml
+    - test-pretty-print-only.xml
+
+# NOTE: Jinja2 templating eats trailing newlines
+- name: Read from xmlstring (not using pretty_print)
+  xml:
+    xmlstring: "{{ lookup('file', '{{ role_path }}/fixtures/ansible-xml-beers.xml') }}"
+    xpath: .
+  register: xmlresponse
+
+- name: Compare to expected result
+  copy:
+    content: "{{ xmlresponse.xmlstring }}\n"
+    dest: '/tmp/test-pretty-print-only.xml'
+  check_mode: true
+  diff: true
+  register: comparison
+
+- name: Test expected result
+  assert:
+    that:
+      - xmlresponse is not changed
+      - comparison is not changed  # identical
+  # command: diff -u {{ role_path }}/results/test-pretty-print-only.xml /tmp/ansible-xml-beers.xml
+
+
+# NOTE: Jinja2 templating eats trailing newlines
+- name: Read from xmlstring (using pretty_print)
+  xml:
+    xmlstring: "{{ lookup('file', '{{ role_path }}/fixtures/ansible-xml-beers.xml') }}"
+    pretty_print: true
+  register: xmlresponse
+
+- name: Compare to expected result
+  copy:
+    content: '{{ xmlresponse.xmlstring }}'
+    dest: '/tmp/test-pretty-print-only.xml'
+  check_mode: true
+  diff: true
+  register: comparison
+
+# FIXME: This change is related to the newline added by pretty_print
+- name: Test expected result
+  assert:
+    that:
+      - xmlresponse is changed
+      - comparison is not changed  # identical
+  # command: diff -u {{ role_path }}/results/test-pretty-print-only.xml /tmp/ansible-xml-beers.xml
+
+
+# NOTE: Jinja2 templating eats trailing newlines
+- name: Read from xmlstring
+  xml:
+    xmlstring: "{{ lookup('file', '{{ role_path }}/fixtures/ansible-xml-beers.xml') }}"
+    xpath: /business/beers
+    pretty_print: true
+    add_children:
+      - beer: Old Rasputin
+  register: xmlresponse_modification
+
+- name: Compare to expected result
+  copy:
+    content: '{{ xmlresponse_modification.xmlstring }}'
+    dest: '/tmp/test-pretty-print.xml'
+  check_mode: true
+  diff: true
+  register: comparison
+
+# FIXME: This change is related to the newline added by pretty_print
+- name: Test expected result
+  assert:
+    that:
+      - xmlresponse_modification is changed
+      - comparison is not changed  # identical
+  # command: diff -u {{ role_path }}/results/test-pretty-print.xml /tmp/ansible-xml-beers.xml

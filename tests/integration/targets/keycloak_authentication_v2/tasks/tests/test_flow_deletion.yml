@@ -1,0 +1,44 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Setup Test
+  ansible.builtin.include_tasks:
+    file: test_setup.yml
+
+- name: Create the new flow <Integration Test Flow>
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v1.yml
+
+- name: Delete the flow <Integration Test Flow>
+  community.general.keycloak_authentication_v2:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: Integration Test Flow
+    state: absent
+  register: flow_deletion_result
+
+- name: Assert that the flow deletion result
+  ansible.builtin.assert:
+    that:
+      - flow_deletion_result is changed
+      - flow_deletion_result.diff is defined
+    msg: "Expected changes and a diff but got: changed={{ flow_deletion_result.changed }}, diff={{ flow_deletion_result.get('diff') }}"
+
+- name: Retrieve access token
+  ansible.builtin.include_tasks:
+    file: ../actions/fetch_access_token.yml
+
+- name: Assert that the flow does not exist anymore
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/authentication/flows/Integratoin%20Test%20Flow/executions"
+    method: GET
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    return_content: true
+    status_code: 404
+  register: flow_response

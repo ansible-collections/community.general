@@ -1,0 +1,15 @@
+dn: cn=config
+add: olcTLSCACertificateFile
+olcTLSCACertificateFile: /usr/local/share/ca-certificates/ca.crt
+-
+add: olcTLSCertificateFile
+olcTLSCertificateFile: /etc/ldap/localhost.crt
+-
+add: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: /etc/ldap/localhost.key
+-
+add: olcAuthzRegexp
+olcAuthzRegexp: {0}"UID=([^,]*)" uid=$1,ou=users,dc=example,dc=com
+-
+add: olcTLSVerifyClient
+olcTLSVerifyClient: allow

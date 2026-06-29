@@ -1,0 +1,46 @@
+---
+# Copyright (c) Contributors to the Ansible project
+# Based on the integraton test for the lvg module
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Collect test volume groups
+  ansible.builtin.command:
+    cmd: "pvs --noheadings -ovg_name {{ loop_device1 | default('') }} {{ loop_device2 | default('') }}"
+  register: test_vgs_output
+  changed_when: false
+
+- name: Remove test volume groups
+  loop: "{{ test_vgs_output.stdout_lines }}"
+  loop_control:
+    label: "{{ item | trim }}"
+  community.general.lvg:
+    vg: "{{ item | trim }}"
+    state: absent
+
+- name: Remove lvmdevices
+  loop:
+    - "{{ loop_device1 | default('') }}"
+    - "{{ loop_device2 | default('') }}"
+  when:
+    - item | length > 0
+  ansible.builtin.command:
+    cmd: "lvmdevices --deldev {{ item }}"
+  failed_when: false
+  changed_when: true
+
+- name: Detach loop devices
+  loop:
+    - "{{ loop_device1 | default('') }}"
+    - "{{ loop_device2 | default('') }}"
+  when:
+    - item | length > 0
+  ansible.builtin.command:
+    cmd: "losetup -d {{ item }}"
+  changed_when: true
+
+- name: Remove device files
+  with_sequence: 'count=2'
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}/img{{ item }}"
+    state: absent

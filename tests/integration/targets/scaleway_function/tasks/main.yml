@@ -1,0 +1,284 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create function_namespace
+  community.general.scaleway_function_namespace:
+    state: present
+    name: '{{ function_namespace_name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ description }}'
+  register: integration_function_namespace
+
+- name: Create a function (Check)
+  check_mode: true
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+  register: fn_creation_check_task
+
+- ansible.builtin.debug:
+    var: fn_creation_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_creation_check_task is success
+      - fn_creation_check_task is changed
+
+- name: Create function
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+  register: fn_creation_task
+
+- ansible.builtin.debug:
+    var: fn_creation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_creation_task is success
+      - fn_creation_task is changed
+      - fn_creation_task.function.status in ["created", "ready"]
+
+- name: Create function (Confirmation)
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+  register: fn_creation_confirmation_task
+
+- ansible.builtin.debug:
+    var: fn_creation_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_creation_confirmation_task is success
+      - fn_creation_confirmation_task is not changed
+      - fn_creation_confirmation_task.function.status in ["created", "ready"]
+
+- name: Update function (Check)
+  check_mode: true
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+  register: fn_update_check_task
+
+- ansible.builtin.debug:
+    var: fn_update_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_update_check_task is success
+      - fn_update_check_task is changed
+
+- name: Update function
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+  register: fn_update_task
+
+- ansible.builtin.debug:
+    var: fn_update_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_update_task is success
+      - fn_update_task is changed
+      - fn_update_task.function.status in ["created", "ready"]
+
+- name: Update function (Confirmation)
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+  register: fn_update_confirmation_task
+
+- ansible.builtin.debug:
+    var: fn_update_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_update_confirmation_task is success
+      - fn_update_confirmation_task is not changed
+      - fn_update_confirmation_task.function.status in ["created", "ready"]
+
+- name: Update function secret variables (Check)
+  check_mode: true
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ updated_secret_environment_variables }}'
+  register: fn_update_secret_check_task
+
+- ansible.builtin.debug:
+    var: fn_update_secret_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_update_secret_check_task is success
+      - fn_update_secret_check_task is changed
+
+- name: Update function secret variables
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ updated_secret_environment_variables }}'
+  register: fn_update_secret_task
+
+- ansible.builtin.debug:
+    var: fn_update_secret_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_update_secret_task is success
+      - fn_update_secret_task is changed
+      - fn_update_secret_task.function.status in ["created", "ready"]
+      - "'hashed_value' in fn_update_secret_task.function.secret_environment_variables[0]"
+
+- name: Update function secret variables (Confirmation)
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ updated_secret_environment_variables }}'
+  register: fn_update_secret_confirmation_task
+
+- ansible.builtin.debug:
+    var: fn_update_secret_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_update_secret_confirmation_task is success
+      - fn_update_secret_confirmation_task is not changed
+      - fn_update_secret_confirmation_task.function.status in ["created", "ready"]
+      - "'hashed_value' in fn_update_secret_confirmation_task.function.secret_environment_variables[0]"
+
+- name: Delete function (Check)
+  check_mode: true
+  community.general.scaleway_function:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+  register: fn_deletion_check_task
+
+- ansible.builtin.debug:
+    var: fn_deletion_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_deletion_check_task is success
+      - fn_deletion_check_task is changed
+
+- name: Delete function
+  community.general.scaleway_function:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+  register: fn_deletion_task
+
+- ansible.builtin.debug:
+    var: fn_deletion_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_deletion_task is success
+      - fn_deletion_task is changed
+
+- name: Delete function (Confirmation)
+  community.general.scaleway_function:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+  register: fn_deletion_confirmation_task
+
+- ansible.builtin.debug:
+    var: fn_deletion_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_deletion_confirmation_task is success
+      - fn_deletion_confirmation_task is not changed
+
+- name: Delete function namespace
+  community.general.scaleway_function_namespace:
+    state: absent
+    name: '{{ function_namespace_name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    project_id: '{{ scw_project }}'

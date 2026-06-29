@@ -1,0 +1,16 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# ------
+# set up : set gitconfig with value
+- name: set up with value
+  copy:
+    src: gitconfig
+    dest: ~/.gitconfig
+
+- name: set up with value (file)
+  copy:
+    src: gitconfig
+    dest: "{{ remote_tmp_dir }}/gitconfig_file"

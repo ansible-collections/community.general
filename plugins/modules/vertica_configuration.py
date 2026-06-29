@@ -1,0 +1,203 @@
+#!/usr/bin/python
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: vertica_configuration
+short_description: Updates Vertica configuration parameters
+description:
+  - Updates Vertica configuration parameters.
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  parameter:
+    description:
+      - Name of the parameter to update.
+    required: true
+    aliases: [name]
+    type: str
+  value:
+    description:
+      - Value of the parameter to be set.
+    type: str
+  db:
+    description:
+      - Name of the Vertica database.
+    type: str
+  cluster:
+    description:
+      - Name of the Vertica cluster.
+    default: localhost
+    type: str
+  port:
+    description:
+      - Vertica cluster port to connect to.
+    default: '5433'
+    type: str
+  login_user:
+    description:
+      - The username used to authenticate with.
+    default: dbadmin
+    type: str
+  login_password:
+    description:
+      - The password used to authenticate with.
+    type: str
+notes:
+  - The default authentication assumes that you are either logging in as or sudo'ing to the C(dbadmin) account on the host.
+  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure that C(unixODBC) and C(pyodbc) is installed
+    on the host and properly configured.
+  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so) to be added to the C(Vertica)
+    section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini) and both C(ErrorMessagesPath = /opt/vertica/lib64) and
+    C(DriverManagerEncoding = UTF-16) to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
+requirements: ['unixODBC', 'pyodbc']
+author: "Dariusz Owczarek (@dareko)"
+"""
+
+EXAMPLES = r"""
+- name: Updating load_balance_policy
+  community.general.vertica_configuration: name=failovertostandbyafter value='8 hours'
+"""
+import traceback
+
+PYODBC_IMP_ERR = None
+try:
+    import pyodbc
+except ImportError:
+    PYODBC_IMP_ERR = traceback.format_exc()
+    pyodbc_found = False
+else:
+    pyodbc_found = True
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+
+class NotSupportedError(Exception):
+    pass
+
+
+class CannotDropError(Exception):
+    pass
+
+
+# module specific functions
+
+
+def get_configuration_facts(cursor, parameter_name=""):
+    facts = {}
+    cursor.execute(
+        """
+        select c.parameter_name, c.current_value, c.default_value
+        from configuration_parameters c
+        where c.node_name = 'ALL'
+        and (? = '' or c.parameter_name ilike ?)
+    """,
+        parameter_name,
+        parameter_name,
+    )
+    while True:
+        rows = cursor.fetchmany(100)
+        if not rows:
+            break
+        for row in rows:
+            facts[row.parameter_name.lower()] = {
+                "parameter_name": row.parameter_name,
+                "current_value": row.current_value,
+                "default_value": row.default_value,
+            }
+    return facts
+
+
+def check(configuration_facts, parameter_name, current_value):
+    parameter_key = parameter_name.lower()
+    return not (current_value and current_value.lower() != configuration_facts[parameter_key]["current_value"].lower())
+
+
+def present(configuration_facts, cursor, parameter_name, current_value):
+    parameter_key = parameter_name.lower()
+    changed = False
+    if current_value and current_value.lower() != configuration_facts[parameter_key]["current_value"].lower():
+        cursor.execute(f"select set_config_parameter('{parameter_name}', '{current_value}')")
+        changed = True
+    if changed:
+        configuration_facts.update(get_configuration_facts(cursor, parameter_name))
+    return changed
+
+
+# module logic
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            parameter=dict(required=True, aliases=["name"]),
+            value=dict(),
+            db=dict(),
+            cluster=dict(default="localhost"),
+            port=dict(default="5433"),
+            login_user=dict(default="dbadmin"),
+            login_password=dict(no_log=True),
+        ),
+        supports_check_mode=True,
+    )
+
+    if not pyodbc_found:
+        module.fail_json(msg=missing_required_lib("pyodbc"), exception=PYODBC_IMP_ERR)
+
+    parameter_name = module.params["parameter"]
+    current_value = module.params["value"]
+    db = ""
+    if module.params["db"]:
+        db = module.params["db"]
+
+    changed = False
+
+    try:
+        dsn = (
+            "Driver=Vertica;"
+            f"Server={module.params['cluster']};"
+            f"Port={module.params['port']};"
+            f"Database={db};"
+            f"User={module.params['login_user']};"
+            f"Password={module.params['login_password']};"
+            f"ConnectionLoadBalance=true"
+        )
+        db_conn = pyodbc.connect(dsn, autocommit=True)
+        cursor = db_conn.cursor()
+    except Exception as e:
+        module.fail_json(msg=f"Unable to connect to database: {e}.", exception=traceback.format_exc())
+
+    try:
+        configuration_facts = get_configuration_facts(cursor)
+        if module.check_mode:
+            changed = not check(configuration_facts, parameter_name, current_value)
+        else:
+            try:
+                changed = present(configuration_facts, cursor, parameter_name, current_value)
+            except pyodbc.Error as e:
+                module.fail_json(msg=f"{e}", exception=traceback.format_exc())
+    except NotSupportedError as e:
+        module.fail_json(msg=f"{e}", ansible_facts={"vertica_configuration": configuration_facts})
+    except CannotDropError as e:
+        module.fail_json(msg=f"{e}", ansible_facts={"vertica_configuration": configuration_facts})
+    except SystemExit:
+        # avoid catching this on python 2.4
+        raise
+    except Exception as e:
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
+
+    module.exit_json(
+        changed=changed, parameter=parameter_name, ansible_facts={"vertica_configuration": configuration_facts}
+    )
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,11 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Check an error occurs when wrong process name is used
+  monit:
+    name: missing
+    state: started
+  register: result
+  failed_when: result is not skip and (result is success or result is not failed)

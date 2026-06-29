@@ -1,0 +1,83 @@
+---
+# Copyright (c) 2023, Steffen Scheib <steffen@scheib.me>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Write INI files that reflect using to_ini
+  ansible.builtin.copy:
+    dest: '{{ item.file }}'
+    content: '{{ ini_test_dict | community.general.to_ini(no_extra_spaces=item.no_extra_spaces) }}'
+  vars:
+    ini_test_dict:
+      section_name:
+        key_name: 'key value'
+
+      another_section:
+        connection: 'ssh'
+
+      interpolate_test:
+        interpolate_test_key: '%'
+  loop:
+    - 'file': '{{ ini_test_file_filter }}'
+      'no_extra_spaces': false
+    - 'file': '{{ ini_test_file_filter_no_extra_spaces }}'
+      'no_extra_spaces': true
+
+- name: 'Write INI file manually to {{ ini_test_file }}'
+  ansible.builtin.copy:
+    dest: '{{ ini_test_file }}'
+    content: |
+      [section_name]
+      key_name = key value
+
+      [another_section]
+      connection = ssh
+
+      [interpolate_test]
+      interpolate_test_key = %
+
+- name: 'Write INI file manually to {{ ini_test_file_no_extra_spaces }}'
+  ansible.builtin.copy:
+    dest: '{{ ini_test_file_no_extra_spaces }}'
+    content: |
+      [section_name]
+      key_name=key value
+
+      [another_section]
+      connection=ssh
+
+      [interpolate_test]
+      interpolate_test_key=%
+
+- name: 'Slurp the manually created test files'
+  ansible.builtin.slurp:
+    src: '{{ item }}'
+  loop:
+    - '{{ ini_test_file }}'
+    - '{{ ini_test_file_filter }}'
+    - '{{ ini_test_file_no_extra_spaces }}'
+    - '{{ ini_test_file_filter_no_extra_spaces }}'
+  register: 'ini_file_content'
+
+- name: >-
+    Ensure the manually created test file and the test file created with
+    to_ini are identical
+  ansible.builtin.assert:
+    that:
+      - "ini_file_content.results | selectattr('source', 'equalto', ini_test_file) | map(attribute='content') | first | b64decode ==
+         ini_file_content.results | selectattr('source', 'equalto', ini_test_file_filter) | map(attribute='content') | first | b64decode"
+      - "ini_file_content.results | selectattr('source', 'equalto', ini_test_file_no_extra_spaces) | map(attribute='content') | first | b64decode ==
+         ini_file_content.results | selectattr('source', 'equalto', ini_test_file_filter_no_extra_spaces) | map(attribute='content') | first | b64decode"
+
+- name: 'Try to convert an empty dictionary with to_ini'
+  ansible.builtin.debug:
+    msg: '{{ {} | community.general.to_ini }}'
+  register: 'ini_empty_dict'
+  ignore_errors: true
+
+- name: 'Ensure the correct exception was raised'
+  ansible.builtin.assert:
+    that:
+      - "'to_ini received an empty dict. An empty dict cannot be converted.' in
+        ini_empty_dict.msg"
+...

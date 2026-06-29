@@ -1,0 +1,11 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[incus]
+incus-pipelining    ansible_ssh_pipelining=true
+incus-no-pipelining ansible_ssh_pipelining=false
+[incus:vars]
+ansible_host=ubuntu-2204
+ansible_connection=community.general.incus
+ansible_python_interpreter=python3

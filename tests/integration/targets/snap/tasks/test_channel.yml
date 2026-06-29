@@ -1,0 +1,78 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# NOTE This is currently disabled for performance reasons!
+
+- name: Make sure package is not installed (wisdom)
+  community.general.snap:
+    name: wisdom
+    state: absent
+
+# Test for https://github.com/ansible-collections/community.general/issues/1606
+- name: Install package (wisdom)
+  community.general.snap:
+    name: wisdom
+    state: present
+  register: install_wisdom
+
+- name: Install package with channel (wisdom)
+  community.general.snap:
+    name: wisdom
+    state: present
+    channel: latest/edge
+  register: install_wisdom_chan
+
+- name: Install package with channel (wisdom) again
+  community.general.snap:
+    name: wisdom
+    state: present
+    channel: latest/edge
+  register: install_wisdom_chan_again
+
+- name: Remove package (wisdom)
+  community.general.snap:
+    name: wisdom
+    state: absent
+  register: remove_wisdom
+
+- assert:
+    that:
+      - install_wisdom is changed
+      - install_wisdom_chan is changed
+      - install_wisdom_chan_again is not changed
+      - remove_wisdom is changed
+
+- name: Install package (shellcheck)
+  community.general.snap:
+    name: shellcheck
+    state: present
+  register: install_shellcheck
+
+- name: Install package with channel (shellcheck)
+  community.general.snap:
+    name: shellcheck
+    channel: edge
+    state: present
+  register: install_shellcheck_chan
+
+- name: Install package with channel (shellcheck) again
+  community.general.snap:
+    name: shellcheck
+    channel: edge
+    state: present
+  register: install_shellcheck_chan_again
+
+- name: Remove package (shellcheck)
+  community.general.snap:
+    name: shellcheck
+    state: absent
+  register: remove_shellcheck
+
+- assert:
+    that:
+      - install_shellcheck is changed
+      - install_shellcheck_chan is changed
+      - install_shellcheck_chan_again is not changed
+      - remove_shellcheck is changed

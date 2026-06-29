@@ -1,0 +1,101 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- vars:
+    reg_pkg: ed
+    url_pkg: lemon
+    file_pkg: hdparm
+    file_pkg_path: /tmp/pkg.zst
+    extra_pkg: core/sdparm
+    extra_pkg_outfmt: sdparm
+  block:
+    - name: Make sure that test packages are not installed
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg}}'
+          - '{{file_pkg}}'
+          - '{{extra_pkg}}'
+        state: absent
+
+    - name: Get URL for {{url_pkg}}
+      command:
+        cmd: pacman --sync --print-format "%l" {{url_pkg}}
+      register: url_pkg_url
+
+    - name: Get URL for {{file_pkg}}
+      command:
+        cmd: pacman --sync --print-format "%l" {{file_pkg}}
+      register: file_pkg_url
+    - name: Download {{file_pkg}} pkg
+      get_url:
+        url: '{{file_pkg_url.stdout}}'
+        dest: '{{file_pkg_path}}'
+
+    - name: Install packages from mixed sources as dependency (check mode)
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url.stdout}}'
+          - '{{file_pkg_path}}'
+        reason: dependency
+      check_mode: true
+      register: install_1
+
+    - name: Install packages from mixed sources as explicit
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url.stdout}}'
+          - '{{file_pkg_path}}'
+        reason: explicit
+      register: install_2
+
+    - name: Install packages from mixed sources with new packages being installed as dependency - (idempotency)
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url.stdout}}'
+          - '{{file_pkg_path}}'
+        reason: dependency
+      register: install_3
+
+    - name: Install new package with already installed packages from mixed sources as dependency
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url.stdout}}'
+          - '{{file_pkg_path}}'
+          - '{{extra_pkg}}'
+        reason: dependency
+      register: install_4
+
+    - name: Set install reason for all packages to dependency
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url.stdout}}'
+          - '{{file_pkg_path}}'
+          - '{{extra_pkg}}'
+        reason: dependency
+        reason_for: all
+      register: install_5
+
+    - assert:
+        that:
+          - install_1 is changed
+          - install_1.msg == 'Would have installed 3 packages'
+          - install_1.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
+          - install_2 is changed
+          - install_2.msg == 'Installed 3 package(s)'
+          - install_2.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
+          - install_3 is not changed
+          - install_3.msg == 'package(s) already installed'
+          - install_4 is changed
+          - install_4.msg == 'Installed 1 package(s)'
+          - install_4.packages == [extra_pkg_outfmt]
+          - install_5 is changed
+          - install_5.msg == 'Installed 3 package(s)'
+          - install_5.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()

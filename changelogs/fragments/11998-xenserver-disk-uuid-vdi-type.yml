@@ -1,0 +1,2 @@
+minor_changes:
+  - xenserver_guest_info - add VDI ``uuid`` and ``vdi_type`` (VHD/QCOW2) fields to disk info output (https://github.com/ansible-collections/community.general/issues/11998, https://github.com/ansible-collections/community.general/pull/12119).

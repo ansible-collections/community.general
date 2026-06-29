@@ -1,0 +1,56 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install/Uninstall supervisorctl block
+  environment:
+    PATH: "{{ pip_scripts_path }}"
+  block:
+    - tempfile:
+        state: directory
+        suffix: supervisorctl-tests
+      register: supervisord_sock_path
+
+    - command: 'echo {{ remote_tmp_dir }}'
+      register: echo
+    - set_fact:
+        remote_dir: '{{ echo.stdout }}'
+
+    - include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts.distribution }}.yml'
+            - '{{ ansible_facts.os_family }}.yml'
+            - 'defaults.yml'
+
+    - include_tasks: '{{ item }}'
+      with_first_found:
+        - files:
+            - 'install_{{ ansible_facts.distribution }}.yml' # CentOS
+            - 'install_{{ ansible_facts.os_family }}.yml'    # RedHat
+            - 'install_{{ ansible_facts.system }}.yml'       # Linux
+
+    - include_tasks: test.yml
+      with_items:
+        - { username: '', password: '' }
+        - { username: 'testétest', password: 'passéword' } # non-ASCII credentials
+      loop_control:
+        loop_var: credentials
+
+  always:
+    - include_tasks: '{{ item }}'
+      with_first_found:
+        - files:
+            - 'uninstall_{{ ansible_facts.distribution }}.yml' # CentOS
+            - 'uninstall_{{ ansible_facts.os_family }}.yml'    # RedHat
+            - 'uninstall_{{ ansible_facts.system }}.yml'       # Linux
+
+    - file:
+        path: '{{ supervisord_sock_path.path }}'
+        state: absent

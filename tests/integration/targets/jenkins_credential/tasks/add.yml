@@ -1,0 +1,169 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Add CUSTOM scope (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "CUSTOM"
+    type: "scope"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    description: "Custom scope credential"
+    inc_path:
+      - "include/path"
+      - "include/path2"
+    exc_path:
+      - "exclude/path"
+      - "exclude/path2"
+    inc_hostname:
+      - "included-hostname"
+      - "included-hostname2"
+    exc_hostname:
+      - "excluded-hostname"
+      - "excluded-hostname2"
+    schemes:
+      - "http"
+      - "https"
+    inc_hostname_port:
+      - "included-hostname:7000"
+      - "included-hostname2:7000"
+    exc_hostname_port:
+      - "excluded-hostname:7000"
+      - "excluded-hostname2:7000"
+  register: custom_scope
+
+- name: Assert CUSTOM scope changed value
+  assert:
+    that:
+      - custom_scope.changed == (run_number == 1)
+    fail_msg: "CUSTOM scope changed status incorrect on run {{ run_number }}"
+    success_msg: "CUSTOM scope behaved correctly on run {{ run_number }}"
+
+- name: Add user_and_pass credential (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "userpass-id"
+    type: "user_and_pass"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    description: "User and password credential"
+    username: "user1"
+    password: "pass1"
+  register: userpass_cred
+
+- name: Assert user_and_pass changed value
+  assert:
+    that:
+      - userpass_cred.changed == (run_number == 1)
+    fail_msg: "user_and_pass credential changed status incorrect on run {{ run_number }}"
+    success_msg: "user_and_pass credential behaved correctly on run {{ run_number }}"
+
+- name: Add file credential to custom scope (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "file-id"
+    type: "file"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    scope: "CUSTOM"
+    description: "File credential"
+    file_path: "{{ output_dir }}/my-secret.pem"
+  register: file_cred
+
+- name: Assert file credential changed value
+  assert:
+    that:
+      - file_cred.changed == (run_number == 1)
+    fail_msg: "file credential changed status incorrect on run {{ run_number }}"
+    success_msg: "file credential behaved correctly on run {{ run_number }}"
+
+- name: Add text credential to folder (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "text-id"
+    type: "text"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    description: "Text credential"
+    secret: "mysecrettext"
+    location: "folder"
+    url: "http://localhost:8080/job/test"
+  register: text_cred
+
+- name: Assert text credential changed value
+  assert:
+    that:
+      - text_cred.changed == (run_number == 1)
+    fail_msg: "text credential changed status incorrect on run {{ run_number }}"
+    success_msg: "text credential behaved correctly on run {{ run_number }}"
+
+- name: Add githubApp credential (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "githubapp-id"
+    type: "github_app"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    description: "GitHub app credential"
+    appID: "12345"
+    private_key_path: "{{ output_dir }}/github.pem"
+    owner: "github_owner"
+  register: githubapp_cred
+
+- name: Assert githubApp credential changed value
+  assert:
+    that:
+      - githubapp_cred.changed == (run_number == 1)
+    fail_msg: "githubApp credential changed status incorrect on run {{ run_number }}"
+    success_msg: "githubApp credential behaved correctly on run {{ run_number }}"
+
+- name: Add sshKey credential (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "sshkey-id"
+    type: "ssh_key"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    description: "SSH key credential"
+    username: "sshuser"
+    private_key_path: "{{ output_dir }}/ssh_key"
+    passphrase: 1234
+  register: sshkey_cred
+
+- name: Assert sshKey credential changed value
+  assert:
+    that:
+      - sshkey_cred.changed == (run_number == 1)
+    fail_msg: "sshKey credential changed status incorrect on run {{ run_number }}"
+    success_msg: "sshKey credential behaved correctly on run {{ run_number }}"
+
+- name: Add certificate (p12) credential (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "certificate-id"
+    type: "certificate"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    description: "Certificate credential"
+    password: "12345678901234"
+    file_path: "{{ output_dir }}/certificate.p12"
+  register: cert_p12_cred
+
+- name: Assert certificate (p12) credential changed value
+  assert:
+    that:
+      - cert_p12_cred.changed == (run_number == 1)
+    fail_msg: "certificate (p12) credential changed status incorrect on run {{ run_number }}"
+    success_msg: "certificate (p12) credential behaved correctly on run {{ run_number }}"
+
+- name: Add certificate (pem) credential (run {{ run_number }})
+  community.general.jenkins_credential:
+    id: "certificate-id-pem"
+    type: "certificate"
+    jenkins_user: "{{ jenkins_username }}"
+    token: "{{ token }}"
+    description: "Certificate credential (pem)"
+    file_path: "{{ output_dir }}/cert.pem"
+    private_key_path: "{{ output_dir }}/private.key"
+  register: cert_pem_cred
+
+- name: Assert certificate (pem) credential changed value
+  assert:
+    that:
+      - cert_pem_cred.changed == (run_number == 1)
+    fail_msg: "certificate (pem) credential changed status incorrect on run {{ run_number }}"
+    success_msg: "certificate (pem) credential behaved correctly on run {{ run_number }}"

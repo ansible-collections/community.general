@@ -1,0 +1,16 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Removing physical volume
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    state: absent
+  register: remove_result
+
+- name: Asserting physical volume was removed
+  ansible.builtin.assert:
+    that:
+      - remove_result.changed == true
+      - "'removed' in remove_result.msg"

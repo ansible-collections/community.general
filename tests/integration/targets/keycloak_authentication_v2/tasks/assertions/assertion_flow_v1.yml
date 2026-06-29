@@ -1,0 +1,144 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Retrieve access token
+  ansible.builtin.include_tasks:
+    file: ../actions/fetch_access_token.yml
+
+- name: Fetch all authentication flows
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/authentication/flows"
+    method: GET
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    return_content: true
+  register: keycloak_flows_response
+  no_log: true
+
+- name: Extract flow id for alias 'Integration Test Flow'
+  ansible.builtin.set_fact:
+    test_flow_id: >-
+      {{ keycloak_flows_response.json
+          | selectattr('alias', 'equalto', 'Integration Test Flow')
+          | map(attribute='id')
+          | first }}
+  no_log: true
+
+- name: Fetch basic flow data for 'Integration Test Flow'
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/authentication/flows/{{ test_flow_id }}"
+    method: GET
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    return_content: true
+  register: test_flow_top_level_data
+  no_log: true
+
+- name: Assert flow attributes
+  ansible.builtin.assert:
+    that:
+      - test_flow_top_level_data.json.alias == "Integration Test Flow"
+      - test_flow_top_level_data.json.providerId == "basic-flow"
+      - test_flow_top_level_data.json.topLevel == true
+      - test_flow_top_level_data.json.builtIn == false
+
+- name: Fetch flow executions for 'Integration Test Flow'
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/authentication/flows/Integration%20Test%20Flow/executions"
+    method: GET
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    return_content: true
+  register: test_flow_executions
+  no_log: true
+
+- name: Assert flow executions
+  ansible.builtin.assert:
+    that:
+      - test_flow_executions.json | length == 6
+      - test_flow_executions.json[0].providerId == "idp-review-profile"
+      - test_flow_executions.json[0].requirement == "REQUIRED"
+      - test_flow_executions.json[0].index == 0
+      - test_flow_executions.json[0].priority == 0
+      - test_flow_executions.json[0].level == 0
+      - test_flow_executions.json[0].authenticationConfig is not none
+      - test_flow_executions.json[0]['authenticationFlow'] is not defined or test_flow_executions.json[0].authenticationFlow == false
+      - test_flow_executions.json[1].displayName == "Integration Test Flow - User creation or linking"
+      - test_flow_executions.json[1].requirement == "REQUIRED"
+      - test_flow_executions.json[1].index == 1
+      - test_flow_executions.json[1].priority == 1
+      - test_flow_executions.json[1].level == 0
+      - test_flow_executions.json[1]['authenticationConfig'] is not defined
+      - test_flow_executions.json[1].authenticationFlow == true
+      - test_flow_executions.json[2].providerId == "idp-create-user-if-unique"
+      - test_flow_executions.json[2].requirement == "ALTERNATIVE"
+      - test_flow_executions.json[2].index == 0
+      - test_flow_executions.json[2].priority == 0
+      - test_flow_executions.json[2].level == 1
+      - test_flow_executions.json[2].authenticationConfig is not none
+      - test_flow_executions.json[2]['authenticationFlow'] is not defined or test_flow_executions.json[0].authenticationFlow == false
+      - test_flow_executions.json[3].displayName == "Integration Test Flow - Handle Existing Account"
+      - test_flow_executions.json[3].requirement == "ALTERNATIVE"
+      - test_flow_executions.json[3].index == 1
+      - test_flow_executions.json[3].priority == 1
+      - test_flow_executions.json[3].level == 1
+      - test_flow_executions.json[3]['authenticationConfig'] is not defined
+      - test_flow_executions.json[3].authenticationFlow == true
+      - test_flow_executions.json[4].providerId == "idp-confirm-link"
+      - test_flow_executions.json[4].requirement == "REQUIRED"
+      - test_flow_executions.json[4].index == 0
+      - test_flow_executions.json[4].priority == 0
+      - test_flow_executions.json[4].level == 2
+      - test_flow_executions.json[4]['authenticationConfig'] is not defined
+      - test_flow_executions.json[4]['authenticationFlow'] is not defined or test_flow_executions.json[0].authenticationFlow == false
+      - test_flow_executions.json[5].providerId == "auth-cookie"
+      - test_flow_executions.json[5].requirement == "REQUIRED"
+      - test_flow_executions.json[5].index == 2
+      - test_flow_executions.json[5].priority == 2
+      - test_flow_executions.json[5].level == 0
+      - test_flow_executions.json[5]['authenticationConfig'] is not defined
+      - test_flow_executions.json[5]['authenticationFlow'] is not defined or test_flow_executions.json[0].authenticationFlow == false
+
+- name: Fetch flow execution config for 'idp-review-profile'
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/authentication/config/{{ test_flow_executions.json[0].authenticationConfig }}"
+    method: GET
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    return_content: true
+  register: test_flow_execution_idp_review_profile_config
+  no_log: true
+
+- name: Assert flow execution config for 'idp-review-profile'
+  ansible.builtin.assert:
+    that:
+      - test_flow_execution_idp_review_profile_config.json.alias == "Integration Test Flow - review profile config"
+      - test_flow_execution_idp_review_profile_config.json.config is not none
+      - test_flow_execution_idp_review_profile_config.json.config['update.profile.on.first.login'] == "missing"
+
+- name: Fetch flow execution config for 'idp-create-user-if-unique'
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/authentication/config/{{ test_flow_executions.json[2].authenticationConfig }}"
+    method: GET
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    return_content: true
+  register: test_flow_execution_idp_create_user_if_unique
+  no_log: true
+
+- name: Assert flow execution config for 'idp-create-user-if-unique'
+  ansible.builtin.assert:
+    that:
+      - test_flow_execution_idp_create_user_if_unique.json.alias == "Integration Test Flow - create unique user config"
+      - test_flow_execution_idp_create_user_if_unique.json.config is not none
+      - test_flow_execution_idp_create_user_if_unique.json.config['require.password.update.after.registration'] == "false"

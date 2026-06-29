@@ -1,0 +1,246 @@
+#!/usr/bin/python
+
+# Copyright Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: vertica_role
+short_description: Adds or removes Vertica database roles and assigns roles to them
+description:
+  - Adds or removes Vertica database role and, optionally, assign other roles.
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  role:
+    description:
+      - Name of the role to add or remove.
+    required: true
+    type: str
+    aliases: ['name']
+  assigned_roles:
+    description:
+      - Comma separated list of roles to assign to the role.
+    aliases: ['assigned_role']
+    type: str
+  state:
+    description:
+      - Whether to create V(present), drop V(absent) or lock V(locked) a role.
+    choices: ['present', 'absent']
+    default: present
+    type: str
+  db:
+    description:
+      - Name of the Vertica database.
+    type: str
+  cluster:
+    description:
+      - Name of the Vertica cluster.
+    default: localhost
+    type: str
+  port:
+    description:
+      - Vertica cluster port to connect to.
+    default: '5433'
+    type: str
+  login_user:
+    description:
+      - The username used to authenticate with.
+    default: dbadmin
+    type: str
+  login_password:
+    description:
+      - The password used to authenticate with.
+    type: str
+notes:
+  - The default authentication assumes that you are either logging in as or sudo'ing to the C(dbadmin) account on the host.
+  - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure that C(unixODBC) and C(pyodbc) is installed
+    on the host and properly configured.
+  - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so) to be added to the C(Vertica)
+    section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini) and both C(ErrorMessagesPath = /opt/vertica/lib64) and
+    C(DriverManagerEncoding = UTF-16) to be added to the C(Driver) section of either C(/etc/vertica.ini) or C($HOME/.vertica.ini).
+requirements: ['unixODBC', 'pyodbc']
+author: "Dariusz Owczarek (@dareko)"
+"""
+
+EXAMPLES = r"""
+- name: Creating a new vertica role
+  community.general.vertica_role: name=role_name db=db_name state=present
+
+- name: Creating a new vertica role with other role assigned
+  community.general.vertica_role: name=role_name assigned_role=other_role_name state=present
+"""
+import traceback
+
+PYODBC_IMP_ERR = None
+try:
+    import pyodbc
+except ImportError:
+    PYODBC_IMP_ERR = traceback.format_exc()
+    pyodbc_found = False
+else:
+    pyodbc_found = True
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+
+class NotSupportedError(Exception):
+    pass
+
+
+class CannotDropError(Exception):
+    pass
+
+
+# module specific functions
+
+
+def get_role_facts(cursor, role=""):
+    facts = {}
+    cursor.execute(
+        """
+        select r.name, r.assigned_roles
+        from roles r
+        where (? = '' or r.name ilike ?)
+    """,
+        role,
+        role,
+    )
+    while True:
+        rows = cursor.fetchmany(100)
+        if not rows:
+            break
+        for row in rows:
+            role_key = row.name.lower()
+            facts[role_key] = {"name": row.name, "assigned_roles": []}
+            if row.assigned_roles:
+                facts[role_key]["assigned_roles"] = row.assigned_roles.replace(" ", "").split(",")
+    return facts
+
+
+def update_roles(role_facts, cursor, role, existing, required):
+    for assigned_role in set(existing) - set(required):
+        cursor.execute(f"revoke {assigned_role} from {role}")
+    for assigned_role in set(required) - set(existing):
+        cursor.execute(f"grant {assigned_role} to {role}")
+
+
+def check(role_facts, role, assigned_roles):
+    role_key = role.lower()
+    if role_key not in role_facts:
+        return False
+    return not (assigned_roles and sorted(assigned_roles) != sorted(role_facts[role_key]["assigned_roles"]))
+
+
+def present(role_facts, cursor, role, assigned_roles):
+    role_key = role.lower()
+    if role_key not in role_facts:
+        cursor.execute(f"create role {role}")
+        update_roles(role_facts, cursor, role, [], assigned_roles)
+        role_facts.update(get_role_facts(cursor, role))
+        return True
+    else:
+        changed = False
+        if assigned_roles and (sorted(assigned_roles) != sorted(role_facts[role_key]["assigned_roles"])):
+            update_roles(role_facts, cursor, role, role_facts[role_key]["assigned_roles"], assigned_roles)
+            changed = True
+        if changed:
+            role_facts.update(get_role_facts(cursor, role))
+        return changed
+
+
+def absent(role_facts, cursor, role, assigned_roles):
+    role_key = role.lower()
+    if role_key in role_facts:
+        update_roles(role_facts, cursor, role, role_facts[role_key]["assigned_roles"], [])
+        cursor.execute(f"drop role {role_facts[role_key]['name']} cascade")
+        del role_facts[role_key]
+        return True
+    else:
+        return False
+
+
+# module logic
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            role=dict(required=True, aliases=["name"]),
+            assigned_roles=dict(aliases=["assigned_role"]),
+            state=dict(default="present", choices=["absent", "present"]),
+            db=dict(),
+            cluster=dict(default="localhost"),
+            port=dict(default="5433"),
+            login_user=dict(default="dbadmin"),
+            login_password=dict(no_log=True),
+        ),
+        supports_check_mode=True,
+    )
+
+    if not pyodbc_found:
+        module.fail_json(msg=missing_required_lib("pyodbc"), exception=PYODBC_IMP_ERR)
+
+    role = module.params["role"]
+    assigned_roles = []
+    if module.params["assigned_roles"]:
+        assigned_roles = module.params["assigned_roles"].split(",")
+        assigned_roles = [_f for _f in assigned_roles if _f]
+    state = module.params["state"]
+    db = ""
+    if module.params["db"]:
+        db = module.params["db"]
+
+    changed = False
+
+    try:
+        dsn = (
+            "Driver=Vertica;"
+            f"Server={module.params['cluster']};"
+            f"Port={module.params['port']};"
+            f"Database={db};"
+            f"User={module.params['login_user']};"
+            f"Password={module.params['login_password']};"
+            f"ConnectionLoadBalance=true"
+        )
+        db_conn = pyodbc.connect(dsn, autocommit=True)
+        cursor = db_conn.cursor()
+    except Exception as e:
+        module.fail_json(msg=f"Unable to connect to database: {e}.")
+
+    try:
+        role_facts = get_role_facts(cursor)
+        if module.check_mode:
+            changed = not check(role_facts, role, assigned_roles)
+        elif state == "absent":
+            try:
+                changed = absent(role_facts, cursor, role, assigned_roles)
+            except pyodbc.Error as e:
+                module.fail_json(msg=f"{e}", exception=traceback.format_exc())
+        elif state == "present":
+            try:
+                changed = present(role_facts, cursor, role, assigned_roles)
+            except pyodbc.Error as e:
+                module.fail_json(msg=f"{e}", exception=traceback.format_exc())
+    except NotSupportedError as e:
+        module.fail_json(msg=f"{e}", ansible_facts={"vertica_roles": role_facts})
+    except CannotDropError as e:
+        module.fail_json(msg=f"{e}", ansible_facts={"vertica_roles": role_facts})
+    except SystemExit:
+        # avoid catching this on python 2.4
+        raise
+    except Exception as e:
+        module.fail_json(msg=f"{e}", exception=traceback.format_exc())
+
+    module.exit_json(changed=changed, role=role, ansible_facts={"vertica_roles": role_facts})
+
+
+if __name__ == "__main__":
+    main()

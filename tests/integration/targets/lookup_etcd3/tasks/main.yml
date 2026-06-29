@@ -1,0 +1,29 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# lookup_etcd3 integration tests
+# Copyright (c) 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Put key/values with an etcd prefix
+  community.general.etcd3:
+    key: "{{ etcd3_prefix }}foo{{ item }}"
+    value: "bar{{ item }}"
+    state: present
+  loop:
+    - 1
+    - 2
+    - 3
+
+- name: Put a single key/value in etcd
+  community.general.etcd3:
+    key: "{{ etcd3_singlekey }}"
+    value: "foobar"
+    state: present
+
+- name: Import lookup tests
+  ansible.builtin.import_tasks: tests.yml

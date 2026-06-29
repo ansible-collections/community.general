@@ -1,0 +1,264 @@
+#!/usr/bin/python
+
+# Copyright (c) 2015, Marius Gedminas <marius@pov.lt>
+# Copyright (c) 2016, Matthew Gamble <git@matthewgamble.net>
+#
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: git_config
+author:
+  - Matthew Gamble (@djmattyg007)
+  - Marius Gedminas (@mgedmin)
+requirements: ['git']
+short_description: Update git configuration
+description:
+  - The M(community.general.git_config) module changes git configuration by invoking C(git config). This is needed if you
+    do not want to use M(ansible.builtin.template) for the entire git config file (for example because you need to change
+    just C(user.email) in C(/etc/.git/config)). Solutions involving M(ansible.builtin.command) are cumbersome or do not work
+    correctly in check mode.
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  name:
+    description:
+      - The name of the setting.
+    type: str
+    required: true
+  repo:
+    description:
+      - Path to a git repository for reading and writing values from a specific repo.
+    type: path
+  file:
+    description:
+      - Path to an adhoc git configuration file to be managed using the V(file) scope.
+    type: path
+    version_added: 2.0.0
+  scope:
+    description:
+      - Specify which scope to read/set values from.
+      - This is required when setting config values.
+      - If this is set to V(local), you must also specify the O(repo) parameter.
+      - If this is set to V(file), you must also specify the O(file) parameter.
+      - It defaults to system.
+    choices: ["file", "local", "global", "system"]
+    type: str
+  state:
+    description:
+      - 'Indicates the setting should be set/unset. This parameter has higher precedence than O(value) parameter: when O(state=absent)
+        and O(value) is defined, O(value) is discarded.'
+    choices: ['present', 'absent']
+    default: 'present'
+    type: str
+  value:
+    description:
+      - When specifying the name of a single setting, supply a value to set that setting to the given value.
+      - From community.general 11.0.0 on, O(value) is required if O(state=present). To read values, use the M(community.general.git_config_info)
+        module instead.
+    type: str
+  add_mode:
+    description:
+      - Specify if a value should replace the existing value(s) or if the new value should be added alongside other values
+        with the same name.
+      - This option is only relevant when adding/replacing values. If O(state=absent) or values are just read out, this option
+        is not considered.
+    choices: ["add", "replace-all"]
+    type: str
+    default: "replace-all"
+    version_added: 8.1.0
+"""
+
+EXAMPLES = r"""
+- name: Add a setting to ~/.gitconfig
+  community.general.git_config:
+    name: alias.ci
+    scope: global
+    value: commit
+
+- name: Add a setting to ~/.gitconfig
+  community.general.git_config:
+    name: alias.st
+    scope: global
+    value: status
+
+- name: Remove a setting from ~/.gitconfig
+  community.general.git_config:
+    name: alias.ci
+    scope: global
+    state: absent
+
+- name: Add a setting to ~/.gitconfig
+  community.general.git_config:
+    name: core.editor
+    scope: global
+    value: vim
+
+- name: Add a setting system-wide
+  community.general.git_config:
+    name: alias.remotev
+    scope: system
+    value: remote -v
+
+- name: Add a setting to a system scope (default)
+  community.general.git_config:
+    name: alias.diffc
+    value: diff --cached
+
+- name: Add a setting to a system scope (default)
+  community.general.git_config:
+    name: color.ui
+    value: auto
+
+- name: Add several options for the same name
+  community.general.git_config:
+    name: push.pushoption
+    value: "{{ item }}"
+    add_mode: add
+  loop:
+    - merge_request.create
+    - merge_request.draft
+
+- name: Make etckeeper not complaining when it is invoked by cron
+  community.general.git_config:
+    name: user.email
+    repo: /etc
+    scope: local
+    value: 'root@{{ ansible_fqdn }}'
+"""
+
+RETURN = r"""
+"""
+
+from ansible.module_utils.basic import AnsibleModule
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            name=dict(type="str", required=True),
+            repo=dict(type="path"),
+            file=dict(type="path"),
+            add_mode=dict(type="str", default="replace-all", choices=["add", "replace-all"]),
+            scope=dict(type="str", choices=["file", "local", "global", "system"]),
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            value=dict(),
+        ),
+        required_if=[
+            ("scope", "local", ["repo"]),
+            ("scope", "file", ["file"]),
+            ("state", "present", ["value"]),
+        ],
+        supports_check_mode=True,
+    )
+    git_path = module.get_bin_path("git", True)
+
+    params = module.params
+    # We check error message for a pattern, so we need to make sure the messages appear in the form we're expecting.
+    # Set the locale to C to ensure consistent messages.
+    module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
+
+    name = params["name"] or ""
+    unset = params["state"] == "absent"
+    new_value = params["value"] or ""
+    add_mode = params["add_mode"]
+
+    if not unset and not new_value:
+        module.fail_json(
+            msg="If state=present, a value must be specified. Use the community.general.git_config_info module to read a config value."
+        )
+
+    scope = determine_scope(params)
+    cwd = determine_cwd(scope, params)
+
+    base_args = [git_path, "config", "--includes"]
+
+    if scope == "file":
+        base_args.append("-f")
+        base_args.append(params["file"])
+    elif scope:
+        base_args.append(f"--{scope}")
+
+    list_args = list(base_args)
+
+    list_args.append("--get-all")
+    list_args.append(name)
+
+    (rc, out, err) = module.run_command(list_args, cwd=cwd, expand_user_and_vars=False)
+
+    if rc >= 2:
+        # If the return code is 1, it just means the option hasn't been set yet, which is fine.
+        module.fail_json(rc=rc, msg=err, cmd=" ".join(list_args))
+
+    old_values = out.rstrip().splitlines()
+
+    if unset and not out:
+        module.exit_json(changed=False, msg="no setting to unset")
+    elif new_value in old_values and (len(old_values) == 1 or add_mode == "add") and not unset:
+        module.exit_json(changed=False, msg="")
+
+    # Until this point, the git config was just read and in case no change is needed, the module has already exited.
+
+    set_args = list(base_args)
+    if unset:
+        set_args.append("--unset-all")
+        set_args.append(name)
+    else:
+        set_args.append(f"--{add_mode}")
+        set_args.append(name)
+        set_args.append(new_value)
+
+    if not module.check_mode:
+        (rc, out, err) = module.run_command(set_args, cwd=cwd, ignore_invalid_cwd=False, expand_user_and_vars=False)
+        if err:
+            module.fail_json(rc=rc, msg=err, cmd=set_args)
+
+    if unset:
+        after_values = []
+    elif add_mode == "add":
+        after_values = old_values + [new_value]
+    else:
+        after_values = [new_value]
+
+    module.exit_json(
+        msg="setting changed",
+        diff=dict(
+            before_header=" ".join(set_args),
+            before=build_diff_value(old_values),
+            after_header=" ".join(set_args),
+            after=build_diff_value(after_values),
+        ),
+        changed=True,
+    )
+
+
+def determine_scope(params):
+    if params["scope"]:
+        return params["scope"]
+    return "system"
+
+
+def build_diff_value(value):
+    if not value:
+        return "\n"
+    if len(value) == 1:
+        return f"{value[0]}\n"
+    return value
+
+
+def determine_cwd(scope, params):
+    if scope == "local":
+        return params["repo"]
+    # Run from root directory to avoid accidentally picking up any local config settings
+    return "/"
+
+
+if __name__ == "__main__":
+    main()

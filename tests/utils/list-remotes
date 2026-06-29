@@ -1,0 +1,29 @@
+#!/bin/sh
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+SUPPORTED_AC2="17 18 19 20"
+
+[ -z "$1" ] && {
+    echo 'usage: ./tests/utils/list-remotes <ansible git repo dir>' >&2
+    exit 1
+}
+ansible_repo_dir="$1"
+
+(
+    cd "$ansible_repo_dir"
+
+    versions=$(
+        for minor in $SUPPORTED_AC2; do
+            echo v2.$minor.$(git tag -l | awk -F. "\$2 == $minor && /v2\.[0-9]+\.[0-9]+$/ { print \$3 }" | sort -rn | head -1)
+        done
+    )
+    versions="$versions devel"
+
+    echo "Listing remotes from ansible-core:" $versions >&2
+    for head in $versions; do
+        git checkout -q $head
+        cat test/lib/ansible_test/_data/completion/remote.txt
+    done | awk '/[a-z]+(\/[0-9]+)?/ { print $1 }' | sort -u | sed -e s'/\///g'
+)

@@ -1,0 +1,32 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Setup test fixture
+  copy:
+    src: results/test-remove-attribute.xml
+    dest: /tmp/ansible-xml-beers.xml
+
+
+- name: Remove non-existing '/business/rating/@subjective'
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/rating/@subjective
+    state: absent
+  register: remove_attribute
+
+- name: Compare to expected result
+  copy:
+    src: results/test-remove-attribute.xml
+    dest: /tmp/ansible-xml-beers.xml
+  check_mode: true
+  diff: true
+  register: comparison
+
+- name: Test expected result
+  assert:
+    that:
+      - remove_attribute is not changed
+      - comparison is not changed  # identical
+  # command: diff -u {{ role_path }}/results/test-remove-attribute.xml /tmp/ansible-xml-beers.xml

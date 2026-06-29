@@ -1,0 +1,122 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Create filesystem ({{ fstype }})"
+  community.general.filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+    label: '{{ label }}'
+  register: fs_result
+
+- name: "Assert that results are as expected"
+  ansible.builtin.assert:
+    that:
+      - 'fs_result is changed'
+      - 'fs_result is success'
+
+- name: "Get UUID of created filesystem"
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
+  changed_when: false
+  register: uuid
+
+- name: "Check that filesystem isn't created if force isn't used"
+  community.general.filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+    label: '{{ label }}'
+  register: fs2_result
+
+- name: "Get UUID of the filesystem"
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
+  changed_when: false
+  register: uuid2
+
+- name: "Assert that filesystem UUID is not changed"
+  ansible.builtin.assert:
+    that:
+      - 'fs2_result is not changed'
+      - 'fs2_result is success'
+      - 'uuid.stdout == uuid2.stdout'
+
+- name: "Check that filesystem is recreated if force is used"
+  community.general.filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+    label: '{{ label }}'
+    force: true
+  register: fs3_result
+
+- name: "Get UUID of the new filesystem"
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
+  changed_when: false
+  register: uuid3
+
+- name: "Assert that filesystem UUID is changed"
+  # libblkid gets no UUID at all for this fstype on FreeBSD
+  when: not (ansible_facts.system == 'FreeBSD' and fstype == 'reiserfs')
+  ansible.builtin.assert:
+    that:
+      - 'fs3_result is changed'
+      - 'fs3_result is success'
+      - 'uuid.stdout != uuid3.stdout'
+
+
+- when: 'grow|bool and (fstype != "vfat" or resize_vfat)'
+  block:
+    - name: "Increase fake device"
+      community.general.filesize:
+        path: '{{ image_file }}'
+        size: '{{ fssize | int + 1 }}M'
+
+    - name: "Resize loop device for LVM"
+      ansible.builtin.command:
+        cmd: 'losetup -c {{ dev }}'
+      when: fstype == 'lvm'
+
+    - name: "Resize memory disk for UFS"
+      ansible.builtin.command:
+        cmd: 'mdconfig -r -u {{ dev }} -s {{ fssize | int + 1 }}M'
+      when: fstype == 'ufs'
+
+    - name: "Expand filesystem"
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        resizefs: true
+      register: fs4_result
+
+    - name: "Get UUID of the filesystem"
+      ansible.builtin.shell:
+        cmd: "{{ get_uuid_cmd }}"
+      changed_when: false
+      register: uuid4
+
+    - name: "Assert that filesystem UUID is not changed"
+      ansible.builtin.assert:
+        that:
+          - 'fs4_result is changed'
+          - 'fs4_result is success'
+          - 'uuid3.stdout == uuid4.stdout' # unchanged
+
+- when:
+    - (grow | bool and (fstype != "vfat" or resize_vfat)) or
+      (fstype == "xfs" and ansible_facts.system == "Linux" and
+      ansible_facts.distribution not in ["CentOS", "Ubuntu"])
+  block:
+    - name: "Check that resizefs does nothing if device size is not changed"
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        resizefs: true
+      register: fs5_result
+
+    - name: "Assert that the state did not change"
+      ansible.builtin.assert:
+        that:
+          - 'fs5_result is not changed'
+          - 'fs5_result is succeeded'

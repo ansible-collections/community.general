@@ -1,0 +1,92 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install skiaparser;1
+  android_sdk:
+    accept_licenses: true
+    name: skiaparser;1
+    state: present
+  register: skiaparser_1_installed
+
+- name: Install skiaparser;1 second time
+  android_sdk:
+    name: skiaparser;1
+    state: present
+  register: skiaparser_1_installed_2
+
+- name: Stat skiaparser;1
+  stat:
+    path: "{{ android_sdk_location }}/skiaparser/1"
+  register: skiaparser_1_stat
+
+- name: Delete skiaparser;1
+  android_sdk:
+    name: skiaparser;1
+    state: absent
+  register: skiaparser_1_deleted
+
+- name: Delete skiaparser;1 second time
+  android_sdk:
+    name: skiaparser;1
+    state: absent
+  register: skiaparser_1_deleted_2
+
+- name: Download old platform-tools
+  unarchive:
+    src: https://dl.google.com/android/repository/platform-tools_r27.0.0-linux.zip
+    remote_src: true
+    dest: "{{ android_sdk_location }}"
+
+- name: Try installing platform-tools from sdkmanager
+  android_sdk:
+    name: platform-tools
+    accept_licenses: true
+    state: present
+  register: platform_tools_present
+
+- name: Install (update) platform-tools
+  android_sdk:
+    name: platform-tools
+    state: latest
+  register: platform_tools_updated
+
+- name: Install a package to a new root
+  android_sdk:
+    name: skiaparser;1
+    accept_licenses: true
+    state: present
+    sdk_root: "{{ remote_tmp_dir }}"
+  register: new_root_package
+
+- name: Check package is installed
+  stat:
+    path: "{{ remote_tmp_dir }}/skiaparser/1"
+  register: new_root_package_stat
+
+- name: Install a package from canary channel
+  android_sdk:
+    name: skiaparser;1
+    state: present
+    channel: canary
+  register: package_canary
+
+- name: Run tests
+  assert:
+    that:
+      - skiaparser_1_stat.stat.exists
+      - skiaparser_1_installed is changed
+      - skiaparser_1_installed_2 is not changed
+      - skiaparser_1_deleted is changed
+      - skiaparser_1_deleted_2 is not changed
+      - platform_tools_present is not changed
+      - platform_tools_updated is changed
+      - new_root_package is changed
+      - new_root_package_stat.stat.exists
+      - package_canary is changed

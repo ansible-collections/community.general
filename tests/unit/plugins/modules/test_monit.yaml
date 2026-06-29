@@ -1,0 +1,998 @@
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+anchors:
+  # version commands (version > 5.18 → adds -B flag to status/summary commands)
+  version_526: &version_526
+    command: [/testbin/monit, -V]
+    environ: {check_rc: true}
+    rc: 0
+    out: "This is monit version 5.26.0\n"
+    err: ''
+  version_518: &version_518
+    command: [/testbin/monit, -V]
+    environ: {check_rc: true}
+    rc: 0
+    out: "This is monit version 5.18.0\n"
+    err: ''
+  version_1218: &version_1218
+    command: [/testbin/monit, -V]
+    environ: {check_rc: true}
+    rc: 0
+    out: "This is monit version 12.18\n"
+    err: ''
+  version_5181: &version_5181
+    command: [/testbin/monit, -V]
+    environ: {check_rc: true}
+    rc: 0
+    out: "This is monit version 5.18.1\n"
+    err: ''
+  version_5112: &version_5112
+    command: [/testbin/monit, -V]
+    environ: {check_rc: true}
+    rc: 0
+    out: "This is monit version 5.1.12\n"
+    err: ''
+
+  # summary commands (presence check)
+  summary_present_526: &summary_present_526
+    command: [/testbin/monit, summary, -B]
+    environ: {check_rc: true}
+    rc: 0
+    out: "processX\n"
+    err: ''
+  summary_not_present_526: &summary_not_present_526
+    command: [/testbin/monit, summary, -B]
+    environ: {check_rc: true}
+    rc: 0
+    out: "other_process\n"
+    err: ''
+  summary_present_518: &summary_present_518
+    command: [/testbin/monit, summary]
+    environ: {check_rc: true}
+    rc: 0
+    out: "processX\n"
+    err: ''
+
+  # status commands with -B (version > 5.18)
+  status_ok_526: &status_ok_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       OK\n"
+    err: ''
+  status_not_monitored_526: &status_not_monitored_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Not monitored\n"
+    err: ''
+
+  # status commands without -B (version <= 5.18)
+  status_ok_no_b: &status_ok_no_b
+    command: [/testbin/monit, status, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       OK\n"
+    err: ''
+  status_not_monitored_no_b: &status_not_monitored_no_b
+    command: [/testbin/monit, status, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Not monitored\n"
+    err: ''
+
+  # status text variants for parse_status coverage (with -B)
+  status_ok_raw_526: &status_ok_raw_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       ok\n"
+    err: ''
+  status_running_526: &status_running_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Running\n"
+    err: ''
+  status_not_monitored_raw_526: &status_not_monitored_raw_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       not_monitored\n"
+    err: ''
+  status_missing_raw_526: &status_missing_raw_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       missing\n"
+    err: ''
+  status_initializing_526: &status_initializing_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       initializing\n"
+    err: ''
+  status_does_not_exist_raw_526: &status_does_not_exist_raw_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       does_not_exist\n"
+    err: ''
+  status_does_not_exist_text_526: &status_does_not_exist_text_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Does not exist\n"
+    err: ''
+  status_exec_failed_raw_526: &status_exec_failed_raw_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       execution_failed\n"
+    err: ''
+  status_exec_failed_pipe_526: &status_exec_failed_pipe_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Execution failed | Does not exist\n"
+    err: ''
+  status_unknown_526: &status_unknown_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Some Unknown Status\n"
+    err: ''
+  status_start_pending_526: &status_start_pending_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Not Monitored - start pending\n"
+    err: ''
+  status_stop_pending_526: &status_stop_pending_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Monitored - stop pending\n"
+    err: ''
+  status_restart_pending_526: &status_restart_pending_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Monitored - restart pending\n"
+    err: ''
+  status_monitor_pending_526: &status_monitor_pending_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'processX'\n  status                       Not Monitored - monitor pending\n"
+    err: ''
+  status_wrong_name_526: &status_wrong_name_526
+    command: [/testbin/monit, status, -B, processX]
+    environ: {check_rc: true}
+    rc: 0
+    out: "Process 'otherProcess'\n  status                       OK\n"
+    err: ''
+
+test_cases:
+  # ------------------------------------------------------------------ no-change cases
+  - id: state_present_already_present
+    input:
+      name: processX
+      state: present
+    output:
+      changed: false
+      name: processX
+      state: present
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+
+  - id: state_present_already_present_old_monit
+    input:
+      name: processX
+      state: present
+    output:
+      changed: false
+      name: processX
+      state: present
+    mocks:
+      run_command:
+        - *version_518
+        - *summary_present_518
+
+  - id: state_started_already_running
+    # main(): is_process_present → wait_for_pending (get_status) → is_process_running (get_status)
+    # running=True, state in [started, monitored] → exit changed=False
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      name: processX
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_ok_526   # wait_for_monit_to_stop_pending
+        - *status_ok_526   # is_process_running
+
+  - id: state_monitored_already_running
+    input:
+      name: processX
+      state: monitored
+    output:
+      changed: false
+      name: processX
+      state: monitored
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_ok_526
+        - *status_ok_526
+
+  # ------------------------------------------------------------------ state changes
+  - id: state_stopped_currently_running
+    # change_state: get_status → stop → wait_for_status_change (status changes on 1st check)
+    input:
+      name: processX
+      state: stopped
+    output:
+      changed: true
+      name: processX
+      monit_version: "5.26.0"
+      state: stopped
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_ok_526             # wait_for_monit_to_stop_pending
+        - *status_ok_526             # is_process_running (running=True)
+        - *status_ok_526             # change_state: current_status = get_status()
+        - command: [/testbin/monit, stop, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_not_monitored_526  # wait_for_status_change: status changed → done
+
+  - id: state_started_not_running
+    # process is not running → monit.start() → status changes to OK on 1st check
+    input:
+      name: processX
+      state: started
+    output:
+      changed: true
+      name: processX
+      monit_version: "5.26.0"
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_not_monitored_526  # wait_for_monit_to_stop_pending
+        - *status_not_monitored_526  # is_process_running (running=False)
+        - *status_not_monitored_526  # change_state: current_status = get_status()
+        - command: [/testbin/monit, start, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_ok_526             # wait_for_status_change: status changed → done
+
+  - id: state_unmonitored_currently_running
+    input:
+      name: processX
+      state: unmonitored
+    output:
+      changed: true
+      name: processX
+      monit_version: "5.26.0"
+      state: unmonitored
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_ok_526             # wait_for_monit_to_stop_pending
+        - *status_ok_526             # is_process_running (running=True)
+        - *status_ok_526             # change_state: current_status = get_status()
+        - command: [/testbin/monit, unmonitor, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_not_monitored_526  # wait_for_status_change: status changed → done
+
+  - id: state_monitored_not_running
+    # process not running → monit.monitor() → status changes to OK (invert_expected=True → success)
+    input:
+      name: processX
+      state: monitored
+    output:
+      changed: true
+      name: processX
+      monit_version: "5.26.0"
+      state: monitored
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_not_monitored_526  # wait_for_monit_to_stop_pending
+        - *status_not_monitored_526  # is_process_running (running=False)
+        - *status_not_monitored_526  # change_state: current_status = get_status()
+        - command: [/testbin/monit, monitor, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_ok_526             # wait_for_status_change: changed → done; match inverted → success
+
+  - id: state_restarted
+    # restart works regardless of running state; process not running → restart → becomes OK
+    input:
+      name: processX
+      state: restarted
+    output:
+      changed: true
+      name: processX
+      monit_version: "5.26.0"
+      state: restarted
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_not_monitored_526  # wait_for_monit_to_stop_pending
+        - *status_not_monitored_526  # is_process_running (running=False)
+        - *status_not_monitored_526  # change_state: current_status = get_status()
+        - command: [/testbin/monit, restart, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_ok_526             # wait_for_status_change: changed → done; OK == OK → success
+
+  # ------------------------------------------------------------------ reload
+  - id: state_reloaded
+    # reload exits before any presence/status checks; version check happens in __init__
+    input:
+      name: processX
+      state: reloaded
+    output:
+      changed: true
+      state: reloaded
+    mocks:
+      run_command:
+        - *version_526
+        - command: [/testbin/monit, reload]
+          environ: {}
+          rc: 0
+          out: ''
+          err: ''
+
+  # ------------------------------------------------------------------ present (not yet)
+  - id: state_present_not_yet_present
+    # not present in summary → Monit.present(): reload + summary check (present on 1st try)
+    input:
+      name: processX
+      state: present
+    output:
+      changed: true
+      name: processX
+      monit_version: "5.26.0"
+      state: present
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_not_present_526   # initial presence check → not present
+        - command: [/testbin/monit, reload, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *summary_present_526       # while loop: present on first check → exit
+
+  # ------------------------------------------------------------------ failure cases
+  - id: state_reloaded_fail
+    # reload returns rc=1 → fail_json("monit reload failed"); version check happens in __init__
+    input:
+      name: processX
+      state: reloaded
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - command: [/testbin/monit, reload]
+          environ: {}
+          rc: 1
+          out: "stdout"
+          err: "stderr"
+
+  - id: state_started_pending_timeout
+    # timeout=0 + status=MISSING (empty output) → wait_for_monit_to_stop_pending times out
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+
+  - id: state_stopped_status_change_on_retry
+    # same as state_stopped_currently_running but status is unchanged on the first check
+    # in wait_for_status_change; changes only on the second check (one retry loop)
+    input:
+      name: processX
+      state: stopped
+    output:
+      changed: true
+      name: processX
+      monit_version: "5.26.0"
+      state: stopped
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_ok_526             # wait_for_monit_to_stop_pending
+        - *status_ok_526             # is_process_running (running=True)
+        - *status_ok_526             # change_state: current_status = get_status()
+        - command: [/testbin/monit, stop, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_ok_526             # wait_for_status_change: initial (same → enters loop)
+        - *status_not_monitored_526  # loop_count=1, validate=False → changed!
+
+  # ------------------------------------------------------------------ check mode
+  - id: state_stopped_check_mode
+    # check mode: presence + pending + running checks happen, then exit_if_check_mode fires
+    flags:
+      check: true
+    input:
+      name: processX
+      state: stopped
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_ok_526   # wait_for_monit_to_stop_pending
+        - *status_ok_526   # is_process_running (running=True) → exit_if_check_mode
+
+  # ------------------------------------------------------------------ parse_status coverage
+  # Each case targets a specific status string → parsed Status → verifiable module behavior.
+  # "ok", "running" → OK → state=started, already running → changed=false (4 commands)
+  # "not_monitored_raw" → NOT_MONITORED → start → changed=true (7 commands)
+  # in waiting_status (missing, initializing, does_not_exist) → timeout=0 → fail (3 commands)
+  # EXECUTION_FAILED → not running → special fast path in wait_for_status_change (7 commands)
+  # pending → is_pending=True → timeout=0 → fail (3 commands)
+
+  - id: parse_status_ok_raw
+    # "ok" (raw enum value, lowercase) → Status("OK") → running → no change
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_ok_raw_526
+        - *status_ok_raw_526
+
+  - id: parse_status_running
+    # "Running" → Status("OK") via the RUNNING→OK alias → running → no change
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_running_526
+        - *status_running_526
+
+  - id: parse_status_not_monitored_raw
+    # "not_monitored" (raw, underscore) → Status("NOT_MONITORED") → not running → start
+    input:
+      name: processX
+      state: started
+    output:
+      changed: true
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_not_monitored_raw_526  # wait_for_monit_to_stop_pending
+        - *status_not_monitored_raw_526  # is_process_running (False)
+        - *status_not_monitored_raw_526  # change_state: current_status
+        - command: [/testbin/monit, start, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_ok_526
+
+  - id: parse_status_missing_raw
+    # "missing" (raw enum value) → Status("MISSING") → in waiting_status → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_missing_raw_526
+
+  - id: parse_status_wrong_name
+    # process name not found in output → Status("MISSING") → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_wrong_name_526
+
+  - id: parse_status_initializing
+    # "initializing" → Status("INITIALIZING") → in waiting_status → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_initializing_526
+
+  - id: parse_status_does_not_exist_raw
+    # "does_not_exist" (raw) → Status("DOES_NOT_EXIST") → in waiting_status → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_does_not_exist_raw_526
+
+  - id: parse_status_does_not_exist_text
+    # "Does not exist" → DOES_NOT_EXIST (via space→underscore normalisation) → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_does_not_exist_text_526
+
+  - id: parse_status_exec_failed_raw
+    # "execution_failed" → EXECUTION_FAILED → not running, but wait_for_status_change
+    # returns immediately (special case: current_status.value == EXECUTION_FAILED)
+    input:
+      name: processX
+      state: started
+    output:
+      changed: true
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_exec_failed_raw_526  # wait_for_monit_to_stop_pending (not in waiting_status)
+        - *status_exec_failed_raw_526  # is_process_running (False)
+        - *status_exec_failed_raw_526  # change_state: current_status
+        - command: [/testbin/monit, start, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_ok_526               # wait_for_status_change returns immediately (EXECUTION_FAILED)
+
+  - id: parse_status_exec_failed_pipe
+    # "Execution failed | Does not exist" → EXECUTION_FAILED (regex stops before |)
+    input:
+      name: processX
+      state: started
+    output:
+      changed: true
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_exec_failed_pipe_526
+        - *status_exec_failed_pipe_526
+        - *status_exec_failed_pipe_526
+        - command: [/testbin/monit, start, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_ok_526
+
+  - id: parse_status_unknown
+    # "Some Unknown Status" → EXECUTION_FAILED (via module.warn + fallback)
+    input:
+      name: processX
+      state: started
+    output:
+      changed: true
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_unknown_526
+        - *status_unknown_526
+        - *status_unknown_526
+        - command: [/testbin/monit, start, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_ok_526
+
+  - id: parse_status_start_pending
+    # "Not Monitored - start pending" → Status("OK", is_pending=True) → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_start_pending_526
+
+  - id: parse_status_stop_pending
+    # "Monitored - stop pending" → Status("NOT_MONITORED", is_pending=True) → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_stop_pending_526
+
+  - id: parse_status_restart_pending
+    # "Monitored - restart pending" → Status("OK", is_pending=True) → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_restart_pending_526
+
+  - id: parse_status_monitor_pending
+    # "Not Monitored - monitor pending" → Status("OK", is_pending=True) → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - *status_monitor_pending_526
+
+  # ------------------------------------------------------------------ parse_service_types coverage
+  # Each recognised service type: process name found → status OK → running → changed=false
+  # "Unsupported" is not in MONIT_SERVICES → MISSING → timeout
+
+  - id: parse_service_file
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "File 'processX'\n  status                       OK\n"
+          err: ''
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "File 'processX'\n  status                       OK\n"
+          err: ''
+
+  - id: parse_service_fifo
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Fifo 'processX'\n  status                       OK\n"
+          err: ''
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Fifo 'processX'\n  status                       OK\n"
+          err: ''
+
+  - id: parse_service_filesystem
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Filesystem 'processX'\n  status                       OK\n"
+          err: ''
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Filesystem 'processX'\n  status                       OK\n"
+          err: ''
+
+  - id: parse_service_directory
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Directory 'processX'\n  status                       OK\n"
+          err: ''
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Directory 'processX'\n  status                       OK\n"
+          err: ''
+
+  - id: parse_service_remote_host
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Remote host 'processX'\n  status                       OK\n"
+          err: ''
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Remote host 'processX'\n  status                       OK\n"
+          err: ''
+
+  - id: parse_service_system
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "System 'processX'\n  status                       OK\n"
+          err: ''
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "System 'processX'\n  status                       OK\n"
+          err: ''
+
+  - id: parse_service_program
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Program 'processX'\n  status                       OK\n"
+          err: ''
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Program 'processX'\n  status                       OK\n"
+          err: ''
+
+  - id: parse_service_network
+    input:
+      name: processX
+      state: started
+    output:
+      changed: false
+      state: started
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Network 'processX'\n  status                       OK\n"
+          err: ''
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Network 'processX'\n  status                       OK\n"
+          err: ''
+
+  - id: parse_service_unsupported
+    # "Unsupported" not in MONIT_SERVICES → _parse_status returns MISSING → timeout
+    input:
+      name: processX
+      state: started
+      timeout: 0
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_526
+        - *summary_present_526
+        - command: [/testbin/monit, status, -B, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: "Unsupported 'processX'\n  status                       OK\n"
+          err: ''
+
+  # ------------------------------------------------------------------ parse_version coverage
+  # state=stopped (running process) exercises exit_success() which includes monit_version.
+  # Commands with/without -B reveal whether the version tuple was parsed correctly.
+
+  - id: parse_version_1218
+    # "12.18" → (12, 18) > (5, 18) → -B added; monit_version="12.18" in output
+    input:
+      name: processX
+      state: stopped
+    output:
+      changed: true
+      monit_version: "12.18"
+      state: stopped
+    mocks:
+      run_command:
+        - *version_1218
+        - *summary_present_526       # -B because (12,18) > (5,18)
+        - *status_ok_526
+        - *status_ok_526
+        - *status_ok_526
+        - command: [/testbin/monit, stop, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_not_monitored_526
+
+  - id: parse_version_5181
+    # "5.18.1" → (5, 18) not > (5, 18) → no -B; monit_version="5.18.1" in output
+    input:
+      name: processX
+      state: stopped
+    output:
+      changed: true
+      monit_version: "5.18.1"
+      state: stopped
+    mocks:
+      run_command:
+        - *version_5181
+        - *summary_present_518       # no -B because (5,18) == (5,18)
+        - *status_ok_no_b
+        - *status_ok_no_b
+        - *status_ok_no_b
+        - command: [/testbin/monit, stop, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_not_monitored_no_b
+
+  - id: parse_version_5112
+    # "5.1.12" → (5, 1) not > (5, 18) → no -B; monit_version="5.1.12" in output
+    input:
+      name: processX
+      state: stopped
+    output:
+      changed: true
+      monit_version: "5.1.12"
+      state: stopped
+    mocks:
+      run_command:
+        - *version_5112
+        - *summary_present_518       # no -B because (5,1) < (5,18)
+        - *status_ok_no_b
+        - *status_ok_no_b
+        - *status_ok_no_b
+        - command: [/testbin/monit, stop, processX]
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+        - *status_not_monitored_no_b

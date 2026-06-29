@@ -1,0 +1,19 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_version }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
+        - default.yml
+      paths: ../vars
+- template:
+    src: dummy_command
+    dest: /usr/bin/dummy{{ item }}
+    owner: root
+    group: root
+    mode: '0755'
+  with_sequence: start=1 end=4

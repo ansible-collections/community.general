@@ -1,0 +1,228 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2024, Max Maxopoly <max@dermax.org>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Run apk tests on Alpine
+  when: ansible_facts.distribution in ['Alpine']
+  block:
+    - name: Ensure vim is not installed
+      community.general.apk:
+        name: vim
+        state: absent
+
+    - name: Install vim
+      community.general.apk:
+        name: vim
+        state: present
+      register: results
+
+    - name: Ensure vim was installed
+      ansible.builtin.assert:
+        that:
+          - results is changed
+          - (results.packages | length) >= 1 # vim has dependencies, so depending on the base image this number may vary
+
+    - name: Install vim again
+      community.general.apk:
+        name: vim
+        state: present
+      register: results
+
+    - name: Ensure vim was not installed again
+      ansible.builtin.assert:
+        that:
+          - results is not changed
+          - (results.packages | default([]) | length) == 0
+
+    - name: Ensure vim is not installed
+      community.general.apk:
+        name: vim
+        state: absent
+      register: results
+
+    - name: Ensure vim was uninstalled
+      ansible.builtin.assert:
+        that:
+          - results is changed
+          - (results.packages | length) >= 1
+
+    - name: Install vim without cache
+      community.general.apk:
+        name: vim
+        state: present
+        no_cache: true
+      register: results
+
+    - name: Ensure vim was installed without cache
+      ansible.builtin.assert:
+        that:
+          - results is changed
+
+    - name: Install vim again without cache
+      community.general.apk:
+        name: vim
+        state: present
+        no_cache: true
+      register: results
+
+    - name: Ensure vim was not installed again without cache
+      ansible.builtin.assert:
+        that:
+          - results is not changed
+          - (results.packages | default([]) | length) == 0
+
+    - name: Ensure a bunch of packages aren't installed
+      community.general.apk:
+        name:
+          - less
+          - nano
+          - vim
+        state: absent
+
+    - name: Install a bunch of packages
+      community.general.apk:
+        name:
+          - less
+          - nano
+          - vim
+          - bash
+          - bash-completion
+          - bash-completion-doc
+          - zsh
+          - zsh-calendar
+          - zsh-completions
+          - zsh-doc
+        state: present
+      register: results
+
+    - name: Ensure a bunch of packages were installed
+      ansible.builtin.assert:
+        that:
+          - results is changed
+          - (results.packages | length) >= 10
+
+    - name: Install a bunch of packages again
+      community.general.apk:
+        name:
+          - less
+          - nano
+          - vim
+        state: present
+      register: results
+
+    - name: Ensure a bunch of packages were not installed again
+      ansible.builtin.assert:
+        that:
+          - results is not changed
+          - (results.packages | default([]) | length) == 0
+
+    - name: Ensure a bunch of packages are not installed
+      community.general.apk:
+        name:
+          - less
+          - nano
+          - vim
+        state: absent
+      register: results
+
+    - name: Ensure a bunch of packages were uninstalled
+      ansible.builtin.assert:
+        that:
+          - results is changed
+          - (results.packages | length) >= 3
+
+    - name: Install a bunch of packages without cache
+      community.general.apk:
+        name:
+          - less
+          - nano
+          - vim
+        state: present
+        no_cache: true
+      register: results
+
+    - name: Ensure a bunch of packages were installed without cache
+      ansible.builtin.assert:
+        that:
+          - results is changed
+
+    - name: Install a bunch of packages again without cache
+      community.general.apk:
+        name:
+          - less
+          - nano
+          - vim
+        state: present
+        no_cache: true
+      register: results
+
+    - name: Ensure a bunch of packages were not installed again without cache
+      ansible.builtin.assert:
+        that:
+          - results is not changed
+          - (results.packages | default([]) | length) == 0
+
+    - name: Install package with empty name
+      community.general.apk:
+        name: ""
+      register: result_empty
+      ignore_errors: true
+
+    - name: Assert failure due to empty package name
+      ansible.builtin.assert:
+        that:
+          - result_empty is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_empty.msg"
+
+    - name: Install package name with only spaces
+      community.general.apk:
+        name: ["   "]
+      register: result_spaces
+      ignore_errors: true
+
+    - name: Assert failure due to whitespace-only package name
+      ansible.builtin.assert:
+        that:
+          - result_spaces is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_spaces.msg"
+
+    - name: Do not accept list with valid and empty string
+      community.general.apk:
+        name: ["busybox", ""]
+      register: result_invalid_mixed
+      ignore_errors: true
+
+    - name: Assert failure with mixed package list
+      ansible.builtin.assert:
+        that:
+          - result_invalid_mixed is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_invalid_mixed.msg"
+
+    - name: Reject package name list with multiple empty/whitespace-only strings
+      community.general.apk:
+        name: ["", "   "]
+      register: result_multiple_empty
+      ignore_errors: true
+
+    - name: Assert failure due to all package names being empty or whitespace
+      ansible.builtin.assert:
+        that:
+          - result_multiple_empty is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_multiple_empty.msg"
+
+    - name: Reject empty package name with update_cache parameter
+      community.general.apk:
+        name: ""
+        update_cache: true
+      register: result_empty_package_with_update_cache
+      ignore_errors: true
+
+    - name: Assert failure due to all package names being empty or whitespace
+      ansible.builtin.assert:
+        that:
+          - result_empty_package_with_update_cache is failed
+          - "'Package name(s) cannot be empty or whitespace-only' == result_empty_package_with_update_cache.msg"

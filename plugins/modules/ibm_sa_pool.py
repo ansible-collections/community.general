@@ -1,0 +1,122 @@
+#!/usr/bin/python
+
+# Copyright (C) 2018 IBM CORPORATION
+# Author(s): Tzur Eliyahu <tzure@il.ibm.com>
+#
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: ibm_sa_pool
+short_description: Handles pools on IBM Spectrum Accelerate Family storage systems
+
+description:
+  - This module creates or deletes pools to be used on IBM Spectrum Accelerate Family storage systems.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+
+options:
+  pool:
+    description:
+      - Pool name.
+    required: true
+    type: str
+  state:
+    description:
+      - Pool state.
+    default: "present"
+    choices: ["present", "absent"]
+    type: str
+  size:
+    description:
+      - Pool size in GB.
+    type: str
+  snapshot_size:
+    description:
+      - Pool snapshot size in GB.
+    type: str
+  domain:
+    description:
+      - Adds the pool to the specified domain.
+    type: str
+  perf_class:
+    description:
+      - Assigns a perf_class to the pool.
+    type: str
+
+extends_documentation_fragment:
+  - community.general._ibm_storage
+  - community.general._attributes
+
+author:
+  - Tzur Eliyahu (@tzure)
+"""
+
+EXAMPLES = r"""
+- name: Create new pool.
+  community.general.ibm_sa_pool:
+    name: pool_name
+    size: 300
+    state: present
+    username: admin
+    password: secret
+    endpoints: hostdev-system
+
+- name: Delete pool.
+  community.general.ibm_sa_pool:
+    name: pool_name
+    state: absent
+    username: admin
+    password: secret
+    endpoints: hostdev-system
+"""
+RETURN = r"""
+"""
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils._ibm_sa_utils import (
+    connect_ssl,
+    execute_pyxcli_command,
+    is_pyxcli_installed,
+    spectrum_accelerate_spec,
+)
+
+
+def main():
+    argument_spec = spectrum_accelerate_spec()
+    argument_spec.update(
+        dict(
+            state=dict(default="present", choices=["present", "absent"]),
+            pool=dict(required=True),
+            size=dict(),
+            snapshot_size=dict(),
+            domain=dict(),
+            perf_class=dict(),
+        )
+    )
+
+    module = AnsibleModule(argument_spec)
+
+    is_pyxcli_installed(module)
+
+    xcli_client = connect_ssl(module)
+    pool = xcli_client.cmd.pool_list(pool=module.params["pool"]).as_single_element
+    state = module.params["state"]
+
+    state_changed = False
+    if state == "present" and not pool:
+        state_changed = execute_pyxcli_command(module, "pool_create", xcli_client)
+    if state == "absent" and pool:
+        state_changed = execute_pyxcli_command(module, "pool_delete", xcli_client)
+
+    module.exit_json(changed=state_changed)
+
+
+if __name__ == "__main__":
+    main()

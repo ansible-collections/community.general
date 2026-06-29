@@ -1,0 +1,120 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Add a few dummy alternatives with state = present and make sure that the
+# group is in 'auto' mode and the highest priority alternative is selected.
+- name: Add some dummy alternatives with state = present
+  alternatives:
+    name: dummy
+    path: "/usr/bin/dummy{{ item.n }}"
+    link: /usr/bin/dummy
+    priority: "{{ item.priority }}"
+    state: present
+  loop:
+    - { n: 1, priority: 50 }
+    - { n: 2, priority: 70 }
+    - { n: 3, priority: 25 }
+
+- name: Ensure that the link group is in auto mode
+  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
+
+# Execute current selected 'dummy' and ensure it's the alternative we expect
+- name: Execute the current dummy command
+  shell: dummy
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy2"
+
+# Add another alternative with state = 'selected' and make sure that
+# this change results in the group being set to manual mode, and the
+# new alternative being the selected one.
+- name: Add another dummy alternative with state = selected
+  alternatives:
+    name: dummy
+    path: /usr/bin/dummy4
+    link: /usr/bin/dummy
+    priority: 10
+    state: selected
+
+- name: Ensure that the link group is in manual mode
+  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
+
+- name: Execute the current dummy command
+  shell: dummy
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy4"
+
+# Set the currently selected alternative to state = 'present' (was previously
+# selected), and ensure that this results in the group not being set to 'auto'
+# mode, and the alternative is still selected.
+- name: Set current selected dummy to state = present
+  alternatives:
+    name: dummy
+    path: /usr/bin/dummy4
+    link: /usr/bin/dummy
+    state: present
+
+- name: Ensure that the link group is in auto mode
+  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
+
+- name: Execute the current dummy command
+  shell: dummy
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy4"
+
+# Set the currently selected alternative to state = 'auto' (was previously
+# selected), and ensure that this results in the group being set to 'auto'
+# mode, and the highest priority alternative is selected.
+- name: Set current selected dummy to state = present
+  alternatives:
+    name: dummy
+    path: /usr/bin/dummy4
+    link: /usr/bin/dummy
+    state: auto
+
+- name: Ensure that the link group is in auto mode
+  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
+
+- name: Execute the current dummy command
+  shell: dummy
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy2"
+
+# Remove an alternative with state = 'absent' and make sure that
+# this change results in the alternative being removed.
+- name: Remove best dummy alternative with state = absent
+  alternatives:
+    name: dummy
+    path: /usr/bin/dummy2
+    state: absent
+
+- name: Ensure that the link group is in auto mode
+  shell: 'grep "/usr/bin/dummy2" {{ alternatives_dir }}/dummy'
+  register: cmd
+  failed_when: cmd.rc == 0
+
+- name: Execute the current dummy command
+  shell: dummy
+  register: cmd
+
+- name: Ensure that the expected command was executed
+  assert:
+    that:
+      - cmd.stdout == "dummy1"

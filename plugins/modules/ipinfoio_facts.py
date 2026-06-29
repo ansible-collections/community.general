@@ -1,0 +1,125 @@
+#!/usr/bin/python
+
+# Copyright (c) 2016, Aleksei Kostiuk <unitoff@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: ipinfoio_facts
+short_description: Retrieve IP geolocation facts of a host's IP address
+description:
+  - Gather IP geolocation facts of a host's IP address using ipinfo.io API.
+author: "Aleksei Kostiuk (@akostyuk)"
+extends_documentation_fragment:
+  - community.general._attributes
+  - community.general._attributes.facts
+  - community.general._attributes.facts_module
+options:
+  timeout:
+    description:
+      - HTTP connection timeout in seconds.
+    default: 10
+    type: int
+  http_agent:
+    description:
+      - Set http user agent.
+    default: "ansible-ipinfoio-module/0.0.1"
+    type: str
+notes:
+  - Check U(http://ipinfo.io/) for more information.
+"""
+
+EXAMPLES = r"""
+# Retrieve geolocation data of a host's IP address
+- name: Get IP geolocation data
+  community.general.ipinfoio_facts:
+"""
+
+RETURN = r"""
+ansible_facts:
+  description: "Dictionary of IP geolocation facts for a host's IP address."
+  returned: success
+  type: dict
+  contains:
+    ip:
+      description: "Public IP address of a host."
+      type: str
+      sample: "8.8.8.8"
+    hostname:
+      description: Domain name.
+      type: str
+      sample: "google-public-dns-a.google.com"
+    country:
+      description: ISO 3166-1 alpha-2 country code.
+      type: str
+      sample: "US"
+    region:
+      description: State or province name.
+      type: str
+      sample: "California"
+    city:
+      description: City name.
+      type: str
+      sample: "Mountain View"
+    loc:
+      description: Latitude and Longitude of the location.
+      type: str
+      sample: "37.3860,-122.0838"
+    org:
+      description: "Organization's name."
+      type: str
+      sample: "AS3356 Level 3 Communications, Inc."
+    postal:
+      description: Postal code.
+      type: str
+      sample: "94035"
+"""
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
+
+USER_AGENT = "ansible-ipinfoio-module/0.0.1"
+
+
+class IpinfoioFacts:
+    def __init__(self, module):
+        self.url = "https://ipinfo.io/json"
+        self.timeout = module.params.get("timeout")
+        self.module = module
+
+    def get_geo_data(self):
+        response, info = fetch_url(
+            self.module,
+            self.url,
+            force=True,
+            timeout=self.timeout,
+        )
+        if info["status"] != 200:
+            self.module.fail_json(msg=f"Could not get {self.url} page, check for connectivity!")
+
+        try:
+            content = response.read()
+            result = self.module.from_json(content)
+        except ValueError:
+            self.module.fail_json(msg=f"Failed to parse the ipinfo.io response: {self.url} {content}")
+        else:
+            return result
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            http_agent=dict(default=USER_AGENT),
+            timeout=dict(type="int", default=10),
+        ),
+        supports_check_mode=True,
+    )
+
+    ipinfoio = IpinfoioFacts(module)
+    ipinfoio_result = dict(changed=False, ansible_facts=ipinfoio.get_geo_data())
+    module.exit_json(**ipinfoio_result)
+
+
+if __name__ == "__main__":
+    main()

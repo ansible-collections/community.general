@@ -1,0 +1,400 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+      - stable-*
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - main
+      - stable-*
+
+schedules:
+  - cron: 0 8 * * *
+    displayName: Nightly (main)
+    always: true
+    branches:
+      include:
+        - main
+  - cron: 0 10 * * *
+    displayName: Nightly (active stable branches)
+    always: true
+    branches:
+      include:
+        - stable-13
+        - stable-12
+  - cron: 0 11 * * 0
+    displayName: Weekly (old stable branches)
+    always: true
+    branches:
+      include:
+        - stable-11
+
+variables:
+  - name: checkoutPath
+    value: ansible_collections/community/general
+  - name: coverageBranches
+    value: main
+  - name: entryPoint
+    value: tests/utils/shippable/nox.sh
+  - name: prepareEntryPoint
+    value: tests/utils/shippable/nox-prepare.sh
+  - name: fetchDepth
+    value: 0
+
+resources:
+  containers:
+    - container: default
+      image: quay.io/ansible/azure-pipelines-test-container:8.0.0
+
+pool: Standard
+
+stages:
+  - stage: sanity
+    displayName: Sanity
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: ansible-core 2.19
+              test: ansible-test-sanity-2.19
+            - name: ansible-core 2.20
+              test: ansible-test-sanity-2.20
+            - name: ansible-core 2.21
+              test: ansible-test-sanity-2.21
+            - name: ansible-core devel
+              test: ansible-test-sanity-devel
+            - name: Extra sanity tests
+              test: extra-sanity-tests
+
+  - stage: units_2_19
+    displayName: Units 2.19
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Python 3.8
+              test: ansible-test-units-2.19-3.8
+            - name: Python 3.11
+              test: ansible-test-units-2.19-3.11
+            - name: Python 3.13
+              test: ansible-test-units-2.19-3.13
+
+  - stage: units_2_20
+    displayName: Units 2.20
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Python 3.9
+              test: ansible-test-units-2.20-3.9
+            - name: Python 3.12
+              test: ansible-test-units-2.20-3.12
+            - name: Python 3.14
+              test: ansible-test-units-2.20-3.14
+
+  - stage: units_2_21
+    displayName: Units 2.21
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Python 3.9
+              test: ansible-test-units-2.21-3.9
+            - name: Python 3.12
+              test: ansible-test-units-2.21-3.12
+            - name: Python 3.14
+              test: ansible-test-units-2.21-3.14
+
+  - stage: units_devel
+    displayName: Units devel
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Python 3.9
+              test: ansible-test-units-devel-3.9
+            - name: Python 3.10
+              test: ansible-test-units-devel-3.10
+            - name: Python 3.11
+              test: ansible-test-units-devel-3.11
+            - name: Python 3.12
+              test: ansible-test-units-devel-3.12
+            - name: Python 3.13
+              test: ansible-test-units-devel-3.13
+            - name: Python 3.14
+              test: ansible-test-units-devel-3.14
+            - name: Python 3.15
+              test: ansible-test-units-devel-3.15
+
+  - stage: docker_2_19
+    displayName: Docker 2.19
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Alpine 3.21 + group 1
+              test: ansible-test-integration-2.19-alpine321-azp-posix-1
+            - name: Alpine 3.21 + group 2
+              test: ansible-test-integration-2.19-alpine321-azp-posix-2
+            - name: Alpine 3.21 + group 3
+              test: ansible-test-integration-2.19-alpine321-azp-posix-3
+            - name: Fedora 41 + group 1
+              test: ansible-test-integration-2.19-fedora41-azp-posix-1
+            - name: Fedora 41 + group 2
+              test: ansible-test-integration-2.19-fedora41-azp-posix-2
+            - name: Fedora 41 + group 3
+              test: ansible-test-integration-2.19-fedora41-azp-posix-3
+
+  - stage: docker_2_20
+    displayName: Docker 2.20
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Alpine 3.22 + group 1
+              test: ansible-test-integration-2.20-alpine322-azp-posix-1
+            - name: Alpine 3.22 + group 2
+              test: ansible-test-integration-2.20-alpine322-azp-posix-2
+            - name: Alpine 3.22 + group 3
+              test: ansible-test-integration-2.20-alpine322-azp-posix-3
+            - name: Fedora 42 + group 1
+              test: ansible-test-integration-2.20-fedora42-azp-posix-1
+            - name: Fedora 42 + group 2
+              test: ansible-test-integration-2.20-fedora42-azp-posix-2
+            - name: Fedora 42 + group 3
+              test: ansible-test-integration-2.20-fedora42-azp-posix-3
+
+  - stage: docker_2_21
+    displayName: Docker 2.21
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Fedora 43 + group 1
+              test: ansible-test-integration-2.21-fedora43-azp-posix-1
+            - name: Fedora 43 + group 2
+              test: ansible-test-integration-2.21-fedora43-azp-posix-2
+            - name: Fedora 43 + group 3
+              test: ansible-test-integration-2.21-fedora43-azp-posix-3
+            - name: Ubuntu 22.04 + group 1
+              test: ansible-test-integration-2.21-ubuntu2204-azp-posix-1
+            - name: Ubuntu 22.04 + group 2
+              test: ansible-test-integration-2.21-ubuntu2204-azp-posix-2
+            - name: Ubuntu 22.04 + group 3
+              test: ansible-test-integration-2.21-ubuntu2204-azp-posix-3
+            - name: Ubuntu 24.04 + group 1
+              test: ansible-test-integration-2.21-ubuntu2404-azp-posix-1
+            - name: Ubuntu 24.04 + group 2
+              test: ansible-test-integration-2.21-ubuntu2404-azp-posix-2
+            - name: Ubuntu 24.04 + group 3
+              test: ansible-test-integration-2.21-ubuntu2404-azp-posix-3
+
+  - stage: docker_devel
+    displayName: Docker devel
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Alpine 3.23 + group 1
+              test: ansible-test-integration-devel-alpine323-azp-posix-1
+            - name: Alpine 3.23 + group 2
+              test: ansible-test-integration-devel-alpine323-azp-posix-2
+            - name: Alpine 3.23 + group 3
+              test: ansible-test-integration-devel-alpine323-azp-posix-3
+            - name: Arch Linux + py3.14 + group 1
+              test: ansible-test-integration-devel-archlinux-3.14-azp-posix-1
+            - name: Arch Linux + py3.14 + group 2
+              test: ansible-test-integration-devel-archlinux-3.14-azp-posix-2
+            - name: Arch Linux + py3.14 + group 3
+              test: ansible-test-integration-devel-archlinux-3.14-azp-posix-3
+            - name: Debian 13 + py3.13 + group 1
+              test: ansible-test-integration-devel-debian-13-trixie-3.13-azp-posix-1
+            - name: Debian 13 + py3.13 + group 2
+              test: ansible-test-integration-devel-debian-13-trixie-3.13-azp-posix-2
+            - name: Debian 13 + py3.13 + group 3
+              test: ansible-test-integration-devel-debian-13-trixie-3.13-azp-posix-3
+            - name: Debian 12 + py3.11 + group 1
+              test: ansible-test-integration-devel-debian-bookworm-3.11-azp-posix-1
+            - name: Debian 12 + py3.11 + group 2
+              test: ansible-test-integration-devel-debian-bookworm-3.11-azp-posix-2
+            - name: Debian 12 + py3.11 + group 3
+              test: ansible-test-integration-devel-debian-bookworm-3.11-azp-posix-3
+            - name: Debian 11 + py3.9 + group 1
+              test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-1
+            - name: Debian 11 + py3.9 + group 2
+              test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-2
+            - name: Debian 11 + py3.9 + group 3
+              test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-3
+            - name: Fedora 44 + group 1
+              test: ansible-test-integration-devel-fedora44-azp-posix-1
+            - name: Fedora 44 + group 2
+              test: ansible-test-integration-devel-fedora44-azp-posix-2
+            - name: Fedora 44 + group 3
+              test: ansible-test-integration-devel-fedora44-azp-posix-3
+            - name: OpenSuSE Tumbleweed + py3.13 + group 1
+              test: ansible-test-integration-devel-opensuse-tumbleweed-3.13-azp-posix-1
+            - name: OpenSuSE Tumbleweed + py3.13 + group 2
+              test: ansible-test-integration-devel-opensuse-tumbleweed-3.13-azp-posix-2
+            - name: OpenSuSE Tumbleweed + py3.13 + group 3
+              test: ansible-test-integration-devel-opensuse-tumbleweed-3.13-azp-posix-3
+            - name: Ubuntu 24.04 + group 1
+              test: ansible-test-integration-devel-ubuntu2404-azp-posix-1
+            - name: Ubuntu 24.04 + group 2
+              test: ansible-test-integration-devel-ubuntu2404-azp-posix-2
+            - name: Ubuntu 24.04 + group 3
+              test: ansible-test-integration-devel-ubuntu2404-azp-posix-3
+            - name: Ubuntu 26.04 + group 1
+              test: ansible-test-integration-devel-ubuntu2604-azp-posix-1
+            - name: Ubuntu 26.04 + group 2
+              test: ansible-test-integration-devel-ubuntu2604-azp-posix-2
+            - name: Ubuntu 26.04 + group 3
+              test: ansible-test-integration-devel-ubuntu2604-azp-posix-3
+
+  - stage: remote_2_19
+    displayName: Remote 2.19
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: RHEL 10.1 + group 1
+              test: ansible-test-integration-2.19-rhel-10.1-azp-posix-1
+            - name: RHEL 10.1 + group 2
+              test: ansible-test-integration-2.19-rhel-10.1-azp-posix-2
+            - name: RHEL 10.1 + group 3
+              test: ansible-test-integration-2.19-rhel-10.1-azp-posix-3
+
+  - stage: remote_2_20
+    displayName: Remote 2.20
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: FreeBSD 14.3 + group 1
+              test: ansible-test-integration-2.20-freebsd-14.3-azp-posix-1
+            - name: FreeBSD 14.3 + group 2
+              test: ansible-test-integration-2.20-freebsd-14.3-azp-posix-2
+            - name: FreeBSD 14.3 + group 3
+              test: ansible-test-integration-2.20-freebsd-14.3-azp-posix-3
+            - name: macOS 15.3 + group 1
+              test: ansible-test-integration-2.20-macos-15.3-azp-posix-1
+            - name: macOS 15.3 + group 2
+              test: ansible-test-integration-2.20-macos-15.3-azp-posix-2
+            - name: macOS 15.3 + group 3
+              test: ansible-test-integration-2.20-macos-15.3-azp-posix-3
+            - name: RHEL 10.1 + group 1
+              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-1
+            - name: RHEL 10.1 + group 2
+              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-2
+            - name: RHEL 10.1 + group 3
+              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-3
+
+  - stage: remote_2_21
+    displayName: Remote 2.21
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: RHEL 10.1 + group 1
+              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-1
+            - name: RHEL 10.1 + group 2
+              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-2
+            - name: RHEL 10.1 + group 3
+              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-3
+
+  - stage: remote_devel
+    displayName: Remote devel
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Alpine 3.23 + extra VMs
+              test: ansible-test-integration-devel-alpine-3.23-azp-posix-vm
+            - name: macOS 26.3 + group 1
+              test: ansible-test-integration-devel-macos-26.3-azp-posix-1
+            - name: macOS 26.3 + group 2
+              test: ansible-test-integration-devel-macos-26.3-azp-posix-2
+            - name: macOS 26.3 + group 3
+              test: ansible-test-integration-devel-macos-26.3-azp-posix-3
+            - name: RHEL 10.2 + group 1
+              test: ansible-test-integration-devel-rhel-10.2-azp-posix-1
+            - name: RHEL 10.2 + group 2
+              test: ansible-test-integration-devel-rhel-10.2-azp-posix-2
+            - name: RHEL 10.2 + group 3
+              test: ansible-test-integration-devel-rhel-10.2-azp-posix-3
+            - name: RHEL 9.8 + group 1
+              test: ansible-test-integration-devel-rhel-9.8-azp-posix-1
+            - name: RHEL 9.8 + group 2
+              test: ansible-test-integration-devel-rhel-9.8-azp-posix-2
+            - name: RHEL 9.8 + group 3
+              test: ansible-test-integration-devel-rhel-9.8-azp-posix-3
+            - name: Ubuntu 24.04 + extra VMs
+              test: ansible-test-integration-devel-ubuntu-24.04-azp-posix-vm
+            - name: Ubuntu 26.04 + extra VMs
+              test: ansible-test-integration-devel-ubuntu-26.04-azp-posix-vm
+
+  - stage: Summary
+    condition: succeededOrFailed()
+    dependsOn:
+      - sanity
+      - units_2_19
+      - units_2_20
+      - units_2_21
+      - units_devel
+      - docker_2_19
+      - docker_2_20
+      - docker_2_21
+      - docker_devel
+      - remote_2_19
+      - remote_2_20
+      - remote_2_21
+      - remote_devel
+    jobs:
+      - template: templates/coverage.yml

@@ -1,0 +1,92 @@
+# Test code for the pam_limits module
+# Copyright (c) 2021, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set value for temp limit configuration
+  set_fact:
+    test_limit_file: "/tmp/limits.conf"
+
+- name: Copy temporary limits.conf
+  copy:
+    src: test_pam_limits.conf
+    dest: "{{ test_limit_file }}"
+
+- name: Test check mode support in pam_limits
+  community.general.pam_limits:
+    domain: smith
+    limit_type: soft
+    limit_item: nofile
+    value: '64000'
+    dest: "{{ test_limit_file }}"
+  check_mode: true
+  register: check_mode_test
+
+- name: Test that check mode is working
+  assert:
+    that:
+      - check_mode_test is changed
+
+- name: Add soft limit for smith user
+  community.general.pam_limits:
+    domain: smith
+    limit_type: soft
+    limit_item: nofile
+    value: '64000'
+    dest: "{{ test_limit_file }}"
+  register: soft_limit_test
+
+- name: Check if changes are made
+  assert:
+    that:
+      - soft_limit_test is changed
+
+- name: Aagin change soft limit for smith user for idempotency
+  community.general.pam_limits:
+    domain: smith
+    limit_type: soft
+    limit_item: nofile
+    value: '64000'
+    dest: "{{ test_limit_file }}"
+  register: soft_limit_test
+
+- name: Check if changes are not made idempotency
+  assert:
+    that:
+      - not soft_limit_test.changed
+
+- name: Change hard limit for Joe user for diff
+  community.general.pam_limits:
+    domain: joe
+    limit_type: hard
+    limit_item: nofile
+    value: '100000'
+    dest: "{{ test_limit_file }}"
+  register: hard_limit_test
+  diff: true
+
+- name: Debugging output for hard limit test
+  debug:
+    msg: "{{ hard_limit_test }}"
+
+- name: Check if changes made
+  assert:
+    that:
+      - hard_limit_test is changed
+      - hard_limit_test.diff.after is defined
+      - hard_limit_test.diff.before is defined
+
+- name: Add comment with change
+  community.general.pam_limits:
+    domain: doom
+    limit_type: hard
+    limit_item: nofile
+    value: '100000'
+    dest: "{{ test_limit_file }}"
+    comment: "This is a nice comment"
+  register: comment_test
+
+- name: Check if changes made
+  assert:
+    that:
+      - comment_test is changed

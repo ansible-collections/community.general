@@ -1,0 +1,21 @@
+---
+# Test code for the iso_extract module.
+# Copyright (c) 2017, James Tanner <tanner.jc@gmail.com>
+# Copyright (c) 2017, Dag Wieers <dag@wieers.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure our testing sub-directory does not exist
+  file:
+    path: '{{ output_test_dir }}'
+    state: absent
+
+- name: Create our testing sub-directory
+  file:
+    path: '{{ output_test_dir }}'
+    state: directory
+
+- name: copy the iso to the test dir
+  copy:
+    src: test.iso
+    dest: '{{ output_test_dir }}'

@@ -1,0 +1,54 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# test code for ini_file plugins
+# Copyright (c) 2017 Red Hat Inc.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: record the output directory
+  set_fact:
+    output_file: "{{ remote_tmp_dir }}/foo.ini"
+    non_existing_file: "{{ remote_tmp_dir }}/bar.ini"
+
+- name: include tasks
+  block:
+    - name: include tasks to perform basic tests
+      include_tasks: tests/00-basic.yml
+
+    - name: reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: include tasks to perform tests with parameter "value"
+      include_tasks: tests/01-value.yml
+
+    - name: reset output file
+      file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: include tasks to perform tests with parameter "values"
+      include_tasks: tests/02-values.yml
+
+    - name: include tasks to test regressions
+      include_tasks: tests/03-encoding.yml
+
+    - name: include tasks to test symlink handling
+      include_tasks: tests/04-symlink.yml
+
+    - name: include tasks to test ignore_spaces
+      include_tasks: tests/05-ignore_spaces.yml
+
+    - name: include tasks to test modify_inactive_option
+      include_tasks: tests/06-modify_inactive_option.yml
+
+    - name: include tasks to test optional spaces in section headings
+      include_tasks: tests/07-section_name_spaces.yml
+
+    - name: include tasks to test section_has_values
+      include_tasks: tests/08-section.yml

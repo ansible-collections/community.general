@@ -1,0 +1,97 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure package is not installed (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: absent
+
+- name: Install package at specific revision (uhttpd rev 15)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    revision: 15
+  register: install_revision
+
+- name: Install same revision again - idempotency (uhttpd rev 15)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    revision: 15
+  register: install_revision_again
+
+- name: Assert revision install behavior
+  assert:
+    that:
+      - install_revision is changed
+      - install_revision_again is not changed
+
+- name: Verify snap is held after revision install
+  ansible.builtin.command: snap list uhttpd
+  register: snap_list_after_install
+  changed_when: false
+
+- name: Assert snap is held
+  assert:
+    that:
+      - "'held' in snap_list_after_install.stdout"
+
+- name: Install different revision (uhttpd rev 45)
+  community.general.snap:
+    name: uhttpd
+    state: present
+    revision: 45
+  register: install_different_revision
+
+- name: Assert switching to a different revision triggers change
+  assert:
+    that:
+      - install_different_revision is changed
+
+- name: Verify snap is still held after switching revision
+  ansible.builtin.command: snap list uhttpd
+  register: snap_list_after_switch
+  changed_when: false
+
+- name: Assert snap is still held
+  assert:
+    that:
+      - "'held' in snap_list_after_switch.stdout"
+
+- name: Run bare snap refresh to verify hold prevents auto-update
+  ansible.builtin.command: snap refresh
+  register: bare_snap_refresh
+  changed_when: false
+  failed_when: false
+
+- name: Verify snap is still at revision 45 after bare snap refresh
+  ansible.builtin.command: snap list uhttpd
+  register: snap_list_after_bare_refresh
+  changed_when: false
+
+- name: Assert snap did not update past the held revision
+  assert:
+    that:
+      - "'45' in snap_list_after_bare_refresh.stdout"
+      - "'held' in snap_list_after_bare_refresh.stdout"
+
+- name: Remove package (uhttpd)
+  community.general.snap:
+    name: uhttpd
+    state: absent
+
+- name: Verify channel and revision are mutually exclusive
+  community.general.snap:
+    name: uhttpd
+    state: present
+    channel: latest/stable
+    revision: 15
+  register: install_channel_and_revision
+  ignore_errors: true
+
+- name: Assert channel and revision are mutually exclusive
+  assert:
+    that:
+      - install_channel_and_revision is failed

@@ -1,0 +1,11 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+fake_token: "fake_token_for_testing"
+test_key_name: "ansible-test-key"
+github_api_url: "https://api.github.com"
+enterprise_api_url: "https://github.company.com/api/v3"
+enterprise_api_url_trailing: "https://github.company.com/api/v3/"
+test_pubkey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDTgvwjlRHZ8E1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ test@example.com"

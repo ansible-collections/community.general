@@ -1,0 +1,209 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+list1:
+  - name: myname01
+    param01: myparam01
+  - name: myname02
+    param01: myparam02
+
+list2:
+  - name: myname01
+    param01: myparam03
+  - name: myname02
+    param02: myparam04
+  - name: myname03
+    param03: myparam03
+
+list3:
+  - name: myname01
+    param01: myparam03
+  - name: myname02
+    param01: myparam02
+    param02: myparam04
+  - name: myname03
+    param03: myparam03
+
+list4:
+  - name: myname01
+    param01: myparam01
+  - myname02
+
+list5:
+  - name: myname01
+    param01: myparam05
+  - name: myname02
+    param01: myparam06
+
+result1:
+  - name: myname01
+    param01: myparam05
+  - name: myname02
+    param01: myparam06
+    param02: myparam04
+  - name: myname03
+    param03: myparam03
+
+# Test list_merge
+
+list100:
+  - name: myname01
+    param01:
+      - default1
+  - name: myname02
+    param01:
+      - default2
+
+list101:
+  - name: myname01
+    param01:
+      - patch1
+  - name: myname02
+    param01:
+      - patch2
+
+list102:
+  - name: myname01
+    param01:
+      - patch1a
+      - patch1b
+      - patch1c
+  - name: myname02
+    param01:
+      - patch2a
+      - patch2b
+      - patch2d
+
+list103:
+  - name: myname01
+    param01:
+      - patch1c
+      - patch1d
+  - name: myname02
+    param01:
+      - patch2c
+      - patch2d
+
+result100:
+  - name: myname01
+    param01:
+      - patch1
+  - name: myname02
+    param01:
+      - patch2
+
+result101:
+  - name: myname01
+    param01:
+      - default1
+  - name: myname02
+    param01:
+      - default2
+
+result102:
+  - name: myname01
+    param01:
+      - default1
+      - patch1
+  - name: myname02
+    param01:
+      - default2
+      - patch2
+
+result103:
+  - name: myname01
+    param01:
+      - patch1
+      - default1
+  - name: myname02
+    param01:
+      - patch2
+      - default2
+
+result104:
+  - name: myname01
+    param01:
+      - patch1a
+      - patch1b
+      - patch1c
+      - patch1d
+  - name: myname02
+    param01:
+      - patch2a
+      - patch2b
+      - patch2c
+      - patch2d
+
+result105:
+  - name: myname01
+    param01:
+      - patch1c
+      - patch1d
+      - patch1a
+      - patch1b
+  - name: myname02
+    param01:
+      - patch2c
+      - patch2d
+      - patch2a
+      - patch2b
+
+# Test recursive
+
+list200:
+  - name: myname01
+    param01:
+      x: default_value
+      y: default_value
+      list:
+        - default_value
+  - name: myname02
+    param01: [1, 1, 2, 3]
+
+list201:
+  - name: myname01
+    param01:
+      y: patch_value
+      z: patch_value
+      list:
+        - patch_value
+  - name: myname02
+    param01: [3, 4, 4, {key: value}]
+
+result200:
+  - name: myname01
+    param01:
+      list:
+        - default_value
+        - patch_value
+      x: default_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+      - 1
+      - 1
+      - 2
+      - 3
+      - 4
+      - 4
+      - key: value
+
+result201:
+  - name: myname01
+    param01:
+      list:
+        - patch_value
+      y: patch_value
+      z: patch_value
+  - name: myname02
+    param01:
+      - 1
+      - 1
+      - 2
+      - 3
+      - 4
+      - 4
+      - key: value

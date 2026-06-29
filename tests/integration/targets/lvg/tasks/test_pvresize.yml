@@ -1,0 +1,81 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Create volume group on first disk"
+  lvg:
+    vg: testvg
+    pvs: "{{ loop_device1 }}"
+
+- name: Gets current vg size
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
+
+- name: Assert the testvg size is 33554432B
+  assert:
+    that:
+      - "'33554432B' == cmd_result.stdout"
+
+- name: Increases size in file
+  command: "dd if=/dev/zero bs=8MiB count=1 of={{ remote_tmp_dir }}/img1 conv=notrunc oflag=append"
+
+- name: "Reread size of file associated with loop_device1"
+  command: "losetup -c {{ loop_device1 }}"
+
+- name: "Reruns lvg with pvresize:no"
+  lvg:
+    vg: testvg
+    pvs: "{{ loop_device1 }}"
+    pvresize: false
+  register: cmd_result
+
+- assert:
+    that:
+      - cmd_result is not changed
+
+- name: Gets current vg size
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
+
+- name: Assert the testvg size is still 33554432B
+  assert:
+    that:
+      - "'33554432B' == cmd_result.stdout"
+
+- name: "Reruns lvg with pvresize:yes and check_mode:yes"
+  lvg:
+    vg: testvg
+    pvs: "{{ loop_device1 }}"
+    pvresize: true
+  check_mode: true
+  register: cmd_result
+
+- name: Assert that the module returned the state was changed
+  assert:
+    that:
+      - cmd_result is changed
+
+- name: Gets current vg size
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
+
+- name: Assert the testvg size is still 33554432B
+  assert:
+    that:
+      - "'33554432B' == cmd_result.stdout"
+
+- name: "Reruns lvg with pvresize:yes"
+  lvg:
+    vg: testvg
+    pvs: "{{ loop_device1 }}"
+    pvresize: true
+
+- name: Gets current vg size
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
+
+- name: Assert the testvg size is now 41943040B
+  assert:
+    that:
+      - "'41943040B' == cmd_result.stdout"

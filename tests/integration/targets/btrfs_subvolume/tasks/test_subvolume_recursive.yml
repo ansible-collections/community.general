@@ -1,0 +1,86 @@
+---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Recursively create subvolumes
+  block:
+    - name: Create a subvolume named '/recursive/son/grandson'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/recursive/son/grandson"
+        recursive: true
+        state: "present"
+      register: result
+    - name: Subvolume named '/recursive/son/grandson' created
+      ansible.builtin.assert:
+        that:
+          - result is changed
+
+    - name: Create a subvolume named '/recursive/son/grandson' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/recursive/son/grandson"
+        recursive: true
+        state: "present"
+      register: result
+    - name: Subvolume named '/recursive/son/grandson' created (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed
+
+    - name: Create a subvolume named '/recursive/daughter/granddaughter'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/recursive/daughter/granddaughter"
+        recursive: true
+        state: "present"
+      register: result
+    - name: Subvolume named '/recursive/son/grandson' created
+      ansible.builtin.assert:
+        that:
+          - result is changed
+
+    - name: Create a subvolume named '/recursive/daughter/granddaughter' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/recursive/daughter/granddaughter"
+        recursive: true
+        state: "present"
+      register: result
+    - name: Subvolume named '/recursive/son/grandson' created (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed
+
+- name: Recursively remove subvolumes
+  block:
+    - name: Remove subvolume '/recursive' and all descendents
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/recursive"
+        recursive: true
+        state: "absent"
+      register: result
+    - name: Subvolume '/recursive' removed
+      ansible.builtin.assert:
+        that:
+          - result is changed
+
+    - name: Remove subvolume '/recursive' and all descendents (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/recursive"
+        recursive: true
+        state: "absent"
+      register: result
+    - name: Subvolume '/recursive' removed (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed

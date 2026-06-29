@@ -1,0 +1,38 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: 9619-Ensure application hello-world is uninstalled
+  community.general.pipx:
+    name: hello-world
+    state: absent
+    global: true
+
+- name: 9619-Install application hello-world
+  community.general.pipx:
+    name: hello-world
+    source: hello-world==0.1
+    global: true
+  register: install_hw
+
+- name: 9619-Upgrade application hello-world
+  community.general.pipx:
+    state: latest
+    name: hello-world
+    global: true
+  register: latest_hw
+
+- name: 9619-Ensure application hello-world is uninstalled
+  community.general.pipx:
+    name: hello-world
+    state: absent
+    global: true
+
+- name: 9619-Assertions
+  ansible.builtin.assert:
+    that:
+      - install_hw is changed
+      - latest_hw is changed
+      - latest_hw.cmd[-3] == "upgrade"
+      - latest_hw.cmd[-2] == "--global"

@@ -1,0 +1,61 @@
+---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create parent subvolume 'container'
+  community.general.btrfs_subvolume:
+    automount: true
+    filesystem_label: "{{ btrfs_subvolume_target_label }}"
+    name: "/container"
+    state: "present"
+
+- name: Create a nested subvolume
+  block:
+    - name: Create a subvolume named 'nested' inside 'container'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/container/nested"
+        state: "present"
+      register: result
+    - name: Subvolume 'container/nested' created
+      ansible.builtin.assert:
+        that:
+          - result is changed
+    - name: Create a subvolume named 'nested' inside 'container' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/container/nested"
+        state: "present"
+      register: result
+    - name: Subvolume 'container/nested' created (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed
+
+- name: Remove a nested subvolume
+  block:
+    - name: Remove a subvolume named 'nested' inside 'container'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/container/nested"
+        state: "absent"
+      register: result
+    - name: Subvolume 'container/nested' removed
+      ansible.builtin.assert:
+        that:
+          - result is changed
+    - name: Remove a subvolume named 'nested' inside 'container' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/container/nested"
+        state: "absent"
+      register: result
+    - name: Subvolume 'container/nested' removed (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed

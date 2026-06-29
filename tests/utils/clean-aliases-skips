@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+import re
+import sys
+from pathlib import Path
+
+
+def sanitize(filepath, remotes_re):
+    with open(filepath) as fileread:
+        lines = fileread.readlines()
+
+    changed = False
+    out_lines = []
+    for ll in lines:
+        if not ll.startswith("skip/") or any(r.match(ll) for r in remotes_re):
+            out_lines.append(ll)
+            continue
+        changed = True
+
+    if changed:
+        print(f"sanitizing {filepath}", file=sys.stderr)
+        with open(filepath, "w") as filewrite:
+            filewrite.writelines(out_lines)
+
+
+def main():
+    remotes = [x.strip() for x in sys.stdin.readlines()]
+    remotes.append("docker")
+
+    print(f"Valid remotes: {', '.join(remotes)}", file=sys.stderr)
+
+    remotes_re = [re.compile(rf"^skip/{r}(\s.*)?$") for r in remotes]
+
+    for filepath in Path("tests/integration/targets").glob("*/aliases"):
+        sanitize(filepath, remotes_re)
+
+
+if __name__ == "__main__":
+    main()

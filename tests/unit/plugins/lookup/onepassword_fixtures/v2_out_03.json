@@ -1,0 +1,103 @@
+{
+  "id": "7t7qu2r35qyvqj3crujd4dqxmy",
+  "title": "Duplicate Sections",
+  "version": 3,
+  "vault": {
+    "id": "stpebbaccrq72xulgouxsk4p7y",
+    "name": "Personal"
+  },
+  "category": "LOGIN",
+  "last_edited_by": "LSGPJERUYBH7BFPHMZ2KKGL6AU",
+  "created_at": "2022-11-04T17:09:18Z",
+  "updated_at": "2022-11-04T17:22:19Z",
+  "additional_information": "flora",
+  "urls": [
+    {
+      "label": "website",
+      "primary": true,
+      "href": "https://acme.com/login"
+    }
+  ],
+  "sections": [
+    {
+      "id": "add more"
+    },
+    {
+      "id": "7osqcvd43i75teocdzbb6d7mie",
+      "label": "Section 2"
+    }
+  ],
+  "fields": [
+    {
+      "id": "username",
+      "type": "STRING",
+      "purpose": "USERNAME",
+      "label": "username",
+      "value": "flora",
+      "reference": "op://Personal/Duplicate Sections/username"
+    },
+    {
+      "id": "password",
+      "type": "CONCEALED",
+      "purpose": "PASSWORD",
+      "label": "password",
+      "value": "PtZGFLAibx-erTo7ywywEvh-n4syas97n-tuF2D.b8DdqA2vCjrvRGkNQxj!Gi9R",
+      "entropy": 379.564697265625,
+      "reference": "op://Personal/Duplicate Sections/password",
+      "password_details": {
+        "entropy": 379,
+        "generated": true,
+        "strength": "FANTASTIC"
+      }
+    },
+    {
+      "id": "notesPlain",
+      "type": "STRING",
+      "purpose": "NOTES",
+      "label": "notesPlain",
+      "reference": "op://Personal/Duplicate Sections/notesPlain"
+    },
+    {
+      "id": "4saaazkb7arwisj6ysctb4jmm4",
+      "section": {
+        "id": "add more"
+      },
+      "type": "STRING",
+      "label": "text",
+      "value": "text field the first",
+      "reference": "op://Personal/Duplicate Sections/add more/text"
+    },
+    {
+      "id": "4vtfkj4bwcmg7d5uf62wnpkp3a",
+      "section": {
+        "id": "add more"
+      },
+      "type": "STRING",
+      "label": "text",
+      "value": "text field the second",
+      "reference": "op://Personal/Duplicate Sections/add more/text"
+    },
+    {
+      "id": "wbrjnowkrgavpooomtht36gjqu",
+      "section": {
+        "id": "7osqcvd43i75teocdzbb6d7mie",
+        "label": "Section 2"
+      },
+      "type": "STRING",
+      "label": "s2 text",
+      "value": "first value",
+      "reference": "op://Personal/Duplicate Sections/Section 2/s2 text"
+    },
+    {
+      "id": "bddlz2fj2pebmtfhksbmcexy7m",
+      "section": {
+        "id": "7osqcvd43i75teocdzbb6d7mie",
+        "label": "Section 2"
+      },
+      "type": "STRING",
+      "label": "s2 text",
+      "value": "second value",
+      "reference": "op://Personal/Duplicate Sections/Section 2/s2 text"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+dn: cn=inc-schema,cn=schema,cn=config
+changetype: add
+objectClass: olcSchemaConfig
+cn: inc-schema
+olcObjectClasses: ( 1.3.6.1.4.1.4203.666.599 NAME 'uidNext' SUP top STRUCTURAL MUST ( cn $ uidNumber ) )

@@ -1,0 +1,29 @@
+---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required packages
+  ansible.builtin.package:
+    name:
+      - btrfs-progs # btrfs userspace
+      - util-linux # losetup
+  ignore_errors: true
+  register: btrfs_installed
+
+- name: Execute integration tests tests
+  block:
+    - ansible.builtin.include_tasks: 'setup.yml'
+
+    - name: "Execute test scenario for single device filesystem"
+      ansible.builtin.include_tasks: 'run_filesystem_tests.yml'
+      vars:
+        btrfs_subvolume_target_device: "{{ btrfs_subvolume_single_devices | first }}"
+        btrfs_subvolume_target_label: "{{ btrfs_subvolume_single_label }}"
+
+    - name: "Execute test scenario for multiple device configuration"
+      ansible.builtin.include_tasks: 'run_filesystem_tests.yml'
+      vars:
+        btrfs_subvolume_target_device: "{{ btrfs_subvolume_multiple_devices | first }}"
+        btrfs_subvolume_target_label: "{{ btrfs_subvolume_multiple_label }}"
+  when: btrfs_installed is success

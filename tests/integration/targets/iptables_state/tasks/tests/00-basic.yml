@@ -1,0 +1,307 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "ensure our next backup is not there (file)"
+  file:
+    path: "{{ iptables_saved }}"
+    state: absent
+
+- name: "ensure our next rule is not there (iptables)"
+  iptables:
+    chain: OUTPUT
+    jump: ACCEPT
+    state: absent
+
+
+#
+# Basic checks about invalid param/value handling.
+#
+- name: "trigger error about invalid param"
+  iptables_state:
+    name: foobar
+  register: iptables_state
+  ignore_errors: true
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is failed
+      - iptables_state.msg is match("Invalid options")
+    quiet: true
+
+
+- name: "trigger error about missing param 'state'"
+  iptables_state:
+    path: foobar
+  register: iptables_state
+  ignore_errors: true
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is failed
+      - iptables_state.msg is match("missing required arguments")
+    quiet: true
+
+
+- name: "trigger error about missing param 'path'"
+  iptables_state:
+    state: saved
+  register: iptables_state
+  ignore_errors: true
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is failed
+      - iptables_state.msg is match("missing required arguments")
+    quiet: true
+
+
+- name: "trigger error about invalid value for param 'state'"
+  iptables_state:
+    path: foobar
+    state: present
+  register: iptables_state
+  ignore_errors: true
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is failed
+      - iptables_state.msg is match("value of state must be one of")
+    quiet: true
+
+
+#
+# Play with the current state first. We will create a file to store it in, but
+# no more. These tests are for:
+# - idempotency
+# - check_mode
+#
+- name: "save state (check_mode, must report a change)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+  register: iptables_state
+  check_mode: true
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is changed
+      - iptables_state.initial_state == iptables_state.saved
+    quiet: true
+
+
+- name: "save state (must report a change)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+  register: iptables_state
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is changed
+      - iptables_state.initial_state == iptables_state.saved
+    quiet: true
+
+
+- name: "save state (idempotency, must NOT report a change)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+  register: iptables_state
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is not changed
+      - iptables_state.initial_state == iptables_state.saved
+    quiet: true
+
+
+- name: "save state (check_mode, must NOT report a change)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+  register: iptables_state
+  check_mode: true
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is not changed
+      - iptables_state.initial_state == iptables_state.saved
+    quiet: true
+
+
+# We begin with 'state=restored' by restoring the current state on itself.
+# This at least ensures the file produced with state=saved is suitable for
+# state=restored.
+
+- name: "state=restored check_mode=true changed=false"
+  block:
+    - name: "restore state (check_mode, must NOT report a change, no warning)"
+      iptables_state:
+        path: "{{ iptables_saved }}"
+        state: restored
+      register: iptables_state
+      check_mode: true
+
+    - name: "assert that results are as expected"
+      assert:
+        that:
+          - iptables_state is not changed
+          - iptables_state.initial_state == iptables_state.restored
+        quiet: true
+
+  rescue:
+    - name: "assert that results are not as expected for only one reason (xtables lock)"
+      assert:
+        that:
+          - iptables_state is failed
+          - iptables_state.stderr is search('xtables lock')
+        quiet: true
+      register: xtables_lock
+
+
+- name: "state=restored changed=false"
+  block:
+    - name: "restore state (must NOT report a change, warning about rollback & async)"
+      iptables_state:
+        path: "{{ iptables_saved }}"
+        state: restored
+      register: iptables_state
+
+    - name: "assert that results are as expected"
+      assert:
+        that:
+          - iptables_state is not changed
+          - iptables_state.initial_state == iptables_state.restored
+        quiet: true
+
+  rescue:
+    - name: "assert that results are not as expected for only one reason (xtables lock)"
+      assert:
+        that:
+          - iptables_state is failed
+          - iptables_state.stderr is search('xtables lock')
+        quiet: true
+      register: xtables_lock
+
+
+- name: "change iptables state (iptables)"
+  iptables:
+    chain: OUTPUT
+    jump: ACCEPT
+
+
+- name: "state=restored changed=true"
+  block:
+    - name: "restore state (check_mode, must report a change)"
+      iptables_state:
+        path: "{{ iptables_saved }}"
+        state: restored
+      register: iptables_state
+      check_mode: true
+
+    - name: "assert that results are as expected"
+      assert:
+        that:
+          - iptables_state is changed
+          - iptables_state.initial_state != iptables_state.restored
+        quiet: true
+
+  rescue:
+    - name: "assert that results are not as expected for only one reason (xtables lock)"
+      assert:
+        that:
+          - iptables_state is failed
+          - iptables_state.stderr is search('xtables lock')
+        quiet: true
+      register: xtables_lock
+
+
+- name: "state=restored changed=true"
+  block:
+    - name: "restore state (must report a change, async, no warning)"
+      iptables_state:
+        path: "{{ iptables_saved }}"
+        state: restored
+      register: iptables_state
+      async: "{{ ansible_timeout }}"
+      poll: 0
+
+    - name: "assert that results are as expected"
+      assert:
+        that:
+          - iptables_state is changed
+          - iptables_state.initial_state != iptables_state.restored
+          - iptables_state.applied
+        quiet: true
+
+  rescue:
+    - name: "assert that results are not as expected for only one reason (xtables lock)"
+      assert:
+        that:
+          - iptables_state is failed
+          - iptables_state.stderr is search('xtables lock')
+        quiet: true
+      register: xtables_lock
+
+
+- name: "state=restored changed=false"
+  block:
+    - name: "restore state (must NOT report a change, async, no warning)"
+      iptables_state:
+        path: "{{ iptables_saved }}"
+        state: restored
+      register: iptables_state
+      async: "{{ ansible_timeout }}"
+      poll: 0
+
+    - name: "assert that results are as expected"
+      assert:
+        that:
+          - iptables_state is not changed
+          - iptables_state.initial_state == iptables_state.restored
+        quiet: true
+
+  rescue:
+    - name: "assert that results are not as expected for only one reason (xtables lock)"
+      assert:
+        that:
+          - iptables_state is failed
+          - iptables_state.stderr is search('xtables lock')
+        quiet: true
+      register: xtables_lock
+
+
+- name: "state=restored changed=false"
+  block:
+    - name: "restore state (check_mode=yes, must NOT report a change, no warning)"
+      iptables_state:
+        path: "{{ iptables_saved }}"
+        state: restored
+      register: iptables_state
+      check_mode: true
+
+    - name: "assert that results are as expected"
+      assert:
+        that:
+          - iptables_state is not changed
+          - iptables_state.initial_state == iptables_state.restored
+        quiet: true
+
+  rescue:
+    - name: "assert that results are not as expected for only one reason (xtables lock)"
+      assert:
+        that:
+          - iptables_state is failed
+          - iptables_state.stderr is search('xtables lock')
+        quiet: true
+      register: xtables_lock

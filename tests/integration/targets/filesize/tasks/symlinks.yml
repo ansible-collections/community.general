@@ -1,0 +1,95 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Check that the module works with symlinks, as expected, i.e. as dd does:
+# follow symlinks.
+
+- name: Ensure the test file is absent
+  ansible.builtin.file:
+    path: "{{ filesize_testfile }}"
+    state: absent
+
+- name: Create a broken symlink in the same directory
+  ansible.builtin.file:
+    src: "{{ filesize_testfile | basename }}"
+    dest: "{{ filesize_testlink }}"
+    state: link
+    force: true
+    follow: false
+
+
+- name: Create a file with a size of 512 kB (512000 bytes) (check mode)
+  community.general.filesize:
+    path: "{{ filesize_testlink }}"
+    size: "512 kB"
+  register: filesize_test_symlink_01
+  check_mode: true
+
+- name: Create a file with a size of 512 kB (512000 bytes)
+  community.general.filesize:
+    path: "{{ filesize_testlink }}"
+    size: "512 kB"
+  register: filesize_test_symlink_02
+
+- name: Stat the resulting file (not the symlink)
+  ansible.builtin.stat:
+    path: "{{ filesize_test_symlink_02.path }}"
+  register: filesize_stat_symlink_02
+
+
+- name: Create a file with a size of 500 KiB (512000 bytes) (check mode, idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testlink }}"
+    size: "500 KiB"
+  register: filesize_test_symlink_03
+  check_mode: true
+
+- name: Create a file with a size of 500 KiB (512000 bytes) (idempotency)
+  community.general.filesize:
+    path: "{{ filesize_testlink }}"
+    size: "500 KiB"
+  register: filesize_test_symlink_04
+
+- name: Stat the file again (should remain the same)
+  ansible.builtin.stat:
+    path: "{{ filesize_test_symlink_04.path }}"
+  register: filesize_stat_symlink_04
+
+
+- name: Assert that results are as expected
+  ansible.builtin.assert:
+    that:
+      - filesize_test_symlink_01 is changed
+      - filesize_test_symlink_02 is changed
+      - filesize_test_symlink_03 is not changed
+      - filesize_test_symlink_04 is not changed
+
+      - filesize_test_symlink_02.cmd == filesize_test_symlink_01.cmd
+      - filesize_test_symlink_03.cmd is undefined
+      - filesize_test_symlink_04.cmd is undefined
+
+      - filesize_test_symlink_01.state is undefined
+      - filesize_test_symlink_02.state in ["file"]
+      - filesize_test_symlink_01.size is undefined
+      - filesize_test_symlink_02.size == 512000
+      - filesize_test_symlink_03.size == 512000
+      - filesize_test_symlink_04.size == 512000
+
+      - filesize_stat_symlink_02.stat.size == 512000
+      - filesize_stat_symlink_04.stat.size == 512000
+
+      - filesize_test_symlink_04.path == filesize_test_symlink_02.path
+      - filesize_test_symlink_04.path != filesize_testlink
+
+
+- name: Remove test file
+  ansible.builtin.file:
+    path: "{{ filesize_testfile }}"
+    state: absent
+
+- name: Remove test link
+  ansible.builtin.file:
+    path: "{{ filesize_testlink }}"
+    state: absent

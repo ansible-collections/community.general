@@ -1,0 +1,539 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# state=present
+
+- name: Test addition - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: addition_result
+
+- name: Verify addition test result - {{ method }}
+  assert:
+    that:
+      - addition_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of addition - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_addition_result
+
+- name: Verify idempotency of addition test result - {{ method }}
+  assert:
+    that:
+      - double_addition_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+# state=absent
+
+- name: Test removal - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+  register: removal_result
+
+- name: Verify removal test result - {{ method }}
+  assert:
+    that:
+      - removal_result is changed
+    msg: "state=absent shall remove flatpak when present"
+
+- name: Test idempotency of removal - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_removal_result
+
+- name: Verify idempotency of removal test result - {{ method }}
+  assert:
+    that:
+      - double_removal_result is not changed
+    msg: "state=absent shall not do anything when flatpak is not present"
+
+# state=latest
+
+- name: Test state=latest - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: latest_result
+
+- name: Verify state=latest test result - {{ method }}
+  assert:
+    that:
+      - latest_result is changed
+    msg: "state=latest shall add flatpak when absent"
+
+- name: Test idempotency of state=latest - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_latest_result
+
+- name: Verify idempotency of state=latest test result - {{ method }}
+  assert:
+    that:
+      - double_latest_result is not changed
+    msg: "state=latest shall not do anything when flatpak is already present"
+
+- name: Cleanup after state=present test - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+# state=present with url as name
+
+- name: Test addition with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: url_addition_result
+
+- name: Verify addition test result - {{ method }}
+  assert:
+    that:
+      - url_addition_result is changed
+    msg: "state=present with url as name shall add flatpak when absent"
+
+- name: Test idempotency of addition with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_url_addition_result
+
+- name: Verify idempotency of addition with url test result - {{ method }}
+  assert:
+    that:
+      - double_url_addition_result is not changed
+    msg: "state=present with url as name shall not do anything when flatpak is already present"
+
+# state=absent with url as name
+
+- name: Test removal with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+  register: url_removal_result
+  ignore_errors: true
+
+- name: Verify removal test result failed - {{ method }}
+  # It looks like flatpak has a bug when the hostname contains a port. If this is the case, it emits
+  # the following message, which we check for. If another error happens, we fail.
+  # Upstream issue: https://github.com/flatpak/flatpak/issues/4307
+  # (The second message happens with Ubuntu 18.04.)
+  assert:
+    that:
+      - >-
+        url_removal_result.msg in [
+          "error: Invalid branch 127.0.0.1:8000: Branch can't contain :",
+          "error: Invalid id http:: Name can't contain :",
+        ]
+  when: url_removal_result is failed
+
+- when: url_removal_result is not failed
+  block:
+
+    - name: Verify removal test result - {{ method }}
+      assert:
+        that:
+          - url_removal_result is changed
+        msg: "state=absent with url as name shall remove flatpak when present"
+
+    - name: Test idempotency of removal with url - {{ method }}
+      flatpak:
+        name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+        state: absent
+        method: "{{ method }}"
+        no_dependencies: true
+      register: double_url_removal_result
+
+    - name: Verify idempotency of removal with url test result - {{ method }}
+      assert:
+        that:
+          - double_url_removal_result is not changed
+        msg: "state=absent with url as name shall not do anything when flatpak is not present"
+
+- name: Make sure flatpak is really gone - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+# state=latest with url as name
+
+- name: Test state=latest with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: url_latest_result
+
+- name: Verify state=latest test result - {{ method }}
+  assert:
+    that:
+      - url_latest_result is changed
+    msg: "state=present with url as name shall add flatpak when absent"
+
+- name: Test idempotency of state=latest with url - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_url_latest_result
+
+- name: Verify idempotency of state=latest with url test result - {{ method }}
+  assert:
+    that:
+      - double_url_latest_result is not changed
+    msg: "state=present with url as name shall not do anything when flatpak is already present"
+
+- name: Cleanup after state=present with url test - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+# state=present with from_url
+
+- name: Test addition with from_url - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: from_url_addition_result
+
+- name: Verify addition with from_url test result - {{ method }}
+  assert:
+    that:
+      - from_url_addition_result is changed
+    msg: "state=present with from_url shall add flatpak when absent"
+
+- name: Test idempotency of addition with from_url - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_from_url_addition_result
+
+- name: Verify idempotency of addition with from_url test result - {{ method }}
+  assert:
+    that:
+      - double_from_url_addition_result is not changed
+    msg: "state=present with from_url shall not do anything when flatpak is already present"
+
+- name: Cleanup after state=present with from_url test - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+# from_url validation failures
+
+- name: Test from_url with URL in name fails - {{ method }}
+  flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+  register: from_url_url_name_result
+  ignore_errors: true
+
+- name: Verify from_url with URL in name fails - {{ method }}
+  assert:
+    that:
+      - from_url_url_name_result is failed
+      - from_url_url_name_result is not changed
+    msg: "from_url and URL in name shall fail"
+
+- name: Test from_url with multiple names fails - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+    from_url: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+  register: from_url_multi_name_result
+  ignore_errors: true
+
+- name: Verify from_url with multiple names fails - {{ method }}
+  assert:
+    that:
+      - from_url_multi_name_result is failed
+      - from_url_multi_name_result is not changed
+    msg: "from_url with multiple names shall fail"
+
+- name: Test from_url with non-http URL fails - {{ method }}
+  flatpak:
+    name: com.dummy.App1
+    from_url: file:///tmp/flatpak/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+  register: from_url_non_http_result
+  ignore_errors: true
+
+- name: Verify from_url with non-http URL fails - {{ method }}
+  assert:
+    that:
+      - from_url_non_http_result is failed
+      - from_url_non_http_result is not changed
+    msg: "from_url with non-http URL shall fail"
+
+# state=present with list of packages
+
+- name: Test addition with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: addition_result
+
+- name: Verify addition with list test result - {{ method }}
+  assert:
+    that:
+      - addition_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of addition with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_addition_result
+
+- name: Verify idempotency of addition with list test result - {{ method }}
+  assert:
+    that:
+      - double_addition_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+- name: Test addition with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: addition_result
+
+- name: Verify addition with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - addition_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of addition with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
+    remote: dummy-remote
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_addition_result
+
+- name: Verify idempotency of addition with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - double_addition_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+# state=absent with list of packages
+
+- name: Test removal with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+    state: absent
+    method: "{{ method }}"
+  register: removal_result
+
+- name: Verify removal with list test result - {{ method }}
+  assert:
+    that:
+      - removal_result is changed
+    msg: "state=absent shall remove flatpak when present"
+
+- name: Test idempotency of removal with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+    state: absent
+    method: "{{ method }}"
+  register: double_removal_result
+
+- name: Verify idempotency of removal with list test result - {{ method }}
+  assert:
+    that:
+      - double_removal_result is not changed
+    msg: "state=absent shall not do anything when flatpak is not present"
+
+- name: Test removal with list partially removed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+      - com.dummy.App3
+    state: absent
+    method: "{{ method }}"
+  register: removal_result
+
+- name: Verify removal with list partially removed test result - {{ method }}
+  assert:
+    that:
+      - removal_result is changed
+    msg: "state=absent shall remove flatpak when present"
+
+- name: Test idempotency of removal with list partially removed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+      - com.dummy.App3
+    state: absent
+    method: "{{ method }}"
+  register: double_removal_result
+
+- name: Verify idempotency of removal with list partially removed test result - {{ method }}
+  assert:
+    that:
+      - double_removal_result is not changed
+    msg: "state=absent shall not do anything when flatpak is not present"
+
+# state=latest with list of packages
+
+- name: Test state=latest with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: latest_result
+
+- name: Verify state=latest with list test result - {{ method }}
+  assert:
+    that:
+      - latest_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of state=latest with list - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_latest_result
+
+- name: Verify idempotency of state=latest with list test result - {{ method }}
+  assert:
+    that:
+      - double_latest_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+- name: Test state=latest with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: latest_result
+
+- name: Verify state=latest with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - latest_result is changed
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of state=latest with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - http://127.0.0.1:8000/repo/com.dummy.App2.flatpakref
+      - com.dummy.App3
+    remote: dummy-remote
+    state: latest
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_latest_result
+
+- name: Verify idempotency of state=latest with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - double_latest_result is not changed
+    msg: "state=present shall not do anything when flatpak is already present"
+
+- name: Cleanup after state=present with list test - {{ method }}
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+      - com.dummy.App3
+    state: absent
+    method: "{{ method }}"

@@ -1,0 +1,79 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- block:
+    - name: Create temporary file
+      tempfile:
+      register: tempfile
+
+    - name: Run tests
+      include_role:
+        name: callback
+      vars:
+        tests:
+          - name: Simple test
+            environment:
+              ANSIBLE_NOCOLOR: 'true'
+              ANSIBLE_FORCE_COLOR: 'false'
+              ANSIBLE_PYTHON_INTERPRETER: "{{ ansible_python_interpreter }}"
+              ANSIBLE_STDOUT_CALLBACK: community.general.tasks_only
+            playbook: |
+              - hosts: testhost
+                gather_facts: true
+                tasks:
+                  - name: Create file
+                    copy:
+                      dest: "{{ tempfile.path }}"
+                      content: |
+                        Foo bar
+
+                  - name: Modify file
+                    copy:
+                      dest: "{{ tempfile.path }}"
+                      content: |
+                        Foo bar
+                        Bar baz bam!
+            expected_output:
+              - ""
+              - "TASK [Gathering Facts] *********************************************************"
+              - "ok: [testhost]"
+              - ""
+              - "TASK [Create file] *************************************************************"
+              - "changed: [testhost]"
+              - ""
+              - "TASK [Modify file] *************************************************************"
+              - "changed: [testhost]"
+          - name: Different column width
+            environment:
+              ANSIBLE_NOCOLOR: 'true'
+              ANSIBLE_FORCE_COLOR: 'false'
+              ANSIBLE_PYTHON_INTERPRETER: "{{ ansible_python_interpreter }}"
+              ANSIBLE_STDOUT_CALLBACK: community.general.tasks_only
+              ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMNS: 40
+            playbook: |
+              - hosts: testhost
+                gather_facts: false
+                tasks:
+                  - name: A task
+                    debug:
+                      msg: Test.
+            expected_output:
+              - ""
+              - "TASK [A task] ***************************"
+              - "ok: [testhost] => {"
+              - '    "msg": "Test."'
+              - "}"
+
+
+  always:
+    - name: Clean up temp file
+      file:
+        path: "{{ tempfile.path }}"
+        state: absent

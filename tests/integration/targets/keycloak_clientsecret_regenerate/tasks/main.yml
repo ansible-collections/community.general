@@ -1,0 +1,49 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create realm
+  community.general.keycloak_realm: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      id: "{{ realm }}"
+      realm: "{{ realm }}"
+      state: present
+
+- name: Keycloak Client
+  community.general.keycloak_client: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      client_id: "{{ client_id }}"
+      state: present
+  register: client
+
+- name: Keycloak Client regenerate clientsecret by client_id
+  community.general.keycloak_clientsecret_regenerate: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      client_id: "{{ client_id }}"
+  register: regenerate_by_client_id
+
+- name: Assert that the client secret was retrieved
+  assert:
+    that:
+      - regenerate_by_client_id.end_state.type == "secret"
+      - regenerate_by_client_id.end_state.value | length >= 32
+
+- name: Keycloak Client regenerate clientsecret by id
+  community.general.keycloak_clientsecret_regenerate: "{{ auth_args | combine(call_args) }}"
+  vars:
+    call_args:
+      realm: "{{ realm }}"
+      id: "{{ client.end_state.id }}"
+  register: regenerate_by_id
+
+- name: Assert that client secret was regenerated
+  assert:
+    that:
+      - regenerate_by_id.end_state.value | length >= 32
+      - regenerate_by_id.end_state.value != regenerate_by_client_id.end_state.value

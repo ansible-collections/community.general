@@ -1,0 +1,16 @@
+{
+  "name": "{{ pkgng_test_pkg_name }}",
+  "origin": "{{ pkgng_test_pkg_category }}/{{ pkgng_test_pkg_name }}",
+  "version": "{{ pkgng_test_pkg_version | default('0') }}",
+  "comment": "{{ pkgng_test_pkg_name }} (Ansible Integration Test Package)",
+  "maintainer": "ansible-devel@googlegroups.com",
+  "www": "https://github.com/ansible-collections/community.general",
+  "abi": "FreeBSD:*:*",
+  "arch": "freebsd:*:*",
+  "prefix": "/usr/local",
+  "flatsize":0,
+  "licenselogic": "single",
+  "licenses":["GPLv3"],
+  "desc": "This package is only installed temporarily for integration testing of the community.general.pkgng Ansible module.\nIts version number is 0 so that ANY version of the real package, with the same name, will be considered an upgrade.\nIts architecture and abi are FreeBSD:*:* so that it will install on any version or architecture of FreeBSD,\nthus future-proof as long as the package MANIFEST format does not change\nand a wildcard in the version portion of the abi or arch field is not prohibited.",
+  "categories":["{{ pkgng_test_pkg_category }}"]
+}

@@ -1,0 +1,43 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- when: has_java_keytool
+  connection: local
+  block:
+    - name: Include tasks to create ssl materials on the controller
+      include_tasks: prepare.yml
+
+- set_fact:
+    ssl_backends: ['openssl']
+
+- set_fact:
+    ssl_backends: "{{ ssl_backends + ['cryptography'] }}"
+  when: cryptography_version.stdout is version('3.0', '>=')
+
+- when: has_java_keytool
+  block:
+    - name: Include tasks to play with 'certificate' and 'private_key' contents
+      include_tasks: tests.yml
+      vars:
+        remote_cert: false
+      loop: "{{ ssl_backends }}"
+      loop_control:
+        loop_var: ssl_backend
+
+    - name: Include tasks to create ssl materials on the remote host
+      include_tasks: prepare.yml
+
+    - name: Include tasks to play with 'certificate_path' and 'private_key_path' locations
+      include_tasks: tests.yml
+      vars:
+        remote_cert: true
+      loop: "{{ ssl_backends }}"
+      loop_control:
+        loop_var: ssl_backend

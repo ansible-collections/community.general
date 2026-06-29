@@ -1,0 +1,11 @@
+CONFIG_VERSION:28
+notes:abbridged_properties
+allow_chflags:0
+allow_mlock:0
+allow_mount:0
+allow_mount_devfs:0
+allow_mount_fusefs:0
+allow_mount_nullfs:0
+allow_mount_procfs:0
+allow_mount_tmpfs:0
+allow_mount_zfs:0

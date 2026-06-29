@@ -1,0 +1,37 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+rundeck_url: http://localhost:4440
+rundeck_api_version: 39
+rundeck_job_id: 3b8a6e54-69fb-42b7-b98f-f82e59238478
+
+system_acl_policy: |
+  description: Test ACL
+  context:
+    application: 'rundeck'
+  for:
+    project:
+      - allow:
+          - read
+  by:
+    group:
+      - users
+
+project_acl_policy: |
+  description: Test project acl
+  for:
+    resource:
+      - equals:
+          kind: node
+        allow: [read,refresh]
+      - equals:
+          kind: event
+        allow: [read]
+    job:
+      - allow: [run,kill]
+    node:
+      - allow: [read,run]
+  by:
+    group: users

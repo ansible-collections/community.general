@@ -1,0 +1,298 @@
+#!/usr/bin/python
+#
+# Copyright (c) 2018, Simon Weald <ansible@simonweald.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: memset_server_info
+author: "Simon Weald (@glitchcrab)"
+short_description: Retrieve server information
+notes:
+  - An API key generated using the Memset customer control panel is needed with the following minimum scope - C(server.info).
+description:
+  - Retrieve server information.
+extends_documentation_fragment:
+  - community.general._attributes
+  - community.general._attributes.info_module
+attributes:
+  check_mode:
+    version_added: 3.3.0
+    # This was backported to 2.5.4 and 1.3.11 as well, since this was a bugfix
+options:
+  api_key:
+    required: true
+    type: str
+    description:
+      - The API key obtained from the Memset control panel.
+  name:
+    required: true
+    type: str
+    description:
+      - The server product name (that is, C(testyaa1)).
+"""
+
+EXAMPLES = r"""
+- name: Get details for testyaa1
+  community.general.memset_server_info:
+    name: testyaa1
+    api_key: 5eb86c9896ab03919abcf03857163741
+  delegate_to: localhost
+"""
+
+RETURN = r"""
+memset_api:
+  description: Info from the Memset API.
+  returned: always
+  type: complex
+  contains:
+    backups:
+      description: Whether this server has a backup service.
+      returned: always
+      type: bool
+      sample: true
+    control_panel:
+      description: Whether the server has a control panel (for example cPanel).
+      returned: always
+      type: str
+      sample: 'cpanel'
+    data_zone:
+      description: The data zone the server is in.
+      returned: always
+      type: str
+      sample: 'Memset Public Cloud'
+    expiry_date:
+      description: Current expiry date of the server.
+      returned: always
+      type: str
+      sample: '2018-08-10'
+    firewall_rule_group:
+      description: Details about the firewall group this server is in.
+      returned: always
+      type: dict
+      sample:
+        {
+          "default_outbound_policy": "RETURN",
+          "name": "testyaa-fw1",
+          "nickname": "testyaa cPanel rules",
+          "notes": "",
+          "public": false,
+          "rules": {
+            "51d7db54d39c3544ef7c48baa0b9944f": {
+              "action": "ACCEPT",
+              "comment": "",
+              "dest_ip6s": "any",
+              "dest_ips": "any",
+              "dest_ports": "any",
+              "direction": "Inbound",
+              "ip_version": "any",
+              "ordering": 2,
+              "protocols": "icmp",
+              "rule_group_name": "testyaa-fw1",
+              "rule_id": "51d7db54d39c3544ef7c48baa0b9944f",
+              "source_ip6s": "any",
+              "source_ips": "any",
+              "source_ports": "any"
+            }
+          }
+        }
+    firewall_type:
+      description: The type of firewall the server has (for example self-managed, managed).
+      returned: always
+      type: str
+      sample: 'managed'
+    host_name:
+      description: The server's hostname.
+      returned: always
+      type: str
+      sample: 'testyaa1.miniserver.com'
+    ignore_monitoring_off:
+      description: When true, Memset does not remind the customer that monitoring is disabled.
+      returned: always
+      type: bool
+      sample: true
+    ips:
+      description: List of dictionaries of all IP addresses assigned to the server.
+      returned: always
+      type: list
+      sample:
+        [
+          {
+            "address": "1.2.3.4",
+            "bytes_in_today": 1000.0,
+            "bytes_in_yesterday": 2000.0,
+            "bytes_out_today": 1000.0,
+            "bytes_out_yesterday": 2000.0
+          }
+        ]
+    monitor:
+      description: Whether the server has monitoring enabled.
+      returned: always
+      type: bool
+      sample: true
+    monitoring_level:
+      description: The server's monitoring level (for example V(basic)).
+      returned: always
+      type: str
+      sample: 'basic'
+    name:
+      description: Server name (same as the service name).
+      returned: always
+      type: str
+      sample: 'testyaa1'
+    network_zones:
+      description: The network zone(s) the server is in.
+      returned: always
+      type: list
+      sample: ["reading"]
+    nickname:
+      description: Customer-set nickname for the server.
+      returned: always
+      type: str
+      sample: 'database server'
+    no_auto_reboot:
+      description: Whether or not to reboot the server if monitoring detects it down.
+      returned: always
+      type: bool
+      sample: true
+    no_nrpe:
+      description: Whether Memset should use NRPE to monitor this server.
+      returned: always
+      type: bool
+      sample: true
+    os:
+      description: The server's Operating System.
+      returned: always
+      type: str
+      sample: 'debian_stretch_64'
+    penetration_patrol:
+      description: Intrusion detection support level for this server.
+      returned: always
+      type: str
+      sample: 'managed'
+    penetration_patrol_alert_level:
+      description: The alert level at which notifications are sent.
+      returned: always
+      type: int
+      sample: 10
+    primary_ip:
+      description: Server's primary IP.
+      returned: always
+      type: str
+      sample: '1.2.3.4'
+    renewal_price_amount:
+      description: Renewal cost for the server.
+      returned: always
+      type: str
+      sample: '30.00'
+    renewal_price_currency:
+      description: Currency for renewal payments.
+      returned: always
+      type: str
+      sample: 'GBP'
+    renewal_price_vat:
+      description: VAT rate for renewal payments.
+      returned: always
+      type: str
+      sample: '20'
+    start_date:
+      description: Server's start date.
+      returned: always
+      type: str
+      sample: '2013-04-10'
+    status:
+      description: Current status of the server (for example live, onhold).
+      returned: always
+      type: str
+      sample: 'LIVE'
+    support_level:
+      description: Support level included with the server.
+      returned: always
+      type: str
+      sample: 'managed'
+    type:
+      description: What this server is (for example V(dedicated)).
+      returned: always
+      type: str
+      sample: 'miniserver'
+    vlans:
+      description: Dictionary of tagged and untagged VLANs this server is in.
+      returned: always
+      type: dict
+      sample:
+        {
+          "tagged": [],
+          "untagged": [
+            "testyaa-vlan1",
+            "testyaa-vlan2"
+          ]
+        }
+    vulnscan:
+      description: Vulnerability scanning level.
+      returned: always
+      type: str
+      sample: 'basic'
+"""
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils._memset import memset_api_call
+
+
+def get_facts(args=None):
+    """
+    Performs a simple API call and returns a JSON blob.
+    """
+    retvals, payload = dict(), dict()
+    has_changed, has_failed = False, False
+
+    payload["name"] = args["name"]
+
+    api_method = "server.info"
+    has_failed, msg, response = memset_api_call(api_key=args["api_key"], api_method=api_method, payload=payload)
+
+    if has_failed:
+        # this is the first time the API is called; incorrect credentials will
+        # manifest themselves at this point so we need to ensure the user is
+        # informed of the reason.
+        retvals["failed"] = has_failed
+        retvals["msg"] = msg
+        if response.status_code is not None:
+            retvals["stderr"] = f"API returned an error: {response.status_code}"
+        else:
+            retvals["stderr"] = f"{response.stderr}"
+        return retvals
+
+    # we don't want to return the same thing twice
+    memset_api = response.json()
+
+    retvals["changed"] = has_changed
+    retvals["failed"] = has_failed
+    retvals["msg"] = None
+    retvals["memset_api"] = memset_api
+
+    return retvals
+
+
+def main():
+    global module
+    module = AnsibleModule(
+        argument_spec=dict(api_key=dict(required=True, type="str", no_log=True), name=dict(required=True, type="str")),
+        supports_check_mode=True,
+    )
+
+    # populate the dict with the user-provided vars.
+    args = dict(module.params)
+
+    retvals = get_facts(args)
+
+    if retvals["failed"]:
+        module.fail_json(**retvals)
+    else:
+        module.exit_json(**retvals)
+
+
+if __name__ == "__main__":
+    main()

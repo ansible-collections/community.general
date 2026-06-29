@@ -1,0 +1,54 @@
+---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a simple subvolume
+  block:
+    - name: Create a subvolume named 'simple'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/simple"
+        state: "present"
+      register: result
+    - name: Subvolume named 'simple' created
+      ansible.builtin.assert:
+        that:
+          - result is changed
+    - name: Create a subvolume named 'simple' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/simple"
+        state: "present"
+      register: result
+    - name: Subvolume named 'simple' created (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed
+
+- name: Remove a simple subvolume
+  block:
+    - name: Remove a subvolume named 'simple'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/simple"
+        state: "absent"
+      register: result
+    - name: Subvolume named 'simple' removed
+      ansible.builtin.assert:
+        that:
+          - result is changed
+    - name: Remove a subvolume named 'simple' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/simple"
+        state: "absent"
+      register: result
+    - name: Subvolume named 'simple' removed (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed

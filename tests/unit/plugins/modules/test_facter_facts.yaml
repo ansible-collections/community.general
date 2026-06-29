@@ -1,0 +1,44 @@
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {check_rc: true}
+test_cases:
+  - id: simple run
+    output:
+      ansible_facts:
+        facter:
+          a: 1
+          b: 2
+          c: 3
+    mocks:
+      run_command:
+        - command: [/testbin/facter, --json]
+          environ: *env-def
+          rc: 0
+          out: >
+            { "a": 1, "b": 2, "c": 3 }
+          err: ''
+  - id: with args
+    input:
+      arguments:
+        - -p
+        - system_uptime
+        - timezone
+        - is_virtual
+    output:
+      ansible_facts:
+        facter:
+          a: 1
+          b: 2
+          c: 3
+    mocks:
+      run_command:
+        - command: [/testbin/facter, --json, -p, system_uptime, timezone, is_virtual]
+          environ: *env-def
+          rc: 0
+          out: >
+            { "a": 1, "b": 2, "c": 3 }
+          err: ''

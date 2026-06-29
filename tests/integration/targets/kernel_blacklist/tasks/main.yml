@@ -1,0 +1,155 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: set destination filename
+  set_fact:
+    bl_file: '{{ remote_tmp_dir }}/blacklist-ansible.conf'
+
+- name: copy blacklist file
+  copy:
+    src: 'files/blacklist'
+    dest: '{{ bl_file }}'
+
+- name: Original stat
+  stat:
+    path: '{{ bl_file }}'
+  register: orig_stat
+
+- name: remove non-existing item from list
+  community.general.kernel_blacklist:
+    blacklist_file: '{{ bl_file }}'
+    state: absent
+    name: zzzz
+  register: bl_test_1
+
+- name: add existing item from list
+  community.general.kernel_blacklist:
+    blacklist_file: '{{ bl_file }}'
+    state: present
+    name: bbbb
+  register: bl_test_1a
+
+- name: stat_test_1
+  stat:
+    path: '{{ bl_file }}'
+  register: stat_test_1
+
+- name: show bl_test_1
+  ansible.builtin.debug:
+    var: bl_test_1_depr_msgs
+  vars:
+    bl_test_1_depr_msgs: "{{ (bl_test_1.deprecations | default([])) | map(attribute='msg') }}"
+    # q('ansible.builtin.subelements', bl_test_1, 'deprecations', {'skip_missing': True}) }}"
+
+- name: assert file is unchanged
+  assert:
+    that:
+      - bl_test_1 is not changed
+      - bl_test_1a is not changed
+      - orig_stat.stat.size == stat_test_1.stat.size
+      - orig_stat.stat.checksum == stat_test_1.stat.checksum
+      - orig_stat.stat.mtime == stat_test_1.stat.mtime
+      - stat_test_1.stat.checksum == (expected_content | trim + '\n') | checksum
+  vars:
+    expected_content: |
+      # Copyright (c) Ansible Project
+      # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+      # SPDX{{ '' }}-License-Identifier: GPL-3.0-or-later
+
+      blacklist aaaa
+      blacklist bbbb
+      blacklist cccc
+
+- name: test deprecation
+  assert:
+    that:
+      - "'deprecations' not in bl_test_1"
+
+- name: add new item to list
+  community.general.kernel_blacklist:
+    blacklist_file: '{{ bl_file }}'
+    state: present
+    name: dddd
+  register: bl_test_2
+
+- name: slurp_test_2
+  slurp:
+    src: '{{ bl_file }}'
+  register: slurp_test_2
+
+- name: assert element is added
+  assert:
+    that:
+      - bl_test_2 is changed
+      - slurp_test_2.content|b64decode == (content | trim + '\n')
+  vars:
+    content: |
+      # Copyright (c) Ansible Project
+      # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+      # SPDX{{ '' }}-License-Identifier: GPL-3.0-or-later
+
+      blacklist aaaa
+      blacklist bbbb
+      blacklist cccc
+      blacklist dddd
+
+- name: remove item from list
+  community.general.kernel_blacklist:
+    blacklist_file: '{{ bl_file }}'
+    state: absent
+    name: bbbb
+  register: bl_test_3
+
+- name: slurp_test_3
+  slurp:
+    src: '{{ bl_file }}'
+  register: slurp_test_3
+
+- name: assert element is removed
+  assert:
+    that:
+      - bl_test_3 is changed
+      - slurp_test_3.content|b64decode == (content | trim + '\n')
+  vars:
+    content: |
+      # Copyright (c) Ansible Project
+      # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+      # SPDX{{ '' }}-License-Identifier: GPL-3.0-or-later
+
+      blacklist aaaa
+      blacklist cccc
+      blacklist dddd
+
+############################################################################################################################################
+#
+# Issue 7362
+#
+
+- name: Create /etc/modprobe.d
+  ansible.builtin.file:
+    path: /etc/modprobe.d
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  notify: Remove modprobe.d
+
+- name: Create cls_rsvp file
+  ansible.builtin.copy:
+    dest: /etc/modprobe.d/cls_rsvp-blacklist.conf
+    content: |
+      blacklist cls_rsvp
+    mode: '0644'
+
+- name: Block potentially affected (and unused) modules (7362)
+  community.general.kernel_blacklist:
+    name: "{{ line_item }}"
+    state: present
+    blacklist_file: "/etc/modprobe.d/{{ line_item }}-blacklist.conf"
+  with_items:
+    - cifs
+    - cls_rsvp
+  loop_control:
+    loop_var: line_item

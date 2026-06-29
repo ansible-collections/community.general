@@ -1,0 +1,527 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Start container
+  community.docker.docker_container:
+    name: mykeycloak
+    image: "quay.io/keycloak/keycloak:20.0.2"
+    command: start-dev
+    env:
+      KC_HTTP_RELATIVE_PATH: /auth
+      KEYCLOAK_ADMIN: "{{ admin_user }}"
+      KEYCLOAK_ADMIN_PASSWORD: "{{ admin_password }}"
+    ports:
+      - "8080:8080"
+    detach: true
+    auto_remove: true
+    memory: 2200M
+
+- name: Check default ports
+  ansible.builtin.wait_for:
+    host: "localhost"
+    port: "8080"
+    state: started         # Port should be open
+    delay: 30              # Wait before first check
+    timeout: 50            # Stop checking after timeout (sec)
+
+- name: Create a keycloak group
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: test-group
+    state: present
+  register: result
+  retries: 3
+  delay: 20
+  until: result is not failed
+
+- name: Assert group was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "test-group"
+      - result.end_state.path == "/test-group"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- set_fact:
+    test_group_id: "{{ result.end_state.id }}"
+
+- name: Group creation rerun (test for idempotency)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: test-group
+    state: present
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "test-group"
+      - result.end_state.path == "/test-group"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- name: Update the name of a keycloak group
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ test_group_id }}"
+    name: new-test-group
+    state: present
+  register: result
+
+- name: Assert that group name was updated
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "new-test-group"
+      - result.end_state.path == "/new-test-group"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- name: Delete a keycloak group by id
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ test_group_id }}"
+    state: absent
+  register: result
+
+- name: Assert that group was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Redo group deletion (check for idempotency)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ test_group_id }}"
+    state: absent
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Create a keycloak group with some custom attributes
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: my-new_group
+    attributes:
+      attrib1: value1
+      attrib2: value2
+      attrib3:
+        - item1
+        - item2
+  register: result
+
+- name: Assert that group was correctly created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "my-new_group"
+      - result.end_state.path == "/my-new_group"
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+      - result.end_state.attributes != {}
+      - result.end_state.attributes.attrib1 == ["value1"]
+      - result.end_state.attributes.attrib2 == ["value2"]
+      - result.end_state.attributes.attrib3 == ["item1", "item2"]
+
+- name: Delete a keycloak group based on name
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: my-new_group
+    state: absent
+  register: result
+
+- name: Assert that group was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+## subgroup tests
+## we already testet this so no asserts for this
+- name: Create a new base group for subgroup testing (test setup)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: rootgrp
+  register: subgrp_basegrp_result
+
+- name: Create a subgroup using parent id
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: subgrp1
+    parents:
+      - id: "{{ subgrp_basegrp_result.end_state.id }}"
+  register: result
+
+- name: Assert that subgroup was correctly created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "subgrp1"
+      - result.end_state.path == "/rootgrp/subgrp1"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- name: Recreate a subgroup using parent id (test idempotency)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: subgrp1
+    parents:
+      - id: "{{ subgrp_basegrp_result.end_state.id }}"
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "subgrp1"
+      - result.end_state.path == "/rootgrp/subgrp1"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- name: Changing name of existing group
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ result.end_state.id }}"
+    name: new-subgrp1
+    parents:
+      - id: "{{ subgrp_basegrp_result.end_state.id }}"
+  register: result
+
+- name: Assert that subgroup name has changed correctly
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "new-subgrp1"
+      - result.end_state.path == "/rootgrp/new-subgrp1"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- name: Create a subgroup using parent name
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: subgrp2
+    parents:
+      - name: rootgrp
+  register: result
+
+- name: Assert that subgroup was correctly created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "subgrp2"
+      - result.end_state.path == "/rootgrp/subgrp2"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- name: Recreate a subgroup using parent name (test idempotency)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: subgrp2
+    parents:
+      - name: rootgrp
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "subgrp2"
+      - result.end_state.path == "/rootgrp/subgrp2"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+## subgroup of subgroup tests
+- name: Create a subgroup of a subgroup using parent names (complete parent chain)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: subsubgrp
+    parents:
+      - name: rootgrp
+      - name: subgrp2
+  register: result
+
+- name: Assert subgroup of subgroup was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "subsubgrp"
+      - result.end_state.path == "/rootgrp/subgrp2/subsubgrp"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- name: ReCreate a subgroup of a subgroup using parent names (test idempotency)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: subsubgrp
+    parents:
+      - name: rootgrp
+      - name: subgrp2
+  register: result_subsubgrp
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result_subsubgrp is not changed
+      - result_subsubgrp.end_state != {}
+      - result_subsubgrp.end_state.name == "subsubgrp"
+      - result_subsubgrp.end_state.path == "/rootgrp/subgrp2/subsubgrp"
+      - result_subsubgrp.end_state.attributes == {}
+      - result_subsubgrp.end_state.clientRoles == {}
+      - result_subsubgrp.end_state.realmRoles == []
+      - result_subsubgrp.end_state.subGroups == []
+
+- name: Create a subgroup of a subgroup using direct parent id (incomplete parent chain)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: subsubsubgrp
+    parents:
+      - id: "{{ result_subsubgrp.end_state.id }}"
+  register: result
+
+- name: Assert subgroup of subgroup was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "subsubsubgrp"
+      - result.end_state.path == "/rootgrp/subgrp2/subsubgrp/subsubsubgrp"
+      - result.end_state.attributes == {}
+      - result.end_state.clientRoles == {}
+      - result.end_state.realmRoles == []
+      - result.end_state.subGroups == []
+
+- name: ReCreate a subgroup of a subgroup using direct parent id (test idempotency)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: subsubsubgrp
+    parents:
+      - id: "{{ result_subsubgrp.end_state.id }}"
+  register: result_subsubsubgrp
+
+- name: Assert that nothing changed
+  assert:
+    that:
+      - result_subsubsubgrp is not changed
+      - result_subsubsubgrp.end_state != {}
+      - result_subsubsubgrp.end_state.name == "subsubsubgrp"
+      - result_subsubsubgrp.end_state.path == "/rootgrp/subgrp2/subsubgrp/subsubsubgrp"
+      - result_subsubsubgrp.end_state.attributes == {}
+      - result_subsubsubgrp.end_state.clientRoles == {}
+      - result_subsubsubgrp.end_state.realmRoles == []
+      - result_subsubsubgrp.end_state.subGroups == []
+
+## subgroup deletion tests
+## note: in principle we already have tested group deletion in general
+##   enough already, but what makes it interesting here again is to
+##   see it works also properly for subgroups and groups with subgroups
+- name: Deleting a subgroup by id (no parents needed)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ result_subsubsubgrp.end_state.id  }}"
+    state: absent
+  register: result
+
+- name: Assert that subgroup was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Redo subgroup deletion (idempotency test)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    id: "{{ result_subsubsubgrp.end_state.id  }}"
+    state: absent
+  register: result
+
+- name: Assert that nothing changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Deleting a subgroup by name
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: new-subgrp1
+    parents:
+      - name: rootgrp
+    state: absent
+  register: result
+
+- name: Assert that subgroup was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Redo deleting a subgroup by name (idempotency test)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: new-subgrp1
+    parents:
+      - name: rootgrp
+    state: absent
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Delete keycloak group which has subgroups
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: rootgrp
+    state: absent
+  register: result
+
+- name: Assert that group was deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Redo delete keycloak group which has subgroups (idempotency test)
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: rootgrp
+    state: absent
+  register: result
+
+- name: Assert that group was deleted
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}

@@ -1,0 +1,328 @@
+#!/usr/bin/python
+#
+# Copyright (c) 2015, Steve Gargan <steve.gargan@gmail.com>
+# Copyright (c) 2018 Genome Research Ltd.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: consul_kv
+short_description: Manipulate entries in the key/value store of a Consul cluster
+description:
+  - Allows the retrieval, addition, modification and deletion of key/value entries in a Consul cluster using the agent. The
+    entire contents of the record, including the indices, flags and session are returned as RV(ignore:value).
+  - If the O(key) represents a prefix then note that when a value is removed, the existing value if any is returned as part
+    of the results.
+  - See http://www.consul.io/docs/agent/http.html#kv for more details.
+requirements:
+  - py-consul
+  - requests
+author:
+  - Steve Gargan (@sgargan)
+  - Colin Nolan (@colin-nolan)
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  state:
+    description:
+      - The action to take with the supplied key and value. If the state is V(present) and O(value) is set, the key contents
+        is set to the value supplied and RV(ignore:changed) is set to V(true) only if the value was different to the current contents.
+        If the state is V(present) and O(value) is not set, the existing value associated to the key is returned. The state
+        V(absent) is used to remove the key/value pair, again RV(ignore:changed) is set to V(true) only if the key actually existed
+        prior to the removal. An attempt can be made to obtain or free the lock associated with a key/value pair with the
+        states V(acquire) or V(release) respectively. A valid session must be supplied to make the attempt RV(ignore:changed) is V(true)
+        if the attempt is successful, V(false) otherwise.
+    type: str
+    choices: [absent, acquire, present, release]
+    default: present
+  key:
+    description:
+      - The key at which the value should be stored.
+    type: str
+    required: true
+  value:
+    description:
+      - The value should be associated with the given key, required if O(state) is V(present).
+    type: str
+  recurse:
+    description:
+      - If the key represents a prefix, each entry with the prefix can be retrieved by setting this to V(true).
+    type: bool
+  retrieve:
+    description:
+      - If the O(state) is V(present) and O(value) is set, perform a read after setting the value and return this value.
+    default: true
+    type: bool
+  session:
+    description:
+      - The session that should be used to acquire or release a lock associated with a key/value pair.
+    type: str
+  token:
+    description:
+      - The token key identifying an ACL rule set that controls access to the key value pair.
+    type: str
+  cas:
+    description:
+      - Used when acquiring a lock with a session. If the O(cas) is V(0), then Consul only puts the key if it does not already
+        exist. If the O(cas) value is non-zero, then the key is only set if the index matches the ModifyIndex of that key.
+    type: str
+  flags:
+    description:
+      - Opaque positive integer value that can be passed when setting a value.
+    type: str
+  host:
+    description:
+      - Host of the Consul agent.
+    type: str
+    default: localhost
+  port:
+    description:
+      - The port on which the Consul agent is running.
+    type: int
+    default: 8500
+  scheme:
+    description:
+      - The protocol scheme on which the Consul agent is running.
+    type: str
+    default: http
+  validate_certs:
+    description:
+      - Whether to verify the TLS certificate of the Consul agent.
+      - Instead of setting this to V(false), please consider using O(ca_path) instead.
+    type: bool
+    default: true
+  ca_path:
+    description:
+      - The CA bundle to use for HTTPS connections.
+    type: str
+    version_added: "12.6.0"
+  datacenter:
+    description:
+      - The name of the datacenter to query. If unspecified, the query defaults to the datacenter of the Consul agent on O(host).
+    type: str
+    version_added: 10.0.0
+"""
+
+
+EXAMPLES = r"""
+# If the key does not exist, the value associated to the "data" property in `retrieved_key` will be `None`
+# If the key value is empty string, `retrieved_key["data"]["Value"]` will be `None`
+- name: Retrieve a value from the key/value store
+  community.general.consul_kv:
+    key: somekey
+  register: retrieved_key
+
+- name: Add or update the value associated with a key in the key/value store
+  community.general.consul_kv:
+    key: somekey
+    value: somevalue
+
+- name: Remove a key from the store
+  community.general.consul_kv:
+    key: somekey
+    state: absent
+
+- name: Add a node to an arbitrary group using Consul inventory (see consul.ini)
+  community.general.consul_kv:
+    key: ansible/groups/dc1/somenode
+    value: top_secret
+
+- name: Register a key/value pair with an associated session
+  community.general.consul_kv:
+    key: stg/node/server_birthday
+    value: 20160509
+    session: "{{ sessionid }}"
+    state: acquire
+"""
+
+from ansible.module_utils.common.text.converters import to_text
+
+try:
+    import consul
+    from requests.exceptions import ConnectionError
+
+    python_consul_installed = True
+except ImportError:
+    python_consul_installed = False
+
+from ansible.module_utils.basic import AnsibleModule
+
+# Note: although the py-consul implementation implies that using a key with a value of `None` with `put` has a special
+# meaning (https://github.com/criteo/py-consul/blob/master/consul/api/kv.py), if not set in the subsequently API call,
+# the value just defaults to an empty string (https://www.consul.io/api/kv.html#create-update-key)
+NOT_SET = None
+
+
+def _has_value_changed(consul_client, key, target_value):
+    """
+    Uses the given Consul client to determine if the value associated to the given key is different to the given target
+    value.
+    :param consul_client: Consul connected client
+    :param key: key in Consul
+    :param target_value: value to be associated to the key
+    :return: tuple where the first element is the value of the "X-Consul-Index" header and the second is `True` if the
+    value has changed (i.e. the stored value is not the target value)
+    """
+    index, existing = consul_client.kv.get(key)
+    if not existing:
+        return index, True
+    try:
+        changed = to_text(existing["Value"], errors="surrogate_or_strict") != target_value
+        return index, changed
+    except UnicodeError:
+        # Existing value was not decodable but all values we set are valid utf-8
+        return index, True
+
+
+def execute(module):
+    state = module.params.get("state")
+
+    if state == "acquire" or state == "release":
+        lock(module, state)
+    elif state == "present":
+        if module.params.get("value") is NOT_SET:
+            get_value(module)
+        else:
+            set_value(module)
+    elif state == "absent":
+        remove_value(module)
+    else:
+        module.exit_json(msg=f"Unsupported state: {state}")
+
+
+def lock(module, state):
+    consul_api = get_consul_api(module)
+
+    session = module.params.get("session")
+    key = module.params.get("key")
+    value = module.params.get("value")
+
+    if not session:
+        module.fail(msg=f"{state} of lock for {key} requested but no session supplied")
+
+    index, changed = _has_value_changed(consul_api, key, value)
+
+    if changed and not module.check_mode:
+        if state == "acquire":
+            changed = consul_api.kv.put(
+                key, value, cas=module.params.get("cas"), acquire=session, flags=module.params.get("flags")
+            )
+        else:
+            changed = consul_api.kv.put(
+                key, value, cas=module.params.get("cas"), release=session, flags=module.params.get("flags")
+            )
+
+    module.exit_json(changed=changed, index=index, key=key)
+
+
+def get_value(module):
+    consul_api = get_consul_api(module)
+    key = module.params.get("key")
+
+    index, existing_value = consul_api.kv.get(key, recurse=module.params.get("recurse"))
+
+    module.exit_json(changed=False, index=index, data=existing_value)
+
+
+def set_value(module):
+    consul_api = get_consul_api(module)
+
+    key = module.params.get("key")
+    value = module.params.get("value")
+
+    if value is NOT_SET:
+        raise AssertionError(f'Cannot set value of "{key}" to `NOT_SET`')
+
+    index, changed = _has_value_changed(consul_api, key, value)
+
+    if changed and not module.check_mode:
+        changed = consul_api.kv.put(key, value, cas=module.params.get("cas"), flags=module.params.get("flags"))
+
+    stored = None
+    if module.params.get("retrieve"):
+        index, stored = consul_api.kv.get(key)
+
+    module.exit_json(changed=changed, index=index, key=key, data=stored)
+
+
+def remove_value(module):
+    """remove the value associated with the given key. if the recurse parameter
+    is set then any key prefixed with the given key will be removed."""
+    consul_api = get_consul_api(module)
+
+    key = module.params.get("key")
+
+    index, existing = consul_api.kv.get(key, recurse=module.params.get("recurse"))
+
+    changed = existing is not None
+    if changed and not module.check_mode:
+        consul_api.kv.delete(key, module.params.get("recurse"))
+
+    module.exit_json(changed=changed, index=index, key=key, data=existing)
+
+
+def get_consul_api(module):
+    ca_path = module.params.get("ca_path")
+    validate_certs = module.params.get("validate_certs")
+    verify = (ca_path or validate_certs) if validate_certs else False
+    return consul.Consul(
+        host=module.params.get("host"),
+        port=module.params.get("port"),
+        scheme=module.params.get("scheme"),
+        verify=verify,
+        token=module.params.get("token"),
+        dc=module.params.get("datacenter"),
+    )
+
+
+def test_dependencies(module):
+    if not python_consul_installed:
+        module.fail_json(
+            msg="python-consul required for this module. "
+            "see https://python-consul.readthedocs.io/en/latest/#installation"
+        )
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            cas=dict(type="str"),
+            datacenter=dict(type="str"),
+            flags=dict(type="str"),
+            key=dict(type="str", required=True, no_log=False),
+            host=dict(type="str", default="localhost"),
+            scheme=dict(type="str", default="http"),
+            validate_certs=dict(type="bool", default=True),
+            ca_path=dict(type="str"),
+            port=dict(type="int", default=8500),
+            recurse=dict(type="bool"),
+            retrieve=dict(type="bool", default=True),
+            state=dict(type="str", default="present", choices=["absent", "acquire", "present", "release"]),
+            token=dict(type="str", no_log=True),
+            value=dict(type="str", default=NOT_SET),
+            session=dict(type="str"),
+        ),
+        supports_check_mode=True,
+    )
+
+    test_dependencies(module)
+
+    try:
+        execute(module)
+    except ConnectionError as e:
+        module.fail_json(
+            msg=f"Could not connect to consul agent at {module.params.get('host')}:{module.params.get('port')}, error was {e}"
+        )
+    except Exception as e:
+        module.fail_json(msg=str(e))
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,111 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: create test ticket
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    project: "{{ proj }}"
+    operation: create
+    summary: test ticket
+    description: bla bla bla
+    issuetype: Task
+  register: issue
+- debug:
+    msg: Issue={{ issue }}
+- name: assert test ticket
+  assert:
+    that:
+      - issue is changed
+      - issue.meta.key.startswith(proj)
+
+- name: add comment bleep bleep
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    issue: "{{ issue.meta.key }}"
+    operation: comment
+    comment: bleep bleep!
+  register: comment_bleep_bleep
+- name: assert comment bleep bleep
+  assert:
+    that:
+      - comment_bleep_bleep is changed
+      - comment_bleep_bleep.meta.body == "bleep bleep!"
+      - comment_bleep_bleep.meta.body != None
+
+- name: transition -> In Progress with comment
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    issue: "{{ issue.meta.key }}"
+    operation: transition
+    status: Start Progress
+    comment: -> in progress
+  register: transition_inprog
+- name: assert transition -> In Progress with comment
+  assert:
+    that:
+      - transition_inprog is changed
+
+- name: change assignee
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    issue: "{{ issue.meta.key }}"
+    operation: edit
+    account_id: "{{ user2 }}"
+  register: assign
+- name: assert change assignee
+  assert:
+    that:
+      - assign is changed
+
+- name: Worklog on issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: Worklog
+    fields:
+      timeSpentSeconds: 1200
+  register: worklog
+- name: assert worklog -> with comment
+  assert:
+    that:
+      - worklog is changed
+      - worklog.meta.comment == 'Worklog'
+      - worklog.meta.timeSpentSeconds == 1200
+
+- name: transition -> Resolved with comment
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    issue: "{{ issue.meta.key }}"
+    operation: transition
+    status: Resolve Issue
+    comment: -> resolved
+    account_id: "{{ user1 }}"
+    fields:
+      resolution:
+        name: Done
+      description: wakawakawakawaka
+  register: transition_resolved
+- name: assert transition -> Resolved with comment
+  assert:
+    that:
+      - transition_resolved is changed
+
+- debug:
+    msg:
+      - Issue = {{ issue.meta.key }}
+      - URL = {{ issue.meta.self }}

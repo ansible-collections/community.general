@@ -1,0 +1,247 @@
+#!/usr/bin/python
+#
+# Scaleway VPC management module
+#
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: scaleway_private_network
+short_description: Scaleway private network management
+version_added: 4.5.0
+author: Pascal MANGIN (@pastral)
+description:
+  - This module manages private network on Scaleway account (U(https://developer.scaleway.com)).
+extends_documentation_fragment:
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  action_group:
+    version_added: 11.3.0
+
+options:
+  state:
+    type: str
+    description:
+      - Indicate desired state of the VPC.
+    default: present
+    choices:
+      - present
+      - absent
+
+  project:
+    type: str
+    description:
+      - Project identifier.
+    required: true
+
+  region:
+    type: str
+    description:
+      - Scaleway region to use (for example V(par1)).
+    required: true
+    choices:
+      - ams1
+      - EMEA-NL-EVS
+      - ams2
+      - ams3
+      - par1
+      - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - par3
+      - waw1
+      - EMEA-PL-WAW1
+      - waw2
+      - waw3
+
+  name:
+    type: str
+    description:
+      - Name of the VPC.
+  tags:
+    type: list
+    elements: str
+    description:
+      - List of tags to apply to the instance.
+    default: []
+"""
+
+EXAMPLES = r"""
+- name: Create an private network
+  community.general.scaleway_private_network:
+    project: '{{ scw_project }}'
+    name: 'vpc_one'
+    state: present
+    region: par1
+  register: vpc_creation_task
+
+- name: Make sure private network with name 'foo' is deleted in region par1
+  community.general.scaleway_private_network:
+    name: 'foo'
+    state: absent
+    region: par1
+"""
+
+RETURN = r"""
+scaleway_private_network:
+  description: Information on the VPC.
+  returned: success when O(state=present)
+  type: dict
+  sample:
+    {
+      "created_at": "2022-01-15T11:11:12.676445Z",
+      "id": "12345678-f1e6-40ec-83e5-12345d67ed89",
+      "name": "network",
+      "organization_id": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
+      "project_id": "a123b4cd-ef5g-678h-90i1-jk2345678l90",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3",
+        "tag4",
+        "tag5"
+      ],
+      "updated_at": "2022-01-15T11:12:04.624837Z",
+      "zone": "fr-par-2"
+    }
+"""
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
+    SCALEWAY_LOCATION,
+    Scaleway,
+    scaleway_argument_spec,
+)
+
+
+def get_private_network(api, name, page=1):
+    page_size = 10
+    response = api.get(
+        "private-networks", params={"name": name, "order_by": "name_asc", "page": page, "page_size": page_size}
+    )
+    if not response.ok:
+        msg = f"Error during get private network creation: {response.info['msg']}: '{response.json['message']}' ({response.json})"
+        api.module.fail_json(msg=msg)
+
+    if response.json["total_count"] == 0:
+        return None
+
+    i = 0
+    while i < len(response.json["private_networks"]):
+        if response.json["private_networks"][i]["name"] == name:
+            return response.json["private_networks"][i]
+        i += 1
+
+    # search on next page if needed
+    if (page * page_size) < response.json["total_count"]:
+        return get_private_network(api, name, page + 1)
+
+    return None
+
+
+def present_strategy(api, wished_private_network):
+    changed = False
+    private_network = get_private_network(api, wished_private_network["name"])
+    if private_network is not None:
+        if set(wished_private_network["tags"]) == set(private_network["tags"]):
+            return changed, private_network
+        else:
+            # private network need to be updated
+            data = {"name": wished_private_network["name"], "tags": wished_private_network["tags"]}
+            changed = True
+            if api.module.check_mode:
+                return changed, {"status": "private network would be updated"}
+
+            response = api.patch(path=f"private-networks/{private_network['id']}", data=data)
+            if not response.ok:
+                api.module.fail_json(msg=f"Error updating private network [{response.status_code}: {response.json}]")
+
+            return changed, response.json
+
+    # private network need to be create
+    changed = True
+    if api.module.check_mode:
+        return changed, {"status": "private network would be created"}
+
+    data = {
+        "name": wished_private_network["name"],
+        "project_id": wished_private_network["project"],
+        "tags": wished_private_network["tags"],
+    }
+
+    response = api.post(path="private-networks/", data=data)
+
+    if not response.ok:
+        api.module.fail_json(msg=f"Error creating private network [{response.status_code}: {response.json}]")
+
+    return changed, response.json
+
+
+def absent_strategy(api, wished_private_network):
+    changed = False
+    private_network = get_private_network(api, wished_private_network["name"])
+    if private_network is None:
+        return changed, {}
+
+    changed = True
+    if api.module.check_mode:
+        return changed, {"status": "private network would be destroyed"}
+
+    response = api.delete(f"private-networks/{private_network['id']}")
+
+    if not response.ok:
+        api.module.fail_json(msg=f"Error deleting private network [{response.status_code}: {response.json}]")
+
+    return changed, response.json
+
+
+def core(module):
+    wished_private_network = {
+        "project": module.params["project"],
+        "tags": module.params["tags"],
+        "name": module.params["name"],
+    }
+
+    region = module.params["region"]
+    module.params["api_url"] = SCALEWAY_LOCATION[region]["api_endpoint_vpc"]
+
+    api = Scaleway(module=module)
+    if module.params["state"] == "absent":
+        changed, summary = absent_strategy(api=api, wished_private_network=wished_private_network)
+    else:
+        changed, summary = present_strategy(api=api, wished_private_network=wished_private_network)
+    module.exit_json(changed=changed, scaleway_private_network=summary)
+
+
+def main():
+    argument_spec = scaleway_argument_spec()
+    argument_spec.update(
+        dict(
+            state=dict(default="present", choices=["absent", "present"]),
+            project=dict(required=True),
+            region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
+            tags=dict(type="list", elements="str", default=[]),
+            name=dict(),
+        )
+    )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+    )
+
+    core(module)
+
+
+if __name__ == "__main__":
+    main()

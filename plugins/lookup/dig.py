@@ -1,0 +1,510 @@
+# Copyright (c) 2015, Jan-Piet Mens <jpmens(at)gmail.com>
+# Copyright (c) 2017 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+name: dig
+author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
+short_description: Query DNS using the dnspython library
+requirements:
+  - dnspython (python library, http://www.dnspython.org/)
+description:
+  - The dig lookup runs queries against DNS servers to retrieve DNS records for a specific name (FQDN - fully qualified domain
+    name). It is possible to lookup any DNS record in this manner.
+  - There is a couple of different syntaxes that can be used to specify what record should be retrieved, and for which name.
+    It is also possible to explicitly specify the DNS server(s) to use for lookups.
+  - In its simplest form, the dig lookup plugin can be used to retrieve an IPv4 address (DNS A record) associated with FQDN.
+  - In addition to (default) A record, it is also possible to specify a different record type that should be queried. This
+    can be done by either passing-in additional parameter of format qtype=TYPE to the dig lookup, or by appending /TYPE to
+    the FQDN being queried.
+  - If multiple values are associated with the requested record, the results are returned as a comma-separated list. In
+    such cases you may want to pass option C(wantlist=true) to the lookup call, or alternatively use C(query) instead of C(lookup),
+    which results in the record values being returned as a list over which you can iterate later on.
+  - By default, the lookup relies on system-wide configured DNS servers for performing the query. It is also possible to
+    explicitly specify DNS servers to query using the @DNS_SERVER_1,DNS_SERVER_2,...,DNS_SERVER_N notation. This needs to
+    be passed-in as an additional parameter to the lookup.
+options:
+  _terms:
+    description: Domain(s) to query.
+    type: list
+    elements: str
+  qtype:
+    description:
+      - Record type to query.
+      - V(DLV) has been removed in community.general 6.0.0.
+      - V(CAA) has been added in community.general 6.3.0.
+    type: str
+    default: 'A'
+    choices:
+      - A
+      - ALL
+      - AAAA
+      - CAA
+      - CNAME
+      - DNAME
+      - DNSKEY
+      - DS
+      - HINFO
+      - LOC
+      - MX
+      - NAPTR
+      - NS
+      - NSEC3PARAM
+      - PTR
+      - RP
+      - RRSIG
+      - SOA
+      - SPF
+      - SRV
+      - SSHFP
+      - TLSA
+      - TXT
+  flat:
+    description: If 0 each record is returned as a dictionary, otherwise a string.
+    type: int
+    default: 1
+  retry_servfail:
+    description: Retry a nameserver if it returns SERVFAIL.
+    default: false
+    type: bool
+    version_added: 3.6.0
+  fail_on_error:
+    description:
+      - Abort execution on lookup errors.
+      - The default for this option is likely to change to V(true) in the future. The current default, V(false), is used for
+        backwards compatibility, and results in empty strings or the string V(NXDOMAIN) in the result in case of errors.
+    default: false
+    type: bool
+    version_added: 5.4.0
+  real_empty:
+    description:
+      - Return empty result without empty strings, and return empty list instead of V(NXDOMAIN).
+      - The default for this option is likely to change to V(true) in the future.
+      - This option is forced to V(true) if multiple domains to be queried are specified.
+    default: false
+    type: bool
+    version_added: 6.0.0
+  class:
+    description:
+      - Class.
+    type: str
+    default: 'IN'
+  tcp:
+    description: Use TCP to lookup DNS records.
+    default: false
+    type: bool
+    version_added: 7.5.0
+  port:
+    description: Use port as target port when looking up DNS records.
+    default: 53
+    type: int
+    version_added: 9.5.0
+notes:
+  - V(ALL) is not a record in itself, merely the listed fields are available for any record results you retrieve in the form
+    of a dictionary.
+  - While the plugin supports anything which C(dnspython) supports out of the box, only a subset can be converted into a dictionary.
+  - If you need to obtain the AAAA record (IPv6 address), you must specify the record type explicitly. Syntax for specifying
+    the record type is shown in the examples below.
+  - The trailing dot in most of the examples listed is purely optional, but is specified for completeness/correctness sake.
+"""
+
+EXAMPLES = r"""
+- name: Simple A record (IPV4 address) lookup for example.com
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.dig', 'example.com.')}}"
+
+- name: "The TXT record for example.org."
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.dig', 'example.org.', qtype='TXT') }}"
+
+- name: "The TXT record for example.org, alternative syntax."
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.dig', 'example.org./TXT') }}"
+
+- name: use in a loop
+  ansible.builtin.debug:
+    msg: "MX record for gmail.com {{ item }}"
+  with_items: "{{ lookup('community.general.dig', 'gmail.com./MX', wantlist=true) }}"
+
+- name: Lookup multiple names at once
+  ansible.builtin.debug:
+    msg: "A record found {{ item }}"
+  loop: "{{ query('community.general.dig', 'example.org.', 'example.com.', 'gmail.com.') }}"
+
+- name: Lookup multiple names at once (from list variable)
+  ansible.builtin.debug:
+    msg: "A record found {{ item }}"
+  loop: "{{ query('community.general.dig', *hosts) }}"
+  vars:
+    hosts:
+      - example.org.
+      - example.com.
+      - gmail.com.
+
+- ansible.builtin.debug:
+    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '192.0.2.5/PTR') }}"
+- ansible.builtin.debug:
+    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa./PTR') }}"
+- ansible.builtin.debug:
+    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa.', qtype='PTR') }}"
+- ansible.builtin.debug:
+    msg: "Querying 198.51.100.23 for IPv4 address for example.com. produces {{ lookup('dig', 'example.com', '@198.51.100.23') }}"
+
+- ansible.builtin.debug:
+    msg: "XMPP service for gmail.com. is available at {{ item.target }} on port {{ item.port }}"
+  with_items: "{{ lookup('community.general.dig', '_xmpp-server._tcp.gmail.com./SRV', flat=0, wantlist=true) }}"
+
+- name: Retry nameservers that return SERVFAIL
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.dig', 'example.org./A', retry_servfail=true) }}"
+"""
+
+RETURN = r"""
+_list:
+  description:
+    - List of composed strings or of dictionaries, with fields depending
+      on query type.
+  type: list
+  elements: raw
+  contains:
+    ALL:
+      description:
+        - C(owner), C(ttl), C(type).
+    A:
+      description:
+        - C(address).
+    AAAA:
+      description:
+        - C(address).
+    CAA:
+      description:
+        - C(flags).
+        - C(tag).
+        - C(value).
+      version_added: 6.3.0
+    CNAME:
+      description:
+        - C(target).
+    DNAME:
+      description:
+        - C(target).
+    DNSKEY:
+      description:
+        - C(flags), C(algorithm), C(protocol), C(key).
+    DS:
+      description:
+        - C(algorithm), C(digest_type), C(key_tag), C(digest).
+    HINFO:
+      description:
+        - C(cpu), C(os).
+    LOC:
+      description:
+        - C(latitude), C(longitude), C(altitude), C(size), C(horizontal_precision), C(vertical_precision).
+    MX:
+      description:
+        - C(preference), C(exchange).
+    NAPTR:
+      description:
+        - C(order), C(preference), C(flags), C(service), C(regexp), C(replacement).
+    NS:
+      description:
+        - C(target).
+    NSEC3PARAM:
+      description:
+        - C(algorithm), C(flags), C(iterations), C(salt).
+    PTR:
+      description:
+        - C(target).
+    RP:
+      description:
+        - C(mbox), C(txt).
+    SOA:
+      description:
+        - C(mname), C(rname), C(serial), C(refresh), C(retry), C(expire), C(minimum).
+    SPF:
+      description:
+        - C(strings).
+    SRV:
+      description:
+        - C(priority), C(weight), C(port), C(target).
+    SSHFP:
+      description:
+        - C(algorithm), C(fp_type), C(fingerprint).
+    TLSA:
+      description:
+        - C(usage), C(selector), C(mtype), C(cert).
+    TXT:
+      description:
+        - C(strings).
+"""
+
+import socket
+
+from ansible.errors import AnsibleError
+from ansible.module_utils.parsing.convert_bool import boolean
+from ansible.plugins.lookup import LookupBase
+from ansible.utils.display import Display
+
+from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
+
+try:
+    import dns.exception
+    import dns.name
+    import dns.rdataclass
+    import dns.resolver
+    import dns.reversename
+    from dns.rdatatype import (
+        AAAA,
+        CAA,
+        CNAME,
+        DNAME,
+        DNSKEY,
+        DS,
+        HINFO,
+        LOC,
+        MX,
+        NAPTR,
+        NS,
+        NSEC3PARAM,
+        PTR,
+        RP,
+        SOA,
+        SPF,
+        SRV,
+        SSHFP,
+        TLSA,
+        TXT,
+        A,
+    )
+
+    HAVE_DNS = True
+except ImportError:
+    HAVE_DNS = False
+
+
+display = Display()
+
+
+def make_rdata_dict(rdata):
+    """While the 'dig' lookup plugin supports anything which dnspython supports
+    out of the box, the following supported_types list describes which
+    DNS query types we can convert to a dict.
+
+    Note: adding support for RRSIG is hard work. :)
+    """
+    supported_types = {
+        A: ["address"],
+        AAAA: ["address"],
+        CAA: ["flags", "tag", "value"],
+        CNAME: ["target"],
+        DNAME: ["target"],
+        DNSKEY: ["flags", "algorithm", "protocol", "key"],
+        DS: ["algorithm", "digest_type", "key_tag", "digest"],
+        HINFO: ["cpu", "os"],
+        LOC: ["latitude", "longitude", "altitude", "size", "horizontal_precision", "vertical_precision"],
+        MX: ["preference", "exchange"],
+        NAPTR: ["order", "preference", "flags", "service", "regexp", "replacement"],
+        NS: ["target"],
+        NSEC3PARAM: ["algorithm", "flags", "iterations", "salt"],
+        PTR: ["target"],
+        RP: ["mbox", "txt"],
+        # RRSIG: ['type_covered', 'algorithm', 'labels', 'original_ttl', 'expiration', 'inception', 'key_tag', 'signer', 'signature'],
+        SOA: ["mname", "rname", "serial", "refresh", "retry", "expire", "minimum"],
+        SPF: ["strings"],
+        SRV: ["priority", "weight", "port", "target"],
+        SSHFP: ["algorithm", "fp_type", "fingerprint"],
+        TLSA: ["usage", "selector", "mtype", "cert"],
+        TXT: ["strings"],
+    }
+
+    rd = {}
+
+    if rdata.rdtype in supported_types:
+        fields = supported_types[rdata.rdtype]
+        for f in fields:
+            val = rdata.__getattribute__(f)
+
+            if isinstance(val, dns.name.Name):
+                val = dns.name.Name.to_text(val)
+
+            if rdata.rdtype == DS and f == "digest":
+                val = dns.rdata._hexify(rdata.digest).replace(" ", "")
+            if rdata.rdtype == DNSKEY and f == "algorithm":
+                val = int(val)
+            if rdata.rdtype == DNSKEY and f == "key":
+                val = dns.rdata._base64ify(rdata.key).replace(" ", "")
+            if rdata.rdtype == NSEC3PARAM and f == "salt":
+                val = dns.rdata._hexify(rdata.salt).replace(" ", "")
+            if rdata.rdtype == SSHFP and f == "fingerprint":
+                val = dns.rdata._hexify(rdata.fingerprint).replace(" ", "")
+            if rdata.rdtype == TLSA and f == "cert":
+                val = dns.rdata._hexify(rdata.cert).replace(" ", "")
+
+            rd[f] = val
+
+    return rd
+
+
+# ==============================================================
+# dig: Lookup DNS records
+#
+# --------------------------------------------------------------
+
+
+class LookupModule(LookupBase):
+    def run(self, terms, variables=None, **kwargs):
+        """
+        terms contains a string with things to `dig' for. We support the
+        following formats:
+            example.com                                     # A record
+            example.com  qtype=A                            # same
+            example.com/TXT                                 # specific qtype
+            example.com  qtype=txt                          # same
+            192.0.2.23/PTR                                 # reverse PTR
+              ^^ shortcut for 23.2.0.192.in-addr.arpa/PTR
+            example.net/AAAA  @nameserver                   # query specified server
+                               ^^^ can be comma-sep list of names/addresses
+
+            ... flat=0                                      # returns a dict; default is 1 == string
+        """
+        if HAVE_DNS is False:
+            raise AnsibleError("The dig lookup requires the python 'dnspython' library and it is not installed")
+
+        self.set_options(var_options=variables, direct=kwargs)
+        check_for_wrong_terms(self, direct=kwargs)
+
+        # Create Resolver object so that we can set NS if necessary
+        myres = dns.resolver.Resolver(configure=True)
+        edns_size = 4096
+        myres.use_edns(0, ednsflags=dns.flags.DO, payload=edns_size)
+
+        domains = []
+        nameservers = []
+        qtype = self.get_option("qtype")
+        flat = self.get_option("flat")
+        fail_on_error = self.get_option("fail_on_error")
+        real_empty = self.get_option("real_empty")
+        tcp = self.get_option("tcp")
+        port = self.get_option("port")
+        try:
+            rdclass = dns.rdataclass.from_text(self.get_option("class"))
+        except Exception as e:
+            raise AnsibleError(f"dns lookup illegal CLASS: {e}") from e
+        myres.retry_servfail = self.get_option("retry_servfail")
+
+        for t in terms:
+            if t.startswith("@"):  # e.g. "@10.0.1.2,192.0.2.1" is ok.
+                nsset = t[1:].split(",")
+                for ns in nsset:
+                    # Check if we have a valid IP address. If so, use that, otherwise
+                    # try to resolve name to address using system's resolver. If that
+                    # fails we bail out.
+                    try:
+                        socket.inet_aton(ns)
+                        nameservers.append(ns)
+                    except Exception:
+                        try:
+                            nsaddr = dns.resolver.query(ns)[0].address
+                            nameservers.append(nsaddr)
+                        except Exception as e:
+                            raise AnsibleError(f"dns lookup NS: {e}") from e
+                continue
+            if "=" in t:
+                try:
+                    opt, arg = t.split("=", 1)
+                except Exception:
+                    pass
+
+                if opt == "qtype":
+                    qtype = arg.upper()
+                elif opt == "flat":
+                    flat = int(arg)
+                elif opt == "class":
+                    try:
+                        rdclass = dns.rdataclass.from_text(arg)
+                    except Exception as e:
+                        raise AnsibleError(f"dns lookup illegal CLASS: {e}") from e
+                elif opt == "retry_servfail":
+                    myres.retry_servfail = boolean(arg)
+                elif opt == "fail_on_error":
+                    fail_on_error = boolean(arg)
+                elif opt == "real_empty":
+                    real_empty = boolean(arg)
+                elif opt == "tcp":
+                    tcp = boolean(arg)
+
+                continue
+
+            if "/" in t:
+                try:
+                    domain, qtype = t.split("/")
+                    domains.append(domain)
+                except Exception:
+                    domains.append(t)
+            else:
+                domains.append(t)
+
+        # print "--- domain = {domain} qtype={qtype} rdclass={rdclass}"
+
+        if port:
+            myres.port = port
+        if len(nameservers) > 0:
+            myres.nameservers = nameservers
+
+        if qtype.upper() == "PTR":
+            reversed_domains = []
+            for domain in domains:
+                try:
+                    n = dns.reversename.from_address(domain)
+                    reversed_domains.append(n.to_text())
+                except dns.exception.SyntaxError:
+                    pass
+                except Exception as e:
+                    raise AnsibleError(f"dns.reversename unhandled exception {e}") from e
+            domains = reversed_domains
+
+        if len(domains) > 1:
+            real_empty = True
+
+        ret = []
+
+        for domain in domains:
+            try:
+                answers = myres.query(domain, qtype, rdclass=rdclass, tcp=tcp)
+                for rdata in answers:
+                    s = rdata.to_text()
+                    if qtype.upper() == "TXT":
+                        s = s[1:-1]  # Strip outside quotes on TXT rdata
+
+                    if flat:
+                        ret.append(s)
+                    else:
+                        try:
+                            rd = make_rdata_dict(rdata)
+                            rd["owner"] = answers.canonical_name.to_text()
+                            rd["type"] = dns.rdatatype.to_text(rdata.rdtype)
+                            rd["ttl"] = answers.rrset.ttl
+                            rd["class"] = dns.rdataclass.to_text(rdata.rdclass)
+
+                            ret.append(rd)
+                        except Exception as err:
+                            if fail_on_error:
+                                raise AnsibleError(f"Lookup failed: {err}") from err
+                            ret.append(str(err))
+
+            except dns.resolver.NXDOMAIN as err:
+                if fail_on_error:
+                    raise AnsibleError(f"Lookup failed: {err}") from err
+                if not real_empty:
+                    ret.append("NXDOMAIN")
+            except (dns.resolver.NoAnswer, dns.resolver.Timeout, dns.resolver.NoNameservers) as err:
+                if fail_on_error:
+                    raise AnsibleError(f"Lookup failed: {err}") from err
+                if not real_empty:
+                    ret.append("")
+            except dns.exception.DNSException as err:
+                raise AnsibleError(f"dns.resolver unhandled exception {err}") from err
+
+        return ret

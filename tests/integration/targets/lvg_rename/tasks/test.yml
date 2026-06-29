@@ -1,0 +1,105 @@
+---
+# Copyright (c) Contributors to the Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Rename a VG in check mode
+  community.general.lvg_rename:
+    vg: testvg
+    vg_new: testvg_renamed
+  check_mode: true
+  register: check_mode_vg_rename
+
+- name: Check if testvg still exists
+  ansible.builtin.command:
+    cmd: vgs testvg
+  changed_when: false
+
+- name: Assert that renaming a VG is changed - check mode
+  assert:
+    that:
+      - check_mode_vg_rename is changed
+
+- name: Rename testvg to testvg_renamed
+  community.general.lvg_rename:
+    vg: testvg
+    vg_new: testvg_renamed
+  register: vg_renamed
+
+- name: Assert that renaming a VG is changed
+  assert:
+    that:
+      - vg_renamed is changed
+
+- name: Check if testvg does not exists
+  ansible.builtin.command:
+    cmd: vgs testvg
+  register: check_testvg_existence_result
+  failed_when: check_testvg_existence_result.rc == 0
+  changed_when: false
+
+- name: Check if testvg_renamed exists
+  ansible.builtin.command:
+    cmd: vgs testvg_renamed
+  changed_when: false
+
+- name: Rename testvg to testvg_renamed again for testing idempotency - check mode
+  community.general.lvg_rename:
+    vg: testvg
+    vg_new: testvg_renamed
+  check_mode: true
+  register: check_mode_vg_renamed_again
+
+- name: Rename testvg to testvg_renamed again for testing idempotency
+  community.general.lvg_rename:
+    vg: testvg
+    vg_new: testvg_renamed
+  register: vg_renamed_again
+
+- name: Assert that renaming a VG again is not changed
+  assert:
+    that:
+      - check_mode_vg_renamed_again is not changed
+      - vg_renamed_again is not changed
+
+- name: Rename a non-existing VG - check mode
+  community.general.lvg_rename:
+    vg: testvg
+    vg_new: testvg_ne
+  check_mode: true
+  ignore_errors: true
+  register: check_mode_ne_vg_rename
+
+- name: Rename a non-existing VG
+  community.general.lvg_rename:
+    vg: testvg
+    vg_new: testvg_ne
+  ignore_errors: true
+  register: ne_vg_rename
+
+- name: Assert that renaming a no-existing VG failed
+  assert:
+    that:
+      - check_mode_ne_vg_rename is failed
+      - ne_vg_rename is failed
+
+- name: Rename testvg_renamed to the existing testvg2 name - check mode
+  community.general.lvg_rename:
+    vg: testvg_renamed
+    vg_new: testvg2
+  check_mode: true
+  ignore_errors: true
+  register: check_mode_vg_rename_collision
+
+- name: Rename testvg_renamed to the existing testvg2 name
+  community.general.lvg_rename:
+    vg: testvg_renamed
+    vg_new: testvg2
+  ignore_errors: true
+  register: vg_rename_collision
+
+- name: Assert that renaming to an existing VG name failed
+  assert:
+    that:
+      - check_mode_vg_rename_collision is failed
+      - vg_rename_collision is failed

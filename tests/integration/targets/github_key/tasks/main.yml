@@ -1,0 +1,58 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the github_key module.
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test api_url parameter with GitHub.com
+  community.general.github_key:
+    token: "{{ fake_token }}"
+    name: "{{ test_key_name }}"
+    pubkey: "{{ test_pubkey }}"
+    state: present
+    api_url: "{{ github_api_url }}"
+  register: github_api_result
+  ignore_errors: true
+
+- name: Assert api_url parameter works with GitHub.com
+  assert:
+    that:
+      - github_api_result is failed
+      - '"Unauthorized" in github_api_result.msg or "401" in github_api_result.msg'
+
+- name: Test api_url parameter with GitHub Enterprise
+  community.general.github_key:
+    token: "{{ fake_token }}"
+    name: "{{ test_key_name }}"
+    pubkey: "{{ test_pubkey }}"
+    state: present
+    api_url: "{{ enterprise_api_url }}"
+  register: enterprise_api_result
+  ignore_errors: true
+
+- name: Assert api_url parameter works with GitHub Enterprise
+  assert:
+    that:
+      - enterprise_api_result is failed
+      - '"github.company.com" in enterprise_api_result.msg'
+
+- name: Test api_url with trailing slash
+  community.general.github_key:
+    token: "{{ fake_token }}"
+    name: "{{ test_key_name }}"
+    pubkey: "{{ test_pubkey }}"
+    state: present
+    api_url: "{{ enterprise_api_url_trailing }}"
+  register: trailing_slash_result
+  ignore_errors: true
+
+- name: Assert trailing slash is handled correctly
+  assert:
+    that:
+      - trailing_slash_result is failed
+      - '"github.company.com" in trailing_slash_result.msg'

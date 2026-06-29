@@ -1,0 +1,38 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- import_tasks: setup_no_value.yml
+
+- name: setting value
+  git_config:
+    name: core.name
+    value: foo
+    scope: global
+  register: set_result1
+
+- name: setting another value for same name
+  git_config:
+    name: core.name
+    value: bar
+    scope: global
+  register: set_result2
+
+- name: getting value
+  git_config_info:
+    name: core.name
+    scope: global
+  register: get_result
+
+- name: assert set changed and value is correct
+  assert:
+    that:
+      - set_result1 is changed
+      - set_result2 is changed
+      - get_result.config_value == 'bar'
+      - set_result1.diff.before == "\n"
+      - set_result1.diff.after == "foo\n"
+      - set_result2.diff.before == "foo\n"
+      - set_result2.diff.after == "bar\n"
+...

@@ -1,0 +1,52 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create temporary directory for package creation
+  tempfile:
+    state: directory
+  register: pkgng_test_outofdate_pkg_tempdir
+
+- name: Copy intentionally out-of-date package manifest to testhost
+  template:
+    src: MANIFEST.json.j2
+    # Plus-sign must be added at the destination
+    # CI doesn't like files with '+' in them in the repository
+    dest: '{{ pkgng_test_outofdate_pkg_tempdir.path }}/MANIFEST'
+
+- name: Create out-of-date test package file
+  command:
+    argv:
+      - pkg
+      - create
+      - '--verbose'
+      - '--out-dir'
+      - '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
+      - '--manifest'
+      - '{{ pkgng_test_outofdate_pkg_tempdir.path }}/MANIFEST'
+
+# pkg switched from .txz to .pkg in version 1.17.0
+# Might as well look for all valid pkg extensions.
+- name: Find created package file
+  find:
+    path: '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
+    use_regex: true
+    pattern: '.*\.(pkg|tzst|t[xbg]z|tar)'
+  register: pkgng_test_outofdate_pkg_tempfile
+
+- name: There should be only one package
+  assert:
+    that:
+      - pkgng_test_outofdate_pkg_tempfile.files | count == 1
+
+- name: Copy the created package file to the expected location
+  copy:
+    remote_src: true
+    src: '{{ pkgng_test_outofdate_pkg_tempfile.files[0].path }}'
+    dest: '{{ pkgng_test_outofdate_pkg_path }}'
+
+- name: Remove temporary directory
+  file:
+    state: absent
+    path: '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
