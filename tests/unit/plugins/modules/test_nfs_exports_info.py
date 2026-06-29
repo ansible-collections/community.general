@@ -37,7 +37,7 @@ def calculate_expected_digests(content_string: str) -> dict:
 
 def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
     mock_module = mock.MagicMock()
-    mock_module.params = {"output_format": "ips_per_share", "file_path": "/etc/exports"}
+    mock_module.params = {"file_path": "/etc/exports", "output_format": "ips_per_share"}
     mock_module.file_exists.return_value = True
     mock_module.warn.return_value = None
     mock_module.fail_json.side_effect = Exception("fail_json called")
@@ -61,7 +61,7 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
 
 def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
     mock_module = mock.MagicMock()
-    mock_module.params = {"output_format": "shares_per_ip", "file_path": "/etc/exports"}
+    mock_module.params = {"file_path": "/etc/exports", "output_format": "shares_per_ip"}
     mock_module.file_exists.return_value = True
     mock_module.warn.return_value = None
     mock_module.fail_json.side_effect = Exception("fail_json called")
