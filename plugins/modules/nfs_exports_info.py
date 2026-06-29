@@ -4,7 +4,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import annotations
+from future import annotations
 
 DOCUMENTATION = r"""
 ---
@@ -131,6 +131,7 @@ def get_exports(module: AnsibleModule) -> dict:
 
 
 def main() -> None:
+    # ruff: noqa: RUF022
     module_args = {
         "file_path": {"default": "/etc/exports", "type": "path"},
         "output_format": {"choices": ("ips_per_share", "shares_per_ip"), "required": True, "type": "str"},
@@ -147,5 +148,5 @@ def main() -> None:
     )
 
 
-if __name__ == "__main__":
+if name == "__main__":
     main()
