@@ -110,13 +110,27 @@ options:
     default: /oauth2/token
     description:
       - The path to append to the base URL to form a valid OAuth2 Access Grant request.
-      - Set this to an empty string V("") to let C(python-tss-sdk) auto-detect whether the host is Secret Server or the Delinea
-        Platform and select the correct token endpoint. This is required for Delinea Platform authentication with O(username)
-        and O(password), because the Platform token endpoint differs from the Secret Server V(/oauth2/token) endpoint.
+      - Used when O(token_path_source=token_path_uri) (the default). To let C(python-tss-sdk) auto-detect the token endpoint
+        instead (for example for Delinea Platform authentication), set O(token_path_source=auto).
     type: string
     env:
       - name: TSS_TOKEN_PATH_URI
     required: false
+  token_path_source:
+    description:
+      - How to determine the OAuth2 token endpoint path.
+      - V(token_path_uri) uses the O(token_path_uri) option as given.
+      - V(auto) ignores O(token_path_uri) and lets C(python-tss-sdk) auto-detect the token endpoint from O(base_url), selecting
+        the correct path for Secret Server or the Delinea Platform.
+    type: string
+    choices:
+      - token_path_uri
+      - auto
+    default: token_path_uri
+    env:
+      - name: TSS_TOKEN_PATH_SOURCE
+    required: false
+    version_added: 13.2.0
 """
 
 RETURN = r"""
@@ -274,7 +288,7 @@ EXAMPLES = r"""
           base_url='https://platform.delinea.app/',
           username='platform_service_username',
           password='platform_service_user_password',
-          token_path_uri=''
+          token_path_source='auto'
         )
       }}
   tasks:
@@ -544,6 +558,13 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
         check_for_wrong_terms(self, direct=kwargs)
 
+        # token_path_source selects how the OAuth2 token endpoint is resolved:
+        # "auto" passes an empty path so python-tss-sdk auto-detects the endpoint
+        # from base_url; the default uses token_path_uri as given.
+        token_path_uri = self.get_option("token_path_uri")
+        if self.get_option("token_path_source") == "auto":
+            token_path_uri = ""
+
         params = {
             "base_url": self.get_option("base_url"),
             "username": self.get_option("username"),
@@ -551,7 +572,7 @@ class LookupModule(LookupBase):
             "domain": self.get_option("domain"),
             "token": self.get_option("token"),
             "api_path_uri": self.get_option("api_path_uri"),
-            "token_path_uri": self.get_option("token_path_uri"),
+            "token_path_uri": token_path_uri,
         }
 
         try:

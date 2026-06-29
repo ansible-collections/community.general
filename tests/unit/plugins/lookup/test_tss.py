@@ -153,6 +153,53 @@ class TestLookupModule(TestCase):
             self.assertEqual(from_params.call_count, 2)
             self.assertEqual(len(tss._client_cache), 2)
 
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_token_path_source_auto_empties_token_path_uri(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", username="u", password="p", token_path_source="auto")
+            self.assertEqual(from_params.call_args.kwargs["token_path_uri"], "")
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_token_path_source_auto_overrides_explicit_token_path_uri(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(
+                self.VALID_TERMS,
+                base_url="dummy",
+                username="u",
+                password="p",
+                token_path_source="auto",
+                token_path_uri="/oauth2/token",
+            )
+            self.assertEqual(from_params.call_args.kwargs["token_path_uri"], "")
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_default_token_path_source_uses_configured_token_path_uri(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(
+                self.VALID_TERMS,
+                base_url="dummy",
+                username="u",
+                password="p",
+                token_path_uri="/custom/token",
+            )
+            self.assertEqual(from_params.call_args.kwargs["token_path_uri"], "/custom/token")
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_token_path_source_partitions_cache(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", username="u", password="p", token_path_source="auto")
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", username="u", password="p")
+            self.assertEqual(from_params.call_count, 2)
+            self.assertEqual(len(tss._client_cache), 2)
+
     @patch.multiple(
         TSS_IMPORT_PATH,
         HAS_TSS_SDK=True,
