@@ -70,7 +70,6 @@ file_digest:
 
 import hashlib
 import re
-
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -156,3 +155,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    
