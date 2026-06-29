@@ -301,7 +301,7 @@ class _ConsulModule:
 
         response_headers = None
         try:
-            if data is not None and not isinstance(data, (bytes, bytearray)):
+            if data is not None and not isinstance(data, bytes):
                 data = json.dumps(data)
                 headers["Content-Type"] = "application/json"
             if params:
