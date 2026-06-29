@@ -132,15 +132,8 @@ def get_exports(module: AnsibleModule) -> dict:
 
 def main() -> None:
     module_args = {
-        "file_path": {
-            "default": "/etc/exports",
-            "type": "path",
-        },
-        "output_format": {
-            "choices": ["ips_per_share", "shares_per_ip"],
-            "required": True,
-            "type": "str",
-        },
+        "file_path": {"default": "/etc/exports", "type": "path"},
+        "output_format": {"choices": ["ips_per_share", "shares_per_ip"], "required": True, "type": "str"},
     }
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
