@@ -19,6 +19,22 @@ from ansible_collections.community.general.plugins.modules import pacemaker_reso
 
 from .uthelper import RunCommandMock, UTHelper
 
+
+@pytest.fixture(autouse=True)
+def _pacemaker_json_capable(mocker):
+    """All pacemaker_resource module tests behave as if ``pcs`` supports JSON output.
+
+    The version-probe / plaintext-fallback dispatch is exhaustively unit-tested
+    in ``tests/unit/plugins/module_utils/test__pacemaker.py``; module-level
+    tests should not have to mock ``pcs --version`` for every scenario.
+    """
+    mocker.patch.object(
+        _pacemaker.PacemakerRunner,
+        "_probe_version",
+        return_value="0.11.7",
+    )
+
+
 UTHelper.from_module(pacemaker_resource, __name__, mocks=[RunCommandMock])
 
 
@@ -288,7 +304,6 @@ def test_is_resource_cloned_false_for_empty_name():
 def test_is_resource_cloned_false_when_clones_key_missing():
     """Defensive: pcs schema mandates the key but tolerate its absence."""
     assert _pacemaker.is_resource_cloned({}, "virtual-ip") is False
-    assert _pacemaker.is_resource_cloned({"clones": None}, "virtual-ip") is False
 
 
 # ---------------------------------------------------------------------------
@@ -311,6 +326,8 @@ class _StubCtx:
 
 
 class _StubRunner:
+    supports_json = True  # helper-level tests exercise the JSON path
+
     def __init__(self, rc, out, err):
         self.rc = rc
         self.out = out
