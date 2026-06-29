@@ -58,9 +58,9 @@ def fmt_resource_argument(value):
 def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
     """Return True if cluster property ``maintenance-mode`` is set to ``true``.
 
-    Uses ``pcs property config --output-format=json`` (pcs >= 0.11.6) and parses the
-    structured output rather than scraping plaintext, so locale-dependent or version-
-    dependent text formatting cannot affect the result.
+    Parses the structured ``pcs property config --output-format=json`` output rather than
+    scraping plaintext, so locale-dependent or version-dependent text formatting cannot
+    affect the result.
     """
     with runner("cli_action config output_format") as ctx:
         rc, out, err = ctx.run(cli_action="property")
@@ -68,8 +68,8 @@ def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
         data = json.loads(out)
     except (TypeError, ValueError):
         return False
-    for nvset in data.get("nvsets") or []:
-        for nvpair in nvset.get("nvpairs") or []:
+    for nvset in data.get("nvsets", []):
+        for nvpair in nvset.get("nvpairs", []):
             if nvpair.get("name") == "maintenance-mode" and nvpair.get("value") == "true":
                 return True
     return False
@@ -77,15 +77,10 @@ def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
 
 def get_pacemaker_resource_config(runner: CmdRunner) -> t.Optional[dict]:
     """Return parsed ``pcs resource config <name> --output-format=json`` for the
-    runner-bound ``name``, or ``None`` if the resource does not exist or the output
-    cannot be parsed.
-
-    Requires pcs >= 0.11.3.
+    runner-bound ``name``, or ``None`` if the output cannot be parsed.
     """
     with runner("cli_action state name output_format") as ctx:
         rc, out, err = ctx.run(cli_action="resource", state="config")
-    if rc != 0 or not out:
-        return None
     try:
         return json.loads(out)
     except (TypeError, ValueError):
@@ -97,7 +92,7 @@ def is_resource_cloned(config: t.Mapping, name: str) -> bool:
     config DTO. Matches both directly-cloned primitives and cloned groups, since pcs
     represents cloned-group membership the same way (``clones[].member_id == <group_id>``).
     """
-    return any(clone.get("member_id") == name for clone in config.get("clones") or [])
+    return any(clone.get("member_id") == name for clone in config.get("clones", []))
 
 
 def wait_for_resource(runner: CmdRunner, cli_noun: str, name: str, wait: int, sleep_interval: int = 5) -> None:

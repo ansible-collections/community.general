@@ -5,11 +5,10 @@
 ---
 anchors:
   environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
-  property_config_no_maintenance: &prop-no-maint |
+  property_config_no_maintenance: &prop-no-maint >
     {"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null, "nvpairs": []}]}
-  property_config_maintenance_true: &prop-maint-true |
-    {"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null,
-    "nvpairs": [{"id": "cib-bootstrap-options-maintenance-mode", "name": "maintenance-mode", "value": "true"}]}]}
+  property_config_maintenance_true: &prop-maint-true >
+    {"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null, "nvpairs": [{"id": "cib-bootstrap-options-maintenance-mode", "name": "maintenance-mode", "value": "true"}]}]}
 test_cases:
   - id: test_online_minimal_input_initial_online_all_no_maintenance
     input:

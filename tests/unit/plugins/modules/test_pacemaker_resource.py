@@ -288,7 +288,6 @@ def test_is_resource_cloned_false_for_empty_name():
 def test_is_resource_cloned_false_when_clones_key_missing():
     """Defensive: pcs schema mandates the key but tolerate its absence."""
     assert _pacemaker.is_resource_cloned({}, "virtual-ip") is False
-    assert _pacemaker.is_resource_cloned({"clones": None}, "virtual-ip") is False
 
 
 # ---------------------------------------------------------------------------

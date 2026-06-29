@@ -14,6 +14,8 @@ author:
 version_added: 11.2.0
 description:
   - Gather information about a Pacemaker cluster.
+requirements:
+  - pcs >= 0.11.6 (for JSON output support)
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.info_module
@@ -87,7 +89,7 @@ class PacemakerInfo(ModuleHelper):
             if rc != 0:
                 self.do_raise(f"pcs {cli_action} config failed with error (rc={rc}): {err}")
             out = json.loads(out)
-            return None if out == "" else out
+            return out if out else None
 
         return process
 
