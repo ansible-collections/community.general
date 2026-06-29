@@ -25,7 +25,7 @@ def fake_exports_content() -> str:
 def calculate_expected_digests(content_string: str) -> dict:
     content_bytes = content_string.encode("utf-8")
     digests = {}
-    for algo in ["md5", "sha1", "sha256"]:
+    for algo in ("md5", "sha1", "sha256"):
         try:
             hasher = hashlib.new(algo)
             hasher.update(content_bytes)

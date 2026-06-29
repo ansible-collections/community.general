@@ -90,7 +90,7 @@ def get_exports(module: AnsibleModule) -> dict:
     except OSError as e:
         module.fail_json(msg=f"Could not read {file_path}: {e}")
 
-    for algo in ["md5", "sha1", "sha256"]:
+    for algo in ("md5", "sha1", "sha256"):
         try:
             hasher = hashlib.new(algo)
             hasher.update(content.encode("utf-8"))
