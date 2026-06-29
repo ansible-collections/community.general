@@ -4,8 +4,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from future import annotations
-
 DOCUMENTATION = r"""
 ---
 module: nfs_exports_info
@@ -74,7 +72,7 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-def get_exports(module: AnsibleModule) -> dict:
+def get_exports(module):
     file_path = module.params["file_path"]
     output_format = module.params["output_format"]
 
@@ -130,7 +128,7 @@ def get_exports(module: AnsibleModule) -> dict:
     return {"exports_info": exports_info, "file_digest": file_digest}
 
 
-def main() -> None:
+def main():
     # ruff: noqa: RUF022
     module_args = {
         "file_path": {"default": "/etc/exports", "type": "path"},
