@@ -1,0 +1,2 @@
+bugfixes:
+  - opennebula inventory plugin - fix crash when retrieving VM without NIC (https://github.com/ansible-collections/community.general/pull/12361).
