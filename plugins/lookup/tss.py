@@ -113,10 +113,26 @@ options:
       - Set this to an empty string V("") to let C(python-tss-sdk) auto-detect whether the host is Secret Server or the Delinea
         Platform and select the correct token endpoint. This is required for Delinea Platform authentication with O(username)
         and O(password), because the Platform token endpoint differs from the Secret Server V(/oauth2/token) endpoint.
+      - Prefer setting O(server_type) instead, which selects the correct endpoint for you and takes precedence over this option.
     type: string
     env:
       - name: TSS_TOKEN_PATH_URI
     required: false
+  server_type:
+    description:
+      - The type of Delinea server to authenticate against.
+      - When set, this selects the OAuth2 token endpoint automatically and takes precedence over O(token_path_uri). V(secret_server)
+        uses the Secret Server endpoint V(/oauth2/token), while V(platform) leaves the token path empty so C(python-tss-sdk)
+        auto-detects the Delinea Platform token endpoint.
+      - When not set, the O(token_path_uri) option is used as configured.
+    type: string
+    choices:
+      - secret_server
+      - platform
+    env:
+      - name: TSS_SERVER_TYPE
+    required: false
+    version_added: 13.2.0
 """
 
 RETURN = r"""
@@ -274,7 +290,7 @@ EXAMPLES = r"""
           base_url='https://platform.delinea.app/',
           username='platform_service_username',
           password='platform_service_user_password',
-          token_path_uri=''
+          server_type='platform'
         )
       }}
   tasks:
@@ -544,6 +560,16 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
         check_for_wrong_terms(self, direct=kwargs)
 
+        # server_type, when set, selects the token endpoint and takes precedence
+        # over token_path_uri: platform leaves it empty so the SDK auto-detects
+        # the Delinea Platform endpoint, secret_server pins the Secret Server one.
+        token_path_uri = self.get_option("token_path_uri")
+        server_type = self.get_option("server_type")
+        if server_type == "platform":
+            token_path_uri = ""
+        elif server_type == "secret_server":
+            token_path_uri = "/oauth2/token"
+
         params = {
             "base_url": self.get_option("base_url"),
             "username": self.get_option("username"),
@@ -551,7 +577,7 @@ class LookupModule(LookupBase):
             "domain": self.get_option("domain"),
             "token": self.get_option("token"),
             "api_path_uri": self.get_option("api_path_uri"),
-            "token_path_uri": self.get_option("token_path_uri"),
+            "token_path_uri": token_path_uri,
         }
 
         try:
