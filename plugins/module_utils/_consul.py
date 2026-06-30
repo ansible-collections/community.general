@@ -33,9 +33,10 @@ def get_auth_headers(configuration):
 
 
 class RequestError(Exception):
-    def __init__(self, status, response_data=None):
+    def __init__(self, status, response_data=None, response_headers=None):
         self.status = status
         self.response_data = response_data
+        self.response_headers = response_headers
 
     def __str__(self):
         if self.response_data is None:
@@ -298,8 +299,9 @@ class _ConsulModule:
         if token:
             headers["X-Consul-Token"] = token
 
+        response_headers = None
         try:
-            if data is not None:
+            if data is not None and not isinstance(data, bytes):
                 data = json.dumps(data)
                 headers["Content-Type"] = "application/json"
             if params:
@@ -313,12 +315,14 @@ class _ConsulModule:
                 ca_path=ca_path,
             )
             response_data = response.read()
+            response_headers = response.headers
             status = response.status if hasattr(response, "status") else response.getcode()
 
         except urllib_error.URLError as e:
             if isinstance(e, urllib_error.HTTPError):
                 status = e.code
                 response_data = e.fp.read()
+                response_headers = e.headers
             else:
                 self._module.fail_json(
                     msg=f"Could not connect to consul agent at {module_params['host']}:{module_params['port']}, error was {e}"
@@ -326,17 +330,29 @@ class _ConsulModule:
                 raise
 
         if status >= HTTPStatus.BAD_REQUEST:  # 4xx and 5xx errors
-            raise RequestError(status, response_data)
+            raise RequestError(status, response_data, response_headers)
 
-        if response_data:
-            return json.loads(response_data)
-        return None
+        body = json.loads(response_data) if response_data else None
+        return body, response_headers
 
     def get(self, url_parts, **kwargs):
-        return self._request("GET", url_parts, **kwargs)
+        body, dummy = self._request("GET", url_parts, **kwargs)
+        return body
 
     def put(self, url_parts, **kwargs):
-        return self._request("PUT", url_parts, **kwargs)
+        body, dummy = self._request("PUT", url_parts, **kwargs)
+        return body
 
     def delete(self, url_parts, **kwargs):
-        return self._request("DELETE", url_parts, **kwargs)
+        body, dummy = self._request("DELETE", url_parts, **kwargs)
+        return body
+
+    def request(self, method, url_parts, **kwargs):
+        """Issue an arbitrary request and return ``(parsed_body, response_headers)``.
+
+        Use this when the caller needs HTTP response headers (for example
+        ``X-Consul-Index`` for blocking queries) in addition to the parsed
+        body. Plain CRUD callers should keep using :meth:`get`, :meth:`put`
+        and :meth:`delete`.
+        """
+        return self._request(method, url_parts, **kwargs)
