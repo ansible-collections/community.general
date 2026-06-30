@@ -129,6 +129,11 @@ options:
       - Whether the record should be the only one for that record type and record name.
       - Only use with O(state=present).
       - This deletes all other records with the same record name and type.
+      - For O(type=TXT), uniqueness is ensured based on value prefix to preserve different TXT record types.
+      - Known RFC-defined prefixes are V(v=spf1) (SPF), V(v=DKIM1) (DKIM), V(v=DMARC1) (DMARC), V(dkim=) (ADSP).
+      - Custom verification records use pattern V(key=) extracted from V(key=value) format.
+      - Only TXT records with matching prefixes are deleted; other TXT records are preserved.
+      - If no prefix pattern is identified, all other TXT records are preserved.
     type: bool
   state:
     description:
@@ -251,13 +256,51 @@ EXAMPLES = r"""
     account_api_key: dummyapitoken
     state: present
 
-# This deletes all other TXT records named "test.example.net"
-- name: Create TXT record "test.example.net" with value "unique value"
+# For TXT records with solo=true, only records with matching prefix are deleted
+# This deletes other TXT records with prefix "v=spf1" (SPF records)
+# Other TXT records (DKIM, DMARC, verification, etc.) are preserved
+- name: Create SPF TXT record with solo=true
   community.general.cloudflare_dns:
     domain: example.net
     record: test
     type: TXT
-    value: unique value
+    value: v=spf1 include:_spf.example.com ~all
+    solo: true
+    account_email: test@example.com
+    account_api_key: dummyapitoken
+    state: present
+
+# This deletes other TXT records with prefix "v=DMARC1" only
+- name: Create DMARC TXT record with solo=true
+  community.general.cloudflare_dns:
+    domain: example.net
+    record: _dmarc
+    type: TXT
+    value: v=DMARC1; p=none; rua=mailto:dmarc@example.com
+    solo: true
+    account_email: test@example.com
+    account_api_key: dummyapitoken
+    state: present
+
+# This deletes other TXT records with prefix "google-site-verification=" only
+- name: Create domain verification TXT record with solo=true
+  community.general.cloudflare_dns:
+    domain: example.net
+    record: test
+    type: TXT
+    value: google-site-verification=abc123xyz
+    solo: true
+    account_email: test@example.com
+    account_api_key: dummyapitoken
+    state: present
+
+# This preserves all other TXT records since no prefix pattern is identified
+- name: Create TXT record without a recognizable prefix
+  community.general.cloudflare_dns:
+    domain: example.net
+    record: test
+    type: TXT
+    value: some random text
     solo: true
     account_email: test@example.com
     account_api_key: dummyapitoken
@@ -441,6 +484,7 @@ record:
 """
 
 import json
+import re
 from urllib.parse import urlencode
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
@@ -454,6 +498,138 @@ def lowercase_string(param):
 
 def join_str(sep, *args):
     return sep.join([str(arg) for arg in args])
+
+
+def normalize_txt_split_strings(value):
+    """
+    Normalize TXT record value by joining split strings while preserving quotes.
+
+    Long DNS TXT records can be split into multiple quoted strings:
+    '"part1" "part2"' should be treated as '"part1part2"' for comparison
+
+    This function handles split strings but preserves quote differences so that
+    '"value"' and 'value' are considered different (and will trigger an update).
+
+    Args:
+        value: The TXT record value string
+
+    Returns:
+        Normalized string with split strings joined but quotes preserved
+
+    Examples:
+        '"part1" "part2"' -> '"part1part2"'
+        '"value"' -> '"value"' (unchanged)
+        'value' -> 'value' (unchanged)
+    """
+    if not value:
+        return value
+
+    # Check if value contains multiple quoted strings (split string pattern)
+    # Pattern: "..." "..." or '...' '...'
+
+    # Join multiple quoted strings together
+    # Match sequences of quoted strings with whitespace between them
+    def join_quoted_strings(match):
+        # Extract all the content between quotes and rejoin
+        parts = re.findall(r'["\']([^"\']*)["\']', match.group(0))
+        quote_char = match.group(0)[0]  # Use the first quote character found
+        return quote_char + ''.join(parts) + quote_char
+
+    # Pattern to match multiple consecutive quoted strings
+    normalized = re.sub(r'(["\'][^"\']*["\'](?:\s+["\'][^"\']*["\'])+)', join_quoted_strings, value)
+
+    return normalized
+
+
+def normalize_txt_value(value):
+    """
+    Normalize TXT record value by removing quotes and joining split strings.
+
+    This function is used for prefix extraction where quotes should be ignored.
+
+    Args:
+        value: The TXT record value string
+
+    Returns:
+        Normalized string with quotes removed and parts joined
+
+    Examples:
+        '"v=spf1 include:example.com ~all"' -> 'v=spf1 include:example.com ~all'
+        '"part1" "part2"' -> 'part1part2'
+        'v=spf1 ...' -> 'v=spf1 ...'
+    """
+    if not value:
+        return value
+
+    # Remove all quote characters (both single and double)
+    # This handles both quoted and split quoted strings
+    normalized = value.replace('"', '').replace("'", '')
+
+    # Remove extra whitespace that may have been between quoted parts
+    normalized = ' '.join(normalized.split())
+
+    return normalized
+
+
+def extract_txt_prefix(value):
+    r"""
+    Extract prefix from TXT record value for uniqueness checking.
+
+    Identifies known RFC-defined TXT record prefixes or custom key=value patterns.
+    Normalizes value first to handle quotes and split strings.
+
+    Known prefixes (RFC-defined, treated as complete prefix including value):
+    - SPF (RFC 7208): 'v=spf1'
+    - DKIM (RFC 6376): 'v=DKIM1'
+    - DMARC (RFC 7489): 'v=DMARC1'
+    - ADSP (RFC 5617): 'dkim='
+    - Domain verification patterns: matches ([\w-]+)=[\w-]+ to avoid base64 values
+
+    Args:
+        value: The TXT record value string
+
+    Returns:
+        The prefix string if found, None otherwise
+
+    Examples:
+        'v=spf1 include:_spf.example.com ~all' -> 'v=spf1'
+        '"v=spf1 include:_spf.example.com ~all"' -> 'v=spf1'
+        '"part1" "part2"' -> extracts prefix from 'part1part2'
+        'v=DKIM1; k=rsa; p=MIGfMA0...' -> 'v=DKIM1'
+        'v=DMARC1; p=none; rua=mailto:...' -> 'v=DMARC1'
+        'dkim=all' -> 'dkim='
+        'google-site-verification=abc123' -> 'google-site-verification='
+        'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQ==' -> None (base64, no prefix)
+        'some random text' -> None
+    """
+    if not value:
+        return None
+
+    # Normalize the value to handle quotes and split strings
+    cleaned_value = normalize_txt_value(value)
+
+    # Known RFC-defined TXT record prefixes (complete prefix including the value part)
+    # These are treated as atomic prefixes
+    known_prefixes = [
+        'v=spf1',      # SPF (RFC 7208)
+        'v=DKIM1',     # DKIM (RFC 6376)
+        'v=DMARC1',    # DMARC (RFC 7489)
+        'dkim=',       # ADSP (RFC 5617)
+    ]
+
+    # Check for known prefixes first
+    for prefix in known_prefixes:
+        if cleaned_value.startswith(prefix):
+            return prefix
+
+    # For other patterns, match key=value format where value starts with word/hyphen chars
+    # Pattern ([\w-]+)=[\w-]+ ensures we don't match base64 values ending in "=="
+    # This handles domain verification records like google-site-verification=abc123
+    match = re.match(r'^([\w-]+)=[\w-]+', cleaned_value)
+    if match:
+        return match.group(1) + '='
+
+    return None
 
 
 class CloudflareAPI:
@@ -488,6 +664,11 @@ class CloudflareAPI:
         self.value = module.params["value"]
         self.weight = module.params["weight"]
         self.zone = lowercase_string(module.params["zone"])
+        self.txt_single_record_update = False  # Track if TXT record should be updated instead of deleted
+        # Track operations for check mode reporting
+        self.records_to_delete = []
+        self.records_to_update = []
+        self.records_to_add = []
 
         if self.record == "@":
             self.record = self.zone
@@ -710,9 +891,88 @@ class CloudflareAPI:
         zone_id = self._get_zone_id(self.zone)
         records = self.get_dns_records(self.zone, self.type, search_record, search_value)
 
+        # For TXT records with solo=true, implement prefix-based deletion logic
+        txt_prefix = None
+        txt_single_record_update = False
+        if solo and self.type == 'TXT':
+            txt_prefix = extract_txt_prefix(self.value)
+            if txt_prefix:
+                # Count how many records have the matching prefix (excluding exact match)
+                # Normalize content for comparison to handle quotes and split strings
+                normalized_content = normalize_txt_value(content)
+                matching_prefix_records = []
+                for rr in records:
+                    if rr['type'] == 'TXT' and rr['name'] == search_record:
+                        normalized_rr_content = normalize_txt_value(rr['content'])
+                        # Skip if content is the same after normalization
+                        if normalized_rr_content == normalized_content:
+                            continue
+                        rr_prefix = extract_txt_prefix(rr['content'])
+                        if rr_prefix == txt_prefix:
+                            matching_prefix_records.append(rr)
+
+                # If only one record with matching prefix, skip deletion and let ensure_dns_record update it
+                if len(matching_prefix_records) == 1:
+                    txt_single_record_update = True
+                    self.txt_single_record_update = True  # Set instance variable for ensure_dns_record
+                    # Track for reporting
+                    self.records_to_update.append({
+                        'id': matching_prefix_records[0]['id'],
+                        'name': matching_prefix_records[0]['name'],
+                        'type': matching_prefix_records[0]['type'],
+                        'old_content': matching_prefix_records[0]['content'],
+                        'new_content': content,
+                        'prefix': txt_prefix
+                    })
+                elif len(matching_prefix_records) > 1:
+                    # Track multiple records to be deleted
+                    for rr in matching_prefix_records:
+                        self.records_to_delete.append({
+                            'id': rr['id'],
+                            'name': rr['name'],
+                            'type': rr['type'],
+                            'content': rr['content'],
+                            'prefix': txt_prefix
+                        })
+
         for rr in records:
             if solo:
-                if not ((rr["type"] == self.type) and (rr["name"] == search_record) and (rr["content"] == content)):
+                # Skip the record we're trying to create/ensure
+                # For TXT records, normalize content before comparison
+                if self.type == 'TXT':
+                    if (rr['type'] == self.type) and (rr['name'] == search_record) and (normalize_txt_value(rr['content']) == normalize_txt_value(content)):
+                        continue
+                else:
+                    if (rr['type'] == self.type) and (rr['name'] == search_record) and (rr['content'] == content):
+                        continue
+
+                # For TXT records, apply prefix-based deletion logic
+                if self.type == 'TXT' and txt_prefix:
+                    # If single record update mode, skip deletion (let ensure_dns_record handle the update)
+                    if txt_single_record_update:
+                        continue
+
+                    rr_prefix = extract_txt_prefix(rr['content'])
+                    # Only delete if the existing record has the same prefix
+                    if rr_prefix == txt_prefix:
+                        # Track deletion (if not already tracked in the prefix matching logic above)
+                        if not any(d['id'] == rr['id'] for d in self.records_to_delete):
+                            self.records_to_delete.append({
+                                'id': rr['id'],
+                                'name': rr['name'],
+                                'type': rr['type'],
+                                'content': rr['content'],
+                                'prefix': txt_prefix
+                            })
+                        self.changed = True
+                        if not self.module.check_mode:
+                            result, info = self._cf_api_call(f"/zones/{zone_id}/dns_records/{rr['id']}", "DELETE")
+                    # If no matching prefix, preserve the record (do nothing)
+                elif self.type == 'TXT' and not txt_prefix:
+                    # No prefix identified, preserve all other TXT records (do nothing)
+                    pass
+                else:
+                    # For non-TXT record types, delete all other records of the same type and name
                     self.changed = True
                     if not self.module.check_mode:
                         result, info = self._cf_api_call(f"/zones/{zone_id}/dns_records/{rr['id']}", "DELETE")
@@ -736,6 +996,12 @@ class CloudflareAPI:
             # CNAME records allows us to update the value if it
             # changes
             if self.type == "CNAME":
+                search_value = None
+
+            # For TXT records with solo=true, search without content filter
+            # to find existing records (will filter by content/prefix later)
+            # This avoids issues with quote differences in the API search
+            if self.type == 'TXT' and self.is_solo:
                 search_value = None
 
             new_record = {"type": self.type, "name": self.record, "content": self.value, "ttl": self.ttl}
@@ -859,6 +1125,31 @@ class CloudflareAPI:
 
         zone_id = self._get_zone_id(self.zone)
         records = self.get_dns_records(self.zone, self.type, search_record, search_value)
+
+        # For TXT records with solo=true, filter results by content/prefix
+        if self.type == 'TXT' and self.is_solo and len(records) > 0:
+            txt_prefix = extract_txt_prefix(self.value)
+            normalized_new_content = normalize_txt_value(self.value)
+            matching_records = []
+
+            if txt_prefix:
+                # Has a prefix: filter by matching prefix
+                for rr in records:
+                    rr_prefix = extract_txt_prefix(rr['content'])
+                    if rr_prefix == txt_prefix:
+                        matching_records.append(rr)
+            else:
+                # No prefix: filter by normalized content (ignoring quotes)
+                for rr in records:
+                    if normalize_txt_value(rr['content']) == normalized_new_content:
+                        matching_records.append(rr)
+
+            records = matching_records
+
+            # If exactly one match found, enable single-record update mode
+            if len(records) == 1:
+                self.txt_single_record_update = True
+
         # in theory this should be impossible as cloudflare does not allow
         # the creation of duplicate records but lets cover it anyways
         if len(records) > 1:
@@ -889,8 +1180,15 @@ class CloudflareAPI:
             if ("data" in new_record) and ("data" in cur_record):
                 if cur_record["data"] != new_record["data"]:
                     do_update = True
+            # For CNAME and TXT in single-record update mode, check content changes
             if (self.type == "CNAME") and (cur_record["content"] != new_record["content"]):
                 do_update = True
+            # For TXT records, normalize split strings but preserve quote differences
+            # This prevents unnecessary updates when provider auto-splits long strings
+            # but still detects when quotes are added/removed
+            if (self.type == 'TXT') and self.txt_single_record_update:
+                if normalize_txt_split_strings(cur_record['content']) != normalize_txt_split_strings(new_record['content']):
+                    do_update = True
             if cur_record["comment"] != new_record["comment"]:
                 do_update = True
             if sorted(cur_record["tags"]) != sorted(new_record["tags"]):
@@ -906,6 +1204,14 @@ class CloudflareAPI:
                 return result, self.changed
             else:
                 return records, self.changed
+        # No existing record found, will create a new one
+        # Track record creation for reporting
+        self.records_to_add.append({
+            'name': new_record['name'],
+            'type': self.type,
+            'content': new_record['content'],
+            'ttl': new_record['ttl']
+        })
         if self.module.check_mode:
             result = new_record
         else:
@@ -1066,10 +1372,15 @@ def main():
         if cf_api.is_solo:
             changed = cf_api.delete_dns_records(solo=cf_api.is_solo)
         result, changed = cf_api.ensure_dns_record()
-        if isinstance(result, list):
-            module.exit_json(changed=changed, result={"record": result[0]})
 
-        module.exit_json(changed=changed, result={"record": result})
+        # Include operation tracking information in all modes
+        result_dict = {
+            'record': result[0] if isinstance(result, list) else result,
+            'records_to_delete': cf_api.records_to_delete,
+            'records_to_update': cf_api.records_to_update,
+            'records_to_add': cf_api.records_to_add
+        }
+        module.exit_json(changed=changed, result=result_dict)
     else:
         # force solo to False, just to be sure
         changed = cf_api.delete_dns_records(solo=False)
