@@ -1,0 +1,4 @@
+bugfixes:
+  - consul_kv - honor the ``CONSUL_HTTP_ADDR``, ``CONSUL_HTTP_SSL``, ``CONSUL_HTTP_SSL_VERIFY``, and ``CONSUL_HTTP_TOKEN``
+    environment variables when the corresponding options are not specified. Module-side defaults of ``localhost``/``8500``/``http``
+    previously masked the environment fallback that py-consul (and python-consul before it) document.

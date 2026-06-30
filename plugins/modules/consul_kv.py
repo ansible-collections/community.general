@@ -67,6 +67,7 @@ options:
   token:
     description:
       - The token key identifying an ACL rule set that controls access to the key value pair.
+      - If unset, the value of the E(CONSUL_HTTP_TOKEN) environment variable is used.
     type: str
   cas:
     description:
@@ -80,22 +81,27 @@ options:
   host:
     description:
       - Host of the Consul agent.
+      - If unset, the host component of E(CONSUL_HTTP_ADDR) is used when set.
     type: str
     default: localhost
   port:
     description:
       - The port on which the Consul agent is running.
+      - If unset, the port component of E(CONSUL_HTTP_ADDR) is used when set.
     type: int
     default: 8500
   scheme:
     description:
       - The protocol scheme on which the Consul agent is running.
+      - If unset, E(CONSUL_HTTP_SSL) is consulted first (V(true) means V(https)), then the scheme component of
+        E(CONSUL_HTTP_ADDR) when set.
     type: str
     default: http
   validate_certs:
     description:
       - Whether to verify the TLS certificate of the Consul agent.
       - Instead of setting this to V(false), please consider using O(ca_path) instead.
+      - If unset, the value of E(CONSUL_HTTP_SSL_VERIFY) is used when set.
     type: bool
     default: true
   ca_path:
@@ -142,6 +148,9 @@ EXAMPLES = r"""
     state: acquire
 """
 
+import os
+from urllib.parse import urlparse
+
 from ansible.module_utils.common.text.converters import to_text
 
 try:
@@ -152,7 +161,46 @@ try:
 except ImportError:
     python_consul_installed = False
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleFallbackNotFound, AnsibleModule, env_fallback
+
+
+def _parse_consul_http_addr():
+    addr = os.environ.get("CONSUL_HTTP_ADDR")
+    if not addr:
+        return None
+    return urlparse(addr if "://" in addr else "//" + addr)
+
+
+def _env_consul_host(*_args, **_kwargs):
+    parsed = _parse_consul_http_addr()
+    if parsed is not None and parsed.hostname:
+        return parsed.hostname
+    raise AnsibleFallbackNotFound
+
+
+def _env_consul_port(*_args, **_kwargs):
+    parsed = _parse_consul_http_addr()
+    if parsed is not None and parsed.port is not None:
+        return parsed.port
+    raise AnsibleFallbackNotFound
+
+
+def _env_consul_scheme(*_args, **_kwargs):
+    ssl = os.environ.get("CONSUL_HTTP_SSL")
+    if ssl:
+        return "https" if ssl.lower() == "true" else "http"
+    parsed = _parse_consul_http_addr()
+    if parsed is not None and parsed.scheme:
+        return parsed.scheme
+    raise AnsibleFallbackNotFound
+
+
+def _env_consul_ssl_verify(*_args, **_kwargs):
+    val = os.environ.get("CONSUL_HTTP_SSL_VERIFY")
+    if val is None:
+        raise AnsibleFallbackNotFound
+    return val.lower() == "true"
+
 
 # Note: although the py-consul implementation implies that using a key with a value of `None` with `put` has a special
 # meaning (https://github.com/criteo/py-consul/blob/master/consul/api/kv.py), if not set in the subsequently API call,
@@ -297,15 +345,15 @@ def main():
             datacenter=dict(type="str"),
             flags=dict(type="str"),
             key=dict(type="str", required=True, no_log=False),
-            host=dict(type="str", default="localhost"),
-            scheme=dict(type="str", default="http"),
-            validate_certs=dict(type="bool", default=True),
+            host=dict(type="str", default="localhost", fallback=(_env_consul_host,)),
+            scheme=dict(type="str", default="http", fallback=(_env_consul_scheme,)),
+            validate_certs=dict(type="bool", default=True, fallback=(_env_consul_ssl_verify,)),
             ca_path=dict(type="str"),
-            port=dict(type="int", default=8500),
+            port=dict(type="int", default=8500, fallback=(_env_consul_port,)),
             recurse=dict(type="bool"),
             retrieve=dict(type="bool", default=True),
             state=dict(type="str", default="present", choices=["absent", "acquire", "present", "release"]),
-            token=dict(type="str", no_log=True),
+            token=dict(type="str", no_log=True, fallback=(env_fallback, ["CONSUL_HTTP_TOKEN"])),
             value=dict(type="str", default=NOT_SET),
             session=dict(type="str"),
         ),
