@@ -69,4 +69,5 @@ known-first-party = [
 ]
 known-third-party = [
     "ansible_collections.community.internal_test_tools",
+    "ansible_collections.community.library_inventory_filtering_v1",
 ]

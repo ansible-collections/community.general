@@ -1,0 +1,8 @@
+minor_changes:
+  - "The collection now depends on community.library_inventory_filtering_v1. This runtime dependency is used
+     by inventory plugins only, and will be automatically installed by ``ansible-galaxy collection install``.
+     If you install community.general by cloning its repository or extracting its release tarball to a specific
+     location, you also need to make sure to install community.library_inventory_filtering_v1 manually if you
+     use one of the affected inventory plugins (https://github.com/ansible-collections/community.general/pull/12302)."
+  - "opennebula inventory plugin - add new option ``filter`` that allows to filter hosts by variables
+     (https://github.com/ansible-collections/community.general/pull/12302)."
