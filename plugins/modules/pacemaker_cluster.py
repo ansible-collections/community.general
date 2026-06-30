@@ -14,6 +14,8 @@ author:
   - Dexter Le (@munchtoast)
 description:
   - This module can manage a pacemaker cluster and nodes from Ansible using the pacemaker CLI.
+requirements:
+  - pcs >= 0.11.6 (for JSON output support used by maintenance-mode detection)
 extends_documentation_fragment:
   - community.general._attributes
 attributes:

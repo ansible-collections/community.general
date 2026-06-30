@@ -14,6 +14,7 @@ import json
 
 import pytest
 
+from ansible_collections.community.general.plugins.module_utils import _pacemaker
 from ansible_collections.community.general.plugins.modules import pacemaker_resource
 
 from .uthelper import RunCommandMock, UTHelper
@@ -145,3 +146,246 @@ def test_present_wait_timeout_raises(mocker, capfd):
     assert result.get("failed") is True
     assert "Timed out" in result["msg"]
     assert "virtual-ip" in result["msg"]
+
+
+# ---------------------------------------------------------------------------
+# is_resource_cloned: pure-function tests over the parsed pcs JSON DTO
+# ---------------------------------------------------------------------------
+
+
+PRIMITIVE_VIRTUAL_IP: dict = {
+    "id": "virtual-ip",
+    "agent_name": {"standard": "ocf", "provider": "heartbeat", "type": "IPaddr2"},
+    "description": None,
+    "operations": [],
+    "meta_attributes": [],
+    "instance_attributes": [],
+    "utilization": [],
+}
+
+
+def _config(*, primitives=(), clones=(), groups=(), bundles=()):
+    return {
+        "primitives": list(primitives),
+        "clones": list(clones),
+        "groups": list(groups),
+        "bundles": list(bundles),
+    }
+
+
+def test_is_resource_cloned_true_for_primitive():
+    config = _config(
+        primitives=[PRIMITIVE_VIRTUAL_IP],
+        clones=[
+            {
+                "id": "virtual-ip-clone",
+                "description": None,
+                "member_id": "virtual-ip",
+                "meta_attributes": [],
+                "instance_attributes": [],
+            }
+        ],
+    )
+    assert _pacemaker.is_resource_cloned(config, "virtual-ip") is True
+
+
+def test_is_resource_cloned_true_for_group():
+    """Cloned-group case from the upstream bug report (locking-clone [locking])."""
+    config = _config(
+        clones=[
+            {
+                "id": "locking-clone",
+                "description": None,
+                "member_id": "locking",
+                "meta_attributes": [],
+                "instance_attributes": [],
+            }
+        ],
+        groups=[
+            {
+                "id": "locking",
+                "description": None,
+                "member_ids": ["dlm", "clvmd"],
+                "meta_attributes": [],
+                "instance_attributes": [],
+            }
+        ],
+    )
+    assert _pacemaker.is_resource_cloned(config, "locking") is True
+
+
+def test_is_resource_cloned_true_for_promotable_clone():
+    """A promotable clone is still a clone — detection is purely on member_id."""
+    config = _config(
+        primitives=[PRIMITIVE_VIRTUAL_IP],
+        clones=[
+            {
+                "id": "virtual-ip-clone",
+                "description": None,
+                "member_id": "virtual-ip",
+                "meta_attributes": [
+                    {
+                        "id": "virtual-ip-clone-meta_attributes",
+                        "options": {},
+                        "rule": None,
+                        "nvpairs": [
+                            {
+                                "id": "virtual-ip-clone-meta_attributes-promotable",
+                                "name": "promotable",
+                                "value": "true",
+                            }
+                        ],
+                    }
+                ],
+                "instance_attributes": [],
+            }
+        ],
+    )
+    assert _pacemaker.is_resource_cloned(config, "virtual-ip") is True
+
+
+def test_is_resource_cloned_false_when_no_clones():
+    config = _config(primitives=[PRIMITIVE_VIRTUAL_IP])
+    assert _pacemaker.is_resource_cloned(config, "virtual-ip") is False
+
+
+def test_is_resource_cloned_false_when_clone_targets_other_resource():
+    """A clone exists in the cluster but not for the requested resource."""
+    config = _config(
+        primitives=[
+            PRIMITIVE_VIRTUAL_IP,
+            {"id": "other", **{k: v for k, v in PRIMITIVE_VIRTUAL_IP.items() if k != "id"}},
+        ],
+        clones=[
+            {
+                "id": "other-clone",
+                "description": None,
+                "member_id": "other",
+                "meta_attributes": [],
+                "instance_attributes": [],
+            }
+        ],
+    )
+    assert _pacemaker.is_resource_cloned(config, "virtual-ip") is False
+
+
+def test_is_resource_cloned_false_for_empty_name():
+    config = _config(
+        clones=[
+            {
+                "id": "virtual-ip-clone",
+                "description": None,
+                "member_id": "virtual-ip",
+                "meta_attributes": [],
+                "instance_attributes": [],
+            }
+        ]
+    )
+    assert _pacemaker.is_resource_cloned(config, "") is False
+    assert _pacemaker.is_resource_cloned(config, None) is False
+
+
+def test_is_resource_cloned_false_when_clones_key_missing():
+    """Defensive: pcs schema mandates the key but tolerate its absence."""
+    assert _pacemaker.is_resource_cloned({}, "virtual-ip") is False
+
+
+# ---------------------------------------------------------------------------
+# get_pacemaker_maintenance_mode: tolerant JSON parsing
+# ---------------------------------------------------------------------------
+
+
+class _StubCtx:
+    def __init__(self, rc, out, err):
+        self._result = (rc, out, err)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def run(self, **_kwargs):
+        return self._result
+
+
+class _StubRunner:
+    def __init__(self, rc, out, err):
+        self.rc = rc
+        self.out = out
+        self.err = err
+
+    def __call__(self, *_args, **_kwargs):
+        return _StubCtx(self.rc, self.out, self.err)
+
+
+@pytest.mark.parametrize(
+    "out,expected",
+    [
+        # maintenance-mode true via nvpair
+        (
+            '{"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null,'
+            ' "nvpairs": [{"id": "x", "name": "maintenance-mode", "value": "true"}]}]}',
+            True,
+        ),
+        # maintenance-mode explicitly false
+        (
+            '{"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null,'
+            ' "nvpairs": [{"id": "x", "name": "maintenance-mode", "value": "false"}]}]}',
+            False,
+        ),
+        # maintenance-mode absent (only other properties present)
+        (
+            '{"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null,'
+            ' "nvpairs": [{"id": "x", "name": "cluster-name", "value": "hacluster"}]}]}',
+            False,
+        ),
+        # empty nvsets
+        ('{"nvsets": []}', False),
+        # nvset with empty nvpairs
+        (
+            '{"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null, "nvpairs": []}]}',
+            False,
+        ),
+        # malformed JSON — must not raise, must return False
+        ("not-valid-json", False),
+        # empty stdout — must not raise, must return False
+        ("", False),
+        # value present but not "true" (stricter than the old regex which would have matched substrings)
+        (
+            '{"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null,'
+            ' "nvpairs": [{"id": "x", "name": "maintenance-mode", "value": "TRUE"}]}]}',
+            False,
+        ),
+    ],
+)
+def test_get_pacemaker_maintenance_mode(out, expected):
+    runner = _StubRunner(rc=0, out=out, err="")
+    assert _pacemaker.get_pacemaker_maintenance_mode(runner) is expected
+
+
+# ---------------------------------------------------------------------------
+# get_pacemaker_resource_config: tolerant JSON parsing and rc handling
+# ---------------------------------------------------------------------------
+
+
+def test_get_pacemaker_resource_config_returns_none_on_nonzero_rc():
+    runner = _StubRunner(rc=1, out="", err="Error: unable to find resource: virtual-ip")
+    assert _pacemaker.get_pacemaker_resource_config(runner) is None
+
+
+def test_get_pacemaker_resource_config_returns_none_on_invalid_json():
+    runner = _StubRunner(rc=0, out="not-valid-json", err="")
+    assert _pacemaker.get_pacemaker_resource_config(runner) is None
+
+
+def test_get_pacemaker_resource_config_returns_parsed_dto():
+    out = (
+        '{"primitives": [], "clones": [{"id": "virtual-ip-clone", "description": null,'
+        ' "member_id": "virtual-ip", "meta_attributes": [], "instance_attributes": []}],'
+        ' "groups": [], "bundles": []}'
+    )
+    runner = _StubRunner(rc=0, out=out, err="")
+    config = _pacemaker.get_pacemaker_resource_config(runner)
+    assert config is not None
+    assert _pacemaker.is_resource_cloned(config, "virtual-ip") is True
