@@ -55,7 +55,7 @@ class IPAClient:
         self.protocol = protocol
         self.module = module
         self.headers = None
-        self.timeout = module.params.get("ipa_timeout")
+        self.timeout = module.params["ipa_timeout"]
         self.use_gssapi = False
 
     def get_base_url(self) -> str:
@@ -178,7 +178,7 @@ class IPAClient:
     def get_diff(self, ipa_data, module_data):
         result = []
         for key in module_data.keys():
-            mod_value = module_data.get(key, None)
+            mod_value = module_data.get(key, None)  # UNCERTAIN: 'module_data' might be a params dict — check callers
             if isinstance(mod_value, list):
                 default = []
             else:

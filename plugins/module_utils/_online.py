@@ -76,7 +76,7 @@ class Online:
     def __init__(self, module: AnsibleModule) -> None:
         self.module = module
         self.headers = {
-            "Authorization": f"Bearer {self.module.params.get('api_token')}",
+            "Authorization": f"Bearer {self.module.params['api_token']}",
             "User-Agent": self.get_user_agent_string(module),
             "Content-type": "application/json",
         }
@@ -86,7 +86,7 @@ class Online:
         results = self.get(f"/{self.name}")
         if not results.ok:
             raise OnlineException(
-                f"Error fetching {self.name} ({self.module.params.get('api_url')}/{self.name}) [{results.status_code}: {results.json['message']}]"
+                f"Error fetching {self.name} ({self.module.params['api_url']}/{self.name}) [{results.status_code}: {results.json['message']}]"
             )
 
         return results.json
@@ -94,7 +94,7 @@ class Online:
     def _url_builder(self, path):
         if path[0] == "/":
             path = path[1:]
-        return f"{self.module.params.get('api_url')}/{path}"
+        return f"{self.module.params['api_url']}/{path}"
 
     def send(self, method, path, data=None, headers=None):
         url = self._url_builder(path)
@@ -109,7 +109,7 @@ class Online:
             data=data,
             headers=self.headers,
             method=method,
-            timeout=self.module.params.get("api_timeout"),
+            timeout=self.module.params["api_timeout"],
         )
 
         # Exceptions in fetch_url may result in a status -1, the ensures a proper error to the user in all cases

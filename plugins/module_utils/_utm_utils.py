@@ -90,14 +90,14 @@ class UTM:
         """
         self.info_only = info_only
         self.module = module
-        self.request_url = f"{module.params.get('utm_protocol')}://{module.params.get('utm_host')}:{module.params.get('utm_port')}/api/objects/{endpoint}/"
+        self.request_url = f"{module.params['utm_protocol']}://{module.params['utm_host']}:{module.params['utm_port']}/api/objects/{endpoint}/"
 
         """
         The change_relevant_keys will be checked for changes to determine whether the object needs to be updated
         """
         self.change_relevant_keys = change_relevant_keys
         self.module.params["url_username"] = "token"
-        self.module.params["url_password"] = module.params.get("utm_token")
+        self.module.params["url_password"] = module.params["utm_token"]
         if all(elem in self.change_relevant_keys for elem in module.params.keys()):
             raise UTMModuleConfigurationError(
                 f"The keys {self.change_relevant_keys} to check are not in the modules keys:\n{list(module.params.keys())}"
@@ -106,9 +106,9 @@ class UTM:
     def execute(self):
         try:
             if not self.info_only:
-                if self.module.params.get("state") == "present":
+                if self.module.params["state"] == "present":
                     self._add()
-                elif self.module.params.get("state") == "absent":
+                elif self.module.params["state"] == "absent":
                     self._remove()
             else:
                 self._info()
@@ -170,9 +170,9 @@ class UTM:
         :return: A combined headers dict
         """
         default_headers = {"Accept": "application/json", "Content-type": "application/json"}
-        if self.module.params.get("headers") is not None:
+        if self.module.params["headers"] is not None:
             result = default_headers.copy()
-            result.update(self.module.params.get("headers"))
+            result.update(self.module.params["headers"])
         else:
             result = default_headers
         return result
@@ -208,7 +208,7 @@ class UTM:
         result = None
         if response is not None:
             results = json.loads(response.read())
-            result = next((d for d in results if d["name"] == module.params.get("name")), None)
+            result = next((d for d in results if d["name"] == module.params["name"]), None)
         return info, result
 
     def _clean_result(self, result):
@@ -235,4 +235,4 @@ class UTM:
         :param result: The result from the query
         :return:
         """
-        return any(module.params.get(key) != result[key] for key in keys)
+        return any(module.params[key] != result[key] for key in keys)

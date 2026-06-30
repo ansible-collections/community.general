@@ -61,9 +61,9 @@ def keycloak_clientsecret_module_resolve_params(module: AnsibleModule, kc: Keycl
     :return: tuple of id, realm
     """
 
-    realm = module.params.get("realm")
-    id = module.params.get("id")
-    client_id = module.params.get("client_id")
+    realm = module.params["realm"]
+    id = module.params["id"]
+    client_id = module.params["client_id"]
 
     # only lookup the client_id if id isn't provided.
     # in the case that both are provided, prefer the ID, since it is one

@@ -289,7 +289,7 @@ class _ConsulModule:
             # Remove values that are None
             params = {k: v for k, v in params.items() if v is not None}
 
-        ca_path = module_params.get("ca_path")
+        ca_path = module_params.get("ca_path")  # UNCERTAIN: 'module_params' might be a params dict — check callers
         base_url = f"{module_params['scheme']}://{module_params['host']}:{module_params['port']}/v1"
         url = "/".join([base_url] + list(url_parts))
 

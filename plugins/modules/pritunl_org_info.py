@@ -82,7 +82,7 @@ from ansible_collections.community.general.plugins.module_utils._pritunl_api imp
 
 
 def get_pritunl_organizations(module):
-    org_name = module.params.get("organization")
+    org_name = module.params["organization"]
 
     organizations = []
 
