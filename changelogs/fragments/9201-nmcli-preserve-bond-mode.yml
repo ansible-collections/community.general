@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - preserve the existing bond mode when `mode` is omitted on an existing connection, avoiding unintended changes to `balance-rr` and preventing broken bond configurations (https://github.com/ansible-collections/community.general/issues/9201)

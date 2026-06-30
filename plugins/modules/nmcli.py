@@ -120,10 +120,12 @@ options:
       - loopback
   mode:
     description:
-      - This is the type of device or network connection that you wish to create for a bond or bridge.
+      - Bond mode to use for a bond connection.
+      - When creating a new bond, NetworkManager's default mode V(balance-rr) is used if this option is not provided.
+      - When omitted for an existing bond connection, the module preserves the current bond mode.
+      - This option only applies when C(type) is set to C(bond).
     type: str
     choices: [802.3ad, active-backup, balance-alb, balance-rr, balance-tlb, balance-xor, broadcast]
-    default: balance-rr
   transport_mode:
     description:
       - This option sets the connection type of Infiniband IPoIB devices.
@@ -2818,7 +2820,6 @@ def create_module() -> AnsibleModule:
             # Bond Specific vars
             mode=dict(
                 type="str",
-                default="balance-rr",
                 choices=[
                     "802.3ad",
                     "active-backup",

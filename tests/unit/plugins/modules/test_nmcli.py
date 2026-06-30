@@ -621,6 +621,34 @@ ipv6.ignore-auto-routes:                no
 bond.options:                           mode=active-backup,primary=non_existent_primary,xmit_hash_policy=layer3+4
 """
 
+TESTCASE_BOND_MODE_UNSET = [
+    {
+        "type": "bond",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "bond_non_existant",
+        "dns4_search": ["example1.com", "example2.com"],
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_BOND_MODE_UNSET_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              bond_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.dns-search:                        example1.com,example2.com
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+802-3-ethernet.mtu:                     auto
+bond.options:                           mode=802.3ad
+"""
+
 TESTCASE_BOND_ARP = [
     {
         "type": "bond",
@@ -1818,6 +1846,11 @@ def mocked_bond_connection_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_bond_mode_unset_connection_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BOND_MODE_UNSET_OUTPUT, ""))
+
+
+@pytest.fixture
 def mocked_bond_arp_connection_unchanged(mocker):
     mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BOND_ARP_SHOW_OUTPUT, ""))
 
@@ -2275,6 +2308,22 @@ def test_bond_connection_unchanged(mocked_bond_connection_unchanged, capfd):
     results = json.loads(out)
     assert not results.get("failed")
     assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_MODE_UNSET, indirect=["patch_ansible_module"])
+def test_bond_mode_omitted_does_not_change_existing_connection(mocked_bond_mode_unset_connection_unchanged):
+    """
+    Regression test for unspecified bond mode on existing connections.
+    """
+    module = nmcli.create_module()
+    nmcli_module = nmcli.Nmcli(module)
+
+    changed, diff = nmcli_module.is_connection_changed()
+    assert not changed
+    assert "mode" not in diff["before"]
+    assert "mode" not in diff["after"]
+    assert diff["before"]["ipv4.dns-search"] == ["example1.com", "example2.com"]
+    assert diff["after"]["ipv4.dns-search"] == ["example1.com", "example2.com"]
 
 
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP, indirect=["patch_ansible_module"])
