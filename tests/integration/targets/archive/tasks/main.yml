@@ -95,3 +95,7 @@
   loop: "{{ formats }}"
   loop_control:
     loop_var: format
+
+- name: Run Determinism tests
+  include_tasks:
+    file: ../tests/determinism.yml

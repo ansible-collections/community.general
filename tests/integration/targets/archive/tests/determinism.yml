@@ -1,0 +1,244 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Determinism tests for the archive module.
+#
+# Validates that the per-entry / format / layout overrides added in
+# 13.1.0 (entry_owner, entry_group, entry_uid, entry_gid, entry_mtime,
+# entry_file_mode, entry_dir_mode, entry_executable_mode, sort_entries,
+# tar_format, gzip_mtime, gzip_filename, gzip_level) produce
+# byte-reproducible tar archives.
+
+- name: Determinism - prepare a small tree
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}/determinism_src/sub"
+    state: directory
+    mode: '0755'
+
+- name: Determinism - write source files in non-lexical order
+  ansible.builtin.copy:
+    dest: "{{ remote_tmp_dir }}/determinism_src/{{ item.name }}"
+    content: "{{ item.content }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - { name: zeta.txt, content: "z\n", mode: '0644' }
+    - { name: alpha.txt, content: "a\n", mode: '0644' }
+    - { name: middle.sh, content: "#!/bin/sh\necho hi\n", mode: '0755' }
+    - { name: sub/nested.txt, content: "n\n", mode: '0644' }
+
+# ---------------------------------------------------------------------
+# Reproducibility: two cold builds with identical determinism params
+# must produce byte-identical archives.
+# ---------------------------------------------------------------------
+
+- name: Determinism - build run 1
+  community.general.archive:
+    path: "{{ remote_tmp_dir }}/determinism_src/*"
+    dest: "{{ remote_tmp_dir }}/determinism_run1.tar.gz"
+    format: gz
+    sort_entries: true
+    tar_format: gnu
+    entry_owner: root
+    entry_group: root
+    entry_uid: 0
+    entry_gid: 0
+    entry_mtime: 0
+    entry_file_mode: "0644"
+    entry_dir_mode: "0755"
+    entry_executable_mode: "0755"
+    gzip_mtime: 0
+    gzip_filename: ""
+    gzip_level: 9
+
+- name: Determinism - sha512 of run 1
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/determinism_run1.tar.gz"
+    checksum_algorithm: sha512
+    get_checksum: true
+  register: determinism_run1
+
+- name: Determinism - build run 2 (same params, different file)
+  community.general.archive:
+    path: "{{ remote_tmp_dir }}/determinism_src/*"
+    dest: "{{ remote_tmp_dir }}/determinism_run2.tar.gz"
+    format: gz
+    sort_entries: true
+    tar_format: gnu
+    entry_owner: root
+    entry_group: root
+    entry_uid: 0
+    entry_gid: 0
+    entry_mtime: 0
+    entry_file_mode: "0644"
+    entry_dir_mode: "0755"
+    entry_executable_mode: "0755"
+    gzip_mtime: 0
+    gzip_filename: ""
+    gzip_level: 9
+
+- name: Determinism - sha512 of run 2
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/determinism_run2.tar.gz"
+    checksum_algorithm: sha512
+    get_checksum: true
+  register: determinism_run2
+
+- name: Determinism - assert two runs produced byte-identical archives
+  ansible.builtin.assert:
+    that:
+      - determinism_run1.stat.checksum == determinism_run2.stat.checksum
+      - determinism_run1.stat.size == determinism_run2.stat.size
+    fail_msg: >-
+      Archives differ between runs:
+      run1={{ determinism_run1.stat.checksum }} size={{ determinism_run1.stat.size }} ;
+      run2={{ determinism_run2.stat.checksum }} size={{ determinism_run2.stat.size }}
+
+# ---------------------------------------------------------------------
+# Idempotency: archive a third time over an existing destination and
+# verify the module reports changed=false (since checksum matches).
+# ---------------------------------------------------------------------
+
+- name: Determinism - re-archive over existing destination (run 3)
+  community.general.archive:
+    path: "{{ remote_tmp_dir }}/determinism_src/*"
+    dest: "{{ remote_tmp_dir }}/determinism_run1.tar.gz"
+    format: gz
+    sort_entries: true
+    tar_format: gnu
+    entry_owner: root
+    entry_group: root
+    entry_uid: 0
+    entry_gid: 0
+    entry_mtime: 0
+    entry_file_mode: "0644"
+    entry_dir_mode: "0755"
+    entry_executable_mode: "0755"
+    gzip_mtime: 0
+    gzip_filename: ""
+    gzip_level: 9
+  register: determinism_run3
+
+- name: Determinism - assert idempotent re-archive is not reported as changed
+  ansible.builtin.assert:
+    that:
+      - determinism_run3 is not changed
+
+# ---------------------------------------------------------------------
+# Per-entry overrides: extract one archive and confirm the recorded
+# uname/gname/mtime/mode match what we asked for.
+# ---------------------------------------------------------------------
+
+- name: Determinism - read tar member metadata via python
+  ansible.builtin.command:
+    cmd: >-
+      python3 -c "import tarfile, json, sys;
+      t=tarfile.open(sys.argv[1]);
+      print(json.dumps([{'name': m.name, 'uname': m.uname, 'gname': m.gname,
+      'uid': m.uid, 'gid': m.gid, 'mtime': m.mtime, 'mode': oct(m.mode),
+      'isdir': m.isdir()} for m in t.getmembers()]))"
+      {{ remote_tmp_dir }}/determinism_run1.tar.gz
+  register: determinism_members
+  changed_when: false
+
+- name: Determinism - parse member metadata
+  ansible.builtin.set_fact:
+    determinism_meta: "{{ determinism_members.stdout | from_json }}"
+
+- name: Determinism - assert every entry has the requested uname/gname/uid/gid/mtime
+  ansible.builtin.assert:
+    that:
+      - determinism_meta | length > 0
+      - determinism_meta | map(attribute='uname') | unique | list == ['root']
+      - determinism_meta | map(attribute='gname') | unique | list == ['root']
+      - determinism_meta | map(attribute='uid') | unique | list == [0]
+      - determinism_meta | map(attribute='gid') | unique | list == [0]
+      - determinism_meta | map(attribute='mtime') | unique | list == [0]
+
+- name: Determinism - assert executables got entry_executable_mode (0o755)
+  ansible.builtin.assert:
+    that:
+      - >-
+        (determinism_meta | selectattr('name', 'search', 'middle\.sh$') | list | first).mode
+        in ['0o755', '0o0755']
+
+- name: Determinism - assert regular files got entry_file_mode (0o644)
+  ansible.builtin.assert:
+    that:
+      - >-
+        (determinism_meta | selectattr('name', 'search', 'alpha\.txt$') | list | first).mode
+        in ['0o644', '0o0644']
+
+- name: Determinism - assert directories got entry_dir_mode (0o755)
+  ansible.builtin.assert:
+    that:
+      - >-
+        (determinism_meta | selectattr('isdir') | list | length) == 0
+        or
+        ((determinism_meta | selectattr('isdir') | list | first).mode in ['0o755', '0o0755'])
+
+# ---------------------------------------------------------------------
+# sort_entries: archive names must appear in lexical order.
+# ---------------------------------------------------------------------
+
+- name: Determinism - assert sort_entries produced lexical name order
+  ansible.builtin.assert:
+    that:
+      - >-
+        (determinism_meta | map(attribute='name') | list)
+        == (determinism_meta | map(attribute='name') | list | sort)
+
+# ---------------------------------------------------------------------
+# gzip_mtime: the gzip header mtime should be 0.
+# ---------------------------------------------------------------------
+
+- name: Determinism - read gzip header mtime
+  ansible.builtin.command:
+    cmd: >-
+      python3 -c "import struct, sys;
+      h=open(sys.argv[1],'rb').read(10);
+      mt=struct.unpack('<I', h[4:8])[0];
+      print(mt)"
+      {{ remote_tmp_dir }}/determinism_run1.tar.gz
+  register: determinism_gzip_mtime
+  changed_when: false
+
+- name: Determinism - assert gzip_mtime=0 zeroed the gzip header timestamp
+  ansible.builtin.assert:
+    that:
+      - determinism_gzip_mtime.stdout | trim == '0'
+
+# ---------------------------------------------------------------------
+# Backward compatibility: omitting all new params must keep the
+# pre-13.1.0 streaming `w|gz` code path (no force_archive needed for
+# multi-file inputs; just verify the build still works and is changed
+# on a cold target).
+# ---------------------------------------------------------------------
+
+- name: Determinism - legacy params-untouched build still works
+  community.general.archive:
+    path: "{{ remote_tmp_dir }}/determinism_src/*"
+    dest: "{{ remote_tmp_dir }}/determinism_legacy.tar.gz"
+    format: gz
+  register: determinism_legacy
+
+- name: Determinism - assert legacy build is changed and tarball exists
+  ansible.builtin.assert:
+    that:
+      - determinism_legacy is changed
+      - determinism_legacy.dest_state == 'archive'
+
+# ---------------------------------------------------------------------
+# Cleanup
+# ---------------------------------------------------------------------
+
+- name: Determinism - cleanup
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ remote_tmp_dir }}/determinism_src"
+    - "{{ remote_tmp_dir }}/determinism_run1.tar.gz"
+    - "{{ remote_tmp_dir }}/determinism_run2.tar.gz"
+    - "{{ remote_tmp_dir }}/determinism_legacy.tar.gz"
