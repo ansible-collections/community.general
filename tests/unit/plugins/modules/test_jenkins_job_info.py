@@ -18,14 +18,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 from ansible_collections.community.general.plugins.modules import jenkins_job_info
 
 
-class jenkins:
-    class JenkinsException(Exception):
-        pass
-
-    class NotFoundException(Exception):
-        pass
-
-
 FOLDER_JOB = {
     "name": "jobs_name_one",
     "fullname": "jobs_name_one",
