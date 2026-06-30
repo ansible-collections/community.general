@@ -66,6 +66,15 @@ options:
   filter_by_label:
     description: Only return servers filtered by this label.
     type: string
+  filter_by_attributes:
+    description:
+      - A dictionary of VM C(USER_TEMPLATE) attribute names and values that are AND-matched against each VM.
+      - Only VMs whose C(USER_TEMPLATE) contains every listed attribute set to the exact given value are returned.
+      - Useful to scope an inventory to a subset of VMs on a shared OpenNebula instance, for example by a project or environment tag.
+      - Matching is case-sensitive and compares values as strings.
+    type: dict
+    default: {}
+    version_added: 13.2.0
   group_by_labels:
     description: Create host groups by VM labels.
     type: bool
@@ -80,6 +89,14 @@ EXAMPLES = r"""
 plugin: community.general.opennebula
 api_url: https://opennebula:2633/RPC2
 filter_by_label: Cache
+
+---
+# Only return VMs whose USER_TEMPLATE has both PROJECT=climb and ENVIRONMENT=test
+plugin: community.general.opennebula
+api_url: https://opennebula:2633/RPC2
+filter_by_attributes:
+  PROJECT: climb
+  ENVIRONMENT: test
 """
 
 try:
@@ -181,7 +198,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         return vm_pool
 
-    def _retrieve_servers(self, label_filter=None):
+    def _retrieve_servers(self, label_filter=None, attribute_filter=None):
         vm_pool = self._get_vm_pool()
 
         result = []
@@ -205,6 +222,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 if label_filter not in labels:
                     continue
 
+            # filter by USER_TEMPLATE attributes (AND-match), scoping the
+            # inventory to a subset of VMs on a shared instance
+            if attribute_filter:
+                if any(str(server.get(key)) != str(value) for key, value in attribute_filter.items()):
+                    continue
+
             server["name"] = vm.NAME
             server["id"] = vm.ID
             if hasattr(vm.HISTORY_RECORDS, "HISTORY") and vm.HISTORY_RECORDS.HISTORY:
@@ -226,7 +249,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self.inventory.add_group(group="all")
 
         filter_by_label = self.get_option("filter_by_label")
-        servers = self._retrieve_servers(filter_by_label)
+        filter_by_attributes = self.get_option("filter_by_attributes")
+        servers = self._retrieve_servers(filter_by_label, filter_by_attributes)
         for server in servers:
             server = make_unsafe(server)
             hostname = server["name"]

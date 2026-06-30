@@ -1,0 +1,2 @@
+minor_changes:
+  - opennebula inventory plugin - add ``filter_by_attributes`` option to only return VMs whose ``USER_TEMPLATE`` matches every given attribute name/value pair, allowing an inventory to be scoped to a subset of VMs on a shared OpenNebula instance (https://github.com/ansible-collections/community.general/pull/12213).
