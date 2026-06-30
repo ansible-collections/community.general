@@ -289,10 +289,8 @@ remote = [
     "macos/26.3",
     "rhel/10.2",
     "rhel/9.8",
-    # TODO: enable this ASAP!
-    # "freebsd/15.0",
-    # TODO: enable this ASAP!
-    # "freebsd/14.4",
+    "freebsd/15.0",
+    "freebsd/14.4",
 ]
 
 ##################################################################################################
