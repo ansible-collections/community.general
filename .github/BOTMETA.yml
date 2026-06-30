@@ -911,6 +911,8 @@ files:
     maintainers: ahussey-redhat
   $modules/kibana_plugin.py:
     maintainers: barryib
+  $modules/kopia_notification.py:
+    maintainers: munchtoast
   $modules/kopia_repository_info.py:
     maintainers: munchtoast
   $modules/kopia_repository.py:
