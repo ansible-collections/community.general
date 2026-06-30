@@ -8,7 +8,6 @@ import unittest
 from unittest.mock import patch
 
 from ansible.module_utils import basic
-from ansible_collections.community.general.plugins.modules import jenkins_job_info
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     exit_json,
@@ -16,6 +15,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args,
 )
 
+from ansible_collections.community.general.plugins.modules import jenkins_job_info
 
 FOLDER_JOB = {
     "name": "jobs_name_one",
