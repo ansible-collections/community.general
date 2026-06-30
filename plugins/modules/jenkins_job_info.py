@@ -235,7 +235,7 @@ def get_jobs(module):
             if "_class" in job:
                 del job["_class"]
 
-    if module.params.get("color"):
+    if module.params["color"]:
         jobs = filter_jobs_by_color(jobs, module.params["color"])
 
     return jobs
