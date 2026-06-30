@@ -1,0 +1,48 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+skip_list:
+  # Ignore rules that make no sense:
+  - galaxy[tags]
+  - galaxy[version-incorrect]
+  - meta-runtime[unsupported-version]
+  - no-changed-when
+  - sanity[cannot-ignore]  # some of the rules you cannot ignore actually MUST be ignored, like yamllint:unparsable-with-libyaml
+  - yaml  # we're using yamllint ourselves
+  - var-naming[no-role-prefix]
+
+  # To be checked and maybe fixed:
+  - args
+  - avoid-implicit
+  - command-instead-of-module
+  - command-instead-of-shell
+  - complexity
+  - fqcn
+  - galaxy
+  - ignore-errors
+  - jinja
+  - key-order
+  - latest
+  - literal-compare
+  - name
+  - no-free-form
+  - no-handler
+  - package-latest
+  - risky-file-permissions
+  - risky-shell-pipe
+  - schema
+  - var-naming
+
+exclude_paths:
+  # Ansible-lint uses "ansible-playbook --syntax-check" as its "syntax check",
+  # which bails out on roles it cannot find. The following playbooks are 100% valid,
+  # but we need to skip them due to ansible-lint's syntax check's deficiencies...
+  - tests/integration/targets/filter_hashids/runme.yml
+  - tests/integration/targets/filter_jc/runme.yml
+  - tests/integration/targets/filter_json_patch/runme.yml
+  - tests/integration/targets/filter_json_query/runme.yml
+  - tests/integration/targets/lookup_etcd3/dependencies.yml
+  - tests/integration/targets/lookup_etcd3/test_lookup_etcd3.yml
+  - tests/integration/targets/test_fqdn_valid/runme.yml
