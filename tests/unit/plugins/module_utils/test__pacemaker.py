@@ -10,9 +10,11 @@ import pytest
 
 from ansible_collections.community.general.plugins.module_utils import _pacemaker
 from ansible_collections.community.general.plugins.module_utils._pacemaker import (
-    _RESOURCE_READY_STATES,
+    _DEFAULT_RESOURCE_READY_STATES,
     wait_for_resource,
 )
+
+_PROMOTABLE_READY_STATES = ("Started", "Promoted", "Unpromoted")
 
 
 def _make_runner(outputs):
@@ -43,11 +45,9 @@ def _no_sleep(mocker):
     mocker.patch.object(_pacemaker.time, "sleep")
 
 
-def test_ready_states_constant_contents():
-    """The accepted ready-state set must cover non-promotable and promotable resources."""
-    assert "Started" in _RESOURCE_READY_STATES
-    assert "Promoted" in _RESOURCE_READY_STATES
-    assert "Unpromoted" in _RESOURCE_READY_STATES
+def test_default_ready_states_is_started_only():
+    """The default must preserve pre-fix behaviour for stonith and non-promotable callers."""
+    assert _DEFAULT_RESOURCE_READY_STATES == ("Started",)
 
 
 @pytest.mark.parametrize(
@@ -59,14 +59,43 @@ def test_ready_states_constant_contents():
     ],
     ids=["started", "promoted", "unpromoted"],
 )
-def test_wait_for_resource_returns_on_ready_state(status_line):
-    """Each ready state in the accepted set must cause an immediate successful return."""
+def test_wait_for_resource_promotable_ready_states(status_line):
+    """Each ready state in the promotable set must cause an immediate successful return."""
     runner = _make_runner([(0, status_line, "")])
 
-    wait_for_resource(runner, "resource", "any-resource", wait=30)
+    wait_for_resource(runner, "resource", "any-resource", wait=30, ready_states=_PROMOTABLE_READY_STATES)
 
     # One poll, one success — no further runner calls.
     assert runner.call_count == 1
+
+
+def test_wait_for_resource_default_matches_started(mocker):
+    """Calling without ready_states must match Started — the stonith and non-promotable default."""
+    runner = _make_runner(
+        [
+            (0, "  * fence-node-a\t(stonith:fence_ipmilan):\t Started node-a", ""),
+        ]
+    )
+
+    wait_for_resource(runner, "stonith", "fence-node-a", wait=30)
+
+    assert runner.call_count == 1
+
+
+def test_wait_for_resource_default_rejects_promoted(mocker):
+    """With the default ready_states, Promoted output must NOT short-circuit (stonith never promotes)."""
+    mocker.patch.object(_pacemaker.time, "monotonic", side_effect=[0.0, 999.0])
+
+    runner = _make_runner(
+        [
+            (0, "  * drbd_data\t(ocf:linbit:drbd):\t Promoted node-a", ""),
+        ]
+    )
+
+    with pytest.raises(Exception) as excinfo:
+        wait_for_resource(runner, "stonith", "drbd_data", wait=10)
+
+    assert "Timed out waiting 10s" in str(excinfo.value)
 
 
 def test_wait_for_resource_returns_when_promotable_replicas_present():
@@ -74,7 +103,7 @@ def test_wait_for_resource_returns_when_promotable_replicas_present():
     out = "  * drbd_data\t(ocf:linbit:drbd):\t Promoted node-a\n  * drbd_data\t(ocf:linbit:drbd):\t Unpromoted node-b"
     runner = _make_runner([(0, out, "")])
 
-    wait_for_resource(runner, "resource", "drbd_data", wait=30)
+    wait_for_resource(runner, "resource", "drbd_data", wait=30, ready_states=_PROMOTABLE_READY_STATES)
 
     assert runner.call_count == 1
 
@@ -92,7 +121,7 @@ def test_wait_for_resource_polls_until_ready(mocker):
         ]
     )
 
-    wait_for_resource(runner, "resource", "drbd_data", wait=300)
+    wait_for_resource(runner, "resource", "drbd_data", wait=300, ready_states=_PROMOTABLE_READY_STATES)
 
     assert runner.call_count == 3
 
@@ -109,7 +138,7 @@ def test_wait_for_resource_transitional_states_do_not_short_circuit(mocker):
     )
 
     with pytest.raises(Exception) as excinfo:
-        wait_for_resource(runner, "resource", "drbd_data", wait=10)
+        wait_for_resource(runner, "resource", "drbd_data", wait=10, ready_states=_PROMOTABLE_READY_STATES)
 
     assert "Timed out waiting 10s" in str(excinfo.value)
     assert "drbd_data" in str(excinfo.value)

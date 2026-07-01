@@ -152,6 +152,9 @@ from ansible_collections.community.general.plugins.module_utils._pacemaker impor
     wait_for_resource,
 )
 
+# Resources may be non-promotable (Started) or promotable (Promoted/Unpromoted, never Started).
+_READY_STATES = ("Started", "Promoted", "Unpromoted")
+
 
 class PacemakerResource(StateModuleHelper):
     module = dict(
@@ -249,7 +252,7 @@ class PacemakerResource(StateModuleHelper):
                 resource_clone_ids=self.fmt_as_stack_argument(self.module.params["resource_clone_ids"], "clone"),
             )
         if not self.module.check_mode and self.vars.wait and not get_pacemaker_maintenance_mode(self.runner):
-            wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait)
+            wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait, ready_states=_READY_STATES)
 
     def state_cloned(self):
         with self.runner(
@@ -264,7 +267,7 @@ class PacemakerResource(StateModuleHelper):
                 resource_clone_meta=self.fmt_as_stack_argument(self.module.params["resource_clone_meta"], "meta"),
             )
         if not self.module.check_mode and self.vars.wait and not get_pacemaker_maintenance_mode(self.runner):
-            wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait)
+            wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait, ready_states=_READY_STATES)
 
     def state_enabled(self):
         with self.runner(

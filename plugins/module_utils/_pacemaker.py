@@ -63,15 +63,24 @@ def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
         return bool(maintenance_mode_output)
 
 
-_RESOURCE_READY_STATES = ("Started", "Promoted", "Unpromoted")
+_DEFAULT_RESOURCE_READY_STATES = ("Started",)
 
 
-def wait_for_resource(runner: CmdRunner, cli_noun: str, name: str, wait: int, sleep_interval: int = 5) -> None:
+def wait_for_resource(
+    runner: CmdRunner,
+    cli_noun: str,
+    name: str,
+    wait: int,
+    sleep_interval: int = 5,
+    ready_states: t.Iterable[str] = _DEFAULT_RESOURCE_READY_STATES,
+) -> None:
     """Poll ``pcs <cli_noun> status <name>`` until the resource reports a ready state or the wait budget expires.
 
     A resource is considered ready when its status output contains any of the states in
-    ``_RESOURCE_READY_STATES``. ``Started`` covers non-promotable resources, while ``Promoted``
-    and ``Unpromoted`` cover promotable resources, which never reach a ``Started`` state.
+    *ready_states*. The default ``("Started",)`` matches non-promotable resources and stonith
+    fencing devices. Callers managing promotable resources should pass
+    ``("Started", "Promoted", "Unpromoted")`` because promotable resources never reach
+    ``Started``.
 
     Raises an exception if the resource does not reach a ready state within *wait* seconds.
     """
@@ -79,7 +88,7 @@ def wait_for_resource(runner: CmdRunner, cli_noun: str, name: str, wait: int, sl
     while True:
         with runner("cli_action state name") as ctx:
             rc, out, err = ctx.run(cli_action=cli_noun, state="status")
-        if out and any(state in out for state in _RESOURCE_READY_STATES):
+        if out and any(state in out for state in ready_states):
             return
         if time.monotonic() >= deadline:
             raise Exception(f"Timed out waiting {wait}s for {cli_noun} resource '{name}' to start")
