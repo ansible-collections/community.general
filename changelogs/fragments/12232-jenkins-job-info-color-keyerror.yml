@@ -1,0 +1,3 @@
+bugfixes:
+  - "jenkins_job_info - fix ``KeyError: 'color'`` when filtering folder jobs by color
+    (https://github.com/ansible-collections/community.general/issues/12232), https://github.com/ansible-collections/community.general/pull/12369)."
