@@ -79,7 +79,7 @@ def parse_xml_doc(
                 module.fail_json(msg=f"The target XML source '{xml_file}' is not readable.")
             infile = open(xml_file, "rb")  # noqa: SIM115
         else:
-            module.fail_json(msg=f"The target XML source '{xml_file}' does not exist.")
+            module.fail_json(msg="No XML source provided; specify 'path' or 'xmlstring'.")
 
         parser = etree.XMLParser(
             remove_blank_text=remove_blank_text,
@@ -106,11 +106,8 @@ def xpath_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> bool:
 
 def is_node(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> bool:
     """Test if a given xpath matches anything and if that match is a node."""
-    if xpath_matches(tree, xpath, namespaces):
-        match = tree.xpath(xpath, namespaces=namespaces)
-        if isinstance(match[0], etree._Element):
-            return True
-    return False
+    match = tree.xpath(xpath, namespaces=namespaces)
+    return bool(match) and isinstance(match[0], etree._Element)
 
 
 def get_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> tuple[list[str], str]:
@@ -122,24 +119,33 @@ def get_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> tuple[li
     return match_xpaths, msg
 
 
-def count_matches(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> tuple[int, str]:
-    """Return the count of nodes matching the xpath as (count, message)."""
-    hits = len(tree.xpath(xpath, namespaces=namespaces))
+def count_matches(tree: t.Any, xpath: str, namespaces: dict[str, str], *, count_mode: str = "match") -> tuple[int, str]:
+    """Return the count of nodes matching the xpath as (count, message).
+
+    When count_mode is "xpath", uses the XPath count() function for better memory efficiency.
+    When count_mode is "match" (default), evaluates the expression and counts with len().
+    """
+    if count_mode == "xpath":
+        hits = int(tree.xpath(f"count({xpath})", namespaces=namespaces))
+    else:
+        hits = len(tree.xpath(xpath, namespaces=namespaces))
     msg = f"found {hits} nodes"
     return hits, msg
 
 
 def collect_element_text(tree: t.Any, xpath: str, namespaces: dict[str, str]) -> list[tuple[str, str | None]] | None:
     """Get text content of matched elements as (tag, text) tuples. Returns None if xpath does not match a node."""
-    if not is_node(tree, xpath, namespaces):
+    match = tree.xpath(xpath, namespaces=namespaces)
+    if not match or not isinstance(match[0], etree._Element):
         return None
-    return [(element.tag, element.text) for element in tree.xpath(xpath, namespaces=namespaces)]
+    return [(element.tag, element.text) for element in match]
 
 
 def collect_element_attr(
     tree: t.Any, xpath: str, namespaces: dict[str, str]
 ) -> list[tuple[str, dict[str, str]]] | None:
     """Get attributes of matched elements as (tag, attributes) tuples. Returns None if xpath does not match a node."""
-    if not is_node(tree, xpath, namespaces):
+    match = tree.xpath(xpath, namespaces=namespaces)
+    if not match or not isinstance(match[0], etree._Element):
         return None
-    return [(element.tag, dict(element.attrib)) for element in tree.xpath(xpath, namespaces=namespaces)]
+    return [(element.tag, dict(element.attrib)) for element in match]

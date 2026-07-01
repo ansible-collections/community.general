@@ -15,8 +15,8 @@
     that:
       - get_element_attribute is not changed
       - get_element_attribute.count == 1
-      - get_element_attribute.elements[0].tag == 'rating'
-      - get_element_attribute.elements[0].attributes.subjective == 'true'
+      - get_element_attribute.content_attributes[0].tag == 'rating'
+      - get_element_attribute.content_attributes[0].attributes.subjective == 'true'
 
 - name: Get element text
   xml_info:
@@ -30,5 +30,5 @@
     that:
       - get_element_text is not changed
       - get_element_text.count == 1
-      - get_element_text.elements[0].tag == 'rating'
-      - get_element_text.elements[0].text == '10'
+      - get_element_text.content_text[0].tag == 'rating'
+      - get_element_text.content_text[0].text == '10'

@@ -28,8 +28,8 @@
     that:
       - text_result is not changed
       - text_result.count == 1
-      - text_result.elements[0].tag == 'rating'
-      - text_result.elements[0].text == '10'
+      - text_result.content_text[0].tag == 'rating'
+      - text_result.content_text[0].text == '10'
 
 - name: Get paths from an XML string
   xml_info:

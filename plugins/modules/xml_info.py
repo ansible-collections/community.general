@@ -32,8 +32,8 @@ options:
     choices:
       count: Returns the number of matches as RV(count).
       paths: Return the XPath paths for all matched elements as RV(matches).
-      content_text: Return the text content of the matched elements as RV(elements).
-      content_attributes: Return the attributes of the matched elements as RV(elements).
+      content_text: Return the text content of the matched elements as RV(content_text).
+      content_attributes: Return the attributes of the matched elements as RV(content_attributes).
   count_mode:
     description:
       - How to determine the count of XPath matches when O(what=count).
@@ -114,7 +114,7 @@ EXAMPLES = r"""
 
 - name: Show an attribute value
   ansible.builtin.debug:
-    var: xmlresp.elements[0].attributes.subjective
+    var: xmlresp.content_attributes[0].attributes.subjective
 
 # How to read text content
 - name: Read an element's text content
@@ -126,7 +126,7 @@ EXAMPLES = r"""
 
 - name: Show text content
   ansible.builtin.debug:
-    var: xmlresp.elements[0].text
+    var: xmlresp.content_text[0].text
 
 # Using an XML string instead of a file
 - name: Count nodes in an XML string
@@ -162,13 +162,10 @@ matches:
   sample:
     - /business/beers/beer[1]
     - /business/beers/beer[2]
-elements:
-  description:
-    - The content of matched elements.
-    - When O(what=content_text), each item contains the fields V(tag) and V(text).
-    - When O(what=content_attributes), each item contains the fields V(tag) and V(attributes).
+content_text:
+  description: The text content of matched elements.
   type: list
-  returned: when O(what) is V(content_text) or V(content_attributes)
+  returned: when O(what=content_text)
   sample:
     - tag: beer
       text: Rochefort 10
@@ -176,15 +173,28 @@ elements:
     tag:
       description: The tag name of the matched element.
       type: str
-      returned: when O(what=content_text) or O(what=content_attributes)
+      returned: always
     text:
       description: The text content of the matched element.
       type: str
-      returned: when O(what=content_text)
+      returned: always
+content_attributes:
+  description: The attributes of matched elements.
+  type: list
+  returned: when O(what=content_attributes)
+  sample:
+    - tag: rating
+      attributes:
+        subjective: "true"
+  contains:
+    tag:
+      description: The tag name of the matched element.
+      type: str
+      returned: always
     attributes:
       description: The attributes of the matched element as key-value pairs.
       type: dict
-      returned: when O(what=content_attributes)
+      returned: always
 """
 
 import typing as t
@@ -241,10 +251,7 @@ def main() -> None:
     )
 
     if what == "count":
-        if count_mode == "xpath":
-            hits = int(doc.xpath(f"count({xpath})", namespaces=namespaces))
-        else:
-            hits, _msg = count_matches(doc, xpath, namespaces)
+        hits, _msg = count_matches(doc, xpath, namespaces, count_mode=count_mode)
         module.exit_json(count=hits)
     elif what == "paths":
         match_xpaths, _msg = get_matches(doc, xpath, namespaces)
@@ -254,13 +261,13 @@ def main() -> None:
         if raw_text is None:
             module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
         text_elements = [{"tag": tag, "text": text} for tag, text in raw_text]
-        module.exit_json(count=len(text_elements), elements=text_elements)
+        module.exit_json(count=len(text_elements), content_text=text_elements)
     elif what == "content_attributes":
         raw_attr = collect_element_attr(doc, xpath, namespaces)
         if raw_attr is None:
             module.fail_json(msg=f"Xpath {xpath} does not reference a node!")
         attr_elements = [{"tag": tag, "attributes": attribs} for tag, attribs in raw_attr]
-        module.exit_json(count=len(attr_elements), elements=attr_elements)
+        module.exit_json(count=len(attr_elements), content_attributes=attr_elements)
 
 
 if __name__ == "__main__":
