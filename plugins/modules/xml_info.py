@@ -165,6 +165,7 @@ matches:
 content_text:
   description: The text content of matched elements.
   type: list
+  elements: dict
   returned: when O(what=content_text)
   sample:
     - tag: beer
@@ -181,6 +182,7 @@ content_text:
 content_attributes:
   description: The attributes of matched elements.
   type: list
+  elements: dict
   returned: when O(what=content_attributes)
   sample:
     - tag: rating

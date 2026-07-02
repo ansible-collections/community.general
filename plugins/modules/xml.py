@@ -344,7 +344,6 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
     check_lxml,
     collect_element_attr,
     collect_element_text,
-    count_matches,
     etree,
     get_common_argument_spec,
     get_matches,
@@ -387,7 +386,8 @@ def do_print_match(module, tree, xpath, namespaces):
 
 def count_nodes(module, tree, xpath, namespaces):
     """Return the count of nodes matching the xpath"""
-    hits, msg = count_matches(tree, xpath, namespaces)
+    hits = int(tree.xpath(f"count(/{xpath})", namespaces=namespaces))
+    msg = f"found {hits} nodes"
     finish(module, tree, xpath, namespaces, changed=False, msg=msg, hitcount=hits)
 
 
