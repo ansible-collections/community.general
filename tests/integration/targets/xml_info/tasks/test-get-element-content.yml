@@ -1,0 +1,34 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get element attributes
+  xml_info:
+    path: /tmp/ansible-xml-info-beers.xml
+    xpath: /business/rating
+    what: content_attributes
+  register: get_element_attribute
+
+- name: Test expected result
+  assert:
+    that:
+      - get_element_attribute is not changed
+      - get_element_attribute.count == 1
+      - get_element_attribute.content_attributes[0].tag == 'rating'
+      - get_element_attribute.content_attributes[0].attributes.subjective == 'true'
+
+- name: Get element text
+  xml_info:
+    path: /tmp/ansible-xml-info-beers.xml
+    xpath: /business/rating
+    what: content_text
+  register: get_element_text
+
+- name: Test expected result
+  assert:
+    that:
+      - get_element_text is not changed
+      - get_element_text.count == 1
+      - get_element_text.content_text[0].tag == 'rating'
+      - get_element_text.content_text[0].text == '10'

@@ -1,0 +1,46 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Count nodes in an XML string
+  xml_info:
+    xmlstring: "{{ xml_info_test_xml }}"
+    xpath: /business/beers/beer
+    what: count
+  register: count_result
+
+- name: Test expected result
+  assert:
+    that:
+      - count_result is not changed
+      - count_result.count == 3
+
+- name: Get element text from an XML string
+  xml_info:
+    xmlstring: "{{ xml_info_test_xml }}"
+    xpath: /business/rating
+    what: content_text
+  register: text_result
+
+- name: Test expected result
+  assert:
+    that:
+      - text_result is not changed
+      - text_result.count == 1
+      - text_result.content_text[0].tag == 'rating'
+      - text_result.content_text[0].text == '10'
+
+- name: Get paths from an XML string
+  xml_info:
+    xmlstring: "{{ xml_info_test_xml }}"
+    xpath: /business/beers/beer
+    what: paths
+  register: match_result
+
+- name: Test expected result
+  assert:
+    that:
+      - match_result is not changed
+      - match_result.count == 3
+      - match_result.matches | length == 3
