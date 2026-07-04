@@ -66,10 +66,10 @@ file_digest:
   returned: always
 """
 
-import hashlib  # noqa: I
-import re  # noqa: I
+import hashlib
+import re
 
-from ansible.module_utils.basic import AnsibleModule  # noqa: I
+from ansible.module_utils.basic import AnsibleModule
 
 
 def get_exports(module):
@@ -129,9 +129,9 @@ def get_exports(module):
 
 
 def main():
-    module_args = {  # noqa: RUF022
-        "file_path": {"default": "/etc/exports", "type": "path"},  # noqa: RUF022
-        "output_format": {"choices": ("ips_per_share", "shares_per_ip"), "required": True, "type": "str"},  # noqa: RUF022
+    module_args = {
+        "file_path": {"default": "/etc/exports", "type": "path"},
+        "output_format": {"choices": ("ips_per_share", "shares_per_ip"), "required": True, "type": "str"},
     }
 
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
