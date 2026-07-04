@@ -2,8 +2,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# ruff: noqa: I, RUF022
-
 import hashlib
 import sys
 
@@ -25,6 +23,7 @@ def fake_exports_content() -> str:
 def calculate_expected_digests(content_string: str) -> dict:
     content_bytes = content_string.encode("utf-8")
     digests = {}
+    # به ترتیب حروف الفبا چیده شده تا هیچ ابزاری خطا نگیرد
     for algo in ("md5", "sha1", "sha256"):
         try:
             hasher = hashlib.new(algo)

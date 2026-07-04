@@ -129,7 +129,6 @@ def get_exports(module):
 
 
 def main():
-    # ruff: noqa: I, RUF022
     module_args = {
         "file_path": {"default": "/etc/exports", "type": "path"},
         "output_format": {"choices": ("ips_per_share", "shares_per_ip"), "required": True, "type": "str"},
