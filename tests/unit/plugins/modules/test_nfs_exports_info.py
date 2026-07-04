@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # ruff: noqa: RUF022
-from future import annotations
 
 import hashlib
 import sys
