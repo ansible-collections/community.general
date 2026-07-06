@@ -250,11 +250,14 @@ def upgrade_packages(module, available):
     packagelist = parse_for_packages(stdout)
     if rc != 0:
         module.fail_json(msg="failed to upgrade packages", stdout=stdout, stderr=stderr, packages=packagelist)
-    if re.search(r"^OK", stdout):
-        module.exit_json(
-            changed=False, msg="packages already upgraded", stdout=stdout, stderr=stderr, packages=packagelist
-        )
-    module.exit_json(changed=True, msg="upgraded packages", stdout=stdout, stderr=stderr, packages=packagelist)
+    # apk prints a "(n/m) <verb> <package> ..." line for every package it changes, so the parsed
+    # package list is the authoritative signal of whether anything was upgraded. Do not rely on the
+    # trailing "OK:" summary line: apk commit hooks (for example mrtest, or anything in
+    # /etc/apk/commit_hooks.d/) print banner lines before it, which broke the previous check and
+    # reported changed even when nothing was upgraded (see https://github.com/ansible-collections/community.general/issues/12223).
+    if packagelist:
+        module.exit_json(changed=True, msg="upgraded packages", stdout=stdout, stderr=stderr, packages=packagelist)
+    module.exit_json(changed=False, msg="packages already upgraded", stdout=stdout, stderr=stderr, packages=packagelist)
 
 
 def install_packages(module, names, state, world):
