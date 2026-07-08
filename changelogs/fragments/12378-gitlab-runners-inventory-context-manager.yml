@@ -1,0 +1,2 @@
+minor_changes:
+  - `plugins.inventory.gitlab_runners` - wrap the Gitlab API object in a context mananger and cleanup inventory group on exception (https://github.com/ansible-collections/community.general/pull/12378).

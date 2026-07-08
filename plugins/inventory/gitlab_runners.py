@@ -113,7 +113,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                     self.inventory.set_variable(host, "ansible_host", make_unsafe(ip_address))
                     if self.get_option("verbose_output", True):
                         self.inventory.set_variable(host, "gitlab_runner_attributes", host_attrs)
-    
+
                     # Use constructed if applicable
                     strict = self.get_option("strict")
                     # Composed variables
