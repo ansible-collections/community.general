@@ -99,12 +99,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
     def _populate(self):
         with gitlab.Gitlab(self.get_option("server_url"), private_token=self.get_option("api_token")) as gl:
-            self.inventory.add_group("gitlab_runners")
             try:
                 if self.get_option("filter"):
                     runners = gl.runners.all(scope=self.get_option("filter"))
                 else:
                     runners = gl.runners.all()
+                self.inventory.add_group("gitlab_runners")
                 for runner in runners:
                     host = make_unsafe(str(runner["id"]))
                     ip_address = runner["ip_address"]
@@ -123,7 +123,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                     # Create groups based on variable values and add the corresponding hosts to it
                     self._add_host_to_keyed_groups(self.get_option("keyed_groups"), host_attrs, host, strict=strict)
             except Exception as e:
-                self.inventory.remove_group("gitlab_runners")
                 raise AnsibleParserError(
                     f"Unable to fetch hosts from GitLab API, this was the original exception: {e}"
                 ) from e
