@@ -12,6 +12,7 @@ short_description: OpenNebula inventory source
 version_added: "3.8.0"
 extends_documentation_fragment:
   - ansible.builtin.constructed
+  - community.library_inventory_filtering_v1.inventory_filter
 description:
   - Get inventory hosts from OpenNebula cloud.
   - Uses an YAML configuration file ending with either C(opennebula.yml) or C(opennebula.yaml) to set parameter values.
@@ -70,16 +71,30 @@ options:
     description: Create host groups by VM labels.
     type: bool
     default: true
+  filters:
+    # This option is provided by the community.library_inventory_filtering_v1.inventory_filter doc fragment
+    version_added: 13.2.0
 """
 
 EXAMPLES = r"""
 # inventory_opennebula.yml file in YAML format
 # Example command line: ansible-inventory --list -i inventory_opennebula.yml
 
+---
 # Pass a label filter to the API
 plugin: community.general.opennebula
 api_url: https://opennebula:2633/RPC2
 filter_by_label: Cache
+
+---
+# Only return VMs whose USER_TEMPLATE has both PROJECT=climb and ENVIRONMENT=test
+plugin: community.general.opennebula
+api_url: https://opennebula:2633/RPC2
+filter:
+  - include: >-
+      PROJECT == "climb" and
+      ENVIRONMENT == "test"
+  - exclude: true
 """
 
 try:
@@ -94,6 +109,10 @@ from dataclasses import dataclass
 
 from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
+from ansible_collections.community.library_inventory_filtering_v1.plugins.plugin_utils.inventory_filter import (
+    filter_host,
+    parse_filters,
+)
 
 from ansible_collections.community.general.plugins.plugin_utils._unsafe import make_unsafe
 
@@ -221,6 +240,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         hostname_preference = self.get_option("hostname")
         group_by_labels = self.get_option("group_by_labels")
         strict = self.get_option("strict")
+        filters = parse_filters(self.get_option("filters"))
 
         # Add a top group 'one'
         self.inventory.add_group(group="all")
@@ -230,6 +250,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         for server in servers:
             server = make_unsafe(server)
             hostname = server["name"]
+
+            if not filter_host(self, hostname, server, filters):
+                continue
+
             # check for labels
             if group_by_labels and server["LABELS"]:
                 for label in server["LABELS"]:
