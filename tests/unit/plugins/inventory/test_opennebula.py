@@ -15,8 +15,13 @@ from ansible import constants as C
 from ansible.inventory.data import InventoryData
 from ansible.inventory.manager import InventoryManager
 from ansible.module_utils.common.text.converters import to_native
+from ansible.parsing.dataloader import DataLoader
+from ansible.template import Templar
 from ansible_collections.community.internal_test_tools.tests.unit.mock.loader import DictDataLoader
 from ansible_collections.community.internal_test_tools.tests.unit.mock.path import mock_unfrackpath_noop
+from ansible_collections.community.internal_test_tools.tests.unit.utils.trust import (
+    make_trusted,
+)
 
 from ansible_collections.community.general.plugins.inventory.opennebula import InventoryModule
 
@@ -63,6 +68,9 @@ class HistoryRecords:
 def inventory():
     r = InventoryModule()
     r.inventory = InventoryData()
+    if not hasattr(r, "templar"):
+        # This is necessary for ansible-core 2.18; 2.19+ provide this out-of-the-box
+        r.templar = Templar(loader=DataLoader())
     return r
 
 
@@ -290,6 +298,7 @@ options_base_test = {
     "hostname": "v4_first_ip",
     "group_by_labels": True,
     "filter_by_label": None,
+    "filters": None,
 }
 
 
@@ -418,3 +427,37 @@ def test_populate(inventory, mocker):
 
     # check for custom ssh port
     assert host_gitlab.get_vars()["ansible_port"] == "8822"
+
+
+def test_populate_filters(inventory, mocker):
+    opts = options_base_test.copy()
+    opts["filters"] = [
+        {
+            "include": make_trusted("v4_first_ip == '172.22.4.187'"),
+        },
+        {
+            "exclude": True,
+        },
+    ]
+    # bypass API fetch call
+    inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool)
+    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(opts))
+    assert "zabbix-327" not in inventory.inventory.hosts
+    inventory._populate()
+    assert "zabbix-327" not in inventory.inventory.hosts
+
+    # get different hosts
+    host_sam = inventory.inventory.get_host("sam-691-sam")
+    assert inventory.inventory.get_host("zabbix-327") is None
+    assert inventory.inventory.get_host("gitlab-107") is None
+
+    # test if groups exists
+    assert "Gitlab" not in inventory.inventory.groups
+    assert "Centos" not in inventory.inventory.groups
+    assert "Oracle_Linux" not in inventory.inventory.groups
+
+    # check IPv4 address
+    assert host_sam.get_vars()["v4_first_ip"] == "172.22.4.187"
+
+    # check ansible_hosts
+    assert host_sam.get_vars()["ansible_host"] == "172.22.4.187"
