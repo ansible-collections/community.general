@@ -1,0 +1,3 @@
+minor_changes:
+ - the nmcli plugin now handles connection names derived from MAC addresses.
+   (https://github.com/ansible-collections/community.general/issues/12386)
