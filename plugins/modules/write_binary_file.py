@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-# Copyright: (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
-# Copyright: (c) 2017, Ansible Project
+# Copyright (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
+# Copyright (c) 2017, Ansible Project
 # Copyright 2026, Felix Fontein (felix@fontein.de)
 # Copyright 2026, Plexim GmbH
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
