@@ -157,8 +157,11 @@ from ansible.errors import AnsibleParserError
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
+from ansible.utils.display import Display
 
 from ansible_collections.community.general.plugins.plugin_utils._unsafe import make_unsafe
+
+display = Display()
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -279,6 +282,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 cmd.append("-Pn")
 
             cmd.extend(self.get_option("address"))
+
+            display.v(f"nmap: scanning {', '.join(self.get_option('address'))}")
             try:
                 # execute
                 p = Popen(cmd, stdout=PIPE, stderr=PIPE)
