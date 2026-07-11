@@ -27,7 +27,9 @@ options:
     default: false
     type: boolean
   address:
-    description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
+    description:
+      - Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
+      - Since community.general 13.2.0 this can be a list of networks or IP ranges.
     type: list
     elements: string
     required: true
