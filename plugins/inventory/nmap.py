@@ -28,7 +28,8 @@ options:
     type: boolean
   address:
     description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
-    type: string
+    type: list
+    elements: string
     required: true
     env:
       - name: ANSIBLE_NMAP_ADDRESS
@@ -277,7 +278,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if self.get_option("skip_host_discovery"):
                 cmd.append("-Pn")
 
-            cmd.append(self.get_option("address"))
+            cmd.extend(self.get_option("address"))
             try:
                 # execute
                 p = Popen(cmd, stdout=PIPE, stderr=PIPE)
