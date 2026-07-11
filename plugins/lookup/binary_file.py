@@ -54,6 +54,7 @@ seealso:
       directory of a role.
   - ref: playbook_task_paths
     description: Search paths used for relative files.
+  - module: community.general.write_binary_file
 """
 
 EXAMPLES = r"""

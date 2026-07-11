@@ -1,0 +1,327 @@
+---
+# Copyright (c) 2025, Felix Fontein <felix@fontein.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_1"
+  register: stat_0
+
+- name: Write file (check mode)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_1 }}"
+    mode: "0600"
+  register: write_1_check
+  check_mode: true
+
+- name: Write file
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_1 }}"
+    mode: "0600"
+  register: write_1
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_1"
+  register: stat_1
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_1"
+  register: read_1
+
+- name: Write file (check mode, idempotent)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_1 }}"
+    mode: "0600"
+  register: write_2_check
+  check_mode: true
+
+- name: Write file (idempotent)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_1 }}"
+    mode: "0600"
+  register: write_2
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_1"
+  register: stat_2
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_1"
+  register: read_2
+
+- name: Write file (check mode, changed)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_2 }}"
+    mode: "0600"
+  register: write_3_check
+  check_mode: true
+
+- name: Write file (changed)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_2 }}"
+    mode: "0600"
+  register: write_3
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_1"
+  register: stat_3
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_1"
+  register: read_3
+
+- name: Write file (check mode, changed mode)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_2 }}"
+    mode: "0440"
+  register: write_4_check
+  check_mode: true
+
+- name: Write file (changed mode)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_2 }}"
+    mode: "0440"
+  register: write_4
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_1"
+  register: stat_4
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_1"
+  register: read_4
+
+- name: Write read-only file (check mode, changed)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_1 }}"
+    mode: "0440"
+  register: write_5_check
+  check_mode: true
+
+- name: Write read-only file (changed)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_1"
+    content: "{{ file_content_1 }}"
+    mode: "0440"
+  register: write_5
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_1"
+  register: stat_5
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_1"
+  register: read_5
+
+- name: Create symlink
+  ansible.builtin.file:
+    dest: "{{ remote_tmp_dir }}/file_2"
+    src: "{{ remote_tmp_dir }}/file_1"
+    state: link
+
+- name: Write to symlink with follow (check mode, idempotent)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_2"
+    content: "{{ file_content_1 }}"
+    mode: "0440"
+    follow: true
+  register: write_6_check
+  check_mode: true
+
+- name: Write to symlink with follow (idempotent)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_2"
+    content: "{{ file_content_1 }}"
+    mode: "0440"
+    follow: true
+  register: write_6
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_2"
+  register: stat_6
+
+- name: Stat destination file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_1"
+  register: stat_6_dest
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_1"
+  register: read_6
+
+- name: Write to symlink with follow (check mode, changed)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_2"
+    content: "{{ file_content_2 }}"
+    mode: "0400"
+    follow: true
+  register: write_7_check
+  check_mode: true
+
+- name: Write to symlink with follow (idempotent)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_2"
+    content: "{{ file_content_2 }}"
+    mode: "0400"
+    follow: true
+  register: write_7
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_2"
+  register: stat_7
+
+- name: Stat destination file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_1"
+  register: stat_7_dest
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_1"
+  register: read_7
+
+- name: Replace link with content (check mode)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_2"
+    content: "{{ file_content_2 }}"
+    mode: "0400"
+  register: write_8_check
+  check_mode: true
+
+- name: Replace link with content
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_2"
+    content: "{{ file_content_2 }}"
+    mode: "0400"
+  register: write_8
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_2"
+  register: stat_8
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_2"
+  register: read_8
+
+- name: Do not replace existing content (check mode)
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_2"
+    content: "{{ file_content_1 }}"
+    force: false
+    mode: "0400"
+  register: write_9_check
+  check_mode: true
+
+- name: Do not replace existing content
+  community.general.write_binary_file:
+    path: "{{ remote_tmp_dir }}/file_2"
+    content: "{{ file_content_1 }}"
+    force: false
+    mode: "0400"
+  register: write_9
+
+- name: Stat file
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir }}/file_2"
+  register: stat_9
+
+- name: Read file
+  ansible.builtin.slurp:
+    src: "{{ remote_tmp_dir }}/file_2"
+  register: read_9
+
+- name: Verify tests
+  ansible.builtin.assert:
+    that:
+      - stat_0.stat.exists == false
+      # Write (first)
+      - write_1_check is changed
+      - write_1 is changed
+      - not stat_1.stat.islnk
+      - read_1.content == file_content_1
+      - stat_1.stat.mode == "0600"
+      # Write (idempotent)
+      - write_2_check is not changed
+      - write_2 is not changed
+      - read_2.content == file_content_1
+      - not stat_2.stat.islnk
+      - stat_2.stat.mode == "0600"
+      - stat_2.stat.mtime == stat_1.stat.mtime
+      # Write (changed)
+      - write_3_check is changed
+      - write_3 is changed
+      - read_3.content == file_content_2
+      - not stat_3.stat.islnk
+      - stat_3.stat.mode == "0600"
+      - stat_3.stat.mtime != stat_2.stat.mtime
+      # Write (changed mode)
+      - write_4_check is changed
+      - write_4 is changed
+      - read_4.content == file_content_2
+      - not stat_4.stat.islnk
+      - stat_4.stat.mode == "0440"
+      - stat_4.stat.mtime == stat_3.stat.mtime  # the file wasn't modified, only its metadata
+      # Write (read-only, changed)
+      - write_5_check is changed
+      - write_5 is changed
+      - read_5.content == file_content_1
+      - not stat_5.stat.islnk
+      - stat_5.stat.mode == "0440"
+      - stat_5.stat.mtime != stat_4.stat.mtime
+      # Write follow (read-only, idempotent)
+      - write_6_check is not changed
+      - write_6 is not changed
+      - read_6.content == file_content_1
+      - stat_6.stat.islnk
+      - stat_6.stat.lnk_target == (remote_tmp_dir ~ "/file_1")
+      - not stat_6_dest.stat.islnk
+      - stat_6_dest.stat.mode == "0440"
+      - stat_6_dest.stat.mtime == stat_5.stat.mtime
+      # Write follow (read-only, changed)
+      - write_7_check is changed
+      - write_7 is changed
+      - read_7.content == file_content_2
+      - stat_7.stat.islnk
+      - stat_7.stat.lnk_target == (remote_tmp_dir ~ "/file_1")
+      - not stat_7_dest.stat.islnk
+      - stat_7_dest.stat.mode == "0400"
+      - stat_7_dest.stat.mtime != stat_6_dest.stat.mtime
+      # Replace (changed)
+      - write_8_check is changed
+      - write_8 is changed
+      - read_8.content == file_content_2
+      - not stat_8.stat.islnk
+      - stat_8.stat.mode == "0400"
+      - stat_8.stat.mtime != stat_7_dest.stat.mtime
+      # Not replace (changed)
+      - write_9_check is not changed
+      - write_9 is not changed
+      - read_9.content == file_content_2
+      - not stat_9.stat.islnk
+      - stat_9.stat.mode == "0400"
+      - stat_9.stat.mtime == stat_8.stat.mtime
