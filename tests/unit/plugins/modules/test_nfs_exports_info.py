@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import hashlib
-import sys
 
 import pytest
 
@@ -39,7 +38,7 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
     mock_module.file_exists.return_value = True
     mock_module.warn.return_value = None
     mock_module.fail_json.side_effect = Exception("fail_json called")
-    
+
     patch_target = "builtins.open"
 
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
@@ -64,7 +63,7 @@ def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
     mock_module.file_exists.return_value = True
     mock_module.warn.return_value = None
     mock_module.fail_json.side_effect = Exception("fail_json called")
-    
+
     patch_target = "builtins.open"
 
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
