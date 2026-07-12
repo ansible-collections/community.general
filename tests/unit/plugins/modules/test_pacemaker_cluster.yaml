@@ -436,6 +436,96 @@ test_cases:
           rc: 0
           out: 'maintenance-mode=true'
           err: ""
+  - id: test_unmaintenance_minimal_input_initial_online
+    input:
+      state: unmaintenance
+    output:
+      changed: true
+      previous_value: 'maintenance-mode=true'
+      value: 'maintenance-mode=false (default)'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode=true'
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=false]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode=false (default)'
+          err: ""
+  - id: test_unmaintenance_minimal_input_initial_online_version_change
+    input:
+      state: unmaintenance
+    output:
+      changed: true
+      previous_value: 'maintenance-mode: true'
+      value: 'maintenance-mode: false'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode: true'
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=false]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode: false'
+          err: ""
+  - id: test_unmaintenance_minimal_input_initial_offline
+    input:
+      state: unmaintenance
+    output:
+      failed: true
+      msg: "pcs failed with error (rc=1): Error: unable to get cib"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: unable to get cib"
+        - command: [/testbin/pcs, property, set, maintenance-mode=false]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: unable to get cib"
+  - id: test_unmaintenance_minimal_input_initial_unmaintenance
+    input:
+      state: unmaintenance
+    output:
+      changed: false
+      previous_value: 'maintenance-mode=false'
+      value: 'maintenance-mode=false'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode=false'
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=false]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, maintenance-mode]
+          environ: *env-def
+          rc: 0
+          out: 'maintenance-mode=false'
+          err: ""
   - id: test_cleanup_minimal_input_initial_resources_not_exist
     input:
       state: cleanup
