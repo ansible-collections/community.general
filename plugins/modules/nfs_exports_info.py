@@ -88,7 +88,7 @@ def get_exports(module):
     except OSError as e:
         module.fail_json(msg=f"Could not read {file_path}: {e}")
 
-    for algo in ("md5", "sha1", "sha256"):
+    for algo in ["md5", "sha1", "sha256"]:
         try:
             hasher = hashlib.new(algo)
             hasher.update(content.encode("utf-8"))
@@ -123,7 +123,10 @@ def get_exports(module):
                 ips_per_share[folder] = []
             ips_per_share[folder].append({"ip": ip, "options": options})
 
-    exports_info = ips_per_share if output_format == "ips_per_share" else shares_per_ip
+    if output_format == "ips_per_share":
+        exports_info = ips_per_share
+    else:
+        exports_info = shares_per_ip
 
     return {"exports_info": exports_info, "file_digest": file_digest}
 
