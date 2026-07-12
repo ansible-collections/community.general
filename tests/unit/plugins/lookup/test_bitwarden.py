@@ -111,8 +111,12 @@ MOCK_RECORDS = [
 
 class MockBitwarden(Bitwarden):
     unlocked = True
+    synced = False
 
     def _run(self, args, stdin=None, expected_rc=0):
+        if args[0] == "sync":
+            self.synced = True
+            return "Syncing complete.", ""
         if args[0] == "get":
             if args[1] == "item":
                 for item in MOCK_RECORDS:
@@ -288,3 +292,9 @@ class TestLookupModule(unittest.TestCase):
         self.lookup.run(None, organization_id=MOCK_ORGANIZATION_ID, result_count=3)
         with self.assertRaises(BitwardenException):
             self.lookup.run(None, organization_id=MOCK_ORGANIZATION_ID, result_count=0)
+
+    def test_bitwarden_plugin_sync_option(self):
+        mock_bitwarden = MockBitwarden()
+        with patch("ansible_collections.community.general.plugins.lookup.bitwarden._bitwarden", mock_bitwarden):
+            self.lookup.run([], sync=True)
+            self.assertTrue(mock_bitwarden.synced)

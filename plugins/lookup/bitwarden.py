@@ -59,6 +59,11 @@ options:
         of query results. Leave empty to skip this check.
     type: int
     version_added: 10.4.0
+  sync:
+    description: Set to C(true) to sync items from the Bitwarden vault in the beginning.
+    type: bool
+    default: false
+    version_added: 13.2.0
 """
 
 EXAMPLES = r"""
@@ -154,6 +159,10 @@ class Bitwarden:
         out, err = self._run(["status"], stdin="")
         decoded = AnsibleJSONDecoder().raw_decode(out)[0]
         return decoded["status"] == "unlocked"
+
+    def sync(self):
+        out, err = self._run(["sync"], stdin="")
+        return out
 
     def _run(self, args, stdin=None, expected_rc=0):
         if self.session:
@@ -264,9 +273,13 @@ class LookupModule(LookupBase):
         organization_id = self.get_option("organization_id")
         result_count = self.get_option("result_count")
         _bitwarden.session = self.get_option("bw_session")
+        sync = self.get_option("sync")
 
         if not _bitwarden.unlocked:
             raise AnsibleError("Bitwarden Vault locked. Run 'bw unlock'.")
+
+        if sync:
+            _bitwarden.sync()
 
         if not terms:
             terms = [None]
