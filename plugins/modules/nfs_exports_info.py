@@ -69,7 +69,7 @@ file_digest:
 import hashlib
 import re
 
-from ansible.module_utils.basic import AnsibleModule
+import ansible.module_utils.basic
 
 
 def get_exports(module):
@@ -137,7 +137,7 @@ def main():
         "output_format": {"choices": ["ips_per_share", "shares_per_ip"], "required": True, "type": "str"},
     }
 
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module = ansible.module_utils.basic.AnsibleModule(argument_spec=module_args, supports_check_mode=True)
     result = get_exports(module)
 
     module.exit_json(
