@@ -1,0 +1,5 @@
+minor_changes:
+ - nmcli - now handles connection names derived from MAC addresses,
+   and generally names that contain ``:`` or ``\\``
+   (https://github.com/ansible-collections/community.general/issues/12386,
+   https://github.com/ansible-collections/community.general/pull/12387).
