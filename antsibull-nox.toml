@@ -94,7 +94,6 @@ name = "consul"
 pattern = "^consul_.*$"
 exclusions = [
     "consul_acl_bootstrap",
-    "consul_kv",
 ]
 doc_fragment = "community.general._consul.actiongroup_consul"
 
