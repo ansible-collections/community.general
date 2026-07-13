@@ -115,6 +115,10 @@ options:
     type: string
     env:
       - name: TSS_TOKEN_PATH_URI
+    ini:
+      - section: tss_lookup
+        key: token_path_uri
+        version_added: 13.2.0
     required: false
   token_path_source:
     description:
@@ -129,6 +133,9 @@ options:
     default: token_path_uri
     env:
       - name: TSS_TOKEN_PATH_SOURCE
+    ini:
+      - section: tss_lookup
+        key: token_path_source
     required: false
     version_added: 13.2.0
 """
