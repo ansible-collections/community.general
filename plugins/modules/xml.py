@@ -333,7 +333,6 @@ xmlstring:
 import copy
 import re
 import traceback
-import typing as t
 from collections.abc import MutableMapping
 from io import BytesIO
 
@@ -344,7 +343,6 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
     check_lxml,
     collect_element_attr,
     collect_element_text,
-    etree,
     get_common_argument_spec,
     get_matches,
     is_node,
@@ -355,7 +353,7 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
 
 objectify: t.Any = None
 try:
-    from lxml import objectify  # type: ignore[no-redef]
+    from lxml import etree, objectify
 except ImportError:
     pass
 
