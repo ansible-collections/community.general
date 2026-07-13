@@ -2402,7 +2402,7 @@ class Nmcli:
         return [self.route_to_string(route_params) for route_params in routes_params]
 
     def list_connection_info(self):
-        cmd = [self.nmcli_bin, "--fields", "name", "--terse", "con", "show"]
+        cmd = [self.nmcli_bin, "--fields", "name", "--terse", "--escape", "no", "con", "show"]
         (rc, out, err) = self.execute_command(cmd)
         if rc != 0:
             raise NmcliModuleError(err)
@@ -2417,7 +2417,7 @@ class Nmcli:
 
     def get_connection_state(self):
         """Get the current state of the connection"""
-        cmd = [self.nmcli_bin, "--terse", "--fields", "GENERAL.STATE", "con", "show", self.conn_name]
+        cmd = [self.nmcli_bin, "--terse", "--escape", "no", "--fields", "GENERAL.STATE", "con", "show", self.conn_name]
         (rc, out, err) = self.execute_command(cmd)
         if rc != 0:
             raise NmcliModuleError(err)
