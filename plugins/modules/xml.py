@@ -351,7 +351,6 @@ from ansible_collections.community.general.plugins.module_utils._xml import (
     xpath_matches,
 )
 
-objectify: t.Any = None
 try:
     from lxml import etree, objectify
 except ImportError:
