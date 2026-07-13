@@ -28,6 +28,10 @@ class SecretServerError(Exception):
         self.message = ""
 
 
+class SecretServerClientError(SecretServerError):
+    pass
+
+
 class MockSecretServer(MagicMock):
     RESPONSE = '{"foo": "bar"}'
 
@@ -87,6 +91,8 @@ class TestLookupModule(TestCase):
 
     def setUp(self):
         self.lookup = lookup_loader.get("community.general.tss")
+        tss._client_cache.clear()
+        self.addCleanup(tss._client_cache.clear)
 
     @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=False, SecretServer=MockSecretServer)
     def test_missing_sdk(self):
@@ -102,8 +108,160 @@ class TestLookupModule(TestCase):
                 self._run_lookup(self.INVALID_TERMS)
 
         with patch(make_absolute("SecretServer"), MockFaultySecretServer):
+            tss._client_cache.clear()
             with self.assertRaises(tss.AnsibleError):
                 self._run_lookup(self.VALID_TERMS)
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_client_cache_reuse(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(self.VALID_TERMS)
+            self._run_lookup(self.VALID_TERMS)
+            self.assertEqual(from_params.call_count, 1)
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_cache_survives_plugin_reinstantiation(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        kwargs = {"base_url": "dummy", "username": "dummy", "password": "dummy"}
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self.lookup.run(self.VALID_TERMS, [], **kwargs)
+            # A brand-new plugin instance (as ansible-core creates per invocation)
+            # must reuse the module-level cache instead of building a new client.
+            fresh = lookup_loader.get("community.general.tss")
+            fresh.run(self.VALID_TERMS, [], **kwargs)
+            self.assertEqual(from_params.call_count, 1)
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_token_auth_is_not_cached(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", token="token")
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", token="token")
+            self.assertEqual(from_params.call_count, 2)
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_cache_separates_clients_by_credential_identity(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", username="alice", password="p")
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", username="bob", password="p")
+            self.assertEqual(from_params.call_count, 2)
+            self.assertEqual(len(tss._client_cache), 2)
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_token_path_source_auto_empties_token_path_uri(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", username="u", password="p", token_path_source="auto")
+            self.assertEqual(from_params.call_args.kwargs["token_path_uri"], "")
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_token_path_source_auto_overrides_explicit_token_path_uri(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(
+                self.VALID_TERMS,
+                base_url="dummy",
+                username="u",
+                password="p",
+                token_path_source="auto",
+                token_path_uri="/oauth2/token",
+            )
+            self.assertEqual(from_params.call_args.kwargs["token_path_uri"], "")
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_default_token_path_source_uses_configured_token_path_uri(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(
+                self.VALID_TERMS,
+                base_url="dummy",
+                username="u",
+                password="p",
+                token_path_uri="/custom/token",
+            )
+            self.assertEqual(from_params.call_args.kwargs["token_path_uri"], "/custom/token")
+
+    @patch.multiple(TSS_IMPORT_PATH, HAS_TSS_SDK=True, SecretServerError=SecretServerError)
+    def test_token_path_source_partitions_cache(self):
+        wrapper = MagicMock()
+        wrapper.get_secret.return_value = "secret"
+        with patch(make_absolute("TSSClient.from_params"), return_value=wrapper) as from_params:
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", username="u", password="p", token_path_source="auto")
+            self._run_lookup(self.VALID_TERMS, base_url="dummy", username="u", password="p")
+            self.assertEqual(from_params.call_count, 2)
+            self.assertEqual(len(tss._client_cache), 2)
+
+    @patch.multiple(
+        TSS_IMPORT_PATH,
+        HAS_TSS_SDK=True,
+        HAS_SS_CLIENT_ERROR=True,
+        SecretServerError=SecretServerError,
+        SecretServerClientError=SecretServerClientError,
+    )
+    def test_retry_on_client_error_then_success(self):
+        faulty = MagicMock()
+        faulty.get_secret.side_effect = SecretServerClientError()
+        good = MagicMock()
+        good.get_secret.return_value = "ok"
+        with patch(make_absolute("TSSClient.from_params"), side_effect=[faulty, good]) as from_params:
+            self.assertListEqual(["ok"], self._run_lookup(self.VALID_TERMS))
+            self.assertEqual(from_params.call_count, 2)
+
+    @patch.multiple(
+        TSS_IMPORT_PATH,
+        HAS_TSS_SDK=True,
+        HAS_SS_CLIENT_ERROR=True,
+        SecretServerError=SecretServerError,
+        SecretServerClientError=SecretServerClientError,
+    )
+    def test_retry_exhausted_raises(self):
+        faulty1 = MagicMock()
+        faulty1.get_secret.side_effect = SecretServerClientError()
+        faulty2 = MagicMock()
+        faulty2.get_secret.side_effect = SecretServerClientError()
+        with patch(make_absolute("TSSClient.from_params"), side_effect=[faulty1, faulty2]) as from_params:
+            with self.assertRaises(tss.AnsibleError):
+                self._run_lookup(self.VALID_TERMS)
+            self.assertEqual(from_params.call_count, 2)
+
+    @patch.multiple(
+        TSS_IMPORT_PATH,
+        HAS_TSS_SDK=True,
+        HAS_SS_CLIENT_ERROR=True,
+        SecretServerError=SecretServerError,
+        SecretServerClientError=SecretServerClientError,
+    )
+    def test_non_client_error_does_not_retry(self):
+        faulty = MagicMock()
+        faulty.get_secret.side_effect = SecretServerError()
+        with patch(make_absolute("TSSClient.from_params"), side_effect=[faulty, MagicMock()]) as from_params:
+            with self.assertRaises(tss.AnsibleError):
+                self._run_lookup(self.VALID_TERMS)
+            self.assertEqual(from_params.call_count, 1)
+
+    @patch.multiple(
+        TSS_IMPORT_PATH,
+        HAS_TSS_SDK=True,
+        HAS_SS_CLIENT_ERROR=False,
+        SecretServerError=SecretServerError,
+        SecretServerClientError=None,
+    )
+    def test_missing_client_error_symbol_does_not_retry(self):
+        faulty = MagicMock()
+        faulty.get_secret.side_effect = SecretServerClientError()
+        with patch(make_absolute("TSSClient.from_params"), side_effect=[faulty, MagicMock()]) as from_params:
+            with self.assertRaises(tss.AnsibleError):
+                self._run_lookup(self.VALID_TERMS)
+            self.assertEqual(from_params.call_count, 1)
 
     def _run_lookup(self, terms, variables=None, **kwargs):
         variables = variables or []

@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - "tss lookup plugin - cache the ``TSSClient`` per process and credential identity so OAuth2 token grants are reused across lookups (rebuilding the client and retrying the lookup once on a stale-token 4xx, while 5xx and other errors propagate unchanged), and add a ``token_path_source`` option whose ``auto`` value lets ``python-tss-sdk`` auto-detect the Secret Server or Delinea Platform token endpoint (https://github.com/ansible-collections/community.general/pull/12328)."
