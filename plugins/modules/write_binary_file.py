@@ -12,7 +12,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: write_binary_file
 short_description: Write binary file from Base64 encoded input
-version_added: 13.2.0
+version_added: 13.3.0
 description:
   - Given Base64 encoded content, write it to a file.
   - This is useful when Base64-encoded binary content (that is not valid UTF-8)
