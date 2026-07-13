@@ -6,6 +6,24 @@ Community General Release Notes
 
 This changelog describes changes after version 11.0.0.
 
+v12.6.3
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- apk - the ``upgrade`` operation no longer reports ``changed=true`` when nothing was upgraded but an apk commit hook (for example ``mrtest``, or anything installed in ``/etc/apk/commit_hooks.d/``) printed output before the trailing ``OK:`` summary line; the change status is now derived from the packages apk actually reports upgrading (https://github.com/ansible-collections/community.general/issues/12223, https://github.com/ansible-collections/community.general/pull/12376).
+- composer - restore compatibility with older compose versions when using ``working_dir`` (https://github.com/ansible-collections/community.general/issues/12293, https://github.com/ansible-collections/community.general/pull/12339).
+- jenkins_job_info - fix ``KeyError: 'color'`` when filtering folder jobs by color (https://github.com/ansible-collections/community.general/issues/12232), https://github.com/ansible-collections/community.general/pull/12369).
+- nmcli - now handles connection names derived from MAC addresses, and generally names that contain ``:`` or ``\\`` (https://github.com/ansible-collections/community.general/issues/12386, https://github.com/ansible-collections/community.general/pull/12387).
+- opennebula inventory plugin - fix crash when retrieving VM without NIC (https://github.com/ansible-collections/community.general/pull/12361).
+- pacemaker_resource - fix bug where the resource-ready state check did not recognize all valid ready states, causing the module to time out on resources that never reach the ``Started`` state (https://github.com/ansible-collections/community.general/issues/12351, https://github.com/ansible-collections/community.general/pull/12355).
+
 v12.6.2
 =======
 
