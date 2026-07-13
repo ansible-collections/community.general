@@ -120,7 +120,7 @@ options:
       - loopback
   mode:
     description:
-      - Bond mode to use for a bond connection.
+      - This is the type of device or network connection that you wish to create for a bond or bridge.
       - When creating a new bond, NetworkManager's default mode V(balance-rr) is used if this option is not provided.
       - When omitted for an existing bond connection, the module preserves the current bond mode.
       - This option only applies when C(type) is set to C(bond).
