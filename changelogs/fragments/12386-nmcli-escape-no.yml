@@ -1,4 +1,4 @@
-minor_changes:
+bugfixes:
  - nmcli - now handles connection names derived from MAC addresses,
    and generally names that contain ``:`` or ``\\``
    (https://github.com/ansible-collections/community.general/issues/12386,
