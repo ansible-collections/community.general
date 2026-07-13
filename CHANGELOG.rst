@@ -6,6 +6,49 @@ Community General Release Notes
 
 This changelog describes changes after version 12.0.0.
 
+v13.2.0
+=======
+
+Release Summary
+---------------
+
+Regular bugfix and feature release.
+
+Minor Changes
+-------------
+
+- The collection now depends on community.library_inventory_filtering_v1. This runtime dependency is used by inventory plugins only, and will be automatically installed by ``ansible-galaxy collection install``. If you install community.general by cloning its repository or extracting its release tarball to a specific location, you also need to make sure to install community.library_inventory_filtering_v1 manually if you use one of the affected inventory plugins (https://github.com/ansible-collections/community.general/pull/12302).
+- bitwarden lookup plugin - add ``sync`` option to sync items from the vault before lookup (https://github.com/ansible-collections/community.general/pull/12377).
+- consul_kv - the module no longer requires the ``py-consul`` Python library, and is now part of the ``community.general.consul`` action group (https://github.com/ansible-collections/community.general/pull/12221).
+- gitlab_runners inventory plugin - wrap the Gitlab API object in a context mananger, and only create the ``gitlab_runners`` group after the API request was successful (https://github.com/ansible-collections/community.general/pull/12378).
+- nmap inventory plugin - allow ``address`` to be a list of networks/IP ranges to scan, in addition to a single string (https://github.com/ansible-collections/community.general/issues/12379, https://github.com/ansible-collections/community.general/pull/12384).
+- opennebula inventory plugin - add new option ``filter`` that allows to filter hosts by variables (https://github.com/ansible-collections/community.general/pull/12302).
+- passwordstore lookup plugin - make ``directory`` configurable through ``ansible.cfg`` (https://github.com/ansible-collections/community.general/pull/12298).
+- tss lookup plugin - cache the ``TSSClient`` per process and credential identity so OAuth2 token grants are reused across lookups (rebuilding the client and retrying the lookup once on a stale-token 4xx, while 5xx and other errors propagate unchanged), and add a ``token_path_source`` option whose ``auto`` value lets ``python-tss-sdk`` auto-detect the Secret Server or Delinea Platform token endpoint (https://github.com/ansible-collections/community.general/pull/12328).
+
+Bugfixes
+--------
+
+- composer - restore compatibility with older compose versions when using ``working_dir`` (https://github.com/ansible-collections/community.general/issues/12293, https://github.com/ansible-collections/community.general/pull/12339).
+- filesystem - the module now also handles the output format of bcachefs-tools v1.38.4 and above (https://github.com/ansible-collections/community.general/issues/12259, https://github.com/ansible-collections/community.general/pull/12291).
+- jenkins_job_info - fix ``KeyError: 'color'`` when filtering folder jobs by color (https://github.com/ansible-collections/community.general/issues/12232), https://github.com/ansible-collections/community.general/pull/12369).
+- nmcli - now handles connection names derived from MAC addresses, and generally names that contain ``:`` or ``\\`` (https://github.com/ansible-collections/community.general/issues/12386, https://github.com/ansible-collections/community.general/pull/12387).
+- opennebula inventory plugin - fix crash when retrieving VM without NIC (https://github.com/ansible-collections/community.general/pull/12361).
+- pacemaker_resource - fix bug where the resource-ready state check did not recognize all valid ready states, causing the module to time out on resources that never reach the ``Started`` state (https://github.com/ansible-collections/community.general/issues/12351, https://github.com/ansible-collections/community.general/pull/12355).
+
+New Plugins
+-----------
+
+Lookup
+~~~~~~
+
+- community.general.proton_pass - Fetch secrets from Proton Pass via the :literal:`pass\-cli` command\-line tool.
+
+New Modules
+-----------
+
+- community.general.xml_info - Query XML files or strings.
+
 v13.1.0
 =======
 
