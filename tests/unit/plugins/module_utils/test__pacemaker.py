@@ -8,8 +8,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from ansible_collections.community.general.plugins.module_utils import _pacemaker
-from ansible_collections.community.general.plugins.module_utils._pacemaker import (
+from ansible_collections.community.general.plugins.module_utils import pacemaker as _pacemaker
+from ansible_collections.community.general.plugins.module_utils.pacemaker import (
     _DEFAULT_RESOURCE_READY_STATES,
     wait_for_resource,
 )
