@@ -10,6 +10,7 @@ action_groups:
     - consul_agent_service
     - consul_auth_method
     - consul_binding_rule
+    - consul_kv
     - consul_policy
     - consul_role
     - consul_session
