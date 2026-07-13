@@ -27,8 +27,11 @@ options:
     default: false
     type: boolean
   address:
-    description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
-    type: string
+    description:
+      - Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
+      - Since community.general 13.2.0 this can be a list of networks or IP ranges.
+    type: list
+    elements: string
     required: true
     env:
       - name: ANSIBLE_NMAP_ADDRESS
@@ -156,8 +159,11 @@ from ansible.errors import AnsibleParserError
 from ansible.module_utils.common.process import get_bin_path
 from ansible.module_utils.common.text.converters import to_native, to_text
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, Constructable
+from ansible.utils.display import Display
 
 from ansible_collections.community.general.plugins.plugin_utils._unsafe import make_unsafe
+
+display = Display()
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -277,7 +283,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if self.get_option("skip_host_discovery"):
                 cmd.append("-Pn")
 
-            cmd.append(self.get_option("address"))
+            cmd.extend(self.get_option("address"))
+
+            display.v(f"nmap: scanning {', '.join(self.get_option('address'))}")
             try:
                 # execute
                 p = Popen(cmd, stdout=PIPE, stderr=PIPE)
