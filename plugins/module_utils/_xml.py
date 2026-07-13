@@ -24,7 +24,7 @@ from ansible_collections.community.general.plugins.module_utils._version import 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
-etree: t.Any = None
+etree = None
 with deps.declare("lxml"):
     from lxml import etree  # type: ignore[no-redef]
 

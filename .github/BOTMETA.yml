@@ -144,7 +144,7 @@ files:
     maintainers: russoz
   $doc_fragments/_xml.py:
     labels: xml
-    maintainers: shrbhosa dagwieers magnus919 tbielawa
+    maintainers: Shreyashxredhat dagwieers magnus919 tbielawa
   $doc_fragments/_xenserver.py:
     labels: xenserver
     maintainers: bvitnik
@@ -460,7 +460,7 @@ files:
     maintainers: russoz
   $module_utils/_xml.py:
     labels: xml
-    maintainers: shrbhosa dagwieers magnus919 tbielawa
+    maintainers: Shreyashxredhat dagwieers magnus919 tbielawa
   $modules/aerospike_migrations.py:
     maintainers: Alb0t
   $modules/airbrake_deployment.py:
@@ -1493,7 +1493,7 @@ files:
     maintainers: dagwieers magnus919 tbielawa cmprescott sm4rk0
   $modules/xml_info.py:
     labels: m:xml_info xml
-    maintainers: shrbhosa Shreyashxredhat dagwieers magnus919 tbielawa cmprescott sm4rk0
+    maintainers: Shreyashxredhat dagwieers magnus919 tbielawa cmprescott sm4rk0
   $modules/yarn.py:
     ignore: chrishoffman verkaufer
   $modules/yum_versionlock.py:

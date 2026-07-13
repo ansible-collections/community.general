@@ -16,7 +16,7 @@ short_description: Query XML files or strings
 description:
   - A read-only interface to query XML files or strings using XPath expressions.
   - Supports counting matches, listing matched XPath paths, and retrieving element text or attributes.
-version_added: "13.1.0"
+version_added: "13.2.0"
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.info_module
@@ -37,9 +37,9 @@ options:
   count_mode:
     description:
       - How to determine the count of XPath matches when O(what=count).
-      - V(match) evaluates the XPath expression and counts the results with Python's C(len()).
+      - V(match) evaluates the XPath expression and counts the results with Python's V(len(\)).
         This is always correct for any XPath expression.
-      - V(xpath) uses the XPath C(count()) function, which is more memory-efficient for large
+      - V(xpath) uses the XPath V(count(\)) function, which is more memory-efficient for large
         result sets since it does not build the full list of matches in memory. However, it may
         produce different results for XPath expressions that do not return node-sets.
       - This option is only used when O(what=count). For other O(what) values, the count is
