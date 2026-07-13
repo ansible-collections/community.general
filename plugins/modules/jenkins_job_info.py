@@ -181,6 +181,28 @@ def test_dependencies(module):
         )
 
 
+def filter_jobs_by_color(jobs, color):
+    """Return jobs matching the given Jenkins status color.
+
+    Folder jobs may not have a top-level color; nested jobs are checked
+    recursively and the folder is kept when any child matches.
+    """
+    filtered = []
+    for job in jobs:
+        if job.get("color") == color:
+            filtered.append(job)
+            continue
+        nested = job.get("jobs")
+        if not nested:
+            continue
+        nested_filtered = filter_jobs_by_color(nested, color)
+        if nested_filtered:
+            folder = job.copy()
+            folder["jobs"] = nested_filtered
+            filtered.append(folder)
+    return filtered
+
+
 def get_jobs(module):
     jenkins_conn = get_jenkins_connection(module)
     jobs = []
@@ -190,14 +212,14 @@ def get_jobs(module):
         except jenkins.NotFoundException:
             pass
         else:
-            jobs.append(
-                {
-                    "name": job_info["name"],
-                    "fullname": job_info["fullName"],
-                    "url": job_info["url"],
-                    "color": job_info["color"],
-                }
-            )
+            job = {
+                "name": job_info["name"],
+                "fullname": job_info["fullName"],
+                "url": job_info["url"],
+            }
+            if "color" in job_info:
+                job["color"] = job_info["color"]
+            jobs.append(job)
 
     else:
         all_jobs = jenkins_conn.get_all_jobs()
@@ -213,8 +235,8 @@ def get_jobs(module):
             if "_class" in job:
                 del job["_class"]
 
-    if module.params.get("color"):
-        jobs = [j for j in jobs if j["color"] == module.params.get("color")]
+    if module.params["color"]:
+        jobs = filter_jobs_by_color(jobs, module.params["color"])
 
     return jobs
 
