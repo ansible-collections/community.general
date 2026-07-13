@@ -7,6 +7,9 @@ from __future__ import annotations
 import unittest
 from unittest import mock
 
+import pytest
+from ansible.module_utils.ansible_release import __version__ as ansible_core_version
+
 from ansible_collections.community.general.plugins.modules import apk
 
 
@@ -67,6 +70,7 @@ class TestApkParseForPackages(unittest.TestCase):
         )
 
 
+@pytest.mark.skipif(tuple(int(x) for x in ansible_core_version.split(".")[:2]) < (2, 18), reason="ansible-core < 2.18")
 class TestApkUpgradePackages(unittest.TestCase):
     def _run_upgrade(self, stdout, rc=0):
         module = mock.Mock()
