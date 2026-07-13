@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_runners inventory plugin - wrap the Gitlab API object in a context mananger, and only create the ``gitlab_runners`` group after the API request was successful (https://github.com/ansible-collections/community.general/pull/12378).

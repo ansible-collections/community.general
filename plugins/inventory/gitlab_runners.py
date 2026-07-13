@@ -98,34 +98,34 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
     NAME = "community.general.gitlab_runners"
 
     def _populate(self):
-        gl = gitlab.Gitlab(self.get_option("server_url"), private_token=self.get_option("api_token"))
-        self.inventory.add_group("gitlab_runners")
-        try:
-            if self.get_option("filter"):
-                runners = gl.runners.all(scope=self.get_option("filter"))
-            else:
-                runners = gl.runners.all()
-            for runner in runners:
-                host = make_unsafe(str(runner["id"]))
-                ip_address = runner["ip_address"]
-                host_attrs = make_unsafe(vars(gl.runners.get(runner["id"]))["_attrs"])
-                self.inventory.add_host(host, group="gitlab_runners")
-                self.inventory.set_variable(host, "ansible_host", make_unsafe(ip_address))
-                if self.get_option("verbose_output", True):
-                    self.inventory.set_variable(host, "gitlab_runner_attributes", host_attrs)
+        with gitlab.Gitlab(self.get_option("server_url"), private_token=self.get_option("api_token")) as gl:
+            try:
+                if self.get_option("filter"):
+                    runners = gl.runners.all(scope=self.get_option("filter"))
+                else:
+                    runners = gl.runners.all()
+                self.inventory.add_group("gitlab_runners")
+                for runner in runners:
+                    host = make_unsafe(str(runner["id"]))
+                    ip_address = runner["ip_address"]
+                    host_attrs = make_unsafe(vars(gl.runners.get(runner["id"]))["_attrs"])
+                    self.inventory.add_host(host, group="gitlab_runners")
+                    self.inventory.set_variable(host, "ansible_host", make_unsafe(ip_address))
+                    if self.get_option("verbose_output", True):
+                        self.inventory.set_variable(host, "gitlab_runner_attributes", host_attrs)
 
-                # Use constructed if applicable
-                strict = self.get_option("strict")
-                # Composed variables
-                self._set_composite_vars(self.get_option("compose"), host_attrs, host, strict=strict)
-                # Complex groups based on jinja2 conditionals, hosts that meet the conditional are added to group
-                self._add_host_to_composed_groups(self.get_option("groups"), host_attrs, host, strict=strict)
-                # Create groups based on variable values and add the corresponding hosts to it
-                self._add_host_to_keyed_groups(self.get_option("keyed_groups"), host_attrs, host, strict=strict)
-        except Exception as e:
-            raise AnsibleParserError(
-                f"Unable to fetch hosts from GitLab API, this was the original exception: {e}"
-            ) from e
+                    # Use constructed if applicable
+                    strict = self.get_option("strict")
+                    # Composed variables
+                    self._set_composite_vars(self.get_option("compose"), host_attrs, host, strict=strict)
+                    # Complex groups based on jinja2 conditionals, hosts that meet the conditional are added to group
+                    self._add_host_to_composed_groups(self.get_option("groups"), host_attrs, host, strict=strict)
+                    # Create groups based on variable values and add the corresponding hosts to it
+                    self._add_host_to_keyed_groups(self.get_option("keyed_groups"), host_attrs, host, strict=strict)
+            except Exception as e:
+                raise AnsibleParserError(
+                    f"Unable to fetch hosts from GitLab API, this was the original exception: {e}"
+                ) from e
 
     def verify_file(self, path):
         """Return the possibly of a file being consumable by this plugin."""
