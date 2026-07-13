@@ -68,7 +68,7 @@ def parse_xml_doc(
     huge_tree: bool = False,
     remove_blank_text: bool = False,
     resolve_entities: bool = True,
-) -> t.Any:
+) -> etree._ElementTree:
     infile: t.IO[bytes] | None = None
     try:
         if xml_string:
