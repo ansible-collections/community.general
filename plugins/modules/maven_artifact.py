@@ -157,9 +157,8 @@ options:
     version_added: 5.2.0
     description:
       - A list of headers that should not be included in the redirection. This headers are sent to the C(fetch_url) function.
-      - On ansible-core version 2.12 or later, the default of this option is V([Authorization, Cookie]).
       - Useful if the redirection URL does not need to have sensitive headers in the request.
-      - Requires ansible-core version 2.12 or later.
+    default: ["Authorization", "Cookie"]
   directory_mode:
     type: str
     description:
@@ -665,16 +664,12 @@ def main():
             keep_name=dict(default=False, type="bool"),
             verify_checksum=dict(default="download", choices=["never", "download", "change", "always"]),
             checksum_alg=dict(default="md5", choices=["md5", "sha1"]),
-            unredirected_headers=dict(type="list", elements="str"),
+            unredirected_headers=dict(type="list", elements="str", default=["Authorization", "Cookie"]),
             directory_mode=dict(type="str"),
         ),
         add_file_common_args=True,
         mutually_exclusive=([("version", "version_by_spec")]),
     )
-
-    if module.params["unredirected_headers"] is None:
-        # if the user did not supply unredirected params, we use the default
-        module.params["unredirected_headers"] = ["Authorization", "Cookie"]
 
     if not HAS_LXML_ETREE:
         module.fail_json(msg=missing_required_lib("lxml"), exception=LXML_ETREE_IMP_ERR)
