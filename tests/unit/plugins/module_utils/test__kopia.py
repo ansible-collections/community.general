@@ -46,6 +46,13 @@ def test_repository_state_map_entries():
     assert REPOSITORY_STATE_MAP["throttled"] == "throttle"
 
 
+def test_repository_state_map_snapshot_entries():
+    assert REPOSITORY_STATE_MAP["deleted"] == "delete"
+    assert REPOSITORY_STATE_MAP["expired"] == "expire"
+    assert REPOSITORY_STATE_MAP["listed"] == "list"
+    assert REPOSITORY_STATE_MAP["verified"] == "verify"
+
+
 # ---------------------------------------------------------------------------
 # fmt_backend
 # ---------------------------------------------------------------------------
