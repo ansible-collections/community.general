@@ -56,10 +56,10 @@ SCHEME_CASES = [
 ]
 
 
-@pytest.mark.parametrize("ssl, addr, expected", SCHEME_CASES)
-def test_env_consul_scheme(monkeypatch, ssl, addr, expected):
-    if ssl is not None:
-        monkeypatch.setenv("CONSUL_HTTP_SSL", ssl)
+@pytest.mark.parametrize("tls, addr, expected", SCHEME_CASES)
+def test_env_consul_scheme(monkeypatch, tls, addr, expected):
+    if tls is not None:
+        monkeypatch.setenv("CONSUL_HTTP_SSL", tls)
     if addr is not None:
         monkeypatch.setenv("CONSUL_HTTP_ADDR", addr)
     assert _consul.env_consul_scheme() == expected
