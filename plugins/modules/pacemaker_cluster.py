@@ -26,7 +26,7 @@ options:
     description:
       - Indicate desired state of the cluster.
       - The value V(maintenance) has been added in community.general 11.1.0.
-      - The value V(unmaintenance) has been added in community.general 13.2.0.
+      - The value V(unmaintenance) has been added in community.general 13.3.0.
     choices: [cleanup, offline, online, restart, maintenance, unmaintenance]
     type: str
     required: true
