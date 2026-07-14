@@ -1,0 +1,2 @@
+minor_changes:
+  - maven_artifact - use Ansible construct to express the default value of parameter (https://github.com/ansible-collections/community.general/pull/12411).
