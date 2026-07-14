@@ -93,6 +93,8 @@ no_trailing_whitespace_skip_directories = [
 name = "consul"
 pattern = "^consul_.*$"
 exclusions = [
+    # The consul_acl_bootstrap module does not have a 'token' option, as opposed
+    # to all other consul modules. Therefore it is not part of the action group.
     "consul_acl_bootstrap",
 ]
 doc_fragment = "community.general._consul.actiongroup_consul"
