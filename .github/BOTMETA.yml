@@ -1472,6 +1472,8 @@ files:
     maintainers: $team_wdc
   $modules/wdc_redfish_info.py:
     maintainers: $team_wdc
+  $modules/write_binary_file.py:
+    maintainers: felixfontein
   $modules/xattr.py:
     labels: xattr
     maintainers: bcoca
