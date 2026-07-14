@@ -100,13 +100,13 @@ def env_consul_scheme(*args: t.Any, **kwargs: t.Any) -> str:
     # A true CONSUL_HTTP_SSL forces https. A false one does NOT downgrade an
     # https scheme in CONSUL_HTTP_ADDR, matching the consul CLI, which never
     # reverts to http when TLS was explicitly requested.
-    ssl = os.environ.get("CONSUL_HTTP_SSL")
-    if ssl:
+    tls = os.environ.get("CONSUL_HTTP_SSL")
+    if tls:
         try:
-            use_ssl = boolean(ssl, strict=True)
+            use_tls = boolean(tls, strict=True)
         except (TypeError, ValueError) as exc:
-            raise ValueError(f"CONSUL_HTTP_SSL ({ssl}) is not a valid boolean") from exc
-        if use_ssl:
+            raise ValueError(f"CONSUL_HTTP_SSL ({tls}) is not a valid boolean") from exc
+        if use_tls:
             return "https"
     parsed = parse_consul_http_addr()
     if parsed is not None and parsed.scheme:

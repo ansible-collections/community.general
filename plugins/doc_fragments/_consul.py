@@ -15,37 +15,38 @@ options:
   host:
     description:
       - Host of the Consul agent.
-      - If unset, the host component of the E(CONSUL_HTTP_ADDR) environment variable is used when set (since community.general
-        13.2.0).
+      - If unset, the host component of the E(CONSUL_HTTP_ADDR) environment variable is used when set.
+        This is supported since community.general 13.3.0.
     default: localhost
     type: str
   port:
     type: int
     description:
       - The port on which the consul agent is running.
-      - If unset, the port component of the E(CONSUL_HTTP_ADDR) environment variable is used when set (since community.general
-        13.2.0).
+      - If unset, the port component of the E(CONSUL_HTTP_ADDR) environment variable is used when set.
+        This is supported since community.general 13.3.0.
     default: 8500
   scheme:
     description:
       - The protocol scheme on which the Consul agent is running. Defaults to V(http) and can be set to V(https) for secure
         connections.
-      - If unset, a true value in the E(CONSUL_HTTP_SSL) environment variable selects V(https), otherwise the scheme component
-        of E(CONSUL_HTTP_ADDR) is used when set (since community.general 13.2.0). A false E(CONSUL_HTTP_SSL) does not downgrade
-        an V(https) scheme in E(CONSUL_HTTP_ADDR).
+      - If unset, a C(true) value in the E(CONSUL_HTTP_SSL) environment variable selects V(https), otherwise the scheme component
+        of E(CONSUL_HTTP_ADDR) is used when set. A C(false) E(CONSUL_HTTP_SSL) does not downgrade an V(https) scheme in
+        E(CONSUL_HTTP_ADDR). This is supported since community.general 13.3.0.
     default: http
     type: str
   validate_certs:
     type: bool
     description:
       - Whether to verify the TLS certificate of the Consul agent.
-      - If unset, the value of the E(CONSUL_HTTP_SSL_VERIFY) environment variable is used when set (since community.general
-        13.2.0).
+      - If unset, the value of the E(CONSUL_HTTP_SSL_VERIFY) environment variable is used when set.
+        This is supported since community.general 13.3.0.
     default: true
   ca_path:
     description:
       - The CA bundle to use for https connections.
-      - If unset, the value of the E(CONSUL_CACERT) environment variable is used when set (since community.general 13.2.0).
+      - If unset, the value of the E(CONSUL_CACERT) environment variable is used when set.
+        This is supported since community.general 13.3.0.
     type: str
 """
 
@@ -54,7 +55,8 @@ options:
   token:
     description:
       - The token to use for authorization.
-      - If unset, the value of the E(CONSUL_HTTP_TOKEN) environment variable is used (since community.general 13.2.0).
+      - If unset, the value of the E(CONSUL_HTTP_TOKEN) environment variable is used.
+        This is supported since community.general 13.3.0.
     type: str
 """
 

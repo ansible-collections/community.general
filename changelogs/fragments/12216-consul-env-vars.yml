@@ -1,4 +1,4 @@
 minor_changes:
   - consul modules - connection options now fall back to the ``CONSUL_HTTP_ADDR``, ``CONSUL_HTTP_SSL``, ``CONSUL_HTTP_SSL_VERIFY``,
     ``CONSUL_HTTP_TOKEN`` and ``CONSUL_CACERT`` environment variables when not specified. This applies to all consul modules
-    except ``consul``, which does not use the shared connection option handling yet (https://github.com/ansible-collections/community.general/pull/12216).
+    except ``community.general.consul``, which does not use the shared connection option handling yet (https://github.com/ansible-collections/community.general/pull/12216).
