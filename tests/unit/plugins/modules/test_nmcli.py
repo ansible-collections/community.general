@@ -621,13 +621,26 @@ ipv6.ignore-auto-routes:                no
 bond.options:                           mode=active-backup,primary=non_existent_primary,xmit_hash_policy=layer3+4
 """
 
-TESTCASE_BOND_MODE_UNSET = [
+TESTCASE_BOND_MODE_UNSET_PRESERVE = [
     {
         "type": "bond",
         "conn_name": "non_existent_nw_device",
         "ifname": "bond_non_existant",
         "dns4_search": ["example1.com", "example2.com"],
         "state": "present",
+        "bond_mode_behavior": "preserve",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_BOND_MODE_UNSET_RESET = [
+    {
+        "type": "bond",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "bond_non_existant",
+        "dns4_search": ["example1.com", "example2.com"],
+        "state": "present",
+        "bond_mode_behavior": "reset",
         "_ansible_check_mode": False,
     }
 ]
@@ -648,6 +661,18 @@ ipv6.ignore-auto-routes:                no
 802-3-ethernet.mtu:                     auto
 bond.options:                           mode=802.3ad
 """
+
+TESTCASE_BOND_MODE_EXPLICIT = [
+    {
+        "type": "bond",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "bond_non_existant",
+        "mode": "active-backup",
+        "state": "present",
+        "bond_mode_behavior": "preserve",
+        "_ansible_check_mode": False,
+    }
+]
 
 TESTCASE_BOND_ARP = [
     {
@@ -2310,8 +2335,8 @@ def test_bond_connection_unchanged(mocked_bond_connection_unchanged, capfd):
     assert not results["changed"]
 
 
-@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_MODE_UNSET, indirect=["patch_ansible_module"])
-def test_bond_mode_omitted_does_not_change_existing_connection(mocked_bond_mode_unset_connection_unchanged):
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_MODE_UNSET_PRESERVE, indirect=["patch_ansible_module"])
+def test_bond_mode_omitted_preserves_existing_connection(mocked_bond_mode_unset_connection_unchanged):
     """
     Regression test for unspecified bond mode on existing connections.
     """
@@ -2324,6 +2349,30 @@ def test_bond_mode_omitted_does_not_change_existing_connection(mocked_bond_mode_
     assert "mode" not in diff["after"]
     assert diff["before"]["ipv4.dns-search"] == ["example1.com", "example2.com"]
     assert diff["after"]["ipv4.dns-search"] == ["example1.com", "example2.com"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_MODE_UNSET_RESET, indirect=["patch_ansible_module"])
+def test_bond_mode_omitted_uses_legacy_reset_behavior(mocked_bond_mode_unset_connection_unchanged):
+    """
+    Regression test for the legacy reset behavior when bond mode is omitted.
+    """
+    module = nmcli.create_module()
+    nmcli_module = nmcli.Nmcli(module)
+
+    options = nmcli_module.connection_options()
+    assert options["mode"] == "balance-rr"
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_MODE_EXPLICIT, indirect=["patch_ansible_module"])
+def test_bond_mode_explicit_value_takes_precedence_over_behavior(mocked_bond_mode_unset_connection_unchanged):
+    """
+    An explicitly provided mode should take precedence over the behavior setting.
+    """
+    module = nmcli.create_module()
+    nmcli_module = nmcli.Nmcli(module)
+
+    options = nmcli_module.connection_options()
+    assert options["mode"] == "active-backup"
 
 
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_ARP, indirect=["patch_ansible_module"])
