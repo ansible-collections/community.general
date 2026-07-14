@@ -122,8 +122,8 @@ options:
     description:
       - This is the type of device or network connection that you wish to create for a bond or bridge.
       - When creating a new bond, NetworkManager's default mode V(balance-rr) is used if this option is not provided.
-      - When omitted for an existing bond connection, the module preserves the current bond mode by default.
-      - This option only applies when C(type) is set to C(bond).
+      - When omitted for an existing bond connection, the module uses the behavior selected by O(bond_mode_behavior).
+      - This option only applies when O(type=bond).
     type: str
     choices: [802.3ad, active-backup, balance-alb, balance-rr, balance-tlb, balance-xor, broadcast]
   bond_mode_behavior:
@@ -131,7 +131,7 @@ options:
       - Controls how the module behaves when O(mode) is omitted on an existing bond connection.
       - When set to V(preserve), the module leaves the current bond mode unchanged.
       - When set to V(reset), the module uses the legacy default V(balance-rr).
-      - This option only applies when C(type) is set to C(bond).
+      - This option only applies when O(type=bond).
     type: str
     choices: [preserve, reset]
     default: reset
