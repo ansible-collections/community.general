@@ -10,12 +10,15 @@ from __future__ import annotations
 import base64
 import copy
 import json
+import os
 import re
 import typing as t
 from http import HTTPStatus
 from urllib import error as urllib_error
-from urllib.parse import quote, urlencode
+from urllib.parse import ParseResult, quote, urlencode, urlparse
 
+from ansible.module_utils.basic import AnsibleFallbackNotFound
+from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.module_utils.urls import open_url
 
 if t.TYPE_CHECKING:
@@ -51,13 +54,83 @@ def handle_consul_response_error(response):
         raise RequestError(f"{response.status_code} {response.content}")
 
 
+def parse_consul_http_addr() -> ParseResult | None:
+    addr = os.environ.get("CONSUL_HTTP_ADDR", "").strip()
+    if not addr:
+        return None
+    # CONSUL_HTTP_ADDR accepts both host:port and scheme://host:port.
+    # urlparse needs the leading // to treat the former as a netloc.
+    parsed = urlparse(addr if "://" in addr else "//" + addr)
+    # The variable may be set for the consul CLI, which also accepts unix://
+    # sockets, path prefixes, credentials and query strings. The modules cannot
+    # honor those faithfully, so such addresses are ignored rather than
+    # half-used, keeping playbooks that never relied on the variable working as
+    # before.
+    if parsed.scheme and parsed.scheme not in ("http", "https"):
+        return None
+    if parsed.path and parsed.path != "/":
+        return None
+    if parsed.query or parsed.fragment or parsed.username is not None:
+        return None
+    try:
+        # A mangled netloc (unbracketed IPv6, garbage port) must never hand
+        # out any component, so validate the port here for every consumer.
+        parsed.port  # noqa: B018
+    except ValueError as exc:
+        raise ValueError(f"CONSUL_HTTP_ADDR ({addr}) contains an invalid port") from exc
+    return parsed
+
+
+def env_consul_host(*args: t.Any, **kwargs: t.Any) -> str:
+    parsed = parse_consul_http_addr()
+    if parsed is not None and parsed.hostname:
+        # Re-bracket IPv6 addresses so composed URLs stay valid.
+        return f"[{parsed.hostname}]" if ":" in parsed.hostname else parsed.hostname
+    raise AnsibleFallbackNotFound
+
+
+def env_consul_port(*args: t.Any, **kwargs: t.Any) -> int:
+    parsed = parse_consul_http_addr()
+    if parsed is not None and parsed.port is not None:
+        return parsed.port
+    raise AnsibleFallbackNotFound
+
+
+def env_consul_scheme(*args: t.Any, **kwargs: t.Any) -> str:
+    # A true CONSUL_HTTP_SSL forces https. A false one does NOT downgrade an
+    # https scheme in CONSUL_HTTP_ADDR, matching the consul CLI, which never
+    # reverts to http when TLS was explicitly requested.
+    ssl = os.environ.get("CONSUL_HTTP_SSL")
+    if ssl:
+        try:
+            use_ssl = boolean(ssl, strict=True)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"CONSUL_HTTP_SSL ({ssl}) is not a valid boolean") from exc
+        if use_ssl:
+            return "https"
+    parsed = parse_consul_http_addr()
+    if parsed is not None and parsed.scheme:
+        return parsed.scheme
+    raise AnsibleFallbackNotFound
+
+
+def nonempty_env_fallback(*names: str) -> str:
+    # Like env_fallback, but a variable that is set to an empty string counts
+    # as unset, matching how the consul CLI reads its environment.
+    for name in names:
+        value = os.environ.get(name)
+        if value:
+            return value
+    raise AnsibleFallbackNotFound
+
+
 AUTH_ARGUMENTS_SPEC = dict(
-    host=dict(default="localhost"),
-    port=dict(type="int", default=8500),
-    scheme=dict(default="http"),
-    validate_certs=dict(type="bool", default=True),
-    token=dict(no_log=True),
-    ca_path=dict(),
+    host=dict(default="localhost", fallback=(env_consul_host,)),
+    port=dict(type="int", default=8500, fallback=(env_consul_port,)),
+    scheme=dict(default="http", fallback=(env_consul_scheme,)),
+    validate_certs=dict(type="bool", default=True, fallback=(nonempty_env_fallback, ["CONSUL_HTTP_SSL_VERIFY"])),
+    token=dict(no_log=True, fallback=(nonempty_env_fallback, ["CONSUL_HTTP_TOKEN"])),
+    ca_path=dict(fallback=(nonempty_env_fallback, ["CONSUL_CACERT"])),
 )
 
 
