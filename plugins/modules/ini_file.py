@@ -468,10 +468,10 @@ def do_ini(
         # override option with no value to option with value if not allow_no_value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
-                match = not changed_lines[index] and match_function(option, line)
+                line_match = match_function(option, line) if not changed_lines[index] else None
                 # skip comment-only lines (e.g. "; output_buffering" with no "="):
                 # group(2) is the comment char, group(6) is "=" or "" (end-of-line match)
-                if match and not (match.group(2) and not match.group(6)):
+                if line_match and not (line_match.group(2) and not line_match.group(6)):
                     newline = f"{option}{sep}{values.pop(0)}\n"
                     (changed, msg) = update_section_line(
                         option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg
@@ -480,9 +480,9 @@ def do_ini(
                         break
         # remove all remaining option occurrences from the rest of the section
         for index in range(len(section_lines) - 1, 0, -1):
-            match = not changed_lines[index] and match_function(option, section_lines[index])
+            line_match = match_function(option, section_lines[index]) if not changed_lines[index] else None
             # skip comment-only lines (no "=") — only remove active or commented config lines
-            if match and not (match.group(2) and not match.group(6)):
+            if line_match and not (line_match.group(2) and not line_match.group(6)):
                 del section_lines[index]
                 del changed_lines[index]
                 changed = True
