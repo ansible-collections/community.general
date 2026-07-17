@@ -1,0 +1,59 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- block: &prepare
+    - name: Create the final file
+      ansible.builtin.copy:
+        content: |
+          [main]
+          foo=BAR
+        dest: "{{ remote_tmp_dir }}/my_original_file.ini"
+    - name: Clean up symlink.ini
+      ansible.builtin.file:
+        path: "{{ remote_tmp_dir }}/symlink.ini"
+        state: absent
+    - name: Create a symbolic link
+      ansible.builtin.file:
+        src: my_original_file.ini
+        dest: "{{ remote_tmp_dir }}/symlink.ini"
+        state: link
+
+- name: Set the proxy key on the symlink which will be converted as a file
+  community.general.ini_file:
+    path: "{{ remote_tmp_dir }}/symlink.ini"
+    section: main
+    option: proxy
+    value: 'http://proxy.myorg.org:3128'
+- name: Set the proxy key on the final file that is still unchanged
+  community.general.ini_file:
+    path: "{{ remote_tmp_dir }}/my_original_file.ini"
+    section: main
+    option: proxy
+    value: 'http://proxy.myorg.org:3128'
+  register: result
+- ansible.builtin.assert:
+    that:
+      - result is changed
+
+# With follow
+- block: *prepare
+- name: Set the proxy key on the symlink which will be preserved
+  community.general.ini_file:
+    path: "{{ remote_tmp_dir }}/symlink.ini"
+    section: main
+    option: proxy
+    value: 'http://proxy.myorg.org:3128'
+    follow: true
+  register: result
+- name: Set the proxy key on the target directly that was changed in the previous step
+  community.general.ini_file:
+    path: "{{ remote_tmp_dir }}/my_original_file.ini"
+    section: main
+    option: proxy
+    value: 'http://proxy.myorg.org:3128'
+  register: result
+- ansible.builtin.assert:
+    that:
+      - "not (result is changed)"

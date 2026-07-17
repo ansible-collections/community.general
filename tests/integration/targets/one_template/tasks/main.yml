@@ -1,0 +1,246 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# test code for the one_template module
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# ENVIRONMENT PREPARATION
+
+- name: "copy fixtures to test host"
+  copy:
+    src: testhost/tmp/opennebula-fixtures.json.gz
+    dest: /tmp
+  when:
+    - opennebula_test_fixture
+    - opennebula_test_fixture_replay
+
+
+# Create a new template
+
+- name: "Create a new TEMPLATE"
+  one_template:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: ansible-onetemplate-test
+    template: |
+      CONTEXT = [
+        HOSTNAME = "ansible-onetemplate",
+        NETWORK = "YES",
+        SSH_PUBLIC_KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKAQwTkU84eEnhX3r60Mn5TPh99BDxyCNJu12OB5sfMu foxy@FoxPad",
+        USERNAME = "root" ]
+      CPU = "1"
+      CUSTOM_ATTRIBUTE = ""
+      DISK = [
+        CACHE = "writeback",
+        DEV_PREFIX = "sd",
+        DISCARD = "unmap",
+        IMAGE = "ansible-onetemplate",
+        IMAGE_UNAME = "oneadmin",
+        IO = "threads",
+        SIZE = "" ]
+      FEATURES = [
+        VIRTIO_SCSI_QUEUES = "2" ]
+      GRAPHICS = [
+        KEYMAP = "de",
+        LISTEN = "0.0.0.0",
+        TYPE = "VNC" ]
+      MEMORY = "2048"
+      NIC = [
+        MODEL = "virtio",
+        NETWORK = "tf-prd-centos",
+        NETWORK_UNAME = "oneadmin" ]
+      OS = [
+        ARCH = "x86_64",
+        BOOT = "disk0" ]
+      SCHED_REQUIREMENTS = "CLUSTER_ID=\"100\""
+      VCPU = "2"
+  environment:
+    PYONE_TEST_FIXTURE: "{{ opennebula_test_fixture }}"
+    PYONE_TEST_FIXTURE_FILE: /tmp/opennebula-fixtures.json.gz
+    PYONE_TEST_FIXTURE_REPLAY: "{{ opennebula_test_fixture_replay }}"
+    PYONE_TEST_FIXTURE_UNIT: test_create_template
+  register: result
+
+- name: "assert that creation worked"
+  assert:
+    that:
+      - result is changed
+
+
+# Updating a template
+
+- name: "Update an existing TEMPLATE"
+  one_template:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: ansible-onetemplate-test
+    template: |
+      CONTEXT = [
+        HOSTNAME = "ansible-onetemplate",
+        NETWORK = "YES",
+        SSH_PUBLIC_KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKAQwTkU84eEnhX3r60Mn5TPh99BDxyCNJu12OB5sfMu foxy@FoxPad",
+        USERNAME = "root" ]
+      CPU = "1"
+      CUSTOM_ATTRIBUTE = ""
+      DISK = [
+        CACHE = "writeback",
+        DEV_PREFIX = "sd",
+        DISCARD = "unmap",
+        IMAGE = "ansible-onetemplate",
+        IMAGE_UNAME = "oneadmin",
+        IO = "threads",
+        SIZE = "" ]
+      FEATURES = [
+        VIRTIO_SCSI_QUEUES = "2" ]
+      GRAPHICS = [
+        KEYMAP = "de",
+        LISTEN = "0.0.0.0",
+        TYPE = "VNC" ]
+      MEMORY = "4096"
+      NIC = [
+        MODEL = "virtio",
+        NETWORK = "tf-prd-centos",
+        NETWORK_UNAME = "oneadmin" ]
+      OS = [
+        ARCH = "x86_64",
+        BOOT = "disk0" ]
+      SCHED_REQUIREMENTS = "CLUSTER_ID=\"100\""
+      VCPU = "2"
+  environment:
+    PYONE_TEST_FIXTURE: "{{ opennebula_test_fixture }}"
+    PYONE_TEST_FIXTURE_FILE: /tmp/opennebula-fixtures.json.gz
+    PYONE_TEST_FIXTURE_REPLAY: "{{ opennebula_test_fixture_replay }}"
+    PYONE_TEST_FIXTURE_UNIT: test_update_existing_template
+  register: result
+
+- name: "assert that it updated the template"
+  assert:
+    that:
+      - result is changed
+
+- name: "Update an existing TEMPLATE with the same changes again"
+  one_template:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: ansible-onetemplate-test
+    template: |
+      CONTEXT = [
+        HOSTNAME = "ansible-onetemplate",
+        NETWORK = "YES",
+        SSH_PUBLIC_KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKAQwTkU84eEnhX3r60Mn5TPh99BDxyCNJu12OB5sfMu foxy@FoxPad",
+        USERNAME = "root" ]
+      CPU = "1"
+      CUSTOM_ATTRIBUTE = ""
+      DISK = [
+        CACHE = "writeback",
+        DEV_PREFIX = "sd",
+        DISCARD = "unmap",
+        IMAGE = "ansible-onetemplate",
+        IMAGE_UNAME = "oneadmin",
+        IO = "threads",
+        SIZE = "" ]
+      FEATURES = [
+        VIRTIO_SCSI_QUEUES = "2" ]
+      GRAPHICS = [
+        KEYMAP = "de",
+        LISTEN = "0.0.0.0",
+        TYPE = "VNC" ]
+      MEMORY = "4096"
+      NIC = [
+        MODEL = "virtio",
+        NETWORK = "tf-prd-centos",
+        NETWORK_UNAME = "oneadmin" ]
+      OS = [
+        ARCH = "x86_64",
+        BOOT = "disk0" ]
+      SCHED_REQUIREMENTS = "CLUSTER_ID=\"100\""
+      VCPU = "2"
+  environment:
+    PYONE_TEST_FIXTURE: "{{ opennebula_test_fixture }}"
+    PYONE_TEST_FIXTURE_FILE: /tmp/opennebula-fixtures.json.gz
+    PYONE_TEST_FIXTURE_REPLAY: "{{ opennebula_test_fixture_replay }}"
+    PYONE_TEST_FIXTURE_UNIT: test_update_existing_and_already_updated_template
+  register: result
+
+- name: "assert that there was no change"
+  assert:
+    that:
+      - result is not changed
+
+
+# Deletion of templates
+
+- name: "Delete a nonexisting TEMPLATE"
+  one_template:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: ansible-onetemplate-test-nonexisting
+    state: absent
+  environment:
+    PYONE_TEST_FIXTURE: "{{ opennebula_test_fixture }}"
+    PYONE_TEST_FIXTURE_FILE: /tmp/opennebula-fixtures.json.gz
+    PYONE_TEST_FIXTURE_REPLAY: "{{ opennebula_test_fixture_replay }}"
+    PYONE_TEST_FIXTURE_UNIT: test_delete_nonexisting_template
+  register: result
+
+- name: "assert that there was no change"
+  assert:
+    that:
+      - result is not changed
+
+- name: "Delete an existing TEMPLATE"
+  one_template:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: ansible-onetemplate-test
+    state: absent
+  environment:
+    PYONE_TEST_FIXTURE: "{{ opennebula_test_fixture }}"
+    PYONE_TEST_FIXTURE_FILE: /tmp/opennebula-fixtures.json.gz
+    PYONE_TEST_FIXTURE_REPLAY: "{{ opennebula_test_fixture_replay }}"
+    PYONE_TEST_FIXTURE_UNIT: test_delete_existing_template
+  register: result
+
+- name: "assert that there was a change"
+  assert:
+    that:
+      - result is changed
+
+
+# Usage without `template` parameter
+
+- name: "Try to create use one_template with state=present and without the template parameter"
+  one_template:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: ansible-onetemplate-test
+    state: present
+  register: result
+  ignore_errors: true
+
+- name: "assert that it failed because template is missing"
+  assert:
+    that:
+      - result is failed
+
+
+# TEARDOWN
+
+- name: "fetch fixtures"
+  fetch:
+    src: /tmp/opennebula-fixtures.json.gz
+    dest: targets/one_host/files
+  when:
+    - opennebula_test_fixture
+    - not opennebula_test_fixture_replay

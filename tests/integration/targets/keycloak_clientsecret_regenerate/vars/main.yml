@@ -1,0 +1,20 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+url: http://localhost:8080/auth
+admin_realm: master
+admin_user: admin
+admin_password: password
+realm: myrealm
+client_id: myclient
+role: myrole
+description_1: desc 1
+description_2: desc 2
+
+auth_args:
+  auth_keycloak_url: "{{ url }}"
+  auth_realm: "{{ admin_realm }}"
+  auth_username: "{{ admin_user }}"
+  auth_password: "{{ admin_password }}"

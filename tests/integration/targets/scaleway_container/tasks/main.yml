@@ -1,0 +1,290 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create container_namespace
+  community.general.scaleway_container_namespace:
+    state: present
+    name: '{{ container_namespace_name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ description }}'
+  register: integration_container_namespace
+
+- name: Create a container (Check)
+  check_mode: true
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_creation_check_task
+
+- ansible.builtin.debug:
+    var: cn_creation_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_creation_check_task is success
+      - cn_creation_check_task is changed
+
+- name: Create container
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_creation_task
+
+- ansible.builtin.debug:
+    var: cn_creation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_creation_task is success
+      - cn_creation_task is changed
+      - cn_creation_task.container.status in ["created", "ready"]
+
+- name: Create container (Confirmation)
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_creation_confirmation_task
+
+- ansible.builtin.debug:
+    var: cn_creation_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_creation_confirmation_task is success
+      - cn_creation_confirmation_task is not changed
+      - cn_creation_confirmation_task.container.status in ["created", "ready"]
+
+- name: Update container (Check)
+  check_mode: true
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_update_check_task
+
+- ansible.builtin.debug:
+    var: cn_update_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_update_check_task is success
+      - cn_update_check_task is changed
+
+- name: Update container
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_update_task
+
+- ansible.builtin.debug:
+    var: cn_update_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_update_task is success
+      - cn_update_task is changed
+      - cn_update_task.container.status in ["created", "ready"]
+
+- name: Update container (Confirmation)
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_update_confirmation_task
+
+- ansible.builtin.debug:
+    var: cn_update_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_update_confirmation_task is success
+      - cn_update_confirmation_task is not changed
+      - cn_update_confirmation_task.container.status in ["created", "ready"]
+
+- name: Update container secret variables (Check)
+  check_mode: true
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ updated_secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_update_secret_check_task
+
+- ansible.builtin.debug:
+    var: cn_update_secret_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_update_secret_check_task is success
+      - cn_update_secret_check_task is changed
+
+- name: Update container secret variables
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ updated_secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_update_secret_task
+
+- ansible.builtin.debug:
+    var: cn_update_secret_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_update_secret_task is success
+      - cn_update_secret_task is changed
+      - cn_update_secret_task.container.status in ["created", "ready"]
+      - "'hashed_value' in cn_update_secret_task.container.secret_environment_variables[0]"
+
+- name: Update container secret variables (Confirmation)
+  community.general.scaleway_container:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+    description: '{{ updated_description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ updated_secret_environment_variables }}'
+    port: '{{ port }}'
+  register: cn_update_secret_confirmation_task
+
+- ansible.builtin.debug:
+    var: cn_update_secret_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_update_secret_confirmation_task is success
+      - cn_update_secret_confirmation_task is not changed
+      - cn_update_secret_confirmation_task.container.status == "ready"
+      - "'hashed_value' in cn_update_secret_confirmation_task.container.secret_environment_variables[0]"
+
+- name: Delete container (Check)
+  check_mode: true
+  community.general.scaleway_container:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+  register: cn_deletion_check_task
+
+- ansible.builtin.debug:
+    var: cn_deletion_check_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_deletion_check_task is success
+      - cn_deletion_check_task is changed
+
+- name: Delete container
+  community.general.scaleway_container:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+  register: cn_deletion_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_deletion_task is success
+      - cn_deletion_task is changed
+
+- name: Delete container (Confirmation)
+  community.general.scaleway_container:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    namespace_id: '{{ integration_container_namespace.container_namespace.id }}'
+    registry_image: '{{ image }}'
+  register: cn_deletion_confirmation_task
+
+- ansible.builtin.debug:
+    var: cn_deletion_confirmation_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - cn_deletion_confirmation_task is success
+      - cn_deletion_confirmation_task is not changed
+
+- name: Delete container namespace
+  community.general.scaleway_container_namespace:
+    state: absent
+    name: '{{ container_namespace_name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    project_id: '{{ scw_project }}'

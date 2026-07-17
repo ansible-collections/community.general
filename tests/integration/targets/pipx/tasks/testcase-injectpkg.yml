@@ -1,0 +1,49 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Ensure application pylint is uninstalled
+  community.general.pipx:
+    name: pylint
+    state: absent
+
+- name: Install application pylint
+  community.general.pipx:
+    name: pylint
+  register: install_pylint
+
+- name: Inject packages
+  community.general.pipx:
+    state: inject
+    name: pylint
+    inject_packages:
+      - licenses
+  register: inject_pkgs_pylint
+
+- name: Inject packages with apps
+  community.general.pipx:
+    state: inject
+    name: pylint
+    inject_packages:
+      - black
+    install_apps: true
+  register: inject_pkgs_apps_pylint
+
+- name: Cleanup pylint
+  community.general.pipx:
+    state: absent
+    name: pylint
+  register: uninstall_pylint
+
+- name: Check assertions inject_packages
+  assert:
+    that:
+      - install_pylint is changed
+      - inject_pkgs_pylint is changed
+      - '"pylint" in inject_pkgs_pylint.application'
+      - '"licenses" in inject_pkgs_pylint.application["pylint"]["injected"]'
+      - inject_pkgs_apps_pylint is changed
+      - '"pylint" in inject_pkgs_apps_pylint.application'
+      - '"black" in inject_pkgs_apps_pylint.application["pylint"]["injected"]'
+      - uninstall_pylint is changed

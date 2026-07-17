@@ -1,0 +1,99 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- debug:
+    msg: Running tests/basic.yml
+
+####################################################################
+## Increment #######################################################
+####################################################################
+- name: Test increment by default
+  ldap_inc:
+    bind_dn: "cn=admin,dc=example,dc=com"
+    bind_pw: "Test1234!"
+    dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
+    attribute: "uidNumber"
+  ignore_errors: true
+  register: output
+
+- name: assert that test increment by default
+  assert:
+    that:
+      - output is not failed
+      - output.incremented
+      - output.value == "1001"
+      - output.rfc4525
+
+- name: Test defined increment
+  ldap_inc:
+    bind_dn: "cn=admin,dc=example,dc=com"
+    bind_pw: "Test1234!"
+    dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
+    attribute: "uidNumber"
+    increment: 2
+  ignore_errors: true
+  register: output
+
+- name: assert that test increment by default
+  assert:
+    that:
+      - output is not failed
+      - output.incremented
+      - output.value == "1003"
+      - output.rfc4525
+
+- name: Test defined increment by 0
+  ldap_inc:
+    bind_dn: "cn=admin,dc=example,dc=com"
+    bind_pw: "Test1234!"
+    dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
+    attribute: "uidNumber"
+    increment: 0
+  ignore_errors: true
+  register: output
+
+- name: assert that test defined increment by 0
+  assert:
+    that:
+      - output is not failed
+      - output.incremented == false
+      - output.value == "1003"
+
+- name: Test defined negative increment
+  ldap_inc:
+    bind_dn: "cn=admin,dc=example,dc=com"
+    bind_pw: "Test1234!"
+    dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
+    attribute: "uidNumber"
+    increment: -1
+  ignore_errors: true
+  register: output
+
+- name: assert that test defined negative increment
+  assert:
+    that:
+      - output is not failed
+      - output.incremented
+      - output.value == "1002"
+      - output.rfc4525
+
+- name: Test forcing classic method instead of automatic detection
+  ldap_inc:
+    bind_dn: "cn=admin,dc=example,dc=com"
+    bind_pw: "Test1234!"
+    dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
+    attribute: "uidNumber"
+    increment: -1
+    method: "legacy"
+  ignore_errors: true
+  register: output
+
+- name: assert that test defined negative increment
+  assert:
+    that:
+      - output is not failed
+      - output.incremented
+      - output.value == "1001"
+      - output.rfc4525 == False

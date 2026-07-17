@@ -1,0 +1,53 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# setup etcd3 for integration tests on module/lookup
+# Copyright (c) 2017, Jean-Philippe Evrard <jean-philippe@evrard.me>
+# Copyright (c) 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install etcd3 Python library
+  ansible.builtin.pip:
+    name: "{{ etcd3_pip_module }}"
+    state: present
+
+- name: Check if etcdctl is already usable
+  ansible.builtin.command: "{{ etcd3_path }}/etcdctl --endpoints=localhost:2379 endpoint health"
+  changed_when: false
+  failed_when: false
+  register: etcd3_health_check
+
+- name: Set up etcd3 binary
+  when: etcd3_health_check.rc != 0
+  block:
+    - name: Ensure clean download directory
+      ansible.builtin.file:
+        path: "{{ etcd3_download_location }}"
+        state: absent
+
+    - name: Create download directory
+      ansible.builtin.file:
+        path: "{{ etcd3_download_location }}"
+        state: directory
+
+    - name: Download etcd3
+      ansible.builtin.unarchive:
+        src: "{{ etcd3_download_url }}"
+        dest: "{{ etcd3_download_location }}"
+        remote_src: true
+
+    - name: Start etcd3
+      ansible.builtin.shell: "nohup {{ etcd3_path }}/etcd > /tmp/etcd3.log 2>&1 &"
+      changed_when: true
+
+    - name: Wait for etcd3 to be ready
+      ansible.builtin.command: "{{ etcd3_path }}/etcdctl --endpoints=localhost:2379 endpoint health"
+      register: etcd3_ready
+      until: etcd3_ready.rc == 0
+      retries: 10
+      delay: 3
+      changed_when: false

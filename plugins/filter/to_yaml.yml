@@ -1,0 +1,92 @@
+# Copyright (c) Contributors to the Ansible project
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: to_yaml
+  author:
+    - Ansible Core Team
+    - Felix Fontein (@felixfontein)
+  version_added: 11.3.0
+  short_description: Convert variable to YAML string
+  description:
+    - Converts an Ansible variable into a YAML string representation, without preserving vaulted strings as P(ansible.builtin.to_yaml#filter).
+    - This filter functions as a wrapper to the L(Python PyYAML library, https://pypi.org/project/PyYAML/)'s C(yaml.dump) function.
+  positional: _input
+  options:
+    _input:
+      description:
+        - A variable or expression that returns a data structure.
+      type: raw
+      required: true
+    indent:
+      description:
+        - Number of spaces to indent Python structures, mainly used for display to humans.
+      type: integer
+    sort_keys:
+      description:
+        - Affects sorting of dictionary keys.
+      default: true
+      type: bool
+    default_style:
+      description:
+        - Indicates the style of the scalar.
+      choices:
+        - ''
+        - "'"
+        - '"'
+        - '|'
+        - '>'
+      type: string
+    canonical:
+      description:
+        - If set to V(true), export tag type to the output.
+      type: bool
+    width:
+      description:
+        - Set the preferred line width.
+      type: integer
+    line_break:
+      description:
+        - Specify the line break.
+      type: string
+    encoding:
+      description:
+        - Specify the output encoding.
+      type: string
+    explicit_start:
+      description:
+        - If set to V(true), adds an explicit start using C(---).
+      type: bool
+    explicit_end:
+      description:
+        - If set to V(true), adds an explicit end using C(...).
+      type: bool
+    redact_sensitive_values:
+      description:
+        - If set to V(true), vaulted strings are replaced by V(<redacted>) instead of being decrypted.
+        - With future ansible-core versions, this can extend to other strings tagged as sensitive.
+        - B(Note) that with ansible-core 2.18 and before this might not yield the expected result
+          since these versions of ansible-core strip the vault information away from strings that are
+          part of more complex data structures specified in C(vars).
+      type: bool
+      default: false
+  notes:
+    - More options may be available, see L(PyYAML documentation, https://pyyaml.org/wiki/PyYAMLDocumentation) for details.
+    - >-
+      These parameters to C(yaml.dump) are not accepted, as they are overridden internally: O(ignore:allow_unicode).
+
+EXAMPLES: |
+  ---
+  # Dump variable in a template to create a YAML document
+  value: "{{ github_workflow | community.general.to_yaml }}"
+
+  ---
+  # Same as above but 'prettier' (equivalent to community.general.to_nice_yaml filter)
+  value: "{{ docker_config | community.general.to_yaml(indent=2) }}"
+
+RETURN:
+  _value:
+    description:
+      - The YAML serialized string representing the variable structure inputted.
+    type: string

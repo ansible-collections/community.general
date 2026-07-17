@@ -1,0 +1,67 @@
+{
+  "id": "bgqegp3xcxnpfkb45olwigpkpi",
+  "title": "OmittedValues",
+  "version": 1,
+  "vault": {
+    "id": "stpebbaccrq72xulgouxsk4p7y",
+    "name": "Private"
+  },
+  "category": "LOGIN",
+  "last_edited_by": "WOUTERRUYBH7BFPHMZ2KKGL6AU",
+  "created_at": "2023-09-12T08:30:07Z",
+  "updated_at": "2023-09-12T08:30:07Z",
+  "additional_information": "fluxility",
+  "sections": [
+    {
+      "id": "7osqcvd43i75teocdzbb6d7mie",
+      "label": "section-without-values"
+    }
+  ],
+  "fields": [
+    {
+      "id": "username",
+      "type": "STRING",
+      "purpose": "USERNAME",
+      "label": "username",
+      "value": "fluxility",
+      "reference": "op://Testcase/OmittedValues/username"
+    },
+    {
+      "id": "password",
+      "type": "CONCEALED",
+      "purpose": "PASSWORD",
+      "label": "password",
+      "value": "j89Dyb7psat*hkbkyLUQyq@GR.a-g2pQH_V_xtMhrn37rQ_2uRYoRiozj6TjWVLy2pbfEvjnse",
+      "entropy": 427.01202392578125,
+      "reference": "op://Testcase/OmittedValues/password",
+      "password_details": {
+        "entropy": 427,
+        "generated": true,
+        "strength": "FANTASTIC"
+      }
+    },
+    {
+      "id": "notesPlain",
+      "type": "STRING",
+      "purpose": "NOTES",
+      "label": "notesPlain",
+      "reference": "op://Testcase/OmittedValues/notesPlain"
+    },
+    {
+      "id": "67890q7mspf4x6zrlw3qejn7m",
+      "type": "URL",
+      "label": "label-without-value",
+      "reference": "op://01202392578125/OmittedValues/section-without-values/section-without-value"
+    },
+    {
+      "id": "123345q7mspf4x6zrlw3qejn7m",
+      "section": {
+        "id": "6hbtca5yrlmoptgy3nw74222",
+        "label": "section-without-values"
+      },
+      "type": "URL",
+      "label": "section-label-without-value",
+      "reference": "op://01202392578125/OmittedValues/section-without-values/section-without-value"
+    }
+  ]
+}

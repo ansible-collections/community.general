@@ -1,0 +1,291 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+################################################################################
+# TEST 01: state=present
+
+- name: "create foobarrc for tests"
+  copy:
+    dest: "{{ foobarrc }}"
+    content: "{{ foobarrc_oldtext }}"
+
+
+- name: "divert foobarrc (check mode, must report a change)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: present
+  register: diversion_0
+  check_mode: true
+
+- name: "divert foobarrc (must report a change)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: present
+  register: diversion_1
+
+
+- name: "divert foobarrc (must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: present
+  register: diversion_2
+
+- name: "divert foobarrc (check mode, must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: present
+  register: diversion_3
+  check_mode: true
+
+
+# Ensure that 'rename' has no effect when state is not changed
+
+- name: "divert foobarrc (rename, must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: present
+    rename: true
+  register: diversion_4
+
+- name: "divert foobarrc (check mode, rename, must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: present
+    rename: true
+  register: diversion_5
+  check_mode: true
+
+
+# Check results
+
+- name: "stat foobarrc (must still be there)"
+  stat:
+    path: "{{ foobarrc }}"
+  register: diversion_6
+
+- name: "stat foobarrc.distrib (must not exist)"
+  stat:
+    path: "{{ foobarrc_distrib }}"
+  register: diversion_7
+
+- name: "assert that results of test 01 are as expected"
+  assert:
+    that:
+      - diversion_0 is changed
+      - diversion_1 is changed
+      - diversion_2 is not changed
+      - diversion_3 is not changed
+      - diversion_4 is not changed
+      - diversion_5 is not changed
+      - diversion_6.stat.exists
+      - diversion_6.stat.checksum == foobarrc_oldsha1
+      - not diversion_7.stat.exists
+      - diversion_0.diversion == diversion_1.diversion
+      - diversion_2.diversion == diversion_3.diversion
+      - diversion_4.diversion == diversion_5.diversion
+      - diversion_0.commands == diversion_1.commands
+      - diversion_2.commands == diversion_3.commands
+      - diversion_4.commands == diversion_5.commands
+    quiet: true
+
+
+################################################################################
+# TEST 02: state=absent
+
+- name: "remove diversion for foobarrc (check mode, must report a change)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: absent
+  register: diversion_0
+  check_mode: true
+
+- name: "remove diversion for foobarrc (must report a change)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: absent
+  register: diversion_1
+
+
+- name: "remove diversion for foobarrc (must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: absent
+  register: diversion_2
+
+- name: "remove diversion for foobarrc (check mode, must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: absent
+  register: diversion_3
+  check_mode: true
+
+
+# Check results
+
+- name: "stat foobarrc (must still be there)"
+  stat:
+    path: "{{ foobarrc }}"
+  register: diversion_4
+
+- name: "stat foobarrc.distrib (must not exist)"
+  stat:
+    path: "{{ foobarrc_distrib }}"
+  register: diversion_5
+
+- name: "assert that results of test 02 are as expected"
+  assert:
+    that:
+      - diversion_0 is changed
+      - diversion_1 is changed
+      - diversion_2 is not changed
+      - diversion_3 is not changed
+      - diversion_4.stat.exists
+      - diversion_4.stat.checksum == foobarrc_oldsha1
+      - not diversion_5.stat.exists
+      - diversion_0.diversion == diversion_1.diversion
+      - diversion_2.diversion == diversion_3.diversion
+      - diversion_0.commands == diversion_1.commands
+      - diversion_2.commands == diversion_3.commands
+    quiet: true
+
+
+################################################################################
+# TEST 03: holder=ansible
+
+- name: "create foobarrc diversion with defaults"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+
+
+- name: "update foobarrc diversion holder (check mode, must report a change)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    holder: "ansible"
+  register: diversion_0
+  check_mode: true
+
+- name: "update foobarrc diversion holder (must report a change)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    holder: "ansible"
+  register: diversion_1
+
+
+- name: "update foobarrc diversion holder (must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    holder: "ansible"
+  register: diversion_2
+
+- name: "update foobarrc diversion holder (check mode, must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    holder: "ansible"
+  register: diversion_3
+  check_mode: true
+
+
+# Check results
+
+- name: "stat foobarrc (must still be there)"
+  stat:
+    path: "{{ foobarrc }}"
+  register: diversion_4
+
+- name: "stat foobarrc.distrib (must not exist)"
+  stat:
+    path: "{{ foobarrc_distrib }}"
+  register: diversion_5
+
+- name: "assert that results of test 03 are as expected"
+  assert:
+    that:
+      - diversion_0 is changed
+      - diversion_1 is changed
+      - diversion_2 is not changed
+      - diversion_3 is not changed
+      - diversion_4.stat.exists
+      - diversion_4.stat.checksum == foobarrc_oldsha1
+      - not diversion_5.stat.exists
+      - diversion_0.diversion == diversion_1.diversion
+      - diversion_2.diversion == diversion_3.diversion
+      - diversion_0.commands == diversion_1.commands
+      - diversion_2.commands == diversion_3.commands
+    quiet: true
+
+- name: "remove foobarrc diversion"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: absent
+
+
+################################################################################
+# TEST 04: divert=/etc/foobarrc.ansible
+
+- name: "create foobarrc diversion with defaults"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+
+
+- name: "update foobarrc divert path (check mode, must report a change)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    divert: "{{ foobarrc_ansible }}"
+  register: diversion_0
+  check_mode: true
+
+- name: "update foobarrc divert path (must report a change)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    divert: "{{ foobarrc_ansible }}"
+  register: diversion_1
+
+
+- name: "update foobarrc divert path (must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    divert: "{{ foobarrc_ansible }}"
+  register: diversion_2
+
+- name: "update foobarrc divert path (check mode, must NOT report a change, idempotency)"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    divert: "{{ foobarrc_ansible }}"
+  register: diversion_3
+  check_mode: true
+
+
+# Check results
+
+- name: "stat foobarrc (must still be there)"
+  stat:
+    path: "{{ foobarrc }}"
+  register: diversion_4
+
+- name: "stat foobarrc.ansible (must not exist)"
+  stat:
+    path: "{{ foobarrc_ansible }}"
+  register: diversion_5
+
+- name: "assert that results of test 04 are as expected"
+  assert:
+    that:
+      - diversion_0 is changed
+      - diversion_1 is changed
+      - diversion_2 is not changed
+      - diversion_3 is not changed
+      - diversion_4.stat.exists
+      - diversion_4.stat.checksum == foobarrc_oldsha1
+      - not diversion_5.stat.exists
+      - diversion_0.diversion == diversion_1.diversion
+      - diversion_2.diversion == diversion_3.diversion
+      - diversion_0.commands == diversion_1.commands
+      - diversion_2.commands == diversion_3.commands
+    quiet: true
+
+- name: "remove foobarrc diversion"
+  dpkg_divert:
+    path: "{{ foobarrc }}"
+    state: absent

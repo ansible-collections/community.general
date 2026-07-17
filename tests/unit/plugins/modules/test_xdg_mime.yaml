@@ -1,0 +1,88 @@
+# Copyright (c) 2025, Marcos Alano <marcoshalano@gmail.com>
+# Based on gio_mime module. Copyright (c) 2022, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# TODO: add tests for setting multiple mime types at once
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+  input: &input
+    mime_types: x-scheme-handler/http
+    handler: google-chrome.desktop
+  get_version: &get_version
+    command: [/testbin/xdg-mime, --version]
+    environ: *env-def
+    rc: 0
+    out: "xdg-mime 1.2.1\n"
+    err: ''
+  query_mime_type: &query_mime_type
+    command: [/testbin/xdg-mime, query, default, x-scheme-handler/http]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
+  set_handler: &set_handler
+    command: [/testbin/xdg-mime, default, google-chrome.desktop, x-scheme-handler/http]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
+test_cases:
+  - id: test_set_handler
+    input: *input
+    output:
+      current_handlers: ['']
+      changed: true
+    mocks:
+      run_command:
+        - *get_version
+        - *query_mime_type
+        - *set_handler
+  - id: test_set_handler_check
+    input: *input
+    output:
+      current_handlers: ['google-chrome.desktop']
+      changed: false
+    flags:
+      check: true
+    mocks:
+      run_command:
+        - *get_version
+        - <<: *query_mime_type
+          out: |
+            google-chrome.desktop
+  - id: test_set_handler_idempot
+    input: *input
+    output:
+      current_handlers: ['google-chrome.desktop']
+      changed: false
+    mocks:
+      run_command:
+        - *get_version
+        - <<: *query_mime_type
+          out: |
+            google-chrome.desktop
+  - id: test_set_handler_idempot_check
+    input: *input
+    output:
+      current_handlers: ['google-chrome.desktop']
+      changed: false
+    flags:
+      check: true
+    mocks:
+      run_command:
+        - *get_version
+        - <<: *query_mime_type
+          out: |
+            google-chrome.desktop
+  - id: test_set_invalid_handler
+    input:
+      <<: *input
+      handler: google-chrome.desktopX
+    output:
+      failed: true
+      msg: Handler must be a .desktop file
+    mocks:
+      run_command:
+        - *get_version

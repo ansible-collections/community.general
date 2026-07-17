@@ -1,0 +1,21 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the homebrew module.
+# Copyright (c) 2020, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- when: ansible_facts.distribution in ['MacOSX']
+  block:
+    - include_tasks: 'formulae.yml'
+    - include_tasks: 'casks.yml'
+    - include_tasks: 'docker.yml'
+
+    # Slow tests to exhaustively test install/uninstall on alternate package names,
+    # Commented out for normal use:
+
+    # - include_tasks: 'package_names.yml'

@@ -1,0 +1,39 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- debug:
+    msg: Running tests/basic.yml
+
+####################################################################
+## Search ##########################################################
+####################################################################
+- name: Test simple search for a user
+  ldap_search:
+    dn: "ou=users,dc=example,dc=com"
+    scope: "onelevel"
+    filter: "(uid=ldaptest)"
+  ignore_errors: true
+  register: output
+
+- name: assert that test LDAP user can be found
+  assert:
+    that:
+      - output is not failed
+      - output.results | length == 1
+      - output.results.0.displayName == "LDAP Test"
+
+- name: Test simple search for a user with no results
+  ldap_search:
+    dn: "ou=users,dc=example,dc=com"
+    scope: "onelevel"
+    filter: "(uid=nonexistent)"
+  ignore_errors: true
+  register: output
+
+- name: assert that the output is empty
+  assert:
+    that:
+      - output is not failed
+      - output.results | length == 0

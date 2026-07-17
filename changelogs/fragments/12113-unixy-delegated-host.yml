@@ -1,0 +1,2 @@
+bugfixes:
+  - "unixy callback - handle missing ``ansible_host`` in delegated vars when a task is delegated to a host without it set, such as ``localhost`` (https://github.com/ansible-collections/community.general/issues/12112, https://github.com/ansible-collections/community.general/pull/12113)."

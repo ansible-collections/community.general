@@ -1,0 +1,28 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- import_tasks: setup_no_value.yml
+
+- name: setting value without state
+  git_config:
+    name: "{{ option_name }}"
+    value: "{{ option_value }}"
+    scope: "{{ option_scope }}"
+  register: set_result
+
+- name: getting value without state
+  git_config_info:
+    name: "{{ option_name }}"
+    scope: "{{ option_scope }}"
+  register: get_result
+
+- name: assert set changed and value is correct
+  assert:
+    that:
+      - set_result is changed
+      - set_result.diff.before == "\n"
+      - set_result.diff.after == option_value + "\n"
+      - get_result.config_value == option_value
+...

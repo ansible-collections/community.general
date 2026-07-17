@@ -1,0 +1,88 @@
+---
+# Copyright (c) 2024, Florian Apolloner (@apollo13)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a policy with rules
+  community.general.consul_policy:
+    name: "{{ item }}"
+    rules: |
+        key "foo" {
+            policy = "read"
+        }
+  loop:
+    - foo-access
+    - foo-access2
+
+- name: Create token without accessor
+  community.general.consul_token:
+    state: present
+  register: simple_create_result
+
+- assert:
+    that:
+      - simple_create_result is changed
+      - simple_create_result.token.AccessorID is truthy
+      - simple_create_result.operation == 'create'
+
+- name: Create token
+  community.general.consul_token:
+    state: present
+    accessor_id: 07a7de84-c9c7-448a-99cc-beaf682efd21
+    service_identities:
+      - service_name: test
+        datacenters: [test1, test2]
+    node_identities:
+      - node_name: test
+        datacenter: test
+    policies:
+      - name: foo-access
+      - name: foo-access2
+    expiration_ttl: 1h
+  register: create_result
+
+- assert:
+    that:
+      - create_result is changed
+      - create_result.token.AccessorID == "07a7de84-c9c7-448a-99cc-beaf682efd21"
+      - create_result.operation == 'create'
+
+- name: Update token
+  community.general.consul_token:
+    state: present
+    accessor_id: 07a7de84-c9c7-448a-99cc-beaf682efd21
+    description: Testing
+    policies:
+      - id: "{{ create_result.token.Policies[-1].ID }}"
+    service_identities: []
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.operation == 'update'
+
+- name: Update token (noop)
+  community.general.consul_token:
+    state: present
+    accessor_id: 07a7de84-c9c7-448a-99cc-beaf682efd21
+    policies:
+      - name: foo-access2
+  register: result
+
+- assert:
+    that:
+      - result is not changed
+      - result.operation is not defined
+
+- name: Remove token
+  community.general.consul_token:
+    state: absent
+    accessor_id: 07a7de84-c9c7-448a-99cc-beaf682efd21
+  register: result
+
+- assert:
+    that:
+      - result is changed
+      - result.token is falsy
+      - result.operation == 'remove'

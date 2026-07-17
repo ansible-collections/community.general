@@ -1,0 +1,27 @@
+---
+# lookup_etcd3 integration tests
+# Copyright 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- block:
+    - name: 'Fetch secrets using "etcd3" lookup'
+      set_fact:
+        etcdoutkey1: "{{ lookup('community.general.etcd3', etcd3_prefix, prefix=True) }}"
+        etcdoutkey2: "{{ lookup('community.general.etcd3', etcd3_singlekey) }}"
+        key_inexistent: "{{ lookup('community.general.etcd3', 'inexistent_key') }}"
+
+    - name: 'Check etcd values'
+      assert:
+        msg: 'unexpected etcd3 values'
+        that:
+          - etcdoutkey1 is sequence
+          - etcdoutkey1 | length() == 3
+          - etcdoutkey1[0].value == 'bar1'
+          - etcdoutkey1[1].value == 'bar2'
+          - etcdoutkey1[2].value == 'bar3'
+          - etcdoutkey2 is sequence
+          - etcdoutkey2 | length() == 2
+          - etcdoutkey2.value == 'foobar'
+          - key_inexistent is sequence
+          - key_inexistent | length() == 0

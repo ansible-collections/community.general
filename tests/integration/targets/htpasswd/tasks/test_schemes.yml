@@ -1,0 +1,116 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Tests for non-standard hash_scheme values (issue #6135):
+# - HtpasswdFile aliases (portable_apache_24, portable, host_apache_24)
+# - bcrypt producing Apache-compatible $2y$ prefix instead of $2b$
+
+- name: add user with portable_apache_24 alias
+  community.general.htpasswd:
+    path: "{{ htpasswd_schemes_path }}"
+    name: user_portable_24
+    password: testpass
+    hash_scheme: portable_apache_24
+  register: scheme_portable24
+
+- name: add user with portable_apache_24 alias (idempotency)
+  community.general.htpasswd:
+    path: "{{ htpasswd_schemes_path }}"
+    name: user_portable_24
+    password: testpass
+    hash_scheme: portable_apache_24
+  register: scheme_portable24_idempot
+
+- name: assert portable_apache_24 alias
+  ansible.builtin.assert:
+    that:
+      - scheme_portable24 is changed
+      - scheme_portable24_idempot is not changed
+
+- name: add user with portable alias
+  community.general.htpasswd:
+    path: "{{ htpasswd_schemes_path }}"
+    name: user_portable
+    password: testpass
+    hash_scheme: portable
+  register: scheme_portable
+
+- name: add user with portable alias (idempotency)
+  community.general.htpasswd:
+    path: "{{ htpasswd_schemes_path }}"
+    name: user_portable
+    password: testpass
+    hash_scheme: portable
+  register: scheme_portable_idempot
+
+- name: assert portable alias
+  ansible.builtin.assert:
+    that:
+      - scheme_portable is changed
+      - scheme_portable_idempot is not changed
+
+- name: bcrypt scheme tests (requires bcrypt<4.2 to be compatible with passlib 1.7.x)
+  block:
+    - name: install compatible bcrypt
+      ansible.builtin.pip:
+        name: bcrypt<4.2
+      register: bcrypt_pip_install
+      ignore_errors: true
+
+    - name: check if passlib can use bcrypt
+      ansible.builtin.command:
+        cmd: >-
+          python3 -c "
+          from passlib.apache import HtpasswdFile;
+          import tempfile, os;
+          f = tempfile.mktemp();
+          ht = HtpasswdFile(f, new=True, default_scheme='bcrypt');
+          ht.set_password('t', 'p');
+          ht.save();
+          os.unlink(f)"
+      register: bcrypt_usable
+      ignore_errors: true
+      changed_when: false
+
+    - name: run bcrypt tests
+      when: bcrypt_usable is not failed
+      block:
+        - name: add user with bcrypt scheme
+          community.general.htpasswd:
+            path: "{{ htpasswd_schemes_path }}"
+            name: user_bcrypt
+            password: testpass
+            hash_scheme: bcrypt
+          register: scheme_bcrypt
+
+        - name: add user with bcrypt scheme (idempotency)
+          community.general.htpasswd:
+            path: "{{ htpasswd_schemes_path }}"
+            name: user_bcrypt
+            password: testpass
+            hash_scheme: bcrypt
+          register: scheme_bcrypt_idempot
+
+        - name: read htpasswd file to verify bcrypt hash prefix
+          ansible.builtin.slurp:
+            src: "{{ htpasswd_schemes_path }}"
+          register: htpasswd_contents
+
+        - name: assert bcrypt scheme
+          ansible.builtin.assert:
+            that:
+              - scheme_bcrypt is changed
+              - scheme_bcrypt_idempot is not changed
+              # Apache requires $2y$ prefix; passlib's CryptContext produces $2b$ — verify the fix
+              - >-
+                htpasswd_contents.content | b64decode | regex_search('^user_bcrypt:\$2y\$', multiline=True) is not none
+
+  always:
+    - name: remove bcrypt if installed by pip
+      ansible.builtin.pip:
+        name: bcrypt
+        state: absent
+      when: bcrypt_pip_install is not failed
+      ignore_errors: true

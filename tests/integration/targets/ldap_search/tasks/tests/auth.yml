@@ -1,0 +1,47 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- debug:
+    msg: Running tests/auth.yml
+
+####################################################################
+## Search ##########################################################
+####################################################################
+- name: Test simple search for password authenticated user
+  ldap_search:
+    dn: "ou=users,dc=example,dc=com"
+    scope: "onelevel"
+    filter: "(uid=ldaptest)"
+    bind_dn: "uid=ldaptest,ou=users,dc=example,dc=com"
+    bind_pw: "test1pass!"
+  ignore_errors: true
+  register: output
+
+- name: assert that test LDAP user can read its password
+  assert:
+    that:
+      - output is not failed
+      - output.results | length == 1
+      - output.results.0.userPassword is defined
+
+- name: Test simple search for cert authenticated user
+  ldap_search:
+    dn: "ou=users,dc=example,dc=com"
+    server_uri: "ldap://localhost/"
+    start_tls: true
+    ca_path: /usr/local/share/ca-certificates/ca.crt
+    scope: "onelevel"
+    filter: "(uid=ldaptest)"
+    client_cert: "/root/user.crt"
+    client_key: "/root/user.key"
+  ignore_errors: true
+  register: output
+
+- name: assert that test LDAP user can read its password
+  assert:
+    that:
+      - output is not failed
+      - output.results | length == 1
+      - output.results.0.userPassword is defined

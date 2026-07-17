@@ -1,0 +1,99 @@
+---
+# Copyright (c) 2022, Gregory Furlong <gnfzdz@fzdz.io>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Change the default subvolume
+  block:
+    - name: Update filesystem default subvolume to '@'
+      community.general.btrfs_subvolume:
+        automount: true
+        default: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/@"
+        state: "present"
+      register: result
+    - name: Subvolume '@' set to default
+      ansible.builtin.assert:
+        that:
+          - result is changed
+    - name: Update filesystem default subvolume to '@' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        default: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/@"
+        state: "present"
+      register: result
+    - name: Subvolume '@' set to default (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed
+
+- name: Revert the default subvolume
+  block:
+    - name: Revert filesystem default subvolume to '/'
+      community.general.btrfs_subvolume:
+        automount: true
+        default: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/"
+        state: "present"
+      register: result
+    - name: Subvolume '/' set to default
+      ansible.builtin.assert:
+        that:
+          - result is changed
+    - name: Revert filesystem default subvolume to '/' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        default: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/"
+        state: "present"
+      register: result
+    - name: Subvolume '/' set to default (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed
+
+
+- name: Change the default subvolume again
+  block:
+    - name: Update filesystem default subvolume to '@'
+      community.general.btrfs_subvolume:
+        automount: true
+        default: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/@"
+        state: "present"
+      register: result
+    - name: Subvolume '@' set to default
+      ansible.builtin.assert:
+        that:
+          - result is changed
+
+- name: Revert custom default subvolume to fs_tree root when deleted
+  block:
+    - name: Delete custom default subvolume '@'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/@"
+        state: "absent"
+      register: result
+    - name: Subvolume '@' deleted
+      ansible.builtin.assert:
+        that:
+          - result is changed
+    - name: Delete custom default subvolume '@' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/@"
+        state: "absent"
+      register: result
+    - name: Subvolume '@' deleted (idempotency)
+      ansible.builtin.assert:
+        that:
+          - result is not changed

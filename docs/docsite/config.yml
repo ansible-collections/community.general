@@ -1,0 +1,17 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+changelog:
+  write_changelog: true
+
+ansible_output:
+  global_env:
+    ANSIBLE_STDOUT_CALLBACK: community.general.tasks_only
+    ANSIBLE_COLLECTIONS_TASKS_ONLY_NUMBER_OF_COLUMNS: 90
+  global_postprocessors:
+    reformat-yaml:
+      command:
+        - python
+        - docs/docsite/reformat-yaml.py

@@ -1,0 +1,337 @@
+#!/usr/bin/python
+# Copyright (c) 2017 Red Hat Inc.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: manageiq_alerts
+
+short_description: Configuration of alerts in ManageIQ
+extends_documentation_fragment:
+  - community.general._manageiq
+  - community.general._attributes
+
+author: Elad Alfassa (@elad661) <ealfassa@redhat.com>
+description:
+  - The manageiq_alerts module supports adding, updating and deleting alerts in ManageIQ.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+
+options:
+  state:
+    type: str
+    description:
+      - V(absent) - alert should not exist,
+      - V(present) - alert should exist.
+    choices: ['absent', 'present']
+    default: 'present'
+  description:
+    type: str
+    description:
+      - The unique alert description in ManageIQ.
+      - Required when state is "absent" or "present".
+  resource_type:
+    type: str
+    description:
+      - The entity type for the alert in ManageIQ. Required when O(state=present).
+    choices: ['Vm', 'ContainerNode', 'MiqServer', 'Host', 'Storage', 'EmsCluster', 'ExtManagementSystem', 'MiddlewareServer']
+  expression_type:
+    type: str
+    description:
+      - Expression type.
+    default: hash
+    choices: ["hash", "miq"]
+  expression:
+    type: dict
+    description:
+      - The alert expression for ManageIQ.
+      - Can either be in the "Miq Expression" format or the "Hash Expression format".
+      - Required if O(state=present).
+  enabled:
+    description:
+      - Enable or disable the alert. Required if O(state=present).
+    type: bool
+  options:
+    type: dict
+    description:
+      - Additional alert options, such as notification type and frequency.
+"""
+
+EXAMPLES = r"""
+- name: Add an alert with a "hash expression" to ManageIQ
+  community.general.manageiq_alerts:
+    state: present
+    description: Test Alert 01
+    options:
+      notifications:
+        email:
+          to: ["example@example.com"]
+          from: "example@example.com"
+    resource_type: ContainerNode
+    expression:
+      eval_method: hostd_log_threshold
+      mode: internal
+      options: {}
+    enabled: true
+    manageiq_connection:
+      url: 'http://127.0.0.1:3000'
+      username: 'admin'
+      password: 'smartvm'
+      validate_certs: false # only do this when you trust the network!
+
+- name: Add an alert with a "miq expression" to ManageIQ
+  community.general.manageiq_alerts:
+    state: present
+    description: Test Alert 02
+    options:
+      notifications:
+        email:
+          to: ["example@example.com"]
+          from: "example@example.com"
+    resource_type: Vm
+    expression_type: miq
+    expression:
+      and:
+        - CONTAINS:
+            tag: Vm.managed-environment
+            value: prod
+        - not:
+          CONTAINS:
+            tag: Vm.host.managed-environment
+            value: prod
+    enabled: true
+    manageiq_connection:
+      url: 'http://127.0.0.1:3000'
+      username: 'admin'
+      password: 'smartvm'
+      validate_certs: false # only do this when you trust the network!
+
+- name: Delete an alert from ManageIQ
+  community.general.manageiq_alerts:
+    state: absent
+    description: Test Alert 01
+    manageiq_connection:
+      url: 'http://127.0.0.1:3000'
+      username: 'admin'
+      password: 'smartvm'
+      validate_certs: false # only do this when you trust the network!
+"""
+
+RETURN = r"""
+"""
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils._manageiq import ManageIQ, manageiq_argument_spec
+
+
+class ManageIQAlert:
+    """Represent a ManageIQ alert. Can be initialized with both the format
+    we receive from the server and the format we get from the user.
+    """
+
+    def __init__(self, alert):
+        self.description = alert["description"]
+        self.db = alert["db"]
+        self.enabled = alert["enabled"]
+        self.options = alert["options"]
+        self.hash_expression = None
+        self.miq_expressipn = None
+
+        if "hash_expression" in alert:
+            self.hash_expression = alert["hash_expression"]
+        if "miq_expression" in alert:
+            self.miq_expression = alert["miq_expression"]
+            if "exp" in self.miq_expression:
+                # miq_expression is a field that needs a special case, because
+                # it is returned surrounded by a dict named exp even though we don't
+                # send it with that dict.
+                self.miq_expression = self.miq_expression["exp"]
+
+    def __eq__(self, other):
+        """Compare two ManageIQAlert objects"""
+        return self.__dict__ == other.__dict__
+
+
+class ManageIQAlerts:
+    """Object to execute alert management operations in manageiq."""
+
+    def __init__(self, manageiq):
+        self.manageiq = manageiq
+
+        self.module = self.manageiq.module
+        self.api_url = self.manageiq.api_url
+        self.client = self.manageiq.client
+        self.alerts_url = f"{self.api_url}/alert_definitions"
+
+    def get_alerts(self):
+        """Get all alerts from ManageIQ"""
+        try:
+            response = self.client.get(f"{self.alerts_url}?expand=resources")
+        except Exception as e:
+            self.module.fail_json(msg=f"Failed to query alerts: {e}")
+        return response.get("resources", [])
+
+    def validate_hash_expression(self, expression):
+        """Validate a 'hash expression' alert definition"""
+        # hash expressions must have the following fields
+        for key in ["options", "eval_method", "mode"]:
+            if key not in expression:
+                msg = f"Hash expression is missing required field {key}"
+                self.module.fail_json(msg)
+
+    def create_alert_dict(self, params):
+        """Create a dict representing an alert"""
+        if params["expression_type"] == "hash":
+            # hash expression supports depends on https://github.com/ManageIQ/manageiq-api/pull/76
+            self.validate_hash_expression(params["expression"])
+            expression_type = "hash_expression"
+        else:
+            # actually miq_expression, but we call it "expression" for backwards-compatibility
+            expression_type = "expression"
+
+        # build the alret
+        alert = dict(
+            description=params["description"],
+            db=params["resource_type"],
+            options=params["options"],
+            enabled=params["enabled"],
+        )
+
+        # add the actual expression.
+        alert.update({expression_type: params["expression"]})
+
+        return alert
+
+    def add_alert(self, alert):
+        """Add a new alert to ManageIQ"""
+        try:
+            result = self.client.post(self.alerts_url, action="create", resource=alert)
+
+            msg = f"Alert {alert['description']} created successfully: {result}"
+            return dict(changed=True, msg=msg)
+        except Exception as e:
+            description = alert["description"]
+            if "Resource expression needs be specified" in str(e):
+                # Running on an older version of ManageIQ and trying to create a hash expression
+                msg = f"Creating alert {description} failed: Your version of ManageIQ does not support hash_expression"
+            else:
+                msg = f"Creating alert {description} failed: {e}"
+            self.module.fail_json(msg=msg)
+
+    def delete_alert(self, alert):
+        """Delete an alert"""
+        try:
+            result = self.client.post(f"{self.alerts_url}/{alert['id']}", action="delete")
+            msg = f"Alert {alert['description']} deleted: {result}"
+            return dict(changed=True, msg=msg)
+        except Exception as e:
+            msg = f"Deleting alert {alert['description']} failed: {e}"
+            self.module.fail_json(msg=msg)
+
+    def update_alert(self, existing_alert, new_alert):
+        """Update an existing alert with the values from `new_alert`"""
+        new_alert_obj = ManageIQAlert(new_alert)
+        if new_alert_obj == ManageIQAlert(existing_alert):
+            # no change needed - alerts are identical
+            return dict(changed=False, msg="No update needed")
+        else:
+            try:
+                url = f"{self.alerts_url}/{existing_alert['id']}"
+                result = self.client.post(url, action="edit", resource=new_alert)
+
+                # make sure that the update was indeed successful by comparing
+                # the result to the expected result.
+                if new_alert_obj == ManageIQAlert(result):
+                    # success!
+                    msg = f"Alert {existing_alert['description']} updated successfully: {result}"
+
+                    return dict(changed=True, msg=msg)
+                else:
+                    # unexpected result
+                    msg = f"Updating alert {existing_alert['description']} failed, unexpected result {result}"
+
+                    self.module.fail_json(msg=msg)
+
+            except Exception as e:
+                description = existing_alert["description"]
+                if "Resource expression needs be specified" in str(e):
+                    # Running on an older version of ManageIQ and trying to update a hash expression
+                    msg = f"Updating alert {description} failed: Your version of ManageIQ does not support hash_expression"
+                else:
+                    msg = f"Updating alert {description} failed: {e}"
+                self.module.fail_json(msg=msg)
+
+
+def main():
+    argument_spec = dict(
+        description=dict(type="str"),
+        resource_type=dict(
+            type="str",
+            choices=[
+                "Vm",
+                "ContainerNode",
+                "MiqServer",
+                "Host",
+                "Storage",
+                "EmsCluster",
+                "ExtManagementSystem",
+                "MiddlewareServer",
+            ],
+        ),
+        expression_type=dict(type="str", default="hash", choices=["miq", "hash"]),
+        expression=dict(type="dict"),
+        options=dict(type="dict"),
+        enabled=dict(type="bool"),
+        state=dict(default="present", choices=["present", "absent"]),
+    )
+    # add the manageiq connection arguments to the arguments
+    argument_spec.update(manageiq_argument_spec())
+
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        required_if=[
+            ("state", "present", ["description", "resource_type", "expression", "enabled", "options"]),
+            ("state", "absent", ["description"]),
+        ],
+    )
+
+    state = module.params["state"]
+    description = module.params["description"]
+
+    manageiq = ManageIQ(module)
+    manageiq_alerts = ManageIQAlerts(manageiq)
+
+    existing_alert = manageiq.find_collection_resource_by("alert_definitions", description=description)
+
+    # we need to add or update the alert
+    if state == "present":
+        alert = manageiq_alerts.create_alert_dict(module.params)
+
+        if not existing_alert:
+            # an alert with this description doesn't exist yet, let's create it
+            res_args = manageiq_alerts.add_alert(alert)
+        else:
+            # an alert with this description exists, we might need to update it
+            res_args = manageiq_alerts.update_alert(existing_alert, alert)
+
+    # this alert should not exist
+    elif state == "absent":
+        # if we have an alert with this description, delete it
+        if existing_alert:
+            res_args = manageiq_alerts.delete_alert(existing_alert)
+        else:
+            # it doesn't exist, and that's okay
+            msg = f"Alert '{description}' does not exist in ManageIQ"
+            res_args = dict(changed=False, msg=msg)
+
+    module.exit_json(**res_args)
+
+
+if __name__ == "__main__":
+    main()

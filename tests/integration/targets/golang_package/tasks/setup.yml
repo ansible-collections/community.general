@@ -1,0 +1,27 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Determine Go package name
+  set_fact:
+    golang_package_name: >-
+      {{ 'go' if ansible_facts.os_family in ['Alpine', 'Archlinux', 'FreeBSD'] else 'golang' }}
+
+- block:
+    - name: Install Go
+      package:
+        name: "{{ golang_package_name }}"
+        state: present
+
+    - name: Check Go version
+      command: go version
+      register: go_version_output
+      changed_when: false
+
+    - name: Set has_go if Go >= 1.19
+      set_fact:
+        has_go: true
+      when: (go_version_output.stdout | regex_search('go(\d+\.\d+)', '\\1') | first) is version('1.19', '>=')
+  when:
+    - ansible_facts.distribution != 'MacOSX'

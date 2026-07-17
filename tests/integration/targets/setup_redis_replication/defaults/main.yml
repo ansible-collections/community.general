@@ -1,0 +1,65 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# General
+redis_packages:
+  Alpine:
+    - redis
+  Archlinux:
+    - valkey
+  Debian:
+    - redis-server
+  Ubuntu:
+    - redis-server
+  openSUSE Leap:
+    - redis
+  openSUSE Tumbleweed:
+    - redis
+  Fedora:
+    - redis
+  CentOS:
+    - redis
+  FreeBSD:
+    - redis
+
+redis_user:
+  Alpine: redis
+  Archlinux: valkey
+  Debian: redis
+  Ubuntu: redis
+  openSUSE Leap: redis
+  openSUSE Tumbleweed: redis
+  Fedora: "{{ '998' if ansible_facts.distribution_major_version is version('41', '>=') else 'redis' }}"
+  CentOS: redis
+  FreeBSD: redis
+
+redis_bin:
+  Alpine: /usr/bin/redis-server
+  Archlinux: /usr/bin/redis-server
+  Debian: /usr/bin/redis-server
+  Ubuntu: /usr/bin/redis-server
+  openSUSE Leap: /usr/sbin/redis-server
+  openSUSE Tumbleweed: /usr/sbin/redis-server
+  Fedora: "/usr/bin/{{ 'valkey-server' if ansible_facts.distribution_major_version is version('41', '>=') else 'redis-server' }}"
+  CentOS: /usr/bin/redis-server
+  FreeBSD: /usr/local/bin/redis-server
+
+redis_module: redis
+
+redis_password: PASS
+
+old_redis: false
+
+# Master
+master_port: 6379
+master_conf: /etc/redis-master.conf
+master_datadir: /var/lib/redis-master
+master_logdir: /var/log/redis-master
+
+# Replica
+replica_port: 6380
+replica_conf: /etc/redis-replica.conf
+replica_datadir: /var/lib/redis-replica
+replica_logdir: /var/log/redis-replica

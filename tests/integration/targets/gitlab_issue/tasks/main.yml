@@ -1,0 +1,150 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- block:
+    - name: Create {{ gitlab_project_name }} project
+      gitlab_project:
+        api_url: "{{ gitlab_host }}"
+        validate_certs: true
+        api_token: "{{ gitlab_api_token }}"
+        name: "{{ gitlab_project_name }}"
+        group: "{{ gitlab_project_group }}"
+        default_branch: "{{ gitlab_branch }}"
+        initialize_with_readme: true
+        state: present
+
+    - name: Create Issue
+      gitlab_issue:
+        api_token: "{{ gitlab_api_token }}"
+        api_url: "{{ gitlab_host }}"
+        description: "Test description"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        state: present
+        title: "Ansible test issue"
+      register: gitlab_issue_create
+
+    - name: Test Issue Created
+      assert:
+        that:
+          - gitlab_issue_create is changed
+
+    - name: Create Issue ( Idempotency test )
+      gitlab_issue:
+        api_token: "{{ gitlab_api_token }}"
+        api_url: "{{ gitlab_host }}"
+        description: "Test description"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        state: present
+        title: "Ansible test issue"
+      register: gitlab_issue_create_idempotence
+
+    - name: Test Create Issue is Idempotent
+      assert:
+        that:
+          - gitlab_issue_create_idempotence is not changed
+
+    - name: Update Issue Test ( Additions )
+      gitlab_issue:
+        api_token: "{{ gitlab_api_token }}"
+        api_url: "{{ gitlab_host }}"
+        assignee_ids: "{{ gitlab_assignee_ids }}"
+        description_path: "{{ gitlab_description_path }}"
+        labels: "{{ gitlab_labels }}"
+        milestone_search: "{{ gitlab_milestone_search }}"
+        milestone_group_id: "{{ gitlab_milestone_group_id }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        state: present
+        title: "Ansible test issue"
+      register: gitlab_issue_update_additions
+
+    - name: Test Issue Updated ( Additions )
+      assert:
+        that:
+          - gitlab_issue_update_additions.issue.labels[0] == "{{ gitlab_labels[0] }}"
+          - gitlab_issue_update_additions.issue.assignees[0].username == "{{ gitlab_assignee_ids[0] }}"
+          - "'### Description\n\nIssue test description' in gitlab_issue_update_additions.issue.description"
+          - gitlab_issue_update_additions.issue.milestone.title == "{{ gitlab_milestone_search }}"
+
+    - name: Update Issue Test ( Persistence )
+      gitlab_issue:
+        api_token: "{{ gitlab_api_token }}"
+        api_url: "{{ gitlab_host }}"
+        description_path: "{{ gitlab_description_path }}"
+        milestone_search: "{{ gitlab_milestone_search }}"
+        milestone_group_id: "{{ gitlab_milestone_group_id }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        state: present
+        title: "Ansible test issue"
+      register: gitlab_issue_update_persistence
+
+    - name: Test issue Not Updated ( Persistence )
+      assert:
+        that:
+          - gitlab_issue_update_persistence.issue.labels[0] == "{{ gitlab_labels[0] }}"
+          - gitlab_issue_update_persistence.issue.assignees[0].username == "{{ gitlab_assignee_ids[0] }}"
+
+    - name: Update Issue Test ( Removals )
+      gitlab_issue:
+        api_token: "{{ gitlab_api_token }}"
+        api_url: "{{ gitlab_host }}"
+        assignee_ids: []
+        description_path: "{{ gitlab_description_path }}"
+        labels: []
+        milestone_search: ""
+        milestone_group_id: ""
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        state: present
+        title: "Ansible test issue"
+      register: gitlab_issue_update_removal
+
+    - name: Test issue updated
+      assert:
+        that:
+          - gitlab_issue_update_removal.issue.labels == []
+          - gitlab_issue_update_removal.issue.assignees == []
+          - gitlab_issue_update_removal.issue.milestone == None
+
+    - name: Delete Issue
+      gitlab_issue:
+        api_url: "{{ gitlab_host }}"
+        api_token: "{{ gitlab_api_token }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        title: "Ansible test issue"
+        state: absent
+      register: gitlab_issue_delete
+
+    - name: Test issue is deleted
+      assert:
+        that:
+          - gitlab_issue_delete is changed
+
+  always:
+    - name: Delete Issue
+      gitlab_issue:
+        api_url: "{{ gitlab_host }}"
+        api_token: "{{ gitlab_api_token }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        title: "Ansible test issue"
+        state_filter: "opened"
+        state: absent
+      register: gitlab_issue_delete
+    - name: Clean up {{ gitlab_project_name }}
+      gitlab_project:
+        api_url: "{{ gitlab_host }}"
+        validate_certs: false
+        api_token: "{{ gitlab_api_token }}"
+        name: "{{ gitlab_project_name }}"
+        group: "{{ gitlab_project_group }}"
+        state: absent

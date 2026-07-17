@@ -1,0 +1,2 @@
+bugfixes:
+  - lxc_container - fix ``create_script`` to accept a single tuple argument, resolving a ``TypeError`` that silently prevented ``container_command`` from being executed (https://github.com/ansible-collections/community.general/issues/11360, https://github.com/ansible-collections/community.general/pull/12106).

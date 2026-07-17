@@ -1,0 +1,225 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Archive - remove source files ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_remove_source_files.{{ format }}"
+    format: "{{ format }}"
+    remove: true
+  register: archive_remove_source_files
+
+- name: Verify archive exists - remove source files ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_files.{{ format }}"
+    state: file
+
+- name: Verify all files were archived - remove source files ({{ format }})
+  assert:
+    that:
+      - archive_remove_source_files is changed
+      - "archive_remove_source_files.archived | length == 3"
+
+- name: Remove Archive - remove source files ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_files.{{ format }}"
+    state: absent
+
+- name: Remove source files in check mode ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/{{ item }}"
+    state: absent
+  check_mode: true
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+  register: remove_files
+
+- name: Assert that source files were removed - remove source files ({{ format }})
+  assert:
+    that:
+      - remove_files is not changed
+
+- name: Copy source files - remove source directory ({{ format }})
+  copy:
+    src: "{{ item }}"
+    dest: "{{ remote_tmp_dir }}/{{ item }}"
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+
+- name: Create temporary directory - remove source directory ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/tmpdir"
+    state: directory
+
+- name: Copy source files to temporary directory - remove source directory ({{ format }})
+  copy:
+    src: "{{ item }}"
+    dest: "{{ remote_tmp_dir }}/tmpdir/{{ item }}"
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+
+- name: Archive - remove source directory ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/tmpdir"
+    dest: "{{ remote_tmp_dir }}/archive_remove_source_directory.{{ format }}"
+    format: "{{ format }}"
+    remove: true
+  register: archive_remove_source_directory
+
+- name: Verify archive exists - remove source directory ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_directory.{{ format }}"
+    state: file
+
+- name: Verify archive contains all files - remove source directory ({{ format }})
+  assert:
+    that:
+      - archive_remove_source_directory is changed
+      - "archive_remove_source_directory.archived | length == 3"
+
+- name: Remove archive - remove source directory ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_directory.{{ format }}"
+    state: absent
+
+- name: Remove source source directory in check mode ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/tmpdir"
+    state: absent
+  check_mode: true
+  register: remove_dir
+
+- name: Verify source directory was removed - remove source directory ({{ format }})
+  assert:
+    that:
+      - remove_dir is not changed
+
+- name: Create temporary directory - remove source excluding path ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/tmpdir"
+    state: directory
+
+- name: Copy source files to temporary directory - remove source excluding path ({{ format }})
+  copy:
+    src: "{{ item }}"
+    dest: "{{ remote_tmp_dir }}/tmpdir/{{ item }}"
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+
+- name: Archive - remove source excluding path ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/tmpdir/*"
+    dest: "{{ remote_tmp_dir }}/archive_remove_source_excluding_path.{{ format }}"
+    format: "{{ format }}"
+    remove: true
+    exclude_path: "{{ remote_tmp_dir }}/tmpdir/empty.txt"
+  register: archive_remove_source_excluding_path
+
+- name: Verify archive exists - remove source excluding path ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_excluding_path.{{ format }}"
+    state: file
+
+- name: Verify all files except excluded are archived - remove source excluding path ({{ format }})
+  assert:
+    that:
+      - archive_remove_source_excluding_path is changed
+      - "archive_remove_source_excluding_path.archived | length == 2"
+
+- name: Remove archive - remove source excluding path ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_excluding_path.{{ format }}"
+    state: absent
+
+- name: Verify that excluded file still exists - remove source excluding path ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/tmpdir/empty.txt"
+    state: file
+
+- name: Copy source files to temporary directory - remove source excluding sub path ({{ format }})
+  copy:
+    src: "{{ item }}"
+    dest: "{{ remote_tmp_dir }}/tmpdir/{{ item }}"
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+    - sub
+    - sub/subfile.txt
+
+- name: Archive - remove source excluding sub path ({{ format }})
+  archive:
+    path:
+      - "{{ remote_tmp_dir }}/tmpdir/*.txt"
+      - "{{ remote_tmp_dir }}/tmpdir/sub/*"
+    dest: "{{ remote_tmp_dir }}/archive_remove_source_excluding_sub_path.{{ format }}"
+    format: "{{ format }}"
+    remove: true
+    exclude_path: "{{ remote_tmp_dir }}/tmpdir/sub/subfile.txt"
+  register: archive_remove_source_excluding_sub_path
+
+- name: Verify archive exists - remove source excluding sub path ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_excluding_sub_path.{{ format }}"
+    state: file
+
+- name: Remove archive - remove source excluding sub path ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_excluding_sub_path.{{ format }}"
+    state: absent
+
+- name: Verify that sub path still exists - remove source excluding sub path ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/tmpdir/sub/subfile.txt"
+    state: file
+
+- name: Copy source files to temporary directory - remove source with nested paths ({{ format }})
+  copy:
+    src: "{{ item }}"
+    dest: "{{ remote_tmp_dir }}/tmpdir/{{ item }}"
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+    - sub
+    - sub/subfile.txt
+
+- name: Archive - remove source with nested paths ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/tmpdir/"
+    dest: "{{ remote_tmp_dir }}/archive_remove_source_nested_paths.{{ format }}"
+    format: "{{ format }}"
+    remove: true
+  register: archive_remove_nested_paths
+
+- name: Verify archive exists - remove source with nested paths ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_nested_paths.{{ format }}"
+    state: file
+
+- name: Verify source files were removed - remove source with nested paths ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/tmpdir"
+    state: absent
+  register: archive_remove_nested_paths_status
+
+- name: Assert tasks status - remove source with nested paths ({{ format }})
+  assert:
+    that:
+      - archive_remove_nested_paths is success
+      - archive_remove_nested_paths_status is not changed
+
+- name: Remove archive - remove source with nested paths ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_remove_source_nested_paths.{{ format }}"
+    state: absent

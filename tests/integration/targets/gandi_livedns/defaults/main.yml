@@ -1,0 +1,37 @@
+---
+# Copyright (c) 2020 Gregory Thiemonge <gregory.thiemonge@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+gandi_livedns_domain_name: "ansible-tests.org"
+gandi_livedns_record_items:
+
+  # Single A record
+  - record: test-www
+    type: A
+    values:
+      - 10.10.10.10
+    ttl: 400
+    update_values:
+      - 10.10.10.11
+    update_ttl: 800
+
+  # Multiple A records
+  - record: test-www-multiple
+    type: A
+    ttl: 3600
+    values:
+      - 10.10.11.10
+      - 10.10.11.10
+    update_values:
+      - 10.10.11.11
+      - 10.10.11.13
+
+  # CNAME
+  - record: test-cname
+    type: CNAME
+    ttl: 10800
+    values:
+      - test-www2
+    update_values:
+      - test-www

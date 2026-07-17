@@ -1,0 +1,567 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Remove keycloak client to avoid failures from previous failed runs
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: absent
+
+- name: Create keycloak client with authorization services enabled
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    enabled: true
+    public_client: false
+    service_accounts_enabled: true
+    authorization_services_enabled: true
+
+- name: Create file:create authorization scope
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "file:create"
+    display_name: "File create"
+    icon_uri: "http://localhost/icon.png"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Create file:delete authorization scope
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "file:delete"
+    display_name: "File delete"
+    icon_uri: "http://localhost/icon.png"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Create permission without type (test for failure)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ScopePermission"
+    description: "Scope permission"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+  failed_when: result.msg.find('missing required arguments') == -1
+
+- name: Create scope permission without scopes (test for failure)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ScopePermission"
+    description: "Scope permission"
+    permission_type: scope
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+  failed_when: result.msg.find('Scopes need to defined when permission type is set to scope!') == -1
+
+- name: Create scope permission with multiple resources (test for failure)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ScopePermission"
+    description: "Scope permission"
+    resources:
+      - "Default Resource"
+      - "Other Resource"
+    permission_type: scope
+    scopes:
+      - "file:delete"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+  failed_when: result.msg.find('Only one resource can be defined for a scope permission!') == -1
+
+- name: Create scope permission with invalid policy name (test for failure)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ScopePermission"
+    description: "Scope permission"
+    permission_type: scope
+    scopes:
+      - "file:delete"
+    policies:
+      - "Missing Policy"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+  failed_when: result.msg.find('Unable to find authorization policy with name') == -1
+
+- name: Create scope permission
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ScopePermission"
+    description: "Scope permission"
+    permission_type: scope
+    scopes:
+      - "file:delete"
+    policies:
+      - "Default Policy"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that scope permission was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "ScopePermission"
+      - result.end_state.description == "Scope permission"
+      - result.end_state.type == "scope"
+      - result.end_state.resources == []
+      - result.end_state.policies|length == 1
+      - result.end_state.scopes|length == 1
+
+- name: Query state
+  community.general.keycloak_authz_permission_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "ScopePermission"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that queried state matches desired end state
+  assert:
+    that:
+      - result.queried_state.name == "ScopePermission"
+      - result.queried_state.description == "Scope permission"
+
+- name: Create scope permission (test for idempotency)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ScopePermission"
+    description: "Scope permission"
+    permission_type: scope
+    scopes:
+      - "file:delete"
+    policies:
+      - "Default Policy"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that nothing changed
+  assert:
+    that:
+      - result.end_state != {}
+      - result.end_state.name == "ScopePermission"
+      - result.end_state.description == "Scope permission"
+      - result.end_state.type == "scope"
+      - result.end_state.resources == []
+      - result.end_state.policies|length == 1
+      - result.end_state.scopes|length == 1
+
+- name: Query state
+  community.general.keycloak_authz_permission_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "ScopePermission"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that queried state matches desired end state
+  assert:
+    that:
+      - result.queried_state.name == "ScopePermission"
+      - result.queried_state.description == "Scope permission"
+
+- name: Update scope permission
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ScopePermission"
+    description: "Scope permission changed"
+    permission_type: scope
+    decision_strategy: 'AFFIRMATIVE'
+    scopes:
+      - "file:create"
+      - "file:delete"
+    policies: []
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that scope permission was updated correctly
+  assert:
+    that:
+      - result.changed == True
+      - result.end_state != {}
+      - result.end_state.scopes|length == 2
+      - result.end_state.policies == []
+      - result.end_state.resources == []
+      - result.end_state.name == "ScopePermission"
+      - result.end_state.description == "Scope permission changed"
+
+- name: Query state
+  community.general.keycloak_authz_permission_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "ScopePermission"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that queried state matches desired end state
+  assert:
+    that:
+      - result.queried_state.name == "ScopePermission"
+      - result.queried_state.description == "Scope permission changed"
+
+- name: Update scope permission (test for idempotency)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ScopePermission"
+    description: "Scope permission changed"
+    permission_type: scope
+    decision_strategy: 'AFFIRMATIVE'
+    scopes:
+      - "file:create"
+      - "file:delete"
+    policies: []
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that nothing changed
+  assert:
+    that:
+      - result.changed == True
+      - result.end_state != {}
+      - result.end_state.scopes|length == 2
+      - result.end_state.policies == []
+      - result.end_state.resources == []
+      - result.end_state.name == "ScopePermission"
+      - result.end_state.description == "Scope permission changed"
+
+- name: Query state
+  community.general.keycloak_authz_permission_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "ScopePermission"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that queried state matches desired end state
+  assert:
+    that:
+      - result.queried_state.name == "ScopePermission"
+      - result.queried_state.description == "Scope permission changed"
+
+- name: Remove scope permission
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    name: "ScopePermission"
+    permission_type: scope
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that scope permission was removed
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Remove scope permission (test for idempotency)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    name: "ScopePermission"
+    permission_type: scope
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Create resource permission without resources (test for failure)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ResourcePermission"
+    description: "Resource permission"
+    permission_type: resource
+    policies:
+      - "Default Policy"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+  failed_when: result.msg.find('A resource need to defined when permission type is set to resource!') == -1
+
+- name: Create resource permission with scopes (test for failure)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ResourcePermission"
+    description: "Resource permission"
+    permission_type: resource
+    resources:
+      - "Default Resource"
+    policies:
+      - "Default Policy"
+    scopes:
+      - "file:delete"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+  failed_when: result.msg.find('Scopes cannot be defined when permission type is set to resource!') == -1
+
+- name: Create resource permission
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ResourcePermission"
+    description: "Resource permission"
+    resources:
+      - "Default Resource"
+    permission_type: resource
+    policies:
+      - "Default Policy"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that resource permission was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.policies|length == 1
+      - result.end_state.resources|length == 1
+      - result.end_state.name == "ResourcePermission"
+      - result.end_state.description == "Resource permission"
+
+- name: Query state
+  community.general.keycloak_authz_permission_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "ResourcePermission"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that queried state matches desired end state
+  assert:
+    that:
+      - result.queried_state.name == "ResourcePermission"
+      - result.queried_state.description == "Resource permission"
+
+- name: Create resource permission (test for idempotency)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ResourcePermission"
+    description: "Resource permission"
+    resources:
+      - "Default Resource"
+    permission_type: resource
+    policies:
+      - "Default Policy"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result.end_state != {}
+      - result.end_state.policies|length == 1
+      - result.end_state.resources|length == 1
+      - result.end_state.name == "ResourcePermission"
+      - result.end_state.description == "Resource permission"
+
+- name: Query state
+  community.general.keycloak_authz_permission_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "ResourcePermission"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that queried state matches desired end state
+  assert:
+    that:
+      - result.queried_state.name == "ResourcePermission"
+      - result.queried_state.description == "Resource permission"
+
+- name: Update resource permission
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "ResourcePermission"
+    description: "Resource permission changed"
+    resources:
+      - "Default Resource"
+    permission_type: resource
+    policies: []
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that resource permission was updated correctly
+  assert:
+    that:
+      - result.changed == True
+      - result.end_state != {}
+      - result.end_state.policies == []
+      - result.end_state.resources|length == 1
+      - result.end_state.name == "ResourcePermission"
+      - result.end_state.description == "Resource permission changed"
+
+- name: Query state
+  community.general.keycloak_authz_permission_info:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "ResourcePermission"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that queried state matches desired end state
+  assert:
+    that:
+      - result.queried_state.name == "ResourcePermission"
+      - result.queried_state.description == "Resource permission changed"
+
+- name: Remove resource permission
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    name: "ResourcePermission"
+    permission_type: resource
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that resource permission was removed
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Remove resource permission (test for idempotency)
+  community.general.keycloak_authz_permission:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    name: "ResourcePermission"
+    permission_type: resource
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Remove keycloak client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: absent

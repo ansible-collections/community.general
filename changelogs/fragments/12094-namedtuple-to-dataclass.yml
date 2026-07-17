@@ -1,0 +1,6 @@
+minor_changes:
+  - homebrew_services - replace ``NamedTuple`` with dataclass (https://github.com/ansible-collections/community.general/pull/12094).
+  - one_service - replace function-local ``namedtuple`` with module-level dataclass (https://github.com/ansible-collections/community.general/pull/12094).
+  - one_vm - replace function-local ``namedtuple`` with module-level dataclass (https://github.com/ansible-collections/community.general/pull/12094).
+  - opennebula inventory plugin - replace function-local ``namedtuple`` with module-level dataclass (https://github.com/ansible-collections/community.general/pull/12094).
+  - pacman - replace ``namedtuple`` with dataclass for ``VersionTuple`` (https://github.com/ansible-collections/community.general/pull/12094).

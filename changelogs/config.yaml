@@ -1,0 +1,43 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+changelog_filename_template: ../CHANGELOG.rst
+changelog_filename_version_depth: 0
+changes_file: changelog.yaml
+changes_format: combined
+ignore_other_fragment_extensions: true
+keep_fragments: false
+mention_ancestor: true
+new_plugins_after_name: removed_features
+notesdir: fragments
+output_formats:
+  - md
+  - rst
+prelude_section_name: release_summary
+prelude_section_title: Release Summary
+sections:
+  - - major_changes
+    - Major Changes
+  - - minor_changes
+    - Minor Changes
+  - - breaking_changes
+    - Breaking Changes / Porting Guide
+  - - deprecated_features
+    - Deprecated Features
+  - - removed_features
+    - Removed Features (previously deprecated)
+  - - security_fixes
+    - Security Fixes
+  - - bugfixes
+    - Bugfixes
+  - - known_issues
+    - Known Issues
+title: Community General
+trivial_section_name: trivial
+use_fqcn: true
+add_plugin_period: true
+changelog_nice_yaml: true
+changelog_sort: version
+vcs: auto

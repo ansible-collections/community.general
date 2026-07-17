@@ -1,0 +1,64 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-beers.xml
+    dest: /tmp/ansible-xml-beers.xml
+
+
+- name: Set child elements
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/beers
+    set_children: &children
+      - beer:
+          alcohol: "0.5"
+          name: 90 Minute IPA
+          +value: "2"
+      - beer:
+          alcohol: "0.3"
+          name: Harvest Pumpkin Ale
+          +value: "5"
+  register: set_children_elements_value
+
+- name: Add trailing newline
+  shell: echo "" >> /tmp/ansible-xml-beers.xml
+
+- name: Compare to expected result
+  copy:
+    src: results/test-set-children-elements-value.xml
+    dest: /tmp/ansible-xml-beers.xml
+  check_mode: true
+  diff: true
+  register: comparison
+
+- name: Test expected result
+  assert:
+    that:
+      - set_children_elements_value is changed
+      - comparison is not changed  # identical
+
+
+- name: Set child elements (again)
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/beers
+    set_children: *children
+  register: set_children_again
+
+- name: Compare to expected result
+  copy:
+    src: results/test-set-children-elements-value.xml
+    dest: /tmp/ansible-xml-beers.xml
+  check_mode: true
+  diff: true
+  register: comparison
+
+- name: Test expected result
+  assert:
+    that:
+      - set_children_again is not changed
+      - comparison is not changed   # identical

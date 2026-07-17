@@ -1,0 +1,74 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Check packages with updates
+  dnf:
+    list: updates
+  register: updates
+
+- name: Set local facts
+  set_fact:
+    _packages: "{{ (updates.results | map(attribute='name') | list)[:5] }}"
+
+- debug:
+    msg:
+      - "The packages to be locked and unlocked are: {{ _packages}}"
+
+- block:
+    - name: Clear locklist
+      community.general.dnf_versionlock:
+        state: clean
+      register: clear_locklist
+
+    - assert:
+        that:
+          - clear_locklist.locklist_post | length == 0
+
+    - name: Lock packages with updates
+      dnf_versionlock:
+        name: "{{ _packages }}"
+        state: present
+      register: lock_packages
+
+    - assert:
+        that:
+          - lock_packages is changed
+          - (lock_packages.locklist_post | length) <= (_packages | length)
+
+    - name: Update packages with updates while locked
+      command: >-
+        dnf update -y
+        --setopt=obsoletes=0 {{ _packages | join(' ') }}
+      register: update_locked_packages
+      changed_when: '"Nothing to do" not in update_locked_packages.stdout'
+
+    - assert:
+        that:
+          - update_locked_packages is not changed
+
+    - name: Unlock packages with updates
+      dnf_versionlock:
+        name: "{{ _packages }}"
+        state: absent
+      register: unlock_packages
+
+    - assert:
+        that:
+          - unlock_packages is changed
+          - unlock_packages.locklist_post | length == 0
+
+    - name: Update packages
+      dnf:
+        name: "{{ _packages }}"
+        state: latest
+      check_mode: true
+      register: update_packages
+
+    - assert:
+        that:
+          - update_packages is changed
+
+  when: updates.results | length > 0
+...

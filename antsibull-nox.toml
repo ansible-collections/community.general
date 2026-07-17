@@ -1,0 +1,300 @@
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2025 Felix Fontein <felix@fontein.de>
+
+[collection_sources]
+"ansible.posix" = "git+https://github.com/ansible-collections/ansible.posix.git,main"
+"community.crypto" = "git+https://github.com/ansible-collections/community.crypto.git,main"
+"community.docker" = "git+https://github.com/ansible-collections/community.docker.git,main"
+"community.internal_test_tools" = "git+https://github.com/ansible-collections/community.internal_test_tools.git,main"
+"community.library_inventory_filtering_v1" = "git+https://github.com/ansible-collections/community.library_inventory_filtering.git,stable-1"
+
+[vcs]
+vcs = "git"
+development_branch = "main"
+stable_branches = [ "stable-*" ]
+
+[sessions]
+
+[sessions.lint]
+code_files = ["."]  # consider all Python files in the collection
+run_isort = false
+run_black = false
+run_ruff_autofix = true
+ruff_autofix_config = "ruff.toml"
+ruff_autofix_select = [
+    "I",
+    "RUF022",
+]
+run_ruff_check = true
+ruff_check_config = "ruff.toml"
+run_ruff_format = true
+ruff_format_config = "ruff.toml"
+run_flake8 = false
+run_pylint = false
+run_yamllint = true
+yamllint_config = ".yamllint"
+# yamllint_config_plugins = ".yamllint-docs"
+# yamllint_config_plugins_examples = ".yamllint-examples"
+run_mypy = true
+mypy_ansible_core_package = "ansible-core>=2.19.0"
+mypy_config = ".mypy.ini"
+mypy_extra_deps = [
+    "cryptography",
+    "dnspython",
+    "lxml-stubs",
+    "types-mock",
+    "types-paramiko",
+    "types-passlib",
+    "types-psutil",
+    "types-PyYAML",
+    "types-requests",
+]
+
+[sessions.docs_check]
+validate_collection_refs="all"
+codeblocks_restrict_types = [
+    "ansible-output",
+    "console",
+    "ini",
+    "json",
+    "python",
+    "shell",
+    "yaml",
+    "yaml+jinja",
+    "text",
+]
+codeblocks_restrict_type_exact_case = true
+codeblocks_allow_without_type = false
+codeblocks_allow_literal_blocks = false
+
+[sessions.license_check]
+
+[sessions.extra_checks]
+run_no_unwanted_files = true
+no_unwanted_files_module_extensions = [".py"]
+no_unwanted_files_yaml_extensions = [".yml"]
+run_action_groups = true
+run_no_trailing_whitespace = true
+no_trailing_whitespace_skip_paths = [
+    "tests/integration/targets/iso_extract/files/test.iso",
+    "tests/integration/targets/java_cert/files/testpkcs.p12",
+    "tests/integration/targets/one_host/files/testhost/tmp/opennebula-fixtures.json.gz",
+    "tests/integration/targets/one_template/files/testhost/tmp/opennebula-fixtures.json.gz",
+    "tests/integration/targets/setup_flatpak_remote/files/repo.tar.xz",
+]
+no_trailing_whitespace_skip_directories = [
+    "tests/unit/plugins/modules/dnf_config_manager/fixtures/",
+    "tests/unit/plugins/modules/interfaces_file/interfaces_file_fixtures/golden_output/",
+    "tests/unit/plugins/modules/interfaces_file/interfaces_file_fixtures/input/",
+]
+
+[[sessions.extra_checks.action_groups_config]]
+name = "consul"
+pattern = "^consul_.*$"
+exclusions = [
+    # The consul_acl_bootstrap module does not have a 'token' option, as opposed
+    # to all other consul modules. Therefore it is not part of the action group.
+    "consul_acl_bootstrap",
+]
+doc_fragment = "community.general._consul.actiongroup_consul"
+
+[[sessions.extra_checks.action_groups_config]]
+name = "keycloak"
+pattern = "^keycloak_.*$"
+exclusions = [
+    "keycloak_realm_info",
+]
+doc_fragment = "community.general._keycloak.actiongroup_keycloak"
+
+[[sessions.extra_checks.action_groups_config]]
+name = "scaleway"
+pattern = "^scaleway_.*$"
+doc_fragment = "community.general._scaleway.actiongroup_scaleway"
+
+[sessions.build_import_check]
+run_galaxy_importer = true
+
+[sessions.ansible_test_sanity]
+include_devel = true
+
+[sessions.ansible_test_units]
+include_devel = true
+split_by_python_version = true
+
+[sessions.ansible_test_units.core_python_versions]
+"2.18" = ["3.8", "3.11", "3.13"]
+"2.19" = ["3.8", "3.11", "3.13"]
+"2.20" = ["3.9", "3.12", "3.14"]
+"2.21" = ["3.9", "3.12", "3.14"]
+
+[sessions.ansible_test_integration]
+session_name_template = "ansible-test-integration-{ansible_core}{dash_docker_short}{dash_remote}{dash_python_version}{dash_target_dashized}"
+display_name_template = "Ⓐ{ansible_core}{plus_docker_nice}{plus_remote_nice}{plus_py_python_version}{plus_target_nice}"
+description_template = "Run integration tests with ansible-core {ansible_core}{comma_docker_nice}{comma_remote_nice}{comma_py_python_version}{comma_target_nice}"
+retry_on_error = "in-ci"
+
+[sessions.ansible_test_integration.nice_target_names]
+"azp/posix/1/" = "group 1"
+"azp/posix/2/" = "group 2"
+"azp/posix/3/" = "group 3"
+"azp/posix/vm/" = "extra VMs"
+
+[sessions.ansible_test_integration.nice_docker_names]
+"quay.io/ansible-community/test-image:debian-bullseye" = "Debian 11"
+"quay.io/ansible-community/test-image:debian-bookworm" = "Debian 12"
+"quay.io/ansible-community/test-image:debian-13-trixie" = "Debian 13"
+"quay.io/ansible-community/test-image:archlinux" = "Arch Linux"
+"quay.io/ansible-community/test-image:opensuse-tumbleweed" = "OpenSuSE Tumbleweed"
+
+##################################################################################################
+
+# Ansible-core 2.18:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.18"
+description = "Meta session for running all ansible-test-integration-2.18-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.18"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+docker = [ "fedora40", "ubuntu2404", "alpine320" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.18"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+remote = [
+    # "macos/14.3",
+    # "freebsd/14.1"
+]
+
+# Ansible-core 2.19:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.19"
+description = "Meta session for running all ansible-test-integration-2.19-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+docker = [ "fedora41", "alpine321" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+remote = [
+    "rhel/10.1",
+    # "freebsd/14.2",
+]
+
+# Ansible-core 2.20:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.20"
+description = "Meta session for running all ansible-test-integration-2.20-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.20"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+docker = [ "fedora42", "alpine322" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.20"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+remote = [ "macos/15.3", "rhel/10.1", "freebsd/14.3" ]
+
+# Ansible-core 2.21:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.21"
+description = "Meta session for running all ansible-test-integration-2.21-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.21"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+docker = [
+    "fedora43",
+    # "alpine323",
+    "ubuntu2204",
+    "ubuntu2404",
+]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.21"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+remote = [
+    # "macos/26.3",
+    "rhel/10.1",
+    # "rhel/9.7",
+]
+
+# Ansible-core devel:
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-devel"
+description = "Meta session for running all ansible-test-integration-devel-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+docker = [
+    "fedora44",
+    "ubuntu2604",
+    "ubuntu2404",
+    "alpine323",
+]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+python_version = "3.9"
+docker = "quay.io/ansible-community/test-image:debian-bullseye"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+python_version = "3.11"
+docker = "quay.io/ansible-community/test-image:debian-bookworm"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+python_version = "3.13"
+docker = "quay.io/ansible-community/test-image:debian-13-trixie"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+python_version = "3.13"
+docker = "quay.io/ansible-community/test-image:opensuse-tumbleweed"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+python_version = "3.14"
+docker = "quay.io/ansible-community/test-image:archlinux"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/vm/" ]
+remote = [
+    "alpine/3.23",
+    # "fedora/44",
+    "ubuntu/26.04",
+    "ubuntu/24.04",
+]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+remote = [
+    "macos/26.3",
+    "rhel/10.2",
+    "rhel/9.8",
+    # TODO: enable this ASAP!
+    # "freebsd/15.0",
+    # TODO: enable this ASAP!
+    # "freebsd/14.4",
+]
+
+##################################################################################################

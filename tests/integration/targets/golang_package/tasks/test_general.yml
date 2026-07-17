@@ -1,0 +1,46 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# x/tools v0.24.1 is the only version that works on both Go 1.16-1.24 AND Go 1.25+.
+# See https://github.com/golang/go/issues/74462 for details.
+
+- name: Ensure stringer is absent
+  community.general.golang_package:
+    state: absent
+    name: golang.org/x/tools/cmd/stringer
+  register: uninstall_absent
+
+- name: Install stringer
+  community.general.golang_package:
+    name: golang.org/x/tools/cmd/stringer
+    version: v0.24.1
+  register: install_result
+
+- name: Install stringer again (idempotent)
+  community.general.golang_package:
+    name: golang.org/x/tools/cmd/stringer
+    version: v0.24.1
+  register: install_idem
+
+- name: Uninstall stringer
+  community.general.golang_package:
+    state: absent
+    name: golang.org/x/tools/cmd/stringer
+  register: uninstall_result
+
+- name: Uninstall stringer again (idempotent)
+  community.general.golang_package:
+    state: absent
+    name: golang.org/x/tools/cmd/stringer
+  register: uninstall_idem
+
+- name: Check assertions
+  assert:
+    that:
+      - uninstall_absent is not changed
+      - install_result is changed
+      - install_idem is not changed
+      - uninstall_result is changed
+      - uninstall_idem is not changed

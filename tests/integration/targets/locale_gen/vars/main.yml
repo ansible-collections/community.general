@@ -1,0 +1,29 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# locale_basic: pt_BR
+
+locale_list_basic:
+  - localegen: pt_BR
+    locales: [pt_BR]
+    skip_removal: false
+  - localegen: C.UTF-8
+    locales: [C.utf8, C.UTF-8]
+    skip_removal: true
+  - localegen: eo
+    locales: [eo]
+    skip_removal: false
+  - localegen:
+      - ar_BH.UTF-8
+      - tr_CY.UTF-8
+    locales:
+      - ar_BH.UTF-8
+      - ar_BH.utf8
+      - tr_CY.UTF-8
+      - tr_CY.utf8
+    skip_removal: false
+  - localegen: de_CH.UTF-8
+    locales: [de_CH.utf8]
+    skip_removal: false

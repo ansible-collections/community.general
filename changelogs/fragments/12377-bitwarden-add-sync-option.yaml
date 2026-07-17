@@ -1,0 +1,2 @@
+minor_changes:
+  - bitwarden lookup plugin - add ``sync`` option to sync items from the vault before lookup (https://github.com/ansible-collections/community.general/pull/12377).

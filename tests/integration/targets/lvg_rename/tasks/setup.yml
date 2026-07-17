@@ -1,0 +1,50 @@
+---
+# Copyright (c) Contributors to the Ansible project
+# Based on the integraton test for the lvg module
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create files to use as disk devices
+  with_sequence: 'count=2'
+  ansible.builtin.command:
+    cmd: "dd if=/dev/zero of={{ remote_tmp_dir }}/img{{ item }} bs=1M count=10"
+    creates: "{{ remote_tmp_dir }}/img{{ item }}"
+
+- name: Show next free loop device
+  ansible.builtin.command:
+    cmd: "losetup -f"
+  changed_when: false
+  register: loop_device1
+
+- name: "Create loop device for file {{ remote_tmp_dir }}/img1"
+  ansible.builtin.command:
+    cmd: "losetup -f {{ remote_tmp_dir }}/img1"
+  changed_when: true
+
+- name: Show next free loop device
+  ansible.builtin.command:
+    cmd: "losetup -f"
+  changed_when: false
+  register: loop_device2
+
+- name: "Create loop device for file {{ remote_tmp_dir }}/img2"
+  ansible.builtin.command:
+    cmd: "losetup -f {{ remote_tmp_dir }}/img2"
+  changed_when: true
+
+- name: Affect name on disk to work on
+  ansible.builtin.set_fact:
+    loop_device1: "{{ loop_device1.stdout }}"
+    loop_device2: "{{ loop_device2.stdout }}"
+
+- name: "Create test volume group testvg on {{ loop_device1 }}"
+  community.general.lvg:
+    vg: "testvg"
+    state: present
+    pvs: "{{ loop_device1 }}"
+
+- name: "Create test volume group testvg2 on {{ loop_device2 }}"
+  community.general.lvg:
+    vg: "testvg2"
+    state: present
+    pvs: "{{ loop_device2 }}"

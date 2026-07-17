@@ -1,0 +1,18 @@
+{
+    "uuid": "0123456789",
+    "vaultUuid": "2468",
+    "overview": {
+        "title": "Mock \"Quot'd\" Server"
+    },
+    "details": {
+        "sections": [{
+            "title": "",
+            "fields": [
+                {"t": "username", "v": "jamesbond"},
+                {"t": "password", "v": "t0pS3cret"},
+                {"t": "notes", "v": "Test note with\nmultiple lines and trailing space.\n\n"},
+                {"t": "tricksy \"quot'd\" field\\", "v": "\"quot'd\" value"}
+            ]
+        }]
+    }
+}

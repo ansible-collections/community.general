@@ -1,0 +1,73 @@
+# Copyright (c) 2026, Dexter Le <dextersydney2001@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+
+test_cases:
+  - id: info_connected
+    input:
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+      repository_status: |-
+        Connected to repository: s3:/my-bucket/
+        Config file: /etc/kopia/root.config
+      throttle: |-
+        upload-bytes-per-second: 0
+        download-bytes-per-second: 0
+    mocks:
+      run_command:
+        - command: [/testbin/kopia, repository, status, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 0
+          out: |-
+            Connected to repository: s3:/my-bucket/
+            Config file: /etc/kopia/root.config
+          err: ''
+        - command: [/testbin/kopia, repository, throttle, get, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 0
+          out: |-
+            upload-bytes-per-second: 0
+            download-bytes-per-second: 0
+          err: ''
+
+  - id: info_not_connected
+    input:
+      config: /etc/kopia/root.config
+    output:
+      failed: true
+      msg: "kopia repository status failed with error (rc=1): repository not connected"
+    mocks:
+      run_command:
+        - command: [/testbin/kopia, repository, status, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'repository not connected'
+
+  - id: info_no_config
+    input: {}
+    output:
+      changed: false
+      repository_status: "Connected to repository: filesystem:/mnt/backup/kopia"
+      throttle: |-
+        upload-bytes-per-second: 1048576
+        download-bytes-per-second: 5242880
+    mocks:
+      run_command:
+        - command: [/testbin/kopia, repository, status]
+          environ: *env-def
+          rc: 0
+          out: "Connected to repository: filesystem:/mnt/backup/kopia"
+          err: ''
+        - command: [/testbin/kopia, repository, throttle, get]
+          environ: *env-def
+          rc: 0
+          out: |-
+            upload-bytes-per-second: 1048576
+            download-bytes-per-second: 5242880
+          err: ''

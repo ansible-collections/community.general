@@ -1,0 +1,32 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- set_fact:
+    has_java_keytool: >
+      {{ ansible_facts.os_family not in ['Darwin', 'FreeBSD'] }}
+
+- name: Include OS-specific variables
+  include_vars: '{{ lookup("first_found", params) }}'
+  vars:
+    params:
+      files:
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
+      paths:
+        - '{{ role_path }}/vars'
+  when: has_java_keytool
+
+- name: Install keytool
+  package:
+    name: '{{ keytool_package_names }}'
+  become: true
+  when: has_java_keytool

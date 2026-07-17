@@ -1,0 +1,59 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Regression test for https://github.com/ansible-collections/community.general/issues/7171
+# Passing an unquoted YAML boolean as `value` must now fail with an explicit error.
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-beers.xml
+    dest: /tmp/ansible-xml-beers.xml
+
+
+- name: "Set '/business/rating/@subjective' to boolean false (unquoted YAML boolean) - must fail"
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/rating
+    attribute: subjective
+    value: false
+  register: set_attribute_boolean_false
+  ignore_errors: true
+
+- name: Assert that passing a boolean attribute value raises an error
+  assert:
+    that:
+      - set_attribute_boolean_false is failed
+      - "'was parsed for' in set_attribute_boolean_false.msg"
+      - "'attribute' in set_attribute_boolean_false.msg"
+
+
+- name: "Set '/business/rating' text content to boolean true (unquoted YAML boolean) - must fail"
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/rating
+    value: true
+  register: set_element_boolean_true
+  ignore_errors: true
+
+- name: Assert that passing a boolean element value raises an error
+  assert:
+    that:
+      - set_element_boolean_true is failed
+      - "'was parsed for' in set_element_boolean_true.msg"
+      - "'element text' in set_element_boolean_true.msg"
+
+
+- name: "Set '/business/rating/@subjective' to quoted string 'false' - must succeed"
+  xml:
+    path: /tmp/ansible-xml-beers.xml
+    xpath: /business/rating
+    attribute: subjective
+    value: "false"
+  register: set_attribute_string_false
+
+- name: Assert that passing a quoted string attribute value succeeds
+  assert:
+    that:
+      - set_attribute_string_false is changed

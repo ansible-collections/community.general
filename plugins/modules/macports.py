@@ -1,0 +1,315 @@
+#!/usr/bin/python
+
+# Copyright (c) 2013, Jimmy Tang <jcftang@gmail.com>
+# Based on okpg (Patrick Pelletier <pp.pelletier@gmail.com>), pacman
+# (Afterburn) and pkgin (Shaun Zinck) modules
+#
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: macports
+author: "Jimmy Tang (@jcftang)"
+short_description: Package manager for MacPorts
+description:
+  - Manages MacPorts packages (ports).
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+options:
+  name:
+    description:
+      - A list of port names.
+    aliases: ['port']
+    type: list
+    elements: str
+  selfupdate:
+    description:
+      - Update Macports and the ports tree, either prior to installing ports or as a separate step.
+      - Equivalent to running C(port selfupdate).
+    aliases: ['update_cache', 'update_ports']
+    default: false
+    type: bool
+  state:
+    description:
+      - Indicates the desired state of the port.
+    choices: ['present', 'absent', 'active', 'inactive', 'installed', 'removed']
+    default: present
+    type: str
+  upgrade:
+    description:
+      - Upgrade all outdated ports, either prior to installing ports or as a separate step.
+      - Equivalent to running C(port upgrade outdated).
+    default: false
+    type: bool
+  variant:
+    description:
+      - A port variant specification.
+      - O(variant) is only supported with O(state=installed) and O(state=present).
+    aliases: ['variants']
+    type: str
+"""
+
+EXAMPLES = r"""
+- name: Install the foo port
+  community.general.macports:
+    name: foo
+
+- name: Install the universal, x11 variant of the foo port
+  community.general.macports:
+    name: foo
+    variant: +universal+x11
+
+- name: Install a list of ports
+  community.general.macports:
+    name: "{{ ports }}"
+  vars:
+    ports:
+      - foo
+      - foo-tools
+
+- name: Update Macports and the ports tree, then upgrade all outdated ports
+  community.general.macports:
+    selfupdate: true
+    upgrade: true
+
+- name: Update Macports and the ports tree, then install the foo port
+  community.general.macports:
+    name: foo
+    selfupdate: true
+
+- name: Remove the foo port
+  community.general.macports:
+    name: foo
+    state: absent
+
+- name: Activate the foo port
+  community.general.macports:
+    name: foo
+    state: active
+
+- name: Deactivate the foo port
+  community.general.macports:
+    name: foo
+    state: inactive
+"""
+
+import re
+
+from ansible.module_utils.basic import AnsibleModule
+
+
+def selfupdate(module, port_path):
+    """Update Macports and the ports tree."""
+
+    rc, out, err = module.run_command([port_path, "-v", "selfupdate"])
+
+    if rc == 0:
+        updated = any(
+            re.search(r"Total number of ports parsed:\s+[^0]", s.strip())
+            or re.search(r"Installing new Macports release", s.strip())
+            for s in out.split("\n")
+            if s
+        )
+        if updated:
+            changed = True
+            msg = "Macports updated successfully"
+        else:
+            changed = False
+            msg = "Macports already up-to-date"
+
+        return (changed, msg, out, err)
+    else:
+        module.fail_json(msg="Failed to update Macports", stdout=out, stderr=err)
+
+
+def upgrade(module, port_path):
+    """Upgrade outdated ports."""
+
+    rc, out, err = module.run_command([port_path, "upgrade", "outdated"])
+
+    # rc is 1 when nothing to upgrade so check stdout first.
+    if out.strip() == "Nothing to upgrade.":
+        changed = False
+        msg = "Ports already upgraded"
+        return (changed, msg, out, err)
+    elif rc == 0:
+        changed = True
+        msg = "Outdated ports upgraded successfully"
+        return (changed, msg, out, err)
+    else:
+        module.fail_json(msg="Failed to upgrade outdated ports", stdout=out, stderr=err)
+
+
+def query_port(module, port_path, name, state="present"):
+    """Returns whether a port is installed or not."""
+
+    if state == "present":
+        rc, out, err = module.run_command([port_path, "-q", "installed", name])
+
+        return rc == 0 and out.strip().startswith(f"{name} ")
+
+    elif state == "active":
+        rc, out, err = module.run_command([port_path, "-q", "installed", name])
+
+        return rc == 0 and "(active)" in out
+
+
+def remove_ports(module, port_path, ports, stdout, stderr):
+    """Uninstalls one or more ports if installed."""
+
+    remove_c = 0
+    # Using a for loop in case of error, we can report the port that failed
+    for port in ports:
+        # Query the port first, to see if we even need to remove
+        if not query_port(module, port_path, port):
+            continue
+
+        rc, out, err = module.run_command([port_path, "uninstall", port])
+        stdout += out
+        stderr += err
+        if query_port(module, port_path, port):
+            module.fail_json(msg=f"Failed to remove {port}: {err}", stdout=stdout, stderr=stderr)
+
+        remove_c += 1
+
+    if remove_c > 0:
+        module.exit_json(changed=True, msg=f"Removed {remove_c} port(s)", stdout=stdout, stderr=stderr)
+
+    module.exit_json(changed=False, msg="Port(s) already absent", stdout=stdout, stderr=stderr)
+
+
+def install_ports(module, port_path, ports, variant, stdout, stderr):
+    """Installs one or more ports if not already installed."""
+
+    install_c = 0
+
+    for port in ports:
+        if query_port(module, port_path, port):
+            continue
+
+        rc, out, err = module.run_command([port_path, "install", port, variant])
+        stdout += out
+        stderr += err
+        if not query_port(module, port_path, port):
+            module.fail_json(msg=f"Failed to install {port}: {err}", stdout=stdout, stderr=stderr)
+
+        install_c += 1
+
+    if install_c > 0:
+        module.exit_json(changed=True, msg=f"Installed {install_c} port(s)", stdout=stdout, stderr=stderr)
+
+    module.exit_json(changed=False, msg="Port(s) already present", stdout=stdout, stderr=stderr)
+
+
+def activate_ports(module, port_path, ports, stdout, stderr):
+    """Activate a port if it is inactive."""
+
+    activate_c = 0
+
+    for port in ports:
+        if not query_port(module, port_path, port):
+            module.fail_json(msg=f"Failed to activate {port}, port(s) not present", stdout=stdout, stderr=stderr)
+
+        if query_port(module, port_path, port, state="active"):
+            continue
+
+        rc, out, err = module.run_command([port_path, "activate", port])
+        stdout += out
+        stderr += err
+
+        if not query_port(module, port_path, port, state="active"):
+            module.fail_json(msg=f"Failed to activate {port}: {err}", stdout=stdout, stderr=stderr)
+
+        activate_c += 1
+
+    if activate_c > 0:
+        module.exit_json(changed=True, msg=f"Activated {activate_c} port(s)", stdout=stdout, stderr=stderr)
+
+    module.exit_json(changed=False, msg="Port(s) already active", stdout=stdout, stderr=stderr)
+
+
+def deactivate_ports(module, port_path, ports, stdout, stderr):
+    """Deactivate a port if it is active."""
+
+    deactivated_c = 0
+
+    for port in ports:
+        if not query_port(module, port_path, port):
+            module.fail_json(msg=f"Failed to deactivate {port}, port(s) not present", stdout=stdout, stderr=stderr)
+
+        if not query_port(module, port_path, port, state="active"):
+            continue
+
+        rc, out, err = module.run_command([port_path, "deactivate", port])
+        stdout += out
+        stderr += err
+        if query_port(module, port_path, port, state="active"):
+            module.fail_json(msg=f"Failed to deactivate {port}: {err}", stdout=stdout, stderr=stderr)
+
+        deactivated_c += 1
+
+    if deactivated_c > 0:
+        module.exit_json(changed=True, msg=f"Deactivated {deactivated_c} port(s)", stdout=stdout, stderr=stderr)
+
+    module.exit_json(changed=False, msg="Port(s) already inactive", stdout=stdout, stderr=stderr)
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            name=dict(type="list", elements="str", aliases=["port"]),
+            selfupdate=dict(aliases=["update_cache", "update_ports"], default=False, type="bool"),
+            state=dict(default="present", choices=["present", "installed", "absent", "removed", "active", "inactive"]),
+            upgrade=dict(default=False, type="bool"),
+            variant=dict(aliases=["variants"], type="str"),
+        )
+    )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
+
+    stdout = ""
+    stderr = ""
+
+    port_path = module.get_bin_path("port", True, ["/opt/local/bin"])
+
+    p = module.params
+
+    if p["selfupdate"]:
+        (changed, msg, out, err) = selfupdate(module, port_path)
+        stdout += out
+        stderr += err
+        if not (p["name"] or p["upgrade"]):
+            module.exit_json(changed=changed, msg=msg, stdout=stdout, stderr=stderr)
+
+    if p["upgrade"]:
+        (changed, msg, out, err) = upgrade(module, port_path)
+        stdout += out
+        stderr += err
+        if not p["name"]:
+            module.exit_json(changed=changed, msg=msg, stdout=stdout, stderr=stderr)
+
+    pkgs = p["name"]
+
+    variant = p["variant"]
+
+    if p["state"] in ["present", "installed"]:
+        install_ports(module, port_path, pkgs, variant, stdout, stderr)
+
+    elif p["state"] in ["absent", "removed"]:
+        remove_ports(module, port_path, pkgs, stdout, stderr)
+
+    elif p["state"] == "active":
+        activate_ports(module, port_path, pkgs, stdout, stderr)
+
+    elif p["state"] == "inactive":
+        deactivate_ports(module, port_path, pkgs, stdout, stderr)
+
+
+if __name__ == "__main__":
+    main()

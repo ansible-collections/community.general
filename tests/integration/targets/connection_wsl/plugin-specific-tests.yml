@@ -1,0 +1,31 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- hosts: "{{ target_hosts }}"
+  gather_facts: false
+  tasks:
+    - name: create file without content
+      copy:
+        content: ""
+        dest: "{{ remote_tmp }}/test_empty.txt"
+        force: false
+        mode: '0644'
+
+    - name: assert file without content exists
+      stat:
+        path: "{{ remote_tmp }}/test_empty.txt"
+      register: empty_file_stat
+
+    - name: verify file without content exists
+      assert:
+        that:
+          - empty_file_stat.stat.exists
+        fail_msg: "The file {{ remote_tmp }}/test_empty.txt does not exist."
+
+    - name: verify file without content is empty
+      assert:
+        that:
+          - empty_file_stat.stat.size == 0
+        fail_msg: "The file {{ remote_tmp }}/test_empty.txt is not empty."

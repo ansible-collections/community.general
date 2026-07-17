@@ -1,0 +1,36 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Clear locklist
+  community.general.dnf_versionlock:
+    state: clean
+  register: clear_locklist
+
+- assert:
+    that:
+      - clear_locklist.locklist_post | length == 0
+
+- name: Lock installed package bash
+  community.general.dnf_versionlock:
+    name: bash
+    state: present
+  register: lock_bash
+
+- assert:
+    that:
+      - lock_bash is changed
+      - lock_bash.locklist_post | length == 1
+
+- name: Unlock installed package bash
+  community.general.dnf_versionlock:
+    name: bash
+    state: absent
+  register: unlock_bash
+
+- assert:
+    that:
+      - unlock_bash is changed
+      - unlock_bash.locklist_post | length == 0
+...

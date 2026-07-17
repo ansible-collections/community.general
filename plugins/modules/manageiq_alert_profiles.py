@@ -1,0 +1,290 @@
+#!/usr/bin/python
+# Copyright (c) 2017 Red Hat Inc.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: manageiq_alert_profiles
+
+short_description: Configuration of alert profiles for ManageIQ
+extends_documentation_fragment:
+  - community.general._manageiq
+  - community.general._attributes
+
+author: Elad Alfassa (@elad661) <ealfassa@redhat.com>
+description:
+  - The manageiq_alert_profiles module supports adding, updating and deleting alert profiles in ManageIQ.
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+
+options:
+  state:
+    type: str
+    description:
+      - V(absent) - alert profile should not exist,
+      - V(present) - alert profile should exist.
+    choices: ['absent', 'present']
+    default: 'present'
+  name:
+    type: str
+    description:
+      - The unique alert profile name in ManageIQ.
+    required: true
+  resource_type:
+    type: str
+    description:
+      - The resource type for the alert profile in ManageIQ. Required when O(state=present).
+    choices: ['Vm', 'ContainerNode', 'MiqServer', 'Host', 'Storage', 'EmsCluster', 'ExtManagementSystem', 'MiddlewareServer']
+  alerts:
+    type: list
+    elements: str
+    description:
+      - List of alert descriptions to assign to this profile.
+      - Required if O(state=present).
+  notes:
+    type: str
+    description:
+      - Optional notes for this profile.
+"""
+
+EXAMPLES = r"""
+- name: Add an alert profile to ManageIQ
+  community.general.manageiq_alert_profiles:
+    state: present
+    name: Test profile
+    resource_type: ContainerNode
+    alerts:
+      - Test Alert 01
+      - Test Alert 02
+    manageiq_connection:
+      url: 'http://127.0.0.1:3000'
+      username: 'admin'
+      password: 'smartvm'
+      validate_certs: false # only do this when you trust the network!
+
+- name: Delete an alert profile from ManageIQ
+  community.general.manageiq_alert_profiles:
+    state: absent
+    name: Test profile
+    manageiq_connection:
+      url: 'http://127.0.0.1:3000'
+      username: 'admin'
+      password: 'smartvm'
+      validate_certs: false # only do this when you trust the network!
+"""
+
+RETURN = r"""
+"""
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils._manageiq import ManageIQ, manageiq_argument_spec
+
+
+class ManageIQAlertProfiles:
+    """Object to execute alert profile management operations in manageiq."""
+
+    def __init__(self, manageiq):
+        self.manageiq = manageiq
+
+        self.module = self.manageiq.module
+        self.api_url = self.manageiq.api_url
+        self.client = self.manageiq.client
+        self.url = f"{self.api_url}/alert_definition_profiles"
+
+    def get_profiles(self):
+        """Get all alert profiles from ManageIQ"""
+        try:
+            response = self.client.get(f"{self.url}?expand=alert_definitions,resources")
+        except Exception as e:
+            self.module.fail_json(msg=f"Failed to query alert profiles: {e}")
+        return response.get("resources") or []
+
+    def get_alerts(self, alert_descriptions):
+        """Get a list of alert hrefs from a list of alert descriptions"""
+        alerts = []
+        for alert_description in alert_descriptions:
+            alert = self.manageiq.find_collection_resource_or_fail("alert_definitions", description=alert_description)
+            alerts.append(alert["href"])
+
+        return alerts
+
+    def add_profile(self, profile):
+        """Add a new alert profile to ManageIQ"""
+        # find all alerts to add to the profile
+        # we do this first to fail early if one is missing.
+        alerts = self.get_alerts(profile["alerts"])
+
+        # build the profile dict to send to the server
+
+        profile_dict = dict(name=profile["name"], description=profile["name"], mode=profile["resource_type"])
+        if profile["notes"]:
+            profile_dict["set_data"] = dict(notes=profile["notes"])
+
+        # send it to the server
+        try:
+            result = self.client.post(self.url, resource=profile_dict, action="create")
+        except Exception as e:
+            self.module.fail_json(msg=f"Creating profile failed {e}")
+
+        # now that it has been created, we can assign the alerts
+        self.assign_or_unassign(result["results"][0], alerts, "assign")
+
+        msg = f"Profile {profile['name']} created successfully"
+        return dict(changed=True, msg=msg)
+
+    def delete_profile(self, profile):
+        """Delete an alert profile from ManageIQ"""
+        try:
+            self.client.post(profile["href"], action="delete")
+        except Exception as e:
+            self.module.fail_json(msg=f"Deleting profile failed: {e}")
+
+        msg = f"Successfully deleted profile {profile['name']}"
+        return dict(changed=True, msg=msg)
+
+    def get_alert_href(self, alert):
+        """Get an absolute href for an alert"""
+        return f"{self.api_url}/alert_definitions/{alert['id']}"
+
+    def assign_or_unassign(self, profile, resources, action):
+        """Assign or unassign alerts to profile, and validate the result."""
+        alerts = [dict(href=href) for href in resources]
+
+        subcollection_url = f"{profile['href']}/alert_definitions"
+        try:
+            result = self.client.post(subcollection_url, resources=alerts, action=action)
+            if len(result["results"]) != len(alerts):
+                msg = (
+                    f"Failed to {action} alerts to profile '{profile['name']}', "
+                    f"expected {len(alerts)} alerts to be {action}ed, "
+                    f"but only {result['results']} were {action}ed"
+                )
+                self.module.fail_json(msg=msg)
+        except Exception as e:
+            msg = f"Failed to {action} alerts to profile '{profile['name']}': {e}"
+            self.module.fail_json(msg=msg)
+
+        return result["results"]
+
+    def update_profile(self, old_profile, desired_profile):
+        """Update alert profile in ManageIQ"""
+        changed = False
+        # we need to use client.get to query the alert definitions
+        old_profile = self.client.get(f"{old_profile['href']}?expand=alert_definitions")
+
+        # figure out which alerts we need to assign / unassign
+        # alerts listed by the user:
+        desired_alerts = set(self.get_alerts(desired_profile["alerts"]))
+
+        # alert which currently exist in the profile
+        if "alert_definitions" in old_profile:
+            # we use get_alert_href to have a direct href to the alert
+            existing_alerts = {self.get_alert_href(alert) for alert in old_profile["alert_definitions"]}
+        else:
+            # no alerts in this profile
+            existing_alerts = set()
+
+        to_add = list(desired_alerts - existing_alerts)
+        to_remove = list(existing_alerts - desired_alerts)
+
+        # assign / unassign the alerts, if needed
+
+        if to_remove:
+            self.assign_or_unassign(old_profile, to_remove, "unassign")
+            changed = True
+        if to_add:
+            self.assign_or_unassign(old_profile, to_add, "assign")
+            changed = True
+
+        # update other properties
+        profile_dict = dict()
+
+        if old_profile["mode"] != desired_profile["resource_type"]:
+            # mode needs to be updated
+            profile_dict["mode"] = desired_profile["resource_type"]
+
+        # check if notes need to be updated
+        old_notes = old_profile.get("set_data", {}).get("notes")
+
+        if desired_profile["notes"] != old_notes:
+            profile_dict["set_data"] = dict(notes=desired_profile["notes"])
+
+        if profile_dict:
+            # if we have any updated values
+            changed = True
+            try:
+                self.client.post(old_profile["href"], resource=profile_dict, action="edit")
+            except Exception as e:
+                msg = f"Updating profile '{old_profile['name']}' failed: {e}"
+                self.module.fail_json(msg=msg)
+
+        if changed:
+            msg = f"Profile {desired_profile['name']} updated successfully"
+        else:
+            msg = f"No update needed for profile {desired_profile['name']}"
+        return dict(changed=changed, msg=msg)
+
+
+def main():
+    argument_spec = dict(
+        name=dict(type="str", required=True),
+        resource_type=dict(
+            type="str",
+            choices=[
+                "Vm",
+                "ContainerNode",
+                "MiqServer",
+                "Host",
+                "Storage",
+                "EmsCluster",
+                "ExtManagementSystem",
+                "MiddlewareServer",
+            ],
+        ),
+        alerts=dict(type="list", elements="str"),
+        notes=dict(type="str"),
+        state=dict(default="present", choices=["present", "absent"]),
+    )
+    # add the manageiq connection arguments to the arguments
+    argument_spec.update(manageiq_argument_spec())
+
+    module = AnsibleModule(argument_spec=argument_spec, required_if=[("state", "present", ["resource_type", "alerts"])])
+
+    state = module.params["state"]
+    name = module.params["name"]
+
+    manageiq = ManageIQ(module)
+    manageiq_alert_profiles = ManageIQAlertProfiles(manageiq)
+
+    existing_profile = manageiq.find_collection_resource_by("alert_definition_profiles", name=name)
+
+    # we need to add or update the alert profile
+    if state == "present":
+        if not existing_profile:
+            # a profile with this name doesn't exist yet, let's create it
+            res_args = manageiq_alert_profiles.add_profile(module.params)
+        else:
+            # a profile with this name exists, we might need to update it
+            res_args = manageiq_alert_profiles.update_profile(existing_profile, module.params)
+
+    # this alert profile should not exist
+    if state == "absent":
+        # if we have an alert profile with this name, delete it
+        if existing_profile:
+            res_args = manageiq_alert_profiles.delete_profile(existing_profile)
+        else:
+            # This alert profile does not exist in ManageIQ, and that's okay
+            msg = f"Alert profile '{name}' does not exist in ManageIQ"
+            res_args = dict(changed=False, msg=msg)
+
+    module.exit_json(**res_args)
+
+
+if __name__ == "__main__":
+    main()

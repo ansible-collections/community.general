@@ -1,0 +1,61 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: 'Recreate "disk" file'
+  community.general.filesize:
+    path: '{{ image_file }}'
+    size: '{{ fssize }}M'
+    force: true
+
+- name: 'Create a minix filesystem'
+  ansible.builtin.command:
+    cmd: 'mkfs.minix {{ dev }}'
+
+- name: 'Get UUID of the new filesystem'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
+  changed_when: false
+  register: uuid
+
+- name: "Check that an existing filesystem (not handled by this module) isn't overwritten when force isn't used"
+  community.general.filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+    label: '{{ label }}'
+  register: fs_result
+  ignore_errors: true
+
+- name: 'Get UUID of the filesystem'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
+  changed_when: false
+  register: uuid2
+
+- name: 'Assert that module failed and filesystem UUID is not changed'
+  ansible.builtin.assert:
+    that:
+      - 'fs_result is failed'
+      - 'uuid.stdout == uuid2.stdout'
+
+- name: "Check that an existing filesystem (not handled by this module) is overwritten when force is used"
+  community.general.filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+    label: '{{ label }}'
+    force: true
+  register: fs_result2
+
+- name: 'Get UUID of the new filesystem'
+  ansible.builtin.shell:
+    cmd: "{{ get_uuid_cmd }}"
+  changed_when: false
+  register: uuid3
+
+- name: 'Assert that module succeeded and filesystem UUID is changed'
+  ansible.builtin.assert:
+    that:
+      - 'fs_result2 is success'
+      - 'fs_result2 is changed'
+      - 'uuid2.stdout != uuid3.stdout'

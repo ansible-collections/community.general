@@ -1,0 +1,45 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: to_days
+  short_description: Converts a duration string to days
+  version_added: 0.2.0
+  description:
+    - Parse a human readable time duration string and convert to days.
+  options:
+    _input:
+      description:
+        - The time string to convert.
+        - Can use the units V(y) and V(year) for a year, V(mo) and V(month) for a month, V(w) and V(week) for a week,
+          V(d) and V(day) for a day, V(h) and V(hour) for a hour, V(m), V(min) and V(minute) for minutes, V(s), V(sec)
+          and V(second) for seconds, V(ms), V(msec), V(msecond) and V(millisecond) for milliseconds. The suffix V(s)
+          can be added to a unit as well, so V(seconds) is the same as V(second).
+        - Valid strings are space separated combinations of an integer with an optional minus sign and a unit.
+        - Examples are V(1h), V(-5m), and V(3h -5m 6s).
+      type: string
+      required: true
+    year:
+      description:
+        - Number of days per year.
+      default: 365
+      type: float
+    month:
+      description:
+        - Number of days per month.
+      default: 30
+      type: float
+  author:
+    - René Moser (@resmo)
+
+EXAMPLES: |
+  - name: Convert a duration into days
+    ansible.builtin.debug:
+      msg: "{{ '1y 7m 5d 30h' | community.general.to_days }}"
+
+RETURN:
+  _value:
+    description: Number of days.
+    type: float

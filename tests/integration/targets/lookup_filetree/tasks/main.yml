@@ -1,0 +1,77 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create test file tree directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ filetree_test_root }}"
+    - "{{ filetree_test_root }}/subdir"
+
+- name: Create test files
+  ansible.builtin.copy:
+    content: "{{ item.content }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - dest: "{{ filetree_test_root }}/app.conf"
+      content: "content\n"
+    - dest: "{{ filetree_test_root }}/subdir/nested.conf"
+      content: "nested\n"
+
+- name: Create .git directory for exclude test
+  ansible.builtin.file:
+    path: "{{ filetree_test_root }}/.git"
+    state: directory
+
+- name: Lookup filetree without exclude
+  ansible.builtin.set_fact:
+    filetree_all: "{{ lookup('community.general.filetree', filetree_test_root ~ '/') }}"
+
+- name: Verify all entries are listed
+  ansible.builtin.assert:
+    that:
+      - filetree_all | selectattr('path', 'equalto', 'app.conf') | list | length == 1
+      - filetree_all | selectattr('path', 'equalto', '.git') | list | length == 1
+      - filetree_all | selectattr('path', 'equalto', 'subdir') | list | length == 1
+      - filetree_all | selectattr('path', 'equalto', 'subdir/nested.conf') | list | length == 1
+
+- name: Lookup filetree with valid exclude regex
+  ansible.builtin.set_fact:
+    filetree_filtered: "{{ lookup('community.general.filetree', filetree_test_root ~ '/', exclude='^\\.git$') }}"
+
+- name: Verify exclude filters matching basenames
+  ansible.builtin.assert:
+    that:
+      - filetree_filtered | selectattr('path', 'equalto', '.git') | list | length == 0
+      - filetree_filtered | selectattr('path', 'equalto', 'app.conf') | list | length == 1
+      - filetree_filtered | selectattr('path', 'equalto', 'subdir/nested.conf') | list | length == 1
+
+- name: Verify file entry properties
+  ansible.builtin.assert:
+    that:
+      - (filetree_all | selectattr('path', 'equalto', 'app.conf') | first).state == 'file'
+      - (filetree_all | selectattr('path', 'equalto', 'app.conf') | first).src is defined
+      - (filetree_all | selectattr('path', 'equalto', 'app.conf') | first).mode is defined
+      - (filetree_all | selectattr('path', 'equalto', 'app.conf') | first).owner is defined
+      - (filetree_all | selectattr('path', 'equalto', 'app.conf') | first).group is defined
+
+- name: Lookup filetree with invalid exclude regex
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.filetree', filetree_test_root ~ '/', exclude='temp[1') }}"
+  ignore_errors: true
+  register: invalid_exclude
+
+- name: Verify invalid exclude raises AnsibleLookupError
+  ansible.builtin.assert:
+    that:
+      - invalid_exclude is failed
+      - "'Invalid exclude regular expression' in invalid_exclude.msg"
+      - "'temp[1' in invalid_exclude.msg"

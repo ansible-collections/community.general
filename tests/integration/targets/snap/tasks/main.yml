@@ -1,0 +1,25 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Has-snap include
+  when: has_snap
+  block:
+    - name: Include test
+      ansible.builtin.include_tasks: test.yml
+    - name: Include test_channel
+      ansible.builtin.include_tasks: test_channel.yml
+    - name: Include test_dangerous
+      ansible.builtin.include_tasks: test_dangerous.yml
+    - name: Include test_3dash
+      ansible.builtin.include_tasks: test_3dash.yml
+    - name: Include test_revision
+      ansible.builtin.include_tasks: test_revision.yml
+    - name: Include test_empty_list
+      ansible.builtin.include_tasks: test_empty_list.yml

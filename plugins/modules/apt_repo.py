@@ -1,0 +1,152 @@
+#!/usr/bin/python
+
+# Copyright (c) 2018, Mikhail Gordeev
+
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: apt_repo
+short_description: Manage APT repositories using C(apt-repo)
+description:
+  - Manages APT repositories using C(apt-repo) tool.
+  - See U(https://www.altlinux.org/Apt-repo) for details about C(apt-repo).
+notes:
+  - This module works on ALT based distros.
+  - Does NOT support checkmode, due to a limitation in C(apt-repo) tool.
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+options:
+  repo:
+    description:
+      - Name of the repository to add or remove.
+    required: true
+    type: str
+  state:
+    description:
+      - Indicates the desired repository state.
+    choices: [absent, present]
+    default: present
+    type: str
+  remove_others:
+    description:
+      - Remove other then added repositories.
+      - Used if O(state=present).
+    type: bool
+    default: false
+  update:
+    description:
+      - Update the package database after changing repositories.
+    type: bool
+    default: false
+author:
+  - Mikhail Gordeev (@obirvalger)
+"""
+
+EXAMPLES = r"""
+- name: Remove all repositories
+  community.general.apt_repo:
+    repo: all
+    state: absent
+
+- name: Add repository `Sisysphus` and remove other repositories
+  community.general.apt_repo:
+    repo: Sisysphus
+    state: present
+    remove_others: true
+
+- name: Add local repository `/space/ALT/Sisyphus` and update package cache
+  community.general.apt_repo:
+    repo: copy:///space/ALT/Sisyphus
+    state: present
+    update: true
+"""
+
+RETURN = """ # """
+
+import os
+
+from ansible.module_utils.basic import AnsibleModule
+
+APT_REPO_PATH = "/usr/bin/apt-repo"
+
+
+def apt_repo(module, *args):
+    """run apt-repo with args and return its output"""
+    # make args list to use in concatenation
+    args = list(args)
+    rc, out, err = module.run_command([APT_REPO_PATH] + args)
+
+    if rc != 0:
+        module.fail_json(msg=f"'{' '.join(['apt-repo'] + args)}' failed: {err}")
+
+    return out
+
+
+def add_repo(module, repo):
+    """add a repository"""
+    apt_repo(module, "add", repo)
+
+
+def rm_repo(module, repo):
+    """remove a repository"""
+    apt_repo(module, "rm", repo)
+
+
+def set_repo(module, repo):
+    """add a repository and remove other repositories"""
+    # first add to validate repository
+    apt_repo(module, "add", repo)
+    apt_repo(module, "rm", "all")
+    apt_repo(module, "add", repo)
+
+
+def update(module):
+    """update package cache"""
+    apt_repo(module, "update")
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            repo=dict(type="str", required=True),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            remove_others=dict(type="bool", default=False),
+            update=dict(type="bool", default=False),
+        ),
+    )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
+
+    if not os.path.exists(APT_REPO_PATH):
+        module.fail_json(msg="cannot find /usr/bin/apt-repo")
+
+    params = module.params
+    repo = params["repo"]
+    state = params["state"]
+    old_repositories = apt_repo(module)
+
+    if state == "present":
+        if params["remove_others"]:
+            set_repo(module, repo)
+        else:
+            add_repo(module, repo)
+    elif state == "absent":
+        rm_repo(module, repo)
+
+    if params["update"]:
+        update(module)
+
+    new_repositories = apt_repo(module)
+    changed = old_repositories != new_repositories
+    module.exit_json(changed=changed, repo=repo, state=state)
+
+
+if __name__ == "__main__":
+    main()

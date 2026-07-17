@@ -1,0 +1,5 @@
+bugfixes:
+  - parted - ignore MBR partition type codes (for example ``type=8e``) reported as flags
+    by some parted builds (for example on SUSE), which cannot be managed via the ``set`` command
+    (https://github.com/ansible-collections/community.general/issues/6292,
+    https://github.com/ansible-collections/community.general/pull/12121).

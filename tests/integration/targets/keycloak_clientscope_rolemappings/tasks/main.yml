@@ -1,0 +1,342 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Wait for Keycloak
+  uri:
+    url: "{{ url }}/admin/"
+    status_code: 200
+    validate_certs: false
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 10
+
+- name: Delete realm if exists
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    state: absent
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create a Keycloak realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ item }}"
+    realm: "{{ realm }}"
+  with_items:
+    - "{{ realm_role_admin }}"
+    - "{{ realm_role_user }}"
+
+- name: Create client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_name }}"
+    state: present
+    public_client: true
+    full_scope_allowed: false
+
+- name: Create full scope client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ full_scope_client_name }}"
+    state: present
+    public_client: true
+    full_scope_allowed: true
+
+- name: Create a Keycloak client roles
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ item }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_name }}"
+  with_items:
+    - "{{ client_role_admin }}"
+    - "{{ client_role_user }}"
+
+- name: Create a Keycloak client roles in full scope client
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: "{{ item }}"
+    realm: "{{ realm }}"
+    client_id: "{{ full_scope_client_name }}"
+  with_items:
+    - "{{ client_role_admin }}"
+    - "{{ client_role_user }}"
+
+- name: Create clientscopes
+  community.general.keycloak_clientscope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+
+    realm: "{{ realm }}"
+    name: "{{ clientscope_id }}"
+    description: ""
+    protocol: "openid-connect"
+    state: "present"
+
+
+- name: Map client roles
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_name }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ client_role_admin }}"
+      - "{{ client_role_user }}"
+  register: result
+
+- name: Assert mapping created
+  assert:
+    that:
+      - result is changed
+      - result.end_state | length == 2
+
+- name: Remap the user client role
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_name }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ client_role_user }}"
+  register: result
+
+- name: Assert no change
+  assert:
+    that:
+      - result is not changed
+      - result.end_state | length == 2
+
+- name: Remove admin role
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_name }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ client_role_admin }}"
+    state: absent
+  register: result
+
+- name: Assert mapping deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state | length == 1
+      - result.end_state[0].name == client_role_user
+
+- name: Map non exisiting client role
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_name }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ client_role_admin }}"
+      - "{{ client_role_not_exists }}"
+  ignore_errors: true
+  register: result
+
+- name: Assert failed mapping missing role
+  assert:
+    that:
+      - result is failed
+      - "result.msg == 'Failed to retrieve role \\'myrealm.backend-client.client-role-missing\\''"
+
+- name: Map roles duplicate
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_name }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ client_role_admin }}"
+      - "{{ client_role_admin }}"
+  register: result
+
+- name: Assert result
+  assert:
+    that:
+      - result is changed
+      - result.end_state | length == 2
+
+- name: Map full scope client roles
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    clientscope_id: "{{ clientscope_id }}"
+    client_id: "{{ full_scope_client_name }}"
+    role_names:
+      - "{{ client_role_admin }}"
+  ignore_errors: true
+  register: result
+
+- name: Assert failed mapping role to full scope client
+  assert:
+    that:
+      - result is failed
+      - "result.msg == 'FullScopeAllowed is active for Client \\'myrealm.full-scope-client\\''"
+
+- name: Map realm role
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ realm_role_admin }}"
+  register: result
+
+- name: Assert result
+  assert:
+    that:
+      - result is changed
+      - result.end_state | length == 1
+
+- name: Map two realm roles
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ realm_role_admin }}"
+      - "{{ realm_role_user }}"
+  register: result
+
+- name: Assert result
+  assert:
+    that:
+      - result is changed
+      - result.end_state | length == 2
+
+- name: Unmap all realm roles
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ realm_role_admin }}"
+      - "{{ realm_role_user }}"
+    state: absent
+  register: result
+
+- name: Assert result
+  assert:
+    that:
+      - result is changed
+      - result.end_state | length == 0
+
+- name: Map non exisiting realm role
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ realm_role_not_exists }}"
+  ignore_errors: true
+  register: result
+
+- name: Assert failed mapping missing realm role
+  assert:
+    that:
+      - result is failed
+      - "result.msg == 'Failed to retrieve role \\'myrealm.client-role-missing\\''"
+
+- name: Check-mode try to Map realm roles to public client
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names:
+      - "{{ realm_role_admin }}"
+      - "{{ realm_role_user }}"
+  check_mode: true
+  register: result
+
+- name: Assert result
+  assert:
+    that:
+      - result is changed
+      - result.end_state | length == 2
+
+- name: Check-mode step two, check if change where applied
+  community.general.keycloak_clientscope_rolemappings:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    clientscope_id: "{{ clientscope_id }}"
+    role_names: []
+  register: result
+
+- name: Assert result
+  assert:
+    that:
+      - result is not changed
+      - result.end_state | length == 0

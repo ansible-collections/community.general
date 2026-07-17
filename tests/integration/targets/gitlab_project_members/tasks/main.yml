@@ -1,0 +1,128 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for gitlab_project_members module
+#
+# Copyright (c) 2021, Sergey Mikhaltsov <metanovii@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required library
+  ansible.builtin.pip:
+    name: python-gitlab
+    state: present
+
+- name: Clean UP before tests
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
+    state: absent
+
+- name: Add a User to A GitLab Project
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
+    state: present
+  register: gitlab_project_members_state
+
+- name: Test member added to project
+  assert:
+    that:
+      - gitlab_project_members_state is changed
+
+- name: Add a User to A GitLab Project ( Idempotency test )
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
+    state: present
+  register: gitlab_project_members_state_again
+
+- name: Test module is idempotent
+  assert:
+    that:
+      - gitlab_project_members_state_again is not changed
+
+- name: Remove a User from A GitLab Project
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
+    state: absent
+  register: remove_gitlab_project_members_state
+
+- name: Test member removed from project
+  assert:
+    that:
+      - remove_gitlab_project_members_state is changed
+
+- name: Remove a User from A GitLab Project ( Idempotency test )
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
+    state: absent
+  register: remove_gitlab_project_members_state_again
+
+- name: Test module is idempotent
+  assert:
+    that:
+      - remove_gitlab_project_members_state_again is not changed
+
+- name: Add a list of Users to A GitLab Project
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_user: "{{ userlist }}"
+    access_level: "{{ gitlab_access_level }}"
+    state: present
+
+- name: Remove a list of Users to A GitLab Project
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_user: "{{ userlist }}"
+    access_level: "{{ gitlab_access_level }}"
+    state: absent
+
+- name: Add a list of Users with Dedicated Access Levels to A GitLab Project
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_users_access: "{{ dedicated_access_users }}"
+    state: present
+
+- name: Remove a list of Users with Dedicated Access Levels to A GitLab Project
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_users_access: "{{ dedicated_access_users }}"
+    state: absent
+
+- name: Add a user, remove all others which might be on this access level
+  community.general.gitlab_project_members:
+    api_url: "{{ gitlab_server_url }}"
+    api_token: "{{ gitlab_api_access_token }}"
+    project: "{{ gitlab_project }}"
+    gitlab_user: "{{ username }}"
+    access_level: "{{ gitlab_access_level }}"
+    purge_users: "{{ gitlab_access_level }}"
+    state: present

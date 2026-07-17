@@ -1,0 +1,46 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-doctype.xml
+    dest: /tmp/ansible-xml-doctype.xml
+
+- name: Set '/foo/@value' to '1' (file has DOCTYPE)
+  xml:
+    path: /tmp/ansible-xml-doctype.xml
+    xpath: /foo
+    attribute: value
+    value: "1"
+  register: set_attribute_doctype
+
+- name: Add trailing newline
+  shell: echo "" >> /tmp/ansible-xml-doctype.xml
+
+- name: Compare to expected result
+  copy:
+    src: results/test-preserve-doctype.xml
+    dest: /tmp/ansible-xml-doctype.xml
+  check_mode: true
+  diff: true
+  register: comparison
+
+- name: Test expected result (DOCTYPE is preserved)
+  assert:
+    that:
+      - set_attribute_doctype is changed
+      - comparison is not changed
+
+- name: Set '/foo/@value' to '1' again (idempotency)
+  xml:
+    path: /tmp/ansible-xml-doctype.xml
+    xpath: /foo
+    attribute: value
+    value: "1"
+  register: set_attribute_doctype_idempotent
+
+- name: Test idempotency
+  assert:
+    that:
+      - set_attribute_doctype_idempotent is not changed

@@ -1,0 +1,2 @@
+bugfixes:
+  - "xml - preserve DOCTYPE declaration when writing modified XML files (https://github.com/ansible-collections/community.general/issues/2762, https://github.com/ansible-collections/community.general/pull/12148)."

@@ -1,0 +1,115 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: test zero is 0
+  assert:
+    that:
+      - "('0' | community.general.to_milliseconds) == 0"
+      - "('0' | community.general.to_seconds) == 0"
+      - "('0' | community.general.to_minutes) == 0"
+
+- name: test to_milliseconds filter
+  assert:
+    that:
+      - "('1000ms' | community.general.to_milliseconds) == 1000"
+      - "('1s' | community.general.to_milliseconds) == 1000"
+      - "('1m' | community.general.to_milliseconds) == 60000"
+
+- name: test to_seconds filter
+  assert:
+    that:
+      - "('1000msecs' | community.general.to_seconds) == 1"
+      - "('1ms' | community.general.to_seconds) == 0.001"
+      - "('12m' | community.general.to_seconds) == 720"
+      - "('300minutes' | community.general.to_seconds) == 18000"
+      - "('3h 12m' | community.general.to_seconds) == 11520"
+      - "('2days 3hours 12mins 15secs' | community.general.to_seconds) == 184335"
+      - "('2d -2d -12s' | community.general.to_seconds) == -12"
+
+- name: test to_minutes filter
+  assert:
+    that:
+      - "('30s' | community.general.to_minutes) == 0.5"
+      - "('12m' | community.general.to_minutes) == 12"
+      - "('3h 72m' | community.general.to_minutes) == 252"
+      - "('300s' | community.general.to_minutes) == 5"
+
+- name: test to_hours filter
+  assert:
+    that:
+      - "('30m' | community.general.to_hours) == 0.5"
+      - "('3h 119m 61s' | community.general.to_hours) > 5"
+
+- name: test to_days filter
+  assert:
+    that:
+      - "('1year' | community.general.to_days) == 365"
+      - "('1week' | community.general.to_days) == 7"
+      - "('2weeks' | community.general.to_days) == 14"
+      - "('1mo' | community.general.to_days) == 30"
+      - "('1mo' | community.general.to_days(month=28)) == 28"
+
+- name: test to_weeks filter
+  assert:
+    that:
+      - "('1y' | community.general.to_weeks | int) == 52"
+      - "('7d' | community.general.to_weeks) == 1"
+      - "('1mo' | community.general.to_weeks(month=28)) == 4"
+
+- name: test to_months filter
+  assert:
+    that:
+      - "('30d' | community.general.to_months) == 1"
+      - "('1year' | community.general.to_months | int) == 12"
+      - "('5years' | community.general.to_months(month=30, year=360)) == 60"
+      - "('1years' | community.general.to_months(month=2, year=34)) == 17"
+
+- name: test to_years filter
+  assert:
+    that:
+      - "('365d' | community.general.to_years | int) == 1"
+      - "('12mo' | community.general.to_years | round(0, 'ceil')) == 1"
+      - "('24mo' | community.general.to_years(month=30, year=360)) == 2"
+
+- name: test fail unknown unit
+  debug:
+    msg: "{{ '1s' | community.general.to_time_unit('lightyears') }}"
+  ignore_errors: true
+  register: res
+
+- name: verify test fail unknown unit
+  assert:
+    that:
+      - res is failed
+      - "'to_time_unit() can not convert to the following unit: lightyears' in res.msg"
+
+- name: test fail unknown string
+  debug:
+    msg: "{{ '1 s' | community.general.to_time_unit('s') }}"
+  ignore_errors: true
+  register: res
+
+- name: test fail unknown string
+  assert:
+    that:
+      - res is failed
+      - "'to_time_unit() can not interpret following string' in res.msg"
+
+- name: test fail unknown kwarg
+  debug:
+    msg: "{{ '1s' | community.general.to_time_unit('s', second=23) }}"
+  ignore_errors: true
+  register: res
+
+- name: test fail unknown kwarg
+  assert:
+    that:
+      - res is failed
+      - "'to_time_unit() got unknown keyword arguments' in res.msg"

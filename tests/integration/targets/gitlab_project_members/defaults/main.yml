@@ -1,0 +1,20 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+gitlab_server_url: https://gitlab.com
+gitlab_api_access_token: "token"
+gitlab_project: some_project
+username: some_user
+gitlab_access_level: developer
+userlist:
+  - username1
+  - username2
+dedicated_access_users:
+  - name: username1
+    access_level: "developer"
+  - name: username2
+    access_level: "maintainer"
+  - name: username3
+    access_level: "owner"

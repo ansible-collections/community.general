@@ -1,0 +1,33 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create copy of /bin/echo ({{ item.name }})
+  ansible.builtin.copy:
+    src: /bin/echo
+    dest: "{{ item.copy_to }}/echo"
+    mode: "0755"
+    remote_src: true
+  when: item.copy_to is defined
+
+- name: Test cmd_echo module ({{ item.name }})
+  cmd_echo:
+    cmd: "{{ item.cmd | default(omit) }}"
+    path_prefix: "{{ item.path_prefix | default(omit) }}"
+    arg_formats: "{{ item.arg_formats | default(omit) }}"
+    arg_order: "{{ item.arg_order }}"
+    arg_values: "{{ item.arg_values | default(omit) }}"
+    check_mode_skip: "{{ item.check_mode_skip | default(omit) }}"
+    aa: "{{ item.aa | default(omit) }}"
+  register: test_result
+  check_mode: "{{ item.check_mode | default(omit) }}"
+  ignore_errors: "{{ item.expect_error | default(omit) }}"
+
+- name: Debug test results ({{ item.name }})
+  ansible.builtin.debug:
+    var: test_result
+
+- name: Check results ({{ item.name }})
+  _unsafe_assert:
+    that: "{{ item.assertions }}"

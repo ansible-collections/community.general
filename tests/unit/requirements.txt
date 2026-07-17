@@ -1,0 +1,60 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+
+# requirement for the memcached cache plugin
+python-memcached ; python_version >= '3.6'
+
+# requirement for the redis cache plugin
+redis
+async-timeout ; python_version == '3.11'
+
+# requirement for the linode module
+linode-python # APIv3
+linode_api4  # APIv4
+
+# requirement for the gitlab and github modules
+python-gitlab
+PyGithub
+httmock
+pynacl
+
+# requirement for maven_artifact module
+lxml
+semantic_version
+
+# requirement for datadog_downtime module
+datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
+
+# requirement for dnsimple module
+dnsimple >= 2 ; python_version >= '3.6'
+
+# requirement for the nsupdate module
+dnspython
+
+# requirement for the opentelemetry callback plugin
+# WARNING: these libraries rely on Protobuf for Python, which regularly stops installing.
+#          That's why they are disabled for now.
+# opentelemetry-api ; python_version >= '3.6' and python_version < '3.10'
+# opentelemetry-exporter-otlp ; python_version >= '3.6' and python_version < '3.10'
+# opentelemetry-sdk ; python_version >= '3.6' and python_version < '3.10'
+
+# requirement for the elastic callback plugin
+elastic-apm ; python_version >= '3.6'
+
+# requirements for scaleway modules
+passlib[argon2]
+
+#requirements for nomad_token modules
+python-nomad >= 2.0.0 ; python_version >= '3.7'
+
+# requirement for jenkins_build, jenkins_node, jenkins_plugin modules
+python-jenkins < 1.8.0 ; python_version < '3.8'
+python-jenkins >= 0.4.12 ; python_version >= '3.8'
+
+# requirement for json_patch, json_patch_recipe and json_patch plugins
+jsonpatch
+
+# requirements for the wsl connection plugin
+paramiko >= 3.0.0 ; python_version >= '3.6'

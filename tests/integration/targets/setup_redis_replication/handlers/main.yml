@@ -1,0 +1,39 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: stop redis services
+  shell: |
+    kill -TERM $(cat /var/run/redis_{{ master_port }}.pid)
+    kill -TERM $(cat /var/run/redis_{{ replica_port }}.pid)
+  listen: cleanup redis
+
+- name: remove redis packages
+  action: "{{ ansible_facts.pkg_mgr }}"
+  args:
+    name: "{{ item }}"
+    state: absent
+  loop: "{{ redis_packages[ansible_facts.distribution] }}"
+  listen: cleanup redis
+
+- name: remove pip packages
+  pip:
+    name: redis
+    state: absent
+  listen: cleanup redis
+
+- name: remove redis data
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ master_conf }}"
+    - "{{ master_datadir }}"
+    - "{{ master_logdir }}"
+    - /var/run/redis_{{ master_port }}.pid
+    - "{{ replica_conf }}"
+    - "{{ replica_datadir }}"
+    - "{{ replica_logdir }}"
+    - /var/run/redis_{{ replica_port }}.pid
+  listen: cleanup redis

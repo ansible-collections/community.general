@@ -1,0 +1,163 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Gather all units from shell
+  ansible.builtin.command: systemctl list-units --no-pager --type service,target,socket,mount,timer --all --plain --no-legend
+  register: all_units
+
+- name: Assert command run successfully
+  ansible.builtin.assert:
+    that:
+      - all_units.rc == 0
+
+- name: Gather all units
+  community.general.systemd_info:
+  register: units_all
+
+- name: Check all units exists
+  ansible.builtin.assert:
+    that:
+      - units_all is defined
+      - units_all.units | length == all_units.stdout_lines | length
+    success_msg: "Success: All units collected."
+
+- name: Build all units list
+  set_fact:
+    shell_units: "{{ all_units.stdout_lines | map('split') | list }}"
+
+- name: Check all units properties
+  ansible.builtin.assert:
+    that:
+      - units_all.units[item[0]].name == item[0]
+      - units_all.units[item[0]].loadstate == item[1]
+      - units_all.units[item[0]].activestate == item[2]
+      - units_all.units[item[0]].substate == item[3]
+  loop: "{{ shell_units }}"
+  loop_control:
+    label: "{{ item[0] }}"
+
+- name: Gather systemd-journald.service properties from shell
+  ansible.builtin.command: systemctl show systemd-journald.service -p Id,LoadState,ActiveState,SubState,FragmentPath,MainPID,ExecMainPID,UnitFileState,UnitFilePreset,Description,Restart
+  register: journald_prop
+
+- name: Assert command run successfully
+  ansible.builtin.assert:
+    that:
+      - journald_prop.rc == 0
+
+- name: Gather systemd-journald.service
+  community.general.systemd_info:
+    unitname:
+      - systemd-journald.service
+  register: journal_unit
+
+- name: Check unit facts and all properties
+  ansible.builtin.assert:
+    that:
+      - journal_unit.units is defined
+      - journal_unit.units['systemd-journald.service'] is defined
+      - journal_unit.units['systemd-journald.service'].name is defined
+      - journal_unit.units['systemd-journald.service'].loadstate is defined
+      - journal_unit.units['systemd-journald.service'].activestate is defined
+      - journal_unit.units['systemd-journald.service'].substate is defined
+      - journal_unit.units['systemd-journald.service'].fragmentpath is defined
+      - journal_unit.units['systemd-journald.service'].mainpid is defined
+      - journal_unit.units['systemd-journald.service'].execmainpid is defined
+      - journal_unit.units['systemd-journald.service'].unitfilestate is defined
+      - journal_unit.units['systemd-journald.service'].unitfilepreset is defined
+    success_msg: "Success: All properties collected."
+
+- name: Create dict of properties from shell
+  ansible.builtin.set_fact:
+    journald_shell: "{{ dict(journald_prop.stdout_lines | map('split', '=', 1) | list) }}"
+
+- name: Check properties content
+  ansible.builtin.assert:
+    that:
+      - journal_unit.units['systemd-journald.service'].name == journald_shell.Id
+      - journal_unit.units['systemd-journald.service'].loadstate == journald_shell.LoadState
+      - journal_unit.units['systemd-journald.service'].activestate == journald_shell.ActiveState
+      - journal_unit.units['systemd-journald.service'].substate == journald_shell.SubState
+      - journal_unit.units['systemd-journald.service'].fragmentpath == journald_shell.FragmentPath
+      - journal_unit.units['systemd-journald.service'].mainpid == journald_shell.MainPID
+      - journal_unit.units['systemd-journald.service'].execmainpid == journald_shell.ExecMainPID
+      - journal_unit.units['systemd-journald.service'].unitfilestate == journald_shell.UnitFileState
+      - journal_unit.units['systemd-journald.service'].unitfilepreset == journald_shell.UnitFilePreset
+    success_msg: "Success: Property values are correct."
+
+- name: Gather systemd-journald.service extra properties
+  community.general.systemd_info:
+    unitname:
+      - systemd-journald.service
+    extra_properties:
+      - Description
+      - Restart
+  register: journal_extra
+
+- name: Check new properties
+  ansible.builtin.assert:
+    that:
+      - journal_extra.units is defined
+      - journal_extra.units['systemd-journald.service'] is defined
+      - journal_extra.units['systemd-journald.service'].description is defined
+      - journal_extra.units['systemd-journald.service'].restart is defined
+      - journal_extra.units['systemd-journald.service'].description == journald_shell.Description
+      - journal_extra.units['systemd-journald.service'].restart == journald_shell.Restart
+    success_msg: "Success: Extra property values are correct."
+
+- name: Gather info using wildcard pattern for services
+  community.general.systemd_info:
+    unitname:
+      - '*.service'
+    extra_properties:
+      - Description
+  register: result_wildcards
+
+- name: Assert that at least one service unit was returned
+  ansible.builtin.assert:
+    that:
+      - result_wildcards.units | length > 0
+
+- name: Gather info using multiple wildcard patterns
+  community.general.systemd_info:
+    unitname:
+      - '*.service'
+      - 'ssh*'
+  register: result_multi
+
+- name: Debug multi-wildcard results
+  ansible.builtin.debug:
+    var: result_multi.units
+
+- name: Assert deduplication of units
+  ansible.builtin.assert:
+    that:
+      - unique_keys | length == all_keys | length
+  vars:
+    all_keys: "{{ result_multi.units | dict2items | map(attribute='key') | list }}"
+    unique_keys: "{{ all_keys | unique }}"
+
+- name: Gather info of systemd-tmpfiles-clean.timer and extra AccuracyUSec
+  community.general.systemd_info:
+    unitname:
+      - systemd-tmpfiles-clean.timer
+    extra_properties:
+      - AccuracyUSec
+  register: result_timer
+
+- name: Check timer unit properties
+  ansible.builtin.assert:
+    that:
+      - result_timer.units is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'] is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].name is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].loadstate is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].activestate is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].substate is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].fragmentpath is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].unitfilestate is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].unitfilepreset is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].accuracyusec is defined
+      - result_timer.units['systemd-tmpfiles-clean.timer'].accuracyusec | length > 0
+    success_msg: "Success: All properties collected."

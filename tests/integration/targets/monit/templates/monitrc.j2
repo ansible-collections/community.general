@@ -1,0 +1,19 @@
+{#
+Copyright (c) Ansible Project
+GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+SPDX-License-Identifier: GPL-3.0-or-later
+#}
+
+set daemon 2
+set logfile /var/log/monit.log
+set idfile /var/lib/monit/id
+set statefile /var/lib/monit/state
+set pidfile /var/run/monit.pid
+
+set eventqueue
+    basedir /var/lib/monit/events
+    slots 100
+
+set httpd port 2812 and
+    use address localhost
+    allow localhost

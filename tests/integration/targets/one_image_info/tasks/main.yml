@@ -1,0 +1,192 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Checks for existence
+- name: Get info by ID
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+  register: result
+
+- name: Assert that image is present
+  assert:
+    that:
+      - result is not changed
+
+- name: Get info by list of ID
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    ids:
+      - 2
+      - 2
+      - 8
+  register: result
+
+- name: Assert that image is present
+  assert:
+    that:
+      - result is not changed
+
+- name: Get info by list of ID
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: somename
+  register: result
+
+- name: Assert that image is present
+  assert:
+    that:
+      - result is not changed
+
+- name: Gather all info
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+  register: result
+
+- name: Assert that images are present
+  assert:
+    that:
+      - result is not changed
+
+- name: Gather info by regex
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: '~my_image-[0-9].*'
+  register: result
+
+- name: Assert that images are present
+  assert:
+    that:
+      - result is not changed
+
+- name: Gather info by regex and ignore upper/lower cases
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: '~*my_image-[0-9].*'
+  register: result
+
+- name: Assert that images are present
+  assert:
+    that:
+      - result is not changed
+
+# Updating an image
+- name: Clone image without name
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: cloned
+  register: result
+
+- name: Assert that image is cloned
+  assert:
+    that:
+      - result is changed
+
+- name: Clone image with name
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    state: renamed
+    new_name: new_image
+  register: result
+
+- name: Assert that image is cloned
+  assert:
+    that:
+      - result is changed
+
+- name: Disable image
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    enabled: false
+  register: result
+
+- name: Assert that network is disabled
+  assert:
+    that:
+      - result is changed
+
+- name: Enable image
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    enabled: true
+  register: result
+
+- name: Assert that network is enabled
+  assert:
+    that:
+      - result is changed
+
+- name: Make image persistent
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    persistent: true
+  register: result
+
+- name: Assert that network is persistent
+  assert:
+    that:
+      - result is changed
+
+- name: Make image non-persistent
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    persistent: false
+  register: result
+
+- name: Assert that network is non-persistent
+  assert:
+    that:
+      - result is changed
+
+# Testing errors
+- name: Try to use name and ID a the same time
+  one_image_info:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    id: 0
+    name: somename
+  register: result
+  ignore_errors: true
+
+- name: Assert that network not changed
+  assert:
+    that:
+      - result is failed

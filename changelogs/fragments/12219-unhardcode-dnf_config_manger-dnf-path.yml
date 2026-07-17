@@ -1,0 +1,2 @@
+minor_changes:
+  - dnf_config_manager - lookup path to the ``dnf`` binary in ``PATH``. It used to be fixed to ``/usr/bin/dnf`` (https://github.com/ansible-collections/community.general/pull/12219).

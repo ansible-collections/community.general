@@ -1,0 +1,32 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set up dummy flatpak repository remote
+  when: |
+      ansible_facts.distribution == 'Fedora' or
+      ansible_facts.distribution == 'Ubuntu' and not ansible_facts.distribution_major_version | int < 16
+  block:
+    - name: Copy repo into place
+      unarchive:
+        src: repo.tar.xz
+        dest: '{{ remote_tmp_dir }}'
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Create deterministic link to temp directory
+      file:
+        state: link
+        src: '{{ remote_tmp_dir }}/'
+        path: /tmp/flatpak
+        owner: root
+        group: root
+        mode: '0644'
+      notify: remove temporary flatpak link
+  become: true

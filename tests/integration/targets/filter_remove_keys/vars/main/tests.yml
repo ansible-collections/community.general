@@ -1,0 +1,40 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+tests:
+  - template: default.j2
+    group:
+      - {tt: [k0_x0, k1_x1], d: 'By default, match keys that equal any of the items in the target.'}
+    input:
+      - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
+      - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
+    result:
+      - {k2_x2: [C0], k3_x3: foo}
+      - {k2_x2: [C1], k3_x3: bar}
+  - template: mp.j2
+    group:
+      - {mp: equal, tt: [k0_x0, k1_x1], d: Match keys that equal any of the items in the target.}
+      - {mp: starts_with, tt: [k0, k1], d: Match keys that start with any of the items in the target.}
+      - {mp: ends_with, tt: [x0, x1], d: Match keys that end with any of the items in target.}
+      - {mp: regex, tt: ['^.*[01]_x.*$'], d: Match keys by the regex.}
+      - {mp: regex, tt: '^.*[01]_x.*$', d: Match keys by the regex.}
+    input:
+      - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
+      - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
+    result:
+      - {k2_x2: [C0], k3_x3: foo}
+      - {k2_x2: [C1], k3_x3: bar}
+  - template: mp.j2
+    group:
+      - {mp: equal, tt: k0_x0, d: Match keys that equal the target.}
+      - {mp: starts_with, tt: k0, d: Match keys that start with the target.}
+      - {mp: ends_with, tt: x0, d: Match keys that end with the target.}
+      - {mp: regex, tt: '^.*0_x.*$', d: Match keys by the regex.}
+    input:
+      - {k0_x0: A0, k1_x1: B0, k2_x2: [C0], k3_x3: foo}
+      - {k0_x0: A1, k1_x1: B1, k2_x2: [C1], k3_x3: bar}
+    result:
+      - {k1_x1: B0, k2_x2: [C0], k3_x3: foo}
+      - {k1_x1: B1, k2_x2: [C1], k3_x3: bar}

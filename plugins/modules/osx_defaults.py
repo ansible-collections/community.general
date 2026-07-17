@@ -1,0 +1,513 @@
+#!/usr/bin/python
+
+# Copyright (c) 2014, GeekChimp - Franck Nijhof <franck@geekchimp.com> (DO NOT CONTACT!)
+# Copyright (c) 2019, Ansible project
+# Copyright (c) 2019, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: osx_defaults
+author:
+# DO NOT RE-ADD GITHUB HANDLE!
+  - Franck Nijhof (!UNKNOWN)
+short_description: Manage macOS user defaults
+description:
+  - This module allows users to read, write, and delete macOS user defaults from Ansible scripts.
+  - MacOS applications and other programs use the defaults system to record user preferences and other information that must
+    be maintained when the applications are not running (such as default font for new documents, or the position of an Info
+    panel).
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+options:
+  domain:
+    description:
+      - The domain is a domain name of the form C(com.companyname.appname).
+    type: str
+    default: NSGlobalDomain
+  host:
+    description:
+      - The host on which the preference should apply.
+      - The special value V(currentHost) corresponds to the C(-currentHost) switch of the defaults commandline tool.
+    type: str
+  key:
+    description:
+      - The key of the user preference.
+    type: str
+  type:
+    description:
+      - The type of value to write.
+      - V(dict) has been added in community.general 12.5.0.
+    type: str
+    choices: [array, bool, boolean, date, dict, float, int, integer, string]
+    default: string
+  check_type:
+    description:
+      - Checks if the type of the provided O(value) matches the type of an existing default.
+      - If the types do not match, raises an error.
+    type: bool
+    default: true
+    version_added: 8.6.0
+  array_add:
+    description:
+      - Add new elements to the array for a key which has an array as its value.
+    type: bool
+    default: false
+  dict_mode:
+    description:
+      - Defines the write behavior for O(type=dict) values.
+      - V(replace) writes the full dictionary, replacing any existing value.
+      - V(add) merges only the specified keys into the existing dictionary, leaving other keys untouched.
+    type: str
+    choices: [replace, add]
+    default: replace
+    version_added: "12.5.0"
+  value:
+    description:
+      - The value to write.
+      - Only required when O(state=present).
+    type: raw
+  state:
+    description:
+      - The state of the user defaults.
+      - If set to V(list) it queries the given parameter specified by O(key). Returns V(null) is nothing found or misspelled.
+    type: str
+    choices: [absent, list, present]
+    default: present
+  path:
+    description:
+      - The path in which to search for C(defaults).
+    type: str
+    default: /usr/bin:/usr/local/bin
+notes:
+  - Apple Mac caches defaults. You may need to logout and login to apply the changes.
+"""
+
+EXAMPLES = r"""
+- name: Set boolean valued key for application domain
+  community.general.osx_defaults:
+    domain: com.apple.Safari
+    key: IncludeInternalDebugMenu
+    type: bool
+    value: true
+    state: present
+
+- name: Set string valued key for global domain
+  community.general.osx_defaults:
+    domain: NSGlobalDomain
+    key: AppleMeasurementUnits
+    type: string
+    value: Centimeters
+    state: present
+
+- name: Set int valued key for arbitrary plist
+  community.general.osx_defaults:
+    domain: /Library/Preferences/com.apple.SoftwareUpdate
+    key: AutomaticCheckEnabled
+    type: int
+    value: 1
+  become: true
+
+- name: Set int valued key only for the current host
+  community.general.osx_defaults:
+    domain: com.apple.screensaver
+    host: currentHost
+    key: showClock
+    type: int
+    value: 1
+
+- name: Defaults to global domain and setting value
+  community.general.osx_defaults:
+    key: AppleMeasurementUnits
+    type: string
+    value: Centimeters
+
+- name: Setting an array valued key
+  community.general.osx_defaults:
+    key: AppleLanguages
+    type: array
+    value:
+      - en
+      - nl
+
+- name: Setting a dict valued key
+  community.general.osx_defaults:
+    domain: com.apple.finder
+    key: FXInfoPanesExpanded
+    type: dict
+    value:
+      General: true
+      OpenWith: true
+      Privileges: true
+
+- name: Removing a key
+  community.general.osx_defaults:
+    domain: com.geekchimp.macable
+    key: ExampleKeyToRemove
+    state: absent
+"""
+
+import json
+import os
+import re
+import tempfile
+from datetime import datetime
+
+from ansible.module_utils.basic import AnsibleModule
+
+
+# exceptions --------------------------------------------------------------- {{{
+class OSXDefaultsException(Exception):
+    def __init__(self, msg):
+        self.message = msg
+
+
+# /exceptions -------------------------------------------------------------- }}}
+
+
+# class MacDefaults -------------------------------------------------------- {{{
+class OSXDefaults:
+    """Class to manage Mac OS user defaults"""
+
+    # init ---------------------------------------------------------------- {{{
+    def __init__(self, module):
+        """Initialize this module. Finds 'defaults' executable and preps the parameters"""
+        # Initial var for storing current defaults value
+        self.current_value = None
+        self.module = module
+        self.domain = module.params["domain"]
+        self.host = module.params["host"]
+        self.key = module.params["key"]
+        self.check_type = module.params["check_type"]
+        self.type = module.params["type"]
+        self.array_add = module.params["array_add"]
+        self.dict_mode = module.params["dict_mode"]
+        self.value = module.params["value"]
+        self.state = module.params["state"]
+        self.path = module.params["path"]
+
+        # Try to find the defaults executable
+        self.executable = self.module.get_bin_path(
+            "defaults",
+            required=False,
+            opt_dirs=self.path.split(":"),
+        )
+
+        if not self.executable:
+            raise OSXDefaultsException("Unable to locate defaults executable.")
+
+        self.plutil = self.module.get_bin_path(
+            "plutil",
+            required=False,
+            opt_dirs=self.path.split(":"),
+        )
+
+        if self.type == "dict" and not self.plutil:
+            raise OSXDefaultsException("Unable to locate plutil executable (required for dict type).")
+
+        # Ensure the value is the correct type
+        if self.state != "absent":
+            self.value = self._convert_type(self.type, self.value)
+
+    # /init --------------------------------------------------------------- }}}
+
+    # tools --------------------------------------------------------------- {{{
+    @staticmethod
+    def is_int(value):
+        as_str = str(value)
+        if as_str.startswith("-"):
+            return as_str[1:].isdigit()
+        else:
+            return as_str.isdigit()
+
+    @staticmethod
+    def _convert_type(data_type, value):
+        """Converts value to given type"""
+        if data_type == "string":
+            return str(value)
+        elif data_type in ["bool", "boolean"]:
+            if isinstance(value, (bytes, str)):
+                value = value.lower()
+            if value in [True, 1, "true", "1", "yes"]:
+                return True
+            elif value in [False, 0, "false", "0", "no"]:
+                return False
+            raise OSXDefaultsException(f"Invalid boolean value: {value!r}")
+        elif data_type == "date":
+            try:
+                return datetime.strptime(value.split("+")[0].strip(), "%Y-%m-%d %H:%M:%S")
+            except ValueError as e:
+                raise OSXDefaultsException(f"Invalid date value: {value!r}. Required format yyy-mm-dd hh:mm:ss.") from e
+        elif data_type in ["int", "integer"]:
+            if not OSXDefaults.is_int(value):
+                raise OSXDefaultsException(f"Invalid integer value: {value!r}")
+            return int(value)
+        elif data_type == "float":
+            try:
+                value = float(value)
+            except ValueError as e:
+                raise OSXDefaultsException(f"Invalid float value: {value!r}") from e
+            return value
+        elif data_type == "array":
+            if not isinstance(value, list):
+                raise OSXDefaultsException("Invalid value. Expected value to be an array")
+            return value
+        elif data_type in ["dict", "dictionary"]:
+            if not isinstance(value, dict):
+                raise OSXDefaultsException("Invalid value. Expected value to be a dict")
+            return value
+
+        raise OSXDefaultsException(f"Type is not supported: {data_type}")
+
+    def _host_args(self):
+        """Returns a normalized list of commandline arguments based on the "host" attribute"""
+        if self.host is None:
+            return []
+        elif self.host == "currentHost":
+            return ["-currentHost"]
+        else:
+            return ["-host", self.host]
+
+    def _base_command(self):
+        """Returns a list containing the "defaults" executable and any common base arguments"""
+        return [self.executable] + self._host_args()
+
+    @staticmethod
+    def _dict_value_to_args(key, val):
+        """Returns the [key, -type, value] tokens for a single dict entry when writing"""
+        if isinstance(val, bool):
+            return [key, "-bool", "TRUE" if val else "FALSE"]
+        elif isinstance(val, int):
+            return [key, "-int", str(val)]
+        elif isinstance(val, float):
+            return [key, "-float", str(val)]
+        else:
+            return [key, "-string", str(val)]
+
+    @staticmethod
+    def _convert_defaults_str_to_list(value):
+        """Converts array output from defaults to an list"""
+        # Split output of defaults. Every line contains a value
+        value = value.splitlines()
+
+        # Remove first and last item, those are not actual values
+        value.pop(0)
+        value.pop(-1)
+
+        # Remove spaces at beginning and comma (,) at the end, unquote and unescape double quotes
+        value = [re.sub('^ *"?|"?,? *$', "", x.replace('\\"', '"')) for x in value]
+
+        return value
+
+    # /tools -------------------------------------------------------------- }}}
+
+    # commands ------------------------------------------------------------ {{{
+    def read(self):
+        """Reads value of this domain & key from defaults"""
+        # First try to find out the type
+        rc, out, err = self.module.run_command(self._base_command() + ["read-type", self.domain, self.key])
+
+        # If RC is 1, the key does not exist
+        if rc == 1:
+            return None
+
+        # If the RC is not 0, then terrible happened! Ooooh nooo!
+        if rc != 0:
+            raise OSXDefaultsException(f"An error occurred while reading key type from defaults: {err}")
+
+        # Ok, lets parse the type from output
+        data_type = out.strip().replace("Type is ", "")
+
+        # Now get the current value
+        rc, out, err = self.module.run_command(self._base_command() + ["read", self.domain, self.key])
+
+        # Strip output
+        out = out.strip()
+
+        # A non zero RC at this point is kinda strange...
+        if rc != 0:
+            raise OSXDefaultsException(f"An error occurred while reading key value from defaults: {err}")
+
+        # Convert string to list when type is array
+        if data_type == "array":
+            out = self._convert_defaults_str_to_list(out)
+        elif data_type == "dictionary":
+            # Export domain plist to a temp file and use plutil -extract for type-preserving JSON conversion.
+            # Reading via 'defaults read' loses boolean type info (booleans appear as 1/0 in old-style plist text).
+            tmp_fd, tmp_path = tempfile.mkstemp(suffix=".plist")
+            os.close(tmp_fd)
+            try:
+                rc2, out2, err2 = self.module.run_command(self._base_command() + ["export", self.domain, tmp_path])
+                if rc2 != 0:
+                    raise OSXDefaultsException(f"An error occurred while exporting domain plist: {err2}")
+                rc3, out3, err3 = self.module.run_command(
+                    [self.plutil, "-extract", self.key, "json", "-o", "-", tmp_path]
+                )
+                if rc3 != 0:
+                    raise OSXDefaultsException(f"An error occurred while extracting dict value via plutil: {err3}")
+                out = json.loads(out3)
+            finally:
+                if os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
+
+        # Store the current_value
+        self.current_value = self._convert_type(data_type, out)
+
+    def write(self):
+        """Writes value to this domain & key to defaults"""
+        if self.type == "dict":
+            effective_type = "dict-add" if (self.dict_mode == "add" and self.current_value is not None) else "dict"
+            tokens = []
+            for k, v in self.value.items():
+                tokens.extend(self._dict_value_to_args(str(k), v))
+            rc, out, err = self.module.run_command(
+                self._base_command() + ["write", self.domain, self.key, f"-{effective_type}"] + tokens,
+                expand_user_and_vars=False,
+            )
+            if rc != 0:
+                raise OSXDefaultsException(f"An error occurred while writing value to defaults: {err}")
+            return
+
+        # We need to convert some values so the defaults commandline understands it
+        if isinstance(self.value, bool):
+            if self.value:
+                value = "TRUE"
+            else:
+                value = "FALSE"
+        elif isinstance(self.value, (int, float)):
+            value = str(self.value)
+        elif self.array_add and self.current_value is not None:
+            value = list(set(self.value) - set(self.current_value))
+        elif isinstance(self.value, datetime):
+            value = self.value.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            value = self.value
+
+        # When the type is array and array_add is enabled, morph the type :)
+        if self.type == "array" and self.array_add:
+            self.type = "array-add"
+
+        # All values should be a list, for easy passing it to the command
+        if not isinstance(value, list):
+            value = [value]
+
+        rc, out, err = self.module.run_command(
+            self._base_command() + ["write", self.domain, self.key, f"-{self.type}"] + value, expand_user_and_vars=False
+        )
+
+        if rc != 0:
+            raise OSXDefaultsException(f"An error occurred while writing value to defaults: {err}")
+
+    def delete(self):
+        """Deletes defaults key from domain"""
+        rc, out, err = self.module.run_command(self._base_command() + ["delete", self.domain, self.key])
+        if rc != 0:
+            raise OSXDefaultsException(f"An error occurred while deleting key from defaults: {err}")
+
+    # /commands ----------------------------------------------------------- }}}
+
+    # run ----------------------------------------------------------------- {{{
+    """ Does the magic! :) """
+
+    def run(self):
+        # Get the current value from defaults
+        self.read()
+
+        if self.state == "list":
+            self.module.exit_json(key=self.key, value=self.current_value)
+
+        # Handle absent state
+        if self.state == "absent":
+            if self.current_value is None:
+                return False
+            if self.module.check_mode:
+                return True
+            self.delete()
+            return True
+
+        # Check if there is a type mismatch, e.g. given type does not match the type in defaults
+        if self.check_type:
+            value_type = type(self.value)
+            if self.current_value is not None and not isinstance(self.current_value, value_type):
+                raise OSXDefaultsException(f"Type mismatch. Type in defaults: {type(self.current_value).__name__}")
+
+        # Current value matches the given value. Nothing need to be done. Arrays need extra care
+        if (
+            self.type == "array"
+            and self.current_value is not None
+            and not self.array_add
+            and set(self.current_value) == set(self.value)
+        ):
+            return False
+        elif (
+            self.type == "array"
+            and self.current_value is not None
+            and self.array_add
+            and len(list(set(self.value) - set(self.current_value))) == 0
+        ):
+            return False
+        elif (
+            self.type == "dict"
+            and self.current_value is not None
+            and self.dict_mode == "add"
+            and all(self.current_value.get(k) == v for k, v in self.value.items())
+        ):
+            return False
+        elif self.current_value == self.value:
+            return False
+
+        if self.module.check_mode:
+            return True
+
+        # Change/Create/Set given key/value for domain in defaults
+        self.write()
+        return True
+
+        # /run ---------------------------------------------------------------- }}}
+
+
+# /class MacDefaults ------------------------------------------------------ }}}
+
+
+# main -------------------------------------------------------------------- {{{
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            domain=dict(type="str", default="NSGlobalDomain"),
+            host=dict(type="str"),
+            key=dict(type="str", no_log=False),
+            check_type=dict(type="bool", default=True),
+            type=dict(
+                type="str",
+                default="string",
+                choices=["array", "bool", "boolean", "date", "dict", "float", "int", "integer", "string"],
+            ),
+            array_add=dict(type="bool", default=False),
+            dict_mode=dict(type="str", default="replace", choices=["replace", "add"]),
+            value=dict(type="raw"),
+            state=dict(type="str", default="present", choices=["absent", "list", "present"]),
+            path=dict(type="str", default="/usr/bin:/usr/local/bin"),
+        ),
+        supports_check_mode=True,
+        required_if=(("state", "present", ["value"]),),
+    )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
+
+    try:
+        defaults = OSXDefaults(module=module)
+        module.exit_json(changed=defaults.run())
+    except OSXDefaultsException as e:
+        module.fail_json(msg=e.message)
+
+
+# /main ------------------------------------------------------------------- }}}
+
+if __name__ == "__main__":
+    main()

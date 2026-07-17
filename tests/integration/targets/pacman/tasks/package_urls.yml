@@ -1,0 +1,219 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- vars:
+    http_port: 27617
+    reg_pkg: ed
+    url_pkg: lemon
+    url_pkg_filename: url.pkg.zst
+    url_pkg_path: '/tmp/'
+    url_pkg_url: 'http://localhost:{{http_port}}/{{url_pkg_filename}}'
+    file_pkg: hdparm
+    file_pkg_path: /tmp/file.pkg.zst
+    extra_pkg: core/sdparm
+    extra_pkg_outfmt: sdparm
+  block:
+    - name: Make sure that test packages are not installed
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg}}'
+          - '{{file_pkg}}'
+          - '{{extra_pkg}}'
+        state: absent
+    - name: Make sure that url package is not cached
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
+
+    - name: Get URL for {{url_pkg}}
+      command:
+        cmd: pacman --sync --print-format "%l" {{url_pkg}}
+      register: url_pkg_stdout
+    - name: Download {{url_pkg}} pkg
+      get_url:
+        url: '{{url_pkg_stdout.stdout}}'
+        dest: '{{url_pkg_path}}/{{url_pkg_filename}}'
+    - name: Download {{url_pkg}} pkg sig
+      get_url:
+        url: '{{url_pkg_stdout.stdout}}.sig'
+        dest: '{{url_pkg_path}}/{{url_pkg_filename}}.sig'
+    - name: Host {{url_pkg}}
+      shell:
+        cmd: 'python -m http.server --directory {{url_pkg_path}} {{http_port}} >/dev/null 2>&1'
+      async: 90
+      poll: 0
+    - name: Wait for http.server to come up online
+      wait_for:
+        host: 'localhost'
+        port: '{{http_port}}'
+        state: started
+
+    - name: Get URL for {{file_pkg}}
+      command:
+        cmd: pacman --sync --print-format "%l" {{file_pkg}}
+      register: file_pkg_url
+    - name: Download {{file_pkg}} pkg
+      get_url:
+        url: '{{file_pkg_url.stdout}}'
+        dest: '{{file_pkg_path}}'
+
+    - name: Install packages from mixed sources (check mode)
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url}}'
+          - '{{file_pkg_path}}'
+      check_mode: true
+      register: install_1
+
+    - name: Install packages from url (check mode, cached)
+      pacman:
+        name:
+          - '{{url_pkg_url}}'
+      check_mode: true
+      register: install_1c
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
+
+    - name: Install packages from mixed sources
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url}}'
+          - '{{file_pkg_path}}'
+      register: install_2
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
+
+    - name: Install packages from mixed sources - (idempotency)
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url}}'
+          - '{{file_pkg_path}}'
+      register: install_3
+    - name: Install packages from url - (idempotency, cached)
+      pacman:
+        name:
+          - '{{url_pkg_url}}'
+      register: install_3c
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
+
+    - name: Install packages with their regular names (idempotency)
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg}}'
+          - '{{file_pkg}}'
+      register: install_4
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
+
+    - name: Install new package with already installed packages from mixed sources
+      pacman:
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url}}'
+          - '{{file_pkg_path}}'
+          - '{{extra_pkg}}'
+      register: install_5
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
+
+    - name: Uninstall packages - mixed sources (check mode)
+      pacman:
+        state: absent
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url}}'
+          - '{{file_pkg_path}}'
+      check_mode: true
+      register: uninstall_1
+    - name: Uninstall packages - url (check mode, cached)
+      pacman:
+        state: absent
+        name:
+          - '{{url_pkg_url}}'
+      check_mode: true
+      register: uninstall_1c
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
+
+    - name: Uninstall packages - mixed sources
+      pacman:
+        state: absent
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url}}'
+          - '{{file_pkg_path}}'
+      register: uninstall_2
+    - name: Delete cached {{url_pkg}}
+      file:
+        path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
+        state: absent
+
+    - name: Uninstall packages - mixed sources (idempotency)
+      pacman:
+        state: absent
+        name:
+          - '{{reg_pkg}}'
+          - '{{url_pkg_url}}'
+          - '{{file_pkg_path}}'
+      register: uninstall_3
+
+    - name: Uninstall package - url (idempotency, cached)
+      pacman:
+        state: absent
+        name:
+          - '{{url_pkg_url}}'
+      register: uninstall_3c
+
+    - assert:
+        that:
+          - install_1 is changed
+          - install_1.msg == 'Would have installed 3 packages'
+          - install_1.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
+          - install_1c is changed
+          - install_1c.msg == 'Would have installed 1 packages'
+          - install_1c.packages|sort() == [url_pkg]
+          - install_2 is changed
+          - install_2.msg == 'Installed 3 package(s)'
+          - install_2.packages|sort() == [reg_pkg, url_pkg, file_pkg]|sort()
+          - install_3 is not changed
+          - install_3.msg == 'package(s) already installed'
+          - install_3c is not changed
+          - install_3c.msg == 'package(s) already installed'
+          - install_4 is not changed
+          - install_4.msg == 'package(s) already installed'
+          - install_5 is changed
+          - install_5.msg == 'Installed 1 package(s)'
+          - install_5.packages == [extra_pkg_outfmt]
+          - uninstall_1 is changed
+          - uninstall_1.msg == 'Would have removed 3 packages'
+          - uninstall_1.packages | length() == 3  # pkgs have versions here
+          - uninstall_1c is changed
+          - uninstall_1c.msg == 'Would have removed 1 packages'
+          - uninstall_1c.packages | length() == 1  # pkgs have versions here
+          - uninstall_2 is changed
+          - uninstall_2.msg == 'Removed 3 package(s)'
+          - uninstall_2.packages | length() == 3
+          - uninstall_3 is not changed
+          - uninstall_3.msg == 'package(s) already absent'
+          - uninstall_3c is not changed
+          - uninstall_3c.msg == 'package(s) already absent'

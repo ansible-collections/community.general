@@ -1,0 +1,313 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create test directory
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir }}"
+    state: directory
+
+- name: Ensure the Java keystore does not exist (cleanup between tests)
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.jks' }}"
+    state: absent
+  loop: "{{ java_keystore_certs }}"
+  loop_control:
+    label: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.jks' }}"
+
+
+- name: Read certificates
+  slurp:
+    src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+  loop: "{{ java_keystore_certs }}"
+  when: not remote_cert
+  register: certificates
+
+- name: Read certificate keys
+  slurp:
+    src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+  loop: "{{ java_keystore_certs }}"
+  when: not remote_cert
+  register: certificate_keys
+
+- name: Create a Java keystore for the given ({{ 'remote' if remote_cert else 'local' }}) certificates (check mode)
+  community.general.java_keystore: &java_keystore_params
+    name: example
+    dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
+    certificate: "{{ omit if remote_cert else (certificates.results[loop_index].content | b64decode) }}"
+    private_key: "{{ omit if remote_cert else (certificate_keys.results[loop_index].content | b64decode) }}"
+    certificate_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+    private_key_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+    password: changeit
+    ssl_backend: "{{ ssl_backend }}"
+    keystore_type: "{{ item.keystore_type | default(omit) }}"
+  loop: "{{ java_keystore_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_check
+
+- name: Create a Java keystore for the given certificates
+  community.general.java_keystore: *java_keystore_params
+  loop: "{{ java_keystore_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result
+
+
+- name: Create a Java keystore for the given certificates (idempotency, check mode)
+  community.general.java_keystore: *java_keystore_params
+  loop: "{{ java_keystore_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_idem_check
+
+- name: Create a Java keystore for the given certificates (idempotency)
+  community.general.java_keystore: *java_keystore_params
+  loop: "{{ java_keystore_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result_idem
+
+
+- name: Read certificates (new)
+  slurp:
+    src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+  loop: "{{ java_keystore_new_certs }}"
+  when: not remote_cert
+  register: certificates_new
+
+- name: Read certificate keys (new)
+  slurp:
+    src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+  loop: "{{ java_keystore_new_certs }}"
+  when: not remote_cert
+  register: certificate_keys_new
+
+- name: Create a Java keystore for the given certificates (certificate changed, check mode)
+  community.general.java_keystore: &java_keystore_params_new_certs
+    name: example
+    dest: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
+    certificate: "{{ omit if remote_cert else (certificates_new.results[loop_index].content | b64decode) }}"
+    private_key: "{{ omit if remote_cert else (certificate_keys_new.results[loop_index].content | b64decode) }}"
+    certificate_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+    private_key_path: "{{ omit if not remote_cert else remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+    password: changeit
+    ssl_backend: "{{ ssl_backend }}"
+    keystore_type: "{{ item.keystore_type | default(omit) }}"
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_change_check
+
+- name: Create a Java keystore for the given certificates (certificate changed)
+  community.general.java_keystore: *java_keystore_params_new_certs
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result_change
+
+
+- name: Create a Java keystore for the given certificates (alias changed, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_alias_change_check
+
+- name: Create a Java keystore for the given certificates (alias changed)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result_alias_change
+
+
+- name: Create a Java keystore for the given certificates (password changed, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_pw_change_check
+
+- name: Create a Java keystore for the given certificates (password changed)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result_pw_change
+
+
+- name: Create a Java keystore for the given certificates (force keystore type pkcs12, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+    keystore_type: pkcs12
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_type_pkcs12_check
+
+- name: Create a Java keystore for the given certificates (force keystore type jks, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+    keystore_type: jks
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_type_jks_check
+
+- name: Create a Java keystore for the given certificates (force keystore type jks)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+    keystore_type: jks
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result_type_jks
+
+
+- name: Stat keystore (before failure)
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
+  loop: "{{ java_keystore_new_certs }}"
+  register: result_stat_before
+
+- name: Fail to create a Java keystore for the given certificates (password too short)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: short
+    keystore_type: jks
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result_fail_jks
+  ignore_errors: true
+
+- name: Stat keystore (after failure)
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
+  loop: "{{ java_keystore_new_certs }}"
+  register: result_stat_after
+
+
+- name: Create a Java keystore for the given certificates (keystore type changed, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+    keystore_type: pkcs12
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_type_change_check
+
+- name: Create a Java keystore for the given certificates (keystore type changed)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+    keystore_type: pkcs12
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result_type_change
+
+
+- name: Create a Java keystore for the given certificates (omit keystore type, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  check_mode: true
+  register: result_type_omit_check
+
+- name: Create a Java keystore for the given certificates (omit keystore type)
+  community.general.java_keystore:
+    <<: *java_keystore_params_new_certs
+    name: foobar
+    password: hunter2
+  loop: "{{ java_keystore_new_certs }}"
+  loop_control:
+    index_var: loop_index
+  register: result_type_omit
+
+
+- name: Check that the remote certificates have not been removed
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
+    state: file
+  loop: "{{ java_keystore_certs + java_keystore_new_certs }}"
+  when: remote_cert
+
+- name: Check that the remote private keys have not been removed
+  ansible.builtin.file:
+    path: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.key' }}"
+    state: file
+  loop: "{{ java_keystore_certs }}"
+  when: remote_cert
+
+- name: Validate results
+  assert:
+    that:
+      - result is changed
+      - result_check is changed
+      - result_idem is not changed
+      - result_idem_check is not changed
+      - result_change is changed
+      - result_change_check is changed
+      - result_alias_change is changed
+      - result_alias_change_check is changed
+      - result_pw_change is changed
+      - result_pw_change_check is changed
+
+      # We don't know if we start from jks or pkcs12 format, anyway check mode
+      # and actual mode must return the same 'changed' state, and 'jks' and
+      # 'pkcs12' must give opposite results on a same host.
+      - result_type_jks_check.changed != result_type_pkcs12_check.changed
+      - result_type_jks_check.changed == result_type_jks.changed
+
+      - result_type_change is changed
+      - result_type_change_check is changed
+      - result_type_omit is not changed
+      - result_type_omit_check is not changed
+
+      # keystore properties must remain the same after failure
+      - result_fail_jks is failed
+      - result_stat_before.results[0].stat.uid == result_stat_after.results[0].stat.uid
+      - result_stat_before.results[1].stat.uid == result_stat_after.results[1].stat.uid
+      - result_stat_before.results[0].stat.gid == result_stat_after.results[0].stat.gid
+      - result_stat_before.results[1].stat.gid == result_stat_after.results[1].stat.gid
+      - result_stat_before.results[0].stat.mode == result_stat_after.results[0].stat.mode
+      - result_stat_before.results[1].stat.mode == result_stat_after.results[1].stat.mode
+      - result_stat_before.results[0].stat.checksum == result_stat_after.results[0].stat.checksum
+      - result_stat_before.results[1].stat.checksum == result_stat_after.results[1].stat.checksum

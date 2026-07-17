@@ -1,0 +1,37 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+tested_filesystems:
+  # key: fstype
+  #   fssize: size (Mo)
+  #   grow: true if resizefs is supported
+  # Other minimal sizes:
+  # - XFS: 20Mo
+  # - Btrfs: 150Mo (50Mo when "--metadata single" is used and 100Mb when on newer Fedora versions)
+  # - f2fs:
+  #     - 1.2.0 requires at least 116Mo
+  #     - 1.7.0 requires at least 30Mo
+  #     - 1.10.0 requires at least 38Mo
+  #     - resizefs asserts when initial fs is smaller than 60Mo and seems to require 1.10.0
+  bcachefs: {fssize: 20, grow: true, new_uuid: 'random', label: null}
+  ext4: {fssize: 10, grow: true, new_uuid: 'random', label: null}
+  ext4dev: {fssize: 10, grow: true, new_uuid: 'random', label: null}
+  ext3: {fssize: 10, grow: true, new_uuid: 'random', label: null}
+  ext2: {fssize: 10, grow: true, new_uuid: 'random', label: null}
+  xfs: {fssize: 300, grow: false, new_uuid: 'generate', label: null}  # grow requires a mounted filesystem
+  btrfs: {fssize: 150, grow: false, new_uuid: null, label: null}  # grow requires a mounted filesystem
+  reiserfs: {fssize: 33, grow: false, new_uuid: null, label: null}  # grow not implemented
+  vfat: {fssize: 20, grow: true, new_uuid: null, label: null}
+  ocfs2: {fssize: '{{ ocfs2_fssize }}', grow: false, new_uuid: null, label: null}  # grow not implemented
+  f2fs: {fssize: '{{ f2fs_fssize|default(60) }}', grow: 'f2fs_version is version("1.10.0", ">=")', new_uuid: null, label: null}
+  lvm: {fssize: 20, grow: true, new_uuid: 'something', label: null}
+  swap: {fssize: 10, grow: false, new_uuid: null, label: null}  # grow not implemented
+  ufs: {fssize: 10, grow: true, new_uuid: null, label: null}
+  gfs2: {fssize: 50, grow: false, new_uuid: null, label: 'CLUSTER:LOCKSPACE'}
+
+
+get_uuid_any: "blkid -c /dev/null -o value -s UUID {{ dev }}"
+get_uuid_ufs: "dumpfs {{ dev }} | awk -v sb=superblock -v id=id '$1 == sb && $4 == id {print $6$7}'"
+get_uuid_cmd: "{{ get_uuid_ufs if fstype == 'ufs' else get_uuid_any }}"

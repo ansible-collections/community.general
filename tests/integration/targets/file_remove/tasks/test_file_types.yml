@@ -1,0 +1,132 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Test different file types
+
+- name: Create regular test files
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+    state: touch
+    mode: '0644'
+  loop:
+    - file1.tmp
+    - file2.tmp
+    - target1.txt
+    - target2.txt
+
+- name: Create symbolic links
+  ansible.builtin.file:
+    src: "{{ file_remove_testdir }}/{{ item.src }}"
+    dest: "{{ file_remove_testdir }}/{{ item.dest }}"
+    state: link
+  loop:
+    - { src: target1.txt, dest: link1.tmp }
+    - { src: target2.txt, dest: link2.tmp }
+
+- name: Remove only regular files (file_type=file, default)
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.tmp"
+    file_type: file
+  register: file_type_result_1
+
+- name: Verify only regular .tmp files were removed
+  ansible.builtin.assert:
+    that:
+      - file_type_result_1 is changed
+      - file_type_result_1.files_count == 2
+      - "file_remove_testdir ~ '/file1.tmp' in file_type_result_1.removed_files"
+      - "file_remove_testdir ~ '/file2.tmp' in file_type_result_1.removed_files"
+
+- name: Verify symbolic links still exist
+  ansible.builtin.stat:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+    follow: false
+  register: links_exist
+  loop:
+    - link1.tmp
+    - link2.tmp
+
+- name: Assert symbolic links still exist
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+      - item.stat.islnk
+  loop: "{{ links_exist.results }}"
+
+- name: Remove only symbolic links (file_type=link)
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.tmp"
+    file_type: link
+  register: file_type_result_2
+
+- name: Verify only symbolic links were removed
+  ansible.builtin.assert:
+    that:
+      - file_type_result_2 is changed
+      - file_type_result_2.files_count == 2
+      - "file_remove_testdir ~ '/link1.tmp' in file_type_result_2.removed_files"
+      - "file_remove_testdir ~ '/link2.tmp' in file_type_result_2.removed_files"
+
+- name: Verify target files still exist
+  ansible.builtin.stat:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+  register: targets_exist
+  loop:
+    - target1.txt
+    - target2.txt
+
+- name: Assert target files still exist
+  ansible.builtin.assert:
+    that:
+      - item.stat.exists
+  loop: "{{ targets_exist.results }}"
+
+- name: Create more test files and links
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}/{{ item }}"
+    state: touch
+    mode: '0644'
+  loop:
+    - data1.dat
+    - data2.dat
+
+- name: Create more symbolic links
+  ansible.builtin.file:
+    src: "{{ file_remove_testdir }}/{{ item.src }}"
+    dest: "{{ file_remove_testdir }}/{{ item.dest }}"
+    state: link
+  loop:
+    - { src: target1.txt, dest: link1.dat }
+    - { src: target2.txt, dest: link2.dat }
+
+- name: Remove both files and links (file_type=any)
+  community.general.file_remove:
+    path: "{{ file_remove_testdir }}"
+    pattern: "*.dat"
+    file_type: any
+  register: file_type_result_3
+
+- name: Verify both files and links were removed
+  ansible.builtin.assert:
+    that:
+      - file_type_result_3 is changed
+      - file_type_result_3.files_count == 4
+      - "file_remove_testdir ~ '/data1.dat' in file_type_result_3.removed_files"
+      - "file_remove_testdir ~ '/data2.dat' in file_type_result_3.removed_files"
+      - "file_remove_testdir ~ '/link1.dat' in file_type_result_3.removed_files"
+      - "file_remove_testdir ~ '/link2.dat' in file_type_result_3.removed_files"
+
+- name: Clean up for next test
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: absent
+
+- name: Recreate test directory
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: directory
+    mode: '0755'

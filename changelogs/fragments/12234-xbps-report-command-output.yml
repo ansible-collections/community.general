@@ -1,0 +1,2 @@
+minor_changes:
+  - "xbps - include ``stdout`` and ``stderr`` from the last executed command in module output (https://github.com/ansible-collections/community.general/issues/2478, https://github.com/ansible-collections/community.general/pull/12234)."

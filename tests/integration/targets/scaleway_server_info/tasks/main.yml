@@ -1,0 +1,37 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get server information and register it in a variable
+  scaleway_server_info:
+    region: par1
+  register: servers
+
+- name: Display servers variable
+  debug:
+    var: servers
+
+- name: Ensure retrieval of servers info is success
+  assert:
+    that:
+      - servers is success
+
+- name: Get server information and register it in a variable
+  scaleway_server_info:
+    region: ams1
+  register: ams1_servers
+
+- name: Display servers variable
+  debug:
+    var: ams1_servers
+
+- name: Ensure retrieval of servers info is success
+  assert:
+    that:
+      - ams1_servers is success

@@ -1,0 +1,49 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test functionality
+  assert:
+    that:
+      - list1 | community.general.groupby_as_dict('name') == dict1
+
+- name: 'Test error: not a list'
+  set_fact:
+    test: "{{ list_no_list | community.general.groupby_as_dict('name') }}"
+  ignore_errors: true
+  register: result
+
+- assert:
+    that:
+      - result.msg is search('Input is not a sequence')
+
+- name: 'Test error: list element not a mapping'
+  set_fact:
+    test: "{{ list_no_dict | community.general.groupby_as_dict('name') }}"
+  ignore_errors: true
+  register: result
+
+- assert:
+    that:
+      - "result.msg is search('Sequence element #0 is not a mapping')"
+
+- name: 'Test error: list element does not have attribute'
+  set_fact:
+    test: "{{ list_no_attribute | community.general.groupby_as_dict('name') }}"
+  ignore_errors: true
+  register: result
+
+- assert:
+    that:
+      - "result.msg is search('Attribute not contained in element #1 of sequence')"
+
+- name: 'Test error: attribute collision'
+  set_fact:
+    test: "{{ list_collision | community.general.groupby_as_dict('name') }}"
+  ignore_errors: true
+  register: result
+
+- assert:
+    that:
+      - result.msg is search("Multiple sequence entries have attribute value u?'a'")

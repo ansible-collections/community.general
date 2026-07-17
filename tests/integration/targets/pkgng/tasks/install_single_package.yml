@@ -1,0 +1,69 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Verify package sentinel file is not present
+  stat:
+    path: '{{ pkgng_test_install_prefix | default("") }}{{ pkgng_test_pkg_sentinelfile_path }}'
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+  register: pkgng_install_stat_before
+
+- name: Install package
+  pkgng: &pkgng_install_params
+    name: '{{ pkgng_test_pkg_name }}'
+    jail: '{{ pkgng_test_jail | default(omit) }}'
+    chroot: '{{ pkgng_test_chroot | default(omit) }}'
+    rootdir: '{{ pkgng_test_rootdir | default(omit) }}'
+  register: pkgng_install
+
+- name: Remove package (checkmode)
+  pkgng:
+    <<: *pkgng_install_params
+    state: absent
+  check_mode: true
+  register: pkgng_install_checkmode
+
+- name: Install package (idempotent, cached)
+  pkgng:
+    <<: *pkgng_install_params
+    cached: true
+  register: pkgng_install_idempotent_cached
+
+- name: Verify package sentinel file is present
+  stat:
+    path: '{{ pkgng_test_install_prefix | default("") }}{{ pkgng_test_pkg_sentinelfile_path }}'
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
+  register: pkgng_install_stat_after
+
+- name: Upgrade package (orig, no globs)
+  pkgng:
+    name: '{{ pkgng_test_pkg_category }}/{{ pkgng_test_pkg_name }}'
+    state: latest
+    use_globs: false
+    jail: '{{ pkgng_test_jail | default(omit) }}'
+    chroot: '{{ pkgng_test_chroot | default(omit) }}'
+    rootdir: '{{ pkgng_test_rootdir | default(omit) }}'
+  register: pkgng_upgrade_orig_noglobs
+
+- name: Remove test package (if requested)
+  pkgng:
+    <<: *pkgng_install_params
+    state: absent
+  when: 'pkgng_test_install_cleanup | default(False)'
+
+- name: Ensure pkgng installs package correctly
+  assert:
+    that:
+      - not pkgng_install_stat_before.stat.exists
+      - pkgng_install.changed
+      - pkgng_install_checkmode.changed
+      - not pkgng_install_idempotent_cached.changed
+      - not pkgng_install_idempotent_cached.stdout is match("Updating \w+ repository catalogue\.\.\.")
+      - pkgng_install_stat_after.stat.exists
+      - pkgng_install_stat_after.stat.executable
+      - pkgng_upgrade_orig_noglobs is not changed

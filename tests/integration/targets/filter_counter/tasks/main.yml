@@ -1,0 +1,41 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: test counter filter
+  assert:
+    that:
+      - "('abca' | community.general.counter) == {'a': 2, 'b': 1, 'c': 1}"
+      - "(['apple', 'pear', 'pear'] | community.general.counter) == {'apple': 1, 'pear': 2}"
+      - "([1, 2, 2, 3] | community.general.counter) == {1: 1, 2: 2, 3: 1}"
+      - "([1.11, 1.11, 1.12] | community.general.counter) == {1.11: 2, 1.12: 1}"
+
+- name: test fail argument not a sequence
+  debug:
+    msg: "{{ {'a': 'b'} | community.general.counter }}"
+  ignore_errors: true
+  register: res
+
+- name: verify test fail argument not a sequence
+  assert:
+    that:
+      - res is failed
+      - res.msg is search('Argument for community.general.counter must be a sequence')
+
+- name: test fail element not hashable
+  debug:
+    msg: "{{ [{'a': 'b'}] | community.general.counter }}"
+  ignore_errors: true
+  register: res
+
+- name: verify test fail element not hashable
+  assert:
+    that:
+      - res is failed
+      - res.msg is search('community.general.counter needs a sequence with hashable elements')
