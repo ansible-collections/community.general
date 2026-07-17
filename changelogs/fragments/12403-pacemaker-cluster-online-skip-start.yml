@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - pacemaker_cluster - skip ``pcs cluster start`` in ``state=online`` when the cluster is already running, improving idempotency and allowing maintenance mode to be disabled without pcsd connectivity (https://github.com/ansible-collections/community.general/issues/12362, https://github.com/ansible-collections/community.general/pull/12403).

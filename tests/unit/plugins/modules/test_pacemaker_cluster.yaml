@@ -20,10 +20,34 @@ test_cases:
           rc: 0
           out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
-        - command: [/testbin/pcs, cluster, start, --all, --wait=300]
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, cluster, status]
           environ: *env-def
           rc: 0
-          out: "Starting Cluster..."
+          out: '   * Online: [ pc1, pc2, pc3 ]'
+          err: ""
+  - id: test_online_minimal_input_initial_online_all_maintenance
+    input:
+      state: online
+    output:
+      changed: true
+      previous_value: '   * Online: [ pc1, pc2, pc3 ]'
+      value: '   * Online: [ pc1, pc2, pc3 ]'
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, cluster, status]
+          environ: *env-def
+          rc: 0
+          out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
         - command: [/testbin/pcs, property, config]
           environ: *env-def
@@ -34,6 +58,12 @@ test_cases:
             cluster-name=hacluster
             dc-version=2.1.9-1.fc41-7188dbf
             have-watchdog=false
+            maintenance-mode=true
+          err: ""
+        - command: [/testbin/pcs, property, set, maintenance-mode=false]
+          environ: *env-def
+          rc: 0
+          out: ""
           err: ""
         - command: [/testbin/pcs, cluster, status]
           environ: *env-def

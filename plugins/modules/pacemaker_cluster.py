@@ -133,6 +133,19 @@ class PacemakerCluster(StateModuleHelper):
             )
             return dict(rc=result[0], out=(result[1] if result[1] != "" else None), err=result[2])
 
+    def _is_cluster_running(self) -> bool:
+        status = self.vars.previous_value
+        if not status or "not currently running" in status:
+            return False
+
+        node_name = self.runner.module.params.get("name")
+        if node_name:
+            for line in status.splitlines():
+                if line.strip().startswith(f"* Node {node_name}:") and "(offline)" in line.lower():
+                    return False
+
+        return True
+
     def state_cleanup(self):
         with self.runner(
             "cli_action state name", output_process=self._process_command_output(True, "Fail"), check_mode_skip=True
@@ -148,18 +161,20 @@ class PacemakerCluster(StateModuleHelper):
             ctx.run(cli_action="cluster", apply_all=self.vars.apply_all, wait=self.module.params["timeout"])
 
     def state_online(self):
-        with self.runner(
-            "cli_action state name apply_all wait",
-            output_process=self._process_command_output(True, "currently running"),
-            check_mode_skip=True,
-        ) as ctx:
-            ctx.run(cli_action="cluster", apply_all=self.vars.apply_all, wait=self.module.params["timeout"])
+        if not self._is_cluster_running():
+            with self.runner(
+                "cli_action state name apply_all wait",
+                output_process=self._process_command_output(True, "currently running"),
+                check_mode_skip=True,
+            ) as ctx:
+                ctx.run(cli_action="cluster", apply_all=self.vars.apply_all, wait=self.module.params["timeout"])
 
         if get_pacemaker_maintenance_mode(self.runner):
             with self.runner(
                 "cli_action state name", output_process=self._process_command_output(True, "Fail"), check_mode_skip=True
             ) as ctx:
                 ctx.run(cli_action="property", state="maintenance", name="maintenance-mode=false")
+            self.changed = True
 
     def state_maintenance(self):
         with self.runner(
