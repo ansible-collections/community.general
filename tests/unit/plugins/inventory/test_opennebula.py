@@ -107,6 +107,7 @@ def get_vm_pool():
             "ETIME": 0,
             "GID": 132,
             "GNAME": "CSApparelVDC",
+            "UNAME": "sam-admin",
             "HISTORY_RECORDS": HistoryRecords(),
             "ID": 7157,
             "LAST_POLL": 1632762935,
@@ -163,6 +164,7 @@ def get_vm_pool():
             "ETIME": 0,
             "GID": 0,
             "GNAME": "oneadmin",
+            "UNAME": "oneadmin",
             "HISTORY_RECORDS": [],
             "ID": 327,
             "LAST_POLL": 1632763543,
@@ -238,6 +240,7 @@ def get_vm_pool():
             "ETIME": 0,
             "GID": 0,
             "GNAME": "oneadmin",
+            "UNAME": "gitlab-admin",
             "HISTORY_RECORDS": [],
             "ID": 107,
             "LAST_POLL": 1632764186,
@@ -426,7 +429,36 @@ def test_populate(inventory, mocker):
     assert host_gitlab.get_vars()["ansible_host"] == "185.165.1.3"
 
     # check for custom ssh port
-    assert host_gitlab.get_vars()["ansible_port"] == "8822"
+    assert host_gitlab.get_vars()["ansible_port"] == 8822
+
+
+def test_populate_uname_gname(inventory, mocker):
+    inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool)
+    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(options_base_test))
+    inventory._populate()
+
+    host_sam = inventory.inventory.get_host("sam-691-sam")
+    host_zabbix = inventory.inventory.get_host("zabbix-327")
+
+    assert host_sam.get_vars()["UNAME"] == "sam-admin"
+    assert host_sam.get_vars()["GNAME"] == "CSApparelVDC"
+    assert host_zabbix.get_vars()["UNAME"] == "oneadmin"
+    assert host_zabbix.get_vars()["GNAME"] == "oneadmin"
+
+
+def test_coerce_ssh_port():
+    coerce = InventoryModule._coerce_ssh_port
+    assert coerce("22") == 22
+    assert coerce(22) == 22
+    assert coerce({"#text": "8822"}) == 8822
+    assert coerce({"text": "443"}) == 443
+    assert coerce(None) is None
+    assert coerce("") is None
+    assert coerce(False) is None
+    assert coerce({"unexpected": ""}) is None
+    assert coerce("0") is None
+    assert coerce("99999") is None
+    assert coerce("not_a_port") is None
 
 
 def test_populate_filters(inventory, mocker):

@@ -1,0 +1,17 @@
+minor_changes:
+  - "opennebula inventory plugin - expose ``UNAME`` (VM owner) and ``GNAME`` (VM group)
+     as host variables, enabling ``keyed_groups`` based on ownership
+     (https://github.com/ansible-collections/community.general/pull/12416)."
+bugfixes:
+  - "opennebula inventory plugin - coerce ``SSH_PORT`` to an integer before setting
+     ``ansible_port``; pyone/XML-RPC sometimes returns a dict wrapper (e.g.
+     ``{\"#text\": \"22\"}``) which broke OpenSSH with ``Connection to UNKNOWN port 65535``
+     (https://github.com/ansible-collections/community.general/pull/12416)."
+  - "opennebula inventory plugin - do not overwrite ``ansible_host`` when a host already
+     has it set by an earlier inventory source, allowing static inventory overrides to
+     take precedence over the dynamic hostname preference
+     (https://github.com/ansible-collections/community.general/pull/12416)."
+  - "opennebula inventory plugin - fix EXAMPLES to use ``filters`` (plural) instead of
+     ``filter`` (singular), and add ``| default('')`` to prevent undefined variable errors
+     on VMs missing the filtered attributes
+     (https://github.com/ansible-collections/community.general/pull/12416)."

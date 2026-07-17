@@ -1,4 +1,5 @@
 # Copyright (c) 2020, FELDSAM s.r.o. - FeldHost™ <support@feldhost.cz>
+# Copyright (c) 2026, Tom Paine, <github@aioue.net>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -8,6 +9,7 @@ DOCUMENTATION = r"""
 name: opennebula
 author:
   - Kristian Feldsam (@feldsam)
+  - Tom Paine (@aioue)
 short_description: OpenNebula inventory source
 version_added: "3.8.0"
 extends_documentation_fragment:
@@ -87,14 +89,35 @@ api_url: https://opennebula:2633/RPC2
 filter_by_label: Cache
 
 ---
-# Only return VMs whose USER_TEMPLATE has both PROJECT=climb and ENVIRONMENT=test
+# Filter VMs by USER_TEMPLATE attributes on a shared instance.
+# Use "| default('')" so VMs missing the attribute are excluded rather than
+# causing an 'undefined' error.
 plugin: community.general.opennebula
 api_url: https://opennebula:2633/RPC2
-filter:
+filters:
   - include: >-
-      PROJECT == "climb" and
-      ENVIRONMENT == "test"
+      (PROJECT | default('')) == "climb" and
+      (ENVIRONMENT | default('')) == "test"
   - exclude: true
+
+---
+# Connect by VM name (useful with ~/.ssh/config Host aliases) and suppress
+# automatic label-based groups when labels are noisy or inconsistent.
+plugin: community.general.opennebula
+api_url: https://opennebula:2633/RPC2
+hostname: name
+group_by_labels: false
+
+---
+# Group VMs by their OpenNebula owner and group (UNAME/GNAME).
+# Produces groups like opennebula_group_EI_Training, opennebula_owner_angiolie.
+plugin: community.general.opennebula
+api_url: https://opennebula:2633/RPC2
+keyed_groups:
+  - key: GNAME
+    prefix: opennebula_group
+  - key: UNAME
+    prefix: opennebula_owner
 """
 
 try:
@@ -226,6 +249,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
             server["name"] = vm.NAME
             server["id"] = vm.ID
+            server["UNAME"] = getattr(vm, "UNAME", "")
+            server["GNAME"] = getattr(vm, "GNAME", "")
             if hasattr(vm.HISTORY_RECORDS, "HISTORY") and vm.HISTORY_RECORDS.HISTORY:
                 server["host"] = vm.HISTORY_RECORDS.HISTORY[-1].HOSTNAME
             server["LABELS"] = labels
@@ -235,6 +260,31 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             result.append(server)
 
         return result
+
+    @staticmethod
+    def _coerce_ssh_port(raw):
+        """Return a valid TCP port number, or ``None`` if the value is unusable.
+
+        XML-RPC responses from OpenNebula sometimes wrap scalar values in a
+        dict (e.g. ``{"#text": "22"}``).  Passing that through to
+        ``ansible_port`` breaks OpenSSH with errors like
+        ``Connection to UNKNOWN port 65535``.
+        """
+        if raw in (None, "", False):
+            return None
+        if isinstance(raw, dict):
+            raw = raw.get("#text") or raw.get("text") or next(
+                (v for v in raw.values() if isinstance(v, (str, int)) and str(v).strip()), None
+            )
+            if raw is None:
+                return None
+        try:
+            port = int(str(raw).strip(), 10)
+        except (TypeError, ValueError):
+            return None
+        if port < 1 or port > 65535:
+            return None
+        return port
 
     def _populate(self):
         hostname_preference = self.get_option("hostname")
@@ -266,10 +316,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 self.inventory.set_variable(hostname, attribute, value)
 
             if hostname_preference != "name":
-                self.inventory.set_variable(hostname, "ansible_host", server[hostname_preference])
+                existing = self.inventory.get_host(hostname)
+                if not existing or "ansible_host" not in existing.vars:
+                    self.inventory.set_variable(hostname, "ansible_host", server[hostname_preference])
 
-            if server.get("SSH_PORT"):
-                self.inventory.set_variable(hostname, "ansible_port", server["SSH_PORT"])
+            ssh_port = self._coerce_ssh_port(server.get("SSH_PORT"))
+            if ssh_port is not None:
+                self.inventory.set_variable(hostname, "ansible_port", ssh_port)
 
             # handle construcable implementation: get composed variables if any
             self._set_composite_vars(self.get_option("compose"), server, hostname, strict=strict)
