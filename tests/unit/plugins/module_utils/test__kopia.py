@@ -8,7 +8,7 @@ import pytest
 
 from ansible_collections.community.general.plugins.module_utils._kopia import (
     KOPIA_COMMON_ARGUMENT_SPEC,
-    REPOSITORY_STATE_MAP,
+    STATE_MAP,
     fmt_backend,
 )
 
@@ -34,21 +34,22 @@ def test_common_argument_spec_only_two_keys():
 
 
 # ---------------------------------------------------------------------------
-# REPOSITORY_STATE_MAP
+# STATE_MAP
 # ---------------------------------------------------------------------------
 
 
-def test_repository_state_map_entries():
-    assert REPOSITORY_STATE_MAP["created"] == "create"
-    assert REPOSITORY_STATE_MAP["connected"] == "connect"
-    assert REPOSITORY_STATE_MAP["disconnected"] == "disconnect"
-    assert REPOSITORY_STATE_MAP["synced"] == "sync-to"
-    assert REPOSITORY_STATE_MAP["throttled"] == "throttle"
+def test_state_map_repository_entries():
+    assert STATE_MAP["created"] == "create"
+    assert STATE_MAP["connected"] == "connect"
+    assert STATE_MAP["disconnected"] == "disconnect"
+    assert STATE_MAP["synced"] == "sync-to"
+    assert STATE_MAP["throttled"] == "throttle"
 
 
 # ---------------------------------------------------------------------------
 # fmt_backend
 # ---------------------------------------------------------------------------
+
 
 TC_FMT_BACKEND = dict(
     server=(
@@ -113,21 +114,124 @@ TC_FMT_BACKEND = dict(
         {"provider": "azure", "container": "my-container", "storage_account": "myaccount"},
         ["azure", "--container=my-container", "--storage-account=myaccount"],
     ),
+    azure_service_principal=(
+        {
+            "provider": "azure",
+            "container": "my-container",
+            "storage_account": "myaccount",
+            "client_id": "cid",
+            "client_secret": "csecret",
+            "tenant_id": "tid",
+        },
+        [
+            "azure",
+            "--container=my-container",
+            "--storage-account=myaccount",
+            "--client-id=cid",
+            "--client-secret=csecret",
+            "--tenant-id=tid",
+        ],
+    ),
+    azure_federated_token=(
+        {
+            "provider": "azure",
+            "container": "my-container",
+            "storage_account": "myaccount",
+            "azure_federated_token_file": "/var/run/secrets/azure/token",
+        },
+        [
+            "azure",
+            "--container=my-container",
+            "--storage-account=myaccount",
+            "--azure-federated-token-file=/var/run/secrets/azure/token",
+        ],
+    ),
     gcs_full=(
-        {"provider": "gcs", "bucket": "my-bucket", "credentials_file": "/etc/gcs.json", "prefix": "kopia/"},
+        {
+            "provider": "gcs",
+            "bucket": "my-bucket",
+            "credentials_file": "/etc/gcs.json",
+            "prefix": "kopia/",
+        },
         ["gcs", "--bucket=my-bucket", "--credentials-file=/etc/gcs.json", "--prefix=kopia/"],
+    ),
+    gcs_embed_credentials=(
+        {
+            "provider": "gcs",
+            "bucket": "my-bucket",
+            "embed_credentials": True,
+        },
+        ["gcs", "--bucket=my-bucket", "--embed-credentials"],
+    ),
+    gcs_embed_credentials_false=(
+        {
+            "provider": "gcs",
+            "bucket": "my-bucket",
+            "embed_credentials": False,
+        },
+        ["gcs", "--bucket=my-bucket"],
+    ),
+    gcs_read_only=(
+        {
+            "provider": "gcs",
+            "bucket": "my-bucket",
+            "read_only": True,
+        },
+        ["gcs", "--bucket=my-bucket", "--read-only"],
     ),
     gdrive=(
         {"provider": "gdrive", "folder_id": "abc123", "credentials_file": "/etc/gdrive.json"},
         ["gdrive", "--folder-id=abc123", "--credentials-file=/etc/gdrive.json"],
     ),
+    gdrive_read_only=(
+        {"provider": "gdrive", "folder_id": "abc123", "read_only": True},
+        ["gdrive", "--folder-id=abc123", "--read-only"],
+    ),
     b2_full=(
         {"provider": "b2", "bucket": "my-b2-bucket", "access_key": "kid", "secret_access_key": "sec"},
         ["b2", "--bucket=my-b2-bucket", "--key-id=kid", "--key=sec"],
     ),
-    rclone=(
+    rclone_minimal=(
         {"provider": "rclone", "path": "remote:backup"},
         ["rclone", "--remote-path=remote:backup"],
+    ),
+    rclone_with_exe=(
+        {"provider": "rclone", "path": "remote:backup", "rclone_exe": "/usr/local/bin/rclone"},
+        ["rclone", "--remote-path=remote:backup", "--rclone-exe=/usr/local/bin/rclone"],
+    ),
+    rclone_with_args=(
+        {
+            "provider": "rclone",
+            "path": "remote:backup",
+            "rclone_args": ["--transfers=4", "--checkers=8"],
+        },
+        [
+            "rclone",
+            "--remote-path=remote:backup",
+            "--rclone-args",
+            "--transfers=4",
+            "--rclone-args",
+            "--checkers=8",
+        ],
+    ),
+    rclone_with_env=(
+        {
+            "provider": "rclone",
+            "path": "remote:backup",
+            "rclone_env": ["RCLONE_CONFIG=/etc/rclone.conf", "HOME=/root"],
+        },
+        [
+            "rclone",
+            "--remote-path=remote:backup",
+            "--rclone-env",
+            "RCLONE_CONFIG=/etc/rclone.conf",
+            "--rclone-env",
+            "HOME=/root",
+        ],
+    ),
+    rclone_embed_config=(
+        {"provider": "rclone", "path": "remote:backup", "embed_rclone_config": True},
+        ["rclone", "--remote-path=remote:backup", "--embed-rclone-config"],
     ),
     sftp_full=(
         {
@@ -135,7 +239,7 @@ TC_FMT_BACKEND = dict(
             "path": "/backup",
             "host": "sftp.example.com",
             "username": "admin",
-            "port": "22",
+            "port": 22,
             "keyfile": "/root/.ssh/id_rsa",
             "known_hosts": "/root/.ssh/known_hosts",
         },
@@ -147,6 +251,79 @@ TC_FMT_BACKEND = dict(
             "--port=22",
             "--keyfile=/root/.ssh/id_rsa",
             "--known-hosts=/root/.ssh/known_hosts",
+        ],
+    ),
+    sftp_password=(
+        {
+            "provider": "sftp",
+            "path": "/backup",
+            "host": "sftp.example.com",
+            "username": "admin",
+            "sftp_password": "s3cr3t",
+        },
+        [
+            "sftp",
+            "--path=/backup",
+            "--host=sftp.example.com",
+            "--username=admin",
+            "--sftp-password=s3cr3t",
+        ],
+    ),
+    sftp_key_data=(
+        {
+            "provider": "sftp",
+            "path": "/backup",
+            "host": "sftp.example.com",
+            "username": "admin",
+            "key_data": "-----BEGIN RSA PRIVATE KEY-----\n...",
+            "known_hosts_data": "sftp.example.com ssh-rsa AAAA...",
+        },
+        [
+            "sftp",
+            "--path=/backup",
+            "--host=sftp.example.com",
+            "--username=admin",
+            "--key-data=-----BEGIN RSA PRIVATE KEY-----\n...",
+            "--known-hosts-data=sftp.example.com ssh-rsa AAAA...",
+        ],
+    ),
+    sftp_embed_credentials=(
+        {
+            "provider": "sftp",
+            "path": "/backup",
+            "host": "sftp.example.com",
+            "username": "admin",
+            "embed_credentials": True,
+        },
+        [
+            "sftp",
+            "--path=/backup",
+            "--host=sftp.example.com",
+            "--username=admin",
+            "--embed-credentials",
+        ],
+    ),
+    sftp_external=(
+        {
+            "provider": "sftp",
+            "path": "/backup",
+            "host": "sftp.example.com",
+            "username": "admin",
+            "external": True,
+            "ssh_command": "/usr/bin/ssh",
+            "ssh_args": ["-o", "StrictHostKeyChecking=no"],
+        },
+        [
+            "sftp",
+            "--path=/backup",
+            "--host=sftp.example.com",
+            "--username=admin",
+            "--external",
+            "--ssh-command=/usr/bin/ssh",
+            "--ssh-args",
+            "-o",
+            "--ssh-args",
+            "StrictHostKeyChecking=no",
         ],
     ),
     webdav_full=(
@@ -161,6 +338,14 @@ TC_FMT_BACKEND = dict(
     none_values_skipped=(
         {"provider": "s3", "bucket": "b", "access_key": None, "secret_access_key": None},
         ["s3", "--bucket=b"],
+    ),
+    bool_false_skipped=(
+        {"provider": "gcs", "bucket": "b", "embed_credentials": False, "read_only": False},
+        ["gcs", "--bucket=b"],
+    ),
+    empty_list_skipped=(
+        {"provider": "rclone", "path": "remote:b", "rclone_args": []},
+        ["rclone", "--remote-path=remote:b"],
     ),
 )
 
