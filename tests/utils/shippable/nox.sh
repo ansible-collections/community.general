@@ -62,6 +62,7 @@ export ANTSIBULL_NOX_COVERAGE_ANALYSIS_FILE="${COVERAGE_DESTINATION_DIRECTORY}/c
 export ANTSIBULL_NOX_COVERAGE_NO_XML="true"
 
 if [ "${nox_session}" == "extra-sanity-tests" ]; then
+    export ANTSIBULL_NOX_OUTPUT_BOT_DIRECTORY="tests/output/bot"
     nox --reuse-existing-virtualenvs --no-install
 else
     nox --reuse-existing-virtualenvs --no-install -e "${nox_session}" -- ${COVERAGE}
