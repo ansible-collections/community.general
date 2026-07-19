@@ -6,7 +6,7 @@
 .. _ansible_collections.community.general.docsite.filter_guide:
 
 community.general Filter Guide
-==============================
+==========================
 
 The :anscollection:`community.general collection <community.general#collection>` offers several useful filter plugins.
 
