@@ -23,6 +23,7 @@ action_groups:
     - keycloak_authentication
     - keycloak_authentication_required_actions
     - keycloak_authentication_v2
+    - keycloak_authz_authorization_scope
     - keycloak_authz_custom_policy
     - keycloak_authz_permission
     - keycloak_authz_permission_info
@@ -59,6 +60,7 @@ action_groups:
     - scaleway_container_namespace
     - scaleway_container_namespace_info
     - scaleway_container_registry
+    - scaleway_container_registry_info
     - scaleway_database_backup
     - scaleway_function
     - scaleway_function_info
