@@ -121,9 +121,21 @@ options:
   mode:
     description:
       - This is the type of device or network connection that you wish to create for a bond or bridge.
+      - When creating a new bond, NetworkManager's default mode V(balance-rr) is used if this option is not provided.
+      - When omitted for an existing bond connection, the module uses the behavior selected by O(bond_mode_behavior).
+      - This option only applies when O(type=bond).
     type: str
     choices: [802.3ad, active-backup, balance-alb, balance-rr, balance-tlb, balance-xor, broadcast]
-    default: balance-rr
+  bond_mode_behavior:
+    description:
+      - Controls how the module behaves when O(mode) is omitted on an existing bond connection.
+      - When set to V(preserve), the module leaves the current bond mode unchanged.
+      - When set to V(reset), the module uses the legacy default V(balance-rr).
+      - This option only applies when O(type=bond).
+    type: str
+    choices: [preserve, reset]
+    default: reset
+    version_added: 13.3.0
   transport_mode:
     description:
       - This option sets the connection type of Infiniband IPoIB devices.
@@ -1784,6 +1796,7 @@ class Nmcli:
         self.stp = module.params["stp"]
         self.priority = module.params["priority"]
         self.mode = module.params["mode"]
+        self.bond_mode_behavior = module.params["bond_mode_behavior"]
         self.miimon = module.params["miimon"]
         self.primary = module.params["primary"]
         self.downdelay = module.params["downdelay"]
@@ -1939,19 +1952,21 @@ class Nmcli:
 
         # Options specific to a connection type.
         if self.type == "bond":
-            options.update(
-                {
-                    "arp_interval": self.arp_interval,
-                    "arp_ip_target": self.arp_ip_target,
-                    "downdelay": self.downdelay,
-                    "miimon": self.miimon,
-                    "mode": self.mode,
-                    "primary": self.primary,
-                    "updelay": self.updelay,
-                    "xmit_hash_policy": self.xmit_hash_policy,
-                    "fail_over_mac": self.fail_over_mac,
-                }
-            )
+            bond_options = {
+                "arp_interval": self.arp_interval,
+                "arp_ip_target": self.arp_ip_target,
+                "downdelay": self.downdelay,
+                "miimon": self.miimon,
+                "primary": self.primary,
+                "updelay": self.updelay,
+                "xmit_hash_policy": self.xmit_hash_policy,
+                "fail_over_mac": self.fail_over_mac,
+            }
+            if self.mode is not None:
+                bond_options["mode"] = self.mode
+            elif self.bond_mode_behavior == "reset":
+                bond_options["mode"] = "balance-rr"
+            options.update(bond_options)
         elif self.type == "bond-slave":
             if self.slave_type and self.slave_type != "bond":
                 self.module.fail_json(
@@ -2818,7 +2833,6 @@ def create_module() -> AnsibleModule:
             # Bond Specific vars
             mode=dict(
                 type="str",
-                default="balance-rr",
                 choices=[
                     "802.3ad",
                     "active-backup",
@@ -2829,6 +2843,7 @@ def create_module() -> AnsibleModule:
                     "broadcast",
                 ],
             ),
+            bond_mode_behavior=dict(type="str", choices=["preserve", "reset"], default="reset"),
             miimon=dict(type="int"),
             downdelay=dict(type="int"),
             updelay=dict(type="int"),
