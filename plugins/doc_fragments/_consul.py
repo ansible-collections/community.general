@@ -16,6 +16,7 @@ options:
     description:
       - Host of the Consul agent.
       - If unset, the host component of the E(CONSUL_HTTP_ADDR) environment variable is used when set.
+        A value that cannot be parsed is ignored with a warning.
         This is supported since community.general 13.3.0.
     default: localhost
     type: str
@@ -24,6 +25,7 @@ options:
     description:
       - The port on which the consul agent is running.
       - If unset, the port component of the E(CONSUL_HTTP_ADDR) environment variable is used when set.
+        A value that cannot be parsed is ignored with a warning.
         This is supported since community.general 13.3.0.
     default: 8500
   scheme:
@@ -32,7 +34,8 @@ options:
         connections.
       - If unset, a C(true) value in the E(CONSUL_HTTP_SSL) environment variable selects V(https), otherwise the scheme component
         of E(CONSUL_HTTP_ADDR) is used when set. A C(false) E(CONSUL_HTTP_SSL) does not downgrade an V(https) scheme in
-        E(CONSUL_HTTP_ADDR). This is supported since community.general 13.3.0.
+        E(CONSUL_HTTP_ADDR). An E(CONSUL_HTTP_SSL) value that is not a valid boolean is treated as C(true) with a warning.
+        This is supported since community.general 13.3.0.
     default: http
     type: str
   validate_certs:

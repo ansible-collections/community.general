@@ -13,11 +13,13 @@ import json
 import os
 import re
 import typing as t
+from functools import lru_cache
 from http import HTTPStatus
 from urllib import error as urllib_error
 from urllib.parse import ParseResult, quote, urlencode, urlparse
 
 from ansible.module_utils.basic import AnsibleFallbackNotFound
+from ansible.module_utils.common.warnings import warn
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.module_utils.urls import open_url
 
@@ -54,31 +56,45 @@ def handle_consul_response_error(response):
         raise RequestError(f"{response.status_code} {response.content}")
 
 
+@lru_cache(maxsize=None)
+def _parse_addr(addr: str) -> ParseResult | None:
+    # Cached per address so the warning below fires once even though the host,
+    # port and scheme fallbacks each parse the variable independently.
+    try:
+        # CONSUL_HTTP_ADDR accepts both host:port and scheme://host:port.
+        # urlparse needs the leading // to treat the former as a netloc.
+        parsed = urlparse(addr if "://" in addr else "//" + addr)
+        # The variable may be set for the consul CLI, which also accepts unix://
+        # sockets, path prefixes, credentials and query strings. The modules
+        # cannot honor those faithfully, so such addresses are ignored rather
+        # than half-used, keeping playbooks that never relied on the variable
+        # working as before.
+        if parsed.scheme and parsed.scheme not in ("http", "https"):
+            return None
+        if parsed.path and parsed.path != "/":
+            return None
+        if parsed.query or parsed.fragment or parsed.username is not None:
+            return None
+        if not parsed.hostname:
+            return None
+        # A mangled netloc (unbracketed IPv6, garbage port) must never hand
+        # out any component, so trigger port validation here for every
+        # consumer.
+        parsed.port  # noqa: B018
+    except ValueError:
+        # Fallbacks may only raise AnsibleFallbackNotFound, anything else
+        # escapes ansible-core's argument handling as a traceback. Warn
+        # without echoing the value, which may embed credentials.
+        warn("The value of the CONSUL_HTTP_ADDR environment variable cannot be parsed and is ignored")
+        return None
+    return parsed
+
+
 def parse_consul_http_addr() -> ParseResult | None:
     addr = os.environ.get("CONSUL_HTTP_ADDR", "").strip()
     if not addr:
         return None
-    # CONSUL_HTTP_ADDR accepts both host:port and scheme://host:port.
-    # urlparse needs the leading // to treat the former as a netloc.
-    parsed = urlparse(addr if "://" in addr else "//" + addr)
-    # The variable may be set for the consul CLI, which also accepts unix://
-    # sockets, path prefixes, credentials and query strings. The modules cannot
-    # honor those faithfully, so such addresses are ignored rather than
-    # half-used, keeping playbooks that never relied on the variable working as
-    # before.
-    if parsed.scheme and parsed.scheme not in ("http", "https"):
-        return None
-    if parsed.path and parsed.path != "/":
-        return None
-    if parsed.query or parsed.fragment or parsed.username is not None:
-        return None
-    try:
-        # A mangled netloc (unbracketed IPv6, garbage port) must never hand
-        # out any component, so validate the port here for every consumer.
-        parsed.port  # noqa: B018
-    except ValueError as exc:
-        raise ValueError(f"CONSUL_HTTP_ADDR ({addr}) contains an invalid port") from exc
-    return parsed
+    return _parse_addr(addr)
 
 
 def env_consul_host(*args: t.Any, **kwargs: t.Any) -> str:
@@ -104,8 +120,13 @@ def env_consul_scheme(*args: t.Any, **kwargs: t.Any) -> str:
     if tls:
         try:
             use_tls = boolean(tls, strict=True)
-        except (TypeError, ValueError) as exc:
-            raise ValueError(f"CONSUL_HTTP_SSL ({tls}) is not a valid boolean") from exc
+        except (TypeError, ValueError):
+            # Fallbacks may only raise AnsibleFallbackNotFound, so this cannot
+            # fail the module. Assume TLS rather than plaintext: the safe
+            # failure mode is a refused connection, not a token sent over
+            # http. Like above, do not echo the value.
+            warn("The value of the CONSUL_HTTP_SSL environment variable is not a valid boolean and is treated as true")
+            use_tls = True
         if use_tls:
             return "https"
     parsed = parse_consul_http_addr()
