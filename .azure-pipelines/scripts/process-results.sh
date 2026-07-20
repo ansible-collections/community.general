@@ -19,7 +19,7 @@ if compgen -G "${output_path}"'/junit/*.xml' > /dev/null; then
     echo "##vso[task.setVariable variable=haveTestResults]true"
 fi
 
-if compgen -G "${output_path}"'/bot/ansible-test-*' > /dev/null; then
+if compgen -G "${output_path}"'/bot/ansible-test-*.json' > /dev/null; then
     echo "##vso[task.setVariable variable=haveBotResults]true"
 fi
 
