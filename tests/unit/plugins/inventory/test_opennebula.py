@@ -107,6 +107,7 @@ def get_vm_pool():
             "ETIME": 0,
             "GID": 132,
             "GNAME": "CSApparelVDC",
+            "UNAME": "sam-admin",
             "HISTORY_RECORDS": HistoryRecords(),
             "ID": 7157,
             "LAST_POLL": 1632762935,
@@ -163,6 +164,7 @@ def get_vm_pool():
             "ETIME": 0,
             "GID": 0,
             "GNAME": "oneadmin",
+            "UNAME": "oneadmin",
             "HISTORY_RECORDS": [],
             "ID": 327,
             "LAST_POLL": 1632763543,
@@ -238,6 +240,7 @@ def get_vm_pool():
             "ETIME": 0,
             "GID": 0,
             "GNAME": "oneadmin",
+            "UNAME": "gitlab-admin",
             "HISTORY_RECORDS": [],
             "ID": 107,
             "LAST_POLL": 1632764186,
@@ -296,6 +299,7 @@ options_base_test = {
     "api_password": "password",
     "api_authfile": "~/.one/one_auth",
     "hostname": "v4_first_ip",
+    "prefer_existing_ansible_host": False,
     "group_by_labels": True,
     "filter_by_label": None,
     "filters": None,
@@ -427,6 +431,102 @@ def test_populate(inventory, mocker):
 
     # check for custom ssh port
     assert host_gitlab.get_vars()["ansible_port"] == "8822"
+
+
+def test_populate_uname_gname(inventory, mocker):
+    inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool)
+    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(options_base_test))
+    inventory._populate()
+
+    host_sam = inventory.inventory.get_host("sam-691-sam")
+    host_zabbix = inventory.inventory.get_host("zabbix-327")
+
+    assert host_sam.get_vars()["UNAME"] == "sam-admin"
+    assert host_sam.get_vars()["GNAME"] == "CSApparelVDC"
+    assert host_zabbix.get_vars()["UNAME"] == "oneadmin"
+    assert host_zabbix.get_vars()["GNAME"] == "oneadmin"
+
+
+def test_populate_hostname_name(inventory, mocker):
+    opts = options_base_test.copy()
+    opts["hostname"] = "name"
+    inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool)
+    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(opts))
+    inventory._populate()
+
+    host_sam = inventory.inventory.get_host("sam-691-sam")
+    assert "ansible_host" not in host_sam.get_vars()
+
+
+def test_populate_respects_existing_ansible_host(inventory, mocker):
+    opts = options_base_test.copy()
+    opts["hostname"] = "v4_first_ip"
+    opts["prefer_existing_ansible_host"] = True
+    inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool)
+    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(opts))
+
+    inventory.inventory.add_host("sam-691-sam")
+    inventory.inventory.set_variable("sam-691-sam", "ansible_host", "10.99.99.99")
+
+    inventory._populate()
+
+    host_sam = inventory.inventory.get_host("sam-691-sam")
+    assert host_sam.get_vars()["ansible_host"] == "10.99.99.99"
+
+    host_zabbix = inventory.inventory.get_host("zabbix-327")
+    assert host_zabbix.get_vars()["ansible_host"] == "185.165.1.1"
+
+
+def test_populate_overwrites_existing_ansible_host_by_default(inventory, mocker):
+    opts = options_base_test.copy()
+    opts["hostname"] = "v4_first_ip"
+    inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool)
+    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(opts))
+
+    inventory.inventory.add_host("sam-691-sam")
+    inventory.inventory.set_variable("sam-691-sam", "ansible_host", "10.99.99.99")
+
+    inventory._populate()
+
+    host_sam = inventory.inventory.get_host("sam-691-sam")
+    assert host_sam.get_vars()["ansible_host"] == "172.22.4.187"
+
+
+def test_populate_vm_without_nic(inventory, mocker):
+    vm_pool = type("pyone.bindings.VM_POOLSub", (object,), {"VM": []})()
+    vm = type(
+        "pyone.bindings.VMType90Sub",
+        (object,),
+        {
+            "DEPLOY_ID": "one-999",
+            "ETIME": 0,
+            "GID": 0,
+            "GNAME": "oneadmin",
+            "UNAME": "testuser",
+            "HISTORY_RECORDS": [],
+            "ID": 999,
+            "LAST_POLL": 0,
+            "LCM_STATE": 3,
+            "MONITORING": {},
+            "NAME": "no-nic-vm",
+            "RESCHED": 0,
+            "SNAPSHOTS": [],
+            "STATE": 3,
+            "STIME": 0,
+            "TEMPLATE": OrderedDict({}),
+            "USER_TEMPLATE": OrderedDict({"HYPERVISOR": "kvm"}),
+        },
+    )()
+    vm_pool.VM.append(vm)
+
+    inventory._get_vm_pool = mocker.MagicMock(return_value=vm_pool)
+    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(options_base_test))
+    inventory._populate()
+
+    host = inventory.inventory.get_host("no-nic-vm")
+    assert host is not None
+    assert host.get_vars()["v4_first_ip"] is False
+    assert host.get_vars()["v6_first_ip"] is False
 
 
 def test_populate_filters(inventory, mocker):
