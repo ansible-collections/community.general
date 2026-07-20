@@ -56,7 +56,7 @@ def handle_consul_response_error(response):
         raise RequestError(f"{response.status_code} {response.content}")
 
 
-@lru_cache(maxsize=None)
+@lru_cache
 def _parse_addr(addr: str) -> ParseResult | None:
     # Cached per address so the warning below fires once even though the host,
     # port and scheme fallbacks each parse the variable independently.
