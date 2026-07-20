@@ -193,6 +193,7 @@ def test_nonempty_env_fallback_unset(monkeypatch, env, names):
 # The cases below run the spec through ansible-core's own argument handling,
 # pinning the fallback contract itself rather than the callables in isolation.
 
+
 def validate_spec():
     return ModuleArgumentSpecValidator(_consul.AUTH_ARGUMENTS_SPEC).validate({})
 
