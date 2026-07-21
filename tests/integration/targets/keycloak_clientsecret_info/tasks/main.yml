@@ -29,7 +29,7 @@
   register: fetch_by_client_id_result
 
 - name: Assert that the client secret was retrieved
-  assert:
+  ansible.builtin.assert:
     that:
       - fetch_by_client_id_result.clientsecret_info.type == "secret"
       - fetch_by_client_id_result.clientsecret_info.value | length >= 32
@@ -43,6 +43,6 @@
   register: fetch_by_id_result
 
 - name: Assert that the same client secret was retrieved both times
-  assert:
+  ansible.builtin.assert:
     that:
       - fetch_by_id_result.clientsecret_info.value == fetch_by_client_id_result.clientsecret_info.value

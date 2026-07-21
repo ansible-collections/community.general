@@ -25,7 +25,7 @@
   register: emptypids
 
 - name: "Verify that the list of Process IDs (PIDs) returned is empty"
-  assert:
+  ansible.builtin.assert:
     that:
       - emptypids is not changed
       - emptypids.pids == []
@@ -99,7 +99,7 @@
     var: result.stdout_lines
 
 - name: "Verify that the Process IDs (PIDs) returned is not empty and also equal to the PIDs obtained in console"
-  assert:
+  ansible.builtin.assert:
     that:
       - "pids.pids | join(' ')  == newpid.content | b64decode | trim"
       - "pids.pids | length > 0"
@@ -115,6 +115,6 @@
   ignore_errors: true
 
 - name: "Verify that bad input pattern result is failed"
-  assert:
+  ansible.builtin.assert:
     that:
       - bad_pattern_result is failed

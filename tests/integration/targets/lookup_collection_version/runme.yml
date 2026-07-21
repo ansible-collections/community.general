@@ -6,7 +6,7 @@
 - hosts: localhost
   tasks:
     - name: Test collection_version
-      assert:
+      ansible.builtin.assert:
         that:
           # Collection that does not exist
           - query('community.general.collection_version', 'foo.bar') == [none]
@@ -34,7 +34,7 @@
       register: invalid_fqcn
 
     - name: Validate error message
-      assert:
+      ansible.builtin.assert:
         that:
           - >
             '"foo.bar.baz" is not a FQCN' in invalid_fqcn.msg

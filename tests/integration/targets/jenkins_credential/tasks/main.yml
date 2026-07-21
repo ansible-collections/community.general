@@ -17,7 +17,7 @@
   register: token_result
 
 - name: Assert token and tokenUuid are returned
-  assert:
+  ansible.builtin.assert:
     that:
       - token_result.token is defined
       - token_result.token_uuid is defined
@@ -67,7 +67,7 @@
   register: delete_token_result
 
 - name: Assert token deletion
-  assert:
+  ansible.builtin.assert:
     that:
       - delete_token_result.changed is true
     fail_msg: "Token deletion failed"

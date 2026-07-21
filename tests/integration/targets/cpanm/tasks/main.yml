@@ -31,7 +31,7 @@
   register: install_perl_package_result
 
 - name: assert package is installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_perl_package_result is changed
       - install_perl_package_result is not failed
@@ -43,7 +43,7 @@
   register: install_same_perl_package_result
 
 - name: assert same package is installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_same_perl_package_result is not changed
       - install_same_perl_package_result is not failed
@@ -57,7 +57,7 @@
   register: install_perl_package_with_version_op_result
 
 - name: assert package with version operator is installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_perl_package_with_version_op_result is changed
       - install_perl_package_with_version_op_result is not failed

@@ -58,7 +58,7 @@
         path: "{{ remote_dir }}/node_modules/.bin"
       register: npm_dotbin_folder_enabled
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - npm_install_no_bin_links_disabled is success
           - npm_install_no_bin_links_disabled is changed

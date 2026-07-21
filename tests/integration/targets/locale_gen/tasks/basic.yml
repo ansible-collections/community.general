@@ -19,7 +19,7 @@
   ignore_errors: true
 
 - name: Make sure the locale is not present {{ locale_basic.localegen }}
-  assert:
+  ansible.builtin.assert:
     that:
       - locale_basic.skip_removal or locale_basic.locales | intersect(cleaned.stdout_lines) == []
 
@@ -35,7 +35,7 @@
   ignore_errors: true
 
 - name: Make sure the locale is present and we say we installed it {{ locale_basic.localegen }}
-  assert:
+  ansible.builtin.assert:
     that:
       - locale_basic.locales | intersect(post_check_output_present.stdout_lines) != []
       - locale_basic.skip_removal or output_present is changed
@@ -52,7 +52,7 @@
   ignore_errors: true
 
 - name: Make sure the locale is present and we reported no change {{ locale_basic.localegen }}
-  assert:
+  ansible.builtin.assert:
     that:
       - locale_basic.locales | intersect(post_check_output_present_idempotent.stdout_lines) != []
       - output_present_idempotent is not changed
@@ -72,7 +72,7 @@
       ignore_errors: true
 
     - name: Make sure the locale is absent and we reported a change {{ locale_basic.localegen }}
-      assert:
+      ansible.builtin.assert:
         that:
           - locale_basic.locales | intersect(post_check_output_absent.stdout_lines) == []
           - output_absent is changed
@@ -89,7 +89,7 @@
       ignore_errors: true
 
     - name: Make sure the locale is absent and we reported no change {{ locale_basic.localegen }}
-      assert:
+      ansible.builtin.assert:
         that:
           - locale_basic.locales | intersect(post_check_output_absent_idempotent.stdout_lines) == []
           - output_absent_idempotent is not changed

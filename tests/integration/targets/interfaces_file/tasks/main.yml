@@ -22,7 +22,7 @@
     value: 1.2.3.5
   register: ifile_1
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ifile_1 is changed
 
@@ -34,7 +34,7 @@
     value: 1.2.3.5
   register: ifile_2
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ifile_2 is not changed
 
@@ -62,7 +62,7 @@
   register: ifile_3841_b
 
 - name: 3841 - check assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - ifile_3841_a is changed
       - ifile_3841_b is not changed
@@ -93,7 +93,7 @@
   register: content_7610
 
 - name: 7610 - check assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - content_7610.content | b64decode == expected_content
   vars:
@@ -115,7 +115,7 @@
   register: content_7610
 
 - name: 7610 - check assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - content_7610.content | b64decode == expected_content
   vars:

@@ -9,6 +9,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: test dict_kv filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('value' | community.general.dict_kv('key')) == {'key': 'value'}"

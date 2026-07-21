@@ -22,7 +22,7 @@
   register: install_status
 
 - name: Ensure the app is uninstalled
-  assert:
+  ansible.builtin.assert:
     that:
       - install_status.stat.exists == false
 
@@ -39,7 +39,7 @@
   check_mode: true
 
 - name: Ensure that the status would have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_check is changed
       - install_check.msg == "Installed 1 app(s)"
@@ -50,7 +50,7 @@
   register: install_status
 
 - name: Ensure the app is not yet installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_status.stat.exists == false
 
@@ -61,7 +61,7 @@
   register: install
 
 - name: Ensure that the status changed
-  assert:
+  ansible.builtin.assert:
     that:
       - install is changed
       - install.msg == "Installed 1 app(s)"
@@ -72,7 +72,7 @@
   register: install_status
 
 - name: Ensure the app is installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_status.stat.exists == true
 
@@ -87,7 +87,7 @@
   register: install_again
 
 - name: Ensure that the status is unchanged (already installed)
-  assert:
+  ansible.builtin.assert:
     that:
       - install_again is not changed
       - "'msg' not in install_again"
@@ -102,7 +102,7 @@
   check_mode: true
 
 - name: Ensure that the status would have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - uninstall_check is changed
       - uninstall_check.msg == "Uninstalled 1 app(s)"
@@ -113,7 +113,7 @@
   register: install_status
 
 - name: Ensure the app is not yet uninstalled
-  assert:
+  ansible.builtin.assert:
     that:
       - install_status.stat.exists == true
 
@@ -125,7 +125,7 @@
   become: true
 
 - name: Ensure that the status changed
-  assert:
+  ansible.builtin.assert:
     that:
       - uninstall is changed
       - uninstall.msg == "Uninstalled 1 app(s)"
@@ -136,7 +136,7 @@
   register: uninstall_status
 
 - name: Ensure the app is uninstalled
-  assert:
+  ansible.builtin.assert:
     that:
       - uninstall_status.stat.exists == false
 
@@ -152,7 +152,7 @@
   become: true
 
 - name: Ensure that the status is unchanged (already uninstalled)
-  assert:
+  ansible.builtin.assert:
     that:
       - uninstall_again is not changed
       - "'msg' not in uninstall_again"

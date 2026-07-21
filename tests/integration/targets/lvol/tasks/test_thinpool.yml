@@ -13,7 +13,7 @@
   register: thinpool_pct_vg_create
 
 - name: Assert thin pool with percentage of VG created
-  assert:
+  ansible.builtin.assert:
     that:
       - thinpool_pct_vg_create is success
       - thinpool_pct_vg_create is changed
@@ -26,7 +26,7 @@
   register: thinpool_pct_vg_idempotent
 
 - name: Assert thin pool with percentage of VG creation is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - thinpool_pct_vg_idempotent is success
       - thinpool_pct_vg_idempotent is not changed
@@ -39,7 +39,7 @@
   register: thinpool_pct_free_create
 
 - name: Assert thin pool with percentage of free space created
-  assert:
+  ansible.builtin.assert:
     that:
       - thinpool_pct_free_create is success
       - thinpool_pct_free_create is changed
@@ -52,7 +52,7 @@
   register: thinpool_abs_create
 
 - name: Assert thin pool with absolute size created
-  assert:
+  ansible.builtin.assert:
     that:
       - thinpool_abs_create is success
       - thinpool_abs_create is changed
@@ -66,7 +66,7 @@
   register: thinpool_abs_idempotent
 
 - name: Assert thin pool with absolute size creation is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - thinpool_abs_idempotent is success
       - thinpool_abs_idempotent is not changed
@@ -80,7 +80,7 @@
   register: thinvol_create
 
 - name: Assert thin volume created
-  assert:
+  ansible.builtin.assert:
     that:
       - thinvol_create is success
       - thinvol_create is changed
@@ -95,7 +95,7 @@
   register: thinvol_idempotent
 
 - name: Assert thin volume creation is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - thinvol_idempotent is success
       - thinvol_idempotent is not changed

@@ -37,7 +37,7 @@
   register: pretest_2
 
 - name: Archive - validate pre-test
-  assert:
+  ansible.builtin.assert:
     that:
       - pretest_1 is changed
       - pretest_2 is not changed

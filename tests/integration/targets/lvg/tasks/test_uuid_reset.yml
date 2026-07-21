@@ -34,7 +34,7 @@
   register: new_pv_uuid_cmd_result
 
 - name: Do all assertions to verify expected results
-  assert:
+  ansible.builtin.assert:
     that:
       - vg_uuid_reset is changed
       - orig_vg_uuid_cmd_result.stdout != new_vg_uuid_cmd_result.stdout
@@ -62,7 +62,7 @@
   register: repeat_pv_uuid_cmd_result
 
 - name: Do all assertions to verify expected results
-  assert:
+  ansible.builtin.assert:
     that:
       - repeat_vg_uuid_reset is changed
       - repeat_pv_uuid_reset is changed
@@ -93,7 +93,7 @@
   register: check_mode_pv_uuid_cmd_result
 
 - name: Do all assertions to verify expected results
-  assert:
+  ansible.builtin.assert:
     that:
       - check_mode_vg_uuid_reset is changed
       - check_mode_pv_uuid_reset is changed

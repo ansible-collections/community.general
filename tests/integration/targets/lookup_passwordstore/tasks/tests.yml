@@ -121,7 +121,7 @@
   register: eval_error
 
 - name: Make sure reading from non-existent passwordstore location failed
-  assert:
+  ansible.builtin.assert:
     that:
       - eval_error is failed
       - >-
@@ -155,7 +155,7 @@
         PATH: "/tmp"
 
     - name: Verify password received from shim
-      assert:
+      ansible.builtin.assert:
         that:
           - newpass == "shim_ok"
 
@@ -164,7 +164,7 @@
         newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
     - name: Verify password received from shim
-      assert:
+      ansible.builtin.assert:
         that:
           - newpass == "shim_ok"
 
@@ -218,7 +218,7 @@
         newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
     - name: Verify password received from gopass mock
-      assert:
+      ansible.builtin.assert:
         that:
           - newpass == "gopass_ok"
 

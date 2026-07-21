@@ -26,7 +26,7 @@
       debug:
         var: modules_after
     - name: ensure that all test modules are disabled again
-      assert:
+      ansible.builtin.assert:
         that: modules_before.stdout == modules_after.stdout
   when: ansible_facts.os_family in ['Debian', 'Suse']
   # CentOS/RHEL does not have a2enmod/a2dismod

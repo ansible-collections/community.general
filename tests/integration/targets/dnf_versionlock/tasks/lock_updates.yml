@@ -22,7 +22,7 @@
         state: clean
       register: clear_locklist
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - clear_locklist.locklist_post | length == 0
 
@@ -32,7 +32,7 @@
         state: present
       register: lock_packages
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - lock_packages is changed
           - (lock_packages.locklist_post | length) <= (_packages | length)
@@ -44,7 +44,7 @@
       register: update_locked_packages
       changed_when: '"Nothing to do" not in update_locked_packages.stdout'
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_locked_packages is not changed
 
@@ -54,7 +54,7 @@
         state: absent
       register: unlock_packages
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - unlock_packages is changed
           - unlock_packages.locklist_post | length == 0
@@ -66,7 +66,7 @@
       check_mode: true
       register: update_packages
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - update_packages is changed
 

@@ -23,7 +23,7 @@
   register: check_mode_test
 
 - name: Test that check mode is working
-  assert:
+  ansible.builtin.assert:
     that:
       - check_mode_test is changed
 
@@ -37,7 +37,7 @@
   register: soft_limit_test
 
 - name: Check if changes are made
-  assert:
+  ansible.builtin.assert:
     that:
       - soft_limit_test is changed
 
@@ -51,7 +51,7 @@
   register: soft_limit_test
 
 - name: Check if changes are not made idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not soft_limit_test.changed
 
@@ -70,7 +70,7 @@
     msg: "{{ hard_limit_test }}"
 
 - name: Check if changes made
-  assert:
+  ansible.builtin.assert:
     that:
       - hard_limit_test is changed
       - hard_limit_test.diff.after is defined
@@ -87,6 +87,6 @@
   register: comment_test
 
 - name: Check if changes made
-  assert:
+  ansible.builtin.assert:
     that:
       - comment_test is changed

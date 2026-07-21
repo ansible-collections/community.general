@@ -27,7 +27,7 @@
   register: get_result3
 
 - name: assert value is correct
-  assert:
+  ansible.builtin.assert:
     that:
       - get_result1.config_value == "foobar"
       - 'get_result1.config_values == {"user.name": ["foobar"]}'

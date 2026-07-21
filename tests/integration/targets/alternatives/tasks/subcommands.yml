@@ -15,7 +15,7 @@
   register: alternative
 
 - name: Check expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is changed'
 
@@ -24,7 +24,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy1"
 
@@ -33,7 +33,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy2"
 
@@ -54,7 +54,7 @@
   register: alternative
 
 - name: Check expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is not changed'
 
@@ -63,7 +63,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy2"
 
@@ -76,7 +76,7 @@
   register: alternative
 
 - name: Check expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is changed'
 
@@ -86,7 +86,7 @@
   ignore_errors: true
 
 - name: Ensure that the subcommand is gone
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.rc == 2
       - '"No such file" in cmd.msg or "Error executing command." == cmd.msg'
@@ -112,7 +112,7 @@
   register: alternative
 
 - name: Check expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is changed'
 
@@ -121,7 +121,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy3"
 
@@ -130,7 +130,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy4"
 
@@ -150,7 +150,7 @@
   register: alternative
 
 - name: Check expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is changed'
 
@@ -159,7 +159,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy1"
 
@@ -169,7 +169,7 @@
   ignore_errors: true
 
 - name: Ensure that the subcommand is gone
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.rc == 2
       - '"No such file" in cmd.msg or "Error executing command." == cmd.msg'
@@ -190,7 +190,7 @@
   register: alternative
 
 - name: Check expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is changed'
 
@@ -199,7 +199,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy3"
 
@@ -208,7 +208,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy4"
 

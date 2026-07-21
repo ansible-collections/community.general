@@ -33,7 +33,7 @@
 
 - debug: var=first_page
 
-- assert:
+- ansible.builtin.assert:
     that:
       - first_page is success
 
@@ -47,11 +47,11 @@
 
 - debug: var=second_page
 
-- assert:
+- ansible.builtin.assert:
     that:
       - second_page is success
 
-- assert:
+- ansible.builtin.assert:
     that:
       - first_page.scaleway_server_info[0].id != second_page.scaleway_server_info[0].id
 

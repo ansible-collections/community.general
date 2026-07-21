@@ -18,7 +18,7 @@
   register: result
 
 - name: Assert that image is present
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -34,7 +34,7 @@
   register: result
 
 - name: Assert that image is present
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -47,7 +47,7 @@
   register: result
 
 - name: Assert that image is present
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -59,7 +59,7 @@
   register: result
 
 - name: Assert that images are present
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -72,7 +72,7 @@
   register: result
 
 - name: Assert that images are present
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -85,7 +85,7 @@
   register: result
 
 - name: Assert that images are present
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -100,7 +100,7 @@
   register: result
 
 - name: Assert that image is cloned
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -115,7 +115,7 @@
   register: result
 
 - name: Assert that image is cloned
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -129,7 +129,7 @@
   register: result
 
 - name: Assert that network is disabled
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -143,7 +143,7 @@
   register: result
 
 - name: Assert that network is enabled
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -157,7 +157,7 @@
   register: result
 
 - name: Assert that network is persistent
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -171,7 +171,7 @@
   register: result
 
 - name: Assert that network is non-persistent
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -187,6 +187,6 @@
   ignore_errors: true
 
 - name: Assert that network not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed

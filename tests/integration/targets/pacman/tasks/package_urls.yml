@@ -184,7 +184,7 @@
           - '{{url_pkg_url}}'
       register: uninstall_3c
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - install_1 is changed
           - install_1.msg == 'Would have installed 3 packages'

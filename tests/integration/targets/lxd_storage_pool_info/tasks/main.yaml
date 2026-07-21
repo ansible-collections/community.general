@@ -12,7 +12,7 @@
   register: pool_info_all
 
 - name: Verify pools information was retrieved
-  assert:
+  ansible.builtin.assert:
     that:
       - pool_info_all is not changed
       - pool_info_all is success
@@ -25,7 +25,7 @@
   register: pool_info_default
 
 - name: Verify default pool information
-  assert:
+  ansible.builtin.assert:
     that:
       - pool_info_default is not changed
       - pool_info_default is success
@@ -39,7 +39,7 @@
   register: pool_info_dir
 
 - name: Verify type filtering works
-  assert:
+  ansible.builtin.assert:
     that:
       - pool_info_dir is not changed
       - pool_info_dir is success
@@ -52,7 +52,7 @@
   ignore_errors: true
 
 - name: Verify error handling for non-existent pool
-  assert:
+  ansible.builtin.assert:
     that:
       - pool_info_nonexistent is failed
 
@@ -62,7 +62,7 @@
   register: pool_info_check
 
 - name: Verify check mode works
-  assert:
+  ansible.builtin.assert:
     that:
       - pool_info_check is not changed
       - pool_info_check is success

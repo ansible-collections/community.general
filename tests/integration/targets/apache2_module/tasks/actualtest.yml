@@ -16,7 +16,7 @@
   register: disable
 
 - name: ensure community.general.apache2_module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - disable is not changed
 
@@ -27,7 +27,7 @@
   register: enable
 
 - name: ensure changed on successful enable
-  assert:
+  ansible.builtin.assert:
     that:
       - enable is changed
 
@@ -38,7 +38,7 @@
   register: enabletwo
 
 - name: ensure community.general.apache2_module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - 'not enabletwo.changed'
 
@@ -49,7 +49,7 @@
   register: disablefinal
 
 - name: ensure changed on successful disable
-  assert:
+  ansible.builtin.assert:
     that:
       - 'disablefinal.changed'
 
@@ -127,7 +127,7 @@
         identifier: dumpio_module
         state: absent
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - enable_dumpio_wrong is failed
           - enable_dumpio_correct_1 is changed
@@ -151,7 +151,7 @@
       register: enabledmpmevent
 
     - name: ensure changed mpm_event
-      assert:
+      ansible.builtin.assert:
         that:
           - 'enabledmpmevent.changed'
 
@@ -173,7 +173,7 @@
       register: enabledmpmworker
 
     - name: ensure mpm_worker unchanged
-      assert:
+      ansible.builtin.assert:
         that:
           - 'not enabledmpmworker.changed'
 
@@ -189,7 +189,7 @@
       register: remove_with_configcheck
 
     - name: ensure configcheck fails task with when run without mpm modules
-      assert:
+      ansible.builtin.assert:
         that:
           - item is failed
       with_items: "{{ remove_with_configcheck.results }}"

@@ -30,7 +30,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_namespaced_element is not changed
       - comparison is not changed  # identical

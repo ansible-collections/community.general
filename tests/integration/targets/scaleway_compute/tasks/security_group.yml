@@ -34,7 +34,7 @@
 
     - debug: var=server_creation_check_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - server_creation_check_task is success
           - server_creation_check_task is changed
@@ -54,7 +54,7 @@
 
     - debug: var=server_creation_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - server_creation_task is success
           - server_creation_task is changed
@@ -74,7 +74,7 @@
 
     - debug: var=server_creation_confirmation_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - server_creation_confirmation_task is success
           - server_creation_confirmation_task is not changed
@@ -95,7 +95,7 @@
 
     - debug: var=server_creation_confirmation_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - server_creation_confirmation_task is success
           - server_creation_confirmation_task is not changed
@@ -114,7 +114,7 @@
 
     - debug: var=server_creation_confirmation_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - server_creation_confirmation_task is success
           - server_creation_confirmation_task is not changed
@@ -134,7 +134,7 @@
 
     - debug: var=server_destroy_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - server_destroy_task is success
           - server_destroy_task is changed

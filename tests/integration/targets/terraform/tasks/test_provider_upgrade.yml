@@ -31,5 +31,5 @@
     state: present
   register: terraform_init_result
 
-- assert:
+- ansible.builtin.assert:
     that: terraform_init_result is not failed

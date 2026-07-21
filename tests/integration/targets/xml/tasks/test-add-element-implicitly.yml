@@ -110,7 +110,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - comparison is not changed  # identical
   # command: diff -u {{ role_path }}/results/test-add-element-implicitly.xml /tmp/ansible-xml-beers-implicit.xml

@@ -57,7 +57,7 @@
   shell: ufw status |grep -E '(ALLOW|DENY|REJECT|LIMIT)' |sed -E 's/[ \t]+/ /g'
   register: ufw_status
 
-- assert:
+- ansible.builtin.assert:
     that:
       - '"8.8.8.8 2222/tcp on bar ALLOW FWD 1.1.1.1 1111/tcp on foo " in stdout'
       - '"Anywhere ALLOW FWD 1.1.1.1 1111/tcp on foo " in stdout'
@@ -80,7 +80,7 @@
   ignore_errors: true
   register: ufw_non_route_iface
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ufw_non_route_iface is failed
       - '"Only route rules" in ufw_non_route_iface.msg'

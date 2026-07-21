@@ -18,7 +18,7 @@
     var: security_groups
 
 - name: Ensure retrieval of security groups info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - security_groups is success
 
@@ -32,6 +32,6 @@
     var: ams1_security_groups
 
 - name: Ensure retrieval of security groups info is success (AMS1)
-  assert:
+  ansible.builtin.assert:
     that:
       - ams1_security_groups is success

@@ -11,7 +11,7 @@
   register: count_result
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - count_result is not changed
       - count_result.count == 3
@@ -24,7 +24,7 @@
   register: text_result
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - text_result is not changed
       - text_result.count == 1
@@ -39,7 +39,7 @@
   register: match_result
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - match_result is not changed
       - match_result.count == 3

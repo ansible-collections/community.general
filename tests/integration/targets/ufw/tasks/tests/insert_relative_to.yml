@@ -69,7 +69,7 @@
   # to ignore these, the extra filtering (grepping for DENY and the regex) makes
   # sure to remove all rules not added here.
   register: ufw_status
-- assert:
+- ansible.builtin.assert:
     that:
       - ufw_status.stdout_lines == expected_stdout
   vars:

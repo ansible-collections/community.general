@@ -21,7 +21,7 @@
     state: args_absent
   register: pamd_file_output
 - name: Check if changes made
-  assert:
+  ansible.builtin.assert:
     that:
       - pamd_file_output is changed
 
@@ -42,7 +42,7 @@
 - name: Check if changes made (3260)
   vars:
     line_array: "{{ (pamd_file_slurp_noargs.content|b64decode).split('\n')[2].split() }}"
-  assert:
+  ansible.builtin.assert:
     that:
       - pamd_file_output_noargs is changed
       - line_array == ['session', 'required', 'pam_lastlog.so']
@@ -68,7 +68,7 @@
     src: "{{ test_pamd_file }}"
   register: pamd_file_slurp
 - name: Check if changes made
-  assert:
+  ansible.builtin.assert:
     that:
       - pamd_file_output_empty is not changed
       - pamd_file_slurp.content|b64decode == ''

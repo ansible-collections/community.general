@@ -29,7 +29,7 @@
   register: regenerate_by_client_id
 
 - name: Assert that the client secret was retrieved
-  assert:
+  ansible.builtin.assert:
     that:
       - regenerate_by_client_id.end_state.type == "secret"
       - regenerate_by_client_id.end_state.value | length >= 32
@@ -43,7 +43,7 @@
   register: regenerate_by_id
 
 - name: Assert that client secret was regenerated
-  assert:
+  ansible.builtin.assert:
     that:
       - regenerate_by_id.end_state.value | length >= 32
       - regenerate_by_id.end_state.value != regenerate_by_client_id.end_state.value

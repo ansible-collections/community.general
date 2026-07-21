@@ -69,7 +69,7 @@
         src: '{{ war_file_1_path }}'
       check_mode: true
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is changed
 
@@ -80,7 +80,7 @@
         path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
       ignore_errors: true
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "'is absent' in result.msg"
 
@@ -92,7 +92,7 @@
         deploy_path: '{{ deploy_dir }}'
         src: '{{ war_file_1_path }}'
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is changed
 
@@ -102,7 +102,7 @@
       file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.state == 'file'
 
@@ -115,7 +115,7 @@
         deploy_path: '{{ deploy_dir }}'
       check_mode: true
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is not changed
 
@@ -127,7 +127,7 @@
         src: '{{ war_file_1_path }}'
         deploy_path: '{{ deploy_dir }}'
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is not changed
 
@@ -137,7 +137,7 @@
       file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.state == 'file'
 
@@ -150,7 +150,7 @@
         state: absent
       check_mode: true
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is changed
 
@@ -159,7 +159,7 @@
       file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.state == 'file'
 
@@ -171,7 +171,7 @@
         deploy_path: '{{ deploy_dir }}'
         state: absent
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is changed
 
@@ -180,7 +180,7 @@
       file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.undeployed'
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result.state == 'file'
 
@@ -193,7 +193,7 @@
         state: absent
       check_mode: true
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is not changed
 
@@ -205,7 +205,7 @@
         deploy_path: '{{ deploy_dir }}'
         state: absent
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is not changed
 
@@ -219,7 +219,7 @@
         state: present
       ignore_errors: true
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is failed
           - "'Source file {{ fake_src_path }} does not exist.' in result.msg"
@@ -232,7 +232,7 @@
         state: present
       ignore_errors: true
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - result is failed
           - "'state is present but all of the following are missing: src' in result.msg"

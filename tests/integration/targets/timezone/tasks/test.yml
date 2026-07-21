@@ -14,7 +14,7 @@
   register: timezone_set_checkmode
 
 - name: ensure timezone reported as changed in checkmode
-  assert:
+  ansible.builtin.assert:
     that:
       - timezone_set_checkmode.changed
       - timezone_set_checkmode.diff.after.name == 'Australia/Brisbane'
@@ -44,7 +44,7 @@
   register: timezone_set
 
 - name: ensure timezone changed
-  assert:
+  ansible.builtin.assert:
     that:
       - timezone_set.changed
       - timezone_set.diff.after.name == 'Australia/Brisbane'
@@ -72,7 +72,7 @@
   register: timezone_again
 
 - name: ensure timezone idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not timezone_again.changed
 
@@ -82,7 +82,7 @@
   register: timezone_again_checkmode
 
 - name: set timezone idempotency (checkmode)
-  assert:
+  ansible.builtin.assert:
     that:
       - not timezone_again_checkmode.changed
 
@@ -113,7 +113,7 @@
       register: timezone_etcutc_to_utc
 
     - name: check timezone changed from Etc/UTC to UTC
-      assert:
+      ansible.builtin.assert:
         that:
           - timezone_etcutc_to_utc.changed
           - timezone_etcutc_to_utc.diff.before.name == 'Etc/UTC'
@@ -125,7 +125,7 @@
       register: timezone_utc_to_etcutc
 
     - name: check timezone changed from UTC to Etc/UTC
-      assert:
+      ansible.builtin.assert:
         that:
           - timezone_utc_to_etcutc.changed
           - timezone_utc_to_etcutc.diff.before.name == 'UTC'
@@ -153,7 +153,7 @@
       register: timezone_empty_conf
 
     - name: check if timezone set (empty config file)
-      assert:
+      ansible.builtin.assert:
         that:
           - timezone_empty_conf.changed
           - timezone_empty_conf.diff.after.name == 'Europe/Belgrade'
@@ -179,7 +179,7 @@
       register: timezone_missing_conf
 
     - name: check if timezone set (no config file)
-      assert:
+      ansible.builtin.assert:
         that:
           - timezone_missing_conf.changed
           - timezone_missing_conf.diff.after.name == 'Europe/Belgrade'
@@ -207,7 +207,7 @@
       register: timezone_symllink
 
     - name: check if timezone set (over symlink)
-      assert:
+      ansible.builtin.assert:
         that:
           - timezone_symllink.changed
           - timezone_symllink.diff.after.name == 'Europe/Belgrade'
@@ -235,7 +235,7 @@
       register: timezone_symllink_broken
 
     - name: check if timezone set (over broken symlink)
-      assert:
+      ansible.builtin.assert:
         that:
           - timezone_symllink_broken.changed
           - timezone_symllink_broken.diff.after.name == 'Europe/Belgrade'
@@ -262,7 +262,7 @@
       register: timezone_copied
 
     - name: check if timezone set (over copied file)
-      assert:
+      ansible.builtin.assert:
         that:
           - timezone_copied.changed
           - timezone_copied.diff.after.name == 'Europe/Belgrade'
@@ -309,7 +309,7 @@
       register: hwclock_set_checkmode
 
     - name: ensure hwclock reported as changed (checkmode)
-      assert:
+      ansible.builtin.assert:
         that:
           - hwclock_set_checkmode.changed
           - hwclock_set_checkmode.diff.after.hwclock == 'UTC'
@@ -331,7 +331,7 @@
       register: hwclock_set
 
     - name: ensure hwclock changed
-      assert:
+      ansible.builtin.assert:
         that:
           - hwclock_set.changed
           - hwclock_set.diff.after.hwclock == 'UTC'
@@ -351,7 +351,7 @@
       register: hwclock_again
 
     - name: set hwclock idempotency
-      assert:
+      ansible.builtin.assert:
         that:
           - not hwclock_again.changed
 
@@ -362,7 +362,7 @@
       register: hwclock_again_checkmode
 
     - name: set hwclock idempotency (checkmode)
-      assert:
+      ansible.builtin.assert:
         that:
           - not hwclock_again_checkmode.changed
 
@@ -390,7 +390,7 @@
           register: hwclock_set_utc_deleted_adjtime_and_conf
 
         - name: ensure hwclock changed with deleted /etc/adjtime and conf
-          assert:
+          ansible.builtin.assert:
             that:
               - hwclock_set_utc_deleted_adjtime_and_conf.changed
               - hwclock_set_utc_deleted_adjtime_and_conf.diff.after.hwclock == 'UTC'
@@ -414,7 +414,7 @@
           register: hwclock_set_utc_deleted_adjtime_utc
 
         - name: ensure hwclock changed with deleted /etc/adjtime
-          assert:
+          ansible.builtin.assert:
             that:
               - not hwclock_set_utc_deleted_adjtime_utc.changed
               - hwclock_set_utc_deleted_adjtime_utc.diff.after.hwclock == 'UTC'
@@ -426,7 +426,7 @@
           register: hwclock_set_local_deleted_adjtime_local
 
         - name: ensure hwclock changed to LOCAL with deleted /etc/adjtime
-          assert:
+          ansible.builtin.assert:
             that:
               - hwclock_set_local_deleted_adjtime_local.changed
               - hwclock_set_local_deleted_adjtime_local.diff.after.hwclock == 'local'
@@ -450,7 +450,7 @@
           register: hwclock_set_utc_deleted_conf
 
         - name: ensure hwclock changed with deleted /etc/adjtime
-          assert:
+          ansible.builtin.assert:
             that:
               - hwclock_set_utc_deleted_conf.changed
               - hwclock_set_utc_deleted_conf.diff.after.hwclock == 'UTC'
@@ -472,7 +472,7 @@
           register: hwclock_set_utc_broken_adjtime
 
         - name: ensure hwclock doesn't report changed with broken /etc/adjtime
-          assert:
+          ansible.builtin.assert:
             that:
               - not hwclock_set_utc_broken_adjtime.changed
               - hwclock_set_utc_broken_adjtime.diff.after.hwclock == 'UTC'
@@ -484,7 +484,7 @@
           register: hwclock_set_local_broken_adjtime
 
         - name: ensure hwclock changed to LOCAL with broken /etc/adjtime
-          assert:
+          ansible.builtin.assert:
             that:
               - hwclock_set_local_broken_adjtime.changed
               - hwclock_set_local_broken_adjtime.diff.after.hwclock == 'local'
@@ -514,7 +514,7 @@
       register: tzclock_set_checkmode
 
     - name: ensure timezone and hwclock reported as changed in checkmode
-      assert:
+      ansible.builtin.assert:
         that:
           - tzclock_set_checkmode.changed
           - tzclock_set_checkmode.diff.after.name == 'Europe/Belgrade'
@@ -555,7 +555,7 @@
       register: tzclock_set
 
     - name: ensure timezone and hwclock changed
-      assert:
+      ansible.builtin.assert:
         that:
           - tzclock_set.changed
           - tzclock_set.diff.after.name == 'Europe/Belgrade'
@@ -592,7 +592,7 @@
       register: tzclock_set_again
 
     - name: set timezone and hwclock idempotency
-      assert:
+      ansible.builtin.assert:
         that:
           - not tzclock_set_again.changed
 
@@ -603,7 +603,7 @@
       register: tzclock_set_again_checkmode
 
     - name: set timezone and hwclock idempotency in checkmode
-      assert:
+      ansible.builtin.assert:
         that:
           - not tzclock_set_again_checkmode.changed
 

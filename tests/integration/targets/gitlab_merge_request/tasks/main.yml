@@ -52,7 +52,7 @@
       register: gitlab_merge_request_create
 
     - name: Test Merge Request Created
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_merge_request_create is changed
 
@@ -74,7 +74,7 @@
       register: gitlab_merge_request_create_idempotence
 
     - name: Test module is idempotent
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_merge_request_create_idempotence is not changed
 
@@ -96,7 +96,7 @@
       register: gitlab_merge_request_udpate
 
     - name: Test merge request updated
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_merge_request_udpate.mr.labels[0] == "{{ gitlab_labels }}"
           - gitlab_merge_request_udpate.mr.assignees[0].username == "{{ gitlab_assignee_ids }}"
@@ -114,7 +114,7 @@
       register: gitlab_merge_request_delete
 
     - name: Test merge request is deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_merge_request_delete is changed
 

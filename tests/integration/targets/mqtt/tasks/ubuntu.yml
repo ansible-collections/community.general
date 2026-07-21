@@ -16,7 +16,7 @@
     client_id: me001
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
@@ -32,7 +32,7 @@
     port: 8883
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
@@ -48,7 +48,7 @@
     port: 8884
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
@@ -66,7 +66,7 @@
 #    port: 8885
 #  register: result
 
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - result is success
 
@@ -84,7 +84,7 @@
   register: result
   failed_when: result is success
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
@@ -104,7 +104,7 @@
 #  register: result
 #  failed_when: result is success
 
-# - assert:
+# - ansible.builtin.assert:
 #    that:
 #      - result is success
 
@@ -122,7 +122,7 @@
   register: result
   failed_when: result is success
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is success
 
@@ -142,6 +142,6 @@
 #  register: result
 #  failed_when: result is success
 
-# - assert:
+# - ansible.builtin.assert:
 #    that:
 #      - result is success

@@ -42,7 +42,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - set_element_first_run is changed
       - set_element_second_run is not changed

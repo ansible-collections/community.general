@@ -28,7 +28,7 @@
     state: absent
 
 - name: check assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - install_conan2 is changed
       - "'    - conan2' in install_conan2.stdout"

@@ -23,7 +23,7 @@
     path: "{{ mount_root_dir }}/preseed/ubuntu.seed"
   register: check_file
 
-- assert:
+- ansible.builtin.assert:
     that:
       - check_file.stat.exists == True
 

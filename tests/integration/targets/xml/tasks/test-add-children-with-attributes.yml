@@ -34,7 +34,7 @@
 #       So we filter the failure out for these platforms (e.g. CentOS 6)
 #       The module still works fine, we simply are not comparing as smart as we should.
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - add_children_with_attributes is changed
       - comparison is not changed  # identical

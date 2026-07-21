@@ -19,7 +19,7 @@
   register: get_all_result
 
 - name: assert unsetting muti-values
-  assert:
+  ansible.builtin.assert:
     that:
       - unset_result is changed
       - 'get_all_result.config_values == {"push.pushoption": []}'

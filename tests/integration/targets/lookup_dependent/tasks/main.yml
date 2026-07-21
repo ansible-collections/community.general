@@ -14,7 +14,7 @@
       }}
 
 - name: Check result of Test 1
-  assert:
+  ansible.builtin.assert:
     that:
       - loop_result == expected_result
   vars:
@@ -41,7 +41,7 @@
     # The last expression could have been `range(item.a, 5)`, but that's not supported by all Jinja2 versions used in CI
 
 - name: Check result of Test 2
-  assert:
+  ansible.builtin.assert:
     that:
       - loop_result == expected_result
   vars:
@@ -96,7 +96,7 @@
         - G
 
 - name: Check result of Test 3
-  assert:
+  ansible.builtin.assert:
     that:
       - (dependent.results | length) == 7
       - dependent.results[0].item.var1.key == "a"
@@ -133,7 +133,7 @@
   register: eval_error
 
 - name: Check result of Test 4
-  assert:
+  ansible.builtin.assert:
     that:
       - eval_error is failed
       - >-
@@ -149,7 +149,7 @@
   register: eval_error
 
 - name: Check result of Test 5
-  assert:
+  ansible.builtin.assert:
     that:
       - eval_error is failed
       - >-
@@ -165,7 +165,7 @@
   register: eval_error
 
 - name: Check result of Test 6
-  assert:
+  ansible.builtin.assert:
     that:
       - eval_error is failed
       - >-
@@ -180,7 +180,7 @@
   register: eval_error
 
 - name: Check result of Test 7
-  assert:
+  ansible.builtin.assert:
     that:
       - eval_error is failed
       - >-

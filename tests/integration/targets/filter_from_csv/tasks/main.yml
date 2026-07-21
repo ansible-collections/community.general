@@ -9,24 +9,24 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Parse valid csv input
-  assert:
+  ansible.builtin.assert:
     that:
       - "valid_comma_separated | community.general.from_csv  ==  expected_result"
 
 - name: Parse valid csv input containing spaces with/without skipinitialspace=True
-  assert:
+  ansible.builtin.assert:
     that:
       - "valid_comma_separated_spaces | community.general.from_csv(skipinitialspace=True)  ==  expected_result"
       - "valid_comma_separated_spaces | community.general.from_csv  !=  expected_result"
 
 - name: Parse valid csv input with no headers with/without specifying fieldnames
-  assert:
+  ansible.builtin.assert:
     that:
       - "valid_comma_separated_no_headers | community.general.from_csv(fieldnames=['id','name','role'])  ==  expected_result"
       - "valid_comma_separated_no_headers | community.general.from_csv  !=  expected_result"
 
 - name: Parse valid pipe-delimited csv input with/without delimiter=|
-  assert:
+  ansible.builtin.assert:
     that:
       - "valid_pipe_separated | community.general.from_csv(delimiter='|')  ==  expected_result"
       - "valid_pipe_separated | community.general.from_csv  !=  expected_result"
@@ -37,7 +37,7 @@
   register: _invalid_csv_strict_false
 
 - name: Test invalid csv input when strict=False is successful
-  assert:
+  ansible.builtin.assert:
     that:
       - _invalid_csv_strict_false is success
 
@@ -48,7 +48,7 @@
   ignore_errors: true
 
 - name: Test invalid csv input when strict=True is failed
-  assert:
+  ansible.builtin.assert:
     that:
       - _invalid_csv_strict_true is failed
       - _invalid_csv_strict_true.msg is search('Unable to process file:.*')

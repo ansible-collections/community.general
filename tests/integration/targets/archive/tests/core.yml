@@ -25,7 +25,7 @@
     state: file
 
 - name: Verify that archive result is changed and includes all files - no options ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_no_options is changed
       - "archive_no_options.dest_state == 'archive'"
@@ -50,7 +50,7 @@
   register: archive_file_options_stat
 
 - name: Test that the file modes were changed
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_file_options_stat is not changed
       - "archive_file_options.mode == '0600'"
@@ -74,7 +74,7 @@
   register: archive_nonascii_stat
 
 - name: Test that archive exists - non-ascii ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_nonascii is changed
       - archive_nonascii_stat.stat.exists == true
@@ -92,7 +92,7 @@
   register: archive_single_target
 
 - name: Assert archive has correct state - single target ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_single_target.dest_state == state_map[format]
   vars:
@@ -114,7 +114,7 @@
       register: archive_single_target_contents
 
     - name: Assert that file names are preserved - single target ({{ format }})
-      assert:
+      ansible.builtin.assert:
         that:
           - "'oo.txt' not in archive_single_target_contents.files"
           - "'foo.txt' in archive_single_target_contents.files"
@@ -143,7 +143,7 @@
     state: file
 
 - name: Assert that archive contains all files - path list ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_path_list is changed
       - "archive_path_list.archived | length == 3"
@@ -164,7 +164,7 @@
   register: archive_missing_paths
 
 - name: Assert that incomplete archive has incomplete state - missing paths ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_missing_paths is changed
       - "archive_missing_paths.dest_state == 'incomplete'"

@@ -13,7 +13,7 @@
   register: volume_info_all
 
 - name: Verify volumes information was retrieved
-  assert:
+  ansible.builtin.assert:
     that:
       - volume_info_all is not changed
       - volume_info_all is success
@@ -27,7 +27,7 @@
   register: volume_info_custom
 
 - name: Verify type filtering works
-  assert:
+  ansible.builtin.assert:
     that:
       - volume_info_custom is not changed
       - volume_info_custom is success
@@ -41,7 +41,7 @@
   register: volume_info_container
 
 - name: Verify container type filtering works
-  assert:
+  ansible.builtin.assert:
     that:
       - volume_info_container is not changed
       - volume_info_container is success
@@ -55,7 +55,7 @@
   when: volume_info_all.storage_volumes | length > 0
 
 - name: Verify specific volume retrieval
-  assert:
+  ansible.builtin.assert:
     that:
       - volume_info_specific is not changed
       - volume_info_specific is success
@@ -70,7 +70,7 @@
   ignore_errors: true
 
 - name: Verify error handling for non-existent pool
-  assert:
+  ansible.builtin.assert:
     that:
       - volume_info_nonexistent_pool is failed
 
@@ -82,7 +82,7 @@
   ignore_errors: true
 
 - name: Verify error handling for non-existent volume
-  assert:
+  ansible.builtin.assert:
     that:
       - volume_info_nonexistent_volume is failed
   when: volume_info_nonexistent_volume is defined
@@ -94,7 +94,7 @@
   register: volume_info_check
 
 - name: Verify check mode works
-  assert:
+  ansible.builtin.assert:
     that:
       - volume_info_check is not changed
       - volume_info_check is success

@@ -13,7 +13,7 @@
   register: get_result
 
 - name: assert value is correct
-  assert:
+  ansible.builtin.assert:
     that:
       - get_result.config_value == "merge_request.create"
       - 'get_result.config_values == {"push.pushoption": ["merge_request.create", "merge_request.draft"]}'

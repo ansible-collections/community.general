@@ -68,7 +68,7 @@
   register: result
 
 - name: "assert that creation worked"
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -121,7 +121,7 @@
   register: result
 
 - name: "assert that it updated the template"
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -171,7 +171,7 @@
   register: result
 
 - name: "assert that there was no change"
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -193,7 +193,7 @@
   register: result
 
 - name: "assert that there was no change"
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -212,7 +212,7 @@
   register: result
 
 - name: "assert that there was a change"
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -230,7 +230,7 @@
   ignore_errors: true
 
 - name: "assert that it failed because template is missing"
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
 

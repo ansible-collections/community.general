@@ -45,7 +45,7 @@
       register: gitlab_group_label_state
 
     - name: Group label - Check_mode state must be changed
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_state is changed
 
@@ -65,7 +65,7 @@
       register: gitlab_group_label_create
 
     - name: Group label - Test Label Created
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_create is changed
           - gitlab_group_label_create.labels.added|length == 2
@@ -89,7 +89,7 @@
       register: gitlab_group_label_create_idempotence
 
     - name: Group label - Test Create Label is Idempotent
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_create_idempotence is not changed
 
@@ -105,7 +105,7 @@
       register: gitlab_group_label_update
 
     - name: Group label - Test Label Updated
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_update.labels.added|length == 0
           - gitlab_group_label_update.labels.untouched|length == 0
@@ -125,7 +125,7 @@
       register: gitlab_group_label_new_name
 
     - name: Group label - Test Label name changed
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_new_name.labels.added|length == 0
           - gitlab_group_label_new_name.labels.untouched|length == 0
@@ -145,7 +145,7 @@
       register: gitlab_group_label_orig_name
 
     - name: Group label - Test Label name changed back
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_orig_name.labels.added|length == 0
           - gitlab_group_label_orig_name.labels.untouched|length == 0
@@ -166,7 +166,7 @@
       register: gitlab_group_label_update_additions
 
     - name: Group label - Test Label Updated ( Additions )
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_update_additions.labels.added|length == 0
           - gitlab_group_label_update_additions.labels.untouched|length == 0
@@ -185,7 +185,7 @@
       register: gitlab_group_label_delete
 
     - name: Group label - Test label is deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_delete is changed
           - gitlab_group_label_delete.labels.added|length == 0
@@ -207,7 +207,7 @@
       register: gitlab_group_label_create_purging
 
     - name: Group label - Test Label Created again
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_label_create_purging is changed
           - gitlab_group_label_create_purging.labels.added|length == 1
@@ -251,7 +251,7 @@
       register: gitlab_first_label_state
 
     - name: Check_mode state must be changed
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_state is changed
 
@@ -271,7 +271,7 @@
       register: gitlab_first_label_create
 
     - name: Test Label Created
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_create is changed
           - gitlab_first_label_create.labels.added|length == 2
@@ -295,7 +295,7 @@
       register: gitlab_first_label_create_idempotence
 
     - name: Test Create Label is Idempotent
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_create_idempotence is not changed
 
@@ -311,7 +311,7 @@
       register: gitlab_first_label_update
 
     - name: Test Label Updated
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_update.labels.added|length == 0
           - gitlab_first_label_update.labels.untouched|length == 0
@@ -331,7 +331,7 @@
       register: gitlab_first_label_new_name
 
     - name: Test Label name changed
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_new_name.labels.added|length == 0
           - gitlab_first_label_new_name.labels.untouched|length == 0
@@ -351,7 +351,7 @@
       register: gitlab_first_label_orig_name
 
     - name: Test Label name changed back
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_orig_name.labels.added|length == 0
           - gitlab_first_label_orig_name.labels.untouched|length == 0
@@ -372,7 +372,7 @@
       register: gitlab_first_label_update_additions
 
     - name: Test Label Updated ( Additions )
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_update_additions.labels.added|length == 0
           - gitlab_first_label_update_additions.labels.untouched|length == 0
@@ -391,7 +391,7 @@
       register: gitlab_first_label_delete
 
     - name: Test label is deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_delete is changed
           - gitlab_first_label_delete.labels.added|length == 0
@@ -413,7 +413,7 @@
       register: gitlab_first_label_create_purging
 
     - name: Test Label Created again
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_create_purging is changed
           - gitlab_first_label_create_purging.labels.added|length == 1
@@ -437,7 +437,7 @@
       register: gitlab_first_label_always_delete
 
     - name: Test label are deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_label_always_delete is changed
           - gitlab_first_label_always_delete.labels.added|length == 0

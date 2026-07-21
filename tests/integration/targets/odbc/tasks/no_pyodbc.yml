@@ -10,7 +10,7 @@
   ignore_errors: true
   register: results
 
-- assert:
+- ansible.builtin.assert:
     that:
       - results is failed
       - "'Failed to import the required Python library (pyodbc) on' in results.msg"

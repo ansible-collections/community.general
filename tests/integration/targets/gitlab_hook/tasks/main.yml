@@ -41,7 +41,7 @@
   register: gitlab_hook_state
 
 - name: Test group created
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_hook_state is changed
 
@@ -57,7 +57,7 @@
   register: gitlab_hook_state_again
 
 - name: Test module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_hook_state_again is not changed
 
@@ -72,6 +72,6 @@
   register: gitlab_hook_state_absent
 
 - name: Assert hook has been removed
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_hook_state_absent is changed

@@ -30,7 +30,7 @@
   register: simple1
 
 - name: assert simple1
-  assert:
+  ansible.builtin.assert:
     that:
       - simple1.a == 1
       - simple1.attr1 == "abc"
@@ -51,7 +51,7 @@
     var: simple2
 
 - name: assert simple2
-  assert:
+  ansible.builtin.assert:
     that:
       - simple2.a == 2
       - simple2.attr2 == "def"

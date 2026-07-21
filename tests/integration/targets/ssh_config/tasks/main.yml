@@ -32,7 +32,7 @@
   register: host_required
 
 - name: Check if ssh_config fails for required parameter host
-  assert:
+  ansible.builtin.assert:
     that:
       - not host_required.changed
 
@@ -48,7 +48,7 @@
   check_mode: true
 
 - name: Check if changes are made in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - host_add.changed
       - "'example.com' in host_add.hosts_added"
@@ -66,7 +66,7 @@
   register: host_add
 
 - name: Check if changes are made
-  assert:
+  ansible.builtin.assert:
     that:
       - host_add.changed
       - "'example.com' in host_add.hosts_added"
@@ -84,7 +84,7 @@
   register: host_add_again
 
 - name: Check for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not host_add_again.changed
       - host_add.hosts_changed is defined
@@ -102,7 +102,7 @@
   register: host_update
 
 - name: Check for update operation
-  assert:
+  ansible.builtin.assert:
     that:
       - host_update.changed
       - host_update.hosts_changed is defined
@@ -122,7 +122,7 @@
   register: host_update
 
 - name: Check update operation for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not host_update.changed
       - host_update.hosts_changed is defined
@@ -138,7 +138,7 @@
   register: host_delete
 
 - name: Check if changes are made
-  assert:
+  ansible.builtin.assert:
     that:
       - host_delete.changed
       - "'example.com' in host_delete.hosts_removed"
@@ -154,7 +154,7 @@
   register: host_delete_again
 
 - name: Check for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not host_delete_again.changed
       - host_delete_again.hosts_changed is defined
@@ -174,7 +174,7 @@
   ignore_errors: true
 
 - name: Check mutual exclusive test - user and ssh_config_file
-  assert:
+  ansible.builtin.assert:
     that:
       - not mut_ex.changed
       - "'parameters are mutually exclusive' in mut_ex.msg"
@@ -193,7 +193,7 @@
   ignore_errors: true
 
 - name: Check mutual exclusive test - proxycommand and proxyjump
-  assert:
+  ansible.builtin.assert:
     that:
       - not proxy_mut_ex.changed
       - "'parameters are mutually exclusive' in proxy_mut_ex.msg"
@@ -209,7 +209,7 @@
   register: full_name
 
 - name: Check if changes are made
-  assert:
+  ansible.builtin.assert:
     that:
       - full_name is changed
       - full_name.hosts_added == ["full_name"]
@@ -227,7 +227,7 @@
   register: short_name
 
 - name: Check that short name host is added and full name host is not updated
-  assert:
+  ansible.builtin.assert:
     that:
       - short_name is changed
       - short_name.hosts_added == ["full"]

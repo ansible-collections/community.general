@@ -14,7 +14,7 @@
   check_mode: true
   register: result
 - name: verify test update in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.record['values'] == (item.update_values | default(item['values']))
@@ -32,7 +32,7 @@
     type: "{{ item.type }}"
   register: result
 - name: verify test update a dns record
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.record['values'] == (item.update_values | default(item['values']))
@@ -50,7 +50,7 @@
     type: "{{ item.type }}"
   register: result
 - name: verify test update a dns record idempotence
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.record['values'] == (item.update_values | default(item['values']))

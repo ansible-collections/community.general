@@ -12,7 +12,7 @@
   register: css_pvs_create_testlv1_result
 
 - name: Assert logical volume (testlv1) created with pvs set as comma separated string
-  assert:
+  ansible.builtin.assert:
     that:
       - css_pvs_create_testlv1_result is success
       - css_pvs_create_testlv1_result is changed
@@ -28,7 +28,7 @@
   register: list_pvs_create_testlv1_result
 
 - name: Assert logical volume (testlv1) creation idempotency with pvs set as list on second execution
-  assert:
+  ansible.builtin.assert:
     that:
       - list_pvs_create_testlv1_result is success
       - list_pvs_create_testlv1_result is not changed
@@ -44,7 +44,7 @@
   register: list_pvs_create_testlv2_result
 
 - name: Assert logical volume (testlv2) created with pvs set as list
-  assert:
+  ansible.builtin.assert:
     that:
       - list_pvs_create_testlv2_result is success
       - list_pvs_create_testlv2_result is changed
@@ -58,7 +58,7 @@
   register: css_pvs_create_testlv2_result
 
 - name: Assert logical volume (testlv2) creation idempotency with pvs set as comma separated string on second execution
-  assert:
+  ansible.builtin.assert:
     that:
       - css_pvs_create_testlv2_result is success
       - css_pvs_create_testlv2_result is not changed

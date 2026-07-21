@@ -29,7 +29,7 @@
     bind_name: yolo
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.binding_rule.AuthMethod == 'test'
@@ -43,7 +43,7 @@
     bind_name: yolo2
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - "result.binding_rule.Description == 'test-binding: my description'"
@@ -55,7 +55,7 @@
     auth_method: test
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - "result.binding_rule.Description == 'test-binding: my description'"
@@ -67,7 +67,7 @@
     auth_method: test
     state: absent
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.operation == 'remove'

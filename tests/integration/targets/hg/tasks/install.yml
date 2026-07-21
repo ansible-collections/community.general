@@ -79,6 +79,6 @@
   register: current_python_version
 
 - name: verify the python version has not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - default_python_version.stdout == current_python_version.stdout

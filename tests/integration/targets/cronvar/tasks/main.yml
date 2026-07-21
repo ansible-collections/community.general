@@ -107,7 +107,7 @@
   failed_when: custom_varcheck3.rc == 0
 
 - name: Ensure cronvar tasks did the right thing
-  assert:
+  ansible.builtin.assert:
     that:
       - create_cronvar1 is changed
       - create_cronvar2 is not changed

@@ -109,7 +109,7 @@
         state: absent
 
 - name: Check assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - uninstall_absent is not changed
       - install_absent is changed

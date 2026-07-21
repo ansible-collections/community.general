@@ -31,12 +31,12 @@
       register: mm_enabled_check_mode
 
     - name: "001: assert that changes were made"
-      assert:
+      ansible.builtin.assert:
         that:
           - mm_enabled_check_mode is changed
 
     - name: "001: assert that changed_attrs is properly set"
-      assert:
+      ansible.builtin.assert:
         that:
           - mm_enabled_check_mode.changed_attrs.Notes == note_mm_enabled
           - mm_enabled_check_mode.changed_attrs.isManaged == "false"
@@ -48,12 +48,12 @@
       check_mode: false
 
     - name: "002: assert that changes were made"
-      assert:
+      ansible.builtin.assert:
         that:
           - mm_enabled is changed
 
     - name: "002: assert that changed_attrs is properly set"
-      assert:
+      ansible.builtin.assert:
         that:
           - mm_enabled.changed_attrs.Notes == note_mm_enabled
           - mm_enabled.changed_attrs.isManaged == "false"
@@ -65,12 +65,12 @@
       check_mode: false
 
     - name: "003: assert that changes were not made"
-      assert:
+      ansible.builtin.assert:
         that:
           - mm_enabled_idp is not changed
 
     - name: "003: assert that changed_attrs is not set"
-      assert:
+      ansible.builtin.assert:
         that:
           - mm_enabled_idp.changed_attrs == {}
 

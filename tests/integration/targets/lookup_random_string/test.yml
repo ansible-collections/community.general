@@ -31,7 +31,7 @@
       register: impossible_result
 
     - name: Check results
-      assert:
+      ansible.builtin.assert:
         that:
           - result1[0] | length == 8
           - result2[0] | length == 0

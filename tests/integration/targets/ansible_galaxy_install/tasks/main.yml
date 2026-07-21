@@ -17,7 +17,7 @@
   register: install_c0
 
 - name: Assert collection netbox.netbox was installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_c0 is changed
       - '"netbox.netbox" in install_c0.new_collections'
@@ -30,7 +30,7 @@
   register: install_c1
 
 - name: Assert collection was not installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_c1 is not changed
 
@@ -48,7 +48,7 @@
   register: install_r0
 
 - name: Assert collection ansistrano.deploy was installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_r0 is changed
       - '"ansistrano.deploy" in install_r0.new_roles'
@@ -61,7 +61,7 @@
   register: install_r1
 
 - name: Assert role was not installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_r1 is not changed
 
@@ -83,7 +83,7 @@
   ignore_errors: true
 
 - name: Assert requirements file was installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_rq0 is changed
       - '"geerlingguy.java" in install_rq0.new_roles'
@@ -97,7 +97,7 @@
   ignore_errors: true
 
 - name: Assert requirements file was not installed
-  assert:
+  ansible.builtin.assert:
     that:
       - install_rq1 is not changed
 
@@ -115,7 +115,7 @@
   register: upgrade_c0
 
 - name: Assert collection netbox.netbox was installed
-  assert:
+  ansible.builtin.assert:
     that:
       - upgrade_c0 is changed
       - '"netbox.netbox" in upgrade_c0.new_collections'
@@ -137,7 +137,7 @@
   register: upgrade_c2
 
 - name: Assert collection was not installed
-  assert:
+  ansible.builtin.assert:
     that:
       - upgrade_c1 is changed
       - upgrade_c2 is not changed
@@ -162,7 +162,7 @@
   register: exec_c0
 
 - name: Assert collection was installed using explicit executable
-  assert:
+  ansible.builtin.assert:
     that:
       - exec_c0 is changed
       - '"netbox.netbox" in exec_c0.new_collections'
@@ -178,6 +178,6 @@
   ignore_errors: true
 
 - name: Assert bad executable caused failure
-  assert:
+  ansible.builtin.assert:
     that:
       - exec_c_fail is failed

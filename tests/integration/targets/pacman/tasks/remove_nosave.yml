@@ -39,7 +39,7 @@
         path: '{{config_file}}.pacsave'
       register: pacsave_st_1
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - pacsave_st_1.stat.exists
 
@@ -71,6 +71,6 @@
         path: '{{config_file}}.pacsave'
       register: pacsave_st_2
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - not pacsave_st_2.stat.exists

@@ -35,7 +35,7 @@
   register: install_check_mode
 
 - name: Verify Python 3.14 installation in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - (install_check_mode is changed) == (check_python_314_exists is failed)
       - install_check_mode is not failed
@@ -48,7 +48,7 @@
   register: install_python
 
 - name: Verify Python 3.14 installation
-  assert:
+  ansible.builtin.assert:
     that:
       - install_python.changed == check_python_314_exists.failed
       - install_python.failed is false
@@ -73,7 +73,7 @@
   register: reinstall_python
 
 - name: Verify Python 3.14 re-installation
-  assert:
+  ansible.builtin.assert:
     that:
       - reinstall_python is not changed
       - reinstall_python is not failed
@@ -92,7 +92,7 @@
   register: install_python_3135
 
 - name: Verify Python 3.13.5 installation
-  assert:
+  ansible.builtin.assert:
     that:
       - install_python_3135.changed == check_python_3135_exists.failed
       - install_python_3135.failed is false
@@ -106,7 +106,7 @@
   register: reinstall_python
 
 - name: Verify Python 3.13.5 installation
-  assert:
+  ansible.builtin.assert:
     that:
       - reinstall_python.changed is false
       - reinstall_python.failed is false
@@ -119,7 +119,7 @@
   register: remove_python
 
 - name: Verify Python 3.10 deletion
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_python.changed is false
       - remove_python.failed is false
@@ -133,14 +133,14 @@
   register: remove_python_in_check_mode
 
 - name: Verify Python 3.13.5 deletion in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_python_in_check_mode.changed == install_python_3135.changed
       - remove_python_in_check_mode.failed is false
 
 - name: Additional check for Python 3.13.5 deletion in check mode
   when: install_python_3135.changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - '"3.13.5" in remove_python_in_check_mode.python_versions'
       - remove_python_in_check_mode.python_paths | length >= 1
@@ -152,14 +152,14 @@
   register: remove_python
 
 - name: Verify Python 3.13.5 deletion
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_python.changed == install_python_3135.changed
       - remove_python.failed is false
 
 - name: Additional check for Python 3.13.5 deletion
   when: install_python_3135.changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_python.python_paths | length >= 1
       - '"3.13.5" in remove_python.python_versions'
@@ -171,7 +171,7 @@
   register: remove_python
 
 - name: Verify Python 3.13.5 deletion again
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_python.changed is false
       - remove_python.failed is false
@@ -185,7 +185,7 @@
   register: upgrade_python
 
 - name: Verify Python 3.13 upgrade
-  assert:
+  ansible.builtin.assert:
     that:
       - upgrade_python.changed is true
       - upgrade_python.failed is false
@@ -200,7 +200,7 @@
   register: upgrade_python
 
 - name: Verify Python 3.13 upgrade in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - upgrade_python.changed is false
       - upgrade_python.failed is false
@@ -214,7 +214,7 @@
   register: upgrade_python
 
 - name: Verify Python 3.13 upgrade again
-  assert:
+  ansible.builtin.assert:
     that:
       - upgrade_python.changed is false
       - upgrade_python.failed is false
@@ -229,7 +229,7 @@
   check_mode: true
 
 - name: Verify unsupported Python 2.0 install in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - unsupported_python_check_mode.changed is false
       - unsupported_python_check_mode.failed is true
@@ -243,7 +243,7 @@
   ignore_errors: true
 
 - name: Verify unsupported Python 2.0 install
-  assert:
+  ansible.builtin.assert:
     that:
       - unsupported_python.changed is false
       - unsupported_python.failed is true
@@ -256,7 +256,7 @@
   ignore_errors: true
 
 - name: Verify Python 2.0 install with latest state
-  assert:
+  ansible.builtin.assert:
     that:
       - unsupported_python.changed is false
       - unsupported_python.failed is true
@@ -268,7 +268,7 @@
   register: uninstall_result
 
 - name: Verify Python 3.13 deletion
-  assert:
+  ansible.builtin.assert:
     that:
       - uninstall_result.changed is true
       - uninstall_result.failed is false
@@ -283,7 +283,7 @@
   register: no_version
 
 - name: Verify failure when no version is specified
-  assert:
+  ansible.builtin.assert:
     that:
       - no_version.failed is true
       - '"Unsupported version format" in no_version.msg'
@@ -296,7 +296,7 @@
   register: wrong_version
 
 - name: Verify failure when unsupported version format is specified
-  assert:
+  ansible.builtin.assert:
     that:
       - wrong_version.failed is true
       - '"Unsupported version format" in wrong_version.msg'

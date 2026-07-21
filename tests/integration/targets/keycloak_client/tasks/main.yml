@@ -84,7 +84,7 @@
   register: check_client_when_present_and_same
 
 - name: Assert changes not detected in last two tasks (desire when same, and check)
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_when_present_and_same is not changed
       - check_client_when_present_and_same is not changed
@@ -107,7 +107,7 @@
   register: check_client_when_present_and_changed
 
 - name: Assert changes detected in last tasks
-  assert:
+  ansible.builtin.assert:
     that:
       - check_client_when_present_and_changed is changed
 
@@ -128,7 +128,7 @@
   register: check_client_protocol_mappers_idempotence
 
 - name: Assert idempotence changes to protocol_mappers
-  assert:
+  ansible.builtin.assert:
     that:
       - check_client_protocol_mappers_idempotence is changed
       - end_state.protocolMappers | length == 3
@@ -160,7 +160,7 @@
   register: desire_client_with_flow_binding_overrides
 
 - name: Assert flows are set
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_flow_binding_overrides is changed
       - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
@@ -189,7 +189,7 @@
   register: desire_client_with_flow_binding_overrides
 
 - name: Assert flows are updated
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_flow_binding_overrides is changed
       - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
@@ -213,7 +213,7 @@
   register: desire_client_with_flow_binding_overrides
 
 - name: Assert flows are updated
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_flow_binding_overrides is changed
       - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
@@ -238,7 +238,7 @@
   register: desire_client_with_flow_binding_overrides
 
 - name: Assert flows are updated
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_flow_binding_overrides is changed
       - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
@@ -263,7 +263,7 @@
   register: desire_client_with_flow_binding_overrides
 
 - name: Assert flows are removed
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_flow_binding_overrides is changed
       - "'authenticationFlowBindingOverrides' in desire_client_with_flow_binding_overrides.end_state"
@@ -318,7 +318,7 @@
   register: desire_client_with_default_client_scopes
 
 - name: Assert default_client_scopes and optional_client_scopes are set correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_default_client_scopes is changed
       - '"scope1" in end_state.defaultClientScopes'
@@ -343,7 +343,7 @@
   register: desire_client_with_default_client_scopes
 
 - name: Assert client scopes remain unchanged with ignore behavior
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_default_client_scopes is not changed
       - end_state.defaultClientScopes | length == 1
@@ -369,7 +369,7 @@
   register: desire_client_with_default_client_scopes
 
 - name: Assert patch behavior fails when scope is both default and optional
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_default_client_scopes is failed
       - "'scope3' in desire_client_with_default_client_scopes.msg"
@@ -389,7 +389,7 @@
   register: desire_client_with_default_client_scopes
 
 - name: Assert client scopes are patched correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_default_client_scopes is changed
       - end_state.defaultClientScopes | length == 2
@@ -415,7 +415,7 @@
   register: desire_client_with_default_client_scopes
 
 - name: Assert idempotent behavior with empty default_client_scopes
-  assert:
+  ansible.builtin.assert:
     that:
       - desire_client_with_default_client_scopes is changed
       - end_state.defaultClientScopes | length == 0
@@ -449,7 +449,7 @@
   register: check_client_when_present_and_attributes_modified
 
 - name: Assert client attributes are updated
-  assert:
+  ansible.builtin.assert:
     that:
       - check_client_when_present_and_attributes_modified is changed
       - end_state.attributes["backchannel.logout.revoke.offline.tokens"] == 'false'
@@ -474,7 +474,7 @@
   register: result_create_logout_client
 
 - name: Assert logout client is created with correct attributes
-  assert:
+  ansible.builtin.assert:
     that:
       - result_create_logout_client is changed
       - result_create_logout_client.end_state.attributes["post.logout.redirect.uris"] is defined
@@ -494,7 +494,7 @@
   register: result_idempotent_logout_client
 
 - name: Assert logout client is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - result_idempotent_logout_client is not changed
 
@@ -513,7 +513,7 @@
   register: result_update_logout_client
 
 - name: Assert logout client fields are updated
-  assert:
+  ansible.builtin.assert:
     that:
       - result_update_logout_client is changed
       - result_update_logout_client.end_state.attributes["backchannel.logout.url"] == "https://example.com/new-backchannel"

@@ -14,7 +14,7 @@
       register: add_admin_user
 
     - name: Check that admin user adding succeeds with a change
-      assert:
+      ansible.builtin.assert:
         that:
           - add_admin_user is changed
 
@@ -25,7 +25,7 @@
       register: add_admin_user
 
     - name: Check that admin user adding succeeds with a change
-      assert:
+      ansible.builtin.assert:
         that:
           - add_admin_user is changed
 
@@ -36,7 +36,7 @@
       register: add_admin_user
 
     - name: Check that admin user adding succeeds without a change
-      assert:
+      ansible.builtin.assert:
         that:
           - add_admin_user is not changed
 
@@ -59,7 +59,7 @@
       register: add_user_with_auth_enabled
 
     - name: Check that adding user with enabled authentication succeeds with a change
-      assert:
+      ansible.builtin.assert:
         that:
           - add_user_with_auth_enabled is changed
 
@@ -70,7 +70,7 @@
       register: add_user_with_auth_enabled
 
     - name: Check that adding user with enabled authentication succeeds with a change
-      assert:
+      ansible.builtin.assert:
         that:
           - add_user_with_auth_enabled is changed
 
@@ -81,7 +81,7 @@
       register: same_user
 
     - name: Check that adding same user succeeds without a change
-      assert:
+      ansible.builtin.assert:
         that:
           - same_user is not changed
 
@@ -93,7 +93,7 @@
       register: change_password
 
     - name: Check that password changing succeeds with a change
-      assert:
+      ansible.builtin.assert:
         that:
           - change_password is changed
 
@@ -104,7 +104,7 @@
       register: change_password
 
     - name: Check that password changing succeeds with a change
-      assert:
+      ansible.builtin.assert:
         that:
           - change_password is changed
 
@@ -116,7 +116,7 @@
       register: remove_user
 
     - name: Check that removing user succeeds with a change
-      assert:
+      ansible.builtin.assert:
         that:
           - remove_user is changed
 
@@ -127,7 +127,7 @@
       register: remove_user
 
     - name: Check that removing user succeeds with a change
-      assert:
+      ansible.builtin.assert:
         that:
           - remove_user is changed
 
@@ -138,6 +138,6 @@
       register: remove_user
 
     - name: Check that removing user succeeds without a change
-      assert:
+      ansible.builtin.assert:
         that:
           - remove_user is not changed

@@ -37,7 +37,7 @@
         state: present
       register: install_4
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - install_1 is changed
           - install_1.msg == 'Would have installed 1 packages'
@@ -74,7 +74,7 @@
         state: absent
       register: uninstall_4
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - uninstall_1 is changed
           - uninstall_1.msg == 'Would have removed 1 packages'

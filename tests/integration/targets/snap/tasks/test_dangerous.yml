@@ -50,7 +50,7 @@
     state: absent
   register: remove_dangerous
 
-- assert:
+- ansible.builtin.assert:
     that:
       - install_dangerous_check is changed
       - install_dangerous is changed

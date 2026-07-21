@@ -169,7 +169,7 @@
       ignore_errors: true
       register: jake_incorrect_pass_out
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - james_info.rc == 0
           - tom_userinfo.data['gid'] == 1000 and tom_userinfo.data['uid'] == 1000

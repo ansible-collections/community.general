@@ -32,7 +32,7 @@
       register: after
 
     - name: verify repo configuration has been restored
-      assert:
+      ansible.builtin.assert:
         that:
           - before.stdout == after.stdout
 

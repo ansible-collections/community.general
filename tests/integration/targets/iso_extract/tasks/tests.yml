@@ -15,7 +15,7 @@
     executable: '{{ iso_extract_7zip_executable | default(omit) }}'
   register: iso_extract_test0
 
-- assert:
+- ansible.builtin.assert:
     that:
       - iso_extract_test0 is changed
 
@@ -30,13 +30,13 @@
   register: iso_extract_test0_again
 
 - name: Test iso_extract_test0_again (normal mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - iso_extract_test0_again is not changed
   when: not in_check_mode
 
 - name: Test iso_extract_test0_again (check-mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - iso_extract_test0_again is changed
   when: in_check_mode
@@ -53,7 +53,7 @@
   register: iso_extract_leading_slash
 
 - name: Test iso_extract with leading slash succeeds (normal mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - iso_extract_leading_slash is not failed
   when: not in_check_mode

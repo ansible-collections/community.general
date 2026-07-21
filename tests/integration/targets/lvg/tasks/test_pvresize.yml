@@ -13,7 +13,7 @@
   register: cmd_result
 
 - name: Assert the testvg size is 33554432B
-  assert:
+  ansible.builtin.assert:
     that:
       - "'33554432B' == cmd_result.stdout"
 
@@ -30,7 +30,7 @@
     pvresize: false
   register: cmd_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - cmd_result is not changed
 
@@ -39,7 +39,7 @@
   register: cmd_result
 
 - name: Assert the testvg size is still 33554432B
-  assert:
+  ansible.builtin.assert:
     that:
       - "'33554432B' == cmd_result.stdout"
 
@@ -52,7 +52,7 @@
   register: cmd_result
 
 - name: Assert that the module returned the state was changed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd_result is changed
 
@@ -61,7 +61,7 @@
   register: cmd_result
 
 - name: Assert the testvg size is still 33554432B
-  assert:
+  ansible.builtin.assert:
     that:
       - "'33554432B' == cmd_result.stdout"
 
@@ -76,6 +76,6 @@
   register: cmd_result
 
 - name: Assert the testvg size is now 41943040B
-  assert:
+  ansible.builtin.assert:
     that:
       - "'41943040B' == cmd_result.stdout"

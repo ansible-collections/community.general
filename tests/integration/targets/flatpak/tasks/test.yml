@@ -15,7 +15,7 @@
   register: addition_result
 
 - name: Verify addition test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - addition_result is changed
     msg: "state=present shall add flatpak when absent"
@@ -30,7 +30,7 @@
   register: double_addition_result
 
 - name: Verify idempotency of addition test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_addition_result is not changed
     msg: "state=present shall not do anything when flatpak is already present"
@@ -46,7 +46,7 @@
   register: removal_result
 
 - name: Verify removal test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_result is changed
     msg: "state=absent shall remove flatpak when present"
@@ -60,7 +60,7 @@
   register: double_removal_result
 
 - name: Verify idempotency of removal test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"
@@ -77,7 +77,7 @@
   register: latest_result
 
 - name: Verify state=latest test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - latest_result is changed
     msg: "state=latest shall add flatpak when absent"
@@ -92,7 +92,7 @@
   register: double_latest_result
 
 - name: Verify idempotency of state=latest test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_latest_result is not changed
     msg: "state=latest shall not do anything when flatpak is already present"
@@ -116,7 +116,7 @@
   register: url_addition_result
 
 - name: Verify addition test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - url_addition_result is changed
     msg: "state=present with url as name shall add flatpak when absent"
@@ -131,7 +131,7 @@
   register: double_url_addition_result
 
 - name: Verify idempotency of addition with url test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_url_addition_result is not changed
     msg: "state=present with url as name shall not do anything when flatpak is already present"
@@ -152,7 +152,7 @@
   # the following message, which we check for. If another error happens, we fail.
   # Upstream issue: https://github.com/flatpak/flatpak/issues/4307
   # (The second message happens with Ubuntu 18.04.)
-  assert:
+  ansible.builtin.assert:
     that:
       - >-
         url_removal_result.msg in [
@@ -165,7 +165,7 @@
   block:
 
     - name: Verify removal test result - {{ method }}
-      assert:
+      ansible.builtin.assert:
         that:
           - url_removal_result is changed
         msg: "state=absent with url as name shall remove flatpak when present"
@@ -179,7 +179,7 @@
       register: double_url_removal_result
 
     - name: Verify idempotency of removal with url test result - {{ method }}
-      assert:
+      ansible.builtin.assert:
         that:
           - double_url_removal_result is not changed
         msg: "state=absent with url as name shall not do anything when flatpak is not present"
@@ -203,7 +203,7 @@
   register: url_latest_result
 
 - name: Verify state=latest test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - url_latest_result is changed
     msg: "state=present with url as name shall add flatpak when absent"
@@ -218,7 +218,7 @@
   register: double_url_latest_result
 
 - name: Verify idempotency of state=latest with url test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_url_latest_result is not changed
     msg: "state=present with url as name shall not do anything when flatpak is already present"
@@ -242,7 +242,7 @@
   register: from_url_addition_result
 
 - name: Verify addition with from_url test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - from_url_addition_result is changed
     msg: "state=present with from_url shall add flatpak when absent"
@@ -257,7 +257,7 @@
   register: double_from_url_addition_result
 
 - name: Verify idempotency of addition with from_url test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_from_url_addition_result is not changed
     msg: "state=present with from_url shall not do anything when flatpak is already present"
@@ -281,7 +281,7 @@
   ignore_errors: true
 
 - name: Verify from_url with URL in name fails - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - from_url_url_name_result is failed
       - from_url_url_name_result is not changed
@@ -299,7 +299,7 @@
   ignore_errors: true
 
 - name: Verify from_url with multiple names fails - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - from_url_multi_name_result is failed
       - from_url_multi_name_result is not changed
@@ -315,7 +315,7 @@
   ignore_errors: true
 
 - name: Verify from_url with non-http URL fails - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - from_url_non_http_result is failed
       - from_url_non_http_result is not changed
@@ -335,7 +335,7 @@
   register: addition_result
 
 - name: Verify addition with list test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - addition_result is changed
     msg: "state=present shall add flatpak when absent"
@@ -352,7 +352,7 @@
   register: double_addition_result
 
 - name: Verify idempotency of addition with list test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_addition_result is not changed
     msg: "state=present shall not do anything when flatpak is already present"
@@ -370,7 +370,7 @@
   register: addition_result
 
 - name: Verify addition with list partially installed test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - addition_result is changed
     msg: "state=present shall add flatpak when absent"
@@ -388,7 +388,7 @@
   register: double_addition_result
 
 - name: Verify idempotency of addition with list partially installed test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_addition_result is not changed
     msg: "state=present shall not do anything when flatpak is already present"
@@ -405,7 +405,7 @@
   register: removal_result
 
 - name: Verify removal with list test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_result is changed
     msg: "state=absent shall remove flatpak when present"
@@ -420,7 +420,7 @@
   register: double_removal_result
 
 - name: Verify idempotency of removal with list test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"
@@ -436,7 +436,7 @@
   register: removal_result
 
 - name: Verify removal with list partially removed test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_result is changed
     msg: "state=absent shall remove flatpak when present"
@@ -452,7 +452,7 @@
   register: double_removal_result
 
 - name: Verify idempotency of removal with list partially removed test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"
@@ -471,7 +471,7 @@
   register: latest_result
 
 - name: Verify state=latest with list test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - latest_result is changed
     msg: "state=present shall add flatpak when absent"
@@ -488,7 +488,7 @@
   register: double_latest_result
 
 - name: Verify idempotency of state=latest with list test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_latest_result is not changed
     msg: "state=present shall not do anything when flatpak is already present"
@@ -506,7 +506,7 @@
   register: latest_result
 
 - name: Verify state=latest with list partially installed test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - latest_result is changed
     msg: "state=present shall add flatpak when absent"
@@ -524,7 +524,7 @@
   register: double_latest_result
 
 - name: Verify idempotency of state=latest with list partially installed test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_latest_result is not changed
     msg: "state=present shall not do anything when flatpak is already present"

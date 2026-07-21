@@ -16,7 +16,7 @@
         complex: "{{ foobar | community.general.to_toml }}"
         complex_redact: "{{ foobar | community.general.to_toml(redact_sensitive_values=true) }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - complex == exp_complex
           - complex_redact == exp_complex_redact
@@ -44,7 +44,7 @@
             - "{{ foo }}"
 
     - when: ansible_version.full is version("2.19", "<")
-      assert:
+      ansible.builtin.assert:
         that:
           - complex == exp_complex
           # With ansible-core 2.18 and before, the vaulted string is decrypted before it reaches the filter,
@@ -65,7 +65,7 @@
           bang = ["2025-01-02 03:04:05+00:00", "foobarbaz", "bar"]
 
     - when: ansible_version.full is version("2.19", ">=")
-      assert:
+      ansible.builtin.assert:
         that:
           - complex == exp_complex
           - complex_redact == exp_complex_redact

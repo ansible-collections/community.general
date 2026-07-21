@@ -15,7 +15,7 @@
         }
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.policy.Name == 'foo-access'
@@ -36,7 +36,7 @@
         }
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.operation == 'update'
@@ -56,7 +56,7 @@
         }
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.operation is not defined
@@ -66,7 +66,7 @@
     name: foo-access
     state: absent
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.operation == 'remove'

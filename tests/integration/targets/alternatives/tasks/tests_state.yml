@@ -26,7 +26,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy2"
 
@@ -49,7 +49,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy4"
 
@@ -71,7 +71,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy4"
 
@@ -93,7 +93,7 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy2"
 
@@ -115,6 +115,6 @@
   register: cmd
 
 - name: Ensure that the expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy1"

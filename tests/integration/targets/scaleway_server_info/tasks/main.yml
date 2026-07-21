@@ -18,7 +18,7 @@
     var: servers
 
 - name: Ensure retrieval of servers info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - servers is success
 
@@ -32,6 +32,6 @@
     var: ams1_servers
 
 - name: Ensure retrieval of servers info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ams1_servers is success

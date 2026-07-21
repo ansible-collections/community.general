@@ -22,12 +22,12 @@
 - debug: var=lb_creation_check_task
 
 - name: lb_creation_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_creation_check_task is success
 
 - name: lb_creation_check_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_creation_check_task is changed
 
@@ -45,17 +45,17 @@
 - debug: var=lb_creation_task
 
 - name: lb_creation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_creation_task is success
 
 - name: lb_creation_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_creation_task is changed
 
 - name: Assert that the load-balancer is in a valid state
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_creation_task.scaleway_lb.status == "ready"
 
@@ -72,17 +72,17 @@
 - debug: var=lb_creation_confirmation_task
 
 - name: lb_creation_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_creation_confirmation_task is success
 
 - name: lb_creation_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_creation_confirmation_task is not changed
 
 - name: Assert that the load-balancer is in a valid state
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_creation_confirmation_task.scaleway_lb.status == "ready"
 
@@ -100,12 +100,12 @@
 - debug: var=lb_update_check_task
 
 - name: lb_update_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_update_check_task is success
 
 - name: lb_update_check_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_update_check_task is changed
 
@@ -123,17 +123,17 @@
 - debug: var=lb_update_task
 
 - name: lb_update_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_update_task is success
 
 - name: lb_update_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_update_task is changed
 
 - name: Assert that the load-balancer is in a valid state
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_update_task.scaleway_lb.status == "ready"
 
@@ -150,17 +150,17 @@
 - debug: var=lb_update_confirmation_task
 
 - name: lb_update_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_update_confirmation_task is success
 
 - name: lb_update_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_update_confirmation_task is not changed
 
 - name: Assert that the load-balancer is in a valid state
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_update_confirmation_task.scaleway_lb.status == "ready"
 
@@ -175,12 +175,12 @@
   register: lb_deletion_check_task
 
 - name: lb_deletion_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_deletion_check_task is success
 
 - name: lb_deletion_check_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_deletion_check_task is changed
 
@@ -195,12 +195,12 @@
   register: lb_deletion_task
 
 - name: lb_deletion_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_deletion_task is success
 
 - name: lb_deletion_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_deletion_task is changed
 
@@ -214,11 +214,11 @@
   register: lb_deletion_confirmation_task
 
 - name: lb_deletion_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_deletion_confirmation_task is success
 
 - name: lb_deletion_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - lb_deletion_confirmation_task is not changed

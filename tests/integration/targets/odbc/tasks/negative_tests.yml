@@ -18,7 +18,7 @@
   register: results
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - results is failed
       - "'Failed to connect to DSN' in results.msg"

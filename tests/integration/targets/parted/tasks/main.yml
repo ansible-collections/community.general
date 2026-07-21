@@ -73,7 +73,7 @@
   register: partition_rem1
 
 - name: Assert results
-  assert:
+  ansible.builtin.assert:
     that:
       - partition1 is changed
       - fs1_succ is changed
@@ -102,7 +102,7 @@
   register: info_preserve_false
 
 - name: Assert unit_preserve_case results
-  assert:
+  ansible.builtin.assert:
     that:
       - info_preserve_true.disk.unit == "KiB"
       - info_preserve_true.partitions[0].unit == "KiB"
@@ -118,6 +118,6 @@
   register: info_roundtrip
 
 - name: Assert round-trip succeeds and unit is consistent
-  assert:
+  ansible.builtin.assert:
     that:
       - info_roundtrip.disk.unit == info_preserve_true.disk.unit

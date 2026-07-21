@@ -31,7 +31,7 @@
     state: present
   register: result
 - name: assert changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 # ----------------------------------------------------------------------------
@@ -47,7 +47,7 @@
     state: present
   register: result
 - name: assert changed is false
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is not changed
@@ -64,7 +64,7 @@
     state: absent
   register: result
 - name: assert changed is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 # ----------------------------------------------------------------------------
@@ -80,7 +80,7 @@
     state: absent
   register: result
 - name: assert changed is false
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is not changed

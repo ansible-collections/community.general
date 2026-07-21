@@ -78,7 +78,7 @@
   register: package_canary
 
 - name: Run tests
-  assert:
+  ansible.builtin.assert:
     that:
       - skiaparser_1_stat.stat.exists
       - skiaparser_1_installed is changed

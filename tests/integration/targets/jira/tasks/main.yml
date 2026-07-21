@@ -17,7 +17,7 @@
 - debug:
     msg: Issue={{ issue }}
 - name: assert test ticket
-  assert:
+  ansible.builtin.assert:
     that:
       - issue is changed
       - issue.meta.key.startswith(proj)
@@ -32,7 +32,7 @@
     comment: bleep bleep!
   register: comment_bleep_bleep
 - name: assert comment bleep bleep
-  assert:
+  ansible.builtin.assert:
     that:
       - comment_bleep_bleep is changed
       - comment_bleep_bleep.meta.body == "bleep bleep!"
@@ -49,7 +49,7 @@
     comment: -> in progress
   register: transition_inprog
 - name: assert transition -> In Progress with comment
-  assert:
+  ansible.builtin.assert:
     that:
       - transition_inprog is changed
 
@@ -63,7 +63,7 @@
     account_id: "{{ user2 }}"
   register: assign
 - name: assert change assignee
-  assert:
+  ansible.builtin.assert:
     that:
       - assign is changed
 
@@ -79,7 +79,7 @@
       timeSpentSeconds: 1200
   register: worklog
 - name: assert worklog -> with comment
-  assert:
+  ansible.builtin.assert:
     that:
       - worklog is changed
       - worklog.meta.comment == 'Worklog'
@@ -101,7 +101,7 @@
       description: wakawakawakawaka
   register: transition_resolved
 - name: assert transition -> Resolved with comment
-  assert:
+  ansible.builtin.assert:
     that:
       - transition_resolved is changed
 

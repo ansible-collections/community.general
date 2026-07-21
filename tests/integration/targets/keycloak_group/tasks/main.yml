@@ -41,7 +41,7 @@
   until: result is not failed
 
 - name: Assert group was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -67,7 +67,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -91,7 +91,7 @@
   register: result
 
 - name: Assert that group name was updated
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -114,7 +114,7 @@
   register: result
 
 - name: Assert that group was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -131,7 +131,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}
@@ -153,7 +153,7 @@
   register: result
 
 - name: Assert that group was correctly created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -179,7 +179,7 @@
   register: result
 
 - name: Assert that group was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -209,7 +209,7 @@
   register: result
 
 - name: Assert that subgroup was correctly created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -233,7 +233,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -258,7 +258,7 @@
   register: result
 
 - name: Assert that subgroup name has changed correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -282,7 +282,7 @@
   register: result
 
 - name: Assert that subgroup was correctly created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -306,7 +306,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -332,7 +332,7 @@
   register: result
 
 - name: Assert subgroup of subgroup was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -357,7 +357,7 @@
   register: result_subsubgrp
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_subsubgrp is not changed
       - result_subsubgrp.end_state != {}
@@ -381,7 +381,7 @@
   register: result
 
 - name: Assert subgroup of subgroup was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -405,7 +405,7 @@
   register: result_subsubsubgrp
 
 - name: Assert that nothing changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result_subsubsubgrp is not changed
       - result_subsubsubgrp.end_state != {}
@@ -432,7 +432,7 @@
   register: result
 
 - name: Assert that subgroup was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -449,7 +449,7 @@
   register: result
 
 - name: Assert that nothing changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}
@@ -468,7 +468,7 @@
   register: result
 
 - name: Assert that subgroup was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -487,7 +487,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}
@@ -504,7 +504,7 @@
   register: result
 
 - name: Assert that group was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -521,7 +521,7 @@
   register: result
 
 - name: Assert that group was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}

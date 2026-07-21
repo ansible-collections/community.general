@@ -34,7 +34,7 @@
       become: true
       register: test_uquota_default_before
     - name: Assert default user limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_uquota_default_before.changed
           - test_uquota_default_before.bsoft == uquota_default_bsoft|human_to_bytes
@@ -57,7 +57,7 @@
       become: true
       register: test_uquota_user_before
     - name: Assert user limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_uquota_user_before.changed
           - test_uquota_user_before.bsoft == uquota_user_bsoft|human_to_bytes
@@ -79,7 +79,7 @@
       become: true
       register: test_uquota_default_after
     - name: Assert default user limits results after re-apply
-      assert:
+      ansible.builtin.assert:
         that:
           - not test_uquota_default_after.changed
     - name: Re-apply user limits
@@ -96,7 +96,7 @@
       become: true
       register: test_uquota_user_after
     - name: Assert user limits results for xfsquotauser after re-apply
-      assert:
+      ansible.builtin.assert:
         that:
           - not test_uquota_user_after.changed
     - name: Reset default user limits
@@ -107,7 +107,7 @@
       become: true
       register: test_reset_uquota_default
     - name: Assert reset of default user limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_reset_uquota_default.changed
           - test_reset_uquota_default.bsoft == 0
@@ -125,7 +125,7 @@
       become: true
       register: test_reset_uquota_user
     - name: Assert reset of default user limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_reset_uquota_user.changed
           - test_reset_uquota_user.bsoft == 0

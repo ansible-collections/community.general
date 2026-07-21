@@ -85,7 +85,7 @@
       become: true
       register: results
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - results is changed
 
@@ -100,7 +100,7 @@
       become: true
       register: results
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - results is changed
 
@@ -119,7 +119,7 @@
       become: true
       register: results
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - results is changed
           - results['row_count'] == -1
@@ -135,7 +135,7 @@
         query: "SELECT * FROM films WHERE code='asdfg'"
       register: results
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - results is changed
           - results is successful
@@ -151,7 +151,7 @@
       register: results
       changed_when: false
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - results is not changed
           - results is successful
@@ -163,7 +163,7 @@
         query: "DROP TABLE films"
       register: results
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - results is successful
           - results is changed
