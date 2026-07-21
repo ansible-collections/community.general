@@ -22,7 +22,7 @@
   when: ansible_facts.pkg_mgr == 'apt'
 
 - name: uninstall packages which were not originally installed (dnf)
-  dnf:
+  ansible.builtin.dnf:
     name: mercurial
     state: absent
     autoremove: true
