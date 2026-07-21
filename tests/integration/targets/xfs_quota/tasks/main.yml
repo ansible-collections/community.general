@@ -10,7 +10,7 @@
 
 - name: setup Alpine
   when: ansible_facts.distribution == 'Alpine'
-  package:
+  ansible.builtin.package:
     name:
       - xfsprogs
       - xfsprogs-extra

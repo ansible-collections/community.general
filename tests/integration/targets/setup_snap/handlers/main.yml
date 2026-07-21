@@ -4,6 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Remove snapd
-  package:
+  ansible.builtin.package:
     name: "{{ snap_packages }}"
     state: absent

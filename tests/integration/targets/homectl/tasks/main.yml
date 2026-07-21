@@ -23,7 +23,7 @@
         - ansible_facts.distribution != 'Archlinux'
 
     - name: Install passlib on Archlinux
-      package:
+      ansible.builtin.package:
         name: python-passlib
         state: present
       when: ansible_facts.distribution == 'Archlinux'

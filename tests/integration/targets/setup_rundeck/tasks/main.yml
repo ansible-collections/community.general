@@ -21,7 +21,7 @@
     rdeck_base: /home/rundeck
 
 - name: Install OpenJDK
-  package:
+  ansible.builtin.package:
     name: "{{ openjdk_pkg }}"
     state: present
 

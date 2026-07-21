@@ -41,25 +41,25 @@
 ####
 
 - name: make sure diffutils are installed on ArchLinux
-  package:
+  ansible.builtin.package:
     name: diffutils
     state: present
   when: ansible_facts.distribution == 'Archlinux'
 
 - name: make sure util-linux-extra are installed on Debian 13+
-  package:
+  ansible.builtin.package:
     name: util-linux-extra
     state: present
   when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version|int >= 13
 
 - name: make sure tzdata is installed on Alpine
-  package:
+  ansible.builtin.package:
     name: tzdata
     state: present
   when: ansible_facts.distribution == 'Alpine'
 
 - name: make sure hwclock is installed in Ubuntu 24.04
-  package:
+  ansible.builtin.package:
     name: util-linux-extra
     state: present
   when:

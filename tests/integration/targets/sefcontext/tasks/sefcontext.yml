@@ -4,14 +4,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: install requirements for RHEL
-  package:
+  ansible.builtin.package:
     name: policycoreutils-python
   when:
     - ansible_facts.distribution == 'RedHat'
     - ansible_facts.distribution_major_version|int < 8
 
 - name: install requirements for rhel8 beta
-  package:
+  ansible.builtin.package:
     name: python3-policycoreutils
   when:
     - ansible_facts.distribution == 'RedHat'

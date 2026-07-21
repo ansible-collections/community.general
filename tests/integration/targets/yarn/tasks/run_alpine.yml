@@ -22,4 +22,4 @@
   vars:
     node_bin_path: /usr/bin
     yarn_bin_path: /usr/bin
-    package: 'iconv-lite'
+    ansible.builtin.package: 'iconv-lite'

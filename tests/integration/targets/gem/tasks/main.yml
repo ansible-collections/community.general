@@ -24,7 +24,7 @@
           paths: '../vars'
 
     - name: Install dependencies for test
-      package:
+      ansible.builtin.package:
         name: "{{ item }}"
         state: present
       loop: "{{ test_packages }}"

@@ -43,7 +43,7 @@
   vars:
     node_bin_path: "{{ remote_tmp_dir }}/{{ nodejs_path }}/bin"
     pnpm_bin_path: "{{ ansible_facts.env.HOME }}/.local/share/pnpm"
-    package: "tailwindcss"
+    ansible.builtin.package: "tailwindcss"
   environment:
     PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
 
