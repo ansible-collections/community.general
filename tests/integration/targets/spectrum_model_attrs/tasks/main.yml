@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "Verify required variables: model_name, model_type, oneclick_username, oneclick_password, oneclick_url"
-  fail:
+  ansible.builtin.fail:
     msg: "One or more of the following variables are not set: model_name, model_type, oneclick_username, oneclick_password, oneclick_url"
   when: >
     model_name is not defined
