@@ -69,7 +69,7 @@
             group: wheel
             mode: '0644'
     - name: enable cron service
-      service:
+      ansible.builtin.service:
         daemon-reload: '{{ (ansible_facts.service_mgr == ''systemd'') | ternary(true, omit) }}'
         name: '{{ cron_service }}'
         state: restarted

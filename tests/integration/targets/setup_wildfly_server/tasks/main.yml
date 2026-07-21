@@ -100,7 +100,7 @@
     dest: '{{ default_deploy_root }}/deployments'
 
 - name: Reload systemd and start wildfly
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
     name: wildfly
     state: started

@@ -51,7 +51,7 @@
   when: ansible_facts.distribution == 'Archlinux'
 
 - name: Make installable on Arch
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
   when: ansible_facts.distribution == 'Archlinux'
 

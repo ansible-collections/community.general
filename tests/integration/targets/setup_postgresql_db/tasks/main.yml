@@ -37,7 +37,7 @@
         - '{{ role_path }}/vars'
 
 - name: make sure the dbus service is started under systemd
-  systemd:
+  ansible.builtin.systemd:
     name: dbus
     state: started
   when: ansible_facts.service_mgr == 'systemd' and ansible_facts.distribution == 'Fedora'
@@ -49,7 +49,7 @@
   ignore_errors: true
 
 - name: stop postgresql service
-  service: name={{ postgresql_service }} state=stopped
+  ansible.builtin.service: name={{ postgresql_service }} state=stopped
   ignore_errors: true
 
 - name: remove old db (RedHat or Suse)
@@ -115,7 +115,7 @@
   when: ansible_facts.os_family == 'Debian'
 
 - name: Initialize postgres (Suse)
-  service: name=postgresql state=stopped
+  ansible.builtin.service: name=postgresql state=stopped
   when: ansible_facts.os_family == 'Suse'
 
 - name: Pause between stop and start postgresql
@@ -145,12 +145,12 @@
   when: ansible_facts.distribution == 'Archlinux'
 
 - name: Make installable on Arch
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
   when: ansible_facts.distribution == 'Archlinux'
 
 - name: Initialize postgres (Suse)
-  service: name=postgresql state=started
+  ansible.builtin.service: name=postgresql state=started
   when: ansible_facts.os_family == 'Suse'
 
 - name: Copy pg_hba into place
@@ -216,7 +216,7 @@
   when: ansible_facts.os_family == "FreeBSD"
 
 - name: start postgresql service
-  service: name={{ postgresql_service }} state=started
+  ansible.builtin.service: name={{ postgresql_service }} state=started
 
 - name: Pause between start and stop
   pause:
@@ -230,7 +230,7 @@
   register: terminate
 
 - name: Stop postgresql service
-  service: name={{ postgresql_service }} state=stopped
+  ansible.builtin.service: name={{ postgresql_service }} state=stopped
   when: terminate is not succeeded
 
 - name: Pause between stop and start
@@ -238,7 +238,7 @@
     seconds: 5
 
 - name: Start postgresql service
-  service: name={{ postgresql_service }} state=started
+  ansible.builtin.service: name={{ postgresql_service }} state=started
 
 - name: copy control file for dummy ext
   ansible.builtin.copy:

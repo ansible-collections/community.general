@@ -25,7 +25,7 @@
     validate: "pfctl -nf %s"
 
 - name: Start pf firewall
-  service:
+  ansible.builtin.service:
     name: pf
     state: started
     enabled: true
@@ -50,7 +50,7 @@
 
 - name: Start ezjail
   ignore_errors: true
-  service:
+  ansible.builtin.service:
     name: ezjail
     state: started
     enabled: true

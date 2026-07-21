@@ -68,7 +68,7 @@
 
     - name: restart monit
       become: true
-      service:
+      ansible.builtin.service:
         name: monit
         state: restarted
 
@@ -77,7 +77,7 @@
   always:
     - name: stop monit
       become: true
-      service:
+      ansible.builtin.service:
         name: monit
         state: stopped
 
