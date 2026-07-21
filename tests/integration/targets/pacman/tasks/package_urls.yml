@@ -46,7 +46,7 @@
       async: 90
       poll: 0
     - name: Wait for http.server to come up online
-      wait_for:
+      ansible.builtin.wait_for:
         host: 'localhost'
         port: '{{http_port}}'
         state: started

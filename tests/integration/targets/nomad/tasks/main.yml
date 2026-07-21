@@ -65,7 +65,7 @@
       ansible.builtin.shell: nohup {{ nomad_cmd }} agent -dev </dev/null >/dev/null 2>&1 &
 
     - name: wait nomad up
-      wait_for:
+      ansible.builtin.wait_for:
         host: localhost
         port: 4646
         delay: 10

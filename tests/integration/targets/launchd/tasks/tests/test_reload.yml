@@ -28,7 +28,7 @@
 
 
 - name: "[{{ item }}] The started service should run on port 21212"
-  wait_for:
+  ansible.builtin.wait_for:
     port: 21212
     delay: 5
     timeout: 10
@@ -65,7 +65,7 @@
 
 
 - name: "[{{ item }}] The started service should run on port 21213"
-  wait_for:
+  ansible.builtin.wait_for:
     port: 21213
     delay: 5
     timeout: 10

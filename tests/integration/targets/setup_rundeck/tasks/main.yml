@@ -36,6 +36,6 @@
     RDECK_BASE: "{{ rdeck_base }}"
 
 - name: Wait for Rundeck port 4440
-  wait_for:
+  ansible.builtin.wait_for:
     host: localhost
     port: 4440

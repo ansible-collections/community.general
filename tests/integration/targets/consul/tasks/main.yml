@@ -79,7 +79,7 @@
         - name: Start Consul (dev mode enabled)
           ansible.builtin.shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
         - name: Wait for Consul HTTP API to be ready
-          wait_for:
+          ansible.builtin.wait_for:
             host: localhost
             port: 8500
             delay: 3
