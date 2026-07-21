@@ -11,7 +11,7 @@
       - "{{ loop_device4 }}"
 
 - name: Save loop_device4 pvid
-  shell: "pvs -ouuid --noheadings {{ loop_device4 }} | xargs -n1 | tr -d '-'"
+  ansible.builtin.shell: "pvs -ouuid --noheadings {{ loop_device4 }} | xargs -n1 | tr -d '-'"
   register: loop_device4_pvid_result
 
 - name: Detach loop_device4

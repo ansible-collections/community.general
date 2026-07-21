@@ -9,7 +9,7 @@
   ignore_errors: true
 
 - name: get git version, only newer than {{git_version_supporting_includes}} has includes option
-  shell: "git --version | grep 'git version' | sed 's/git version //'"
+  ansible.builtin.shell: "git --version | grep 'git version' | sed 's/git version //'"
   register: git_version
   ignore_errors: true
 ...

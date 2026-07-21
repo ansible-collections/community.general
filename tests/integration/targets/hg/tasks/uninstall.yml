@@ -18,7 +18,7 @@
 
 # using the apt module prevents autoremove from working, so call apt-get via shell instead
 - name: uninstall packages which were not originally installed (apt)
-  shell: apt-get -y remove mercurial && apt-get -y autoremove
+  ansible.builtin.shell: apt-get -y remove mercurial && apt-get -y autoremove
   when: ansible_facts.pkg_mgr == 'apt'
 
 - name: uninstall packages which were not originally installed (dnf)
@@ -30,7 +30,7 @@
 
 # the yum module does not have an autoremove parameter
 - name: uninstall packages which were not originally installed (yum)
-  shell: yum -y autoremove mercurial
+  ansible.builtin.shell: yum -y autoremove mercurial
   when: ansible_facts.pkg_mgr == 'yum'
 
 - name: uninstall packages which were not originally installed

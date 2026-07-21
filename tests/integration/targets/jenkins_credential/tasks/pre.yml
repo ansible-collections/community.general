@@ -17,7 +17,7 @@
   until: result.status == 200
 
 - name: Get Jenkins crumb and save cookie
-  shell: |
+  ansible.builtin.shell: |
     curl -s -c cookies.txt -u FishLegs:MeatLug http://localhost:8080/crumbIssuer/api/json > crumb.json
   args:
     executable: /bin/bash
@@ -27,7 +27,7 @@
     crumb_data: "{{ lookup('file', 'crumb.json') | from_json }}"
 
 - name: Create Jenkins folder 'test'
-  shell: |
+  ansible.builtin.shell: |
     curl -b cookies.txt -u {{ jenkins_username }}:{{ jenkins_password }} \
       -H "{{ crumb_data.crumbRequestField }}: {{ crumb_data.crumb }}" \
       -H "Content-Type: application/xml" \

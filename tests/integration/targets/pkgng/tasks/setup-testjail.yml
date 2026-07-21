@@ -66,7 +66,7 @@
 
 - name: Setup ezjail base
   when: not ezjail_base_jail.stat.exists
-  shell: "ezjail-admin install {{ pkgng_jail_log_redirect }}"
+  ansible.builtin.shell: "ezjail-admin install {{ pkgng_jail_log_redirect }}"
   changed_when: false
 
 - name: Has testjail
@@ -76,7 +76,7 @@
 
 - name: Create testjail
   when: not ezjail_test_jail.stat.exists
-  shell: "ezjail-admin create testjail 'lo1|127.0.1.1' {{ pkgng_jail_log_redirect }}"
+  ansible.builtin.shell: "ezjail-admin create testjail 'lo1|127.0.1.1' {{ pkgng_jail_log_redirect }}"
   changed_when: false
 
 - name: Configure testjail to use Cloudflare DNS
@@ -90,7 +90,7 @@
     - "1.0.0.1"
 
 - name: Is testjail running
-  shell: "jls | grep testjail"
+  ansible.builtin.shell: "jls | grep testjail"
   changed_when: false
   failed_when: false
   register: is_testjail_up

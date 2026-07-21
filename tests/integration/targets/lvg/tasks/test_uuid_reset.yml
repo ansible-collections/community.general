@@ -9,11 +9,11 @@
     pvs: "{{ loop_device1 }}"
 
 - name: Save testvg uuid
-  shell: vgs -ouuid --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -ouuid --noheadings testvg | xargs -n1
   register: orig_vg_uuid_cmd_result
 
 - name: Save pv uuid
-  shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
+  ansible.builtin.shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
   register: orig_pv_uuid_cmd_result
 
 - name: Deactivate and reset vg/pv uuid
@@ -26,11 +26,11 @@
   register: vg_uuid_reset
 
 - name: Save testvg uuid
-  shell: vgs -ouuid --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -ouuid --noheadings testvg | xargs -n1
   register: new_vg_uuid_cmd_result
 
 - name: Save pv uuid
-  shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
+  ansible.builtin.shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
   register: new_pv_uuid_cmd_result
 
 - name: Do all assertions to verify expected results
@@ -54,11 +54,11 @@
   register: repeat_pv_uuid_reset
 
 - name: Save testvg uuid
-  shell: vgs -ouuid --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -ouuid --noheadings testvg | xargs -n1
   register: repeat_vg_uuid_cmd_result
 
 - name: Save pv uuid
-  shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
+  ansible.builtin.shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
   register: repeat_pv_uuid_cmd_result
 
 - name: Do all assertions to verify expected results
@@ -85,11 +85,11 @@
   check_mode: true
 
 - name: Save testvg uuid
-  shell: vgs -ouuid --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -ouuid --noheadings testvg | xargs -n1
   register: check_mode_vg_uuid_cmd_result
 
 - name: Save pv uuid
-  shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
+  ansible.builtin.shell: "pvs -ouuid --noheadings {{ loop_device1 }} | xargs -n1"
   register: check_mode_pv_uuid_cmd_result
 
 - name: Do all assertions to verify expected results

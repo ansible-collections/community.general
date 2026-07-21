@@ -22,7 +22,7 @@
   register: remove_namespaced_element
 
 - name: Add trailing newline
-  shell: echo "" >> /tmp/ansible-xml-namespaced-beers.xml
+  ansible.builtin.shell: echo "" >> /tmp/ansible-xml-namespaced-beers.xml
 
 - name: Compare to expected result
   copy:
