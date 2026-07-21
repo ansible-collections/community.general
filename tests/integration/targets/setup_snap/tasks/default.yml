@@ -10,7 +10,7 @@
   notify: Remove snapd
 
 - name: Make sure that snapd is running
-  service:
+  ansible.builtin.service:
     name: snapd
     state: started
 

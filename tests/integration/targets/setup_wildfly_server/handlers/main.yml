@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Stop wildfly (jboss)
-  systemd:
+  ansible.builtin.systemd:
     name: wildfly
     state: stopped
   ignore_errors: true

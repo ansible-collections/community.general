@@ -48,7 +48,7 @@
           if failed host localhost port 8082 then restart
 
 - name: restart monit
-  service:
+  ansible.builtin.service:
     name: monit
     state: restarted
 

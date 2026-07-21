@@ -37,7 +37,7 @@
 
 - name: Start ezjail
   ignore_errors: true
-  service:
+  ansible.builtin.service:
     name: ezjail
     state: started
     enabled: true

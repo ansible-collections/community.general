@@ -24,6 +24,6 @@
     dest: /etc/mosquitto/mosquitto.conf
 
 - name: Start Mosquitto service
-  service:
+  ansible.builtin.service:
     name: mosquitto
     state: restarted
