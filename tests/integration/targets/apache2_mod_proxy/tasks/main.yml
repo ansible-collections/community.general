@@ -79,7 +79,7 @@
     balancer_vhost: localhost:81
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.members | length == 2
@@ -101,7 +101,7 @@
     state: present
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -110,7 +110,7 @@
     balancer_vhost: localhost:81
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.members | length == 2
@@ -140,7 +140,7 @@
     state: drained
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
 
@@ -151,7 +151,7 @@
     balancer_vhost: localhost:81
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.members | length == 2
@@ -181,7 +181,7 @@
     state: absent
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
 
@@ -190,7 +190,7 @@
     balancer_vhost: localhost:81
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.members | length == 2
@@ -220,7 +220,7 @@
     state: present
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
 
@@ -229,7 +229,7 @@
     balancer_vhost: localhost:81
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.members | length == 2

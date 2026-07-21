@@ -22,7 +22,7 @@
   ignore_errors: true
 
 - name: Assert that passing a boolean attribute value raises an error
-  assert:
+  ansible.builtin.assert:
     that:
       - set_attribute_boolean_false is failed
       - "'was parsed for' in set_attribute_boolean_false.msg"
@@ -38,7 +38,7 @@
   ignore_errors: true
 
 - name: Assert that passing a boolean element value raises an error
-  assert:
+  ansible.builtin.assert:
     that:
       - set_element_boolean_true is failed
       - "'was parsed for' in set_element_boolean_true.msg"
@@ -54,6 +54,6 @@
   register: set_attribute_string_false
 
 - name: Assert that passing a quoted string attribute value succeeds
-  assert:
+  ansible.builtin.assert:
     that:
       - set_attribute_string_false is changed

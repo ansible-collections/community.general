@@ -36,7 +36,7 @@
   register: pkgng_test_outofdate_pkg_tempfile
 
 - name: There should be only one package
-  assert:
+  ansible.builtin.assert:
     that:
       - pkgng_test_outofdate_pkg_tempfile.files | count == 1
 

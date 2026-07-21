@@ -15,7 +15,7 @@
 
 
 - name: "[{{ item }}] Validate that service was started in check mode"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_1_launchd_start_result_check_mode is success
       - test_1_launchd_start_result_check_mode is changed
@@ -30,7 +30,7 @@
 
 
 - name: "[{{ item }}] Validate that service was started"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_1_launchd_start_result is success
       - test_1_launchd_start_result is changed
@@ -50,7 +50,7 @@
   register: "test_2_launchd_stop_result"
 
 - name: "[{{ item }}] Validate that service was stopped after it was started"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_2_launchd_stop_result is success
       - test_2_launchd_stop_result is changed
@@ -69,7 +69,7 @@
   register: "test_3_launchd_stop_result"
 
 - name: "[{{ item }}] Validate that service can be stopped after being already stopped"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_3_launchd_stop_result is success
       - not test_3_launchd_stop_result is changed
@@ -88,7 +88,7 @@
   register: "test_4_launchd_start_result"
 
 - name: "[{{ item }}] Validate that service was started..."
-  assert:
+  ansible.builtin.assert:
     that:
       - test_4_launchd_start_result is success
       - test_4_launchd_start_result is changed
@@ -106,7 +106,7 @@
   register: "test_5_launchd_start_result"
 
 - name: "[{{ item }}] Validate that service is still in the same state as before"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_5_launchd_start_result is success
       - not test_5_launchd_start_result is changed

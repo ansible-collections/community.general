@@ -47,7 +47,7 @@
   register: set_result3
 
 - name: assert set changed and value is correct
-  assert:
+  ansible.builtin.assert:
     that:
       - set_result1.results[0] is changed
       - set_result1.results[1] is changed
@@ -60,7 +60,7 @@
       - 'get_result.config_values == {"push.pushoption": ["merge_request.create", "merge_request.draft", "merge_request.target=foobar"]}'
 
 - name: assert the diffs are also right
-  assert:
+  ansible.builtin.assert:
     that:
       - set_result1.results[0].diff.before == "\n"
       - set_result1.results[0].diff.after == "merge_request.create\n"

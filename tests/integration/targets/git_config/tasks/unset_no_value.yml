@@ -19,7 +19,7 @@
   register: get_result
 
 - name: assert unsetting didn't change
-  assert:
+  ansible.builtin.assert:
     that:
       - unset_result is not changed
       - unset_result.msg == 'no setting to unset'

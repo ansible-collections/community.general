@@ -17,7 +17,7 @@
 
 - debug: var=server_creation_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_check_task is success
       - server_creation_check_task is changed
@@ -36,7 +36,7 @@
 
 - debug: var=server_creation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_task is success
       - server_creation_task is changed
@@ -55,7 +55,7 @@
 
 - debug: var=server_creation_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_confirmation_task is success
       - server_creation_confirmation_task is not changed
@@ -76,7 +76,7 @@
 
 - debug: var=server_patching_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_patching_check_task is success
       - server_patching_check_task is changed
@@ -97,7 +97,7 @@
 
 - debug: var=server_patching_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_patching_task is success
       - server_patching_task is changed
@@ -118,7 +118,7 @@
 
 - debug: var=server_patching_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_patching_confirmation_task is success
       - server_patching_confirmation_task is not changed
@@ -139,7 +139,7 @@
 
 - debug: var=server_run_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_run_check_task is success
       - server_run_check_task is changed
@@ -160,7 +160,7 @@
 
 - debug: var=server_run_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_run_task is success
       - server_run_task is changed
@@ -181,7 +181,7 @@
 
 - debug: var=server_run_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_run_confirmation_task is success
       - server_run_confirmation_task is not changed
@@ -202,7 +202,7 @@
 
 - debug: var=server_reboot_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_reboot_check_task is success
       - server_reboot_check_task is changed
@@ -223,7 +223,7 @@
 
 - debug: var=server_reboot_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_reboot_task is success
       - server_reboot_task is changed
@@ -244,7 +244,7 @@
 
 - debug: var=server_stop_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_stop_check_task is success
       - server_stop_check_task is changed
@@ -265,7 +265,7 @@
 
 - debug: var=server_stop_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_stop_task is success
       - server_stop_task is changed
@@ -286,7 +286,7 @@
 
 - debug: var=server_stop_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_stop_confirmation_task is success
       - server_stop_confirmation_task is not changed
@@ -307,7 +307,7 @@
 
 - debug: var=server_destroy_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_destroy_check_task is success
       - server_destroy_check_task is changed
@@ -328,7 +328,7 @@
 
 - debug: var=server_destroy_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_destroy_task is success
       - server_destroy_task is changed
@@ -349,7 +349,7 @@
 
 - debug: var=server_destroy_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_destroy_confirmation_task is success
       - server_destroy_confirmation_task is not changed
@@ -367,7 +367,7 @@
 
 - debug: var=unauthorized_organization_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - unauthorized_organization_task is not success
       - unauthorized_organization_task is not changed
@@ -385,7 +385,7 @@
 
 - debug: var=unexisting_image_check
 
-- assert:
+- ansible.builtin.assert:
     that:
       - unexisting_image_check is not success
       - unexisting_image_check is not changed

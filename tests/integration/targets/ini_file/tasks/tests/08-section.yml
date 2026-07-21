@@ -46,7 +46,7 @@
     output1: "{{ output_content.content | b64decode }}"
 
 - name: test-section 1 - Option was added to first section
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is changed
       - result1.msg == 'option added'
@@ -98,7 +98,7 @@
     output1: "{{ output_content.content | b64decode }}"
 
 - name: test-section 2 - Option added to second section specified with section_has_values
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is changed
       - result1.msg == 'option added'
@@ -148,7 +148,7 @@
     output1: "{{ output_content.content | b64decode }}"
 
 - name: test-section 3 - Option was removed from specified section
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is changed
       - result1.msg == 'option changed'
@@ -202,7 +202,7 @@
     output1: "{{ output_content.content | b64decode }}"
 
 - name: test-section 4 - New section created, including required values
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is changed
       - result1.msg == 'section and option added'
@@ -240,7 +240,7 @@
     output1: "{{ output_content.content | b64decode }}"
 
 - name: test-section 5 - Section removed as specified
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is changed
       - result1.msg == 'section removed'
@@ -292,7 +292,7 @@
     output1: "{{ output_content.content | b64decode }}"
 
 - name: test-section 6 - New section added
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is changed
       - result1.msg == 'section and option added'
@@ -334,7 +334,7 @@
     output1: "{{ output_content.content | b64decode }}"
 
 - name: test-section 7 - Option changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is changed
       - result1.msg == 'option changed'

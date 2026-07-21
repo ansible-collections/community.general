@@ -21,7 +21,7 @@
           -----END PUBLIC KEY-----
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.auth_method.Type == 'jwt'
@@ -33,7 +33,7 @@
     max_token_ttl: 30m80s
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.auth_method.Type == 'jwt'
@@ -45,7 +45,7 @@
     max_token_ttl: 30m80s
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.auth_method.Type == 'jwt'
@@ -57,7 +57,7 @@
     state: absent
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.operation == 'remove'
@@ -68,7 +68,7 @@
     state: absent
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.operation is not defined

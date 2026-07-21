@@ -36,7 +36,7 @@
     reload: false
   register: first
 
-- assert:
+- ansible.builtin.assert:
     that:
       - first is changed
       - first.setype == 'httpd_sys_content_t'
@@ -49,7 +49,7 @@
     reload: false
   register: second
 
-- assert:
+- ansible.builtin.assert:
     that:
       - second is not changed
       - second.setype == 'httpd_sys_content_t'
@@ -62,7 +62,7 @@
     reload: false
   register: third
 
-- assert:
+- ansible.builtin.assert:
     that:
       - third is changed
       - third.setype == 'unlabeled_t'
@@ -75,7 +75,7 @@
     reload: false
   register: fourth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - fourth is not changed
       - fourth.setype == 'unlabeled_t'
@@ -88,7 +88,7 @@
     reload: false
   register: fifth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - fifth is changed
       - fifth.setype == 'httpd_sys_content_t'
@@ -101,7 +101,7 @@
     reload: false
   register: sixth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - sixth is not changed
       - sixth.setype == 'unlabeled_t'
@@ -114,7 +114,7 @@
     reload: false
   register: subst_first
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_first is changed
       - subst_first.substitute == '/home'
@@ -127,7 +127,7 @@
     reload: false
   register: subst_second
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_second is not changed
       - subst_second.substitute == '/home'
@@ -140,7 +140,7 @@
     reload: false
   register: subst_third
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_third is changed
       - subst_third.substitute == '/boot'
@@ -153,7 +153,7 @@
     reload: false
   register: subst_fourth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_fourth is not changed
       - subst_fourth.substitute == '/boot'
@@ -166,7 +166,7 @@
     reload: false
   register: subst_fifth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_fifth is not changed
       - subst_fifth.substitute == '/dev'
@@ -179,7 +179,7 @@
     reload: false
   register: subst_sixth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_sixth is changed
       - subst_sixth.substitute == '/boot'
@@ -192,7 +192,7 @@
     reload: false
   register: subst_seventh
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_seventh is not changed
       - subst_seventh.substitute == '/boot'
@@ -205,7 +205,7 @@
     reload: false
   register: subst_eighth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_eighth is changed
       - subst_eighth.substitute == '/home'
@@ -217,7 +217,7 @@
     reload: false
   register: subst_ninth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_ninth is changed
 
@@ -228,6 +228,6 @@
     reload: false
   register: subst_tenth
 
-- assert:
+- ansible.builtin.assert:
     that:
       - subst_tenth is not changed

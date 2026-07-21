@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test json_patch
-  assert:
+  ansible.builtin.assert:
     that:
       - > # Insert a new element into an array at a specified index
           list_input |
@@ -82,7 +82,7 @@
       bar: { two: 2 }
 
 - name: Test json_patch_recipe
-  assert:
+  ansible.builtin.assert:
     that:
       - > # List of operations
           input |
@@ -120,7 +120,7 @@
         value: [10, 20, 30]
 
 - name: Test json_diff
-  assert:
+  ansible.builtin.assert:
     that: # The order in the result array is not stable, sort by path
       - >
           input |

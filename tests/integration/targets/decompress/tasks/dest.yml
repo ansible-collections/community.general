@@ -33,7 +33,7 @@
   register: result_files_stat
 
 - name: Test that file exists
-  assert:
+  ansible.builtin.assert:
     that:
       - item.stat.exists
     quiet: true

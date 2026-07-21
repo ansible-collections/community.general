@@ -11,7 +11,7 @@
   register: paths_result
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - paths_result is not changed
       - paths_result.count == 3
@@ -28,7 +28,7 @@
   register: paths_empty
 
 - name: Test expected result for no matches
-  assert:
+  ansible.builtin.assert:
     that:
       - paths_empty is not changed
       - paths_empty.count == 0

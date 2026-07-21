@@ -15,6 +15,6 @@
   register: repeat_vg_create
 
 - name: Do all assertions to verify expected results
-  assert:
+  ansible.builtin.assert:
     that:
       - repeat_vg_create is not changed

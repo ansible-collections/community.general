@@ -17,6 +17,6 @@
     var: organizations
 
 - name: Ensure retrieval of organizations info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - organizations is success

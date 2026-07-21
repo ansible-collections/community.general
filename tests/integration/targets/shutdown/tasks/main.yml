@@ -23,7 +23,7 @@
   check_mode: true
 
 - name: Verify Custom Message except Alpine, AIX
-  assert:
+  ansible.builtin.assert:
     that:
       - '"Custom Message" in shutdown_result["shutdown_command"]'
       - '"Shut down initiated by Ansible" in shutdown_result_minus["shutdown_command"]'
@@ -34,7 +34,7 @@
     - '"systemctl" not in shutdown_result_minus["shutdown_command"]'
 
 - name: Verify shutdown command is present except Alpine or AIX or systemd
-  assert:
+  ansible.builtin.assert:
     that: '"shutdown" in shutdown_result["shutdown_command"]'
   when:
     - "ansible_facts.os_family != 'Alpine'"
@@ -42,7 +42,7 @@
     - '"systemctl" not in shutdown_result["shutdown_command"]'
 
 - name: Verify shutdown command is present in Alpine except systemd
-  assert:
+  ansible.builtin.assert:
     that: '"poweroff" in shutdown_result["shutdown_command"]'
   when:
     - "ansible_facts.os_family == 'Alpine'"
@@ -50,14 +50,14 @@
 
 
 - name: Verify shutdown command is present in VMKernel except systemd
-  assert:
+  ansible.builtin.assert:
     that: '"halt" in shutdown_result["shutdown_command"]'
   when:
     - "ansible_facts.system == 'VMKernel'"
     - '"systemctl" not in shutdown_result["shutdown_command"]'
 
 - name: Verify shutdown delay is present in minutes in Linux except systemd
-  assert:
+  ansible.builtin.assert:
     that:
       - '"-h 1" in shutdown_result["shutdown_command"]'
       - '"-h 0" in shutdown_result_minus["shutdown_command"]'
@@ -68,28 +68,28 @@
     - '"systemctl" not in shutdown_result_minus["shutdown_command"]'
 
 - name: Verify shutdown delay is present in minutes in Void, MacOSX, OpenBSD
-  assert:
+  ansible.builtin.assert:
     that:
       - '"-h +1" in shutdown_result["shutdown_command"]'
       - '"-h +0" in shutdown_result_minus["shutdown_command"]'
   when: ansible_facts.system in ['Void', 'Darwin', 'OpenBSD']
 
 - name: Verify shutdown delay is present in seconds in FreeBSD
-  assert:
+  ansible.builtin.assert:
     that:
       - '"-p +100s" in shutdown_result["shutdown_command"]'
       - '"-p +0s" in shutdown_result_minus["shutdown_command"]'
   when: ansible_facts.system == 'FreeBSD'
 
 - name: Verify shutdown delay is present in seconds in Solaris, SunOS
-  assert:
+  ansible.builtin.assert:
     that:
       - '"-g 100" in shutdown_result["shutdown_command"]'
       - '"-g 0" in shutdown_result_minus["shutdown_command"]'
   when: ansible_facts.system in ['Solaris', 'SunOS']
 
 - name: Verify shutdown delay is present in seconds, VMKernel
-  assert:
+  ansible.builtin.assert:
     that:
       - '"-d 100" in shutdown_result["shutdown_command"]'
       - '"-d 0" in shutdown_result_minus["shutdown_command"]'

@@ -28,7 +28,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_attribute is changed
       - comparison is not changed  # identical

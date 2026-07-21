@@ -12,6 +12,6 @@
   register: alternative
 
 - name: Check previous task failed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is failed'

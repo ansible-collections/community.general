@@ -21,7 +21,7 @@
     key: foo
   register: xattr_get_specific_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "xattr_set_result.changed"
       - "xattr_get_all_result['xattr']['user.foo'] == 'bar'"
@@ -37,7 +37,7 @@
     value: bar
   register: xattr_set_again_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "not xattr_set_again_result.changed"
 
@@ -53,7 +53,7 @@
     path: "{{ test_file }}"
   register: xattr_get_after_unset_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "xattr_unset_result.changed"
       - "xattr_get_after_unset_result['xattr'] == {}"
@@ -67,6 +67,6 @@
     state: absent
   register: xattr_unset_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "not xattr_set_again_result.changed"

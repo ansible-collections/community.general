@@ -18,7 +18,7 @@
     var: ips
 
 - name: Ensure retrieval of ips info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ips is success
 
@@ -32,6 +32,6 @@
     var: ips_ams1
 
 - name: Ensure retrieval of ips info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ips_ams1 is success

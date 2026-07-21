@@ -60,7 +60,7 @@
   register: package_canary
 
 - name: Run tests (FreeBSD)
-  assert:
+  ansible.builtin.assert:
     that:
       - sources_android_26.stat.exists
       - sources_android_26_installed is changed

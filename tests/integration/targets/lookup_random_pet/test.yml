@@ -15,7 +15,7 @@
         result5: "{{ query('community.general.random_pet', words=2, length=6, prefix='kubernetes', separator='_') }}"
 
     - name: Check results
-      assert:
+      ansible.builtin.assert:
         that:
           - result1 | length == 1
           - result1[0].split('-') | length == 3

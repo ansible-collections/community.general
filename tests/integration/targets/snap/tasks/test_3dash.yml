@@ -26,6 +26,6 @@
       - shellcheck
     state: absent
 
-- assert:
+- ansible.builtin.assert:
     that:
       - install_3dash_check is changed

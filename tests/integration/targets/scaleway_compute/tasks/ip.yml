@@ -18,7 +18,7 @@
 
 - debug: var=server_creation_absent_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_absent_check_task is success
       - server_creation_absent_check_task is changed
@@ -38,7 +38,7 @@
 
 - debug: var=server_creation_absent_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_absent_task is success
       - server_creation_absent_task is changed
@@ -58,7 +58,7 @@
 
 - debug: var=server_creation_absent_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_absent_confirmation_task is success
       - server_creation_absent_confirmation_task is not changed
@@ -80,7 +80,7 @@
 
 - debug: var=ip_patching_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ip_patching_check_task is success
       - ip_patching_check_task is changed
@@ -99,7 +99,7 @@
 
 - debug: var=ip_patching_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ip_patching_task is success
       - ip_patching_task is changed
@@ -119,7 +119,7 @@
 
 - debug: var=ip_patching_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - ip_patching_confirmation_task is success
       - ip_patching_confirmation_task is not changed
@@ -141,7 +141,7 @@
 
 - debug: var=remove_ip_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - remove_ip_check_task is success
       - remove_ip_check_task is changed
@@ -161,7 +161,7 @@
 
 - debug: var=remove_ip_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - remove_ip_task is success
       - remove_ip_task is changed
@@ -181,7 +181,7 @@
 
 - debug: var=remove_ip_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - remove_ip_confirmation_task is success
       - remove_ip_confirmation_task is not changed
@@ -200,7 +200,7 @@
 
 - debug: var=server_destroy_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_destroy_task is success
       - server_destroy_task is changed

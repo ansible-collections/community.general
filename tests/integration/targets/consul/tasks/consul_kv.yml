@@ -10,13 +10,13 @@
     token: "{{ consul_management_token }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.data.Value == 'somevalue'
 
 # - name: Test the lookup
-#   assert:
+#   ansible.builtin.assert:
 #     that:
 #       - lookup('community.general.consul_kv', 'somekey', token=consul_management_token) == 'somevalue'
 
@@ -27,7 +27,7 @@
     token: "{{ consul_management_token }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.data.Value == 'somevalue'
@@ -39,7 +39,7 @@
     token: "{{ consul_management_token }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.data.Value == 'somevalue'
@@ -51,7 +51,7 @@
     token: "{{ consul_management_token }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - not result.data

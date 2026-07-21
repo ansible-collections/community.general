@@ -19,7 +19,7 @@
   shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
 
 - name: check expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is changed'
       - 'cmd.stdout == "dummy" ~ item'
@@ -46,7 +46,7 @@
   register: alternative
 
 - name: check no change was triggered without priority
-  assert:
+  ansible.builtin.assert:
     that:
       - 'alternative is not changed'
 

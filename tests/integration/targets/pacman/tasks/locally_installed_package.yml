@@ -72,7 +72,7 @@
       register: remove_3
 
     - name: Check conditions
-      assert:
+      ansible.builtin.assert:
         that:
           - remove_1 is changed
           - remove_2 is changed

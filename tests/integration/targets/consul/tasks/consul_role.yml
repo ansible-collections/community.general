@@ -34,7 +34,7 @@
       - name: "foo-access-for-role"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.Name == 'foo-role-with-policy'
@@ -47,7 +47,7 @@
   check_mode: true
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.Description == "Testing updating description"
@@ -60,7 +60,7 @@
     description: "Role for testing policies"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.Description == "Role for testing policies"
@@ -75,7 +75,7 @@
       - name: "bar-access-for-role"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.Policies.0.Name == 'foo-access-for-role'
@@ -92,7 +92,7 @@
           - dc1
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.ServiceIdentities.0.ServiceName == "web"
@@ -108,7 +108,7 @@
   register: result
   check_mode: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.ServiceIdentities.0.ServiceName == "web"
@@ -121,7 +121,7 @@
       - name: "foo-access-for-role"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.ServiceIdentities.0.ServiceName == "web"
@@ -134,7 +134,7 @@
     policies: []
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.ServiceIdentities.0.ServiceName == "web"
@@ -148,7 +148,7 @@
   register: result
   check_mode: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.ServiceIdentities.0.ServiceName == "web"
@@ -162,7 +162,7 @@
     service_identities: []
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.ServiceIdentities is not defined # in normal mode the dictionary is removed from the result
@@ -176,7 +176,7 @@
         datacenter: dc2
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.role.NodeIdentities.0.NodeName == "node-1"
@@ -188,7 +188,7 @@
     state: absent
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.operation == 'remove'

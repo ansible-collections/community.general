@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: test counter filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('abca' | community.general.counter) == {'a': 2, 'b': 1, 'c': 1}"
       - "(['apple', 'pear', 'pear'] | community.general.counter) == {'apple': 1, 'pear': 2}"
@@ -23,7 +23,7 @@
   register: res
 
 - name: verify test fail argument not a sequence
-  assert:
+  ansible.builtin.assert:
     that:
       - res is failed
       - res.msg is search('Argument for community.general.counter must be a sequence')
@@ -35,7 +35,7 @@
   register: res
 
 - name: verify test fail element not hashable
-  assert:
+  ansible.builtin.assert:
     that:
       - res is failed
       - res.msg is search('community.general.counter needs a sequence with hashable elements')

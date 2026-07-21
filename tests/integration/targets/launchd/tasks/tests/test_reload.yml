@@ -14,7 +14,7 @@
   check_mode: true
 
 - name: "[{{ item }}] Assert that everything work in check mode"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_1_launchd_start_result_check_mode is success
       - test_1_launchd_start_result_check_mode is changed
@@ -47,7 +47,7 @@
   register: "test_1_launchd_reload_result"
 
 - name: "[{{ item }}] Validate that service was reloaded"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_1_launchd_reload_result is success
       - test_1_launchd_reload_result is changed

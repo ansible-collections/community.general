@@ -19,7 +19,7 @@
   ignore_errors: true
 
 - name: Test if state and value are required together
-  assert:
+  ansible.builtin.assert:
     that:
       - "'following are missing: value' in missing_value['msg']"
 
@@ -34,7 +34,7 @@
   check_mode: true
 
 - name: Test if AppleMeasurementUnits value is changed to Centimeters in check_mode
-  assert:
+  ansible.builtin.assert:
     that:
       - measure_task_check_mode.changed
 
@@ -66,7 +66,7 @@
   register: change_value
 
 - name: Test if AppleMeasurementUnits value is changed to {{ new_value }}
-  assert:
+  ansible.builtin.assert:
     that:
       - change_value.changed
 
@@ -80,7 +80,7 @@
   register: change_value
 
 - name: Again test if AppleMeasurementUnits value is not changed to {{ new_value }}
-  assert:
+  ansible.builtin.assert:
     that:
       - not change_value.changed
 
@@ -95,7 +95,7 @@
     msg: "{{ list_fake_value }}"
 
 - name: Check if fake value is listed
-  assert:
+  ansible.builtin.assert:
     that:
       - not list_fake_value.changed
 
@@ -111,7 +111,7 @@
     msg: "{{ present_fake_value }}"
 
 - name: Check if fake is created
-  assert:
+  ansible.builtin.assert:
     that:
       - present_fake_value.changed
   when: present_fake_value.changed
@@ -137,7 +137,7 @@
     msg: "{{ absent_task }}"
 
 - name: Check if fake setting is deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - absent_task.changed
   when: present_fake_value.changed
@@ -153,7 +153,7 @@
     msg: "{{ absent_task }}"
 
 - name: Check if fake setting is not deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - not absent_task.changed
 
@@ -169,7 +169,7 @@
     msg: "{{ absent_check_mode_task }}"
 
 - name: Check delete operation with check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - not absent_check_mode_task.changed
 
@@ -193,7 +193,7 @@
     - { type: 'array', value: ['1', '2'], key: 'sample_array'}
   register: test_data_types
 
-- assert:
+- ansible.builtin.assert:
     that: "item is changed"
   with_items: "{{ test_data_types.results }}"
 
@@ -207,7 +207,7 @@
   with_items: *data_type
   register: test_data_types
 
-- assert:
+- ansible.builtin.assert:
     that: "item is changed"
   with_items: "{{ test_data_types.results }}"
 
@@ -228,7 +228,7 @@
     array_add: true
   register: test_array_add
 
-- assert:
+- ansible.builtin.assert:
     that: test_array_add.changed
 
 - name: add for the second time, should be skipped
@@ -241,7 +241,7 @@
     array_add: true
   register: test_array_add
 
-- assert:
+- ansible.builtin.assert:
     that: not test_array_add.changed
 
 - name: Clean up test key
@@ -251,7 +251,7 @@
     state: absent
   register: test_array_add
 
-- assert:
+- ansible.builtin.assert:
     that: test_array_add.changed
 
 
@@ -271,7 +271,7 @@
       OpenWith: true
   register: test_dict_write
 
-- assert:
+- ansible.builtin.assert:
     that: test_dict_write.changed
 
 - name: Write same dict value again, should not change
@@ -284,7 +284,7 @@
       OpenWith: true
   register: test_dict_write
 
-- assert:
+- ansible.builtin.assert:
     that: not test_dict_write.changed
 
 - name: Write different dict value, should change
@@ -297,7 +297,7 @@
       OpenWith: false
   register: test_dict_write
 
-- assert:
+- ansible.builtin.assert:
     that: test_dict_write.changed
 
 - name: Add new key via dict_add
@@ -310,7 +310,7 @@
       Privileges: true
   register: test_dict_add
 
-- assert:
+- ansible.builtin.assert:
     that: test_dict_add.changed
 
 - name: Add same key via dict_add again, should not change
@@ -323,7 +323,7 @@
       Privileges: true
   register: test_dict_add
 
-- assert:
+- ansible.builtin.assert:
     that: not test_dict_add.changed
 
 - name: Use dict_add on non-existent key, should create it
@@ -336,7 +336,7 @@
       Alpha: true
   register: test_dict_add_new
 
-- assert:
+- ansible.builtin.assert:
     that: test_dict_add_new.changed
 
 - name: Clean up dict test keys

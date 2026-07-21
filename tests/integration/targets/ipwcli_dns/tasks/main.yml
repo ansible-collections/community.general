@@ -26,7 +26,7 @@
   register: result
 
 - name: assert the new A record is added
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is changed
@@ -45,7 +45,7 @@
   register: result
 
 - name: assert the new A record is deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is changed
@@ -64,7 +64,7 @@
   register: result
 
 - name: assert the new a record
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is not changed
@@ -86,7 +86,7 @@
   ignore_errors: true
 
 - name: assert the failure of the new SRV record
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
       - result is not changed
@@ -109,7 +109,7 @@
   register: result
 
 - name: assert the NAPTR check_mode
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not failed
       - result is changed

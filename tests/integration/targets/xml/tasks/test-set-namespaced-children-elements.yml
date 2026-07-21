@@ -54,7 +54,7 @@
   # command: diff /tmp/ansible-xml-namespaced-beers-1.xml /tmp/ansible-xml-namespaced-beers-2.xml
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - set_children_again is not changed  # idempotency
       - set_namespaced_attribute_value is changed

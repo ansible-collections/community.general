@@ -83,7 +83,7 @@
         reason_for: all
       register: install_5
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - install_1 is changed
           - install_1.msg == 'Would have installed 3 packages'

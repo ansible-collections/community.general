@@ -16,7 +16,7 @@
   check_mode: true
 
 - name: Verify addition of absent flatpak remote test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - addition_result is changed
     msg: "Adding an absent flatpak remote shall mark module execution as changed"
@@ -32,7 +32,7 @@
 - name: >
       Verify non-existent idempotency of addition of absent flatpak remote
       test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_addition_result is changed
     msg: |
@@ -49,7 +49,7 @@
   check_mode: true
 
 - name: Verify removal of absent flatpak remote test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_result is not changed
     msg: "Removing an absent flatpak remote shall mark module execution as not changed"
@@ -68,7 +68,7 @@
   check_mode: true
 
 - name: Verify addition of present flatpak remote test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - addition_result is not changed
     msg: "Adding a present flatpak remote shall mark module execution as not changed"
@@ -83,7 +83,7 @@
   check_mode: true
 
 - name: Verify removal of present flatpak remote test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_result is changed
     msg: "Removing a present flatpak remote shall mark module execution as changed"
@@ -98,7 +98,7 @@
 - name: >
       Verify non-existent idempotency of removal of present flatpak remote
       test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_removal_result is changed
     msg: |
@@ -118,7 +118,7 @@
   check_mode: true
 
 - name: Verify activation of disabled flatpak remote test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - activation_result is changed
     msg: "Enabling an disabled flatpak remote shall mark module execution as changed"
@@ -133,7 +133,7 @@
 - name: >
       Verify non-existent idempotency of activation of disabled flatpak remote
       test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_activation_result is changed
     msg: |
@@ -150,7 +150,7 @@
   check_mode: true
 
 - name: Verify deactivation of disabled flatpak remote test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - deactivation_result is not changed
     msg: "Disabling an disabled flatpak remote shall mark module execution as not changed"
@@ -168,7 +168,7 @@
   check_mode: true
 
 - name: Verify activation of enabled flatpak remote test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - activation_result is not changed
     msg: "Enabling a enabled flatpak remote shall mark module execution as not changed"
@@ -183,7 +183,7 @@
   check_mode: true
 
 - name: Verify deactivation of enabled flatpak remote test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - deactivation_result is changed
     msg: "Disabling a enabled flatpak remote shall mark module execution as changed"
@@ -198,7 +198,7 @@
 - name: >
       Verify non-existent idempotency of deactivation of enabled flatpak remote
       test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_deactivation_result is changed
     msg: |

@@ -20,7 +20,7 @@
       register: active_vg_autoact_status_result
 
     - name: Assert vg autoactivation is set for vg_autoact_test
-      assert:
+      ansible.builtin.assert:
         that: "'enabled' == active_vg_autoact_status_result.stdout"
 
     - name: Remove vg_autoact_test for the next test
@@ -40,7 +40,7 @@
       register: inactive_vg_autoact_status_result
 
     - name: Assert vg autoactivation disabled for vg_autoact_test
-      assert:
+      ansible.builtin.assert:
         that: "inactive_vg_autoact_status_result.stdout | length == 0"
 
     - name: Remove vg_autoact_test for the next test
@@ -61,7 +61,7 @@
       register: inactive_by_option_vg_autoact_status_result
 
     - name: Assert vg autoactivation disabled by option for vg_autoact_test
-      assert:
+      ansible.builtin.assert:
         that: "inactive_by_option_vg_autoact_status_result.stdout | length == 0"
   always:
     - name: Cleanup vg_autoact_test

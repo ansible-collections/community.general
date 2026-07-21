@@ -11,7 +11,7 @@
   register: launchd_unloaded_result
 
 - name: "[{{ item }}] Validation"
-  assert:
+  ansible.builtin.assert:
     that:
       - launchd_unloaded_result is success
       - launchd_unloaded_result.status.current_state == 'unloaded'

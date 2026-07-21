@@ -6,7 +6,7 @@
 # -------------------------------------------
 
 - name: String. AnsibleUnicode.
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype)
     success_msg: '"abc" is {{ dtype }}'
     fail_msg: '"abc" is {{ result }}'
@@ -19,7 +19,7 @@
       - '_AnsibleTaggedStr'
 
 - name: String. AnsibleUnicode alias str.
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype, alias)
     success_msg: '"abc" is {{ dtype }}'
     fail_msg: '"abc" is {{ result }}'
@@ -31,7 +31,7 @@
     dtype: 'str'
 
 - name: List. All items are AnsibleUnicode.
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype)
     success_msg: '["a", "b", "c"] is {{ dtype }}'
     fail_msg: '["a", "b", "c"] is {{ result }}'
@@ -44,7 +44,7 @@
       - 'list[_AnsibleTaggedStr]'
 
 - name: Dictionary. All keys are AnsibleUnicode. All values are AnsibleUnicode.
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype)
     success_msg: '{"a": "foo", "b": "bar", "c": "baz"} is {{ dtype }}'
     fail_msg: '{"a": "foo", "b": "bar", "c": "baz"} is {{ result }}'
@@ -60,7 +60,7 @@
 # ----------------------------------------------------
 
 - name: String
-  assert:
+  ansible.builtin.assert:
     that: '"abc" is community.general.ansible_type(dtype)'
     success_msg: '"abc" is {{ dtype }}'
     fail_msg: '"abc" is {{ result }}'
@@ -70,7 +70,7 @@
     dtype: str
 
 - name: Integer
-  assert:
+  ansible.builtin.assert:
     that: '123 is community.general.ansible_type(dtype)'
     success_msg: '123 is {{ dtype }}'
     fail_msg: '123 is {{ result }}'
@@ -80,7 +80,7 @@
     dtype: int
 
 - name: Float
-  assert:
+  ansible.builtin.assert:
     that: '123.45 is community.general.ansible_type(dtype)'
     success_msg: '123.45 is {{ dtype }}'
     fail_msg: '123.45 is {{ result }}'
@@ -90,7 +90,7 @@
     dtype: float
 
 - name: Boolean
-  assert:
+  ansible.builtin.assert:
     that: 'true is community.general.ansible_type(dtype)'
     success_msg: 'true is {{ dtype }}'
     fail_msg: 'true is {{ result }}'
@@ -100,7 +100,7 @@
     dtype: bool
 
 - name: List. All items are strings.
-  assert:
+  ansible.builtin.assert:
     that: '["a", "b", "c"] is community.general.ansible_type(dtype)'
     success_msg: '["a", "b", "c"] is {{ dtype }}'
     fail_msg: '["a", "b", "c"] is {{ result }}'
@@ -110,7 +110,7 @@
     dtype: list[str]
 
 - name: List of dictionaries.
-  assert:
+  ansible.builtin.assert:
     that: '[{"a": 1}, {"b": 2}] is community.general.ansible_type(dtype)'
     success_msg: '[{"a": 1}, {"b": 2}] is {{ dtype }}'
     fail_msg: '[{"a": 1}, {"b": 2}] is {{ result }}'
@@ -120,7 +120,7 @@
     dtype: list[dict]
 
 - name: Dictionary. All keys are strings. All values are integers.
-  assert:
+  ansible.builtin.assert:
     that: '{"a": 1} is community.general.ansible_type(dtype)'
     success_msg: '{"a": 1} is {{ dtype }}'
     fail_msg: '{"a": 1} is {{ result }}'
@@ -130,7 +130,7 @@
     dtype: dict[str, int]
 
 - name: Dictionary. All keys are strings. All values are integers.
-  assert:
+  ansible.builtin.assert:
     that: '{"a": 1, "b": 2} is community.general.ansible_type(dtype)'
     success_msg: '{"a": 1, "b": 2} is {{ dtype }}'
     fail_msg: '{"a": 1, "b": 2} is {{ result }}'
@@ -143,7 +143,7 @@
 # ----------------------------------------
 
 - name: Dictionary. The keys are integers or strings. All values are strings.
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype, alias)
     success_msg: '{"1": "a", "b": "b"} is {{ dtype }}'
     fail_msg: '{"1": "a", "b": "b"} is {{ result }}'
@@ -158,7 +158,7 @@
     dtype: dict[int|str, str]
 
 - name: Dictionary. All keys are integers. All values are keys.
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype, alias)
     success_msg: '{"1": "a", "2": "b"} is {{ dtype }}'
     fail_msg: '{"1": "a", "2": "b"} is {{ result }}'
@@ -173,7 +173,7 @@
     dtype: dict[int, str]
 
 - name: Dictionary. All keys are strings. Multiple types values.
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype, alias)
     success_msg: '{"a": 1, "b": 1.1, "c": "abc", "d": true, "e": ["x", "y", "z"], "f": {"x": 1, "y": 2}} is {{ dtype }}'
     fail_msg: '{"a": 1, "b": 1.1, "c": "abc", "d": true, "e": ["x", "y", "z"], "f": {"x": 1, "y": 2}} is {{ result }}'
@@ -189,7 +189,7 @@
     dtype: dict[str, bool|dict|float|int|list|str]
 
 - name: List. Multiple types items.
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype, alias)
     success_msg: '[1, 2, 1.1, "abc", true, ["x", "y", "z"], {"x": 1, "y": 2}] is {{ dtype }}'
     fail_msg: '[1, 2, 1.1, "abc", true, ["x", "y", "z"], {"x": 1, "y": 2}] is {{ result }}'
@@ -208,7 +208,7 @@
 # --------------------
 
 - name: AnsibleUnicode or str
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype)
     success_msg: '"abc" is {{ dtype }}'
     fail_msg: '"abc" is {{ result }}'
@@ -222,7 +222,7 @@
       - 'str'
 
 - name: float or int
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype)
     success_msg: '123 is {{ dtype }}'
     fail_msg: '123 is {{ result }}'
@@ -237,7 +237,7 @@
       - '_AnsibleTaggedFloat'
 
 - name: float or int
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype)
     success_msg: '123.45 is {{ dtype }}'
     fail_msg: '123.45 is {{ result }}'
@@ -255,7 +255,7 @@
 # --------------
 
 - name: int alias number
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype, alias)
     success_msg: '123 is {{ dtype }}'
     fail_msg: '123 is {{ result }}'
@@ -271,7 +271,7 @@
     dtype: number
 
 - name: float alias number
-  assert:
+  ansible.builtin.assert:
     that: data is community.general.ansible_type(dtype, alias)
     success_msg: '123.45 is {{ dtype }}'
     fail_msg: '123.45 is {{ result }}'

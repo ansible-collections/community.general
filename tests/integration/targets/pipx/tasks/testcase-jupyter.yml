@@ -22,7 +22,7 @@
         name: mkdocs
 
     - name: check assertions
-      assert:
+      ansible.builtin.assert:
         that:
           - install_mkdocs is changed
           - '"markdown_py" in install_mkdocs.stdout'

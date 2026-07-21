@@ -30,7 +30,7 @@
   check_mode: true
 
 - name: Options - Check if changes are made in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - options_add.changed
       - "'options.example.com' in options_add.hosts_added"
@@ -43,7 +43,7 @@
   register: slurp_ssh_config
 
 - name: "Options - Verify that nothing was added to {{ ssh_config_test }} during change mode"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'options.example.com' not in slurp_ssh_config['content'] | b64decode"
 
@@ -67,7 +67,7 @@
   register: options_add
 
 - name: Options - Check if changes are made
-  assert:
+  ansible.builtin.assert:
     that:
       - options_add.changed
       - "'options.example.com' in options_add.hosts_added"
@@ -94,7 +94,7 @@
   register: options_add_again
 
 - name: Options - Check for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not options_add_again.changed
       - options_add.hosts_changed is defined
@@ -107,7 +107,7 @@
   register: slurp_ssh_config
 
 - name: "Verify that {{ ssh_config_test }} contains added options"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'proxycommand ssh jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
@@ -141,7 +141,7 @@
   register: options_update
 
 - name: Options - Check for update operation
-  assert:
+  ansible.builtin.assert:
     that:
       - options_update.changed
       - options_update.hosts_changed is defined
@@ -170,7 +170,7 @@
   register: options_update
 
 - name: Options - Check update operation for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not options_update.changed
       - options_update.hosts_changed is defined
@@ -184,7 +184,7 @@
   register: slurp_ssh_config
 
 - name: "Verify that {{ ssh_config_test }} contains changed options"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
@@ -206,7 +206,7 @@
   register: options_no_update
 
 - name: Options - Check that no update took place
-  assert:
+  ansible.builtin.assert:
     that:
       - not options_update.changed
       - options_update.hosts_changed is defined
@@ -220,7 +220,7 @@
   register: slurp_ssh_config
 
 - name: "Verify that {{ ssh_config_test }} wasn't changed"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
@@ -246,7 +246,7 @@
   register: options_delete
 
 - name: Options - Check if host was removed
-  assert:
+  ansible.builtin.assert:
     that:
       - options_delete.changed
       - "'options.example.com' in options_delete.hosts_removed"
@@ -261,7 +261,7 @@
   register: options_delete_again
 
 - name: Options - Check delete operation for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not options_delete_again.changed
       - options_delete_again.hosts_changed is defined
@@ -274,7 +274,7 @@
   register: slurp_ssh_config
 
 - name: "Verify that {{ ssh_config_test }} does not contains deleted options"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
@@ -317,7 +317,7 @@
   check_mode: true
 
 - name: Options - Check if changes are made in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - options_add.changed
       - "'options.example.com' in options_add.hosts_added"
@@ -330,7 +330,7 @@
   register: slurp_ssh_config
 
 - name: "Options - Verify that nothing was added to {{ ssh_config_test }} during change mode"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'options.example.com' not in slurp_ssh_config['content'] | b64decode"
 
@@ -354,7 +354,7 @@
   register: options_add
 
 - name: Options - Check if changes are made
-  assert:
+  ansible.builtin.assert:
     that:
       - options_add.changed
       - "'options.example.com' in options_add.hosts_added"
@@ -381,7 +381,7 @@
   register: options_add_again
 
 - name: Options - Check for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not options_add_again.changed
       - options_add.hosts_changed is defined
@@ -394,7 +394,7 @@
   register: slurp_ssh_config
 
 - name: "Verify that {{ ssh_config_test }} contains added options"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'proxyjump jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
@@ -428,7 +428,7 @@
   register: options_update
 
 - name: Options - Check for update operation
-  assert:
+  ansible.builtin.assert:
     that:
       - options_update.changed
       - options_update.hosts_changed is defined
@@ -457,7 +457,7 @@
   register: options_update
 
 - name: Options - Check update operation for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not options_update.changed
       - options_update.hosts_changed is defined
@@ -471,7 +471,7 @@
   register: slurp_ssh_config
 
 - name: "Verify that {{ ssh_config_test }} contains changed options"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'proxyjump new-jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
@@ -493,7 +493,7 @@
   register: options_no_update
 
 - name: Options - Check that no update took place
-  assert:
+  ansible.builtin.assert:
     that:
       - not options_update.changed
       - options_update.hosts_changed is defined
@@ -507,7 +507,7 @@
   register: slurp_ssh_config
 
 - name: "Verify that {{ ssh_config_test }} wasn't changed"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'proxyjump new-jumphost.example.com' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
@@ -533,7 +533,7 @@
   register: options_delete
 
 - name: Options - Check if host was removed
-  assert:
+  ansible.builtin.assert:
     that:
       - options_delete.changed
       - "'options.example.com' in options_delete.hosts_removed"
@@ -548,7 +548,7 @@
   register: options_delete_again
 
 - name: Options - Check delete operation for idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - not options_delete_again.changed
       - options_delete_again.hosts_changed is defined
@@ -561,7 +561,7 @@
   register: slurp_ssh_config
 
 - name: "Verify that {{ ssh_config_test }} does not contains deleted options"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'proxyjump new-jumphost.example.com' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"

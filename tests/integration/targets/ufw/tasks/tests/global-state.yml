@@ -50,7 +50,7 @@
   register: ufw_logging_change
   environment:
     LC_ALL: C
-- assert:
+- ansible.builtin.assert:
     that:
       - logging_check is changed
       - logging is changed
@@ -136,7 +136,7 @@
   ufw:
     default: allow
   register: default_change_implicit_idem
-- assert:
+- ansible.builtin.assert:
     that:
       - default_check is changed
       - default is changed

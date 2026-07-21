@@ -42,7 +42,7 @@
       +-------+-----+-------+
 
 - name: Verify basic table output
-  assert:
+  ansible.builtin.assert:
     that:
       - basic_table == expected_basic_table
 
@@ -59,7 +59,7 @@
       +-------+-------+-----+
 
 - name: Verify ordered table output
-  assert:
+  ansible.builtin.assert:
     that:
       - ordered_table == expected_ordered_table
 
@@ -76,7 +76,7 @@
       +-------+-------+
 
 - name: Verify selective column ordering
-  assert:
+  ansible.builtin.assert:
     that:
       - selective_ordered_table == expected_selective_table
 
@@ -93,7 +93,7 @@
       +-----------+----------+-----------+
 
 - name: Verify custom headers output
-  assert:
+  ansible.builtin.assert:
     that:
       - headers_table == expected_headers_table
 
@@ -110,7 +110,7 @@
       +-----------+-----------+
 
 - name: Verify selective column ordering with custom headers
-  assert:
+  ansible.builtin.assert:
     that:
       - selective_ordered_headers_table == expected_selective_headers_table
 
@@ -126,7 +126,7 @@
       +------------+-----------------+--------+
 
 - name: Verify aligned table output
-  assert:
+  ansible.builtin.assert:
     that:
       - aligned_table == expected_aligned_table
 
@@ -146,7 +146,7 @@
       +----------+-----------+-------+
 
 - name: Verify combined table output
-  assert:
+  ansible.builtin.assert:
     that:
       - combined_table == expected_combined_table
 
@@ -159,7 +159,7 @@
       ++
 
 - name: Verify empty table output
-  assert:
+  ansible.builtin.assert:
     that:
       - empty_table == expected_empty_table
 
@@ -174,7 +174,7 @@
       +------+-----+------+
 
 - name: Verify empty table with column_order
-  assert:
+  ansible.builtin.assert:
     that:
       - empty_with_columns == expected_empty_with_columns
 
@@ -189,7 +189,7 @@
       +-----------+----------+-----------+
 
 - name: Verify empty table with header_names
-  assert:
+  ansible.builtin.assert:
     that:
       - empty_with_headers == expected_empty_with_headers
 
@@ -207,7 +207,7 @@
       +----------+-----------+-------+
 
 - name: Verify empty table with combined parameters
-  assert:
+  ansible.builtin.assert:
     that:
       - empty_combined == expected_empty_combined
 
@@ -219,7 +219,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for empty data with invalid column_order
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -232,7 +232,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for empty data with invalid header_names
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -245,7 +245,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for empty data with invalid column_alignments
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -258,7 +258,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for empty data with non-string values in column_alignments
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -271,7 +271,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for empty data with invalid alignment value
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -286,7 +286,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for empty data with mismatched lengths
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -300,7 +300,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-list input
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -313,7 +313,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-dictionary items
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -326,7 +326,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-list column_order
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -339,7 +339,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-list header_names
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -352,7 +352,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for unknown parameters
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -365,7 +365,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for using both positional args and column_order
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -378,7 +378,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-string values in positional args
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -391,7 +391,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-string values in column_order
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -404,7 +404,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-string values in header_names
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -417,7 +417,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for mismatched sizes
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -430,7 +430,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for column_order with too many elements
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -443,7 +443,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for header_names with too many elements
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -456,7 +456,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for column_alignments with too many elements
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -469,7 +469,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-dictionary column_alignments
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -482,7 +482,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-string keys in column_alignments
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -495,7 +495,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for non-string values in column_alignments
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -508,7 +508,7 @@
       register: failure_result
       ignore_errors: true
     - name: Verify error message for invalid alignment value in column_alignments
-      assert:
+      ansible.builtin.assert:
         that:
           - failure_result is failed
           - >
@@ -539,7 +539,7 @@
       +-------+-------+-------+
 
 - name: Verify mixed key types were handled correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - mixed_key_table == expected_mixed_key_table
 
@@ -556,7 +556,7 @@
       +-------+-------+-------+
 
 - name: Verify column ordering with numeric keys
-  assert:
+  ansible.builtin.assert:
     that:
       - mixed_ordered_table == expected_ordered_numeric_table
 
@@ -573,7 +573,7 @@
       +-------+-------+-------+
 
 - name: Verify custom headers with numeric keys
-  assert:
+  ansible.builtin.assert:
     that:
       - mixed_headers_table == expected_headers_numeric_table
 
@@ -590,7 +590,7 @@
       +-------+-------+-------+
 
 - name: Verify column alignments with numeric keys
-  assert:
+  ansible.builtin.assert:
     that:
       - mixed_aligned_table == expected_aligned_numeric_table
 
@@ -619,7 +619,7 @@
       +-------+-------+------+-------+
 
 - name: Verify boolean-like keys were handled correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - bool_table == expected_bool_table
 
@@ -636,7 +636,7 @@
       +------+-------+-------+-------+
 
 - name: Verify that 'True' in column_order works with 'true' keys
-  assert:
+  ansible.builtin.assert:
     that:
       - bool_ordered_table == expected_bool_ordered_table
 
@@ -653,6 +653,6 @@
       +-------+-------+------+-------+
 
 - name: Verify column alignments with boolean-like string keys
-  assert:
+  ansible.builtin.assert:
     that:
       - bool_aligned_table == expected_bool_aligned_table

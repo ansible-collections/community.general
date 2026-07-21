@@ -57,7 +57,7 @@
   when: 'pkgng_test_install_cleanup | default(False)'
 
 - name: Ensure pkgng installs package correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - not pkgng_install_stat_before.stat.exists
       - pkgng_install.changed

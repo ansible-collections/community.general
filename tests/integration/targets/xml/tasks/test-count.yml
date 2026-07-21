@@ -17,7 +17,7 @@
   register: beers
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - beers is not changed
       - beers.count == 3

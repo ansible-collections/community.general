@@ -19,7 +19,7 @@
   register: output
 
 - name: assert that test increment by default
-  assert:
+  ansible.builtin.assert:
     that:
       - output is not failed
       - output.incremented
@@ -37,7 +37,7 @@
   register: output
 
 - name: assert that test increment by default
-  assert:
+  ansible.builtin.assert:
     that:
       - output is not failed
       - output.incremented
@@ -55,7 +55,7 @@
   register: output
 
 - name: assert that test defined increment by 0
-  assert:
+  ansible.builtin.assert:
     that:
       - output is not failed
       - output.incremented == false
@@ -72,7 +72,7 @@
   register: output
 
 - name: assert that test defined negative increment
-  assert:
+  ansible.builtin.assert:
     that:
       - output is not failed
       - output.incremented
@@ -91,7 +91,7 @@
   register: output
 
 - name: assert that test defined negative increment
-  assert:
+  ansible.builtin.assert:
     that:
       - output is not failed
       - output.incremented

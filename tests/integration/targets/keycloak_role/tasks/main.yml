@@ -50,7 +50,7 @@
     var: result
 
 - name: Assert realm role created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.existing == {}
@@ -74,7 +74,7 @@
     var: result
 
 - name: Assert realm role unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -95,7 +95,7 @@
     var: result
 
 - name: Assert realm role updated
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.existing.description == description_1
@@ -117,7 +117,7 @@
     var: result
 
 - name: Assert realm role deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -138,7 +138,7 @@
     var: result
 
 - name: Assert realm role unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}
@@ -161,7 +161,7 @@
     var: result
 
 - name: Assert client role created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.existing == {}
@@ -186,7 +186,7 @@
     var: result
 
 - name: Assert client role unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -208,7 +208,7 @@
     var: result
 
 - name: Assert client role updated
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.existing.description == description_1
@@ -231,7 +231,7 @@
     var: result
 
 - name: Assert client role deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -253,7 +253,7 @@
     var: result
 
 - name: Assert client role unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}
@@ -277,7 +277,7 @@
     var: result
 
 - name: Assert realm role is created with composites
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.composites | length == 3
@@ -301,7 +301,7 @@
     var: result
 
 - name: Assert realm role with composites have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state.composites | length == 3
@@ -325,7 +325,7 @@
     var: result
 
 - name: Assert realm role with composites using aliases have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -348,7 +348,7 @@
     var: result
 
 - name: Assert composite was removed from realm role with composites
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.composites | length == 2
@@ -369,7 +369,7 @@
     var: result
 
 - name: Assert realm role deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -390,7 +390,7 @@
     var: result
 
 - name: Assert not changed and realm role absent
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}
@@ -415,7 +415,7 @@
     var: result
 
 - name: Assert client role is created with composites
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.composites | length == 3
@@ -440,7 +440,7 @@
     var: result
 
 - name: Assert client role with composites have not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state.composites | length == 3
@@ -465,7 +465,7 @@
     var: result
 
 - name: Assert composite was removed from client role with composites
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.composites | length == 2
@@ -487,7 +487,7 @@
     var: result
 
 - name: Assert client role deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -509,7 +509,7 @@
     var: result
 
 - name: Assert not changed and client role absent
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}

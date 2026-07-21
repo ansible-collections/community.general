@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "Test dict filter"
-  assert:
+  ansible.builtin.assert:
     that:
       - "[['a', 'b']] | community.general.dict == dict([['a', 'b']])"
       - "[['a', 'b'], [1, 2]] | community.general.dict == dict([['a', 'b'], [1, 2]])"

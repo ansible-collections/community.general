@@ -19,7 +19,7 @@
   register: result
 
 - name: Check result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -33,7 +33,7 @@
   register: result
 
 - name: Check customer creation
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -47,7 +47,7 @@
   register: result
 
 - name: Check customer creation idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -63,7 +63,7 @@
   register: result
 
 - name: Check customer deletion (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -78,7 +78,7 @@
   register: result
 
 - name: Check customer deletion
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -93,7 +93,7 @@
   register: result
 
 - name: Check customer deletion idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -109,7 +109,7 @@
   register: result
 
 - name: Check non-existing customer deletion (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -122,7 +122,7 @@
   register: result
 
 - name: Check customer creation with api key
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -136,7 +136,7 @@
   register: result
 
 - name: Check customer deletion with api key
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -150,7 +150,7 @@
   ignore_errors: true
 
 - name: Check customer creation with api key
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result is failed

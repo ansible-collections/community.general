@@ -16,7 +16,7 @@
   ignore_errors: true
 
 - name: test-value 1 - verify error message
-  assert:
+  ansible.builtin.assert:
     that:
       - result_value_1 is not changed
       - result_value_1 is failed
@@ -33,7 +33,7 @@
   ignore_errors: true
 
 - name: test-value 2 - verify error message
-  assert:
+  ansible.builtin.assert:
     that:
       - result_value_2 is not changed
       - result_value_2 is failed
@@ -62,7 +62,7 @@
     content3: "{{ output_content.content | b64decode }}"
 
 - name: test-value 3 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result3 is changed
       - result3.msg == 'section and option added'
@@ -78,7 +78,7 @@
   register: result4
 
 - name: test-value 4 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result4 is not changed
       - result4.msg == 'OK'
@@ -107,7 +107,7 @@
     content5: "{{ output_content.content | b64decode }}"
 
 - name: test-value 5 - assert 'changed' is true and content is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - result5 is changed
       - result5.msg == 'option added'
@@ -136,7 +136,7 @@
     content6: "{{ output_content.content | b64decode }}"
 
 - name: test-value 6 - assert 'changed' is true and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result6 is changed
       - result6.msg == 'option changed'
@@ -160,7 +160,7 @@
     content7: "{{ output_content.content | b64decode }}"
 
 - name: test-value 7 - assert 'changed' is true and content is empty
-  assert:
+  ansible.builtin.assert:
     that:
       - result7 is changed
       - result7.msg == 'section removed'
@@ -191,7 +191,7 @@
       skip-name
 
 - name: test-value 8 - assert 'changed' is true and section and option added
-  assert:
+  ansible.builtin.assert:
     that:
       - result8 is changed
       - result8.msg == 'section and option added'
@@ -207,7 +207,7 @@
   register: result9
 
 - name: test-value 9 - assert 'changed' is false
-  assert:
+  ansible.builtin.assert:
     that:
       - result9 is not changed
       - result9.msg == 'OK'
@@ -221,7 +221,7 @@
   register: result10
 
 - name: test-value 10 - assert 'changed' is true and section added
-  assert:
+  ansible.builtin.assert:
     that:
       - result10 is changed
       - result10.msg == 'only section added'
@@ -235,7 +235,7 @@
   register: result11
 
 - name: test-value 11 - assert 'changed' is false
-  assert:
+  ansible.builtin.assert:
     that:
       - result11 is not changed
       - result11.msg == 'OK'
@@ -275,7 +275,7 @@
       max_connections = 500
 
 - name: test-value 12 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - content12 == expected12
 
@@ -304,7 +304,7 @@
       max_connections = 500
 
 - name: test-value 13 - assert 'changed' and msg 'option changed' and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result13 is changed
       - result13.msg == 'option changed'
@@ -335,7 +335,7 @@
       max_connections = 500
 
 - name: test-value 14 - assert 'changed' is true and msg 'option changed' and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result14 is changed
       - result14.msg == 'option changed'
@@ -365,7 +365,7 @@
       max_connections = 500
 
 - name: test-value 15 - assert 'changed' is true and msg 'option changed' and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result15 is changed
       - result15.msg == 'option changed'
@@ -399,7 +399,7 @@
     content16: "{{ output_content.content | b64decode }}"
 
 - name: test-value 16 - assert 'changed' is true and content is OK (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result16 is changed
       - result16.msg == 'option added'
@@ -427,7 +427,7 @@
     content17: "{{ output_content.content | b64decode }}"
 
 - name: test-value 17 - assert 'changed' is true and content is OK (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result17 is changed
       - result17.msg == 'option changed'
@@ -452,7 +452,7 @@
     content18: "{{ output_content.content | b64decode }}"
 
 - name: test-value 18 - assert 'changed' is true and option is removed (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result18 is changed
       - result18.msg == 'option changed'
@@ -489,7 +489,7 @@
     content19: "{{ output_content.content | b64decode }}"
 
 - name: test-value 19 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - content19 == expected19
 
@@ -536,7 +536,7 @@
     content20: "{{ output_content.content | b64decode }}"
 
 - name: test-value 20 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - content20 == expected20
 
@@ -578,7 +578,7 @@
     content21: "{{ output_content.content | b64decode }}"
 
 - name: test-value 21 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result21 is changed
       - result21.msg == 'option added'

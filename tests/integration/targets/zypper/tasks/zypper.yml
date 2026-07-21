@@ -41,7 +41,7 @@
 - debug: var=rpm_result
 
 - name: verify uninstallation of hello
-  assert:
+  ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
       - "rpm_result.rc == 1"
@@ -54,7 +54,7 @@
   register: zypper_result
 
 - name: verify no change on re-uninstall
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zypper_result.changed"
 
@@ -74,7 +74,7 @@
 - debug: var=rpm_result
 
 - name: verify installation of hello
-  assert:
+  ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
       - "zypper_result.changed"
@@ -88,7 +88,7 @@
   register: zypper_result
 
 - name: verify no change on second install
-  assert:
+  ansible.builtin.assert:
     that:
       - "not zypper_result.changed"
 
@@ -112,7 +112,7 @@
   register: rpm_metamail_result
 
 - name: verify packages uninstalled
-  assert:
+  ansible.builtin.assert:
     that:
       - "rpm_hello_result.rc != 0"
       - "rpm_metamail_result.rc != 0"
@@ -136,7 +136,7 @@
   register: rpm_metamail_result
 
 - name: verify packages installed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
       - "zypper_result.changed"
@@ -159,7 +159,7 @@
   ignore_errors: true
 
 - name: verify package installation failed
-  assert:
+  ansible.builtin.assert:
     that:
       - "zypper_result.rc == 104"
       - "zypper_result.msg.startswith('No provider of')"
@@ -185,7 +185,7 @@
 - debug: var=zypper_result
 
 - name: verify we failed installation of broken rpm
-  assert:
+  ansible.builtin.assert:
     that:
       - "zypper_result.rc == 3"
       - "'Problem reading the RPM header' in zypper_result.stdout"
@@ -240,7 +240,7 @@
   register: rpm_result
 
 - name: verify installation of empty
-  assert:
+  ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
       - "zypper_result.changed"
@@ -263,7 +263,7 @@
   register: stat_result
 
 - name: check that we extract rpm package in testdir folder and folder var is exist
-  assert:
+  ansible.builtin.assert:
     that:
       - "stat_result.stat.exists == true"
 
@@ -318,7 +318,7 @@
   register: rpm_result
 
 - name: verify installation of post_error
-  assert:
+  ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
       - "zypper_result.changed"
@@ -342,7 +342,7 @@
   register: rpm_result
 
 - name: verify installation of post_error
-  assert:
+  ansible.builtin.assert:
     that:
       - "zypper_result.rc == 107"
       - "not zypper_result.changed"
@@ -402,7 +402,7 @@
   register: zypper_res3
 
 - name: verify simultaneous install/remove worked
-  assert:
+  ansible.builtin.assert:
     that:
       - zypper_res1 is successful
       - zypper_res1 is changed
@@ -422,7 +422,7 @@
   ignore_errors: true
 
 - name: verify simultaneous install/remove failed with absent
-  assert:
+  ansible.builtin.assert:
     that:
       - zypper_res is failed
       - zypper_res.msg == "Can not combine '+' prefix with state=remove/absent."
@@ -434,7 +434,7 @@
     state: absent
   ignore_errors: true
   register: zypper_patch
-- assert:
+- ansible.builtin.assert:
     that:
       - zypper_patch is failed
       - zypper_patch.msg.startswith('Can not remove patches.')
@@ -445,7 +445,7 @@
     state: absent
   ignore_errors: true
   register: zypper_rm
-- assert:
+- ansible.builtin.assert:
     that:
       - zypper_rm is failed
       - zypper_rm.msg.startswith('Can not remove via URL.')
@@ -470,7 +470,7 @@
     state: present
   register: zypper_install_pattern2
 
-- assert:
+- ansible.builtin.assert:
     that:
       - zypper_install_pattern1 is changed
       - zypper_install_pattern2 is not changed
@@ -492,7 +492,7 @@
     state: present
   register: zypperin2
 
-- assert:
+- ansible.builtin.assert:
     that:
       - zypperin1 is succeeded
       - zypperin1 is changed
@@ -515,7 +515,7 @@
   register: zypper_result_update_cache_check
 
 
-- assert:
+- ansible.builtin.assert:
     that:
       - zypper_result_update_cache is successful
       - zypper_result_update_cache_check is successful
@@ -540,7 +540,7 @@
 #   ignore_errors: true
 #   register: zypper_pkg_conflict
 #
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - zypper_pkg_conflict is failed
 #       - "'conflicts with netcat-openbsd provided' in zypper_pkg_conflict.stdout"
@@ -590,7 +590,7 @@
       register: duplicate_out
 
     - name: Check failure when installing rpms with duplicate files without replacefiles option
-      assert:
+      ansible.builtin.assert:
         that:
           - zypper_duplicate_result.results[0] is successful
           - zypper_duplicate_result.results[1] is failed
@@ -614,7 +614,7 @@
       register: duplicate_out
 
     - name: Check success installing rpms with duplicate files using replacefiles option
-      assert:
+      ansible.builtin.assert:
         that:
           - zypper_duplicate_result is successful
           - zypper_duplicate_result is changed

@@ -22,6 +22,6 @@
     state: absent
 
 - name: check assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - install_conan is changed

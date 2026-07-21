@@ -11,7 +11,7 @@
   register: beers
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - beers is not changed
       - beers.count == 3
@@ -25,7 +25,7 @@
   register: beers_xpath
 
 - name: Test expected result for xpath count mode
-  assert:
+  ansible.builtin.assert:
     that:
       - beers_xpath is not changed
       - beers_xpath.count == 3

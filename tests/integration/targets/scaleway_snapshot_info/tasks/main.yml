@@ -18,7 +18,7 @@
     var: snapshots
 
 - name: Ensure retrieval of snapshots info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - snapshots is success
 
@@ -32,6 +32,6 @@
     var: ams1_snapshots
 
 - name: Ensure retrieval of snapshots info is success (AMS1)
-  assert:
+  ansible.builtin.assert:
     that:
       - ams1_snapshots is success

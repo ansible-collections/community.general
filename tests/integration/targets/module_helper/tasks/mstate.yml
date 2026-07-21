@@ -11,7 +11,7 @@
   register: state1
 
 - name: assert state1
-  assert:
+  ansible.builtin.assert:
     that:
       - state1.a == 80
       - state1.b == "banana"
@@ -27,7 +27,7 @@
   register: state2
 
 - name: assert state2
-  assert:
+  ansible.builtin.assert:
     that:
       - state2.a == 80
       - state2.b == "banana"
@@ -43,7 +43,7 @@
   register: state3
 
 - name: assert state3
-  assert:
+  ansible.builtin.assert:
     that:
       - state3.a == 3
       - state3.b == "banana"
@@ -58,7 +58,7 @@
   register: state4
 
 - name: assert state4
-  assert:
+  ansible.builtin.assert:
     that:
       - state4.a == 4
       - state4.c == "cashew"
@@ -74,7 +74,7 @@
   register: state5
 
 - name: assert state5
-  assert:
+  ansible.builtin.assert:
     that:
       - state5.a == 5
       - state5.b == "foo"

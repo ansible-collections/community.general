@@ -20,7 +20,7 @@
   ignore_errors: true
 
 - name: Assert api_url parameter works with GitHub.com
-  assert:
+  ansible.builtin.assert:
     that:
       - github_api_result is failed
       - '"Unauthorized" in github_api_result.msg or "401" in github_api_result.msg'
@@ -36,7 +36,7 @@
   ignore_errors: true
 
 - name: Assert api_url parameter works with GitHub Enterprise
-  assert:
+  ansible.builtin.assert:
     that:
       - enterprise_api_result is failed
       - '"github.company.com" in enterprise_api_result.msg'
@@ -52,7 +52,7 @@
   ignore_errors: true
 
 - name: Assert trailing slash is handled correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - trailing_slash_result is failed
       - '"github.company.com" in trailing_slash_result.msg'

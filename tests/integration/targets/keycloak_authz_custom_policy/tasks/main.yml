@@ -41,7 +41,7 @@
   register: result
 
 - name: Assert that first custom policy was not created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -63,7 +63,7 @@
   register: result
 
 - name: Assert that first custom policy was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -85,7 +85,7 @@
   register: result
 
 - name: Assert that first custom policy was not modified
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -108,7 +108,7 @@
   register: result
 
 - name: Assert that second instance of the custom policy was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -131,7 +131,7 @@
   register: result
 
 - name: Assert that second custom policy was not removed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -151,7 +151,7 @@
   register: result
 
 - name: Assert that second custom policy was removed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}

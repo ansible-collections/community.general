@@ -27,7 +27,7 @@
   register: comparison
 
 - name: Test expected result (DOCTYPE is preserved)
-  assert:
+  ansible.builtin.assert:
     that:
       - set_attribute_doctype is changed
       - comparison is not changed
@@ -41,6 +41,6 @@
   register: set_attribute_doctype_idempotent
 
 - name: Test idempotency
-  assert:
+  ansible.builtin.assert:
     that:
       - set_attribute_doctype_idempotent is not changed

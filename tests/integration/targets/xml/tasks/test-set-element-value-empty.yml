@@ -28,7 +28,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - set_element_value_empty is changed
       - comparison is not changed  # identical

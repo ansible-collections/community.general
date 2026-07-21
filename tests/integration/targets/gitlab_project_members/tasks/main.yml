@@ -34,7 +34,7 @@
   register: gitlab_project_members_state
 
 - name: Test member added to project
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_project_members_state is changed
 
@@ -49,7 +49,7 @@
   register: gitlab_project_members_state_again
 
 - name: Test module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_project_members_state_again is not changed
 
@@ -64,7 +64,7 @@
   register: remove_gitlab_project_members_state
 
 - name: Test member removed from project
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_gitlab_project_members_state is changed
 
@@ -79,7 +79,7 @@
   register: remove_gitlab_project_members_state_again
 
 - name: Test module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_gitlab_project_members_state_again is not changed
 

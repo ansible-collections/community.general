@@ -20,7 +20,7 @@
   ignore_errors: true
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - module_output is not changed
       - module_output is failed

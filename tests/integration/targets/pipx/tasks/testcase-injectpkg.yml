@@ -37,7 +37,7 @@
   register: uninstall_pylint
 
 - name: Check assertions inject_packages
-  assert:
+  ansible.builtin.assert:
     that:
       - install_pylint is changed
       - inject_pkgs_pylint is changed

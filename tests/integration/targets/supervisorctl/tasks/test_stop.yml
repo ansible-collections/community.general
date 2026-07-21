@@ -28,7 +28,7 @@
   failed_when: result_cmd.rc not in [0, 3]
 
 - name: check that service is stopped
-  assert:
+  ansible.builtin.assert:
     that:
       - (result is success and result_with_auth is skip) or (result is skip and result_with_auth is success)
       - (result is changed and result_with_auth is skip) or (result is skip and result_with_auth is changed)
@@ -61,7 +61,7 @@
   when: credentials.username != ''
 
 - name: check that service is already stopped
-  assert:
+  ansible.builtin.assert:
     that:
       - (result is success and result_with_auth is skip) or (result is skip and result_with_auth is success)
       - (result is not changed and result_with_auth is skip) or (result is skip and result_with_auth is not changed)

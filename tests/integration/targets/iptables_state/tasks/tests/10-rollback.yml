@@ -20,7 +20,7 @@
   check_mode: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is changed
 
@@ -37,7 +37,7 @@
 
   rescue:
     - name: "explain expected failure"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is not changed
           - not iptables_state.applied
@@ -52,7 +52,7 @@
           expected.
 
 - name: "check that the expected failure happened"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed
 
@@ -71,7 +71,7 @@
 
   rescue:
     - name: "explain expected failure"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is not changed
           - not iptables_state.applied
@@ -86,7 +86,7 @@
           expected.
 
 - name: "check that the expected failure happened"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed
 
@@ -100,7 +100,7 @@
   poll: 0
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is not changed
 
@@ -115,7 +115,7 @@
   poll: 0
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is not changed
 
@@ -141,7 +141,7 @@
 
   rescue:
     - name: "explain expected failure"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is not changed
           - not iptables_state.applied
@@ -156,7 +156,7 @@
           expected.
 
 - name: "check that the expected failure happened"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed
 
@@ -175,7 +175,7 @@
 
   rescue:
     - name: "explain expected failure"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is not changed
           - not iptables_state.applied
@@ -190,6 +190,6 @@
           expected.
 
 - name: "check that the expected failure happened"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed

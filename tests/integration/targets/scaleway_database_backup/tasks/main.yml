@@ -21,7 +21,7 @@
 
 - debug: var=backup_creation_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_creation_check_task is success
       - backup_creation_check_task is changed
@@ -39,7 +39,7 @@
 
 - debug: var=backup_creation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_creation_task is success
       - backup_creation_task is changed
@@ -57,7 +57,7 @@
 
 - debug: var=backup_creation_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_creation_confirmation_task is success
       - backup_creation_confirmation_task is not changed
@@ -75,7 +75,7 @@
 
 - debug: var=backup_patching_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_patching_check_task is success
       - backup_patching_check_task is changed
@@ -92,7 +92,7 @@
 
 - debug: var=backup_patching_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_patching_task is success
       - backup_patching_task is changed
@@ -109,7 +109,7 @@
 
 - debug: var=backup_patching_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_patching_confirmation_task is success
       - backup_patching_confirmation_task is not changed
@@ -124,7 +124,7 @@
 
 - debug: var=backup_export_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_export_check_task is success
       - backup_export_check_task is changed
@@ -139,7 +139,7 @@
 
 - debug: var=backup_export_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_export_task is success
       - backup_export_task is changed
@@ -154,7 +154,7 @@
 
 - debug: var=backup_export_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_export_confirmation_task is success
       - backup_export_confirmation_task is not changed
@@ -172,7 +172,7 @@
 
 - debug: var=backup_restore_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_restore_check_task is success
       - backup_restore_check_task is changed
@@ -189,7 +189,7 @@
 
 - debug: var=backup_restore_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_restore_task is success
       - backup_restore_task is changed
@@ -204,7 +204,7 @@
 
 - debug: var=backup_delete_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_delete_check_task is success
       - backup_delete_check_task is changed
@@ -218,7 +218,7 @@
 
 - debug: var=backup_delete_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_delete_task is success
       - backup_delete_task is changed
@@ -232,7 +232,7 @@
 
 - debug: var=backup_delete_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - backup_delete_confirmation_task is success
       - backup_delete_confirmation_task is not changed

@@ -12,7 +12,7 @@
   register: archive_exclusion_patterns
 
 - name: Assert that only included files are archived - exclusion patterns ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_exclusion_patterns is changed
       - "'bar.txt' not in archive_exclusion_patterns.archived"
@@ -34,7 +34,7 @@
   register: archive_excluded_paths
 
 - name: Assert that excluded paths do not influence archive root - exclude path ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_excluded_paths.arcroot != remote_tmp_dir
 

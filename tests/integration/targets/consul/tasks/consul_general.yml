@@ -12,7 +12,7 @@
   register: result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is failed
 
@@ -27,7 +27,7 @@
   ignore_errors: true
 
 - name: previous task should fail since certificate is not known
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
       - "'certificate verify failed' in result.msg"
@@ -43,7 +43,7 @@
   register: result
 
 - name: previous task should succeed since certificate isn't checked
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -57,7 +57,7 @@
     ca_path: '{{ remote_dir }}/cert.pem'
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
 
@@ -70,7 +70,7 @@
   register: result
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is failed
       - result.msg.startswith('Could not connect to consul agent at localhost:1234, error was')

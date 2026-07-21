@@ -27,7 +27,7 @@
   register: uninstall_present_helloworld
 
 - name: Check assertions helloworld
-  assert:
+  ansible.builtin.assert:
     that:
       - uninstall_absent_helloworld is not changed
       - install_absent_helloworld is changed

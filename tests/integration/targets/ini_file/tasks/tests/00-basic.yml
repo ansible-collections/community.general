@@ -18,7 +18,7 @@
   ignore_errors: true
 
 - name: test-basic 1 - verify error message
-  assert:
+  ansible.builtin.assert:
     that:
       - result_basic_1 is not changed
       - result_basic_1 is failed
@@ -35,7 +35,7 @@
   ignore_errors: true
 
 - name: test-basic 2 - verify error message
-  assert:
+  ansible.builtin.assert:
     that:
       - result_basic_2 is not changed
       - result_basic_2 is failed

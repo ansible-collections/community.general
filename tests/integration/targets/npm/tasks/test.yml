@@ -28,7 +28,7 @@
         name: '{{ package }}'
       register: npm_install
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - npm_install is success
           - npm_install is changed
@@ -41,7 +41,7 @@
       register: npm_reinstall
 
     - name: Check there is no change
-      assert:
+      ansible.builtin.assert:
         that:
           - npm_reinstall is success
           - not (npm_reinstall is changed)
@@ -59,7 +59,7 @@
       register: npm_fix_install
 
     - name: Check result is changed and successful
-      assert:
+      ansible.builtin.assert:
         that:
           - npm_fix_install is success
           - npm_fix_install is changed

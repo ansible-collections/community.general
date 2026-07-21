@@ -24,7 +24,7 @@
     key: name
   register: users_unique
 
-- assert:
+- ansible.builtin.assert:
     that:
       - users_unique.dict.dag.name == 'dag'
       - users_unique.dict.dag.gecos == 'Dag Wieërs'
@@ -41,7 +41,7 @@
     path: "{{ remote_tmp_dir }}/users_unique.csv"
   register: users_unique
 
-- assert:
+- ansible.builtin.assert:
     that:
       - users_unique.list.0.name == 'dag'
       - users_unique.list.0.gecos == 'Dag Wieërs'
@@ -72,7 +72,7 @@
     delimiter: ';'
   register: users_nonunique
 
-- assert:
+- ansible.builtin.assert:
     that:
       - users_nonunique.dict.dag.name == 'dag'
       - users_nonunique.dict.dag.gecos == 'Dag Wieers'
@@ -92,7 +92,7 @@
   register: users_placebo
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - users_placebo is failed
       - users_placebo.msg == "Dialect 'placebo' is not supported by your version of python."
@@ -114,7 +114,7 @@
     fieldnames: name,uid,gid,gecos
   register: users_noheader
 
-- assert:
+- ansible.builtin.assert:
     that:
       - users_noheader.dict.dag.name == 'dag'
       - users_noheader.dict.dag.gecos == 'Dag Wieërs'
@@ -144,7 +144,7 @@
   register: users_broken
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - users_broken is failed
       - "'Unable to process file' in users_broken.msg"
@@ -164,7 +164,7 @@
     path: "{{ remote_tmp_dir }}/users_bom.csv"
   register: users_bom
 
-- assert:
+- ansible.builtin.assert:
     that:
       - users_bom.list.0.name == 'dag'
       - users_bom.list.0.gecos == 'Dag Wieërs'

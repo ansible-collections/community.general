@@ -14,7 +14,7 @@
   register: addition_result
 
 - name: Verify addition test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - addition_result is changed
     msg: "state=present shall add flatpak when absent"
@@ -28,7 +28,7 @@
   register: double_addition_result
 
 - name: Verify idempotency of addition test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_addition_result is not changed
     msg: "state=present shall not do anything when flatpak is already present"
@@ -42,7 +42,7 @@
   register: url_update_result
 
 - name: Verify updating remote url does not do anything - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - url_update_result is not changed
     msg: "Trying to update the URL of an existing flatpak remote shall not do anything"
@@ -58,7 +58,7 @@
   register: deactivation_result
 
 - name: Verify deactivation test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - deactivation_result is changed
     msg: "enable=false shall disable flatpak remote when enabled"
@@ -71,7 +71,7 @@
   register: double_deactivation_result
 
 - name: Verify idempotency of deactivation test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_deactivation_result is not changed
     msg: "enabled=false shall not do anything when flatpak remote is already disabled"
@@ -87,7 +87,7 @@
   register: activation_result
 
 - name: Verify activation test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - activation_result is changed
     msg: "enable=true shall enable flatpak remote when disabled"
@@ -100,7 +100,7 @@
   register: double_activation_result
 
 - name: Verify idempotency of activation test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_activation_result is not changed
     msg: "enabled=true shall not do anything when flatpak remote is already enabled"
@@ -116,7 +116,7 @@
   register: removal_result
 
 - name: Verify removal test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_result is changed
     msg: "state=absent shall remove flatpak when present"
@@ -129,7 +129,7 @@
   register: double_removal_result
 
 - name: Verify idempotency of removal test result - {{ method }}
-  assert:
+  ansible.builtin.assert:
     that:
       - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"

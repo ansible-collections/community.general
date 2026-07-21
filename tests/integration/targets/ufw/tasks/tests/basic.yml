@@ -25,7 +25,7 @@
     state: enabled
   check_mode: true
   register: enable_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - enable_check is changed
       - enable is changed
@@ -59,7 +59,7 @@
     to_ip: 0.0.0.0
   check_mode: true
   register: ipv4_allow_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - ipv4_allow_check is changed
       - ipv4_allow is changed
@@ -97,7 +97,7 @@
     delete: true
   check_mode: true
   register: delete_ipv4_allow_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_ipv4_allow_check is changed
       - delete_ipv4_allow is changed
@@ -131,7 +131,7 @@
     to_ip: "::"
   check_mode: true
   register: ipv6_allow_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - ipv6_allow_check is changed
       - ipv6_allow is changed
@@ -169,7 +169,7 @@
     delete: true
   check_mode: true
   register: delete_ipv6_allow_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_ipv6_allow_check is changed
       - delete_ipv6_allow is changed
@@ -204,7 +204,7 @@
     to_ip: 0.0.0.0
   check_mode: true
   register: ipv4_allow_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - ipv4_allow_check is changed
       - ipv4_allow is changed
@@ -242,7 +242,7 @@
     delete: true
   check_mode: true
   register: delete_ipv4_allow_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_ipv4_allow_check is changed
       - delete_ipv4_allow is changed
@@ -276,7 +276,7 @@
     to_ip: "::"
   check_mode: true
   register: ipv6_allow_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - ipv6_allow_check is changed
       - ipv6_allow is changed
@@ -314,7 +314,7 @@
     delete: true
   check_mode: true
   register: delete_ipv6_allow_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - delete_ipv6_allow_check is changed
       - delete_ipv6_allow is changed
@@ -331,7 +331,7 @@
     state: reloaded
   check_mode: true
   register: reload_check
-- assert:
+- ansible.builtin.assert:
     that:
       - reload is changed
       - reload_check is changed
@@ -355,7 +355,7 @@
     state: disabled
   check_mode: true
   register: disable_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - disable_check is changed
       - disable is changed
@@ -398,7 +398,7 @@
     state: reset
   check_mode: true
   register: reset_idem_check
-- assert:
+- ansible.builtin.assert:
     that:
       - reset_check is changed
       - reset is changed

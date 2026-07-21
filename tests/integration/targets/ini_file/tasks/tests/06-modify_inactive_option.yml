@@ -40,7 +40,7 @@
     content1: "{{ output_content.content | b64decode }}"
 
 - name: test-modify_inactive_option 1 - assert 'changed' is true, content is OK and option changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is changed
       - result1.msg == 'option changed'
@@ -83,7 +83,7 @@
     content2: "{{ output_content.content | b64decode }}"
 
 - name: test-modify_inactive_option 2 - assert 'changed' is true and content is OK and option added
-  assert:
+  ansible.builtin.assert:
     that:
       - result2 is changed
       - result2.msg == 'option added'
@@ -116,7 +116,7 @@
     content3: "{{ output_content.content | b64decode }}"
 
 - name: test-modify_inactive_option 3 - assert 'changed' is true and content is OK and active option removed
-  assert:
+  ansible.builtin.assert:
     that:
       - result3 is changed
       - result3.msg == 'option changed'
@@ -158,7 +158,7 @@
     content4: "{{ output_content.content | b64decode }}"
 
 - name: test-modify_inactive_option 4 - assert 'changed' is true and content is OK and option changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result4 is changed
       - result4.msg == 'option changed'

@@ -10,7 +10,7 @@
         msg: "{{ list1 | community.general.lists_mergeby(list2, 'name') }}"
       when: debug_test|default(false)|bool
     - name: Test lists merged by attribute name assert
-      assert:
+      ansible.builtin.assert:
         that:
           - "(list1 | community.general.lists_mergeby(list2, 'name') | list |
               difference(list3) | length) == 0"
@@ -23,7 +23,7 @@
         msg: "{{ [] | community.general.lists_mergeby(list2, 'name') }}"
       when: debug_test|default(false)|bool
     - name: Test list1 empty assert
-      assert:
+      ansible.builtin.assert:
         that:
           - "([] | community.general.lists_mergeby(list2, 'name') | list |
               difference(list2) | length) == 0"
@@ -36,7 +36,7 @@
         msg: "{{ [] | community.general.lists_mergeby([], 'name') }}"
       when: debug_test|default(false)|bool
     - name: Test all lists empty assert
-      assert:
+      ansible.builtin.assert:
         that:
           - "([] | community.general.lists_mergeby([], 'name') | list |
               length) == 0"
@@ -54,7 +54,7 @@
         var: my_list
       when: debug_test|default(false)|bool
     - name: First argument must be list assert
-      assert:
+      ansible.builtin.assert:
         that:
           - result is failed
           - '"All arguments before the argument index for community.general.lists_mergeby must be lists." in result.msg'
@@ -72,7 +72,7 @@
         var: my_list
       when: debug_test|default(false)|bool
     - name: Second argument must be list set assert
-      assert:
+      ansible.builtin.assert:
         that:
           - result is failed
           - '"All arguments before the argument index for community.general.lists_mergeby must be lists." in result.msg'
@@ -90,7 +90,7 @@
         var: my_list
       when: debug_test|default(false)|bool
     - name: First arguments after the lists must be string assert
-      assert:
+      ansible.builtin.assert:
         that:
           - result is failed
           - '"First argument after the lists for community.general.lists_mergeby must be string." in result.msg'
@@ -108,7 +108,7 @@
         var: my_list
       when: debug_test|default(false)|bool
     - name: Elements of list must be dictionaries assert
-      assert:
+      ansible.builtin.assert:
         that:
           - result is failed
           - '"Elements of list arguments for lists_mergeby must be dictionaries." in result.msg'
@@ -124,7 +124,7 @@
         var: my_list
       when: debug_test|default(false)|bool
     - name: Merge 3 lists by attribute name. 1 list in params. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result1) | length == 0
   tags: t8
 
@@ -138,7 +138,7 @@
         var: my_list
       when: debug_test|default(false)|bool
     - name: Merge 3 lists by attribute name. No list in the params. asset
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result1) | length == 0
   tags: t9
 
@@ -158,6 +158,6 @@
             {{ my_list|difference(result100)|to_nice_yaml|indent(2) }}
       when: debug_test|default(false)|bool
     - name: Merge 2 lists by attribute name. list_merge='replace'. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result100) | length == 0
   tags: t100

@@ -52,7 +52,7 @@
       check_mode: true
       register: result
     - name: verify test gather cloud-init facts in check mode
-      assert:
+      ansible.builtin.assert:
         that:
           - result.cloud_init_data_facts.status.v1 is defined
           - result.cloud_init_data_facts.status.v1.stage is defined
@@ -65,7 +65,7 @@
       cloud_init_data_facts:
       register: result
     - name: verify test gather cloud-init facts
-      assert:
+      ansible.builtin.assert:
         that:
           - result.cloud_init_data_facts.status.v1 is defined
           - result.cloud_init_data_facts.status.v1.stage is defined

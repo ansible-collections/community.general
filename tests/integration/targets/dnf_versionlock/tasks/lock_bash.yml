@@ -8,7 +8,7 @@
     state: clean
   register: clear_locklist
 
-- assert:
+- ansible.builtin.assert:
     that:
       - clear_locklist.locklist_post | length == 0
 
@@ -18,7 +18,7 @@
     state: present
   register: lock_bash
 
-- assert:
+- ansible.builtin.assert:
     that:
       - lock_bash is changed
       - lock_bash.locklist_post | length == 1
@@ -29,7 +29,7 @@
     state: absent
   register: unlock_bash
 
-- assert:
+- ansible.builtin.assert:
     that:
       - unlock_bash is changed
       - unlock_bash.locklist_post | length == 0

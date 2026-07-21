@@ -22,7 +22,7 @@
   register: cm_add_package
 
 - name: Verify cm_add_package
-  assert:
+  ansible.builtin.assert:
     that:
       - cm_add_package is changed
 
@@ -33,7 +33,7 @@
   register: nm_add_package
 
 - name: Verify nm_add_package
-  assert:
+  ansible.builtin.assert:
     that:
       - nm_add_package is changed
 
@@ -45,7 +45,7 @@
   register: cm_add_package_again
 
 - name: Verify cm_add_package_again
-  assert:
+  ansible.builtin.assert:
     that:
       - cm_add_package_again is not changed
 
@@ -56,7 +56,7 @@
   register: nm_add_package_again
 
 - name: Verify nm_add_package_again
-  assert:
+  ansible.builtin.assert:
     that:
       - nm_add_package_again is not changed
 
@@ -70,7 +70,7 @@
   register: cm_remove_package
 
 - name: Verify cm_remove_package
-  assert:
+  ansible.builtin.assert:
     that:
       - cm_remove_package is changed
 
@@ -81,7 +81,7 @@
   register: nm_remove_package
 
 - name: Verify nm_remove_package
-  assert:
+  ansible.builtin.assert:
     that:
       - nm_remove_package is changed
 
@@ -93,7 +93,7 @@
   register: cm_remove_package_again
 
 - name: Verify cm_remove_package_again
-  assert:
+  ansible.builtin.assert:
     that:
       - cm_remove_package_again is not changed
 
@@ -104,7 +104,7 @@
   register: nm_remove_package_again
 
 - name: Verify nm_remove_package_again
-  assert:
+  ansible.builtin.assert:
     that:
       - nm_remove_package_again is not changed
 

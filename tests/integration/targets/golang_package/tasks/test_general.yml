@@ -37,7 +37,7 @@
   register: uninstall_idem
 
 - name: Check assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - uninstall_absent is not changed
       - install_result is changed

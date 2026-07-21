@@ -45,7 +45,7 @@
 # Despite the fact that there is alternative with higher priority (/usr/bin/dummy1),
 # it is not chosen as it doesn't belong to the selected family
 - name: Ensure that the alternative from the selected family is used
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy2"
 
@@ -60,6 +60,6 @@
   register: cmd
 
 - name: Ensure that the next alternative is selected as having the highest priority from the family
-  assert:
+  ansible.builtin.assert:
     that:
       - cmd.stdout == "dummy3"

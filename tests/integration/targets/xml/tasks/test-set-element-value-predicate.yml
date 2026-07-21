@@ -40,7 +40,7 @@
   register: comparison
 
 - name: Assert create_if_missing=false with predicate no-match is a no-op
-  assert:
+  ansible.builtin.assert:
     that:
       - set_predicate_first_run is changed
       - set_predicate_second_run is not changed
@@ -62,7 +62,7 @@
   register: set_nonexistent
 
 - name: Assert create_if_missing=false with missing simple path is a no-op
-  assert:
+  ansible.builtin.assert:
     that:
       - set_nonexistent is not changed
 
@@ -90,7 +90,7 @@
   register: set_predicate_create_again
 
 - name: Assert create_if_missing=true creates the node and is then idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - set_predicate_create is changed
       - set_predicate_create_again is not changed

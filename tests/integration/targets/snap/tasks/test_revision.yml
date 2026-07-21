@@ -23,7 +23,7 @@
   register: install_revision_again
 
 - name: Assert revision install behavior
-  assert:
+  ansible.builtin.assert:
     that:
       - install_revision is changed
       - install_revision_again is not changed
@@ -34,7 +34,7 @@
   changed_when: false
 
 - name: Assert snap is held
-  assert:
+  ansible.builtin.assert:
     that:
       - "'held' in snap_list_after_install.stdout"
 
@@ -46,7 +46,7 @@
   register: install_different_revision
 
 - name: Assert switching to a different revision triggers change
-  assert:
+  ansible.builtin.assert:
     that:
       - install_different_revision is changed
 
@@ -56,7 +56,7 @@
   changed_when: false
 
 - name: Assert snap is still held
-  assert:
+  ansible.builtin.assert:
     that:
       - "'held' in snap_list_after_switch.stdout"
 
@@ -72,7 +72,7 @@
   changed_when: false
 
 - name: Assert snap did not update past the held revision
-  assert:
+  ansible.builtin.assert:
     that:
       - "'45' in snap_list_after_bare_refresh.stdout"
       - "'held' in snap_list_after_bare_refresh.stdout"
@@ -92,6 +92,6 @@
   ignore_errors: true
 
 - name: Assert channel and revision are mutually exclusive
-  assert:
+  ansible.builtin.assert:
     that:
       - install_channel_and_revision is failed

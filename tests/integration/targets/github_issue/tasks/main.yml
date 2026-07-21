@@ -17,7 +17,7 @@
     action: get_status
   register: get_status_0002
 
-- assert:
+- ansible.builtin.assert:
     that:
       - get_status_0002 is changed
       - get_status_0002.issue_status == 'closed'
@@ -31,7 +31,7 @@
   register: get_status_0003
   ignore_errors: true
 
-- assert:
+- ansible.builtin.assert:
     that:
       - get_status_0003 is not changed
       - get_status_0003 is failed

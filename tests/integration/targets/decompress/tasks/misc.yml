@@ -31,7 +31,7 @@
   register: nonexisting_stat
 
 - name: Check mode test
-  assert:
+  ansible.builtin.assert:
     that:
       - decompressed_check_mode.changed
       - decompressed_check_mode_2.changed
@@ -63,7 +63,7 @@
   register: compressed_stat
 
 - name: Run tests
-  assert:
+  ansible.builtin.assert:
     that:
       - not compressed_stat.stat.exists
       - not decompress_non_existing_src.changed

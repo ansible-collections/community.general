@@ -8,7 +8,7 @@
   register: simple1
 
 - name: assert simple1
-  assert:
+  ansible.builtin.assert:
     that:
       - simple1.a == 80
       - simple1.abc == "abc"
@@ -22,7 +22,7 @@
   register: simple2
 
 - name: assert simple2
-  assert:
+  ansible.builtin.assert:
     that:
       - simple1.a == 80
       - simple1.abc == "abc"
@@ -41,7 +41,7 @@
   register: simple3
 
 - name: assert simple3
-  assert:
+  ansible.builtin.assert:
     that:
       - simple3.a == 101
       - >

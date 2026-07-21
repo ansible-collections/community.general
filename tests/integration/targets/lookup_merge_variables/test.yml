@@ -18,7 +18,7 @@
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
-          assert:
+          ansible.builtin.assert:
             that:
               - "(merged_list | length) == 2"
               - "'item1' in merged_list"
@@ -33,7 +33,7 @@
             msg: "{{ merged_dict }}"
 
         - name: Validate that dict is complete
-          assert:
+          ansible.builtin.assert:
             that:
               - "'item1' in merged_dict"
               - "'item2' in merged_dict"
@@ -107,7 +107,7 @@
             msg: "{{ not_found }}"
         - name: Validate that the variable defaults to an empty list
           vars:
-          assert:
+          ansible.builtin.assert:
             that:
               - "(not_found | default('default-used', True)) == 'default-used'"
       vars:
@@ -121,7 +121,7 @@
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
-          assert:
+          ansible.builtin.assert:
             that:
               - "(merged_list | length) == 4"
               - "'item1' in merged_list"
@@ -138,7 +138,7 @@
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
-          assert:
+          ansible.builtin.assert:
             that:
               - "(merged_list | length) == 2"
               - "'item1' in merged_list"
@@ -153,7 +153,7 @@
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
-          assert:
+          ansible.builtin.assert:
             that:
               - "(merged_list | length) == 3"
               - "'item1' in merged_list"
@@ -171,7 +171,7 @@
 
         - name: Validate that the variable only contains the initial value
           vars:
-          assert:
+          ansible.builtin.assert:
             that:
               - "(not_found_initial_value | count) == 1"
               - "(not_found_initial_value | first) == 'item2'"
@@ -185,7 +185,7 @@
             msg: "{{ merged_list_with_initial_value }}"
 
         - name: Validate that the list is complete
-          assert:
+          ansible.builtin.assert:
             that:
               - "(merged_list_with_initial_value | length) == 3"
               - "'item1' in merged_list_with_initial_value"
@@ -202,7 +202,7 @@
             msg: "{{ merged_with_override_warn }}"
 
         - name: Validate that the dict is complete and the warning is printed
-          assert:
+          ansible.builtin.assert:
             that:
               - "'key_to_override' in merged_with_override_warn"
               - "merged_with_override_warn.key_to_override == 'Override value'"
@@ -224,7 +224,7 @@
             msg: "{{ _override_error_result }}"
 
         - name: Validate that the error is reported
-          assert:
+          ansible.builtin.assert:
             that:
               - "_override_error_result.failed"
               - "'key_to_override' in _override_error_result.msg"

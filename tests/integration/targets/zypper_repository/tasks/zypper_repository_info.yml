@@ -15,7 +15,7 @@
   register: repositories
 
 - name: verify, that test-repo is returned by the repodatalist
-  assert:
+  ansible.builtin.assert:
     that:
       - "{{ 'test' in repositories.repodatalist|map(attribute='name') | list }}"
 

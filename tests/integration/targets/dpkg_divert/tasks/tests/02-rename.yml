@@ -47,7 +47,7 @@
   register: diversion_5
 
 - name: "assert that results of test 05 are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - diversion_0 is changed
       - diversion_1 is changed
@@ -111,7 +111,7 @@
   register: diversion_5
 
 - name: "assert that results of test 06 are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - diversion_0 is changed
       - diversion_1 is changed
@@ -197,7 +197,7 @@
   register: diversion_7
 
 - name: "assert that results of test 07 are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - diversion_0 is failed
       - diversion_1 is failed
@@ -276,7 +276,7 @@
   register: diversion_6
 
 - name: "assert that results of test 08 are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - diversion_0 is changed
       - diversion_1 is changed
@@ -369,7 +369,7 @@
   register: diversion_8
 
 - name: "assert that results of test 09 are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - diversion_0 is failed
       - diversion_1 is failed

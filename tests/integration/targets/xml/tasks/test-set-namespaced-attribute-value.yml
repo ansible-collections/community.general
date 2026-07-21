@@ -34,7 +34,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - set_namespaced_attribute_value is changed
       - comparison is not changed  # identical

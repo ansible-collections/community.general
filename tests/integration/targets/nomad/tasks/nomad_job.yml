@@ -35,7 +35,7 @@
   register: list_nomad_jobs
 
 - name: assert job is deployed and tasks is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - job_check_deployed is changed
       - job_deployed is changed
@@ -102,7 +102,7 @@
     msg: "{{ list_nomad_jobs }}"
 
 - name: assert idempotence
-  assert:
+  ansible.builtin.assert:
     that:
       - job_check_deployed_idempotence is not changed
       - job_deployed_idempotence is not changed
