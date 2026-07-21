@@ -9,7 +9,7 @@
     state: directory
 
 - name: create temporary directory
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
     suffix: .test
     path: ~/tmp

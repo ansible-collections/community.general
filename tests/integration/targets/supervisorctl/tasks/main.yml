@@ -12,7 +12,7 @@
   environment:
     PATH: "{{ pip_scripts_path }}"
   block:
-    - tempfile:
+    - ansible.builtin.tempfile:
         state: directory
         suffix: supervisorctl-tests
       register: supervisord_sock_path
