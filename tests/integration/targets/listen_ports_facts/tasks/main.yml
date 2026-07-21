@@ -68,13 +68,13 @@
 
 - name: Gather listening ports facts explicitly via netstat and include_non_listening
   listen_ports_facts:
-    ansible.builtin.command: 'netstat'
+    command: 'netstat'
     include_non_listening: 'yes'
   when: (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int < 7) or ansible_facts.os_family == "Debian"
 
 - name: Gather listening ports facts explicitly via ss and include_non_listening
   listen_ports_facts:
-    ansible.builtin.command: 'ss'
+    command: 'ss'
     include_non_listening: 'yes'
   when: ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int >= 7
 
