@@ -31,7 +31,7 @@
   register: set_element_second_run
 
 - name: Add trailing newline
-  shell: echo "" >> /tmp/ansible-xml-beers.xml
+  ansible.builtin.shell: echo "" >> /tmp/ansible-xml-beers.xml
 
 - name: Compare to expected result
   copy:

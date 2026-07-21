@@ -62,7 +62,7 @@
 - name: Run tests integration
   block:
     - name: Start nomad (dev mode enabled)
-      shell: nohup {{ nomad_cmd }} agent -dev </dev/null >/dev/null 2>&1 &
+      ansible.builtin.shell: nohup {{ nomad_cmd }} agent -dev </dev/null >/dev/null 2>&1 &
 
     - name: wait nomad up
       wait_for:
@@ -75,4 +75,4 @@
   always:
 
     - name: kill nomad
-      shell: pkill nomad
+      ansible.builtin.shell: pkill nomad

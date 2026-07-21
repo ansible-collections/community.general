@@ -93,7 +93,7 @@
       - "not current_path_unfinished_filename.stat.exists"
 - stat: path={{ deploy_helper.releases_path }}/third
   register: third_release_path
-- shell: "ls {{ deploy_helper.releases_path }} | wc -l"
+- ansible.builtin.shell: "ls {{ deploy_helper.releases_path }} | wc -l"
   register: releases_count
 - name: Assert State=finalize with default parameters (clean=true checks)
   ansible.builtin.assert:
@@ -140,13 +140,13 @@
 # Add a buildfile, to an older deploy
 - copy: content='' dest={{ deploy_helper.releases_path }}/third/{{ deploy_helper.unfinished_filename }}
 
-- shell: "ls {{ deploy_helper_test_root }}/releases | wc -l"
+- ansible.builtin.shell: "ls {{ deploy_helper_test_root }}/releases | wc -l"
   register: before_releases_count
 - name: State=clean with keep_releases=3
   deploy_helper: path={{ deploy_helper_test_root }} release={{ deploy_helper.new_release }} state=clean keep_releases=3
 - stat: path={{ deploy_helper.releases_path }}/third
   register: third_release_path
-- shell: "ls {{ deploy_helper.releases_path }} | wc -l"
+- ansible.builtin.shell: "ls {{ deploy_helper.releases_path }} | wc -l"
   register: releases_count
 - name: Assert State=finalize with default parameters (clean=true checks)
   ansible.builtin.assert:

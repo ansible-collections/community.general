@@ -65,7 +65,7 @@
     # Name setup database
     #
     - name: Create a user to run the tests with
-      shell: echo "CREATE USER {{ my_user }} SUPERUSER PASSWORD '{{ my_pass }}'" | psql postgres
+      ansible.builtin.shell: echo "CREATE USER {{ my_user }} SUPERUSER PASSWORD '{{ my_pass }}'" | psql postgres
       become_user: "{{ pg_user }}"
       become: true
 

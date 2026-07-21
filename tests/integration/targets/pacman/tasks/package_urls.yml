@@ -41,7 +41,7 @@
         url: '{{url_pkg_stdout.stdout}}.sig'
         dest: '{{url_pkg_path}}/{{url_pkg_filename}}.sig'
     - name: Host {{url_pkg}}
-      shell:
+      ansible.builtin.shell:
         cmd: 'python -m http.server --directory {{url_pkg_path}} {{http_port}} >/dev/null 2>&1'
       async: 90
       poll: 0

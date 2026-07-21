@@ -54,7 +54,7 @@
     from_port: 4444
 
 - name: Check result
-  shell: ufw status |grep -E '(ALLOW|DENY|REJECT|LIMIT)' |sed -E 's/[ \t]+/ /g'
+  ansible.builtin.shell: ufw status |grep -E '(ALLOW|DENY|REJECT|LIMIT)' |sed -E 's/[ \t]+/ /g'
   register: ufw_status
 
 - ansible.builtin.assert:

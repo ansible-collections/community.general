@@ -26,7 +26,7 @@
   register: create_cronvar2
 
 - name: Check cron var value
-  shell: crontab -l -u root | grep -c EMAIL=doug@ansibmod.con.com
+  ansible.builtin.shell: crontab -l -u root | grep -c EMAIL=doug@ansibmod.con.com
   register: varcheck1
 
 - name: Modify EMAIL cron var
@@ -36,7 +36,7 @@
   register: create_cronvar3
 
 - name: Check cron var value again
-  shell: crontab -l -u root | grep -c EMAIL=jane@ansibmod.con.com
+  ansible.builtin.shell: crontab -l -u root | grep -c EMAIL=jane@ansibmod.con.com
   register: varcheck2
 
 - name: Remove EMAIL cron var
@@ -52,7 +52,7 @@
   register: remove_cronvar2
 
 - name: Check cron var value again
-  shell: crontab -l -u root | grep -c EMAIL
+  ansible.builtin.shell: crontab -l -u root | grep -c EMAIL
   register: varcheck3
   failed_when: varcheck3.rc == 0
 

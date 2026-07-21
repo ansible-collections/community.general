@@ -9,11 +9,11 @@
     - ansible_facts.distribution == 'FreeBSD'
   block:
     - name: Cache original contents of /etc/rc.conf
-      shell: "cat /etc/rc.conf"
+      ansible.builtin.shell: "cat /etc/rc.conf"
       register: cached_etc_rcconf_content
 
     - name: Cache original contents of /boot/loader.conf
-      shell: "cat /boot/loader.conf"
+      ansible.builtin.shell: "cat /boot/loader.conf"
       register: cached_boot_loaderconf_content
 
     ##
@@ -39,7 +39,7 @@
       register: sysrc_example1_idempotent
 
     - name: Get file content
-      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      ansible.builtin.shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_example1_content
 
     - name: Ensure sysrc updates rc.conf properly
@@ -80,7 +80,7 @@
       register: sysrc_example2_idempotent
 
     - name: Get file content
-      shell: "cat /boot/loader.conf | egrep -v ^\\#"
+      ansible.builtin.shell: "cat /boot/loader.conf | egrep -v ^\\#"
       register: sysrc_example2_content
 
     - name: Ensure sysrc did not change the file, but marked as changed
@@ -123,7 +123,7 @@
       register: sysrc_example3_idempotent
 
     - name: Get file content
-      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      ansible.builtin.shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_example3_content
 
     - name: Ensure sysrc did not change the file, but marked as changed
@@ -172,7 +172,7 @@
           register: sysrc_example4_idempotent
 
         - name: Get file content
-          shell: "cat /usr/jails/testjail/etc/rc.conf | grep nginx_enable"
+          ansible.builtin.shell: "cat /usr/jails/testjail/etc/rc.conf | grep nginx_enable"
           register: sysrc_example4_content
 
         - name: Ensure sysrc worked in testjail
@@ -216,7 +216,7 @@
       register: sysrc_absent_idempotent
 
     - name: Get file content
-      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      ansible.builtin.shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_absent_content
 
     - name: Ensure sysrc did as intended
@@ -269,7 +269,7 @@
       register: sysrc_delim_idempotent
 
     - name: Get file content
-      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      ansible.builtin.shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_delim_content
 
     - name: Ensure sysrc did as intended
@@ -319,7 +319,7 @@
       register: sysrc_value_absent_idempotent
 
     - name: Get file content
-      shell: "cat /etc/rc.conf | egrep -v ^\\#"
+      ansible.builtin.shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_delim_content
 
     - name: Ensure sysrc did as intended with value_absent
@@ -409,7 +409,7 @@
       register: sysrc_10394_changed
 
     - name: Get file content
-      shell: "cat /tmp/10394.conf"
+      ansible.builtin.shell: "cat /tmp/10394.conf"
       register: sysrc_10394_content
 
     - name: Ensure sysrc changed k1 from v1 to v2

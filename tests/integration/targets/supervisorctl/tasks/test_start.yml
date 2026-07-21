@@ -64,7 +64,7 @@
 
 # supervisord has been stopped, check logfile
 - name: check that service has done what it was expected (part 2)
-  shell: 'test "$(tail -2 {{ remote_dir }}/py1.log | head -1)" = ">>> 2"'
+  ansible.builtin.shell: 'test "$(tail -2 {{ remote_dir }}/py1.log | head -1)" = ">>> 2"'
 
 # restart supervisord and py1 service for next tasks
 - ansible.builtin.import_tasks: start_supervisord.yml

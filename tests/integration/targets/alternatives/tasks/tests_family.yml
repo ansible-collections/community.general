@@ -13,7 +13,7 @@
     state: selected
 
 - name: Ensure that the alternative has family assigned
-  shell: 'grep family1 {{ alternatives_dir }}/dummy'
+  ansible.builtin.shell: 'grep family1 {{ alternatives_dir }}/dummy'
 
 - name: Add two alternatives with different families
   alternatives:
@@ -36,10 +36,10 @@
     state: selected
 
 - name: Ensure manual mode
-  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual"'
+  ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual"'
 
 - name: Execute the current dummy command
-  shell: dummy
+  ansible.builtin.shell: dummy
   register: cmd
 
 # Despite the fact that there is alternative with higher priority (/usr/bin/dummy1),
@@ -56,7 +56,7 @@
     state: absent
 
 - name: Execute the current dummy command
-  shell: dummy
+  ansible.builtin.shell: dummy
   register: cmd
 
 - name: Ensure that the next alternative is selected as having the highest priority from the family

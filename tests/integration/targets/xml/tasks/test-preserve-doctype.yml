@@ -16,7 +16,7 @@
   register: set_attribute_doctype
 
 - name: Add trailing newline
-  shell: echo "" >> /tmp/ansible-xml-doctype.xml
+  ansible.builtin.shell: echo "" >> /tmp/ansible-xml-doctype.xml
 
 - name: Compare to expected result
   copy:

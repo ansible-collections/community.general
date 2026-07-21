@@ -11,13 +11,13 @@
 - name: test apache2_module
   block:
     - name: get list of enabled modules
-      shell: apache2ctl -M | sort
+      ansible.builtin.shell: apache2ctl -M | sort
       register: modules_before
     - name: include only on supported systems
       ansible.builtin.include_tasks: actualtest.yml
   always:
     - name: get list of enabled modules
-      shell: apache2ctl -M | sort
+      ansible.builtin.shell: apache2ctl -M | sort
       register: modules_after
     - name: modules_before
       debug:

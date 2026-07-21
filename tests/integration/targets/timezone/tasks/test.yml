@@ -91,13 +91,13 @@
 ##
 
 - name: check dpkg-reconfigure
-  shell: type dpkg-reconfigure
+  ansible.builtin.shell: type dpkg-reconfigure
   register: check_dpkg_reconfigure
   ignore_errors: true
   changed_when: false
 
 - name: check timedatectl
-  shell: type timedatectl && timedatectl
+  ansible.builtin.shell: type timedatectl && timedatectl
   register: check_timedatectl
   ignore_errors: true
   changed_when: false

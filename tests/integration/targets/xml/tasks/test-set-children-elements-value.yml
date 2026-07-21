@@ -25,7 +25,7 @@
   register: set_children_elements_value
 
 - name: Add trailing newline
-  shell: echo "" >> /tmp/ansible-xml-beers.xml
+  ansible.builtin.shell: echo "" >> /tmp/ansible-xml-beers.xml
 
 - name: Compare to expected result
   copy:

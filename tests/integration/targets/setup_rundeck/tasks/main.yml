@@ -26,7 +26,7 @@
     state: present
 
 - name: Install Rundeck
-  shell: |
+  ansible.builtin.shell: |
       mkdir -p $RDECK_BASE;
       curl -k -o $RDECK_BASE/rundeck.war -L '{{ rundeck_war_url }}';
       curl -k -o $RDECK_BASE/rundeck-cli.jar -L '{{ rundeck_cli_url }}'

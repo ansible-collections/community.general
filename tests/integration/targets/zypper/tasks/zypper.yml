@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: get hello package version
-  shell: zypper --xmlout se -svx hello | grep 'name="hello"' | grep 'repository="Main Repository"' | sed 's/.*edition="\([^ ]*\)".*/\1/'
+  ansible.builtin.shell: zypper --xmlout se -svx hello | grep 'name="hello"' | grep 'repository="Main Repository"' | sed 's/.*edition="\([^ ]*\)".*/\1/'
   register: hello_version
   when: ansible_facts.distribution == 'openSUSE Leap'
 
@@ -14,7 +14,7 @@
   when: ansible_facts.distribution == 'openSUSE Leap'
 
 - name: get hello package version
-  shell: zypper --xmlout se -svx hello | grep 'name="hello"' | grep 'repository="openSUSE-Tumbleweed-Oss"' | sed 's/.*edition="\([^ ]*\)".*/\1/'
+  ansible.builtin.shell: zypper --xmlout se -svx hello | grep 'name="hello"' | grep 'repository="openSUSE-Tumbleweed-Oss"' | sed 's/.*edition="\([^ ]*\)".*/\1/'
   register: hello_version_tumbleweed
   when: ansible_facts.distribution == 'openSUSE Tumbleweed'
 
@@ -33,7 +33,7 @@
   register: zypper_result
 
 - name: check hello with rpm
-  shell: rpm -q hello
+  ansible.builtin.shell: rpm -q hello
   failed_when: false
   register: rpm_result
 
@@ -66,7 +66,7 @@
   register: zypper_result
 
 - name: check hello with rpm
-  shell: rpm -q hello
+  ansible.builtin.shell: rpm -q hello
   failed_when: false
   register: rpm_result
 
@@ -102,12 +102,12 @@
   register: zypper_result
 
 - name: check hello with rpm
-  shell: rpm -q hello
+  ansible.builtin.shell: rpm -q hello
   failed_when: false
   register: rpm_hello_result
 
 - name: check metamail with rpm
-  shell: rpm -q metamail
+  ansible.builtin.shell: rpm -q metamail
   failed_when: false
   register: rpm_metamail_result
 
@@ -126,12 +126,12 @@
   register: zypper_result
 
 - name: check hello with rpm
-  shell: rpm -q hello
+  ansible.builtin.shell: rpm -q hello
   failed_when: false
   register: rpm_hello_result
 
 - name: check metamail with rpm
-  shell: rpm -q metamail
+  ansible.builtin.shell: rpm -q metamail
   failed_when: false
   register: rpm_metamail_result
 
@@ -235,7 +235,7 @@
   register: zypper_result
 
 - name: check empty with rpm
-  shell: rpm -q empty
+  ansible.builtin.shell: rpm -q empty
   failed_when: false
   register: rpm_result
 
@@ -313,7 +313,7 @@
   register: zypper_result
 
 - name: check post_error rpm
-  shell: rpm -q post_error
+  ansible.builtin.shell: rpm -q post_error
   failed_when: false
   register: rpm_result
 
@@ -337,7 +337,7 @@
   ignore_errors: true
 
 - name: check post_error rpm
-  shell: rpm -q post_error
+  ansible.builtin.shell: rpm -q post_error
   failed_when: false
   register: rpm_result
 

@@ -28,7 +28,7 @@
     size: 50%ORIGIN
 
 - name: Collect all lv active status in testvg
-  shell: vgs -olv_active --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -olv_active --noheadings testvg | xargs -n1
   register: initial_lv_status_result
 
 - name: Assert all lv in testvg are active
@@ -44,7 +44,7 @@
   register: vg_deactivate_result
 
 - name: Collect all lv active status in testvg
-  shell: vgs -olv_active --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -olv_active --noheadings testvg | xargs -n1
   register: deactivated_lv_status_result
 
 - name: Do all assertions to verify expected results
@@ -72,7 +72,7 @@
   check_mode: true
 
 - name: Collect all lv active status in testvg
-  shell: vgs -olv_active --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -olv_active --noheadings testvg | xargs -n1
   register: check_mode_activate_lv_status_result
 
 - name: Verify VG activation in check mode changed without activating LVs
@@ -88,7 +88,7 @@
   register: vg_activate_result
 
 - name: Collect all lv active status in testvg
-  shell: vgs -olv_active --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -olv_active --noheadings testvg | xargs -n1
   register: activate_lv_status_result
 
 - name: Verify vg activation
@@ -131,7 +131,7 @@
       - partial_vg_activate_result is changed
 
 - name: Collect all lv active status in testvg
-  shell: vgs -olv_active --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -olv_active --noheadings testvg | xargs -n1
   register: activate_partial_lv_status_result
 
 - name: Assert all lv in testvg are active
@@ -148,7 +148,7 @@
   check_mode: true
 
 - name: Collect all lv active status in testvg
-  shell: vgs -olv_active --noheadings testvg | xargs -n1
+  ansible.builtin.shell: vgs -olv_active --noheadings testvg | xargs -n1
   register: check_mode_deactivate_lv_status_result
 
 - name: Verify check mode vg deactivation changed

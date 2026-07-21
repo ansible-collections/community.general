@@ -29,7 +29,7 @@
   register: set_predicate_second_run
 
 - name: Add trailing newline
-  shell: echo "" >> /tmp/ansible-xml-items.xml
+  ansible.builtin.shell: echo "" >> /tmp/ansible-xml-items.xml
 
 - name: Compare to expected result
   copy:

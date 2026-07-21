@@ -12,11 +12,11 @@
   register: alternative
 
 - name: execute dummy command
-  shell: dummy
+  ansible.builtin.shell: dummy
   register: cmd
 
 - name: check if link group is in manual mode
-  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
+  ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
 
 - name: check expected command was executed
   ansible.builtin.assert:

@@ -63,7 +63,7 @@
 
 # ## CHECK RESULT ############################
 - name: Get rules
-  shell: |
+  ansible.builtin.shell: |
     ufw status | grep DENY | cut -f 1-2 -d ' ' | grep -E "^(0\.0\.0\.0|::) [123]+"
   # Note that there was also a rule "ff02::fb mDNS" on at least one CI run;
   # to ignore these, the extra filtering (grepping for DENY and the regex) makes

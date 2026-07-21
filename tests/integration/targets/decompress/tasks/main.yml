@@ -61,7 +61,7 @@
     - ansible_facts.os_family == 'Darwin'
 
 - name: Generate compressed files
-  shell: |
+  ansible.builtin.shell: |
     gzip < {{ item }} > {{ item }}.gz
     bzip2 < {{ item }} > {{ item }}.bz2
     xz < {{ item }} > {{ item }}.xz

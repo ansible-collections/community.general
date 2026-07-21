@@ -14,7 +14,7 @@
 
 - name: Install uv in RHEL
   when: ansible_facts['os_family'] == "RedHat"
-  shell: |
+  ansible.builtin.shell: |
     curl -LsSf https://astral.sh/uv/install.sh | sh
   environment:
     UV_INSTALL_DIR: "{{ ansible_env.HOME }}/ansible/bin"

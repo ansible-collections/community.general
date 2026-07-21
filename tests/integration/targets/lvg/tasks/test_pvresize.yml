@@ -9,7 +9,7 @@
     pvs: "{{ loop_device1 }}"
 
 - name: Gets current vg size
-  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  ansible.builtin.shell: vgs -v testvg -o pv_size --noheading --units b | xargs
   register: cmd_result
 
 - name: Assert the testvg size is 33554432B
@@ -35,7 +35,7 @@
       - cmd_result is not changed
 
 - name: Gets current vg size
-  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  ansible.builtin.shell: vgs -v testvg -o pv_size --noheading --units b | xargs
   register: cmd_result
 
 - name: Assert the testvg size is still 33554432B
@@ -57,7 +57,7 @@
       - cmd_result is changed
 
 - name: Gets current vg size
-  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  ansible.builtin.shell: vgs -v testvg -o pv_size --noheading --units b | xargs
   register: cmd_result
 
 - name: Assert the testvg size is still 33554432B
@@ -72,7 +72,7 @@
     pvresize: true
 
 - name: Gets current vg size
-  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  ansible.builtin.shell: vgs -v testvg -o pv_size --noheading --units b | xargs
   register: cmd_result
 
 - name: Assert the testvg size is now 41943040B

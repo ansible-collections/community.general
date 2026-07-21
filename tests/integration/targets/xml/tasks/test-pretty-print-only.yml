@@ -9,7 +9,7 @@
     dest: /tmp/ansible-xml-beers.xml.orig
 
 - name: Remove spaces from test fixture
-  shell: sed 's/^[ ]*//g' < /tmp/ansible-xml-beers.xml.orig > /tmp/ansible-xml-beers.xml
+  ansible.builtin.shell: sed 's/^[ ]*//g' < /tmp/ansible-xml-beers.xml.orig > /tmp/ansible-xml-beers.xml
 
 - name: Pretty print without modification
   xml:

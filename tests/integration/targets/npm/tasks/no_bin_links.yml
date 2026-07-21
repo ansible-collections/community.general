@@ -13,7 +13,7 @@
     node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
     package: 'ncp'
   block:
-    - shell: npm --version
+    - ansible.builtin.shell: npm --version
       environment:
         PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
       register: npm_version

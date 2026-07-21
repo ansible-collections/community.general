@@ -77,7 +77,7 @@
             src: consul_config.hcl.j2
             dest: '{{ remote_tmp_dir }}/consul_config.hcl'
         - name: Start Consul (dev mode enabled)
-          shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
+          ansible.builtin.shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
         - name: Wait for Consul HTTP API to be ready
           wait_for:
             host: localhost
@@ -113,5 +113,5 @@
 
   always:
     - name: Kill consul process
-      shell: kill $(cat {{ remote_tmp_dir }}/consul.pid)
+      ansible.builtin.shell: kill $(cat {{ remote_tmp_dir }}/consul.pid)
       ignore_errors: true

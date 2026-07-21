@@ -10,10 +10,10 @@
     checkout_dir: "{{ remote_tmp_dir }}/hg_project_test"
 
 - name: clean out the remote_tmp_dir
-  shell: rm -rf "{{ checkout_dir }}"
+  ansible.builtin.shell: rm -rf "{{ checkout_dir }}"
 
 - name: verify that mercurial is installed so this test can continue
-  shell: which hg
+  ansible.builtin.shell: which hg
 
 - name: initial checkout
   hg:
@@ -21,7 +21,7 @@
     dest: "{{ checkout_dir }}"
   register: hg_result
 
-- shell: ls {{ checkout_dir }}
+- ansible.builtin.shell: ls {{ checkout_dir }}
 
 - name: verify information about the initial clone
   ansible.builtin.assert:

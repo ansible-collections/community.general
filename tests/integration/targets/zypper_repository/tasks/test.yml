@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: collect repo configuration before test
-  shell: "grep . /etc/zypp/repos.d/*"
+  ansible.builtin.shell: "grep . /etc/zypp/repos.d/*"
   register: before
 
 - name: ensure zypper ref works
@@ -28,7 +28,7 @@
         - systemsmanagement_Uyuni_Utils
 
     - name: collect repo configuration after test
-      shell: "grep . /etc/zypp/repos.d/*"
+      ansible.builtin.shell: "grep . /etc/zypp/repos.d/*"
       register: after
 
     - name: verify repo configuration has been restored
