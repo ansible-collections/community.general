@@ -215,7 +215,7 @@
   diff: true
 
 - name: check_mode test file contents
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: check_mode_contents
   ignore_errors: true

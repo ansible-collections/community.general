@@ -20,7 +20,7 @@
   register: result
 
 - name: test-ignore_spaces 1 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -49,7 +49,7 @@
   register: result
 
 - name: test-ignore_spaces 2 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -78,7 +78,7 @@
   register: result
 
 - name: test-ignore_spaces 3 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -108,7 +108,7 @@
   register: result
 
 - name: test-ignore_spaces 4 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 

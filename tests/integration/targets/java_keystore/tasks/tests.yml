@@ -18,14 +18,14 @@
 
 
 - name: Read certificates
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
   loop: "{{ java_keystore_certs }}"
   when: not remote_cert
   register: certificates
 
 - name: Read certificate keys
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
   loop: "{{ java_keystore_certs }}"
   when: not remote_cert
@@ -74,14 +74,14 @@
 
 
 - name: Read certificates (new)
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir ~ '/' ~ item.name ~ '.pem' }}"
   loop: "{{ java_keystore_new_certs }}"
   when: not remote_cert
   register: certificates_new
 
 - name: Read certificate keys (new)
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
   loop: "{{ java_keystore_new_certs }}"
   when: not remote_cert

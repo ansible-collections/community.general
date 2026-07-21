@@ -85,7 +85,7 @@
   register: match_all
 
 - name: "Reading pid from the file"
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ remote_tmp_dir }}/obtainpid.txt"
   register: newpid
 

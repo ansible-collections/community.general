@@ -88,7 +88,7 @@
       value: "1:2::3/48"
 
 - name: 7610 - read file
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ interfaces_testfile_7610 }}'
   register: content_7610
 
@@ -110,7 +110,7 @@
     value: foobar
 
 - name: 7610 - read file
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ interfaces_testfile_7610 }}'
   register: content_7610
 

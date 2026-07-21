@@ -75,7 +75,7 @@
   register: bl_test_2
 
 - name: slurp_test_2
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ bl_file }}'
   register: slurp_test_2
 
@@ -103,7 +103,7 @@
   register: bl_test_3
 
 - name: slurp_test_3
-  slurp:
+  ansible.builtin.slurp:
     src: '{{ bl_file }}'
   register: slurp_test_3
 

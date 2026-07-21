@@ -52,7 +52,7 @@
   register: result3
 
 - name: test-values 3 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -85,7 +85,7 @@
   register: result4
 
 - name: test-values 4 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -117,7 +117,7 @@
   register: result5
 
 - name: test-values 5 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -203,7 +203,7 @@
   register: result9
 
 - name: test-values 9 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -234,7 +234,7 @@
   register: result10
 
 - name: test-values 10 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -275,7 +275,7 @@
       register: result11
 
 - name: test-values 11 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -326,7 +326,7 @@
   register: result13
 
 - name: test-values 13 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -361,7 +361,7 @@
   register: result14
 
 - name: test-values 14 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -431,7 +431,7 @@
   register: result17
 
 - name: test-values 17 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -462,7 +462,7 @@
   register: result18
 
 - name: test-values 18 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -515,7 +515,7 @@
   register: result20_remove_again
 
 - name: test-values 20 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -546,7 +546,7 @@
   register: result21
 
 - name: test-values 21 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -597,7 +597,7 @@
   register: result22
 
 - name: test-values 22 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -640,7 +640,7 @@
   register: result23
 
 - name: test-values 23 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -684,7 +684,7 @@
   register: result24
 
 - name: test-values 24 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -735,7 +735,7 @@
   register: result25
 
 - name: test-values 25 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -768,7 +768,7 @@
   register: result26
 
 - name: test-values 26 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -797,7 +797,7 @@
   register: result27
 
 - name: test-values 27 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -836,7 +836,7 @@
         state: present
 
 - name: test-values 28 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -878,7 +878,7 @@
   register: result29
 
 - name: test-value 29 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -920,7 +920,7 @@
   register: result30
 
 - name: test-value 30 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -960,7 +960,7 @@
   register: result31
 
 - name: test-value 31 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
@@ -1001,7 +1001,7 @@
   diff: true
 
 - name: test-value 32 - read content from output file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ output_file }}"
   register: output_content
 
