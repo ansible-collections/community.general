@@ -43,7 +43,7 @@
 - name: Enable authentication and restart service
   block:
     - name: Enable authentication
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/influxdb/influxdb.conf
         regexp: 'auth-enabled ='
         line: '  auth-enabled = true'

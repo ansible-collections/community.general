@@ -11,7 +11,7 @@
   register: file_content_idempotency_before
 
 - name: Modify file - file content idempotency ({{ format }})
-  lineinfile:
+  ansible.builtin.lineinfile:
     line: bar.txt
     regexp: "^foo.txt$"
     path: "{{ remote_tmp_dir }}/foo.txt"
@@ -36,7 +36,7 @@
     state: absent
 
 - name: Modify file back - file content idempotency ({{ format }})
-  lineinfile:
+  ansible.builtin.lineinfile:
     line: foo.txt
     regexp: "^bar.txt$"
     path: "{{ remote_tmp_dir }}/foo.txt"
@@ -79,7 +79,7 @@
   register: single_file_content_idempotency_before
 
 - name: Modify file - single file content idempotency ({{ format }})
-  lineinfile:
+  ansible.builtin.lineinfile:
     line: bar.txt
     regexp: "^foo.txt$"
     path: "{{ remote_tmp_dir }}/foo.txt"
@@ -104,7 +104,7 @@
     state: absent
 
 - name: Modify file back - single file content idempotency ({{ format }})
-  lineinfile:
+  ansible.builtin.lineinfile:
     line: foo.txt
     regexp: "^bar.txt$"
     path: "{{ remote_tmp_dir }}/foo.txt"

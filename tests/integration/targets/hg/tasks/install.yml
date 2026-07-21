@@ -62,7 +62,7 @@
   register: stat_hg_interpreter
 
 - name: bypass the mercurial python interpreter symlink (if needed)
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ which_hg.stdout }}"
     regexp: "^#!.*$"
     line: "#!{{ stat_hg_interpreter.stat.lnk_source }}"

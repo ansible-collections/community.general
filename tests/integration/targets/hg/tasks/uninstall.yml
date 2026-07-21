@@ -10,7 +10,7 @@
   ansible.builtin.command: mv "{{ which_pip.stdout }}.updated" "{{ which_pip.stdout }}"
 
 - name: restore the mercurial python interpreter symlink (if needed)
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ which_hg.stdout }}"
     regexp: "^#!.*$"
     line: "#!{{ stat_hg_interpreter.stat.path }}"

@@ -23,7 +23,7 @@
     - lbmethod_byrequests
 
 - name: Add port 81
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "/etc/apache2/{{ 'ports.conf' if ansible_facts.os_family == 'Debian' else 'listen.conf' }}"
     line: Listen 81
 

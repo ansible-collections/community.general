@@ -38,7 +38,7 @@
         creates: "/root/slapd_configured"
 
     - name: Enable secure ldap
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/default/slapd
         regexp: "^SLAPD_SERVICES"
         line: 'SLAPD_SERVICES="ldap:/// ldaps:/// ldapi:///"'

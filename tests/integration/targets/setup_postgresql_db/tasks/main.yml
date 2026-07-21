@@ -210,7 +210,7 @@
   when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version is version('24', '>=')
 
 - name: enable postgresql service (FreeBSD)
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/rc.conf
     line: postgresql_enable="YES"
   when: ansible_facts.os_family == "FreeBSD"
