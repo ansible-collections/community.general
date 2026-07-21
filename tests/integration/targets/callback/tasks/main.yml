@@ -58,7 +58,7 @@
 
   always:
     - name: Remove temporary playbooks
-      file:
+      ansible.builtin.file:
         path: "{{ temporary_file.path }}"
         state: absent
       loop: "{{ temporary_playbook_files.results }}"

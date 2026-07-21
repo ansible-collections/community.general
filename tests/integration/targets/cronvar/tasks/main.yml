@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Ensure /etc/cron.d directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/cron.d
     state: directory
 

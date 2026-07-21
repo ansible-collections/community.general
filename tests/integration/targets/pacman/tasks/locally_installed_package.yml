@@ -21,7 +21,7 @@
         create_home: true
 
     - name: Create directory
-      file:
+      ansible.builtin.file:
         path: '/home/{{ username }}/{{ package_name }}'
         state: directory
         owner: '{{ username }}'
@@ -80,7 +80,7 @@
 
   always:
     - name: Remove directory
-      file:
+      ansible.builtin.file:
         path: '{{ remote_tmp_dir }}/{{ package_name }}'
         state: absent
       become: true

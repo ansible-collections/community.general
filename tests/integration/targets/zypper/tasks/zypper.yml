@@ -166,12 +166,12 @@
 
 # INSTALL broken local package
 - name: create directory
-  file:
+  ansible.builtin.file:
     path: "{{remote_tmp_dir | expanduser}}/zypper1"
     state: directory
 
 - name: fake rpm package
-  file:
+  ansible.builtin.file:
     path: "{{remote_tmp_dir | expanduser}}/zypper1/broken.rpm"
     state: touch
 
@@ -202,12 +202,12 @@
     state: present
 
 - name: clean zypper RPM cache
-  file:
+  ansible.builtin.file:
     name: /var/cache/zypper/RPMS
     state: absent
 
 - name: create directory
-  file:
+  ansible.builtin.file:
     path: "{{remote_tmp_dir | expanduser}}/zypper2"
     state: directory
 
@@ -279,12 +279,12 @@
     state: present
 
 - name: clean zypper RPM cache
-  file:
+  ansible.builtin.file:
     name: /var/cache/zypper/RPMS
     state: absent
 
 - name: create directory
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir | expanduser }}/zypper2"
     state: directory
 

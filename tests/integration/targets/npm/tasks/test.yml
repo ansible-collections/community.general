@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: 'Remove any node modules'
-  file:
+  ansible.builtin.file:
     path: '{{ remote_dir }}/node_modules'
     state: absent
 
@@ -47,7 +47,7 @@
           - not (npm_reinstall is changed)
 
     - name: 'Manually delete package'
-      file:
+      ansible.builtin.file:
         path: '{{ remote_dir }}/node_modules/{{ package }}'
         state: absent
 

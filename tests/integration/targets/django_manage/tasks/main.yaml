@@ -37,7 +37,7 @@
     cmd: "{{ tmp_django_root.path }}/venv/bin/django-admin startapp app1"
 
 - name: Make manage.py executable
-  file:
+  ansible.builtin.file:
     path: "{{ tmp_django_root.path }}/startproj/test_django_manage_1/manage.py"
     mode: "0755"
 

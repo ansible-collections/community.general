@@ -18,7 +18,7 @@
       - "'bar.txt' not in archive_exclusion_patterns.archived"
 
 - name: Remove archive - exclusion patterns ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_exclusion_patterns.{{ format }}"
     state: absent
 
@@ -39,6 +39,6 @@
       - archive_excluded_paths.arcroot != remote_tmp_dir
 
 - name: Remove archive - exclude path ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_exclude_paths.{{ format }}"
     state: absent

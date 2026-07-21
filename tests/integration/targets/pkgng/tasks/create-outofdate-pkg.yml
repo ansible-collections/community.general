@@ -47,6 +47,6 @@
     dest: '{{ pkgng_test_outofdate_pkg_path }}'
 
 - name: Remove temporary directory
-  file:
+  ansible.builtin.file:
     state: absent
     path: '{{ pkgng_test_outofdate_pkg_tempdir.path }}'

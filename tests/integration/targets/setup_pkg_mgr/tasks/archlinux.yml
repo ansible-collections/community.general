@@ -23,6 +23,6 @@
   when: archlinux_upgrade_tag is changed
 
 - name: Remove EXTERNALLY-MANAGED file
-  file:
+  ansible.builtin.file:
     path: /usr/lib/python{{ ansible_facts.python.version.major }}.{{ ansible_facts.python.version.minor }}/EXTERNALLY-MANAGED
     state: absent

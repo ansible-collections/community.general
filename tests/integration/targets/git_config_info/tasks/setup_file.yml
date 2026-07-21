@@ -6,7 +6,7 @@
 # ------
 # set up : set gitconfig with value
 - name: delete global config
-  file:
+  ansible.builtin.file:
     path: ~/.gitconfig
     state: absent
 

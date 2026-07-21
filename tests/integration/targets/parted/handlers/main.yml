@@ -9,6 +9,6 @@
   changed_when: true
 
 - name: Remove file
-  file:
+  ansible.builtin.file:
     path: /bigfile
     state: absent

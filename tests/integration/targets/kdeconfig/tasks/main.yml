@@ -54,7 +54,7 @@
       - result_simple_idem is not failed
 
 - name: Reset
-  file:
+  ansible.builtin.file:
     path: "{{ output_file }}"
     state: absent
 
@@ -155,7 +155,7 @@
       - result_groups_idem is not failed
 
 - name: Reset
-  file:
+  ansible.builtin.file:
     path: "{{ output_file }}"
     state: absent
 
@@ -194,7 +194,7 @@
       - result_bool_idem is not failed
 
 - name: Reset
-  file:
+  ansible.builtin.file:
     path: "{{ output_file }}"
     state: absent
 
@@ -273,7 +273,7 @@
       - result_checkmode2 is not failed
 
 - name: Reset
-  file:
+  ansible.builtin.file:
     path: "{{ output_file }}"
     state: absent
 
@@ -295,7 +295,7 @@
       - result_unicode is not failed
 
 - name: Reset
-  file:
+  ansible.builtin.file:
     path: "{{ output_file }}"
     state: absent
 
