@@ -8,7 +8,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- meta: end_play
+- ansible.builtin.meta: end_play
   when: ansible_facts.os_family not in ['Debian', 'Suse']
 
 - name: Enable mod_proxy

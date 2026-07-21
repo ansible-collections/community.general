@@ -6,7 +6,7 @@
 # Skip Alpine (Nomad official binaries are glibc-linked, Alpine uses musl)
 # Skip MacOS because of how complicated it is to run an downloaded binary
 - name: Skip unsupported platforms
-  meta: end_play
+  ansible.builtin.meta: end_play
   when: >
     ansible_facts.distribution == 'Alpine'
     or ansible_facts.os_family == 'Darwin'

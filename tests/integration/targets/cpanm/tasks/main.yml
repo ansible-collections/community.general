@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: bail out for non-supported platforms
-  meta: end_play
+  ansible.builtin.meta: end_play
   when: ansible_facts.os_family != 'Debian'
 
 - name: install perl development package for Red Hat family
