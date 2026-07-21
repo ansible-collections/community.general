@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Check packages with updates
-  dnf:
+  ansible.builtin.dnf:
     list: updates
   register: updates
 
@@ -60,7 +60,7 @@
           - unlock_packages.locklist_post | length == 0
 
     - name: Update packages
-      dnf:
+      ansible.builtin.dnf:
         name: "{{ _packages }}"
         state: latest
       check_mode: true
