@@ -22,7 +22,7 @@
     state: directory
 
 - name: Download wildfly
-  get_url:
+  ansible.builtin.get_url:
     url: 'https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/setup_wildfly_server/wildfly-{{ wf_version }}.tar.gz'
     dest: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
 
