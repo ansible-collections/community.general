@@ -127,7 +127,7 @@
           - result_alias_deleted is successful
 
     - name: include extended test suite
-      import_tasks: state_change.yml
+      ansible.builtin.import_tasks: state_change.yml
 
     - name: cleanup environment
       ansible.builtin.file:

@@ -10,7 +10,7 @@
 
 - name: Run LDAP search module tests
   block:
-    - include_tasks: "{{ item }}"
+    - ansible.builtin.include_tasks: "{{ item }}"
       with_fileglob:
         - 'tests/*.yml'
   when: ansible_facts.os_family in ['Ubuntu', 'Debian']

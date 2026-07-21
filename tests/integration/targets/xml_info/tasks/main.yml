@@ -64,7 +64,7 @@
   when: lxml_xpath_attribute_result_attrname
   block:
 
-    - include_tasks: test-count.yml
-    - include_tasks: test-print-match.yml
-    - include_tasks: test-get-element-content.yml
-    - include_tasks: test-xmlstring.yml
+    - ansible.builtin.include_tasks: test-count.yml
+    - ansible.builtin.include_tasks: test-print-match.yml
+    - ansible.builtin.include_tasks: test-get-element-content.yml
+    - ansible.builtin.include_tasks: test-xmlstring.yml

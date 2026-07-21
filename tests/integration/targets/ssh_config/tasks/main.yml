@@ -235,4 +235,4 @@
       - short_name.hosts_removed == []
 
 - name: Include integration tests for additional options (e.g. proxycommand, proxyjump)
-  include_tasks: 'options.yml'
+  ansible.builtin.include_tasks: 'options.yml'

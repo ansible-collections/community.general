@@ -15,7 +15,7 @@
   block:
 
     - name: Run tests
-      import_tasks: tests.yml
+      ansible.builtin.import_tasks: tests.yml
 
   when: >
     ansible_facts.distribution in ['RedHat', 'CentOS', 'ScientificLinux', 'Fedora', 'Ubuntu', 'Debian', 'Archlinux'] or

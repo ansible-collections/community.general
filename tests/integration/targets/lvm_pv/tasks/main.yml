@@ -17,11 +17,11 @@
 
 - name: Testing lvm_pv module
   block:
-    - import_tasks: creation.yml
+    - ansible.builtin.import_tasks: creation.yml
 
-    - import_tasks: resizing.yml
+    - ansible.builtin.import_tasks: resizing.yml
 
-    - import_tasks: removal.yml
+    - ansible.builtin.import_tasks: removal.yml
 
   always:
-    - import_tasks: cleanup.yml
+    - ansible.builtin.import_tasks: cleanup.yml

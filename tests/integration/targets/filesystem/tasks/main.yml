@@ -12,7 +12,7 @@
     msg: '{{ role_name }}'
 - ansible.builtin.debug:
     msg: '{{ role_path|basename }}'
-- import_tasks: setup.yml
+- ansible.builtin.import_tasks: setup.yml
 
 - include_vars: "{{ lookup('first_found', search) }}"
   vars:
@@ -23,7 +23,7 @@
       paths:
         - '../vars/'
 
-- include_tasks: create_device.yml
+- ansible.builtin.include_tasks: create_device.yml
   vars:
     image_file: '{{ remote_tmp_dir }}/img'
     fstype: '{{ item.0.key }}'
@@ -87,12 +87,12 @@
 
 # With FreeBSD extended support (util-linux is not available before 12.2)
 
-- include_tasks: freebsd_setup.yml
+- ansible.builtin.include_tasks: freebsd_setup.yml
   when:
     - 'ansible_facts.system == "FreeBSD"'
     - 'ansible_facts.distribution_version is version("12.2", ">=")'
 
-- include_tasks: create_device.yml
+- ansible.builtin.include_tasks: create_device.yml
   vars:
     image_file: '{{ remote_tmp_dir }}/img'
     fstype: '{{ item.0.key }}'

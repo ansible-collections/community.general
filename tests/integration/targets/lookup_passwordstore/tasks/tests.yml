@@ -95,7 +95,7 @@
 
 # these tests should apply to all backends
 - name: Password tests
-  include_tasks: password_tests.yml
+  ansible.builtin.include_tasks: password_tests.yml
   loop:
     - pass
     - gopass

@@ -3,6 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- include_tasks: create_record.yml
-- include_tasks: update_record.yml
-- include_tasks: remove_record.yml
+- ansible.builtin.include_tasks: create_record.yml
+- ansible.builtin.include_tasks: update_record.yml
+- ansible.builtin.include_tasks: remove_record.yml

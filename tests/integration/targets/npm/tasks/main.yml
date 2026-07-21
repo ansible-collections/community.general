@@ -22,7 +22,7 @@
     - set_fact:
         remote_dir: '{{ echo.stdout }}'
 
-    - include_tasks: run.yml
+    - ansible.builtin.include_tasks: run.yml
       vars:
         nodejs_version: '{{ item }}'
         nodejs_path: 'node-v{{ nodejs_version }}-{{ ansible_facts.system|lower }}-{{ nodejs_arch }}'

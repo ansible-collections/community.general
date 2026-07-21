@@ -12,7 +12,7 @@
         dest_file: "preseed/ubuntu.seed"
 
 
-- include_tasks: iso_mount.yml
+- ansible.builtin.include_tasks: iso_mount.yml
   vars:
     iso_name: "{{ dest_iso_name }}"
 

@@ -2,8 +2,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- include_tasks: msimple.yml
-- include_tasks: msimple_output_conflict.yml
-- include_tasks: mdepfail.yml
-- include_tasks: mstate.yml
-- include_tasks: msimpleda.yml
+- ansible.builtin.include_tasks: msimple.yml
+- ansible.builtin.include_tasks: msimple_output_conflict.yml
+- ansible.builtin.include_tasks: mdepfail.yml
+- ansible.builtin.include_tasks: mstate.yml
+- ansible.builtin.include_tasks: msimpleda.yml

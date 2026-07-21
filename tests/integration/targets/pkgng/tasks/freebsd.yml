@@ -15,7 +15,7 @@
 ## pkgng - example - state=present for single package
 ##
 - name: 'state=present for single package'
-  include_tasks: install_single_package.yml
+  ansible.builtin.include_tasks: install_single_package.yml
 
 ##
 ## pkgng - example - state=latest for already up-to-date package
@@ -94,7 +94,7 @@
   #
   block:
     - name: Create out-of-date test package
-      import_tasks: create-outofdate-pkg.yml
+      ansible.builtin.import_tasks: create-outofdate-pkg.yml
 
     - name: Install out-of-date test package
       command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
@@ -150,7 +150,7 @@
         shell: /bin/bash
 
     - name: Create out-of-date test package
-      import_tasks: create-outofdate-pkg.yml
+      ansible.builtin.import_tasks: create-outofdate-pkg.yml
 
     - name: Install out-of-date test package
       command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
@@ -223,7 +223,7 @@
   register: pkgng_example6_check
 
 - name: Create out-of-date test package
-  import_tasks: create-outofdate-pkg.yml
+  ansible.builtin.import_tasks: create-outofdate-pkg.yml
 
 - name: Install out-of-date test package
   command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
@@ -518,24 +518,24 @@
     or ansible_facts.distribution_version is version('14.4', '>=')
   block:
     - name: Setup testjail
-      include_tasks: setup-testjail.yml
+      ansible.builtin.include_tasks: setup-testjail.yml
 
     - name: Install package in jail as rootdir
-      include_tasks: install_single_package.yml
+      ansible.builtin.include_tasks: install_single_package.yml
       vars:
         pkgng_test_rootdir: /usr/jails/testjail
         pkgng_test_install_prefix: /usr/jails/testjail
         pkgng_test_install_cleanup: true
 
     - name: Install package in jail
-      include_tasks: install_single_package.yml
+      ansible.builtin.include_tasks: install_single_package.yml
       vars:
         pkgng_test_jail: testjail
         pkgng_test_install_prefix: /usr/jails/testjail
         pkgng_test_install_cleanup: true
 
     - name: Install package in jail as chroot
-      include_tasks: install_single_package.yml
+      ansible.builtin.include_tasks: install_single_package.yml
       vars:
         pkgng_test_chroot: /usr/jails/testjail
         pkgng_test_install_prefix: /usr/jails/testjail
