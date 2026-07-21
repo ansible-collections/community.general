@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 tests:
-  - template: default.j2
+  - ansible.builtin.template: default.j2
     group:
       - {tt: [k0_x0, k1_x1], d: 'By default, match keys that equal any of the items in the target.'}
     input:
@@ -13,7 +13,7 @@ tests:
     result:
       - {k0_x0: A0, k1_x1: B0}
       - {k0_x0: A1, k1_x1: B1}
-  - template: mp.j2
+  - ansible.builtin.template: mp.j2
     group:
       - {mp: equal, tt: [k0_x0, k1_x1], d: Match keys that equal any of the items in the target.}
       - {mp: starts_with, tt: [k0, k1], d: Match keys that start with any of the items in the target.}
@@ -26,7 +26,7 @@ tests:
     result:
       - {k0_x0: A0, k1_x1: B0}
       - {k0_x0: A1, k1_x1: B1}
-  - template: mp.j2
+  - ansible.builtin.template: mp.j2
     group:
       - {mp: equal, tt: k0_x0, d: Match keys that equal the target.}
       - {mp: starts_with, tt: k0, d: Match keys that start with the target.}

@@ -73,7 +73,7 @@
         - command: echo {{ remote_tmp_dir }}
           register: echo_remote_tmp_dir
         - name: Create configuration file
-          template:
+          ansible.builtin.template:
             src: consul_config.hcl.j2
             dest: '{{ remote_tmp_dir }}/consul_config.hcl'
         - name: Start Consul (dev mode enabled)

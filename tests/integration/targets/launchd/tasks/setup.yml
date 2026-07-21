@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "[{{ item }}] Deploy test service configuration"
-  template:
+  ansible.builtin.template:
     src: "{{ launchd_service_name }}.plist.j2"
     dest: "{{ launchd_plist_location }}"
   become: true

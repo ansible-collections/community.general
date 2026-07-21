@@ -28,7 +28,7 @@
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
     name: ansible-onetemplate-test
-    template: |
+    ansible.builtin.template: |
       CONTEXT = [
         HOSTNAME = "ansible-onetemplate",
         NETWORK = "YES",
@@ -81,7 +81,7 @@
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
     name: ansible-onetemplate-test
-    template: |
+    ansible.builtin.template: |
       CONTEXT = [
         HOSTNAME = "ansible-onetemplate",
         NETWORK = "YES",
@@ -131,7 +131,7 @@
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
     name: ansible-onetemplate-test
-    template: |
+    ansible.builtin.template: |
       CONTEXT = [
         HOSTNAME = "ansible-onetemplate",
         NETWORK = "YES",
