@@ -44,7 +44,7 @@
     state: link
 
 - name: Create group for wildfly
-  group:
+  ansible.builtin.group:
     name: '{{ wf_user }}'
     system: true
 
