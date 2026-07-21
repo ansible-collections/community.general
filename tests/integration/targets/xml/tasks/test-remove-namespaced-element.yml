@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Setup test fixture
-  copy:
+  ansible.builtin.copy:
     src: fixtures/ansible-xml-namespaced-beers.xml
     dest: /tmp/ansible-xml-namespaced-beers.xml
 
@@ -25,7 +25,7 @@
   shell: echo "" >> /tmp/ansible-xml-namespaced-beers.xml
 
 - name: Compare to expected result
-  copy:
+  ansible.builtin.copy:
     src: results/test-remove-element.xml
     dest: /tmp/ansible-xml-namespaced-beers.xml
   check_mode: true

@@ -64,7 +64,7 @@
     recurse: true
 
 - name: Create config file
-  copy:
+  ansible.builtin.copy:
     src: wildfly.conf
     dest: '{{ wf_homedir }}/wildfly.conf'
     mode: "0644"

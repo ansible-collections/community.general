@@ -18,7 +18,7 @@
     state: directory
 
 - name: ensure TLS files are present
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "/tls/{{ item }}"
   loop:

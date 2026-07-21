@@ -14,7 +14,7 @@
     kwriteconf_fake: "{{ remote_tmp_dir }}/kwriteconf"
 
 - name: Install fake kwriteconf
-  copy:
+  ansible.builtin.copy:
     dest: "{{ kwriteconf_fake }}"
     src: kwriteconf_fake
     mode: "0755"

@@ -10,7 +10,7 @@
 # once per day.
 
 - name: Create tag
-  copy:
+  ansible.builtin.copy:
     dest: /tmp/.ansible_archlinux_sysupgrade_tag
     content: |
       Last ArchLinux system upgrade by integration tests was done on {{ ansible_facts.date_time.date }}.

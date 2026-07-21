@@ -10,7 +10,7 @@
   serial: 1
   tasks:
     - name: Copy wsl.exe mock
-      copy:
+      ansible.builtin.copy:
         src: files/wsl.exe
         dest: /usr/local/bin/wsl.exe
         mode: '0755'

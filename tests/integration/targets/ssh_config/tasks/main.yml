@@ -16,12 +16,12 @@
     state: directory
 
 - name: Copy sample config file
-  copy:
+  ansible.builtin.copy:
     src: 'files/ssh_config_test'
     dest: '{{ ssh_config_test }}'
 
 - name: Copy sample private key file
-  copy:
+  ansible.builtin.copy:
     src: 'files/fake_id_rsa'
     dest: '{{ ssh_private_key }}'
 

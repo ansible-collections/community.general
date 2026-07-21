@@ -7,7 +7,7 @@
 # Passing an unquoted YAML boolean as `value` must now fail with an explicit error.
 
 - name: Setup test fixture
-  copy:
+  ansible.builtin.copy:
     src: fixtures/ansible-xml-beers.xml
     dest: /tmp/ansible-xml-beers.xml
 

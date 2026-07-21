@@ -16,6 +16,6 @@
     state: directory
 
 - name: copy the iso to the test dir
-  copy:
+  ansible.builtin.copy:
     src: test.iso
     dest: '{{ output_test_dir }}'

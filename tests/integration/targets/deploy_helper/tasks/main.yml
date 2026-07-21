@@ -75,9 +75,9 @@
 # Setup the new release
 - file: path={{ deploy_helper.new_release_path }} state=directory
 # Add a buildfile, just like in a real deploy
-- copy: content='' dest={{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}
+- ansible.builtin.copy: content='' dest={{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}
 # Add a buildfile, to an older deploy
-- copy: content='' dest={{ deploy_helper.releases_path }}/third/{{ deploy_helper.unfinished_filename }}
+- ansible.builtin.copy: content='' dest={{ deploy_helper.releases_path }}/third/{{ deploy_helper.unfinished_filename }}
 
 - name: State=finalize with default parameters
   deploy_helper: path={{ deploy_helper_test_root }} release={{ deploy_helper.new_release }} state=finalize
@@ -136,9 +136,9 @@
 # Setup the new release
 - file: path={{ deploy_helper.new_release_path }} state=directory
 # Add a buildfile, just like in a real deploy
-- copy: content='' dest={{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}
+- ansible.builtin.copy: content='' dest={{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}
 # Add a buildfile, to an older deploy
-- copy: content='' dest={{ deploy_helper.releases_path }}/third/{{ deploy_helper.unfinished_filename }}
+- ansible.builtin.copy: content='' dest={{ deploy_helper.releases_path }}/third/{{ deploy_helper.unfinished_filename }}
 
 - shell: "ls {{ deploy_helper_test_root }}/releases | wc -l"
   register: before_releases_count

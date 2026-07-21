@@ -275,7 +275,7 @@
       - result_pkcs12_succeeded is succeeded
 
 - name: Copy the ssl server script
-  copy:
+  ansible.builtin.copy:
     src: "setupSSLServer.py"
     dest: "{{ remote_tmp_dir }}"
 

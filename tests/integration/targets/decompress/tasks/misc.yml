@@ -39,7 +39,7 @@
       - not nonexisting_stat.stat.exists
 
 - name: Copy compressed file
-  copy:
+  ansible.builtin.copy:
     src: "{{ remote_tmp_dir }}/file.txt.gz"
     dest: "{{ remote_tmp_dir }}/file_copied.txt.gz"
     remote_src: true

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Copy test files
-  copy:
+  ansible.builtin.copy:
     src: "files/"
     dest: "{{ remote_tmp_dir }}"
 

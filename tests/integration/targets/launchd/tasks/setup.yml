@@ -15,7 +15,7 @@
     state: directory
 
 - name: install the test daemon script
-  copy:
+  ansible.builtin.copy:
     src: ansible_test_service.py
     dest: /usr/local/sbin/ansible_test_service
     mode: '755'

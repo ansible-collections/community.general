@@ -21,7 +21,7 @@
     virtualenv: "{{ tmp_django_root.path }}/venv"
 
 - name: Copy files
-  copy:
+  ansible.builtin.copy:
     src: base_test/
     dest: "{{ tmp_django_root.path }}"
     mode: preserve

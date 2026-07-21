@@ -27,7 +27,7 @@
         owner: '{{ username }}'
 
     - name: Create PKGBUILD
-      copy:
+      ansible.builtin.copy:
         dest: '/home/{{ username }}/{{ package_name }}/PKGBUILD'
         content: |
           pkgname=('{{ package_name }}')
