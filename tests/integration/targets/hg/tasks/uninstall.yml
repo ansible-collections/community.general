@@ -34,13 +34,13 @@
   when: ansible_facts.pkg_mgr == 'yum'
 
 - name: uninstall packages which were not originally installed
-  package:
+  ansible.builtin.package:
     name: mercurial
     state: absent
   when: ansible_facts.pkg_mgr in ['pacman', 'community.general.pacman', 'zypper', 'community.general.zypper', 'apk', 'community.general.apk']
 
 - name: uninstall packages which were not originally installed (pkgng)
-  package:
+  ansible.builtin.package:
     name: mercurial
     state: absent
     autoremove: true

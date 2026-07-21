@@ -8,7 +8,7 @@
   when: ansible_facts.os_family != 'Debian'
 
 - name: install perl development package for Red Hat family
-  package:
+  ansible.builtin.package:
     name:
       - perl-devel
       - perl-App-cpanminus
@@ -17,7 +17,7 @@
   when: ansible_facts.os_family == "RedHat"
 
 - name: install perl development package for Debian family
-  package:
+  ansible.builtin.package:
     name:
       - cpanminus
     state: present

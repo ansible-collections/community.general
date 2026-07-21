@@ -40,7 +40,7 @@
         provider: selfsigned
         selfsigned_digest: sha256
     - name: Install unzip
-      package:
+      ansible.builtin.package:
         name: unzip
       register: result
       until: result is success

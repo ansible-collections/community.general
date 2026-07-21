@@ -17,7 +17,7 @@
   when: ansible_facts.distribution != 'Debian' or ansible_facts.distribution_major_version is version('13', '<')
 
 - name: Install required libs (Debian 13+)
-  package:
+  ansible.builtin.package:
     name: python3-paramiko
     state: present
   when: ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version is version('13', '>=')

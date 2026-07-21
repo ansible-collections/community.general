@@ -27,7 +27,7 @@
 
     - name: install monit
       become: true
-      package:
+      ansible.builtin.package:
         name: monit
         state: present
 
@@ -83,7 +83,7 @@
 
     - name: uninstall monit
       become: true
-      package:
+      ansible.builtin.package:
         name: monit
         state: absent
 

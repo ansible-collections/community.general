@@ -79,7 +79,7 @@
     loop_var: loop_item
 
 - name: install dependencies for postgresql test
-  package:
+  ansible.builtin.package:
     name: '{{ postgresql_package_item }}'
     state: present
   with_items: '{{ postgresql_packages }}'
@@ -201,7 +201,7 @@
   when: ansible_facts.os_family == 'RedHat' and ansible_facts.distribution != 'Fedora'
 
 - name: Install glibc langpacks (Fedora >= 24)
-  package:
+  ansible.builtin.package:
     name: '{{ item }}'
     state: latest
   with_items:
