@@ -12,7 +12,7 @@
   set_fact:
     _packages: "{{ (updates.results | map(attribute='name') | list)[:5] }}"
 
-- debug:
+- ansible.builtin.debug:
     msg:
       - "The packages to be locked and unlocked are: {{ _packages}}"
 

@@ -115,7 +115,8 @@
     that:
       - "not project_path.stat.exists"
 
-- debug: msg="Clearing all release data and facts ---------"
+- ansible.builtin.debug:
+    msg: "Clearing all release data and facts ---------"
 
 - name: State=present with shared_path set to False
   deploy_helper: path={{ deploy_helper_test_root }} state=present shared_path=''

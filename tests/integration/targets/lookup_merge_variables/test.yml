@@ -14,7 +14,7 @@
     - name: Test merge list
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
@@ -29,7 +29,7 @@
     - name: Test merge dict
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_dict }}"
 
         - name: Validate that dict is complete
@@ -103,7 +103,7 @@
     # Test the behavior when no results are found
     - name: Test merge without results
       block:
-        - debug:
+        - ansible.builtin.debug:
             msg: "{{ not_found }}"
         - name: Validate that the variable defaults to an empty list
           vars:
@@ -117,7 +117,7 @@
     - name: Test merge list (pattern_type = prefix)
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
@@ -134,7 +134,7 @@
     - name: Test merge list (pattern_type = suffix)
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
@@ -149,7 +149,7 @@
     - name: Test merge list (pattern_type = regex)
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
@@ -166,7 +166,7 @@
     - name: Test merge without results but with initial value
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ not_found_initial_value }}"
 
         - name: Validate that the variable only contains the initial value
@@ -181,7 +181,7 @@
     - name: Test merging a list with an initial value
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_list_with_initial_value }}"
 
         - name: Validate that the list is complete
@@ -198,7 +198,7 @@
     - name: Test the 'override=warn' option
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_with_override_warn }}"
 
         - name: Validate that the dict is complete and the warning is printed
@@ -214,13 +214,13 @@
     - name: Test the 'override=error' option
       block:
         - name: Validate that an override result in an error
-          debug:
+          ansible.builtin.debug:
             msg: "{{ lookup('community.general.merge_variables', '^.+__override_error$', initial_value=override_error_init, override='error') }}"
           ignore_errors: true  # Do not stop the playbook
           register: _override_error_result
 
         - name: Print the output
-          debug:
+          ansible.builtin.debug:
             msg: "{{ _override_error_result }}"
 
         - name: Validate that the error is reported

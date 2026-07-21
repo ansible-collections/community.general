@@ -9,7 +9,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test cartesian lookup
-  debug: var=item
+  ansible.builtin.debug:
+    var: item
   register: product
   with_community.general.cartesian:
     - - A

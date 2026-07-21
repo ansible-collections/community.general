@@ -14,7 +14,7 @@
   register: servers
 
 - name: Display servers variable
-  debug:
+  ansible.builtin.debug:
     var: servers
 
 - name: Ensure retrieval of servers info is success
@@ -28,7 +28,7 @@
   register: ams1_servers
 
 - name: Display servers variable
-  debug:
+  ansible.builtin.debug:
     var: ams1_servers
 
 - name: Ensure retrieval of servers info is success

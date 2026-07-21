@@ -14,7 +14,7 @@
   register: snapshots
 
 - name: Display snapshots variable
-  debug:
+  ansible.builtin.debug:
     var: snapshots
 
 - name: Ensure retrieval of snapshots info is success
@@ -28,7 +28,7 @@
   register: ams1_snapshots
 
 - name: Display snapshots variable (AMS1)
-  debug:
+  ansible.builtin.debug:
     var: ams1_snapshots
 
 - name: Ensure retrieval of snapshots info is success (AMS1)

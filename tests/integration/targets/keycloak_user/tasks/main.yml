@@ -76,7 +76,7 @@
   register: create_result
 
 - name: debug
-  debug:
+  ansible.builtin.debug:
     var: create_result
 
 - name: Assert user is created
@@ -104,7 +104,7 @@
   register: delete_result
 
 - name: debug
-  debug:
+  ansible.builtin.debug:
     var: delete_result
 
 - name: Assert user is deleted

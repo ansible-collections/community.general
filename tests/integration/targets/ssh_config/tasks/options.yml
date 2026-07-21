@@ -235,7 +235,7 @@
       - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     msg: "{{ slurp_ssh_config['content'] | b64decode }}"
 
 - name: Options - Delete a host
@@ -522,7 +522,7 @@
       - "'addressfamily inet6' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     msg: "{{ slurp_ssh_config['content'] | b64decode }}"
 
 - name: Options - Delete a host

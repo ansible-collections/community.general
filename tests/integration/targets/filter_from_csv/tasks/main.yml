@@ -32,7 +32,7 @@
       - "valid_pipe_separated | community.general.from_csv  !=  expected_result"
 
 - name: Register result of invalid csv input when strict=False
-  debug:
+  ansible.builtin.debug:
     var: "invalid_comma_separated | community.general.from_csv"
   register: _invalid_csv_strict_false
 
@@ -42,7 +42,7 @@
       - _invalid_csv_strict_false is success
 
 - name: Register result of invalid csv input when strict=True
-  debug:
+  ansible.builtin.debug:
     var: "invalid_comma_separated | community.general.from_csv(strict=True)"
   register: _invalid_csv_strict_true
   ignore_errors: true

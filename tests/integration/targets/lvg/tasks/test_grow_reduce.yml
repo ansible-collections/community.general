@@ -11,7 +11,8 @@
 - name: "get lvm facts"
   setup:
 
-- debug: var=ansible_facts.lvm
+- ansible.builtin.debug:
+    var: ansible_facts.lvm
 
 - name: "Assert the testvg span only on first disk"
   ansible.builtin.assert:
@@ -28,7 +29,8 @@
 - name: "get lvm facts"
   setup:
 
-- debug: var=ansible_facts.lvm
+- ansible.builtin.debug:
+    var: ansible_facts.lvm
 
 - name: "Assert the testvg span only on first disk"
   ansible.builtin.assert:

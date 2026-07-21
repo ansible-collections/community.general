@@ -30,7 +30,8 @@
     volume_type: l_ssd
   register: server_creation_check_task
 
-- debug: var=server_creation_check_task
+- ansible.builtin.debug:
+    var: server_creation_check_task
 
 - ansible.builtin.assert:
     that:

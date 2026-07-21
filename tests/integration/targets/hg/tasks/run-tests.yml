@@ -37,7 +37,8 @@
     dest: "{{ checkout_dir }}"
   register: hg_result2
 
-- debug: var=hg_result2
+- ansible.builtin.debug:
+    var: hg_result2
 
 - name: check if tags exists
   ansible.builtin.stat:

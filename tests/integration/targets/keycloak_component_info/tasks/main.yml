@@ -87,7 +87,7 @@
       pagination: true
       allowKerberosAuthentication: false
       useKerberosForPasswordAuthentication: false
-      debug: false
+      ansible.builtin.debug: false
 
 - name: Retrive ldap info
   community.general.keycloak_component_info:

@@ -23,7 +23,8 @@
     hello_package_url: https://download.opensuse.org/tumbleweed/repo/oss/x86_64/hello-{{ hello_version_tumbleweed.stdout }}.x86_64.rpm
   when: ansible_facts.distribution == 'openSUSE Tumbleweed'
 
-- debug: var=hello_package_url
+- ansible.builtin.debug:
+    var: hello_package_url
 
 # UNINSTALL
 - name: uninstall hello
@@ -37,8 +38,10 @@
   failed_when: false
   register: rpm_result
 
-- debug: var=zypper_result
-- debug: var=rpm_result
+- ansible.builtin.debug:
+    var: zypper_result
+- ansible.builtin.debug:
+    var: rpm_result
 
 - name: verify uninstallation of hello
   ansible.builtin.assert:
@@ -70,8 +73,10 @@
   failed_when: false
   register: rpm_result
 
-- debug: var=zypper_result
-- debug: var=rpm_result
+- ansible.builtin.debug:
+    var: zypper_result
+- ansible.builtin.debug:
+    var: rpm_result
 
 - name: verify installation of hello
   ansible.builtin.assert:
@@ -182,7 +187,8 @@
   register: zypper_result
   ignore_errors: true
 
-- debug: var=zypper_result
+- ansible.builtin.debug:
+    var: zypper_result
 
 - name: verify we failed installation of broken rpm
   ansible.builtin.assert:

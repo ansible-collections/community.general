@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Help debugging
-  debug:
+  ansible.builtin.debug:
     msg: >-
       distribution={{ ansible_facts.distribution }},
       distribution major version={{ ansible_facts.distribution_major_version }},

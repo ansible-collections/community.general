@@ -17,7 +17,7 @@
       - "([1.11, 1.11, 1.12] | community.general.counter) == {1.11: 2, 1.12: 1}"
 
 - name: test fail argument not a sequence
-  debug:
+  ansible.builtin.debug:
     msg: "{{ {'a': 'b'} | community.general.counter }}"
   ignore_errors: true
   register: res
@@ -29,7 +29,7 @@
       - res.msg is search('Argument for community.general.counter must be a sequence')
 
 - name: test fail element not hashable
-  debug:
+  ansible.builtin.debug:
     msg: "{{ [{'a': 'b'}] | community.general.counter }}"
   ignore_errors: true
   register: res

@@ -19,7 +19,8 @@
     tags: '{{ tags }}'
   register: lb_creation_check_task
 
-- debug: var=lb_creation_check_task
+- ansible.builtin.debug:
+    var: lb_creation_check_task
 
 - name: lb_creation_check_task is success
   ansible.builtin.assert:
@@ -42,7 +43,8 @@
     wait: true
   register: lb_creation_task
 
-- debug: var=lb_creation_task
+- ansible.builtin.debug:
+    var: lb_creation_task
 
 - name: lb_creation_task is success
   ansible.builtin.assert:
@@ -69,7 +71,8 @@
     description: '{{ description }}'
   register: lb_creation_confirmation_task
 
-- debug: var=lb_creation_confirmation_task
+- ansible.builtin.debug:
+    var: lb_creation_confirmation_task
 
 - name: lb_creation_confirmation_task is success
   ansible.builtin.assert:
@@ -97,7 +100,8 @@
     description: '{{ updated_description }}'
   register: lb_update_check_task
 
-- debug: var=lb_update_check_task
+- ansible.builtin.debug:
+    var: lb_update_check_task
 
 - name: lb_update_check_task is success
   ansible.builtin.assert:
@@ -120,7 +124,8 @@
     wait: true
   register: lb_update_task
 
-- debug: var=lb_update_task
+- ansible.builtin.debug:
+    var: lb_update_task
 
 - name: lb_update_task is success
   ansible.builtin.assert:
@@ -147,7 +152,8 @@
     description: '{{ updated_description }}'
   register: lb_update_confirmation_task
 
-- debug: var=lb_update_confirmation_task
+- ansible.builtin.debug:
+    var: lb_update_confirmation_task
 
 - name: lb_update_confirmation_task is success
   ansible.builtin.assert:

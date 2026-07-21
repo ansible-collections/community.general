@@ -111,7 +111,7 @@
       ignore_errors: true
       register: install_gem_fail_result
 
-    - debug:
+    - ansible.builtin.debug:
         var: install_gem_fail_result
       tags: debug
 

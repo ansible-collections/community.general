@@ -12,7 +12,7 @@
     bar: foobarbaz
   tasks:
     - name: Print vaulted values
-      debug:
+      ansible.builtin.debug:
         msg:
           foo: "{{ foo }}"
 

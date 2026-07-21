@@ -95,7 +95,7 @@
   no_log: true
 
 - name: List all processes to make debugging easier
-  debug:
+  ansible.builtin.debug:
     var: result.stdout_lines
 
 - name: "Verify that the Process IDs (PIDs) returned is not empty and also equal to the PIDs obtained in console"

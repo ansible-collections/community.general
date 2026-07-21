@@ -61,7 +61,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider created
@@ -111,7 +111,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider unchanged
@@ -132,7 +132,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider updated
@@ -162,7 +162,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider updated
@@ -200,7 +200,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider updated
@@ -237,7 +237,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider updated
@@ -257,7 +257,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider deleted
@@ -278,7 +278,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider unchanged
@@ -318,7 +318,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert identity provider created with IDP endpoints

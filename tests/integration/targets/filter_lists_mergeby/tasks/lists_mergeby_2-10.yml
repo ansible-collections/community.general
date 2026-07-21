@@ -10,7 +10,7 @@
         my_list: "{{ [list100, list101]|
                      community.general.lists_mergeby('name', list_merge='keep') }}"
     - name: Merge 2 lists by attribute name. list_merge='keep'. debug
-      debug:
+      ansible.builtin.debug:
         msg: |-
           my_list:
             {{ my_list|to_nice_yaml|indent(2) }}
@@ -29,7 +29,7 @@
         my_list: "{{ [list100, list101]|
                      community.general.lists_mergeby('name', list_merge='append') }}"
     - name: Merge 2 lists by attribute name. list_merge='append'. debug
-      debug:
+      ansible.builtin.debug:
         msg: |-
           my_list:
             {{ my_list|to_nice_yaml|indent(2) }}
@@ -48,7 +48,7 @@
         my_list: "{{ [list100, list101]|
                      community.general.lists_mergeby('name', list_merge='prepend') }}"
     - name: Merge 2 lists by attribute name. list_merge='prepend'. debug
-      debug:
+      ansible.builtin.debug:
         msg: |-
           my_list:
             {{ my_list|to_nice_yaml|indent(2) }}
@@ -67,7 +67,7 @@
         my_list: "{{ [list102, list103]|
                      community.general.lists_mergeby('name', list_merge='append_rp') }}"
     - name: Merge 2 lists by attribute name. list_merge='append_rp'. debug
-      debug:
+      ansible.builtin.debug:
         msg: |-
           my_list:
             {{ my_list|to_nice_yaml|indent(2) }}
@@ -86,7 +86,7 @@
         my_list: "{{ [list102, list103]|
                      community.general.lists_mergeby('name', list_merge='prepend_rp') }}"
     - name: Merge 2 lists by attribute name. list_merge='prepend_rp'. debug
-      debug:
+      ansible.builtin.debug:
         msg: |-
           my_list:
             {{ my_list|to_nice_yaml|indent(2) }}
@@ -109,7 +109,7 @@
                                                      recursive=True,
                                                      list_merge='append_rp') }}"
     - name: Merge by name. recursive=True list_merge='append_rp'. debug
-      debug:
+      ansible.builtin.debug:
         msg: |-
           my_list:
             {{ my_list|to_nice_yaml|indent(2) }}
@@ -130,7 +130,7 @@
                                                      recursive=False,
                                                      list_merge='append_rp') }}"
     - name: Merge by name. recursive=False list_merge='append_rp'. debug
-      debug:
+      ansible.builtin.debug:
         msg: |-
           my_list:
             {{ my_list|to_nice_yaml|indent(2) }}

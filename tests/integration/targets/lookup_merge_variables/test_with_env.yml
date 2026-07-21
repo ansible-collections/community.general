@@ -14,7 +14,7 @@
     - name: Test merge list (pattern_type = regex)
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
@@ -30,7 +30,7 @@
     - name: Test merge list (pattern_type = suffix)
       block:
         - name: Print the merged list
-          debug:
+          ansible.builtin.debug:
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete

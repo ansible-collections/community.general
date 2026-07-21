@@ -43,7 +43,7 @@
   register: result
 
 - name: Print result
-  debug:
+  ansible.builtin.debug:
     var: result.stdout_lines
 
 - name: Subcommands are not removed if not specified
@@ -97,7 +97,7 @@
   register: result
 
 - name: Print result
-  debug:
+  ansible.builtin.debug:
     var: result.stdout_lines
 
 - name: Install other alternative with subcommands
@@ -140,7 +140,7 @@
   register: result
 
 - name: Print result
-  debug:
+  ansible.builtin.debug:
     var: result.stdout_lines
 
 - name: Switch to first alternative
@@ -180,7 +180,7 @@
   register: result
 
 - name: Print result
-  debug:
+  ansible.builtin.debug:
     var: result.stdout_lines
 
 - name: Switch to second alternative
@@ -218,5 +218,5 @@
   register: result
 
 - name: Print result
-  debug:
+  ansible.builtin.debug:
     var: result.stdout_lines
