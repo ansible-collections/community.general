@@ -37,7 +37,7 @@
         - '{{ role_path }}/vars'
 
 - name: make sure the dbus service is started under systemd
-  systemd:
+  ansible.builtin.systemd:
     name: dbus
     state: started
   when: ansible_facts.service_mgr == 'systemd' and ansible_facts.distribution == 'Fedora'
@@ -145,7 +145,7 @@
   when: ansible_facts.distribution == 'Archlinux'
 
 - name: Make installable on Arch
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
   when: ansible_facts.distribution == 'Archlinux'
 
