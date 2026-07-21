@@ -175,7 +175,7 @@
       register: install_gem_result
 
     - name: Get stats of gem executable
-      stat:
+      ansible.builtin.stat:
         path: "{{ remote_tmp_dir }}/custom_bindir/gist"
       register: gem_bindir_stat
 
@@ -195,7 +195,7 @@
       register: install_gem_result
 
     - name: Get stats of gem executable
-      stat:
+      ansible.builtin.stat:
         path: "{{ remote_tmp_dir }}/custom_bindir/gist"
       register: gem_bindir_stat
 

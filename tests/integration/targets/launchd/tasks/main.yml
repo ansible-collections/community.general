@@ -11,7 +11,7 @@
 - name: Test launchd module
   block:
     - name: Expect that launchctl exists
-      stat:
+      ansible.builtin.stat:
         path: /bin/launchctl
       register: launchctl_check
       failed_when:

@@ -16,7 +16,7 @@
   register: first_decompression
 
 - name: Stat decompressed file ({{ format }} test)
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/file_from_{{ format }}.txt"
   register: decompressed_file_stat
 

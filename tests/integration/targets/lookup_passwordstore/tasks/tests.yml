@@ -185,7 +185,7 @@
     passwordstore_backend: "gopass"
   block:
     - name: Check if gopass executable exists
-      stat:
+      ansible.builtin.stat:
         path: "{{ gopasspath }}"
       register: gopass_check
 

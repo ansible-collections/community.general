@@ -59,9 +59,9 @@
 
 - name: State=present with default parameters
   deploy_helper: path={{ deploy_helper_test_root }} state=present
-- stat: path={{ deploy_helper.releases_path }}
+- ansible.builtin.stat: path={{ deploy_helper.releases_path }}
   register: releases_path
-- stat: path={{ deploy_helper.shared_path }}
+- ansible.builtin.stat: path={{ deploy_helper.shared_path }}
   register: shared_path
 - name: Assert State=present with default parameters
   assert:
@@ -81,9 +81,9 @@
 
 - name: State=finalize with default parameters
   deploy_helper: path={{ deploy_helper_test_root }} release={{ deploy_helper.new_release }} state=finalize
-- stat: path={{ deploy_helper.current_path }}
+- ansible.builtin.stat: path={{ deploy_helper.current_path }}
   register: current_path
-- stat: path={{ deploy_helper.current_path }}/DEPLOY_UNFINISHED
+- ansible.builtin.stat: path={{ deploy_helper.current_path }}/DEPLOY_UNFINISHED
   register: current_path_unfinished_filename
 - name: Assert State=finalize with default parameters
   assert:
@@ -91,7 +91,7 @@
       - "current_path.stat.islnk"
       - "deploy_helper.new_release_path in current_path.stat.lnk_source"
       - "not current_path_unfinished_filename.stat.exists"
-- stat: path={{ deploy_helper.releases_path }}/third
+- ansible.builtin.stat: path={{ deploy_helper.releases_path }}/third
   register: third_release_path
 - shell: "ls {{ deploy_helper.releases_path }} | wc -l"
   register: releases_count
@@ -108,7 +108,7 @@
 
 - name: State=absent with default parameters
   deploy_helper: path={{ deploy_helper_test_root }} state=absent
-- stat: path={{ deploy_helper_test_root }}
+- ansible.builtin.stat: path={{ deploy_helper_test_root }}
   register: project_path
 - name: Assert State=absent with default parameters
   assert:
@@ -119,9 +119,9 @@
 
 - name: State=present with shared_path set to False
   deploy_helper: path={{ deploy_helper_test_root }} state=present shared_path=''
-- stat: path={{ deploy_helper.releases_path }}
+- ansible.builtin.stat: path={{ deploy_helper.releases_path }}
   register: releases_path
-- stat: path={{ deploy_helper.shared_path }}
+- ansible.builtin.stat: path={{ deploy_helper.shared_path }}
   register: shared_path
   when: deploy_helper.shared_path is truthy
 - name: Assert State=present with shared_path set to False
@@ -144,7 +144,7 @@
   register: before_releases_count
 - name: State=clean with keep_releases=3
   deploy_helper: path={{ deploy_helper_test_root }} release={{ deploy_helper.new_release }} state=clean keep_releases=3
-- stat: path={{ deploy_helper.releases_path }}/third
+- ansible.builtin.stat: path={{ deploy_helper.releases_path }}/third
   register: third_release_path
 - shell: "ls {{ deploy_helper.releases_path }} | wc -l"
   register: releases_count

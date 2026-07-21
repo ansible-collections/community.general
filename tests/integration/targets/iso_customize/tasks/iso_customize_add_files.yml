@@ -19,7 +19,7 @@
 - debug: var=mount_root_dir
 
 - name: Check the file /preseed/ubuntu.seed is added
-  stat:
+  ansible.builtin.stat:
     path: "{{ mount_root_dir }}/preseed/ubuntu.seed"
   register: check_file
 
