@@ -47,7 +47,7 @@
   when: pyopenssl_package_name_python3 is defined
 
 - name: register openssl version
-  shell: "openssl version | cut -d' ' -f2"
+  ansible.builtin.shell: "openssl version | cut -d' ' -f2"
   register: openssl_version
 
 - name: register cryptography version

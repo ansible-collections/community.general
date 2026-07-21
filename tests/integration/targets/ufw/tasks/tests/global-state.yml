@@ -21,7 +21,7 @@
     logging: true
   register: logging
 - name: Get logging
-  shell: |
+  ansible.builtin.shell: |
     ufw status verbose | grep "^Logging:"
   register: ufw_logging
   environment:
@@ -45,7 +45,7 @@
     logging: full
   register: logging_change
 - name: Get logging
-  shell: |
+  ansible.builtin.shell: |
     ufw status verbose | grep "^Logging:"
   register: ufw_logging_change
   environment:
@@ -74,7 +74,7 @@
     direction: incoming
   register: default
 - name: Get defaults
-  shell: |
+  ansible.builtin.shell: |
     ufw status verbose | grep "^Default:"
   register: ufw_defaults
   environment:
@@ -102,7 +102,7 @@
     direction: incoming
   register: default_change
 - name: Get defaults
-  shell: |
+  ansible.builtin.shell: |
     ufw status verbose | grep "^Default:"
   register: ufw_defaults_change
   environment:
@@ -122,7 +122,7 @@
     default: allow
   register: default_change_implicit
 - name: Get defaults
-  shell: |
+  ansible.builtin.shell: |
     ufw status verbose | grep "^Default:"
   register: ufw_defaults_change_implicit
   environment:

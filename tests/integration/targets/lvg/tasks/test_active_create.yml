@@ -16,7 +16,7 @@
         pvs: "{{ loop_device2 }}"
 
     - name: Collect vg autoactivation status for vg_autoact_test
-      shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
+      ansible.builtin.shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
       register: active_vg_autoact_status_result
 
     - name: Assert vg autoactivation is set for vg_autoact_test
@@ -36,7 +36,7 @@
         pvs: "{{ loop_device2 }}"
 
     - name: Collect vg autoactivation status for vg_autoact_test
-      shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
+      ansible.builtin.shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
       register: inactive_vg_autoact_status_result
 
     - name: Assert vg autoactivation disabled for vg_autoact_test
@@ -57,7 +57,7 @@
         pvs: "{{ loop_device2 }}"
 
     - name: Collect vg autoactivation status for vg_autoact_test
-      shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
+      ansible.builtin.shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
       register: inactive_by_option_vg_autoact_status_result
 
     - name: Assert vg autoactivation disabled by option for vg_autoact_test

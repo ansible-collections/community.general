@@ -36,7 +36,7 @@
           register: faketime_package_installed
           until: faketime_package_installed is success
         - name: Find libfaketime path
-          shell: '{{ list_pkg_files }} {{ faketime_pkg }} | grep -F libfaketime.so.1'
+          ansible.builtin.shell: '{{ list_pkg_files }} {{ faketime_pkg }} | grep -F libfaketime.so.1'
           register: libfaketime_path
         - when: ansible_facts.service_mgr == 'systemd'
           block:

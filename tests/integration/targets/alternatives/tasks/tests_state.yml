@@ -18,11 +18,11 @@
     - { n: 3, priority: 25 }
 
 - name: Ensure that the link group is in auto mode
-  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
+  ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
 
 # Execute current selected 'dummy' and ensure it's the alternative we expect
 - name: Execute the current dummy command
-  shell: dummy
+  ansible.builtin.shell: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -42,10 +42,10 @@
     state: selected
 
 - name: Ensure that the link group is in manual mode
-  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
+  ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
 
 - name: Execute the current dummy command
-  shell: dummy
+  ansible.builtin.shell: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -64,10 +64,10 @@
     state: present
 
 - name: Ensure that the link group is in auto mode
-  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
+  ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
 
 - name: Execute the current dummy command
-  shell: dummy
+  ansible.builtin.shell: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -86,10 +86,10 @@
     state: auto
 
 - name: Ensure that the link group is in auto mode
-  shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
+  ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
 
 - name: Execute the current dummy command
-  shell: dummy
+  ansible.builtin.shell: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -106,12 +106,12 @@
     state: absent
 
 - name: Ensure that the link group is in auto mode
-  shell: 'grep "/usr/bin/dummy2" {{ alternatives_dir }}/dummy'
+  ansible.builtin.shell: 'grep "/usr/bin/dummy2" {{ alternatives_dir }}/dummy'
   register: cmd
   failed_when: cmd.rc == 0
 
 - name: Execute the current dummy command
-  shell: dummy
+  ansible.builtin.shell: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed

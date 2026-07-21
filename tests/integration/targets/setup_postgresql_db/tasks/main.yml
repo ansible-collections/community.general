@@ -43,7 +43,7 @@
   when: ansible_facts.service_mgr == 'systemd' and ansible_facts.distribution == 'Fedora'
 
 - name: Kill all postgres processes
-  shell: 'pkill -u {{ pg_user }}'
+  ansible.builtin.shell: 'pkill -u {{ pg_user }}'
   become: true
   when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
   ignore_errors: true
@@ -109,7 +109,7 @@
   when: ansible_facts.os_family == "Alpine"
 
 - name: Initialize postgres (Debian)
-  shell: . /usr/share/postgresql-common/maintscripts-functions && set_system_locale && /usr/bin/pg_createcluster -u postgres {{ pg_ver }} main
+  ansible.builtin.shell: . /usr/share/postgresql-common/maintscripts-functions && set_system_locale && /usr/bin/pg_createcluster -u postgres {{ pg_ver }} main
   args:
     creates: /etc/postgresql/{{ pg_ver }}/
   when: ansible_facts.os_family == 'Debian'
@@ -181,7 +181,7 @@
       when: ansible_facts.distribution_major_version is version('8', '>=')
 
     - name: Check if locales need to be generated (RedHat)
-      shell: localedef --list-archive | grep -a -q '^{{ locale }}$'
+      ansible.builtin.shell: localedef --list-archive | grep -a -q '^{{ locale }}$'
       register: locale_present
       ignore_errors: true
       with_items:
@@ -191,7 +191,7 @@
         loop_var: locale
 
     - name: Reinstall internationalization files
-      shell: yum -y reinstall glibc-common || yum -y install glibc-common
+      ansible.builtin.shell: yum -y reinstall glibc-common || yum -y install glibc-common
       when: locale_present is failed
 
     - name: Generate locale (RedHat)
@@ -223,7 +223,7 @@
     seconds: 5
 
 - name: Kill all postgres processes
-  shell: 'pkill -u {{ pg_user }}'
+  ansible.builtin.shell: 'pkill -u {{ pg_user }}'
   become: true
   when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
   ignore_errors: true
@@ -271,7 +271,7 @@
 - name: Get PostgreSQL version
   become_user: '{{ pg_user }}'
   become: true
-  shell: echo 'SHOW SERVER_VERSION' | psql --tuples-only --no-align --dbname postgres
+  ansible.builtin.shell: echo 'SHOW SERVER_VERSION' | psql --tuples-only --no-align --dbname postgres
   register: postgres_version_resp
 
 - name: Print PostgreSQL server version
