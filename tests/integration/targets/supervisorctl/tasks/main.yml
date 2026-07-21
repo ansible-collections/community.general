@@ -51,6 +51,6 @@
             - 'uninstall_{{ ansible_facts.os_family }}.yml'    # RedHat
             - 'uninstall_{{ ansible_facts.system }}.yml'       # Linux
 
-    - file:
+    - ansible.builtin.file:
         path: '{{ supervisord_sock_path.path }}'
         state: absent

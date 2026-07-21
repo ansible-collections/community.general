@@ -13,7 +13,7 @@
         state: absent
 
     - name: Make sure {{config_file}}.pacsave file doesn't exist
-      file:
+      ansible.builtin.file:
         path: '{{config_file}}.pacsave'
         state: absent
 
@@ -44,7 +44,7 @@
           - pacsave_st_1.stat.exists
 
     - name: Delete {{config_file}}.pacsave
-      file:
+      ansible.builtin.file:
         path: '{{config_file}}.pacsave'
         state: absent
 

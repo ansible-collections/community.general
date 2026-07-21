@@ -9,6 +9,6 @@
     state: present
 
 - name: Create file
-  file:
+  ansible.builtin.file:
     path: "{{ test_file }}"
     state: touch

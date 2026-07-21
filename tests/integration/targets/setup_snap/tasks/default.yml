@@ -15,7 +15,7 @@
     state: started
 
 - name: Create link /snap
-  file:
+  ansible.builtin.file:
     src: /var/lib/snapd/snap
     dest: /snap
     state: link

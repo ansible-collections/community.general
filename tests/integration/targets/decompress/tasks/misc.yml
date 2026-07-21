@@ -69,6 +69,6 @@
       - not decompress_non_existing_src.changed
 
 - name: Delete decompressed file
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/file_copied.txt"
     state: absent

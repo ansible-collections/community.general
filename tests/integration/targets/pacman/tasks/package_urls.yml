@@ -24,7 +24,7 @@
           - '{{extra_pkg}}'
         state: absent
     - name: Make sure that url package is not cached
-      file:
+      ansible.builtin.file:
         path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
@@ -76,7 +76,7 @@
       check_mode: true
       register: install_1c
     - name: Delete cached {{url_pkg}}
-      file:
+      ansible.builtin.file:
         path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
@@ -88,7 +88,7 @@
           - '{{file_pkg_path}}'
       register: install_2
     - name: Delete cached {{url_pkg}}
-      file:
+      ansible.builtin.file:
         path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
@@ -105,7 +105,7 @@
           - '{{url_pkg_url}}'
       register: install_3c
     - name: Delete cached {{url_pkg}}
-      file:
+      ansible.builtin.file:
         path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
@@ -117,7 +117,7 @@
           - '{{file_pkg}}'
       register: install_4
     - name: Delete cached {{url_pkg}}
-      file:
+      ansible.builtin.file:
         path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
@@ -130,7 +130,7 @@
           - '{{extra_pkg}}'
       register: install_5
     - name: Delete cached {{url_pkg}}
-      file:
+      ansible.builtin.file:
         path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
@@ -151,7 +151,7 @@
       check_mode: true
       register: uninstall_1c
     - name: Delete cached {{url_pkg}}
-      file:
+      ansible.builtin.file:
         path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 
@@ -164,7 +164,7 @@
           - '{{file_pkg_path}}'
       register: uninstall_2
     - name: Delete cached {{url_pkg}}
-      file:
+      ansible.builtin.file:
         path: '/var/cache/pacman/pkg/{{url_pkg_filename}}'
         state: absent
 

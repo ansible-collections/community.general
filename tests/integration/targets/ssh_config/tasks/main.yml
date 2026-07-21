@@ -11,7 +11,7 @@
     ssh_private_key: '{{ output_test_dir }}/fake_id_rsa'
 
 - name: create a temporary directory
-  file:
+  ansible.builtin.file:
     path: "{{ output_test_dir }}"
     state: directory
 

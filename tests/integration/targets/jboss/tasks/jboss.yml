@@ -76,7 +76,7 @@
     # Check
     - name: check that nothing changed after the previous step
       <<: *task_parameters
-      file:
+      ansible.builtin.file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
       ignore_errors: true
 
@@ -99,7 +99,7 @@
     # Check
     - name: check that the file is deployed after the previous step
       <<: *task_parameters
-      file:
+      ansible.builtin.file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
     - ansible.builtin.assert:
@@ -134,7 +134,7 @@
     # Check
     - name: check that nothing changed after the previous step
       <<: *task_parameters
-      file:
+      ansible.builtin.file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
     - ansible.builtin.assert:
@@ -156,7 +156,7 @@
 
     - name: check that nothing actually changed after the previous step
       <<: *task_parameters
-      file:
+      ansible.builtin.file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
 
     - ansible.builtin.assert:
@@ -177,7 +177,7 @@
 
     - name: check that file is undeployed after the previous step
       <<: *task_parameters
-      file:
+      ansible.builtin.file:
         path: '{{ deploy_dir }}/{{ war_file_1 }}.undeployed'
 
     - ansible.builtin.assert:

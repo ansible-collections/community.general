@@ -6,7 +6,7 @@
 # ------
 # set up : set gitconfig with value
 - name: delete file config
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/gitconfig_file"
     state: absent
 

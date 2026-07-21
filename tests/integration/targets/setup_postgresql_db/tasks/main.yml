@@ -53,21 +53,21 @@
   ignore_errors: true
 
 - name: remove old db (RedHat or Suse)
-  file:
+  ansible.builtin.file:
     path: '{{ pg_dir }}'
     state: absent
   ignore_errors: true
   when: ansible_facts.os_family == "RedHat" or ansible_facts.os_family == "Suse"
 
 - name: remove old db (FreeBSD)
-  file:
+  ansible.builtin.file:
     path: '{{ pg_dir }}'
     state: absent
   ignore_errors: true
   when: ansible_facts.os_family == "FreeBSD"
 
 - name: remove old db config and files (debian)
-  file:
+  ansible.builtin.file:
     path: '{{ loop_item }}'
     state: absent
   ignore_errors: true
@@ -259,7 +259,7 @@
   when: ansible_facts.os_family == 'Debian'
 
 - name: add update paths
-  file:
+  ansible.builtin.file:
     path: /usr/share/postgresql/{{ pg_ver }}/extension/{{ item }}
     mode: '0444'
     state: touch

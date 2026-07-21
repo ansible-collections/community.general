@@ -18,13 +18,13 @@
       - launchd_unloaded_result.status.current_pid == '-'
 
 - name: "[{{ item }}] Remove test service configuration"
-  file:
+  ansible.builtin.file:
     path: "{{ launchd_plist_location }}"
     state: absent
   become: true
 
 - name: "[{{ item }}] Remove test service server"
-  file:
+  ansible.builtin.file:
     path: "/usr/local/sbin/ansible_test_service"
     state: absent
   become: true

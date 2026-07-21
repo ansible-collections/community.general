@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "ensure our next backup is not there (file)"
-  file:
+  ansible.builtin.file:
     path: "{{ iptables_saved }}"
     state: absent
 

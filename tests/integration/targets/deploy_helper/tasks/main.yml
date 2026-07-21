@@ -55,7 +55,7 @@
       - "'UNFINISHED_DEPLOY' == deploy_helper.unfinished_filename"
 
 # Remove the root folder just in case it exists
-- file: path={{ deploy_helper_test_root }} state=absent
+- ansible.builtin.file: path={{ deploy_helper_test_root }} state=absent
 
 - name: State=present with default parameters
   deploy_helper: path={{ deploy_helper_test_root }} state=present
@@ -70,10 +70,10 @@
       - "shared_path.stat.exists"
 
 # Setup older releases for tests
-- file: path={{ deploy_helper.releases_path }}/{{ item }} state=directory
+- ansible.builtin.file: path={{ deploy_helper.releases_path }}/{{ item }} state=directory
   with_items: ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh']
 # Setup the new release
-- file: path={{ deploy_helper.new_release_path }} state=directory
+- ansible.builtin.file: path={{ deploy_helper.new_release_path }} state=directory
 # Add a buildfile, just like in a real deploy
 - ansible.builtin.copy: content='' dest={{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}
 # Add a buildfile, to an older deploy
@@ -131,10 +131,10 @@
       - "deploy_helper.shared_path is falsy or not shared_path.stat.exists"
 
 # Setup older releases for tests
-- file: path={{ deploy_helper.releases_path }}/{{ item }} state=directory
+- ansible.builtin.file: path={{ deploy_helper.releases_path }}/{{ item }} state=directory
   with_items: ['first', 'second', 'third', 'fourth', 'fifth']
 # Setup the new release
-- file: path={{ deploy_helper.new_release_path }} state=directory
+- ansible.builtin.file: path={{ deploy_helper.new_release_path }} state=directory
 # Add a buildfile, just like in a real deploy
 - ansible.builtin.copy: content='' dest={{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}
 # Add a buildfile, to an older deploy
@@ -156,4 +156,4 @@
       - "releases_count.stdout|trim == '3'"
 
 # Remove the root folder
-- file: path={{ deploy_helper_test_root }} state=absent
+- ansible.builtin.file: path={{ deploy_helper_test_root }} state=absent

@@ -41,7 +41,7 @@
         - when: ansible_facts.service_mgr == 'systemd'
           block:
             - name: create directory for cron drop-in file
-              file:
+              ansible.builtin.file:
                 path: /etc/systemd/system/{{ cron_service }}.service.d
                 state: directory
                 owner: root

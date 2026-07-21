@@ -10,7 +10,7 @@
   become: true
 
 - name: ensure target directory exists
-  file:
+  ansible.builtin.file:
     path: /usr/local/sbin
     state: directory
 

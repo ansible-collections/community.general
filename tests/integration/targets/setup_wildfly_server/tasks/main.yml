@@ -17,7 +17,7 @@
     name: java-1.8.0-openjdk-devel
 
 - name: Create wf_tmp_dir
-  file:
+  ansible.builtin.file:
     path: '{{ wf_tmp_dir }}'
     state: directory
 
@@ -33,12 +33,12 @@
     remote_src: true
 
 - name: Remove tar
-  file:
+  ansible.builtin.file:
     path: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
     state: absent
 
 - name: Create symlink
-  file:
+  ansible.builtin.file:
     src: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}'
     dest: '{{ wf_tmp_dir }}/wildfly'
     state: link
@@ -56,7 +56,7 @@
     home: '{{ wf_homedir }}'
 
 - name: Set permissions
-  file:
+  ansible.builtin.file:
     path: '{{ remote_tmp_dir }}'
     state: directory
     owner: '{{ wf_user }}'
@@ -86,7 +86,7 @@
 
 - name: Create directories for testing the default deploy_path
   become: true
-  file:
+  ansible.builtin.file:
     path: '{{ default_deploy_root }}'
     state: directory
     recurse: true
@@ -94,7 +94,7 @@
     group: '{{ wf_user }}'
 
 - name: Create simlink for testing the default deploy_path
-  file:
+  ansible.builtin.file:
     state: link
     src: '{{ deploy_dir }}'
     dest: '{{ default_deploy_root }}/deployments'

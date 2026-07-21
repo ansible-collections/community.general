@@ -24,7 +24,7 @@
   listen: cleanup redis
 
 - name: remove redis data
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:

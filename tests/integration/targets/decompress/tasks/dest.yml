@@ -42,7 +42,7 @@
     label: "{{ item.stat.path }}"
 
 - name: Delete test files
-  file:
+  ansible.builtin.file:
     path: "{{ filename }}"
     state: absent
   loop:

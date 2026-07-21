@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: 'Remove any node modules'
-  file:
+  ansible.builtin.file:
     path: '{{ remote_dir }}/node_modules'
     state: absent
 
@@ -38,7 +38,7 @@
       register: npm_dotbin_folder_disabled
 
     - name: 'Remove any node modules'
-      file:
+      ansible.builtin.file:
         path: '{{ remote_dir }}/node_modules'
         state: absent
 

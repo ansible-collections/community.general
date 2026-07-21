@@ -17,7 +17,7 @@
 
     - name: create required directories
       become: true
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       loop:
@@ -88,6 +88,6 @@
         state: absent
 
     - name: remove process files
-      file:
+      ansible.builtin.file:
         path: "{{ process_root }}"
         state: absent

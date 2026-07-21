@@ -247,7 +247,7 @@
   when: ansible_facts.os_family != 'Darwin'
 
 - name: Prevent visudo being executed
-  file:
+  ansible.builtin.file:
     path: "{{ which_visudo.stdout }}"
     mode: '-x'
   when: ansible_facts.os_family != 'Darwin'

@@ -17,7 +17,7 @@
   ignore_errors: true
 
 - name: Remove previous password files and directory
-  file:
+  ansible.builtin.file:
     dest: "{{ item }}"
     state: absent
   loop:

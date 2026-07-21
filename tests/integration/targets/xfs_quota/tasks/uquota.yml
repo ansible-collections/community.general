@@ -142,6 +142,6 @@
         path: '{{ remote_tmp_dir }}/uquota'
         state: unmounted
     - name: Remove disk image
-      file:
+      ansible.builtin.file:
         path: '{{ remote_tmp_dir }}/img-uquota'
         state: absent

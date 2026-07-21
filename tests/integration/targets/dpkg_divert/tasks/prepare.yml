@@ -22,7 +22,7 @@
   become: true
 
 - name: "remove test files"
-  file:
+  ansible.builtin.file:
     path: "{{ dpkg_divert_item }}"
     state: absent
   loop:

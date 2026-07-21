@@ -20,7 +20,7 @@
   register: archive_no_options
 
 - name: Verify that archive exists - no options ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{remote_tmp_dir}}/archive_no_opts.{{ format }}"
     state: file
 
@@ -32,7 +32,7 @@
       - "archive_no_options.archived | length == 3"
 
 - name: Remove the archive - no options ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_no_options.{{ format }}"
     state: absent
 
@@ -57,7 +57,7 @@
       - "archive_file_options.archived | length == 3"
 
 - name: Remove the archive - file options ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
     state: absent
 
@@ -80,7 +80,7 @@
       - archive_nonascii_stat.stat.exists == true
 
 - name: Remove the archive - non-ascii ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
     state: absent
 
@@ -123,7 +123,7 @@
   when: "format == 'zip'"
 
 - name: Remove archive - single target ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_single_target.{{ format }}"
     state: absent
 
@@ -138,7 +138,7 @@
   register: archive_path_list
 
 - name: Verify that archive exists - path list ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{remote_tmp_dir}}/archive_path_list.{{ format }}"
     state: file
 
@@ -149,7 +149,7 @@
       - "archive_path_list.archived | length == 3"
 
 - name: Remove archive - path list ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_path_list.{{ format }}"
     state: absent
 
@@ -172,6 +172,6 @@
       - "(remote_tmp_dir ~ '/foo.txt') not in archive_missing_paths.missing"
 
 - name: Remove archive - missing paths ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_missing_paths.{{ format }}"
     state: absent
