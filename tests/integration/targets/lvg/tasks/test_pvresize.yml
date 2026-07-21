@@ -18,10 +18,10 @@
       - "'33554432B' == cmd_result.stdout"
 
 - name: Increases size in file
-  command: "dd if=/dev/zero bs=8MiB count=1 of={{ remote_tmp_dir }}/img1 conv=notrunc oflag=append"
+  ansible.builtin.command: "dd if=/dev/zero bs=8MiB count=1 of={{ remote_tmp_dir }}/img1 conv=notrunc oflag=append"
 
 - name: "Reread size of file associated with loop_device1"
-  command: "losetup -c {{ loop_device1 }}"
+  ansible.builtin.command: "losetup -c {{ loop_device1 }}"
 
 - name: "Reruns lvg with pvresize:no"
   lvg:

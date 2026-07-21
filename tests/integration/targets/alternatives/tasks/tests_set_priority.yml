@@ -25,7 +25,7 @@
       - 'cmd.stdout == "dummy" ~ item'
 
 - name: check that alternative has been updated
-  command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 60 + item|int }}' '{{ alternatives_dir }}/dummy'"
+  ansible.builtin.command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 60 + item|int }}' '{{ alternatives_dir }}/dummy'"
 
 - name: update dummy priority
   alternatives:
@@ -36,7 +36,7 @@
   register: alternative
 
 - name: check that alternative priority has been updated
-  command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 70 + item|int }}' '{{ alternatives_dir }}/dummy'"
+  ansible.builtin.command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 70 + item|int }}' '{{ alternatives_dir }}/dummy'"
 
 - name: no change without priority
   alternatives:
@@ -51,4 +51,4 @@
       - 'alternative is not changed'
 
 - name: check that alternative priority has not been changed
-  command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 70 + item|int }}' '{{ alternatives_dir }}/dummy'"
+  ansible.builtin.command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 70 + item|int }}' '{{ alternatives_dir }}/dummy'"

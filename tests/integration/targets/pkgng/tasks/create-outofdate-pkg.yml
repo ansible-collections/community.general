@@ -16,7 +16,7 @@
     dest: '{{ pkgng_test_outofdate_pkg_tempdir.path }}/MANIFEST'
 
 - name: Create out-of-date test package file
-  command:
+  ansible.builtin.command:
     argv:
       - pkg
       - create

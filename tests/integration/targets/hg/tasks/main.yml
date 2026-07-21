@@ -10,7 +10,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: determine if mercurial is already installed
-  command: which hg
+  ansible.builtin.command: which hg
   register: has_hg
   ignore_errors: true
 

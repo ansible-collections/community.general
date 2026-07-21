@@ -29,7 +29,7 @@
 
 - name: Run django_command check on the created project (issue 8884 scenario)
   community.general.django_command:
-    command: check
+    ansible.builtin.command: check
     settings: testproject.settings
     pythonpath: "{{ remote_tmp_dir }}/testproject"
     venv: "{{ remote_tmp_dir }}/venv"

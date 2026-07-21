@@ -56,7 +56,7 @@
     that:
       - set_children_elements_level is changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-set-children-elements-level.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-set-children-elements-level.xml /tmp/ansible-xml-beers.xml
 
 
 - name: Set child elements (again)

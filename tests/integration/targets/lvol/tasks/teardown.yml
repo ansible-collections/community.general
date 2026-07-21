@@ -20,11 +20,11 @@
     - "{{ loop_device4 | default('') }}"
   when:
     - item|length > 0
-  command: "lvmdevices --deldev {{ item }}"
+  ansible.builtin.command: "lvmdevices --deldev {{ item }}"
   ignore_errors: true
 
 - name: Detach loop devices
-  command: "losetup -d {{ item }}"
+  ansible.builtin.command: "losetup -d {{ item }}"
   loop:
     - "{{ loop_device1 | default('') }}"
     - "{{ loop_device2 | default('') }}"

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Is the locale we're going to test against installed? {{ locale_basic.localegen }}
-  command: locale -a
+  ansible.builtin.command: locale -a
   register: initial_state
   ignore_errors: true
 
@@ -14,7 +14,7 @@
     state: absent
 
 - name: Is the locale present? {{ locale_basic.localegen }}
-  command: locale -a
+  ansible.builtin.command: locale -a
   register: cleaned
   ignore_errors: true
 
@@ -30,7 +30,7 @@
   register: output_present
 
 - name: Is the locale present? {{ locale_basic.localegen }}
-  command: locale -a
+  ansible.builtin.command: locale -a
   register: post_check_output_present
   ignore_errors: true
 
@@ -47,7 +47,7 @@
   register: output_present_idempotent
 
 - name: Is the locale present? {{ locale_basic.localegen }}
-  command: locale -a
+  ansible.builtin.command: locale -a
   register: post_check_output_present_idempotent
   ignore_errors: true
 
@@ -67,7 +67,7 @@
       register: output_absent
 
     - name: Is the locale present? {{ locale_basic.localegen }}
-      command: locale -a
+      ansible.builtin.command: locale -a
       register: post_check_output_absent
       ignore_errors: true
 
@@ -84,7 +84,7 @@
       register: output_absent_idempotent
 
     - name: Is the locale present? {{ locale_basic.localegen }}
-      command: locale -a
+      ansible.builtin.command: locale -a
       register: post_check_output_absent_idempotent
       ignore_errors: true
 

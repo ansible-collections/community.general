@@ -32,6 +32,6 @@
         mode: "0750"
         force: true
     - name: Install rustup cargo
-      command: /tmp/sh.rustup.rs -y
+      ansible.builtin.command: /tmp/sh.rustup.rs -y
     - set_fact:
         rustup_cargo_bin: "{{ lookup('env', 'HOME') }}/.cargo/bin/cargo"

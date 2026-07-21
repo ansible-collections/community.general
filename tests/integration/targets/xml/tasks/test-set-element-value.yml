@@ -47,4 +47,4 @@
       - set_element_first_run is changed
       - set_element_second_run is not changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-set-element-value.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-set-element-value.xml /tmp/ansible-xml-beers.xml

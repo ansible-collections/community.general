@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Collect vgcreate help
-  command: "vgcreate --help"
+  ansible.builtin.command: "vgcreate --help"
   register: vgcreate_help_result
 
 - when: "'--setautoactivation' in vgcreate_help_result.stdout"

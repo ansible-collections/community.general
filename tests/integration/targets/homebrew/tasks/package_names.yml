@@ -9,7 +9,7 @@
 # or else errors will occur.
 
 - name: Find brew binary
-  command: which brew
+  ansible.builtin.command: which brew
   register: brew_which
 
 - name: Get owner of brew binary

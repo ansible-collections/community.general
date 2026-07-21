@@ -7,7 +7,7 @@
   when: ansible_facts.distribution not in ['Archlinux']
   block:
     - name: Is the locale we're going to test against installed?
-      command: locale -a
+      ansible.builtin.command: locale -a
       register: initial_state
 
     - name: Make sure the locale is not available

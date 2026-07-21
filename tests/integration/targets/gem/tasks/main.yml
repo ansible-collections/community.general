@@ -40,7 +40,7 @@
           register: install_gem_result
 
         - name: List gems
-          command: gem list
+          ansible.builtin.command: gem list
           register: current_gems
 
         - name: Ensure gem was installed
@@ -56,7 +56,7 @@
           register: remove_gem_results
 
         - name: List gems
-          command: gem list
+          ansible.builtin.command: gem list
           register: current_gems
 
         - name: Verify gem is not installed
@@ -75,7 +75,7 @@
           register: install_gem_result
 
         - name: List gems
-          command: gem list
+          ansible.builtin.command: gem list
           register: current_gems
 
         - name: Ensure gem was installed
@@ -92,7 +92,7 @@
           register: remove_gem_results
 
         - name: List gems
-          command: gem list
+          ansible.builtin.command: gem list
           register: current_gems
 
         - name: Verify gem is not installed
@@ -214,7 +214,7 @@
       register: install_gem_result
 
     - name: List gems
-      command: gem list
+      ansible.builtin.command: gem list
       register: current_gems
 
     - name: Ensure gem was installed with override_platform_install_dir
@@ -243,7 +243,7 @@
       register: remove_gem_result
 
     - name: List gems
-      command: gem list
+      ansible.builtin.command: gem list
       register: current_gems
 
     - name: Verify gem was removed with override_platform_install_dir
