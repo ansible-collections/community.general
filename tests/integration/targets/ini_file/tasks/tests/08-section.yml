@@ -6,7 +6,7 @@
 ## testing section selection
 
 - name: test-section 1 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = lemonade
@@ -55,7 +55,7 @@
 # ----------------
 
 - name: test-section 2 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = lemonade
@@ -107,7 +107,7 @@
 # ----------------
 
 - name: test-section 3 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = lemonade
@@ -157,7 +157,7 @@
 # ----------------
 
 - name: test-section 4 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = lemonade

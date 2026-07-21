@@ -91,7 +91,7 @@
 
 
     - name: Fix directory structure
-      copy:
+      ansible.builtin.copy:
         src: "{{ android_cmdline_temp_dir }}/cmdline-tools/"
         dest: "{{ android_sdk_location }}/cmdline-tools/latest"
         remote_src: true

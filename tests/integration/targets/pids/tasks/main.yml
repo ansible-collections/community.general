@@ -35,7 +35,7 @@
     random_name: some-random-long-name-{{ 10000000000 + (9999999999 | random) }}
 
 - name: Copy the fake 'sleep' source code
-  copy:
+  ansible.builtin.copy:
     src: sleeper.c
     dest: "{{ remote_tmp_dir }}/sleeper.c"
     mode: "0644"

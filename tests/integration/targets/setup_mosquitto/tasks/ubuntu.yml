@@ -19,7 +19,7 @@
   retries: 10
 
 - name: Ensure TLS config
-  copy:
+  ansible.builtin.copy:
     src: mosquitto.conf
     dest: /etc/mosquitto/mosquitto.conf
 

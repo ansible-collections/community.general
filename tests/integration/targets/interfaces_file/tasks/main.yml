@@ -10,7 +10,7 @@
     interfaces_testfile_7610: '{{ remote_tmp_dir }}/interfaces_7610'
 
 - name: Copy interfaces file
-  copy:
+  ansible.builtin.copy:
     src: 'files/interfaces_ff'
     dest: '{{ interfaces_testfile }}'
 
@@ -39,7 +39,7 @@
       - ifile_2 is not changed
 
 - name: 3841 - copy interfaces file
-  copy:
+  ansible.builtin.copy:
     src: 'files/interfaces_ff_3841'
     dest: '{{ interfaces_testfile_3841 }}'
 
@@ -68,7 +68,7 @@
       - ifile_3841_b is not changed
 
 - name: 7610 - create file
-  copy:
+  ansible.builtin.copy:
     dest: '{{ interfaces_testfile_7610 }}'
     content: |
       iface ens3 inet dhcp

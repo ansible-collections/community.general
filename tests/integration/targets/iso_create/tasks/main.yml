@@ -20,7 +20,7 @@
 # - include_tasks: prepare_dest_dir.yml
 
 - name: Copy files and directories
-  copy:
+  ansible.builtin.copy:
     src: '{{ item }}'
     dest: '{{ remote_tmp_dir }}/{{ item }}'
   loop:

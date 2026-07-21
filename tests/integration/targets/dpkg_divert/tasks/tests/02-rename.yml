@@ -131,7 +131,7 @@
 # TEST 07: rename=yes, force=yes, state=present
 
 - name: "create foobarrc.distrib for tests"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ foobarrc_distrib }}"
     content: "{{ foobarrc_oldtext }}"
 
@@ -225,7 +225,7 @@
 # TEST 08: state=present, update an existing divert path
 
 - name: "create foobarrc with new contents for tests"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ foobarrc }}"
     content: "{{ foobarrc_newtext }}"
 

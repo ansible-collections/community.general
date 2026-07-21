@@ -18,7 +18,7 @@
   changed_when: false
 
 - name: Add nat rule for cloned interfaces
-  copy:
+  ansible.builtin.copy:
     dest: /etc/pf.conf
     content: |
       nat on {{ ansible_facts.default_ipv4.interface }} from 127.0.1.0/24 -> {{ ansible_facts.default_ipv4.interface }}:0

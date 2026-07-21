@@ -6,7 +6,7 @@
 ## testing modify_inactive_option option
 
 - name: test-modify_inactive_option 1 - create test file
-  copy:
+  ansible.builtin.copy:
     content: |
 
       [section1]
@@ -48,7 +48,7 @@
 
 
 - name: test-modify_inactive_option 2 - create test file
-  copy:
+  ansible.builtin.copy:
     content: |
 
       [section1]
@@ -124,7 +124,7 @@
 
 
 - name: test-modify_inactive_option 4 - create test file with spaces before commented option
-  copy:
+  ansible.builtin.copy:
     content: |
 
       [section1]

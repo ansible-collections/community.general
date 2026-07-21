@@ -13,7 +13,7 @@
 
 # Test setup
 - name: prep our files
-  copy: src={{ item }} dest={{remote_tmp_dir}}/{{ item }}
+  ansible.builtin.copy: src={{ item }} dest={{remote_tmp_dir}}/{{ item }}
   with_items:
     - foo.txt
     - bar.txt

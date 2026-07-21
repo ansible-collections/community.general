@@ -33,7 +33,7 @@
     - "{{ replica_logdir }}"
 
 - name: Create redis configs
-  copy:
+  ansible.builtin.copy:
     dest: "{{ item.file }}"
     content: |
       daemonize yes

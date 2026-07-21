@@ -281,7 +281,7 @@
 - when: false
   block:
     - name: Copy test .repo file
-      copy:
+      ansible.builtin.copy:
         src: 'files/systemsmanagement_Uyuni_Utils.repo'
         dest: '{{ remote_tmp_dir }}'
 

@@ -48,7 +48,7 @@
                 group: root
                 mode: '0755'
             - name: Use faketime with cron service
-              copy:
+              ansible.builtin.copy:
                 content: '[Service]
 
                   Environment=LD_PRELOAD={{ libfaketime_path.stdout_lines[0].strip() }}
@@ -62,7 +62,7 @@
                 mode: '0644'
         - when: ansible_facts.system == 'FreeBSD'
           name: Use faketime with cron service
-          copy:
+          ansible.builtin.copy:
             content: cron_env='LD_PRELOAD={{ libfaketime_path.stdout_lines[0].strip() }} FAKETIME="+0y x10"'
             dest: /etc/rc.conf.d/cron
             owner: root

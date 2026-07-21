@@ -241,14 +241,14 @@
   service: name={{ postgresql_service }} state=started
 
 - name: copy control file for dummy ext
-  copy:
+  ansible.builtin.copy:
     src: dummy.control
     dest: /usr/share/postgresql/{{ pg_ver }}/extension/dummy.control
     mode: '0444'
   when: ansible_facts.os_family == 'Debian'
 
 - name: copy version files for dummy ext
-  copy:
+  ansible.builtin.copy:
     src: '{{ item }}'
     dest: /usr/share/postgresql/{{ pg_ver }}/extension/{{ item }}
     mode: '0444'

@@ -373,7 +373,7 @@
 
 
 - name: test-value 16 - Clean test file
-  copy:
+  ansible.builtin.copy:
     content: ""
     dest: "{{ output_file }}"
     force: true
@@ -542,7 +542,7 @@
 
 
 - name: test-value 21 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     # The content below is the following text file with BOM:
     # [section1]
     # var1=aaa

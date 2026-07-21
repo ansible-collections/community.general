@@ -7,7 +7,7 @@
     test_pamd_file: "/tmp/pamd_file"
 
 - name: Create temporary pam.d file
-  copy:
+  ansible.builtin.copy:
     content: "session required pam_lastlog.so silent showfailed"
     dest: "{{ test_pamd_file }}"
 - name: Test working on a single-line file works (2925)
@@ -48,7 +48,7 @@
       - line_array == ['session', 'required', 'pam_lastlog.so']
 
 - name: Create temporary pam.d file
-  copy:
+  ansible.builtin.copy:
     content: ""
     dest: "{{ test_pamd_file }}"
 # This test merely demonstrates that, as-is, module will not perform any changes on an empty file

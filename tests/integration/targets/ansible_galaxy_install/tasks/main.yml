@@ -71,7 +71,7 @@
     reqs_file: '{{ remote_tmp_dir }}/reqs.yaml'
 
 - name: Copy requirements file
-  copy:
+  ansible.builtin.copy:
     src: 'files/test.yml'
     dest: '{{ reqs_file }}'
 
