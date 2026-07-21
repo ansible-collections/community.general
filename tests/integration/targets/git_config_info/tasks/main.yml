@@ -10,10 +10,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: setup
-  import_tasks: setup.yml
+  ansible.builtin.import_tasks: setup.yml
 
 - block:
-    - include_tasks: get_simple_value.yml
+    - ansible.builtin.include_tasks: get_simple_value.yml
       loop:
         - import_file: setup_global.yml
           git_scope: 'global'
@@ -21,7 +21,7 @@
           git_scope: 'file'
           git_file: "{{ remote_tmp_dir }}/gitconfig_file"
 
-    - include_tasks: get_multi_value.yml
+    - ansible.builtin.include_tasks: get_multi_value.yml
       loop:
         - import_file: setup_global.yml
           git_scope: 'global'
@@ -29,7 +29,7 @@
           git_scope: 'file'
           git_file: "{{ remote_tmp_dir }}/gitconfig_file"
 
-    - include_tasks: get_all_values.yml
+    - ansible.builtin.include_tasks: get_all_values.yml
       loop:
         - import_file: setup_global.yml
           git_scope: 'global'
@@ -37,6 +37,6 @@
           git_scope: 'file'
           git_file: "{{ remote_tmp_dir }}/gitconfig_file"
 
-    - include_tasks: error_handling.yml
+    - ansible.builtin.include_tasks: error_handling.yml
   when: git_installed is succeeded and git_version.stdout is version(git_version_supporting_includes, ">=")
 ...

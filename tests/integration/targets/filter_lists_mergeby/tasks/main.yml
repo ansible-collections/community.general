@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test list_merge default options
-  import_tasks: lists_mergeby_default.yml
+  ansible.builtin.import_tasks: lists_mergeby_default.yml
 
 - name: Test list_merge non-default options
-  import_tasks: lists_mergeby_2-10.yml
+  ansible.builtin.import_tasks: lists_mergeby_2-10.yml

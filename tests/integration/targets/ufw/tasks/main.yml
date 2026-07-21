@@ -20,7 +20,7 @@
 
 # Run the tests
 - block:
-    - include_tasks: run-test.yml
+    - ansible.builtin.include_tasks: run-test.yml
       with_fileglob:
         - "tests/*.yml"
   become: true

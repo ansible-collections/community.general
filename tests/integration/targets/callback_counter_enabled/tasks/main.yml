@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Run tests
-  include_role:
+  ansible.builtin.include_role:
     name: callback
   vars:
     tests:

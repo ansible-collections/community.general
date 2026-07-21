@@ -17,7 +17,7 @@
 - set_fact:
     output_test_dir: '{{ remote_tmp_dir }}/test_iso_create'
 
-# - include_tasks: prepare_dest_dir.yml
+# - ansible.builtin.include_tasks: prepare_dest_dir.yml
 
 - name: Copy files and directories
   copy:

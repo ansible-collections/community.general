@@ -62,35 +62,35 @@
 
 # Run tests
 - name: Run core tests
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: ../tests/core.yml
   loop: "{{ formats }}"
   loop_control:
     loop_var: format
 
 - name: Run exclusions tests
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: ../tests/exclusions.yml
   loop: "{{ formats }}"
   loop_control:
     loop_var: format
 
 - name: Run remove tests
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: ../tests/remove.yml
   loop: "{{ formats }}"
   loop_control:
     loop_var: format
 
 - name: Run broken link tests
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: ../tests/broken-link.yml
   loop: "{{ formats }}"
   loop_control:
     loop_var: format
 
 - name: Run Idempotency tests
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: ../tests/idempotency.yml
   loop: "{{ formats }}"
   loop_control:

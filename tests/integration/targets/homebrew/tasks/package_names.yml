@@ -49,7 +49,7 @@
       - [cmark, homebrew/core/commonmark, "formula with oldnames and tap prefix"]
       - [sipgate, clinq, "cask with old_tokens"]
       - [sipgate, homebrew/cask/clinq, "cask with old_tokens and tap prefix"]
-  include_tasks: package_names_item.yml
+  ansible.builtin.include_tasks: package_names_item.yml
   loop: "{{ packages }}"
   loop_control:
     loop_var: package

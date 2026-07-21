@@ -35,9 +35,9 @@
 
 - block:
     - name: "include tasks to perform basic tests (create, remove, update)"
-      include_tasks: tests/01-basic.yml
+      ansible.builtin.include_tasks: tests/01-basic.yml
 
     - name: "include tasks to perform other tests (rename)"
-      include_tasks: tests/02-rename.yml
+      ansible.builtin.include_tasks: tests/02-rename.yml
   become: true
   diff: true

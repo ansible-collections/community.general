@@ -11,7 +11,7 @@
 
 - block:
 
-    - import_tasks: setup.yml
+    - ansible.builtin.import_tasks: setup.yml
       become: true
 
     # executable override
@@ -32,15 +32,15 @@
           - executable_override_result is not changed
         msg: "Specifying non-existing executable shall fail module execution"
 
-    - import_tasks: check_mode.yml
+    - ansible.builtin.import_tasks: check_mode.yml
       become: false
 
-    - import_tasks: test.yml
+    - ansible.builtin.import_tasks: test.yml
       become: false
       vars:
         method: user
 
-    - import_tasks: test.yml
+    - ansible.builtin.import_tasks: test.yml
       become: true
       vars:
         method: system

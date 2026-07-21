@@ -13,7 +13,7 @@
     msg: "Distribution '{{ ansible_facts.distribution }}', version '{{ ansible_facts.distribution_version }}', OS family '{{ ansible_facts.os_family }}'"
 
 - name: Include distribution specific tasks
-  include_tasks: "{{ lookup('first_found', params) }}"
+  ansible.builtin.include_tasks: "{{ lookup('first_found', params) }}"
   vars:
     params:
       files:

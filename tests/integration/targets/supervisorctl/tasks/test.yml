@@ -10,9 +10,9 @@
   diff: true
 
 - block:
-    - import_tasks: start_supervisord.yml
+    - ansible.builtin.import_tasks: start_supervisord.yml
 
-    - import_tasks: test_start.yml
-    - import_tasks: test_stop.yml
+    - ansible.builtin.import_tasks: test_start.yml
+    - ansible.builtin.import_tasks: test_stop.yml
   always:
-    - import_tasks: stop_supervisord.yml
+    - ansible.builtin.import_tasks: stop_supervisord.yml

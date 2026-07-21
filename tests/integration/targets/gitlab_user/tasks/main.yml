@@ -254,4 +254,4 @@
     that:
       - gitlab_user_state is not changed
 
-- include_tasks: sshkey.yml
+- ansible.builtin.include_tasks: sshkey.yml

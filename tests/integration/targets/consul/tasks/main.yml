@@ -95,18 +95,18 @@
             - 1
             - 2
             - 3
-        - import_tasks: consul_general.yml
-        - import_tasks: consul_kv.yml
+        - ansible.builtin.import_tasks: consul_general.yml
+        - ansible.builtin.import_tasks: consul_kv.yml
 
         - block:
-            - import_tasks: consul_session.yml
-            - import_tasks: consul_policy.yml
-            - import_tasks: consul_role.yml
-            - import_tasks: consul_token.yml
-            - import_tasks: consul_auth_method.yml
-            - import_tasks: consul_binding_rule.yml
-            - import_tasks: consul_agent_service.yml
-            - import_tasks: consul_agent_check.yml
+            - ansible.builtin.import_tasks: consul_session.yml
+            - ansible.builtin.import_tasks: consul_policy.yml
+            - ansible.builtin.import_tasks: consul_role.yml
+            - ansible.builtin.import_tasks: consul_token.yml
+            - ansible.builtin.import_tasks: consul_auth_method.yml
+            - ansible.builtin.import_tasks: consul_binding_rule.yml
+            - ansible.builtin.import_tasks: consul_agent_service.yml
+            - ansible.builtin.import_tasks: consul_agent_check.yml
           module_defaults:
             group/community.general.consul:
               token: "{{ consul_management_token }}"

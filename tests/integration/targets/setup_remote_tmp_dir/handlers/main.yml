@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: delete temporary directory
-  include_tasks: default-cleanup.yml
+  ansible.builtin.include_tasks: default-cleanup.yml
 
 - name: delete temporary directory (windows)
-  include_tasks: windows-cleanup.yml
+  ansible.builtin.include_tasks: windows-cleanup.yml
