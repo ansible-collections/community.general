@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: 'Create directory for Node'
-  file:
+  ansible.builtin.file:
     path: /usr/local/lib/nodejs
     state: directory
 
@@ -31,7 +31,7 @@
 
 # Clean up before running tests
 - name: Remove any previous Nodejs modules
-  file:
+  ansible.builtin.file:
     path: '{{remote_tmp_dir}}/node_modules'
     state: absent
 

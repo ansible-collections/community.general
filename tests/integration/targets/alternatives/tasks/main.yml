@@ -68,7 +68,7 @@
   always:
     - include_tasks: remove_links.yml
 
-    - file:
+    - ansible.builtin.file:
         path: '{{ item }}'
         state: absent
       with_items:
@@ -76,7 +76,7 @@
         - '{{ alternatives_dir }}/dummymain'
         - '{{ alternatives_dir }}/dummysubcmd'
 
-    - file:
+    - ansible.builtin.file:
         path: '/usr/bin/dummy{{ item }}'
         state: absent
       with_sequence: start=1 end=4

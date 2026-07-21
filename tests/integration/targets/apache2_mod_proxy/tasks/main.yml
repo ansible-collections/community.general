@@ -56,7 +56,7 @@
       </VirtualHost>
 
 - name: Enable virtual host
-  file:
+  ansible.builtin.file:
     src: /etc/apache2/sites-available/000-apache2_mod_proxy-test.conf
     dest: /etc/apache2/sites-enabled/000-apache2_mod_proxy-test.conf
     owner: root

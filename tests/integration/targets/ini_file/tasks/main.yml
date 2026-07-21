@@ -20,7 +20,7 @@
       include_tasks: tests/00-basic.yml
 
     - name: reset output file
-      file:
+      ansible.builtin.file:
         path: "{{ output_file }}"
         state: absent
 
@@ -28,7 +28,7 @@
       include_tasks: tests/01-value.yml
 
     - name: reset output file
-      file:
+      ansible.builtin.file:
         path: "{{ output_file }}"
         state: absent
 

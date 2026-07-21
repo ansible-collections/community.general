@@ -31,7 +31,7 @@
   when: "format == 'zip'"
 
 - name: Remove archive - file content idempotency ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
     state: absent
 
@@ -64,7 +64,7 @@
       - file_name_idempotency_after is changed
 
 - name: Remove archive - file name idempotency ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
     state: absent
 
@@ -99,7 +99,7 @@
   when: "format != 'tar'"
 
 - name: Remove archive - single file content idempotency ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
     state: absent
 
@@ -136,7 +136,7 @@
   when: "format in ('tar', 'zip')"
 
 - name: Remove archive - single file name idempotency ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
     state: absent
 

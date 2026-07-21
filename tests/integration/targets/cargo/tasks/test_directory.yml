@@ -104,7 +104,7 @@
 
   always:
     - name: Remove temp directory
-      file:
+      ansible.builtin.file:
         path: "{{ temp_directory.path }}"
         state: absent
 

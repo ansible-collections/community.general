@@ -169,7 +169,7 @@
   ##
 
     - name: remove config file
-      file:
+      ansible.builtin.file:
         path: '{{ timezone_config_file }}'
         state: absent
 
@@ -195,7 +195,7 @@
   ##
 
     - name: create symlink /etc/locatime -> /usr/share/zoneinfo/Etc/UTC
-      file:
+      ansible.builtin.file:
         src: /usr/share/zoneinfo/Etc/UTC
         dest: /etc/localtime
         state: link
@@ -223,7 +223,7 @@
   ##
 
     - name: set timezone to a broken symlink
-      file:
+      ansible.builtin.file:
         src: /tmp/foo
         dest: /etc/localtime
         state: link
@@ -377,7 +377,7 @@
         ##
 
         - name: remove /etc/adjtime and conf file
-          file:
+          ansible.builtin.file:
             path: '{{ item }}'
             state: absent
           with_items:
@@ -402,7 +402,7 @@
         ##
 
         - name: remove /etc/adjtime
-          file:
+          ansible.builtin.file:
             path: '{{ item }}'
             state: absent
           with_items:
@@ -438,7 +438,7 @@
         ##
 
         - name: remove conf file
-          file:
+          ansible.builtin.file:
             path: '{{ item }}'
             state: absent
           with_items:

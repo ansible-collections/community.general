@@ -12,7 +12,7 @@
     dev: '{{ remote_tmp_dir }}/img-pquota'
     fstype: xfs
 - name: Create xfs related files
-  file:
+  ansible.builtin.file:
     path: /etc/{{ item }}
     state: touch
   become: true
@@ -42,7 +42,7 @@
         opts: pquota
         state: mounted
     - name: Create test directory
-      file:
+      ansible.builtin.file:
         path: '{{ remote_tmp_dir }}/pquota/test'
         state: directory
       become: true
@@ -167,7 +167,7 @@
         path: '{{ remote_tmp_dir }}/pquota'
         state: unmounted
     - name: Remove disk image
-      file:
+      ansible.builtin.file:
         path: '{{ remote_tmp_dir }}/img-pquota'
         state: absent
     - name: Remove xfs quota project id

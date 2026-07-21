@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create terraform project directory (provider upgrade)
-  file:
+  ansible.builtin.file:
     path: "{{ terraform_project_dir }}/{{ item['name'] }}"
     state: directory
     mode: "0755"

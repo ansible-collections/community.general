@@ -10,7 +10,7 @@
   ignore_errors: true
 
 - name: Remove files
-  file:
+  ansible.builtin.file:
     path: '{{ item }}'
     state: absent
   loop:

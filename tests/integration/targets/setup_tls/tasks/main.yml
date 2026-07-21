@@ -13,7 +13,7 @@
 # verify with: make info
 
 - name: ensure target directory is present
-  file:
+  ansible.builtin.file:
     path: /tls
     state: directory
 

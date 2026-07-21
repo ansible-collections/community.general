@@ -12,7 +12,7 @@
   register: archive_remove_source_files
 
 - name: Verify archive exists - remove source files ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_files.{{ format }}"
     state: file
 
@@ -23,12 +23,12 @@
       - "archive_remove_source_files.archived | length == 3"
 
 - name: Remove Archive - remove source files ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_files.{{ format }}"
     state: absent
 
 - name: Remove source files in check mode ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/{{ item }}"
     state: absent
   check_mode: true
@@ -53,7 +53,7 @@
     - empty.txt
 
 - name: Create temporary directory - remove source directory ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/tmpdir"
     state: directory
 
@@ -75,7 +75,7 @@
   register: archive_remove_source_directory
 
 - name: Verify archive exists - remove source directory ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_directory.{{ format }}"
     state: file
 
@@ -86,12 +86,12 @@
       - "archive_remove_source_directory.archived | length == 3"
 
 - name: Remove archive - remove source directory ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_directory.{{ format }}"
     state: absent
 
 - name: Remove source source directory in check mode ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/tmpdir"
     state: absent
   check_mode: true
@@ -103,7 +103,7 @@
       - remove_dir is not changed
 
 - name: Create temporary directory - remove source excluding path ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/tmpdir"
     state: directory
 
@@ -126,7 +126,7 @@
   register: archive_remove_source_excluding_path
 
 - name: Verify archive exists - remove source excluding path ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_excluding_path.{{ format }}"
     state: file
 
@@ -137,12 +137,12 @@
       - "archive_remove_source_excluding_path.archived | length == 2"
 
 - name: Remove archive - remove source excluding path ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_excluding_path.{{ format }}"
     state: absent
 
 - name: Verify that excluded file still exists - remove source excluding path ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/tmpdir/empty.txt"
     state: file
 
@@ -169,17 +169,17 @@
   register: archive_remove_source_excluding_sub_path
 
 - name: Verify archive exists - remove source excluding sub path ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_excluding_sub_path.{{ format }}"
     state: file
 
 - name: Remove archive - remove source excluding sub path ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_excluding_sub_path.{{ format }}"
     state: absent
 
 - name: Verify that sub path still exists - remove source excluding sub path ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/tmpdir/sub/subfile.txt"
     state: file
 
@@ -203,12 +203,12 @@
   register: archive_remove_nested_paths
 
 - name: Verify archive exists - remove source with nested paths ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_nested_paths.{{ format }}"
     state: file
 
 - name: Verify source files were removed - remove source with nested paths ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/tmpdir"
     state: absent
   register: archive_remove_nested_paths_status
@@ -220,6 +220,6 @@
       - archive_remove_nested_paths_status is not changed
 
 - name: Remove archive - remove source with nested paths ({{ format }})
-  file:
+  ansible.builtin.file:
     path: "{{ remote_tmp_dir }}/archive_remove_source_nested_paths.{{ format }}"
     state: absent

@@ -59,6 +59,6 @@
 
   always:
     - name: Clean up temp file
-      file:
+      ansible.builtin.file:
         path: "{{ tempfile.path }}"
         state: absent

@@ -21,7 +21,7 @@
         group: root
         mode: '0644'
     - name: Create deterministic link to temp directory
-      file:
+      ansible.builtin.file:
         state: link
         src: '{{ remote_tmp_dir }}/'
         path: /tmp/flatpak

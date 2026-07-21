@@ -34,7 +34,7 @@
     ### fetch remote file with unicode filename and content
 
     - name: remove local file with unicode filename and content
-      file: path={{ local_tmp }}-汉语/汉语.txt state=absent
+      ansible.builtin.file: path={{ local_tmp }}-汉语/汉语.txt state=absent
       delegate_to: localhost
     - name: fetch remote file with unicode filename and content
       fetch: src={{ remote_tmp }}-汉语/汉语.txt dest={{ local_tmp }}-汉语/汉语.txt fail_on_missing=true validate_checksum=true flat=true
@@ -42,7 +42,7 @@
     ### remove local and remote temp files
 
     - name: remove local temp file
-      file: path={{ local_tmp }}-汉语 state=absent
+      ansible.builtin.file: path={{ local_tmp }}-汉语 state=absent
       delegate_to: localhost
     - name: remove remote temp file
       action: "{{ action_prefix }}file path={{ remote_tmp }}-汉语 state=absent"

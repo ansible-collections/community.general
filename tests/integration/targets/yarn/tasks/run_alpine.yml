@@ -14,7 +14,7 @@
 
 # Clean up before running tests
 - name: Remove any previous Nodejs modules
-  file:
+  ansible.builtin.file:
     path: '{{ remote_tmp_dir }}/node_modules'
     state: absent
 

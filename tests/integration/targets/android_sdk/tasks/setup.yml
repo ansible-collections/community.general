@@ -51,7 +51,7 @@
         HOMEBREW_NO_AUTO_UPDATE: "True"
     - name: Symlink java
       become: true
-      file:
+      ansible.builtin.file:
         src: "{{ brew_prefix }}/opt/openjdk@17/libexec/openjdk.jdk"
         dest: "/Library/Java/JavaVirtualMachines/openjdk-17.jdk"
         state: link
@@ -61,7 +61,7 @@
     - ansible_facts.os_family == 'Darwin'
 
 - name: Create Android SDK directory
-  file:
+  ansible.builtin.file:
     path: "{{ android_sdk_location }}"
     state: directory
 
@@ -74,7 +74,7 @@
   when: not sdkmanager_installed.stat.exists
   block:
     - name: Create Android SDK dir structure
-      file:
+      ansible.builtin.file:
         path: "{{ item.path }}"
         state: "{{ item.state }}"
       with_items:
