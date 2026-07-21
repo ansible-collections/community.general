@@ -44,7 +44,7 @@
   command: cc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
 
 - name: Copy templated helper script
-  template:
+  ansible.builtin.template:
     src: obtainpid.sh.j2
     dest: "{{ remote_tmp_dir }}/obtainpid.sh"
     mode: "0755"

@@ -40,7 +40,7 @@
 
     - name: monit config
       become: true
-      template:
+      ansible.builtin.template:
         src: "monitrc.j2"
         dest: "{{ monitrc }}"
 

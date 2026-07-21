@@ -9,7 +9,7 @@
   register: pkgng_test_outofdate_pkg_tempdir
 
 - name: Copy intentionally out-of-date package manifest to testhost
-  template:
+  ansible.builtin.template:
     src: MANIFEST.json.j2
     # Plus-sign must be added at the destination
     # CI doesn't like files with '+' in them in the repository

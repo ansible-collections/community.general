@@ -70,7 +70,7 @@
     mode: "0644"
 
 - name: Create launcher
-  template:
+  ansible.builtin.template:
     src: launch.sh.j2
     dest: '{{ wf_homedir }}/bin/launch.sh'
     mode: "0755"
@@ -79,7 +79,7 @@
   ansible.builtin.shell: 'chmod +rx {{ wf_homedir }}/bin/*.sh'
 
 - name: Create service file
-  template:
+  ansible.builtin.template:
     src: wildfly.service.j2
     dest: '{{ wf_service_file_path }}'
     mode: "0644"

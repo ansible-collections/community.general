@@ -154,7 +154,7 @@
   when: ansible_facts.os_family == 'Suse'
 
 - name: Copy pg_hba into place
-  template:
+  ansible.builtin.template:
     src: files/pg_hba.conf
     dest: '{{ pg_hba_location }}'
     owner: '{{ pg_user }}'

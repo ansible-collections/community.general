@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: generate supervisor configuration
-  template:
+  ansible.builtin.template:
     src: supervisord.conf
     dest: '{{ remote_dir }}/supervisord.conf'
   diff: true
