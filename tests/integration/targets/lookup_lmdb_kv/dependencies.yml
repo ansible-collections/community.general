@@ -11,6 +11,6 @@
       environment:
         LMDB_PURE: "1"
     - name: Setup test data
-      script: test_db.py
+      ansible.builtin.script: test_db.py
       args:
         executable: "{{ ansible_facts.python.executable }}"
