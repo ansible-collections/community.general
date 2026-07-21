@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get facts
-  setup:
+  ansible.builtin.setup:
   when: ansible_facts == {}
 
 # pip._internal.locations.get_scheme() reflects pip's actual install scheme (e.g. RHEL root → /usr/local/bin),

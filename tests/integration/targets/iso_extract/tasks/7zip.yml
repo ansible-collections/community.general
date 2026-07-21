@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Gather facts
-  setup:
+  ansible.builtin.setup:
   become: true
 
 - name: Include distribution specific variables
