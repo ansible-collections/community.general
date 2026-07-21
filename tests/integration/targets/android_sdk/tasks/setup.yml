@@ -82,7 +82,7 @@
         - { path: "{{ android_sdk_location }}/cmdline-tools/latest", state: "directory" }
 
     - name: Download Android command line tools
-      unarchive:
+      ansible.builtin.unarchive:
         src: "{{ commandline_tools_link }}"
         dest: "{{ android_cmdline_temp_dir }}"
         remote_src: true

@@ -39,7 +39,7 @@
   register: skiaparser_1_deleted_2
 
 - name: Download old platform-tools
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://dl.google.com/android/repository/platform-tools_r27.0.0-linux.zip
     remote_src: true
     dest: "{{ android_sdk_location }}"

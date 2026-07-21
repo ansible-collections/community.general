@@ -27,7 +27,7 @@
     dest: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
 
 - name: Unarchive tar
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
     dest: '{{ wf_tmp_dir }}'
     remote_src: true

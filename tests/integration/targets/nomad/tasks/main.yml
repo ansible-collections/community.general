@@ -52,7 +52,7 @@
   until: result is success
 
 - name: Download nomad binary
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ nomad_uri }}'
     dest: '{{ remote_tmp_dir }}'
     remote_src: true

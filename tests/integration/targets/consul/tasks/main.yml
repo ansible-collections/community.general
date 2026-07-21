@@ -57,7 +57,7 @@
         consul_arch: arm64
       when: ansible_facts.architecture in ['arm64', 'aarch64']
     - name: Download consul binary
-      unarchive:
+      ansible.builtin.unarchive:
         src: '{{ consul_uri }}'
         dest: '{{ remote_tmp_dir }}'
         remote_src: true
