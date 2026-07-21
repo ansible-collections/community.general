@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Include OS-specific variables
-  include_vars: '{{ lookup("first_found", search) }}'
+  ansible.builtin.include_vars: '{{ lookup("first_found", search) }}'
   vars:
     search:
       files:

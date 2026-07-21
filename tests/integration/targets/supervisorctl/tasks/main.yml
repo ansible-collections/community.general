@@ -22,7 +22,7 @@
     - set_fact:
         remote_dir: '{{ echo.stdout }}'
 
-    - include_vars: '{{ item }}'
+    - ansible.builtin.include_vars: '{{ item }}'
       with_first_found:
         - files:
             - '{{ ansible_facts.distribution }}.yml'
