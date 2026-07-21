@@ -55,7 +55,7 @@
 
     - name: Start OpenLDAP service
       become: true
-      service:
+      ansible.builtin.service:
         name: '{{ openldap_service_name }}'
         enabled: true
         state: started

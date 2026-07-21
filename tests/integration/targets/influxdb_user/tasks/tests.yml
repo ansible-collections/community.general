@@ -49,7 +49,7 @@
         line: '  auth-enabled = true'
 
     - name: Restart InfluxDB service
-      service: name=influxdb state=restarted
+      ansible.builtin.service: name=influxdb state=restarted
 
 - name: Test add user in check mode when authentication enabled
   block:
