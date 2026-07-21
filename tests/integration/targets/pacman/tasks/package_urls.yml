@@ -29,7 +29,7 @@
         state: absent
 
     - name: Get URL for {{url_pkg}}
-      command:
+      ansible.builtin.command:
         cmd: pacman --sync --print-format "%l" {{url_pkg}}
       register: url_pkg_stdout
     - name: Download {{url_pkg}} pkg
@@ -52,7 +52,7 @@
         state: started
 
     - name: Get URL for {{file_pkg}}
-      command:
+      ansible.builtin.command:
         cmd: pacman --sync --print-format "%l" {{file_pkg}}
       register: file_pkg_url
     - name: Download {{file_pkg}} pkg

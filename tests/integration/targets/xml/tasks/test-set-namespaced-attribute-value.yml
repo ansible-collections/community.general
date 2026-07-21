@@ -38,4 +38,4 @@
     that:
       - set_namespaced_attribute_value is changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-set-namespaced-attribute-value.xml /tmp/ansible-xml-namespaced-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-set-namespaced-attribute-value.xml /tmp/ansible-xml-namespaced-beers.xml

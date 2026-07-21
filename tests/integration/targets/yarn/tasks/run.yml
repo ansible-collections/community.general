@@ -27,7 +27,7 @@
     creates: '{{ remote_tmp_dir }}/yarn-v{{yarn_version}}_pkg.tar.gz'
 
 - name: 'Copy node to directory created earlier'
-  command: "mv {{ remote_tmp_dir }}/{{ nodejs_path }} /usr/local/lib/nodejs/{{nodejs_path}}"
+  ansible.builtin.command: "mv {{ remote_tmp_dir }}/{{ nodejs_path }} /usr/local/lib/nodejs/{{nodejs_path}}"
 
 # Clean up before running tests
 - name: Remove any previous Nodejs modules

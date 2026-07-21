@@ -10,7 +10,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Find brew binary
-  command: which brew
+  ansible.builtin.command: which brew
   register: brew_which
   when: ansible_facts.distribution in ['MacOSX']
 

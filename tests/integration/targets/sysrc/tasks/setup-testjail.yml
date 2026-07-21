@@ -14,7 +14,7 @@
     line: cloned_interfaces=lo1
 
 - name: Activate cloned interfaces
-  command: "service netif cloneup"
+  ansible.builtin.command: "service netif cloneup"
   changed_when: false
 
 - name: Install ezjail
@@ -70,4 +70,4 @@
 
 - name: Start testjail
   when: is_testjail_up.rc == 1
-  command: "ezjail-admin start testjail"
+  ansible.builtin.command: "ezjail-admin start testjail"

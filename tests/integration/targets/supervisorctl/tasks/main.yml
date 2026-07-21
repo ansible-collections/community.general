@@ -17,7 +17,7 @@
         suffix: supervisorctl-tests
       register: supervisord_sock_path
 
-    - command: 'echo {{ remote_tmp_dir }}'
+    - ansible.builtin.command: 'echo {{ remote_tmp_dir }}'
       register: echo
     - set_fact:
         remote_dir: '{{ echo.stdout }}'

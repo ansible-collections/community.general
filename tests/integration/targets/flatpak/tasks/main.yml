@@ -52,10 +52,10 @@
       ignore_errors: true
 
     - name: List processes
-      command: ps aux
+      ansible.builtin.command: ps aux
 
     - name: Stop HTTP server
-      command: >-
+      ansible.builtin.command: >-
         pkill -f -- '{{ remote_tmp_dir }}/serve.py'
 
   when: ansible_facts.distribution in ['Fedora', 'Ubuntu']

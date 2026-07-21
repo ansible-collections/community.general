@@ -38,7 +38,7 @@
           - (lock_packages.locklist_post | length) <= (_packages | length)
 
     - name: Update packages with updates while locked
-      command: >-
+      ansible.builtin.command: >-
         dnf update -y
         --setopt=obsoletes=0 {{ _packages | join(' ') }}
       register: update_locked_packages

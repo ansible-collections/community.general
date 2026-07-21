@@ -39,7 +39,7 @@
         owner: '{{ username }}'
 
     - name: Build package
-      command:
+      ansible.builtin.command:
         cmd: su {{ username }} -c "makepkg -srf"
         chdir: '/home/{{ username }}/{{ package_name }}'
 

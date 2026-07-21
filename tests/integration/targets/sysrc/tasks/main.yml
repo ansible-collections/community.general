@@ -186,7 +186,7 @@
         - name: Stop and remove testjail
           failed_when: false
           changed_when: false
-          command: "ezjail-admin delete -wf testjail"
+          ansible.builtin.command: "ezjail-admin delete -wf testjail"
 
     ##
     ## sysrc - Test Absent
@@ -354,7 +354,7 @@
           register: sysrc_equals_sign_2
 
         - name: Get file content
-          command: sysrc -a
+          ansible.builtin.command: sysrc -a
           register: sysrc_content
 
         - name: Ensure sysrc did as intended with values that contains equals sign

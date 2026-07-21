@@ -20,7 +20,7 @@
       - 'alternative is changed'
 
 - name: Execute the current dummymain command
-  command: dummymain
+  ansible.builtin.command: dummymain
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -29,7 +29,7 @@
       - cmd.stdout == "dummy1"
 
 - name: Execute the current dummysubcmd command
-  command: dummysubcmd
+  ansible.builtin.command: dummysubcmd
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -38,7 +38,7 @@
       - cmd.stdout == "dummy2"
 
 - name: Get dummymain alternatives output
-  command:
+  ansible.builtin.command:
     cmd: '{{ alternatives_command }} --display dummymain'
   register: result
 
@@ -59,7 +59,7 @@
       - 'alternative is not changed'
 
 - name: Execute the current dummysubcmd command
-  command: dummysubcmd
+  ansible.builtin.command: dummysubcmd
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -81,7 +81,7 @@
       - 'alternative is changed'
 
 - name: Execute the current dummysubcmd command
-  command: dummysubcmd
+  ansible.builtin.command: dummysubcmd
   register: cmd
   ignore_errors: true
 
@@ -92,7 +92,7 @@
       - '"No such file" in cmd.msg or "Error executing command." == cmd.msg'
 
 - name: Get dummymain alternatives output
-  command:
+  ansible.builtin.command:
     cmd: '{{ alternatives_command }} --display dummymain'
   register: result
 
@@ -117,7 +117,7 @@
       - 'alternative is changed'
 
 - name: Execute the current dummymain command
-  command: dummymain
+  ansible.builtin.command: dummymain
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -126,7 +126,7 @@
       - cmd.stdout == "dummy3"
 
 - name: Execute the current dummysubcmd command
-  command: dummysubcmd
+  ansible.builtin.command: dummysubcmd
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -135,7 +135,7 @@
       - cmd.stdout == "dummy4"
 
 - name: Get dummymain alternatives output
-  command:
+  ansible.builtin.command:
     cmd: '{{ alternatives_command }} --display dummymain'
   register: result
 
@@ -155,7 +155,7 @@
       - 'alternative is changed'
 
 - name: Execute the current dummymain command
-  command: dummymain
+  ansible.builtin.command: dummymain
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -164,7 +164,7 @@
       - cmd.stdout == "dummy1"
 
 - name: Execute the current dummysubcmd command
-  command: dummysubcmd
+  ansible.builtin.command: dummysubcmd
   register: cmd
   ignore_errors: true
 
@@ -175,7 +175,7 @@
       - '"No such file" in cmd.msg or "Error executing command." == cmd.msg'
 
 - name: Get dummymain alternatives output
-  command:
+  ansible.builtin.command:
     cmd: '{{ alternatives_command }} --display dummymain'
   register: result
 
@@ -195,7 +195,7 @@
       - 'alternative is changed'
 
 - name: Execute the current dummymain command
-  command: dummymain
+  ansible.builtin.command: dummymain
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -204,7 +204,7 @@
       - cmd.stdout == "dummy3"
 
 - name: Execute the current dummysubcmd command
-  command: dummysubcmd
+  ansible.builtin.command: dummysubcmd
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -213,7 +213,7 @@
       - cmd.stdout == "dummy4"
 
 - name: Get dummymain alternatives output
-  command:
+  ansible.builtin.command:
     cmd: '{{ alternatives_command }} --display dummymain'
   register: result
 

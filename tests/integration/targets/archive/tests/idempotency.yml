@@ -49,7 +49,7 @@
   register: file_name_idempotency_before
 
 - name: Rename file - file name idempotency ({{ format }})
-  command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
+  ansible.builtin.command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
 
 - name: Archive again - file name idempotency ({{ format }})
   archive:
@@ -69,7 +69,7 @@
     state: absent
 
 - name: Rename file back - file name idempotency ({{ format }})
-  command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"
+  ansible.builtin.command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive - single file content idempotency ({{ format }})
   archive:
@@ -117,7 +117,7 @@
   register: single_file_name_idempotency_before
 
 - name: Rename file - single file name idempotency ({{ format }})
-  command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
+  ansible.builtin.command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
 
 - name: Archive again - single file name idempotency ({{ format }})
   archive:
@@ -141,4 +141,4 @@
     state: absent
 
 - name: Rename file back - single file name idempotency ({{ format }})
-  command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"
+  ansible.builtin.command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"

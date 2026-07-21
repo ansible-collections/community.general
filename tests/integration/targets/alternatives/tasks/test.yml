@@ -53,4 +53,4 @@
   when: ansible_facts.os_family == 'RedHat' and not with_alternatives and item == 1
 
 - name: check that alternative has been updated
-  command: "grep -Pzq '/bin/dummy{{ item }}\\n' '{{ alternatives_dir }}/dummy'"
+  ansible.builtin.command: "grep -Pzq '/bin/dummy{{ item }}\\n' '{{ alternatives_dir }}/dummy'"

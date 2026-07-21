@@ -4,10 +4,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: restore the updated python
-  command: mv "{{ which_python.stdout }}.updated" "{{ which_python.stdout }}"
+  ansible.builtin.command: mv "{{ which_python.stdout }}.updated" "{{ which_python.stdout }}"
 
 - name: restore the updated pip
-  command: mv "{{ which_pip.stdout }}.updated" "{{ which_pip.stdout }}"
+  ansible.builtin.command: mv "{{ which_pip.stdout }}.updated" "{{ which_pip.stdout }}"
 
 - name: restore the mercurial python interpreter symlink (if needed)
   lineinfile:

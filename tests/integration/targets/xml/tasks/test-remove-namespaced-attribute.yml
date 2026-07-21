@@ -37,4 +37,4 @@
     that:
       - remove_namespaced_attribute is changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-remove-namespaced-attribute.xml /tmp/ansible-xml-namespaced-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-remove-namespaced-attribute.xml /tmp/ansible-xml-namespaced-beers.xml
