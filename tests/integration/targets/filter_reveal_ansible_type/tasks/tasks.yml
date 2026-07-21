@@ -6,7 +6,7 @@
 # -------------------------------------------------------------
 
 - name: String. AnsibleUnicode/_AnsibleTaggedStr.
-  assert:
+  ansible.builtin.assert:
     that: result in dtype
     success_msg: '"abc" is one of {{ dtype }}'
     fail_msg: '"abc" is {{ result }}, not one of {{ dtype }}'
@@ -19,7 +19,7 @@
       - '_AnsibleTaggedStr'
 
 - name: String. AnsibleUnicode/_AnsibleTaggedStr alias str.
-  assert:
+  ansible.builtin.assert:
     that: result in dtype
     success_msg: '"abc" is one of {{ dtype }}'
     fail_msg: '"abc" is {{ result }}, not one of {{ dtype }}'
@@ -32,7 +32,7 @@
       - 'str'
 
 - name: List. All items are AnsibleUnicode/_AnsibleTaggedStr.
-  assert:
+  ansible.builtin.assert:
     that: result in dtype
     success_msg: '["a", "b", "c"] is one of {{ dtype }}'
     fail_msg: '["a", "b", "c"] is {{ result }}, not one of {{ dtype }}'
@@ -45,7 +45,7 @@
       - 'list[_AnsibleTaggedStr]'
 
 - name: Dictionary. All keys and values are AnsibleUnicode/_AnsibleTaggedStr.
-  assert:
+  ansible.builtin.assert:
     that: result in dtype
     success_msg: '{"a": "foo", "b": "bar", "c": "baz"} is one of {{ dtype }}'
     fail_msg: '{"a": "foo", "b": "bar", "c": "baz"} is {{ result }}, not one of {{ dtype }}'
@@ -61,7 +61,7 @@
 # ----------------------------------------------------
 
 - name: String
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: '"abc" is {{ dtype }}'
     fail_msg: '"abc" is {{ result }}, not {{ dtype }}'
@@ -71,7 +71,7 @@
     dtype: str
 
 - name: Integer
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: '123 is {{ dtype }}'
     fail_msg: '123 is {{ result }}, not {{ dtype }}'
@@ -81,7 +81,7 @@
     dtype: int
 
 - name: Float
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: '123.45 is {{ dtype }}'
     fail_msg: '123.45 is {{ result }}, not {{ dtype }}'
@@ -91,7 +91,7 @@
     dtype: float
 
 - name: Boolean
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: 'true is {{ dtype }}'
     fail_msg: 'true is {{ result }}, not {{ dtype }}'
@@ -101,7 +101,7 @@
     dtype: bool
 
 - name: List. All items are strings.
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: '["a", "b", "c"] is {{ dtype }}'
     fail_msg: '["a", "b", "c"] is {{ result }}, not {{ dtype }}'
@@ -111,7 +111,7 @@
     dtype: list[str]
 
 - name: List of dictionaries.
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: '[{"a": 1}, {"b": 2}] is {{ dtype }}'
     fail_msg: '[{"a": 1}, {"b": 2}] is {{ result }}, not {{ dtype }}'
@@ -121,7 +121,7 @@
     dtype: list[dict]
 
 - name: Dictionary. All keys are strings. All values are integers.
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: '{"a": 1} is {{ dtype }}'
     fail_msg: '{"a": 1} is {{ result }}, not {{ dtype }}'
@@ -131,7 +131,7 @@
     dtype: dict[str, int]
 
 - name: Dictionary. All keys are strings. All values are integers.
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: '{"a": 1, "b": 2} is {{ dtype }}'
     fail_msg: '{"a": 1, "b": 2} is {{ result }}, not {{ dtype }}'
@@ -144,7 +144,7 @@
 # ----------------------------------------------------------
 
 - name: Dictionary. The keys are integers or strings. All values are strings.
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: 'data is {{ dtype }}'
     fail_msg: 'data is {{ result }}, not {{ dtype }}'
@@ -156,7 +156,7 @@
     dtype: dict[int|str, str]
 
 - name: Dictionary. All keys are integers. All values are keys.
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: 'data is {{ dtype }}'
     fail_msg: 'data is {{ result }}, not {{ dtype }}'
@@ -168,7 +168,7 @@
     dtype: dict[int, str]
 
 - name: Dictionary. All keys are strings. Multiple types values.
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: 'data is {{ dtype }}'
     fail_msg: 'data is {{ result }}, not {{ dtype }}'
@@ -180,7 +180,7 @@
     dtype: dict[str, bool|dict|float|int|list|str]
 
 - name: List. Multiple types items.
-  assert:
+  ansible.builtin.assert:
     that: result == dtype
     success_msg: 'data is {{ dtype }}'
     fail_msg: 'data is {{ result }}, not {{ dtype }}'

@@ -29,7 +29,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: cask_install_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - cask_install_result is changed
           - "'Cask installed' in cask_install_result.msg"
@@ -42,7 +42,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: cask_install_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - cask_install_result is not changed
           - "'Cask installed' not in cask_install_result.msg"
@@ -57,7 +57,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: cask_install_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - cask_install_result is changed
           - "'Cask installed' in cask_install_result.msg"

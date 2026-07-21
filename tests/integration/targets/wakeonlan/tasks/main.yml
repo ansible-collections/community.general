@@ -26,7 +26,7 @@
   register: incorrect_mac_length
 
 - name: Check error message
-  assert:
+  ansible.builtin.assert:
     that:
       - incorrect_mac_length is failed
       - incorrect_mac_length.msg is search('Incorrect MAC address length')
@@ -39,7 +39,7 @@
   register: incorrect_mac_format
 
 - name: Check error message
-  assert:
+  ansible.builtin.assert:
     that:
       - incorrect_mac_format is failed
       - incorrect_mac_format.msg is search('Incorrect MAC address format')
@@ -52,7 +52,7 @@
   register: incorrect_broadcast_address
 
 - name: Check error message
-  assert:
+  ansible.builtin.assert:
     that:
       - incorrect_broadcast_address is failed
       - incorrect_broadcast_address.msg is search('not known|Name does not resolve')

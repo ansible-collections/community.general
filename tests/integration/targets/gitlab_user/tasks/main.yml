@@ -38,7 +38,7 @@
   register: gitlab_user_state
 
 - name: Check user has been created correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is changed
 
@@ -55,7 +55,7 @@
   register: gitlab_user_state_again
 
 - name: Check state is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state_again is not changed
       - gitlab_user_state_again.user.is_admin == False
@@ -74,7 +74,7 @@
   register: gitlab_user_state
 
 - name: Check if user is admin now
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is changed
       - gitlab_user_state.user.is_admin == True
@@ -92,7 +92,7 @@
   register: gitlab_user_state
 
 - name: Check state is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is not changed
       - gitlab_user_state.user.is_admin == True
@@ -110,7 +110,7 @@
   register: gitlab_user_state
 
 - name: Check if user is not admin anymore
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is changed
       - gitlab_user_state.user.is_admin == False
@@ -129,7 +129,7 @@
   register: gitlab_user_state
 
 - name: Check that eMail is unchanged (Only works with confirmation skipping)
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is changed
       - gitlab_user_state.user.email == gitlab_user_email
@@ -147,7 +147,7 @@
   register: gitlab_user_state
 
 - name: Check that mail has changed now
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is changed
       - gitlab_user_state.user.email == 'foo@bar.baz'
@@ -165,7 +165,7 @@
   register: gitlab_user_state
 
 - name: Check state is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is not changed
       - gitlab_user_state.user.email == 'foo@bar.baz'
@@ -183,7 +183,7 @@
   register: gitlab_user_state
 
 - name: Check that reverting mail back to original has worked
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is changed
       - gitlab_user_state.user.email == gitlab_user_email
@@ -208,7 +208,7 @@
   register: gitlab_user_state
 
 - name: Check PW setting return state
-  assert:
+  ansible.builtin.assert:
     that:
         # note: there is no way to determine if a password has changed or
         #   not, so it can only be always yellow or always green, we
@@ -231,7 +231,7 @@
   register: gitlab_user_state
 
 - name: Check PW setting return state (Again)
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is not changed
 
@@ -250,7 +250,7 @@
   register: gitlab_user_state
 
 - name: Check PW setting return state (Reset)
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_state is not changed
 

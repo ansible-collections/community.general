@@ -29,7 +29,7 @@
         vdict: "{{ {'a': 'b', 1: 2} | community.general.to_yaml }}"
 
     - name: Check values
-      assert:
+      ansible.builtin.assert:
         that:
           - 'vstr == "foo\n"'
           - 'vvstr == "bar\n"'
@@ -54,7 +54,7 @@
         vdict: "{{ {'a': 'b', 1: 2} | community.general.to_nice_yaml }}"
 
     - name: Check values
-      assert:
+      ansible.builtin.assert:
         that:
           - 'vstr == "foo\n"'
           - 'vvstr == "bar\n"'
@@ -73,7 +73,7 @@
         complex_nice: "{{ foobar | community.general.to_nice_yaml }}"
         complex_nice_redact: "{{ foobar | community.general.to_nice_yaml(redact_sensitive_values=true) }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - complex == exp_complex
           - complex_redact == exp_complex_redact
@@ -121,7 +121,7 @@
             - "{{ foo }}"
 
     - when: ansible_version.full is version("2.19", "<")
-      assert:
+      ansible.builtin.assert:
         that:
           - complex == exp_complex
           # With ansible-core 2.18 and before, the vaulted string is decryped before it reaches the filter,
@@ -149,7 +149,7 @@
           foo: 123
 
     - when: ansible_version.full is version("2.19", ">=")
-      assert:
+      ansible.builtin.assert:
         that:
           - complex == exp_complex
           - complex_redact == exp_complex_redact

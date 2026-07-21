@@ -16,7 +16,7 @@
   register: print_match_result
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - print_match_result is not changed
       - print_match_result.matches | length == 3
@@ -32,7 +32,7 @@
   register: print_match_empty
 
 - name: Test expected result for no matches
-  assert:
+  ansible.builtin.assert:
     that:
       - print_match_empty is not changed
       - print_match_empty.matches | length == 0

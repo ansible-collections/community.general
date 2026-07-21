@@ -17,7 +17,7 @@
     state: file
 
 - name: Verify all files were archived - remove source files ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_remove_source_files is changed
       - "archive_remove_source_files.archived | length == 3"
@@ -39,7 +39,7 @@
   register: remove_files
 
 - name: Assert that source files were removed - remove source files ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_files is not changed
 
@@ -80,7 +80,7 @@
     state: file
 
 - name: Verify archive contains all files - remove source directory ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_remove_source_directory is changed
       - "archive_remove_source_directory.archived | length == 3"
@@ -98,7 +98,7 @@
   register: remove_dir
 
 - name: Verify source directory was removed - remove source directory ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - remove_dir is not changed
 
@@ -131,7 +131,7 @@
     state: file
 
 - name: Verify all files except excluded are archived - remove source excluding path ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_remove_source_excluding_path is changed
       - "archive_remove_source_excluding_path.archived | length == 2"
@@ -214,7 +214,7 @@
   register: archive_remove_nested_paths_status
 
 - name: Assert tasks status - remove source with nested paths ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - archive_remove_nested_paths is success
       - archive_remove_nested_paths_status is not changed

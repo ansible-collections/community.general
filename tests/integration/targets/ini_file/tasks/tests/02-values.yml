@@ -16,7 +16,7 @@
   ignore_errors: true
 
 - name: test-values 1 - verify error message
-  assert:
+  ansible.builtin.assert:
     that:
       - result1 is not changed
       - result1 is failed
@@ -33,7 +33,7 @@
   ignore_errors: true
 
 - name: test-values 2 - verify error message
-  assert:
+  ansible.builtin.assert:
     that:
       - result2 is not changed
       - result2 is failed
@@ -66,7 +66,7 @@
     content3: "{{ output_content.content | b64decode }}"
 
 - name: test-values 3 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result3 is changed
       - result3.msg == 'section and option added'
@@ -98,7 +98,7 @@
     content4: "{{ output_content.content | b64decode }}"
 
 - name: test-values 4 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result4 is changed
       - result4.msg == 'option changed'
@@ -131,7 +131,7 @@
     content5: "{{ output_content.content | b64decode }}"
 
 - name: test-values 5 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result5 is changed
       - result5.msg == 'option added'
@@ -150,7 +150,7 @@
   register: result6
 
 - name: test-values 6 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result6 is not changed
       - result6.msg == 'OK'
@@ -168,7 +168,7 @@
   register: result7
 
 - name: test-values 7 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result7 is not changed
       - result7.msg == 'OK'
@@ -186,7 +186,7 @@
   register: result8
 
 - name: test-values 8 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result8 is not changed
       - result8.msg == 'OK'
@@ -216,7 +216,7 @@
     content9: "{{ output_content.content | b64decode }}"
 
 - name: test-values 9 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result9 is changed
       - result9.msg == 'option changed'
@@ -247,7 +247,7 @@
 
 
 - name: test-values 10 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result10 is changed
       - result10.msg == 'option changed'
@@ -289,7 +289,7 @@
     content11: "{{ output_content.content | b64decode }}"
 
 - name: test-values 11 - assert 'changed' is true and content is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - result11 is changed
       - result11.msg == 'option added'
@@ -308,7 +308,7 @@
   register: result12
 
 - name: test-values 12 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result12 is not changed
       - result12.msg == 'OK'
@@ -341,7 +341,7 @@
     content13: "{{ output_content.content | b64decode }}"
 
 - name: test-values 13 - Verify content of ini file is as expected and ini_file 'changed' is true
-  assert:
+  ansible.builtin.assert:
     that:
       - result13 is changed
       - result13.msg == 'option added'
@@ -379,7 +379,7 @@
     content14: "{{ output_content.content | b64decode }}"
 
 - name: test-values 14 - assert 'changed' is true and content is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - result14 is changed
       - result14.msg == 'option added'
@@ -398,7 +398,7 @@
   register: result15
 
 - name: test-values 15 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result15 is not changed
       - result15.msg == 'OK'
@@ -416,7 +416,7 @@
   register: result16
 
 - name: test-values 16 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result16 is not changed
       - result16.msg == 'OK'
@@ -446,7 +446,7 @@
     content17: "{{ output_content.content | b64decode }}"
 
 - name: test-values 17 - assert 'changed' is true and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result17 is changed
       - result17.msg == 'option changed'
@@ -476,7 +476,7 @@
     content18: "{{ output_content.content | b64decode }}"
 
 - name: test-values 18 - assert 'changed' is true and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result18 is changed
       - result18.msg == 'option changed'
@@ -494,7 +494,7 @@
   register: result19
 
 - name: test-values 19 - Ensure unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result19 is not changed
       - result19.msg == 'OK'
@@ -524,7 +524,7 @@
     content20: "{{ output_content.content | b64decode }}"
 
 - name: test-values 20 - assert 'changed' is true and content is empty
-  assert:
+  ansible.builtin.assert:
     that:
       - result20 is changed
       - result20_remove_again is not changed
@@ -561,7 +561,7 @@
     content21: "{{ output_content.content | b64decode }}"
 
 - name: test-values 21 - assert 'changed' is true and content is OK
-  assert:
+  ansible.builtin.assert:
     that:
       - result21 is changed
       - result21.msg == 'section and option added'
@@ -622,7 +622,7 @@
     content22: "{{ output_content.content | b64decode }}"
 
 - name: test-values 22 - assert 'changed' is true and content is OK and option added
-  assert:
+  ansible.builtin.assert:
     that:
       - result22 is changed
       - result22.msg == 'option added'
@@ -665,7 +665,7 @@
     content23: "{{ output_content.content | b64decode }}"
 
 - name: test-values 23 - assert 'changed' and msg 'option changed' and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result23 is changed
       - result23.msg == 'option changed'
@@ -710,7 +710,7 @@
     content24: "{{ output_content.content | b64decode }}"
 
 - name: test-values 24 - assert 'changed' and msg 'option added' and content is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result24 is changed
       - result24.msg == 'option added'
@@ -748,7 +748,7 @@
     content25: "{{ output_content.content | b64decode }}"
 
 - name: test-values 25 - assert 'changed' is true and content is OK (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result25 is changed
       - result25.msg == 'option added'
@@ -781,7 +781,7 @@
     content26: "{{ output_content.content | b64decode }}"
 
 - name: test-values 26 - assert 'changed' is true and content is OK (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result26 is changed
       - result26.msg == 'option changed'
@@ -806,7 +806,7 @@
     content27: "{{ output_content.content | b64decode }}"
 
 - name: test-values 27 - assert changed (no section)
-  assert:
+  ansible.builtin.assert:
     that:
       - result27 is changed
       - result27.msg == 'option changed'
@@ -852,7 +852,7 @@
     content28: "{{ output_content.content | b64decode }}"
 
 - name: test-values 28 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - content28 == expected28
 
@@ -891,7 +891,7 @@
     content29: "{{ output_content.content | b64decode }}"
 
 - name: test-value 29 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result29 is changed
       - result29.msg == 'option changed'
@@ -934,7 +934,7 @@
     content30: "{{ output_content.content | b64decode }}"
 
 - name: test-value 30 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result30 is changed
       - result30.msg == 'option changed'
@@ -973,7 +973,7 @@
     content31: "{{ output_content.content | b64decode }}"
 
 - name: test-value 31 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result31 is changed
       - result31.msg == 'option changed'
@@ -1016,7 +1016,7 @@
     content32: "{{ output_content.content | b64decode }}"
 
 - name: test-value 32 - Verify content of ini file is as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - result32 is not changed
       - result32.msg == 'OK'

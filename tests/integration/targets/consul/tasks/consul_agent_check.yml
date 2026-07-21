@@ -17,7 +17,7 @@
 - set_fact:
     nginx_service: "{{result.service}}"
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.service.ID is defined
@@ -32,7 +32,7 @@
     service_id: "{{ nginx_service.ID }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.check is defined
@@ -55,7 +55,7 @@
     service_id: "{{ nginx_service.ID }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.check is defined
@@ -72,7 +72,7 @@
     service_id: "{{ nginx_service.ID }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result is not failed
@@ -87,7 +87,7 @@
     notes: "check"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.check is defined
@@ -101,7 +101,7 @@
     notes: "check"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.check is defined

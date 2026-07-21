@@ -20,7 +20,7 @@
   register: output
 
 - name: assert that test LDAP user can read its password
-  assert:
+  ansible.builtin.assert:
     that:
       - output is not failed
       - output.results | length == 1
@@ -40,7 +40,7 @@
   register: output
 
 - name: assert that test LDAP user can read its password
-  assert:
+  ansible.builtin.assert:
     that:
       - output is not failed
       - output.results | length == 1

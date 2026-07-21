@@ -33,7 +33,7 @@
   register: gitlab_group_state
 
 - name: Test group created
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_group_state is changed
 
@@ -49,7 +49,7 @@
   register: gitlab_group_state_again
 
 - name: Test module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_group_state_again is not changed
 
@@ -74,7 +74,7 @@
   register: gitlab_group_state_desc
 
 - name: Test group created with Description
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_group_state_desc.group.description == "My Test Group"
 
@@ -99,7 +99,7 @@
   register: gitlab_group_state_pcl
 
 - name: Test group created with project_creation_level
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_group_state_pcl.group.project_creation_level == "noone"
 
@@ -124,6 +124,6 @@
   register: gitlab_group_state_rtfa
 
 - name: Test group created with project_creation_level
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_group_state_rtfa.group.require_two_factor_authentication == true

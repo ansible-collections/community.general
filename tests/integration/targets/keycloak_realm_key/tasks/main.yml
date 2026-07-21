@@ -41,7 +41,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -74,7 +74,7 @@
   register: result
 
 - name: Assert that realm key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -106,7 +106,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -139,7 +139,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -173,7 +173,7 @@
   register: result
 
 - name: Assert that realm key was updated
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -206,7 +206,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -239,7 +239,7 @@
   register: result
 
 - name: Assert that forced update ran correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -270,7 +270,7 @@
   register: result
 
 - name: Assert that realm key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -292,7 +292,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}
@@ -317,7 +317,7 @@
   register: result
 
 - name: Assert that realm key with custom certificate was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -350,7 +350,7 @@
   register: result
 
 - name: Assert that nothing has changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -388,7 +388,7 @@
   register: result
 
 - name: Assert HMAC key would be created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -417,7 +417,7 @@
   register: result
 
 - name: Assert HMAC key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -447,7 +447,7 @@
   register: result
 
 - name: Assert HMAC key is in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key hmac-test-key was in sync"
@@ -471,7 +471,7 @@
   register: result
 
 - name: Assert HMAC key was updated
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.config.priority == ["110"]
@@ -492,7 +492,7 @@
   register: result
 
 - name: Assert HMAC key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -520,7 +520,7 @@
   register: result
 
 - name: Assert AES key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -547,7 +547,7 @@
   register: result
 
 - name: Assert AES key is in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key aes-test-key was in sync"
@@ -567,7 +567,7 @@
   register: result
 
 - name: Assert AES key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.msg == "Realm key aes-test-key deleted"
@@ -595,7 +595,7 @@
   register: result
 
 - name: Assert ECDSA key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -624,7 +624,7 @@
   register: result
 
 - name: Assert ECDSA key is in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key ecdsa-test-key was in sync"
@@ -644,7 +644,7 @@
   register: result
 
 - name: Assert ECDSA key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.msg == "Realm key ecdsa-test-key deleted"
@@ -672,7 +672,7 @@
   register: result
 
 - name: Assert RSA generated key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -701,7 +701,7 @@
   register: result
 
 - name: Assert RSA generated key is in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key rsa-gen-test-key was in sync"
@@ -721,7 +721,7 @@
   register: result
 
 - name: Assert RSA generated key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.msg == "Realm key rsa-gen-test-key deleted"
@@ -747,7 +747,7 @@
   register: result
 
 - name: Assert default hmac-generated key was updated
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.config.priority == ["150"]
@@ -767,7 +767,7 @@
   register: result
 
 - name: Assert default hmac-generated key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -796,7 +796,7 @@
   register: result
 
 - name: Assert RSA encryption key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -825,7 +825,7 @@
   register: result
 
 - name: Assert RSA encryption key is in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key rsa-enc-gen-test-key was in sync"
@@ -845,7 +845,7 @@
   register: result
 
 - name: Assert RSA encryption key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.msg == "Realm key rsa-enc-gen-test-key deleted"
@@ -873,7 +873,7 @@
   register: result
 
 - name: Assert ECDH key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -902,7 +902,7 @@
   register: result
 
 - name: Assert ECDH key is in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key ecdh-test-key was in sync"
@@ -922,7 +922,7 @@
   register: result
 
 - name: Assert ECDH key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.msg == "Realm key ecdh-test-key deleted"
@@ -949,7 +949,7 @@
   register: result
 
 - name: Assert EdDSA key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -976,7 +976,7 @@
   register: result
 
 - name: Assert EdDSA key is in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key eddsa-test-key was in sync"
@@ -996,7 +996,7 @@
   register: result
 
 - name: Assert EdDSA key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.msg == "Realm key eddsa-test-key deleted"
@@ -1030,7 +1030,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore key would be created (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -1064,7 +1064,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -1101,7 +1101,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore key is in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key jks-test-key was in sync"
@@ -1129,7 +1129,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore key was updated
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.config.priority == ["110"]
@@ -1152,7 +1152,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -1186,7 +1186,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore key was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -1221,7 +1221,7 @@
 # for the config comparison (passwords are excluded from comparison).
 # The key difference is: always sends real passwords, on_create sends masked values.
 - name: Assert java-keystore key is in sync (no config changes detected)
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key jks-update-pw-test was in sync"
@@ -1265,7 +1265,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore key was created with on_create mode
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -1296,7 +1296,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore key is idempotent with on_create mode
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.msg == "Realm key jks-update-pw-test was in sync"
@@ -1325,7 +1325,7 @@
   when: test_keystore_path is defined
 
 - name: Assert priority was updated but passwords preserved
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.config.priority == ["110"]
@@ -1348,7 +1348,7 @@
   when: test_keystore_path is defined
 
 - name: Assert java-keystore update_password test key was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}

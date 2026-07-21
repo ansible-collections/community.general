@@ -12,7 +12,7 @@
         key_inexistent: "{{ lookup('community.general.etcd3', 'inexistent_key') }}"
 
     - name: 'Check etcd values'
-      assert:
+      ansible.builtin.assert:
         msg: 'unexpected etcd3 values'
         that:
           - etcdoutkey1 is sequence

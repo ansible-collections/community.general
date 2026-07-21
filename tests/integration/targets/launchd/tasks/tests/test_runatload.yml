@@ -14,7 +14,7 @@
   register: test_1_launchd_start_result
 
 - name: "[{{ item }}] Validate that service was started"
-  assert:
+  ansible.builtin.assert:
     that:
       - test_1_launchd_start_result is success
       - test_1_launchd_start_result is changed

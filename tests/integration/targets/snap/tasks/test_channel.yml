@@ -37,7 +37,7 @@
     state: absent
   register: remove_wisdom
 
-- assert:
+- ansible.builtin.assert:
     that:
       - install_wisdom is changed
       - install_wisdom_chan is changed
@@ -70,7 +70,7 @@
     state: absent
   register: remove_shellcheck
 
-- assert:
+- ansible.builtin.assert:
     that:
       - install_shellcheck is changed
       - install_shellcheck_chan is changed

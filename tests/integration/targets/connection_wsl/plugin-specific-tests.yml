@@ -19,13 +19,13 @@
       register: empty_file_stat
 
     - name: verify file without content exists
-      assert:
+      ansible.builtin.assert:
         that:
           - empty_file_stat.stat.exists
         fail_msg: "The file {{ remote_tmp }}/test_empty.txt does not exist."
 
     - name: verify file without content is empty
-      assert:
+      ansible.builtin.assert:
         that:
           - empty_file_stat.stat.size == 0
         fail_msg: "The file {{ remote_tmp }}/test_empty.txt is not empty."

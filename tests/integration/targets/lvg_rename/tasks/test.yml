@@ -16,7 +16,7 @@
   changed_when: false
 
 - name: Assert that renaming a VG is changed - check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - check_mode_vg_rename is changed
 
@@ -27,7 +27,7 @@
   register: vg_renamed
 
 - name: Assert that renaming a VG is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - vg_renamed is changed
 
@@ -57,7 +57,7 @@
   register: vg_renamed_again
 
 - name: Assert that renaming a VG again is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - check_mode_vg_renamed_again is not changed
       - vg_renamed_again is not changed
@@ -78,7 +78,7 @@
   register: ne_vg_rename
 
 - name: Assert that renaming a no-existing VG failed
-  assert:
+  ansible.builtin.assert:
     that:
       - check_mode_ne_vg_rename is failed
       - ne_vg_rename is failed
@@ -99,7 +99,7 @@
   register: vg_rename_collision
 
 - name: Assert that renaming to an existing VG name failed
-  assert:
+  ansible.builtin.assert:
     that:
       - check_mode_vg_rename_collision is failed
       - vg_rename_collision is failed

@@ -25,7 +25,7 @@
   ignore_errors: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed
       - iptables_state.msg is match("Invalid options")
@@ -39,7 +39,7 @@
   ignore_errors: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed
       - iptables_state.msg is match("missing required arguments")
@@ -53,7 +53,7 @@
   ignore_errors: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed
       - iptables_state.msg is match("missing required arguments")
@@ -68,7 +68,7 @@
   ignore_errors: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed
       - iptables_state.msg is match("value of state must be one of")
@@ -89,7 +89,7 @@
   check_mode: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is changed
       - iptables_state.initial_state == iptables_state.saved
@@ -103,7 +103,7 @@
   register: iptables_state
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is changed
       - iptables_state.initial_state == iptables_state.saved
@@ -117,7 +117,7 @@
   register: iptables_state
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is not changed
       - iptables_state.initial_state == iptables_state.saved
@@ -132,7 +132,7 @@
   check_mode: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is not changed
       - iptables_state.initial_state == iptables_state.saved
@@ -153,7 +153,7 @@
       check_mode: true
 
     - name: "assert that results are as expected"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is not changed
           - iptables_state.initial_state == iptables_state.restored
@@ -161,7 +161,7 @@
 
   rescue:
     - name: "assert that results are not as expected for only one reason (xtables lock)"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is failed
           - iptables_state.stderr is search('xtables lock')
@@ -178,7 +178,7 @@
       register: iptables_state
 
     - name: "assert that results are as expected"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is not changed
           - iptables_state.initial_state == iptables_state.restored
@@ -186,7 +186,7 @@
 
   rescue:
     - name: "assert that results are not as expected for only one reason (xtables lock)"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is failed
           - iptables_state.stderr is search('xtables lock')
@@ -210,7 +210,7 @@
       check_mode: true
 
     - name: "assert that results are as expected"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is changed
           - iptables_state.initial_state != iptables_state.restored
@@ -218,7 +218,7 @@
 
   rescue:
     - name: "assert that results are not as expected for only one reason (xtables lock)"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is failed
           - iptables_state.stderr is search('xtables lock')
@@ -237,7 +237,7 @@
       poll: 0
 
     - name: "assert that results are as expected"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is changed
           - iptables_state.initial_state != iptables_state.restored
@@ -246,7 +246,7 @@
 
   rescue:
     - name: "assert that results are not as expected for only one reason (xtables lock)"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is failed
           - iptables_state.stderr is search('xtables lock')
@@ -265,7 +265,7 @@
       poll: 0
 
     - name: "assert that results are as expected"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is not changed
           - iptables_state.initial_state == iptables_state.restored
@@ -273,7 +273,7 @@
 
   rescue:
     - name: "assert that results are not as expected for only one reason (xtables lock)"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is failed
           - iptables_state.stderr is search('xtables lock')
@@ -291,7 +291,7 @@
       check_mode: true
 
     - name: "assert that results are as expected"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is not changed
           - iptables_state.initial_state == iptables_state.restored
@@ -299,7 +299,7 @@
 
   rescue:
     - name: "assert that results are not as expected for only one reason (xtables lock)"
-      assert:
+      ansible.builtin.assert:
         that:
           - iptables_state is failed
           - iptables_state.stderr is search('xtables lock')

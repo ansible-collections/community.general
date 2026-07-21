@@ -29,7 +29,7 @@
   register: result
 
 - name: Assert that network is created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -55,7 +55,7 @@
   register: result
 
 - name: Assert that network is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -80,7 +80,7 @@
   register: result
 
 - name: Assert that network is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -96,7 +96,7 @@
   register: result
 
 - name: Assert that network is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -110,7 +110,7 @@
   register: result
 
 - name: Assert that network was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -126,7 +126,7 @@
   ignore_errors: true
 
 - name: Assert that it failed because network is missing
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
 
@@ -152,7 +152,7 @@
   ignore_errors: true
 
 - name: Assert that it failed because name is required for initial creation
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
 
@@ -168,6 +168,6 @@
   ignore_errors: true
 
 - name: Assert that it failed because you can use only one at the time
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed

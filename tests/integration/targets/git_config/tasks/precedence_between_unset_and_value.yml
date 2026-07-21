@@ -20,7 +20,7 @@
   register: get_result
 
 - name: assert unset changed and deleted value
-  assert:
+  ansible.builtin.assert:
     that:
       - unset_result is changed
       - unset_result.diff.before == option_value + "\n"

@@ -46,7 +46,7 @@
   # command: diff -u {{ role_path }}/results/test-set-namespaced-element-value.xml /tmp/ansible-xml-namespaced-beers.xml
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - set_element_first_run is changed
       - set_element_second_run is not changed

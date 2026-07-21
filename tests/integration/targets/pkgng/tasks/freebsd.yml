@@ -27,7 +27,7 @@
   register: pkgng_example2
 
 - name: Ensure pkgng does not upgrade up-to-date package
-  assert:
+  ansible.builtin.assert:
     that:
       - not pkgng_example2.changed
 
@@ -69,7 +69,7 @@
   register: pkgng_example3_stat_after
 
 - name: Ensure pkgng installs package correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - pkgng_example3_stat_before.stat.exists
       - pkgng_example3_stat_before.stat.executable
@@ -132,7 +132,7 @@
         state: absent
 
     - name: Ensure pkgng upgrades package correctly
-      assert:
+      ansible.builtin.assert:
         that:
           - not pkgng_example4_prepare.failed
           - pkgng_example4_wildcard_checkmode.changed
@@ -171,7 +171,7 @@
         state: absent
 
     - name: Ensure pkgng upgrades package correctly
-      assert:
+      ansible.builtin.assert:
         that:
           - not pkgng_example4_nopower_prepare.failed
           - pkgng_example4_nopower_wildcard.failed
@@ -204,7 +204,7 @@
   register: pkgng_example5_cleanup
 
 - name: Ensure pkgng installs multiple packages with one command
-  assert:
+  ansible.builtin.assert:
     that:
       - not pkgng_example5_prepare.changed
       - pkgng_example5.changed
@@ -246,7 +246,7 @@
   register: pkgng_example6_cleanup
 
 - name: Ensure pkgng installs multiple packages with one command
-  assert:
+  ansible.builtin.assert:
     that:
       - not pkgng_example6_check.changed
       - not pkgng_example6_prepare.failed
@@ -293,7 +293,7 @@
       register: pkgng_example7_cleanup
 
     - name: Ensure pkgng autoremove works correctly
-      assert:
+      ansible.builtin.assert:
         that:
           - pkgng_example7_prepare_install is changed
           - "'autoremoved' is in(pkgng_example7.msg)"
@@ -365,7 +365,7 @@
   register: pkgng_example8_remove_annotation_verify
 
 - name: Ensure pkgng annotations on single packages work correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - pkgng_example8_add_annotation.changed
       - pkgng_example8_add_annotation_failure.failed
@@ -433,7 +433,7 @@
   # ```
 
 - name: Ensure multiple annotations work correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - pkgng_example9_add_annotation.changed
       - '(pkgng_example9_add_annotation_verify.stdout_lines | select("match",  "ansibletest_example9_[12]\s*:\s*added") | list | count) == 2'
@@ -463,7 +463,7 @@
   register: pkgng_example8_invalid_annotation_verify
 
 - name: Ensure invalid annotate strings fail safely
-  assert:
+  ansible.builtin.assert:
     that:
       # Invalid strings should not change anything
       - '(pkgng_example8_invalid_annotation_failure.results | selectattr("changed") | list | count) == 0'
@@ -489,7 +489,7 @@
   register: pkgng_example10_invalid_pkgsite_failure
 
 - name: Ensure invalid pkgsite fails as expected
-  assert:
+  ansible.builtin.assert:
     that:
       - pkgng_example10_invalid_pkgsite_failure.failed
       - 'pkgng_example10_invalid_pkgsite_failure.stdout is search("^No repositories are enabled.", multiline=True)'

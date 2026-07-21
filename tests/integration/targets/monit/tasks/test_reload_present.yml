@@ -10,7 +10,7 @@
   register: result
 
 - name: check that state is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is success
       - result is changed
@@ -67,7 +67,7 @@
   register: result
 
 - name: check that state is unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - result is success
       - result is not changed

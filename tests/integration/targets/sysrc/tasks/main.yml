@@ -43,7 +43,7 @@
       register: sysrc_example1_content
 
     - name: Ensure sysrc updates rc.conf properly
-      assert:
+      ansible.builtin.assert:
         that:
           - sysrc_example1.changed
           - sysrc_example1_checkmode.changed
@@ -84,7 +84,7 @@
       register: sysrc_example2_content
 
     - name: Ensure sysrc did not change the file, but marked as changed
-      assert:
+      ansible.builtin.assert:
         that:
           - sysrc_example2.changed
           - sysrc_example2_checkmode.changed
@@ -127,7 +127,7 @@
       register: sysrc_example3_content
 
     - name: Ensure sysrc did not change the file, but marked as changed
-      assert:
+      ansible.builtin.assert:
         that:
           - sysrc_example3.changed
           - sysrc_example3_checkmode.changed
@@ -176,7 +176,7 @@
           register: sysrc_example4_content
 
         - name: Ensure sysrc worked in testjail
-          assert:
+          ansible.builtin.assert:
             that:
               - sysrc_example4.changed
               - sysrc_example4_checkmode.changed
@@ -220,7 +220,7 @@
       register: sysrc_absent_content
 
     - name: Ensure sysrc did as intended
-      assert:
+      ansible.builtin.assert:
         that:
           - sysrc_absent_checkmode.changed
           - sysrc_absent.changed
@@ -273,7 +273,7 @@
       register: sysrc_delim_content
 
     - name: Ensure sysrc did as intended
-      assert:
+      ansible.builtin.assert:
         that:
           - sysrc_delim_create.changed
           - sysrc_delim.changed
@@ -323,7 +323,7 @@
       register: sysrc_delim_content
 
     - name: Ensure sysrc did as intended with value_absent
-      assert:
+      ansible.builtin.assert:
         that:
           - not sysrc_value_absent_ignored.changed
           - sysrc_value_absent.changed
@@ -360,7 +360,7 @@
         - name: Ensure sysrc did as intended with values that contains equals sign
           vars:
             conf: "{{ sysrc_content.stdout | from_yaml }}"
-          assert:
+          ansible.builtin.assert:
             that:
               - "value_1 == sysrc_equals_sign_1.value"
               - sysrc_equals_sign_2.changed
@@ -413,7 +413,7 @@
       register: sysrc_10394_content
 
     - name: Ensure sysrc changed k1 from v1 to v2
-      assert:
+      ansible.builtin.assert:
         that:
           - sysrc_10394_changed.changed
           - >

@@ -29,7 +29,7 @@
         - uninstall black
 
     - name: Check the black service is installed
-      assert:
+      ansible.builtin.assert:
         that:
           - install_result is success
 
@@ -42,7 +42,7 @@
         HOMEBREW_NO_ENV_HINTS: "1"
 
     - name: Check the black service is running
-      assert:
+      ansible.builtin.assert:
         that:
           - start_result is success
 
@@ -55,7 +55,7 @@
         HOMEBREW_NO_ENV_HINTS: "1"
 
     - name: Check for idempotency
-      assert:
+      ansible.builtin.assert:
         that:
           - start_result.changed == 0
 
@@ -68,7 +68,7 @@
         HOMEBREW_NO_ENV_HINTS: "1"
 
     - name: Check the black service is restarted
-      assert:
+      ansible.builtin.assert:
         that:
           - restart_result is success
 
@@ -81,6 +81,6 @@
         HOMEBREW_NO_ENV_HINTS: "1"
 
     - name: Check the black service is stopped
-      assert:
+      ansible.builtin.assert:
         that:
           - stop_result is success

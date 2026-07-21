@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test json_query filter
-  assert:
+  ansible.builtin.assert:
     that:
       - >-
         users | community.general.json_query('[*].hosts[].host') == ['host_a', 'host_b', 'host_c', 'host_d']

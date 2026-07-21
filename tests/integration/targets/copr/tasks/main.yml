@@ -21,7 +21,7 @@
       register: result
 
     - name: assert that the copr project was enabled
-      assert:
+      ansible.builtin.assert:
         that:
           - 'result is changed'
           - result.msg == 'enabled'
@@ -36,7 +36,7 @@
       register: result
 
     - name: assert that the copr project was enabled
-      assert:
+      ansible.builtin.assert:
         that:
           - result is not changed
           - result.msg == 'enabled'
@@ -91,7 +91,7 @@
       register: result
 
     - name: assert that the copr project was removed
-      assert:
+      ansible.builtin.assert:
         that:
           - 'result is changed'
           - result.msg == 'absent'
@@ -113,7 +113,7 @@
       register: result
 
     - name: assert that the copr project was disabled
-      assert:
+      ansible.builtin.assert:
         that:
           - 'result is changed'
           - result.msg == 'disabled'

@@ -58,7 +58,7 @@
   register: create_result
 
 - name: Assert user is created
-  assert:
+  ansible.builtin.assert:
     that:
       - create_result.changed
       - create_result.end_state.username == 'test'
@@ -96,7 +96,7 @@
     user_info_with_groups: "{{ [user_infos.users[0] | combine({'groups': ['test', 'test2']}), user_infos.users[1] | combine({'groups': []}) ] }}"
 
 - name: Assert user info is returned correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - not user_infos.changed
       - " user_info_with_groups == [create_result.end_state, create_result2.end_state]"

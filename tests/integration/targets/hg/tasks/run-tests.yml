@@ -24,7 +24,7 @@
 - shell: ls {{ checkout_dir }}
 
 - name: verify information about the initial clone
-  assert:
+  ansible.builtin.assert:
     that:
       - "'before' in hg_result"
       - "'after' in hg_result"
@@ -50,13 +50,13 @@
   register: branches
 
 - name: assert presence of tags/trunk/branches
-  assert:
+  ansible.builtin.assert:
     that:
       - "hg_tags.stat.isreg"
       - "branches.stat.isreg"
 
 - name: verify on a re-clone things are marked unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - "not hg_result2.changed"
 
@@ -69,7 +69,7 @@
   ignore_errors: true
 
 - name: Verify result of non-existent repo clone
-  assert:
+  ansible.builtin.assert:
     that:
       - "'abort: HTTP Error' in hg_result3.msg"
       - "not hg_result3.changed"

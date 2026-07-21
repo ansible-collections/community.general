@@ -28,7 +28,7 @@
   vars:
     actual_content: "{{ output_content.content | b64decode }}"
     expected_content: "[foo]\nbar = frelt\n"
-  assert:
+  ansible.builtin.assert:
     that:
       - actual_content == expected_content
       - result is changed
@@ -57,7 +57,7 @@
   vars:
     actual_content: "{{ output_content.content | b64decode }}"
     expected_content: "[foo]\nbar = frelt\n"
-  assert:
+  ansible.builtin.assert:
     that:
       - actual_content == expected_content
       - result is changed
@@ -86,7 +86,7 @@
   vars:
     actual_content: "{{ output_content.content | b64decode }}"
     expected_content: "[foo]\nbar=baz\n"
-  assert:
+  ansible.builtin.assert:
     that:
       - actual_content == expected_content
       - result is not changed
@@ -116,7 +116,7 @@
   vars:
     actual_content: "{{ output_content.content | b64decode }}"
     expected_content: "[foo]\nbar = baz\n"
-  assert:
+  ansible.builtin.assert:
     that:
       - actual_content == expected_content
       - result is not changed

@@ -13,7 +13,7 @@
     - { module: mpm_event, state: absent }
     - { module: mpm_prefork, state: present }
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "'warnings' in disable_mpm_modules"
       - disable_mpm_modules["warnings"] == [
@@ -42,6 +42,6 @@
     - { module: mpm_event, state: absent }
     - { module: mpm_prefork, state: present }
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "'warnings' not in disable_mpm_modules"

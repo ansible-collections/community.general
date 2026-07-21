@@ -45,7 +45,7 @@
       register: result
       until: result is success
       when: ansible_facts.distribution != "MacOSX"
-    - assert:
+    - ansible.builtin.assert:
         that: ansible_facts.architecture in ['i386', 'x86_64', 'amd64', 'arm64', 'aarch64']
     - set_fact:
         consul_arch: '386'

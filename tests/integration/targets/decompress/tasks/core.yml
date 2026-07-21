@@ -21,7 +21,7 @@
   register: decompressed_file_stat
 
 - name: Check that file was decompressed correctly ({{ format }} test)
-  assert:
+  ansible.builtin.assert:
     that:
       - first_decompression.changed
       - decompressed_file_stat.stat.exists

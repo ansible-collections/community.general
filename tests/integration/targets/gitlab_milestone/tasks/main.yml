@@ -43,7 +43,7 @@
       register: gitlab_group_milestone_state
 
     - name: Group milestone - Check_mode state must be changed
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_milestone_state is changed
 
@@ -69,7 +69,7 @@
       register: gitlab_group_milestone_create
 
     - name: Group milestone - Test milestone Created
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_milestone_create is changed
           - gitlab_group_milestone_create.milestones.added|length == 2
@@ -92,7 +92,7 @@
       register: gitlab_group_milestone_create_idempotence
 
     - name: Group milestone - Test Create milestone is Idempotent
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_milestone_create_idempotence is not changed
 
@@ -109,7 +109,7 @@
       register: gitlab_group_milestone_update
 
     - name: Group milestone - Test milestone Updated
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_milestone_update.milestones.added|length == 0
           - gitlab_group_milestone_update.milestones.untouched|length == 0
@@ -129,7 +129,7 @@
       register: gitlab_group_milestone_update_additions
 
     - name: Group milestone - Test milestone Updated ( Additions )
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_milestone_update_additions.milestones.added|length == 0
           - gitlab_group_milestone_update_additions.milestones.untouched|length == 0
@@ -148,7 +148,7 @@
       register: gitlab_group_milestone_delete
 
     - name: Group milestone - Test milestone is deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_milestone_delete is changed
           - gitlab_group_milestone_delete.milestones.added|length == 0
@@ -169,7 +169,7 @@
       register: gitlab_group_milestone_create_purging
 
     - name: Group milestone - Test milestone Created again
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_group_milestone_create_purging is changed
           - gitlab_group_milestone_create_purging.milestones.added|length == 1
@@ -220,7 +220,7 @@
       register: gitlab_first_milestone_state
 
     - name: Check_mode state must be changed
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_milestone_state is changed
 
@@ -238,7 +238,7 @@
       register: gitlab_milestones_create
 
     - name: Test milestone Created
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_milestones_create is changed
           - gitlab_milestones_create.milestones.added|length == 2
@@ -261,7 +261,7 @@
       register: gitlab_first_milestone_create_idempotence
 
     - name: Test Create milestone is Idempotent
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_milestone_create_idempotence is not changed
 
@@ -278,7 +278,7 @@
       register: gitlab_first_milestone_update
 
     - name: Test milestone Updated
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_milestone_update.milestones.added|length == 0
           - gitlab_first_milestone_update.milestones.untouched|length == 0
@@ -298,7 +298,7 @@
       register: gitlab_first_milestone_update_additions
 
     - name: Test milestone Updated ( Additions )
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_milestone_update_additions.milestones.added|length == 0
           - gitlab_first_milestone_update_additions.milestones.untouched|length == 0
@@ -317,7 +317,7 @@
       register: gitlab_first_milestone_delete
 
     - name: Test milestone is deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_milestone_delete is changed
           - gitlab_first_milestone_delete.milestones.added|length == 0
@@ -338,7 +338,7 @@
       register: gitlab_first_milestone_create_purging
 
     - name: Test milestone Created again
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_milestone_create_purging is changed
           - gitlab_first_milestone_create_purging.milestones.added|length == 1
@@ -362,7 +362,7 @@
       register: gitlab_first_milestone_always_delete
 
     - name: Test milestone are deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_first_milestone_always_delete is changed
           - gitlab_first_milestone_always_delete.milestones.added|length == 0

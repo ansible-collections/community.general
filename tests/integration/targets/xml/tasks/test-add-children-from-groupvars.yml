@@ -28,7 +28,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - add_children_from_groupvars is changed
       - comparison is not changed  # identical

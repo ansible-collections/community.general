@@ -25,7 +25,7 @@
 - debug: var=security_group_creation
 
 - name: Ensure security groups check facts is success
-  assert:
+  ansible.builtin.assert:
     that:
       - security_group_creation is success
       - security_group_creation is changed
@@ -47,7 +47,7 @@
     - debug: var=security_group_creation
 
     - name: Ensure security groups facts is success
-      assert:
+      ansible.builtin.assert:
         that:
           - security_group_creation is success
           - security_group_creation is changed
@@ -68,7 +68,7 @@
     - debug: var=security_group_creation
 
     - name: Ensure security groups duplicate facts is success
-      assert:
+      ansible.builtin.assert:
         that:
           - security_group_creation is success
           - security_group_creation is not changed
@@ -90,7 +90,7 @@
     - debug: var=security_group_deletion
 
     - name: Ensure security groups delete check facts is success
-      assert:
+      ansible.builtin.assert:
         that:
           - security_group_deletion is success
           - security_group_deletion is changed
@@ -112,7 +112,7 @@
     - debug: var=security_group_deletion
 
     - name: Ensure security groups delete facts is success
-      assert:
+      ansible.builtin.assert:
         that:
           - security_group_deletion is success
           - security_group_deletion is changed
@@ -133,7 +133,7 @@
 - debug: var=security_group_deletion
 
 - name: Ensure security groups delete duplicate facts is success
-  assert:
+  ansible.builtin.assert:
     that:
       - security_group_deletion is success
       - security_group_deletion is not changed

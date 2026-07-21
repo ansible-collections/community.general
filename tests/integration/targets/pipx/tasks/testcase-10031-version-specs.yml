@@ -51,7 +51,7 @@
   register: uninstall_tox_final
 
 - name: Check version specifier assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - install_tox_version is changed
       - "'tox' in install_tox_version.application"
@@ -77,7 +77,7 @@
       ignore_errors: true
 
     - name: Check version specifier assertions
-      assert:
+      ansible.builtin.assert:
         that:
           - install_tox_invalid is failed
           - "'Invalid package specification' in install_tox_invalid.msg"

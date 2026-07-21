@@ -11,7 +11,7 @@
   register: get_element_attribute
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - get_element_attribute is not changed
       - get_element_attribute.count == 1
@@ -26,7 +26,7 @@
   register: get_element_text
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - get_element_text is not changed
       - get_element_text.count == 1

@@ -39,7 +39,7 @@
     state: absent
 
 - name: Check assertions
-  assert:
+  ansible.builtin.assert:
     that:
       - install_version is changed
       - install_version_idem is not changed

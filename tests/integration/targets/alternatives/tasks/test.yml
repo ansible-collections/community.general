@@ -15,7 +15,7 @@
       register: alternative
 
     - name: check expected command was executed
-      assert:
+      ansible.builtin.assert:
         that:
           - 'alternative is successful'
           - 'alternative is changed'
@@ -29,7 +29,7 @@
       register: alternative
 
     - name: check expected command was executed
-      assert:
+      ansible.builtin.assert:
         that:
           - 'alternative is successful'
           - 'alternative is changed'
@@ -40,7 +40,7 @@
   register: cmd
 
 - name: check expected command was executed
-  assert:
+  ansible.builtin.assert:
     that:
       - 'cmd.stdout == "dummy" ~ item'
 

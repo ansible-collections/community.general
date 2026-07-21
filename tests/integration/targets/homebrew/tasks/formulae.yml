@@ -28,7 +28,7 @@
 #   environment:
 #     HOMEBREW_NO_AUTO_UPDATE: True
 
-# - assert:
+# - ansible.builtin.assert:
 #     that:
 #       - upgrade_option_result.changed
 
@@ -51,7 +51,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Package installed: gnu-tar'"
@@ -66,7 +66,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is not changed
           - "package_result.msg == 'Package already installed: gnu-tar'"
@@ -81,7 +81,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Package unlinked: gnu-tar'"
@@ -96,7 +96,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Package linked: gnu-tar'"
@@ -111,7 +111,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Package uninstalled: gnu-tar'"
@@ -126,7 +126,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is not changed
           - "package_result.msg == 'Package already uninstalled: gnu-tar'"
@@ -141,7 +141,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Package upgraded: gnu-tar'"
@@ -156,7 +156,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is not changed
           - "package_result.msg == 'Package already upgraded: gnu-tar'"
@@ -191,7 +191,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Changed: 1, Unchanged: 1'"
@@ -206,7 +206,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is not changed
           - "package_result.msg == 'Changed: 0, Unchanged: 2'"
@@ -221,7 +221,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Changed: 2, Unchanged: 0'"
@@ -236,7 +236,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Changed: 2, Unchanged: 0'"
@@ -251,7 +251,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Changed: 2, Unchanged: 0'"
@@ -266,7 +266,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is not changed
           - "package_result.msg == 'Changed: 0, Unchanged: 2'"
@@ -281,7 +281,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - "package_result.msg == 'Changed: 2, Unchanged: 0'"
@@ -296,7 +296,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is not changed
           - "package_result.msg == 'Changed: 0, Unchanged: 2'"
@@ -325,7 +325,7 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - terraform_install_result is changed
           - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
@@ -349,7 +349,7 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - terraform_install_result is changed
           - "terraform_install_result.msg == 'Package upgraded: hashicorp/tap/terraform'"
@@ -378,7 +378,7 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - ascii_install_result is changed
           - "ascii_install_result.msg == 'Package upgraded: thezoraiz/ascii-image-converter/ascii-image-converter'"
@@ -393,7 +393,7 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - ascii_reinstall_result is not changed
           - "ascii_reinstall_result.msg == 'Package already upgraded: thezoraiz/ascii-image-converter/ascii-image-converter'"
@@ -408,7 +408,7 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - ascii_uninstall_result is changed
           - "ascii_uninstall_result.msg == 'Package uninstalled: thezoraiz/ascii-image-converter/ascii-image-converter'"
@@ -424,7 +424,7 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - ascii_again_uninstall_result is not changed
           - "ascii_again_uninstall_result.msg == 'Package already uninstalled: thezoraiz/ascii-image-converter/ascii-image-converter'"
@@ -439,7 +439,7 @@
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - ascii_install_result is changed
           - "ascii_install_result.msg == 'Package upgraded: ascii-image-converter'"

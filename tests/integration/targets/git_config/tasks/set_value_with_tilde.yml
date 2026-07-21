@@ -28,7 +28,7 @@
   register: get_result
 
 - name: assert set changed and value is correct
-  assert:
+  ansible.builtin.assert:
     that:
       - set_result1 is changed
       - set_result2 is not changed

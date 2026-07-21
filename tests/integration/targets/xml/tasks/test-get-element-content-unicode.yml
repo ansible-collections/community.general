@@ -17,7 +17,7 @@
   register: get_element_attribute
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - get_element_attribute is not changed
       - get_element_attribute.matches[0]['rating'] is defined and get_element_attribute.matches[0]['rating']['subjective'] == 'да'
@@ -30,7 +30,7 @@
   register: get_element_text
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - get_element_text is not changed
       - get_element_text.matches[0]['rating'] == 'десять'

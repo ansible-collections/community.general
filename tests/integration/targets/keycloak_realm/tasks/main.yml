@@ -50,7 +50,7 @@
   register: result
 
 - name: Assert result
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.clientSessionIdleTimeout == 240
@@ -87,7 +87,7 @@
   register: result
 
 - name: Assert result
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state.clientSessionIdleTimeout == 240

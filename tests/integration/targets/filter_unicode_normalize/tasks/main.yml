@@ -9,14 +9,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test 'NFC' normalization
-  assert:
+  ansible.builtin.assert:
     that:
       - u_umlaut != u_umlaut_combining
       - u_umlaut_combining != (u_umlaut_combining | community.general.unicode_normalize)
       - u_umlaut == (u_umlaut_combining | community.general.unicode_normalize)
 
 - name: Test 'NFKC' normalization
-  assert:
+  ansible.builtin.assert:
     that:
       - latin_capital_i != roman_numeral_one
       - latin_capital_i == (roman_numeral_one | community.general.unicode_normalize(form='NFKC'))
@@ -28,7 +28,7 @@
   register: invalid_input_type
 
 - name: Assert an invalid input type causes failure
-  assert:
+  ansible.builtin.assert:
     that:
       - invalid_input_type is failed
 
@@ -39,6 +39,6 @@
   register: invalid_form_selection
 
 - name: Assert invalid form selection causes failure
-  assert:
+  ansible.builtin.assert:
     that:
       - invalid_form_selection is failed

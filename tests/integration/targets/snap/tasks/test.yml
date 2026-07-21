@@ -35,7 +35,7 @@
   register: install_again
 
 - name: Assert package has been installed just once (hello-world)
-  assert:
+  ansible.builtin.assert:
     that:
       - install is changed
       - install_check is changed
@@ -74,7 +74,7 @@
   register: remove_again
 
 - name: Assert package has been removed just once (hello-world)
-  assert:
+  ansible.builtin.assert:
     that:
       - remove is changed
       - remove_check is changed
@@ -102,7 +102,7 @@
   register: classic_install_again
 
 - name: Assert package has been installed just once (nvim)
-  assert:
+  ansible.builtin.assert:
     that:
       - classic_install is changed
       - classic_install_again is not changed
@@ -123,7 +123,7 @@
   register: classic_remove_with_true_classic
 
 - name: Assert package has been removed without setting classic to true (nvim)
-  assert:
+  ansible.builtin.assert:
     that:
       - classic_remove_without_true_classic is changed
       - classic_remove_with_true_classic is not changed
@@ -172,7 +172,7 @@
   register: remove
 
 - name: Assert package has been installed with options just once and only changed options trigger a change (uhttpd)
-  assert:
+  ansible.builtin.assert:
     that:
       - install is changed
       - install_with_option is changed
@@ -217,7 +217,7 @@
   register: install_two_remove_again
 
 - name: Assert installation of two packages
-  assert:
+  ansible.builtin.assert:
     that:
       - install_two is changed
       - "'hello-world' in install_two.snaps_installed"

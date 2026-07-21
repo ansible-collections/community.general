@@ -14,7 +14,7 @@
   check_mode: true
   register: result
 - name: verify test remove a dns record in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -28,7 +28,7 @@
     state: absent
   register: result
 - name: verify test remove a dns record
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -42,7 +42,7 @@
     state: absent
   register: result
 - name: verify test remove a dns record idempotence
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -56,6 +56,6 @@
     state: absent
   register: result
 - name: verify test remove a dns record idempotence
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed

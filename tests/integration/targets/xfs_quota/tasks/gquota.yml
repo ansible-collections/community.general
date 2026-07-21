@@ -34,7 +34,7 @@
       become: true
       register: test_gquota_default_before
     - name: Assert default group limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_gquota_default_before.changed
           - test_gquota_default_before.bsoft == gquota_default_bsoft|human_to_bytes
@@ -57,7 +57,7 @@
       become: true
       register: test_gquota_group_before
     - name: Assert group limits results for xfsquotauser
-      assert:
+      ansible.builtin.assert:
         that:
           - test_gquota_group_before.changed
           - test_gquota_group_before.bsoft == gquota_group_bsoft|human_to_bytes
@@ -79,7 +79,7 @@
       become: true
       register: test_gquota_default_after
     - name: Assert default group limits results after re-apply
-      assert:
+      ansible.builtin.assert:
         that:
           - not test_gquota_default_after.changed
     - name: Re-apply group limits
@@ -96,7 +96,7 @@
       become: true
       register: test_gquota_group_after
     - name: Assert group limits results for xfsquotauser after re-apply
-      assert:
+      ansible.builtin.assert:
         that:
           - not test_gquota_group_after.changed
     - name: Reset default group limits
@@ -107,7 +107,7 @@
       become: true
       register: test_reset_gquota_default
     - name: Assert reset of default group limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_reset_gquota_default.changed
           - test_reset_gquota_default.bsoft == 0
@@ -125,7 +125,7 @@
       become: true
       register: test_reset_gquota_group
     - name: Assert reset of default group limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_reset_gquota_group.changed
           - test_reset_gquota_group.bsoft == 0

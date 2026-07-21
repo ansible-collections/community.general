@@ -33,7 +33,7 @@
 
 - name: Assert all lv in testvg are active
   loop: "{{ initial_lv_status_result.stdout_lines }}"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'active' == item"
 
@@ -48,7 +48,7 @@
   register: deactivated_lv_status_result
 
 - name: Do all assertions to verify expected results
-  assert:
+  ansible.builtin.assert:
     that:
       - vg_deactivate_result is changed
       - "'active' not in deactivated_lv_status_result.stdout"
@@ -60,7 +60,7 @@
   register: repeated_vg_deactivate_result
 
 - name: Verify vg deactivation idempontency
-  assert:
+  ansible.builtin.assert:
     that:
       - repeated_vg_deactivate_result is not changed
 
@@ -76,7 +76,7 @@
   register: check_mode_activate_lv_status_result
 
 - name: Verify VG activation in check mode changed without activating LVs
-  assert:
+  ansible.builtin.assert:
     that:
       - check_mode_vg_activate_result is changed
       - "'active' not in check_mode_activate_lv_status_result.stdout"
@@ -92,13 +92,13 @@
   register: activate_lv_status_result
 
 - name: Verify vg activation
-  assert:
+  ansible.builtin.assert:
     that:
       - vg_activate_result is changed
 
 - name: Assert all lv in testvg are active
   loop: "{{ activate_lv_status_result.stdout_lines }}"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'active' == item"
 
@@ -109,7 +109,7 @@
   register: repeated_vg_activate_result
 
 - name: Verify vg activation idempontency
-  assert:
+  ansible.builtin.assert:
     that:
       - repeated_vg_activate_result is not changed
 
@@ -126,7 +126,7 @@
   register: partial_vg_activate_result
 
 - name: Verify partially activated vg activation
-  assert:
+  ansible.builtin.assert:
     that:
       - partial_vg_activate_result is changed
 
@@ -136,7 +136,7 @@
 
 - name: Assert all lv in testvg are active
   loop: "{{ activate_partial_lv_status_result.stdout_lines }}"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'active' == item"
 
@@ -152,12 +152,12 @@
   register: check_mode_deactivate_lv_status_result
 
 - name: Verify check mode vg deactivation changed
-  assert:
+  ansible.builtin.assert:
     that:
       - check_mode_vg_deactivate_result is changed
 
 - name: Assert all lv in testvg are still active
   loop: "{{ check_mode_deactivate_lv_status_result.stdout_lines }}"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'active' == item"

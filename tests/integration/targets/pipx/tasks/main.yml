@@ -61,7 +61,7 @@
   register: uninstall_tox
 
 - name: check assertions tox
-  assert:
+  ansible.builtin.assert:
     that:
       - install_tox is changed
       - "'version' in install_tox"
@@ -90,7 +90,7 @@
   register: uninstall_tox
 
 - name: check assertions tox
-  assert:
+  ansible.builtin.assert:
     that:
       - install_tox is changed
       - "'tox' in install_tox.application"
@@ -132,7 +132,7 @@
   register: uninstall_tox_324
 
 - name: check assertions tox 3.24.0
-  assert:
+  ansible.builtin.assert:
     that:
       - install_tox_324 is changed
       - "'tox' in install_tox_324.application"
@@ -224,7 +224,7 @@
   register: uninstall_tox_3
 
 - name: check assertions tox latest
-  assert:
+  ansible.builtin.assert:
     that:
       - install_tox_latest is changed
       - "'tox' in install_tox_latest.application"

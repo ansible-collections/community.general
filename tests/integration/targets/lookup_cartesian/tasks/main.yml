@@ -19,7 +19,7 @@
       - '2'
       - '3'
 - name: Verify cartesian lookup
-  assert:
+  ansible.builtin.assert:
     that:
       - product.results[0]['item'] == ["A", "1"]
       - product.results[1]['item'] == ["A", "2"]

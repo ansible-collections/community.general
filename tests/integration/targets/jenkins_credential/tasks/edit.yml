@@ -49,7 +49,7 @@
   register: custom_scope
 
 - name: Assert CUSTOM scope changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - custom_scope.changed == true
     fail_msg: "CUSTOM scope changed status when it shouldn't"
@@ -68,7 +68,7 @@
   register: userpass_cred
 
 - name: Assert user_and_pass changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - userpass_cred.changed == true
     fail_msg: "user_and_pass credential changed status incorrect"
@@ -87,7 +87,7 @@
   register: file_cred
 
 - name: Assert file credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - file_cred.changed == true
     fail_msg: "file credential changed status incorrect"
@@ -107,7 +107,7 @@
   register: text_cred
 
 - name: Assert text credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - text_cred.changed == true
     fail_msg: "text credential changed status incorrect"
@@ -127,7 +127,7 @@
   register: githubapp_cred
 
 - name: Assert githubApp credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - githubapp_cred.changed == true
     fail_msg: "githubApp credential changed status incorrect"
@@ -147,7 +147,7 @@
   register: sshkey_cred
 
 - name: Assert sshKey credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - sshkey_cred.changed == true
     fail_msg: "sshKey credential changed status incorrect"
@@ -166,7 +166,7 @@
   register: cert_p12_cred
 
 - name: Assert certificate (p12) credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_p12_cred.changed == true
     fail_msg: "certificate (p12) credential changed status incorrect"
@@ -185,7 +185,7 @@
   register: cert_pem_cred
 
 - name: Assert certificate (pem) credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_pem_cred.changed == true
     fail_msg: "certificate (pem) credential changed status incorrect"

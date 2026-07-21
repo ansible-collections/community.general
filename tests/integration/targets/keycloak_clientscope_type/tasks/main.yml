@@ -63,7 +63,7 @@
   register: result
 
 - name: Assert that client scope types are set
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -96,7 +96,7 @@
   register: result
 
 - name: Assert that client scope types are set
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -119,7 +119,7 @@
   register: result
 
 - name: Assert that client scope types are set
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -154,7 +154,7 @@
   register: result
 
 - name: Assert that client scope types are set
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}

@@ -30,7 +30,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - set_children_elements_unicode is changed
       - comparison is not changed  # identical
@@ -46,7 +46,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - set_children_again is not changed
       - comparison is not changed  # identical

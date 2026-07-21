@@ -18,7 +18,7 @@
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
-          assert:
+          ansible.builtin.assert:
             that:
               - "(merged_list | length) == 2"
               - "'item1' in merged_list"
@@ -34,7 +34,7 @@
             msg: "{{ merged_list }}"
 
         - name: Validate that the list is complete
-          assert:
+          ansible.builtin.assert:
             that:
               - "(merged_list | length) == 3"
               - "'item1' in merged_list"

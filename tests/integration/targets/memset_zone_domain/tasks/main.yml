@@ -18,7 +18,7 @@
   register: result
 
 - name: check API response with invalid API key
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Memset API returned a 403 response (ApiErrorForbidden, Bad api_key)' in result.msg"
       - result is not successful
@@ -33,7 +33,7 @@
   register: result
 
 - name: test domain length is validated
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
       - "'Zone domain must be less than 250 characters in length' in result.stderr"
@@ -48,7 +48,7 @@
   register: result
 
 - name: fail if zone does not exist
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
       - "'does not exist, cannot create domain.' in result.stderr"
@@ -63,7 +63,7 @@
   register: result
 
 - name: fail if the zone is not unique
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
       - "'matches multiple zones, cannot create domain' in result.stderr"
@@ -78,7 +78,7 @@
   register: result
 
 - name: create domain with check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -92,7 +92,7 @@
   register: result
 
 - name: create domain
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -106,7 +106,7 @@
   register: result
 
 - name: create existing domain
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -120,7 +120,7 @@
   register: result
 
 - name: delete domain with check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -134,7 +134,7 @@
   register: result
 
 - name: delete domain
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -147,6 +147,6 @@
   register: result
 
 - name: delete absent domain
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed

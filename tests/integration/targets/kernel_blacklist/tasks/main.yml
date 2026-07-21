@@ -44,7 +44,7 @@
     # q('ansible.builtin.subelements', bl_test_1, 'deprecations', {'skip_missing': True}) }}"
 
 - name: assert file is unchanged
-  assert:
+  ansible.builtin.assert:
     that:
       - bl_test_1 is not changed
       - bl_test_1a is not changed
@@ -63,7 +63,7 @@
       blacklist cccc
 
 - name: test deprecation
-  assert:
+  ansible.builtin.assert:
     that:
       - "'deprecations' not in bl_test_1"
 
@@ -80,7 +80,7 @@
   register: slurp_test_2
 
 - name: assert element is added
-  assert:
+  ansible.builtin.assert:
     that:
       - bl_test_2 is changed
       - slurp_test_2.content|b64decode == (content | trim + '\n')
@@ -108,7 +108,7 @@
   register: slurp_test_3
 
 - name: assert element is removed
-  assert:
+  ansible.builtin.assert:
     that:
       - bl_test_3 is changed
       - slurp_test_3.content|b64decode == (content | trim + '\n')

@@ -59,7 +59,7 @@
       become: true
       register: test_pquota_default_before
     - name: Assert default project limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_pquota_default_before.changed
           - test_pquota_default_before.bsoft == pquota_default_bsoft|human_to_bytes
@@ -82,7 +82,7 @@
       become: true
       register: test_pquota_project_before
     - name: Assert project limits results for xft_quotaval
-      assert:
+      ansible.builtin.assert:
         that:
           - test_pquota_project_before.changed
           - test_pquota_project_before.bsoft == pquota_project_bsoft|human_to_bytes
@@ -104,7 +104,7 @@
       become: true
       register: test_pquota_default_after
     - name: Assert default project limits results after re-apply
-      assert:
+      ansible.builtin.assert:
         that:
           - not test_pquota_default_after.changed
     - name: Re-apply project limits
@@ -121,7 +121,7 @@
       become: true
       register: test_pquota_project_after
     - name: Assert project limits results for xft_quotaval after re-apply
-      assert:
+      ansible.builtin.assert:
         that:
           - test_pquota_project_after is not changed
     - name: Reset default project limits
@@ -132,7 +132,7 @@
       become: true
       register: test_reset_pquota_default
     - name: Assert reset of default projecy limits results
-      assert:
+      ansible.builtin.assert:
         that:
           - test_reset_pquota_default.changed
           - test_reset_pquota_default.bsoft == 0
@@ -150,7 +150,7 @@
       become: true
       register: test_reset_pquota_project
     - name: Assert reset of project limits results for xft_quotaval
-      assert:
+      ansible.builtin.assert:
         that:
           - test_reset_pquota_project.changed
           - test_reset_pquota_project.bsoft == 0

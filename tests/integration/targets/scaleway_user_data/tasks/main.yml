@@ -38,7 +38,7 @@
 
 - debug: var=user_data_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - user_data_check_task is success
       - user_data_check_task is changed
@@ -53,7 +53,7 @@
 
 - debug: var=user_data_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - user_data_task is success
       - user_data_task is changed
@@ -68,7 +68,7 @@
 
 - debug: var=user_data_confirmation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - user_data_confirmation_task is success
       - user_data_confirmation_task is not changed

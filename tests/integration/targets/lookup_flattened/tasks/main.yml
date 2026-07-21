@@ -16,7 +16,7 @@
       - - c__
         - d__
 - name: verify with_flattened results
-  assert:
+  ansible.builtin.assert:
     that:
       - a__ == 'flattened'
       - b__ == 'flattened'

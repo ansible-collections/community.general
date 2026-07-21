@@ -20,7 +20,7 @@
   check_mode: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'*filter' in iptables_state.initial_state"
       - iptables_state.tables.filter is defined
@@ -38,7 +38,7 @@
   check_mode: true
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'*nat' in iptables_state.initial_state"
       - "'*filter' in iptables_state.initial_state"
@@ -55,7 +55,7 @@
   register: iptables_state
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'*filter' in iptables_state.initial_state"
       - "'*filter' in iptables_state.saved"
@@ -74,7 +74,7 @@
   register: iptables_state
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is changed
       - "'*nat' in iptables_state.initial_state"
@@ -93,7 +93,7 @@
   register: iptables_state
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is changed
       - "'*filter' in iptables_state.initial_state"
@@ -115,7 +115,7 @@
   poll: 0
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'*nat' in iptables_state.initial_state"
       - "'*nat' in iptables_state.restored"
@@ -145,7 +145,7 @@
   poll: 0
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'*nat' in iptables_state.initial_state"
       - "'*nat' in iptables_state.restored"
@@ -178,7 +178,7 @@
   register: iptables_state
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'filter' in iptables_state.tables"
       - "'*filter' in iptables_state.saved"
@@ -213,7 +213,7 @@
   poll: 0
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'*filter' in iptables_state.initial_state"
       - "'*mangle' in iptables_state.initial_state"
@@ -240,7 +240,7 @@
   poll: 0
 
 - name: "assert that results are as expected"
-  assert:
+  ansible.builtin.assert:
     that:
       - "'*filter' in iptables_state.initial_state"
       - "'*mangle' in iptables_state.initial_state"
@@ -269,7 +269,7 @@
   ignore_errors: true
 
 - name: "explain expected failure"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is failed
       - "iptables_state.msg == ('Table mangle to restore not defined in ' ~ iptables_tests)"

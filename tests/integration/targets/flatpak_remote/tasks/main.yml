@@ -26,7 +26,7 @@
       register: executable_override_result
 
     - name: Verify executable override test result
-      assert:
+      ansible.builtin.assert:
         that:
           - executable_override_result is failed
           - executable_override_result is not changed

@@ -13,7 +13,7 @@
     var: result
 
 - name: assert failing dependency
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
       - '"Failed to import" in result.msg'

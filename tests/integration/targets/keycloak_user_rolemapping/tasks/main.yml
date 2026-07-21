@@ -51,7 +51,7 @@
   register: result
 
 - name: Assert realm role is assigned
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | selectattr("clientRole", "eq", false) | selectattr("name", "eq", role) | list | count > 0
@@ -72,7 +72,7 @@
   register: result
 
 - name: Assert realm role is unassigned
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - (result.end_state | length) == (result.existing | length) - 1
@@ -130,7 +130,7 @@
   register: result
 
 - name: Assert client role is assigned to user with no prior roles
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | selectattr("clientRole", "eq", true) | selectattr("name", "eq", role) | list | count > 0
@@ -152,7 +152,7 @@
   register: result
 
 - name: Assert cross-client role mapping is removed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == []
@@ -174,7 +174,7 @@
   register: result
 
 - name: Assert client role is assigned
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | selectattr("clientRole", "eq", true) | selectattr("name", "eq", role) | list | count > 0
@@ -196,7 +196,7 @@
   register: result
 
 - name: Assert client role is unassigned
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == []

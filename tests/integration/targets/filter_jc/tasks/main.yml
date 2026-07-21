@@ -9,6 +9,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: test jc key/value parser
-  assert:
+  ansible.builtin.assert:
     that:
       - "('key1=value1\nkey2=value2' | community.general.jc('kv')) == {'key1': 'value1', 'key2': 'value2'}"

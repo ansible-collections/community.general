@@ -26,7 +26,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - package_result.changed_pkgs[0] == package[1]
@@ -42,7 +42,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is not changed
           - 'package_result.msg == "Package already installed: " ~ package[1]'
@@ -56,7 +56,7 @@
       become_user: "{{ brew_stat.stat.pw_name }}"
       register: package_result
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - package_result is changed
           - 'package_result.msg == "Package uninstalled: " ~ package[1]'

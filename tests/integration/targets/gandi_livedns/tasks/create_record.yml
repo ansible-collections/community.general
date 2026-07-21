@@ -13,7 +13,7 @@
     state: absent
   register: result
 - name: verify test absent dns record
-  assert:
+  ansible.builtin.assert:
     that:
       - result is successful
 
@@ -28,7 +28,7 @@
   check_mode: true
   register: result
 - name: verify test create a dns record in check mode
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
 
@@ -42,7 +42,7 @@
     type: "{{ item.type }}"
   register: result
 - name: verify test create a dns record
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.record['values'] == item['values']
@@ -60,7 +60,7 @@
     type: "{{ item.type }}"
   register: result
 - name: verify test create a dns record idempotence
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.record['values'] == item['values']

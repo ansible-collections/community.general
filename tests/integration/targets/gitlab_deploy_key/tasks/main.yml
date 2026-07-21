@@ -41,7 +41,7 @@
     state: present
   register: deploy_key_status
 
-- assert:
+- ansible.builtin.assert:
     that:
       - deploy_key_status is changed
       - deploy_key_status.deploy_key.key == gitlab_deploy_key
@@ -57,7 +57,7 @@
     state: present
   register: deploy_key_status
 
-- assert:
+- ansible.builtin.assert:
     that:
       - deploy_key_status is changed
       - deploy_key_status.deploy_key.key == gitlab_deploy_key_new
@@ -72,7 +72,7 @@
     state: present
   register: deploy_key_status
 
-- assert:
+- ansible.builtin.assert:
     that:
       - not deploy_key_status.changed
       - deploy_key_status.deploy_key.key == gitlab_deploy_key_new

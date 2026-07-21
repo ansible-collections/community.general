@@ -19,7 +19,7 @@
     state: present
   register: simple_create_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - simple_create_result is changed
       - simple_create_result.token.AccessorID is truthy
@@ -41,7 +41,7 @@
     expiration_ttl: 1h
   register: create_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - create_result is changed
       - create_result.token.AccessorID == "07a7de84-c9c7-448a-99cc-beaf682efd21"
@@ -57,7 +57,7 @@
     service_identities: []
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.operation == 'update'
@@ -70,7 +70,7 @@
       - name: foo-access2
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.operation is not defined
@@ -81,7 +81,7 @@
     accessor_id: 07a7de84-c9c7-448a-99cc-beaf682efd21
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.token is falsy

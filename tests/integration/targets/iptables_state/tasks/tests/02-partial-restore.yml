@@ -48,7 +48,7 @@
 
 
 - name: "assert that no changes are detected in check mode"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is not changed
 
@@ -61,6 +61,6 @@
   poll: 0
 
 - name: "assert that no changes are made"
-  assert:
+  ansible.builtin.assert:
     that:
       - iptables_state is not changed

@@ -33,7 +33,7 @@
   register: custom_scope
 
 - name: Assert CUSTOM scope changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - custom_scope.changed == (run_number == 1)
     fail_msg: "CUSTOM scope changed status incorrect on run {{ run_number }}"
@@ -51,7 +51,7 @@
   register: userpass_cred
 
 - name: Assert user_and_pass changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - userpass_cred.changed == (run_number == 1)
     fail_msg: "user_and_pass credential changed status incorrect on run {{ run_number }}"
@@ -69,7 +69,7 @@
   register: file_cred
 
 - name: Assert file credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - file_cred.changed == (run_number == 1)
     fail_msg: "file credential changed status incorrect on run {{ run_number }}"
@@ -88,7 +88,7 @@
   register: text_cred
 
 - name: Assert text credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - text_cred.changed == (run_number == 1)
     fail_msg: "text credential changed status incorrect on run {{ run_number }}"
@@ -107,7 +107,7 @@
   register: githubapp_cred
 
 - name: Assert githubApp credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - githubapp_cred.changed == (run_number == 1)
     fail_msg: "githubApp credential changed status incorrect on run {{ run_number }}"
@@ -126,7 +126,7 @@
   register: sshkey_cred
 
 - name: Assert sshKey credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - sshkey_cred.changed == (run_number == 1)
     fail_msg: "sshKey credential changed status incorrect on run {{ run_number }}"
@@ -144,7 +144,7 @@
   register: cert_p12_cred
 
 - name: Assert certificate (p12) credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_p12_cred.changed == (run_number == 1)
     fail_msg: "certificate (p12) credential changed status incorrect on run {{ run_number }}"
@@ -162,7 +162,7 @@
   register: cert_pem_cred
 
 - name: Assert certificate (pem) credential changed value
-  assert:
+  ansible.builtin.assert:
     that:
       - cert_pem_cred.changed == (run_number == 1)
     fail_msg: "certificate (pem) credential changed status incorrect on run {{ run_number }}"

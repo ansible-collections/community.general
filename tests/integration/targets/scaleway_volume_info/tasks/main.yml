@@ -18,7 +18,7 @@
     var: volumes
 
 - name: Ensure retrieval of volumes info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - volumes is success
 
@@ -32,6 +32,6 @@
     var: ams1_volumes
 
 - name: Ensure retrieval of volumes info is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ams1_volumes is success

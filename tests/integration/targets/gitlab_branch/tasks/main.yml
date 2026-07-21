@@ -42,7 +42,7 @@
   register: create_branch
 
 - name: Test module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - create_branch is not changed
 
@@ -56,7 +56,7 @@
   register: delete_branch
 
 - name: Test module is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - delete_branch is changed
 

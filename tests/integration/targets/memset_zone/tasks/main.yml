@@ -22,7 +22,7 @@
   register: result
 
 - name: check API response with invalid API key
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Memset API returned a 403 response (ApiErrorForbidden, Bad api_key)' in result.msg"
       - result is not successful
@@ -37,7 +37,7 @@
   register: result
 
 - name: check if the zone would be created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -51,7 +51,7 @@
   register: result
 
 - name: create the zone
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -65,7 +65,7 @@
   register: result
 
 - name: ensure we can't create duplicate zones
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -78,7 +78,7 @@
   register: result
 
 - name: check if the zone would be deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -92,7 +92,7 @@
   register: result
 
 - name: delete the zone
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -105,7 +105,7 @@
   register: result
 
 - name: ensure we can't create duplicate zones
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -119,7 +119,7 @@
   register: result
 
 - name: ensure force is respected
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful

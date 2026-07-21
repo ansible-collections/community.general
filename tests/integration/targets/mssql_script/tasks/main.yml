@@ -58,7 +58,7 @@
     script: "SELCT 1"
   failed_when: false
   register: bad_query
-- assert:
+- ansible.builtin.assert:
     that:
       - bad_query.error.startswith('ProgrammingError')
 
@@ -97,7 +97,7 @@
 #     ]
 # ]
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result_batches.query_results | length == 2  # two batch results
       - result_batches.query_results[0] | length == 2  # two selects in first batch
@@ -141,7 +141,7 @@
 #         ]
 #     ]
 # ]
-- assert:
+- ansible.builtin.assert:
     that:
       - result_batches_dict.query_results_dict | length == 2  # two batch results
       - result_batches_dict.query_results_dict[0] | length == 2  # two selects in first batch
@@ -165,7 +165,7 @@
       GO
       DROP TABLE #integration56yH2
   register: empty_batches
-- assert:
+- ansible.builtin.assert:
     that:
       - empty_batches.query_results | length == 5  # five batch results
       - empty_batches.query_results[3][0] | length == 1  # one row in select
@@ -181,7 +181,7 @@
     script: sp_spaceused
     output: dict
   register: result_spaceused
-- assert:
+- ansible.builtin.assert:
     that:
       - result_spaceused.query_results_dict | length == 1  # one batch
       - result_spaceused.query_results_dict[0] | length == 2  # stored procedure returns two result sets
@@ -197,7 +197,7 @@
     output: dict
     db: msdb
   register: result_db
-- assert:
+- ansible.builtin.assert:
     that:
       - result_db.query_results_dict[0][0][0]['database_name'] == 'msdb'
 
@@ -212,7 +212,7 @@
     params:
       dbname: msdb
   register: result_params
-- assert:
+- ansible.builtin.assert:
     that:
       - result_params.query_results[0][0][0][0] == 'msdb'
       - result_params.query_results[0][0][0][1] == 'ONLINE'
@@ -226,7 +226,7 @@
     script: SELECT Invalid_Column FROM Does_Not_Exist WITH Invalid Syntax
   check_mode: true
   register: check_mode
-- assert:
+- ansible.builtin.assert:
     that: check_mode.query_results is undefined
 
 - name: "Test: Value of unknown type: <class 'uuid.UUID'>"
@@ -241,7 +241,7 @@
 - debug:
     var: result_databases
 - name: check types
-  assert:
+  ansible.builtin.assert:
     that:
       - result_databases.query_results[0][0][0][0] == '00000000-0000-0000-0000-000000000000'  # guid
       - result_databases.query_results[0][0][0][1] == 'master'  # string
@@ -274,7 +274,7 @@
     params:
       dbname: msdb
   register: empty_result
-- assert:
+- ansible.builtin.assert:
     that:
       - empty_result.query_results[0] | length == 3  # == 1 ; issue: only first result is returned
       - empty_result.query_results[0][0][0][0] == 'msdb'

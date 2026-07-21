@@ -68,7 +68,7 @@
           when: yum_updates.results | length != 0
 
         - name: Assert everything is fine
-          assert:
+          ansible.builtin.assert:
             that:
               - lock_all_packages is changed
               - lock_all_packages_again is not changed

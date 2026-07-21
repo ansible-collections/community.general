@@ -277,7 +277,7 @@
   when: remote_cert
 
 - name: Validate results
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result_check is changed

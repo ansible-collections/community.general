@@ -9,14 +9,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test valid hashable inputs
-  assert:
+  ansible.builtin.assert:
     that:
       - "single_int | community.general.hashids_encode | community.general.hashids_decode == [single_int]"
       - "int_list | community.general.hashids_encode | community.general.hashids_decode | list == int_list"
       - "(1,2,3) | community.general.hashids_encode | community.general.hashids_decode == [1,2,3]"
 
 - name: Test valid parameters
-  assert:
+  ansible.builtin.assert:
     that:
       - "single_int | community.general.hashids_encode(salt='test') | community.general.hashids_decode(salt='test') == [single_int]"
       - "single_int | community.general.hashids_encode(alphabet='1234567890abcdef') | community.general.hashids_decode(alphabet='1234567890abcdef') == [single_int]"
@@ -24,7 +24,7 @@
       - "single_int | community.general.hashids_encode(min_length=20) | length == 20"
 
 - name: Test valid unhashable inputs
-  assert:
+  ansible.builtin.assert:
     that:
       - "single_float | community.general.hashids_encode | community.general.hashids_decode == []"
       - "arbitrary_string | community.general.hashids_encode | community.general.hashids_decode == []"
@@ -36,7 +36,7 @@
   ignore_errors: true
 
 - name: Test invalid salt fails
-  assert:
+  ansible.builtin.assert:
     that:
       - invalid_salt_message is failed
 
@@ -47,7 +47,7 @@
   ignore_errors: true
 
 - name: Test invalid alphabet fails
-  assert:
+  ansible.builtin.assert:
     that:
       - invalid_alphabet_message is failed
 
@@ -58,6 +58,6 @@
   ignore_errors: true
 
 - name: Test invalid min_length fails
-  assert:
+  ansible.builtin.assert:
     that:
       - invalid_min_length_message is failed

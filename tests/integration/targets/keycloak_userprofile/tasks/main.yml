@@ -57,7 +57,7 @@
   register: result
 
 - name: Assert that User Profile would be created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -78,7 +78,7 @@
   register: result
 
 - name: Assert that User Profile was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -98,7 +98,7 @@
   register: result
 
 - name: Assert that User Profile was in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -119,7 +119,7 @@
   register: result
 
 - name: Assert that User Profile would be changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -140,7 +140,7 @@
   register: result
 
 - name: Assert that User Profile changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -160,7 +160,7 @@
   register: result
 
 - name: Assert that User Profile was in sync
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state != {}
@@ -182,7 +182,7 @@
 #   register: result
 #
 # - name: Assert that forced update ran correctly
-#   assert:
+#   ansible.builtin.assert:
 #     that:
 #       - result is changed
 #       - result.end_state != {}
@@ -203,7 +203,7 @@
   register: result
 
 - name: Assert that User Profile was deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state == {}
@@ -221,7 +221,7 @@
   register: result
 
 - name: Assert that User Profile not present
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state == {}
@@ -240,7 +240,7 @@
   register: result
 
 - name: Assert that User Profile was created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -261,7 +261,7 @@
   register: result
 
 - name: Assert that User Profile was changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}
@@ -282,7 +282,7 @@
   register: result
 
 - name: Assert that User Profile was changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state != {}

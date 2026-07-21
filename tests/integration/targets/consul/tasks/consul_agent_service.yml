@@ -17,7 +17,7 @@
 - set_fact:
     nginx_service: "{{result.service}}"
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.service.ID is defined
@@ -42,7 +42,7 @@
       nginx_version: 1.0.0
       nginx: 1.25.3
   register: result
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result.service.ID is defined
@@ -71,7 +71,7 @@
       nginx: 1.25.3
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.operation is not defined
@@ -82,7 +82,7 @@
     state: absent
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is changed
       - result is not failed

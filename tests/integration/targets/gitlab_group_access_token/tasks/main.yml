@@ -30,7 +30,7 @@
       register: create_pfail_token_status
   always:
     - name: Assert that token creation in nonexisting group failed
-      assert:
+      ansible.builtin.assert:
         that:
           - create_pfail_token_status is failed
   ignore_errors: true
@@ -52,7 +52,7 @@
       register: create_efail_token_status
   always:
     - name: Assert that token creation with invalid expires_at failed
-      assert:
+      ansible.builtin.assert:
         that:
           - create_efail_token_status is failed
   ignore_errors: true
@@ -72,7 +72,7 @@
       - read_api
   register: create_token_status
 - name: Assert that token creation with valid arguments is successfull
-  assert:
+  ansible.builtin.assert:
     that:
       - create_token_status is changed
       - create_token_status.access_token.token is defined
@@ -92,7 +92,7 @@
       - read_api
   register: check_token_status
 - name: Assert that token creation without changes and recreate=never succeeds with status not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - check_token_status is not changed
       - check_token_status.access_token.token is not defined
@@ -113,7 +113,7 @@
     recreate: state_change
   register: check_recreate_token_status
 - name: Assert that token creation without changes and recreate=state_change succeeds with status not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - check_recreate_token_status is not changed
       - check_recreate_token_status.access_token.token is not defined
@@ -135,7 +135,7 @@
       register: change_token_status
   always:
     - name: Assert that token change with recreate=never fails
-      assert:
+      ansible.builtin.assert:
         that:
           - change_token_status is failed
   ignore_errors: true
@@ -156,7 +156,7 @@
     recreate: state_change
   register: change_recreate_token_status
 - name: Assert that token change with recreate=state_change succeeds
-  assert:
+  ansible.builtin.assert:
     that:
       - change_recreate_token_status is changed
       - change_recreate_token_status.access_token.token is defined
@@ -177,7 +177,7 @@
     recreate: always
   register: change_recreate1_token_status
 - name: Assert that token change with recreate=always succeeds
-  assert:
+  ansible.builtin.assert:
     that:
       - change_recreate1_token_status is changed
       - change_recreate1_token_status.access_token.token is defined
@@ -197,7 +197,7 @@
       - read_api
   register: revoke_token_status
 - name: Assert that token revocation succeeds
-  assert:
+  ansible.builtin.assert:
     that:
       - revoke_token_status is changed
 
@@ -216,6 +216,6 @@
       - read_api
   register: revoke_token_status
 - name: Assert that token revocation succeeds with status not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - revoke_token_status is not changed

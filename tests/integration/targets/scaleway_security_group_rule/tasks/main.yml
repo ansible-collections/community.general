@@ -38,7 +38,7 @@
 
 - debug: var=security_group_rule_creation_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - security_group_rule_creation_task is success
       - security_group_rule_creation_task is changed
@@ -58,7 +58,7 @@
 
     - debug: var=security_group_rule_creation_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - security_group_rule_creation_task is success
           - security_group_rule_creation_task is changed
@@ -77,7 +77,7 @@
 
     - debug: var=security_group_rule_creation_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - security_group_rule_creation_task is success
           - security_group_rule_creation_task is not changed
@@ -97,7 +97,7 @@
 
     - debug: var=security_group_rule_deletion_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - security_group_rule_deletion_task is success
           - security_group_rule_deletion_task is changed
@@ -117,7 +117,7 @@
 
     - debug: var=security_group_rule_deletion_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - security_group_rule_deletion_task is success
           - security_group_rule_deletion_task is changed
@@ -136,7 +136,7 @@
 
 - debug: var=security_group_rule_deletion_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - security_group_rule_deletion_task is success
       - security_group_rule_deletion_task is not changed
@@ -156,7 +156,7 @@
 
     - debug: var=security_group_rule_creation_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - security_group_rule_creation_task is success
           - security_group_rule_creation_task is changed
@@ -175,7 +175,7 @@
 
     - debug: var=security_group_rule_creation_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - security_group_rule_creation_task is success
           - security_group_rule_creation_task is not changed
@@ -195,7 +195,7 @@
 
     - debug: var=security_group_rule_deletion_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - security_group_rule_deletion_task is success
           - security_group_rule_deletion_task is changed
@@ -215,7 +215,7 @@
 
     - debug: var=security_group_rule_deletion_task
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - security_group_rule_deletion_task is success
           - security_group_rule_deletion_task is changed
@@ -234,7 +234,7 @@
 
 - debug: var=security_group_rule_deletion_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - security_group_rule_deletion_task is success
       - security_group_rule_deletion_task is not changed

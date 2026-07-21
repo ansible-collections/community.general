@@ -36,7 +36,7 @@
       register: gitlab_issue_create
 
     - name: Test Issue Created
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_issue_create is changed
 
@@ -51,7 +51,7 @@
       register: gitlab_issue_create_idempotence
 
     - name: Test Create Issue is Idempotent
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_issue_create_idempotence is not changed
 
@@ -70,7 +70,7 @@
       register: gitlab_issue_update_additions
 
     - name: Test Issue Updated ( Additions )
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_issue_update_additions.issue.labels[0] == "{{ gitlab_labels[0] }}"
           - gitlab_issue_update_additions.issue.assignees[0].username == "{{ gitlab_assignee_ids[0] }}"
@@ -90,7 +90,7 @@
       register: gitlab_issue_update_persistence
 
     - name: Test issue Not Updated ( Persistence )
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_issue_update_persistence.issue.labels[0] == "{{ gitlab_labels[0] }}"
           - gitlab_issue_update_persistence.issue.assignees[0].username == "{{ gitlab_assignee_ids[0] }}"
@@ -110,7 +110,7 @@
       register: gitlab_issue_update_removal
 
     - name: Test issue updated
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_issue_update_removal.issue.labels == []
           - gitlab_issue_update_removal.issue.assignees == []
@@ -126,7 +126,7 @@
       register: gitlab_issue_delete
 
     - name: Test issue is deleted
-      assert:
+      ansible.builtin.assert:
         that:
           - gitlab_issue_delete is changed
 

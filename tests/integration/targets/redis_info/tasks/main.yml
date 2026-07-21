@@ -12,7 +12,7 @@
     login_password: "{{ redis_password }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.info is defined
@@ -27,7 +27,7 @@
   check_mode: true
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.info is defined
@@ -40,7 +40,7 @@
     login_password: "{{ redis_password }}"
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result is not changed
       - result.info is defined

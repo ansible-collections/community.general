@@ -23,7 +23,7 @@
   register: gitlab_user_sshkey
 
 - name: Check user has been created correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_sshkey is changed
 
@@ -42,7 +42,7 @@
   register: gitlab_user_sshkey_again
 
 - name: Check state is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_sshkey_again is not changed
 
@@ -62,7 +62,7 @@
   register: gitlab_user_sshkey_updated
 
 - name: Check ssh key has been updated
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_sshkey_updated is changed
 
@@ -82,7 +82,7 @@
   register: gitlab_user_sshkey_updated_again
 
 - name: Check updated ssh key is idempotent
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_sshkey_updated_again is not changed
 
@@ -103,7 +103,7 @@
   register: gitlab_user_created_user_sshkey_expires_at
 
 - name: Check expires_at will not be added to a present ssh key
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_created_user_sshkey_expires_at is not changed
 
@@ -119,7 +119,7 @@
   register: gitlab_user_sshkey_remove
 
 - name: Check user has been removed correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_sshkey_remove is changed
 
@@ -139,7 +139,7 @@
   register: gitlab_user_sshkey_expires_at
 
 - name: Check user has been created correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_sshkey_expires_at is changed
 
@@ -159,7 +159,7 @@
   register: gitlab_user_sshkey_expires_at_again
 
 - name: Check state is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_sshkey_expires_at_again is not changed
 
@@ -175,6 +175,6 @@
   register: gitlab_user_sshkey_expires_at_remove
 
 - name: Check user has been removed correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - gitlab_user_sshkey_expires_at_remove is changed

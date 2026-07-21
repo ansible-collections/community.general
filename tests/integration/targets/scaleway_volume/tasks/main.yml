@@ -16,7 +16,7 @@
     organization: '{{ scaleway_organization }}'
   register: server_creation_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_check_task is success
 
@@ -32,7 +32,7 @@
 
 - debug: var=server_creation_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_check_task is success
       - server_creation_check_task is changed
@@ -45,7 +45,7 @@
     organization: '{{ scaleway_organization }}'
   register: server_creation_check_task
 
-- assert:
+- ansible.builtin.assert:
     that:
       - server_creation_check_task is success
       - server_creation_check_task is changed

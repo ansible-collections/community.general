@@ -15,7 +15,7 @@
         result5: "{{ query('community.general.random_words', min_length=5, max_length=5, numwords=3, delimiter='') }}"
 
     - name: Check results
-      assert:
+      ansible.builtin.assert:
         that:
           - result1 | length == 1
           - result1[0] | length >= 35

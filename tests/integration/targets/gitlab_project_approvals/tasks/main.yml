@@ -29,7 +29,7 @@
     require_reauthentication_to_approve: true
   register: approval_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - approval_result is changed
 
@@ -49,7 +49,7 @@
     require_reauthentication_to_approve: true
   register: approval_result_idem
 
-- assert:
+- ansible.builtin.assert:
     that:
       - approval_result_idem is not changed
 
@@ -69,6 +69,6 @@
     require_reauthentication_to_approve: false
   register: approval_result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - approval_result is changed

@@ -16,7 +16,7 @@
   check_mode: true
 
 - name: Verify addition of absent flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - addition_result is changed
     msg: "Adding an absent flatpak shall mark module execution as changed"
@@ -30,7 +30,7 @@
   check_mode: true
 
 - name: Verify non-existent idempotency of addition of absent flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_addition_result is changed
     msg: |
@@ -47,7 +47,7 @@
   check_mode: true
 
 - name: Verify removal of absent flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_result is not changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
@@ -63,7 +63,7 @@
   check_mode: true
 
 - name: Verify state=latest of absent flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - latest_result is changed
     msg: "state=latest an absent flatpak shall mark module execution as changed"
@@ -77,7 +77,7 @@
   check_mode: true
 
 - name: Verify non-existent idempotency of state=latest of absent flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_latest_result is changed
     msg: |
@@ -96,7 +96,7 @@
   check_mode: true
 
 - name: Verify addition of absent flatpak with from_url test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - from_url_addition_result is changed
     msg: "Adding an absent flatpak with from_url shall mark module execution as changed"
@@ -111,7 +111,7 @@
   check_mode: true
 
 - name: Verify non-existent idempotency of addition of absent flatpak with from_url test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_from_url_addition_result is changed
     msg: |
@@ -129,7 +129,7 @@
   check_mode: true
 
 - name: Verify addition of absent flatpak with url test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - url_addition_result is changed
     msg: "Adding an absent flatpak from URL shall mark module execution as changed"
@@ -145,7 +145,7 @@
 - name: >
       Verify non-existent idempotency of additionof absent flatpak with url test
       result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_url_addition_result is changed
     msg: |
@@ -162,7 +162,7 @@
   check_mode: true
 
 - name: Verify removal of absent flatpak with url test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - url_removal_result is not changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
@@ -178,7 +178,7 @@
   check_mode: true
 
 - name: Verify state=latest of absent flatpak with url test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - url_latest_result is changed
     msg: "state=latest an absent flatpak from URL shall mark module execution as changed"
@@ -194,7 +194,7 @@
 - name: >
       Verify non-existent idempotency of additionof state=latest flatpak with url test
       result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_url_latest_result is changed
     msg: |
@@ -214,7 +214,7 @@
   check_mode: true
 
 - name: Verify addition test result of present flatpak (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - addition_present_result is not changed
     msg: "Adding an present flatpak shall mark module execution as not changed"
@@ -229,7 +229,7 @@
   check_mode: true
 
 - name: Verify removal of present flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - removal_present_result is changed
     msg: "Removing a present flatpak shall mark module execution as changed"
@@ -242,7 +242,7 @@
   check_mode: true
 
 - name: Verify non-existent idempotency of removal (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_removal_present_result is changed
     msg: |
@@ -260,7 +260,7 @@
   check_mode: true
 
 - name: Verify latest test result of present flatpak (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - latest_present_result is changed
     msg: "state=latest an present flatpak shall mark module execution as changed"
@@ -277,7 +277,7 @@
   check_mode: true
 
 - name: Verify addition with from_url of present flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - from_url_addition_present_result is not changed
     msg: "Adding a present flatpak with from_url shall mark module execution as not changed"
@@ -293,7 +293,7 @@
   check_mode: true
 
 - name: Verify addition with url of present flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - url_addition_present_result is not changed
     msg: "Adding a present flatpak from URL shall mark module execution as not changed"
@@ -308,7 +308,7 @@
   check_mode: true
 
 - name: Verify removal with url of present flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - url_removal_present_result is changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
@@ -324,7 +324,7 @@
 - name: >
       Verify non-existent idempotency of installation with url of present
       flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - double_url_removal_present_result is changed
     msg: Removing an absent flatpak a second time shall still mark module execution as changed
@@ -340,7 +340,7 @@
   check_mode: true
 
 - name: Verify state=latest with url of present flatpak test result (check mode)
-  assert:
+  ansible.builtin.assert:
     that:
       - url_latest_present_result is changed
     msg: "state=latest a present flatpak from URL shall mark module execution as changed"

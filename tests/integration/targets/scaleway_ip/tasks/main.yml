@@ -19,12 +19,12 @@
 - debug: var=ip_creation_check_task
 
 - name: ip_creation_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_creation_check_task is success
 
 - name: ip_creation_check_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_creation_check_task is changed
 
@@ -38,17 +38,17 @@
 - debug: var=ip_creation_task
 
 - name: ip_creation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_creation_task is success
 
 - name: ip_creation_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_creation_task is changed
 
 - name: ip_creation_task.scaleway_ip.server is none
-  assert:
+  ansible.builtin.assert:
     that:
       - '{{ ip_creation_task.scaleway_ip.server is none }}'
 
@@ -63,17 +63,17 @@
 - debug: var=ip_creation_confirmation_task
 
 - name: ip_creation_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_creation_confirmation_task is success
 
 - name: ip_creation_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_creation_confirmation_task is not changed
 
 - name: ip_creation_confirmation_task.scaleway_ip.server is none
-  assert:
+  ansible.builtin.assert:
     that:
       - '{{ ip_creation_task.scaleway_ip.server is none }}'
 
@@ -90,12 +90,12 @@
 - debug: var=ip_reverse_assignation_check_task
 
 - name: ip_reverse_assignation_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_assignation_check_task is success
 
 - name: ip_reverse_assignation_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_assignation_check_task is success
 
@@ -111,12 +111,12 @@
 - debug: var=ip_reverse_assignation_task
 
 - name: ip_reverse_assignation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_assignation_task is success
 
 - name: ip_reverse_assignation_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_assignation_task is changed
 
@@ -132,12 +132,12 @@
 - debug: var=ip_reverse_assignation_confirmation_task
 
 - name: ip_reverse_assignation_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_assignation_confirmation_task is success
 
 - name: ip_reverse_assignation_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_assignation_confirmation_task is not changed
 
@@ -157,7 +157,7 @@
 - debug: var=server_creation_task
 
 - name: server_creation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - server_creation_task is success
 
@@ -175,12 +175,12 @@
 - debug: var=ip_assignation_check_task
 
 - name: ip_assignation_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_assignation_check_task is success
 
 - name: ip_assignation_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_assignation_check_task is success
 
@@ -197,12 +197,12 @@
 - debug: var=ip_assignation_task
 
 - name: ip_assignation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_assignation_task is success
 
 - name: ip_assignation_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_assignation_task is changed
 
@@ -219,12 +219,12 @@
 - debug: var=ip_assignation_confirmation_task
 
 - name: ip_assignation_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_assignation_confirmation_task is success
 
 - name: ip_assignation_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_assignation_confirmation_task is not changed
 
@@ -241,12 +241,12 @@
 - debug: var=ip_unassignation_check_task
 
 - name: ip_unassignation_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_unassignation_check_task is success
 
 - name: ip_unassignation_check_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_unassignation_check_task is changed
 
@@ -262,17 +262,17 @@
 - debug: var=ip_unassignation_task
 
 - name: ip_unassignation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_unassignation_task is success
 
 - name: ip_unassignation_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_unassignation_task is changed
 
 - name: ip_unassignation_task.scaleway_ip.server is none
-  assert:
+  ansible.builtin.assert:
     that:
       - '{{ ip_unassignation_task.scaleway_ip.server is none }}'
 
@@ -288,17 +288,17 @@
 - debug: var=ip_unassignation_confirmation_task
 
 - name: ip_unassignation_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_unassignation_confirmation_task is success
 
 - name: ip_unassignation_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_unassignation_confirmation_task is not changed
 
 - name: ip_unassignation_confirmation_task.scaleway_ip.server is none
-  assert:
+  ansible.builtin.assert:
     that:
       - '{{ ip_unassignation_task.scaleway_ip.server is none }}'
 
@@ -314,12 +314,12 @@
 - debug: var=ip_reverse_unassignation_check_task
 
 - name: ip_reverse_unassignation_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_unassignation_check_task is success
 
 - name: ip_reverse_unassignation_check_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_unassignation_check_task is changed
 
@@ -334,17 +334,17 @@
 - debug: var=ip_reverse_unassignation_task
 
 - name: ip_reverse_unassignation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_unassignation_task is success
 
 - name: ip_reverse_unassignation_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_unassignation_task is changed
 
 - name: ip_reverse_unassignation_task.scaleway_ip.reverse is none
-  assert:
+  ansible.builtin.assert:
     that:
       - '{{ ip_reverse_unassignation_task.scaleway_ip.reverse is none }}'
 
@@ -359,17 +359,17 @@
 - debug: var=ip_reverse_unassignation_confirmation_task
 
 - name: ip_reverse_unassignation_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_unassignation_confirmation_task is success
 
 - name: ip_reverse_unassignation_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_reverse_unassignation_confirmation_task is not changed
 
 - name: ip_reverse_unassignation_confirmation_task.scaleway_ip.server is none
-  assert:
+  ansible.builtin.assert:
     that:
       - '{{ ip_reverse_unassignation_confirmation_task.scaleway_ip.reverse is none }}'
 
@@ -387,12 +387,12 @@
 - debug: var=server_destroy_task
 
 - name: server_destroy_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - server_destroy_task is success
 
 - name: server_destroy_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - server_destroy_task is changed
 
@@ -405,12 +405,12 @@
   register: ip_deletion_check_task
 
 - name: ip_deletion_check_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_deletion_check_task is success
 
 - name: ip_deletion_check_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_deletion_check_task is changed
 
@@ -422,12 +422,12 @@
   register: ip_deletion_task
 
 - name: ip_deletion_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_deletion_task is success
 
 - name: ip_deletion_task is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_deletion_task is changed
 
@@ -439,11 +439,11 @@
   register: ip_deletion_confirmation_task
 
 - name: ip_deletion_confirmation_task is success
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_deletion_confirmation_task is success
 
 - name: ip_deletion_confirmation_task is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - ip_deletion_confirmation_task is not changed

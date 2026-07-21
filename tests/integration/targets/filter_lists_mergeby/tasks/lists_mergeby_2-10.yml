@@ -18,7 +18,7 @@
             {{ my_list|difference(result101)|to_nice_yaml|indent(2) }}
       when: debug_test|default(false)|bool
     - name: Merge 2 lists by attribute name. list_merge='keep'. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result101) | length == 0
   tags: t101
 
@@ -37,7 +37,7 @@
             {{ my_list|difference(result102)|to_nice_yaml|indent(2) }}
       when: debug_test|default(false)|bool
     - name: Merge 2 lists by attribute name. list_merge='append'. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result102) | length == 0
   tags: t102
 
@@ -56,7 +56,7 @@
             {{ my_list|difference(result103)|to_nice_yaml|indent(2) }}
       when: debug_test|default(false)|bool
     - name: Merge 2 lists by attribute name. list_merge='prepend'. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result103) | length == 0
   tags: t103
 
@@ -75,7 +75,7 @@
             {{ my_list|difference(result104)|to_nice_yaml|indent(2) }}
       when: debug_test|default(false)|bool
     - name: Merge 2 lists by attribute name. list_merge='append_rp'. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result104) | length == 0
   tags: t104
 
@@ -94,7 +94,7 @@
             {{ my_list|difference(result105)|to_nice_yaml|indent(2) }}
       when: debug_test|default(false)|bool
     - name: Merge 2 lists by attribute name. list_merge='prepend_rp'. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result105) | length == 0
   tags: t105
 
@@ -117,7 +117,7 @@
             {{ my_list|difference(result200)|to_nice_yaml|indent(2) }}
       when: debug_test|default(false)|bool
     - name: Merge by name. recursive=True list_merge='append_rp'. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result200) | length == 0
   tags: t200
 
@@ -138,6 +138,6 @@
             {{ my_list|difference(result201)|to_nice_yaml|indent(2) }}
       when: debug_test|default(false)|bool
     - name: Merge by name. recursive=False list_merge='append_rp'. assert
-      assert:
+      ansible.builtin.assert:
         that: my_list | difference(result201) | length == 0
   tags: t201

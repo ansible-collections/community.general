@@ -60,7 +60,7 @@
   when: ansible_facts.os_family == "RedHat" or ansible_facts.os_family == "Debian"
 
 - name: check that the include_non_listening parameters ('state' and 'foreign_address') are not active in default setting
-  assert:
+  ansible.builtin.assert:
     that:
       - ansible_facts.tcp_listen | selectattr('state', 'defined') | list | length == 0
       - ansible_facts.tcp_listen | selectattr('foreign_address', 'defined') | list | length == 0
@@ -79,29 +79,29 @@
   when: ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int >= 7
 
 - name: check for ansible_facts.udp_listen exists
-  assert:
+  ansible.builtin.assert:
     that: ansible_facts.udp_listen is defined
   when: ansible_facts.os_family == "RedHat" or ansible_facts.os_family == "Debian"
 
 - name: check for ansible_facts.tcp_listen exists
-  assert:
+  ansible.builtin.assert:
     that: ansible_facts.tcp_listen is defined
   when: ansible_facts.os_family == "RedHat" or ansible_facts.os_family == "Debian"
 
 - name: check that the include_non_listening parameter 'state' and 'foreign_address' exists
-  assert:
+  ansible.builtin.assert:
     that:
       - ansible_facts.tcp_listen | selectattr('state', 'defined') | list | length > 0
       - ansible_facts.tcp_listen | selectattr('foreign_address', 'defined') | list | length > 0
   when: ansible_facts.os_family == "RedHat" or ansible_facts.os_family == "Debian"
 
 - name: check TCP 5556 is in listening ports
-  assert:
+  ansible.builtin.assert:
     that: 5556 in ansible_facts.tcp_listen | map(attribute='port') | sort | list
   when: (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int >= 7) or ansible_facts.os_family == "Debian"
 
 - name: check UDP 5555 is in listening ports
-  assert:
+  ansible.builtin.assert:
     that: 5555 in ansible_facts.udp_listen | map(attribute='port') | sort | list
   when: (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int >= 7) or ansible_facts.os_family == "Debian"
 

@@ -67,7 +67,7 @@
     - offline
 
 - name: "assert test_{{test_number}} failed"
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
       - result.results[0].msg == 'invalid host state ERROR'
@@ -92,7 +92,7 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.changed
 
@@ -118,7 +118,7 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.changed
 
@@ -148,7 +148,7 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.changed
 
@@ -178,7 +178,7 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
 
@@ -203,7 +203,7 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.changed
 
@@ -228,7 +228,7 @@
   register: result
 
 - name: "assert test_{{test_number}} worked"
-  assert:
+  ansible.builtin.assert:
     that:
       - result.changed
 

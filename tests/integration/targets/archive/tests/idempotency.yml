@@ -24,7 +24,7 @@
   register: file_content_idempotency_after
 
 - name: Assert task status is changed - file content idempotency ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - file_content_idempotency_after is changed
   # Only ``zip`` archives are guaranteed to compare file content checksums rather than header checksums
@@ -59,7 +59,7 @@
   register: file_name_idempotency_after
 
 - name: Check task status - file name idempotency ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - file_name_idempotency_after is changed
 
@@ -92,7 +92,7 @@
   register: single_file_content_idempotency_after
 
 - name: Assert task status is changed - single file content idempotency ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - single_file_content_idempotency_after is changed
   # ``tar`` archives are not guaranteed to identify changes to file content if the file meta properties are unchanged.
@@ -130,7 +130,7 @@
 # The gz, bz2, and xz formats do not store the original file name
 # so it is not possible to identify a change in this scenario.
 - name: Check task status - single file name idempotency ({{ format }})
-  assert:
+  ansible.builtin.assert:
     that:
       - single_file_name_idempotency_after is changed
   when: "format in ('tar', 'zip')"

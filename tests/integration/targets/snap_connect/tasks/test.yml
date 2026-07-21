@@ -51,7 +51,7 @@
   register: connect_3
 
 - name: Assert connect results
-  assert:
+  ansible.builtin.assert:
     that:
       - connect_0 is changed
       - connect_1 is changed
@@ -91,7 +91,7 @@
   register: disconnect_3
 
 - name: Assert disconnect results
-  assert:
+  ansible.builtin.assert:
     that:
       - disconnect_0 is changed
       - disconnect_1 is changed

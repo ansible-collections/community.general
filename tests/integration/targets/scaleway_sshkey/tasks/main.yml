@@ -23,7 +23,7 @@
     state: present
   register: result2
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result1 is success and result1 is changed
       - result2 is success and result2 is not changed
@@ -43,7 +43,7 @@
     state: absent
   register: result2
 
-- assert:
+- ansible.builtin.assert:
     that:
       - result1 is success and result1 is changed
       - result2 is success and result2 is not changed

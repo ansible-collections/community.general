@@ -19,7 +19,7 @@
   register: basic_info
 
 - name: ensure python_requirements_info returns desired info
-  assert:
+  ansible.builtin.assert:
     that:
       - "'python' in basic_info"
       - "'python_version' in basic_info"
@@ -33,7 +33,7 @@
   register: dep_info
 
 - name: ensure python_requirements_info returns desired info
-  assert:
+  ansible.builtin.assert:
     that:
       - "'installed' in dep_info.valid.pip"
       - "'notreal' in dep_info.not_found"
@@ -46,6 +46,6 @@
   ignore_errors: true
 
 - name: ensure wrong specs return error
-  assert:
+  ansible.builtin.assert:
     that:
       - wrong_spec1 is failed

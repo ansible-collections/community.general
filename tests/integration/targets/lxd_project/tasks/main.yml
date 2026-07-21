@@ -29,7 +29,7 @@
   register: results
 
 - name: Check project has been created correctly
-  assert:
+  ansible.builtin.assert:
     that:
       - results is changed
       - results.actions is defined
@@ -48,7 +48,7 @@
   register: results
 
 - name: Check state is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - results is not changed
       - "{{ results.actions | length }} == 0"
@@ -66,7 +66,7 @@
   register: results
 
 - name: Check state is not changed
-  assert:
+  ansible.builtin.assert:
     that:
       - results is changed
       - "'apply_projects_configs' in results.actions"
@@ -85,7 +85,7 @@
   register: results
 
 - name: Check state is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - results is changed
       - "'apply_projects_configs' in results.actions"
@@ -104,7 +104,7 @@
   register: results
 
 - name: Check state is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - results is changed
       - "'apply_projects_configs' in results.actions"
@@ -124,7 +124,7 @@
   register: results
 
 - name: Check state is changed
-  assert:
+  ansible.builtin.assert:
     that:
       - results is changed
       - "'rename' in results.actions"
@@ -136,7 +136,7 @@
   register: results
 
 - name: Check project is deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - results is changed
       - "'delete' in results.actions"

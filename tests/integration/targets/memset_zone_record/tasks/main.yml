@@ -18,7 +18,7 @@
   ignore_errors: true
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "'Memset API returned a 403 response (ApiErrorForbidden, Bad api_key)' in result.msg"
       - result is not successful
@@ -34,7 +34,7 @@
   register: result
 
 - name: assert that record is not created
-  assert:
+  ansible.builtin.assert:
     that:
       - "'DNS zone a-non-existent-zone does not exist.' in result.msg"
       - result is not successful
@@ -50,7 +50,7 @@
   register: result
 
 - name: assert that record is not created
-  assert:
+  ansible.builtin.assert:
     that:
       - "'ansible-dns-zone-dupe matches multiple zones.' in result.msg"
       - result is not successful
@@ -68,7 +68,7 @@
   register: result
 
 - name: assert that priority was out of range
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Priority must be in the range 0 > 999 (inclusive).' in result.msg"
       - result is not successful
@@ -85,7 +85,7 @@
   register: result
 
 - name: assert that address was longer than allowed
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Address must be less than 250 characters in length.' in result.msg"
       - result is not successful
@@ -102,7 +102,7 @@
   register: result
 
 - name: assert that record was longer than allowed
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Record must be less than 63 characters in length.' in result.msg"
       - result is not successful
@@ -119,7 +119,7 @@
   register: result
 
 - name: assert that setting relative failed
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Relative is only valid for CNAME, MX, NS and SRV record types' in result.msg"
       - result is not successful
@@ -136,7 +136,7 @@
   register: result
 
 - name: assert that result would have changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -152,7 +152,7 @@
   register: result
 
 - name: assert that result changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -167,7 +167,7 @@
   register: result
 
 - name: assert that result changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -184,7 +184,7 @@
   register: result
 
 - name: assert that result changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -200,7 +200,7 @@
   register: result
 
 - name: assert that result changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -215,7 +215,7 @@
   register: result
 
 - name: assert that result changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result is successful
@@ -230,6 +230,6 @@
   register: result
 
 - name: assert that result changed
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed

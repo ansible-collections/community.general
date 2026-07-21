@@ -27,7 +27,7 @@
   register: comparison
 
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - xmlresponse is not changed
       - comparison is not changed  # identical
@@ -51,7 +51,7 @@
 
 # FIXME: This change is related to the newline added by pretty_print
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - xmlresponse is changed
       - comparison is not changed  # identical
@@ -78,7 +78,7 @@
 
 # FIXME: This change is related to the newline added by pretty_print
 - name: Test expected result
-  assert:
+  ansible.builtin.assert:
     that:
       - xmlresponse_modification is changed
       - comparison is not changed  # identical

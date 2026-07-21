@@ -16,7 +16,7 @@
   register: result
 
 - name: check API response with invalid API key
-  assert:
+  ansible.builtin.assert:
     that:
       - "'Memset API returned a 403 response (ApiErrorForbidden, Bad api_key)' in result.msg"
       - result is not successful
@@ -28,7 +28,7 @@
   register: result
 
 - name: check the request succeeded
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result is successful

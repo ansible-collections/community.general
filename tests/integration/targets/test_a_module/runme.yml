@@ -6,7 +6,7 @@
 - hosts: localhost
   tasks:
     - name: Test a_module
-      assert:
+      ansible.builtin.assert:
         that:
           # Modules/actions that do not exist
           - "'foo_bar' is not community.general.a_module"
@@ -30,7 +30,7 @@
           - "'testns.testcoll.foobar' is not community.general.a_module"
 
     - name: Test a_module in case of routing
-      assert:
+      ansible.builtin.assert:
         that:
           # Redirected module
           - "'ufw' is community.general.a_module"

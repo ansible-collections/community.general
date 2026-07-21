@@ -9,21 +9,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: test zero is 0
-  assert:
+  ansible.builtin.assert:
     that:
       - "('0' | community.general.to_milliseconds) == 0"
       - "('0' | community.general.to_seconds) == 0"
       - "('0' | community.general.to_minutes) == 0"
 
 - name: test to_milliseconds filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('1000ms' | community.general.to_milliseconds) == 1000"
       - "('1s' | community.general.to_milliseconds) == 1000"
       - "('1m' | community.general.to_milliseconds) == 60000"
 
 - name: test to_seconds filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('1000msecs' | community.general.to_seconds) == 1"
       - "('1ms' | community.general.to_seconds) == 0.001"
@@ -34,7 +34,7 @@
       - "('2d -2d -12s' | community.general.to_seconds) == -12"
 
 - name: test to_minutes filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('30s' | community.general.to_minutes) == 0.5"
       - "('12m' | community.general.to_minutes) == 12"
@@ -42,13 +42,13 @@
       - "('300s' | community.general.to_minutes) == 5"
 
 - name: test to_hours filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('30m' | community.general.to_hours) == 0.5"
       - "('3h 119m 61s' | community.general.to_hours) > 5"
 
 - name: test to_days filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('1year' | community.general.to_days) == 365"
       - "('1week' | community.general.to_days) == 7"
@@ -57,14 +57,14 @@
       - "('1mo' | community.general.to_days(month=28)) == 28"
 
 - name: test to_weeks filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('1y' | community.general.to_weeks | int) == 52"
       - "('7d' | community.general.to_weeks) == 1"
       - "('1mo' | community.general.to_weeks(month=28)) == 4"
 
 - name: test to_months filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('30d' | community.general.to_months) == 1"
       - "('1year' | community.general.to_months | int) == 12"
@@ -72,7 +72,7 @@
       - "('1years' | community.general.to_months(month=2, year=34)) == 17"
 
 - name: test to_years filter
-  assert:
+  ansible.builtin.assert:
     that:
       - "('365d' | community.general.to_years | int) == 1"
       - "('12mo' | community.general.to_years | round(0, 'ceil')) == 1"
@@ -85,7 +85,7 @@
   register: res
 
 - name: verify test fail unknown unit
-  assert:
+  ansible.builtin.assert:
     that:
       - res is failed
       - "'to_time_unit() can not convert to the following unit: lightyears' in res.msg"
@@ -97,7 +97,7 @@
   register: res
 
 - name: test fail unknown string
-  assert:
+  ansible.builtin.assert:
     that:
       - res is failed
       - "'to_time_unit() can not interpret following string' in res.msg"
@@ -109,7 +109,7 @@
   register: res
 
 - name: test fail unknown kwarg
-  assert:
+  ansible.builtin.assert:
     that:
       - res is failed
       - "'to_time_unit() got unknown keyword arguments' in res.msg"

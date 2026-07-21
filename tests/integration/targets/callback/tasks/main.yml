@@ -48,7 +48,7 @@
           {%- endfor -%}"
 
     - name: Assert test output equals expected output
-      assert:
+      ansible.builtin.assert:
         that: result.output.differences | length == 0
       loop: "{{ outputs.results | callback_results_extractor }}"
       loop_control:

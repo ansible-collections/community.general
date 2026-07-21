@@ -101,7 +101,7 @@
   register: result
 
 - name: Assert mapping created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | length == 2
@@ -120,7 +120,7 @@
   register: result
 
 - name: Assert mapping created
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state | length == 2
@@ -140,7 +140,7 @@
   register: result
 
 - name: Assert mapping deleted
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | length == 1
@@ -162,7 +162,7 @@
   register: result
 
 - name: Assert failed mapping missing role
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
 
@@ -181,7 +181,7 @@
   register: result
 
 - name: Assert result
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | length == 2
@@ -200,7 +200,7 @@
   register: result
 
 - name: Assert failed mapping role to full scope client
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
 
@@ -217,7 +217,7 @@
   register: result
 
 - name: Assert result
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | length == 1
@@ -236,7 +236,7 @@
   register: result
 
 - name: Assert result
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | length == 2
@@ -256,7 +256,7 @@
   register: result
 
 - name: Assert result
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | length == 0
@@ -275,7 +275,7 @@
   register: result
 
 - name: Assert failed mapping missing realm role
-  assert:
+  ansible.builtin.assert:
     that:
       - result is failed
 
@@ -294,7 +294,7 @@
   register: result
 
 - name: Assert result
-  assert:
+  ansible.builtin.assert:
     that:
       - result is changed
       - result.end_state | length == 2
@@ -311,7 +311,7 @@
   register: result
 
 - name: Assert result
-  assert:
+  ansible.builtin.assert:
     that:
       - result is not changed
       - result.end_state | length == 0

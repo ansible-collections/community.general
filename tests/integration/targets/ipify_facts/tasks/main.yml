@@ -28,7 +28,7 @@
   delay: 10
 
 - name: check if task was successful
-  assert:
+  ansible.builtin.assert:
     that:
       - external_ip is not changed
       - external_ip.ansible_facts is defined
