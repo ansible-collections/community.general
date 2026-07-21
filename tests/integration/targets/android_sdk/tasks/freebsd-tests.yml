@@ -22,7 +22,7 @@
   register: sources_android_26_installed2
 
 - name: Stat build-tools (FreeBSD)
-  stat:
+  ansible.builtin.stat:
     path: "{{ android_sdk_location }}/sources/android-26"
   register: sources_android_26
 
@@ -47,7 +47,7 @@
   register: new_root_package
 
 - name: Check package is installed (FreeBSD)
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/sources/android-26"
   register: new_root_package_stat
 

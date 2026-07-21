@@ -21,12 +21,12 @@
   register: decompressed_check_mode_2
 
 - name: Stat original compressed file
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/file.txt.gz"
   register: original_file
 
 - name: Stat non-existing file
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/file_from_gz.txt"
   register: nonexisting_stat
 
@@ -58,7 +58,7 @@
   register: decompress_non_existing_src
 
 - name: Stat compressed file
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/file_copied.txt.gz"
   register: compressed_stat
 

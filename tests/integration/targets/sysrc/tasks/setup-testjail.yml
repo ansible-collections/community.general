@@ -44,7 +44,7 @@
 
 - name: Has ezjail
   register: ezjail_base_jail
-  stat:
+  ansible.builtin.stat:
     path: /usr/jails/basejail
 
 - name: Setup ezjail base
@@ -54,7 +54,7 @@
 
 - name: Has testjail
   register: ezjail_test_jail
-  stat:
+  ansible.builtin.stat:
     path: /usr/jails/testjail
 
 - name: Create testjail

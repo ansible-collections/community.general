@@ -35,7 +35,7 @@
       command: which brew
       register: brew_which
     - name: Get owner of brew binary
-      stat:
+      ansible.builtin.stat:
         path: "{{ brew_which.stdout }}"
       register: brew_stat
     - name: "Install package"
@@ -66,7 +66,7 @@
     state: directory
 
 - name: Check that sdkmanager is installed
-  stat:
+  ansible.builtin.stat:
     path: "{{ android_sdk_location }}/cmdline-tools/latest/bin/sdkmanager"
   register: sdkmanager_installed
 

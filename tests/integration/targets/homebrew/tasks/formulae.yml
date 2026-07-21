@@ -14,7 +14,7 @@
   register: brew_which
 
 - name: Get owner of brew binary
-  stat:
+  ansible.builtin.stat:
     path: "{{ brew_which.stdout }}"
   register: brew_stat
 

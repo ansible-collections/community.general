@@ -40,12 +40,12 @@
 - debug: var=hg_result2
 
 - name: check if tags exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ checkout_dir }}/.hgtags"
   register: hg_tags
 
 - name: check for remotes
-  stat:
+  ansible.builtin.stat:
     path: "{{ checkout_dir }}/.hg/branch"
   register: branches
 

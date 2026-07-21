@@ -9,7 +9,7 @@
     dest: "{{ remote_tmp_dir }}"
 
 - name: Get original file stat
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/file.txt"
   register: orig_file_stat
 
@@ -43,7 +43,7 @@
       command: which brew
       register: brew_which
     - name: Get owner of brew binary
-      stat:
+      ansible.builtin.stat:
         path: "{{ brew_which.stdout }}"
       register: brew_stat
     - name: "Install package"

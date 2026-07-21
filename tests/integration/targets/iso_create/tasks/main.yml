@@ -38,7 +38,7 @@
 - debug: var=iso_result
 
 - name: Check if iso file created
-  stat:
+  ansible.builtin.stat:
     path: "{{ output_test_dir }}/test.iso"
   register: iso_file
 - debug: var=iso_file
@@ -57,7 +57,7 @@
 - debug: var=iso_result
 
 - name: Check if iso file created
-  stat:
+  ansible.builtin.stat:
     path: "{{ output_test_dir }}/test.iso"
   register: iso_file
 
@@ -77,7 +77,7 @@
 - debug: var=iso_result
 
 - name: Check if iso file created
-  stat:
+  ansible.builtin.stat:
     path: "{{ output_test_dir }}/test1.iso"
   register: iso_file
 
@@ -96,7 +96,7 @@
 - debug: var=iso_result
 
 - name: Check if iso file created
-  stat:
+  ansible.builtin.stat:
     path: "{{ output_test_dir }}/test2.iso"
   register: iso_file
 
@@ -115,7 +115,7 @@
 - debug: var=iso_result
 
 - name: Check if iso file created
-  stat:
+  ansible.builtin.stat:
     path: "{{ output_test_dir }}/test3.iso"
   register: iso_file
 
@@ -134,7 +134,7 @@
 - debug: var=iso_result
 
 - name: Check if iso file created
-  stat:
+  ansible.builtin.stat:
     path: "{{ output_test_dir }}/test4.iso"
   register: iso_file
 
@@ -153,7 +153,7 @@
 - debug: var=iso_result
 
 - name: Check if iso file created
-  stat:
+  ansible.builtin.stat:
     path: "{{ output_test_dir }}/test5.iso"
   register: iso_file
 

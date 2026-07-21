@@ -14,7 +14,7 @@
         mode: '0644'
 
     - name: assert file without content exists
-      stat:
+      ansible.builtin.stat:
         path: "{{ remote_tmp }}/test_empty.txt"
       register: empty_file_stat
 

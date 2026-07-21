@@ -13,7 +13,7 @@
     dest: '{{ bl_file }}'
 
 - name: Original stat
-  stat:
+  ansible.builtin.stat:
     path: '{{ bl_file }}'
   register: orig_stat
 
@@ -32,7 +32,7 @@
   register: bl_test_1a
 
 - name: stat_test_1
-  stat:
+  ansible.builtin.stat:
     path: '{{ bl_file }}'
   register: stat_test_1
 
