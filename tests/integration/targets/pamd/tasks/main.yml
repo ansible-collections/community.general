@@ -36,7 +36,7 @@
     state: updated
   register: pamd_file_output_noargs
 - name: Read back the file (3260)
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ test_pamd_file }}"
   register: pamd_file_slurp_noargs
 - name: Check if changes made (3260)
@@ -64,7 +64,7 @@
     module_arguments: silent
   register: pamd_file_output_empty
 - name: Read back the file
-  slurp:
+  ansible.builtin.slurp:
     src: "{{ test_pamd_file }}"
   register: pamd_file_slurp
 - name: Check if changes made

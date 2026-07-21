@@ -585,7 +585,7 @@
       loop: "{{ looplist }}"
 
     - name: Read in duplicate file contents
-      slurp:
+      ansible.builtin.slurp:
         src: /usr/lib/duplicate/duplicate.txt
       register: duplicate_out
 
@@ -609,7 +609,7 @@
       loop: "{{ looplist }}"
 
     - name: Read in duplicate file contents
-      slurp:
+      ansible.builtin.slurp:
         src: /usr/lib/duplicate/duplicate.txt
       register: duplicate_out
 
