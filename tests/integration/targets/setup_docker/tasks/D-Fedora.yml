@@ -9,7 +9,7 @@
 
 - name: Install dnf-plugins-core
   become: true
-  package:
+  ansible.builtin.package:
     name: dnf-plugins-core
     state: present
   notify: "D-Fedora : Remove dnf-plugins-core"
@@ -22,7 +22,7 @@
 
 - name: Install docker
   become: true
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: present
   loop: "{{ docker_packages }}"

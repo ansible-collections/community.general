@@ -27,7 +27,7 @@
   when: ansible_facts.pkg_mgr == 'apt'
 
 - name: install mercurial package
-  package:
+  ansible.builtin.package:
     name: mercurial
     state: present
   when: ansible_facts.pkg_mgr in ['apk', 'community.general.apk', 'pacman', 'community.general.pacman', 'pkgng', 'community.general.pkgng', 'zypper', 'community.general.zypper']

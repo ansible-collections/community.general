@@ -9,14 +9,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: ensure iptables package is installed (non-RHEL)
-  package:
+  ansible.builtin.package:
     name:
       - iptables
   become: true
   when: not (ansible_facts.distribution == 'RedHat' and ansible_facts.distribution_major_version|int >= 10)
 
 - name: ensure iptables package is installed (RHEL 10+)
-  package:
+  ansible.builtin.package:
     name:
       - "kernel-modules-extra-matched-{{ ansible_facts.kernel }}"
       - "iptables-nft"

@@ -9,13 +9,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install iptables (SuSE only)
-  package:
+  ansible.builtin.package:
     name: iptables
   become: true
   when: ansible_facts.os_family == 'Suse'
 - name: Install ufw
   become: true
-  package:
+  ansible.builtin.package:
     name: ufw
 
 # Run the tests

@@ -5,7 +5,7 @@
 
 - block:
     - name: Install cargo
-      package:
+      ansible.builtin.package:
         name: cargo
         state: present
     - set_fact:
@@ -16,7 +16,7 @@
 
 - block:
     - name: Install rust (containing cargo)
-      package:
+      ansible.builtin.package:
         name: rust
         state: present
     - set_fact:

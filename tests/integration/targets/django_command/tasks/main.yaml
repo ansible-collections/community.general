@@ -10,7 +10,7 @@
   register: tmp_django_root
 
 - name: Install OS package virtualenv
-  package:
+  ansible.builtin.package:
     name: "{{ os_package_name.virtualenv }}"
     state: present
 

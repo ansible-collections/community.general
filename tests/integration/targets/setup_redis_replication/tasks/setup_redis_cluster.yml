@@ -7,7 +7,7 @@
 # to be able to check replication (one server for master, another for replica).
 
 - name: Install redis dependencies
-  package:
+  ansible.builtin.package:
     name: "{{ redis_packages[ansible_facts.distribution] }}"
     state: latest
     policy_rc_d: "{{ 101 if ansible_facts.pkg_mgr == 'apt' else omit }}"

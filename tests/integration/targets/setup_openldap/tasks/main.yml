@@ -15,13 +15,13 @@
 
     - name: Install OpenLDAP server and tools
       become: true
-      package:
+      ansible.builtin.package:
         name: '{{ item }}'
       loop: '{{ openldap_packages_name }}'
 
     - name: Install python-ldap
       become: true
-      package:
+      ansible.builtin.package:
         name: '{{ python_ldap_package_name_python3 }}'
 
     - name: Make sure OpenLDAP service is stopped

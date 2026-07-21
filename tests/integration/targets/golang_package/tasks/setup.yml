@@ -10,7 +10,7 @@
 
 - block:
     - name: Install Go
-      package:
+      ansible.builtin.package:
         name: "{{ golang_package_name }}"
         state: present
 

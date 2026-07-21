@@ -28,7 +28,7 @@
         dest: /etc/zypp/repos.d/security:privacy.repo
 
     - name: SUSE | Install package
-      package:
+      ansible.builtin.package:
         name: password-store
         state: present
         update_cache: true

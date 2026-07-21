@@ -23,7 +23,7 @@
           paths:
             - vars
     - name: install cron package
-      package:
+      ansible.builtin.package:
         name: '{{ cron_pkg }}'
       when: (cron_pkg | default(false, true)) is truthy
       register: cron_package_installed
@@ -31,7 +31,7 @@
     - when: (faketime_pkg | default(false, true)) is truthy
       block:
         - name: install cron and faketime packages
-          package:
+          ansible.builtin.package:
             name: '{{ faketime_pkg }}'
           register: faketime_package_installed
           until: faketime_package_installed is success

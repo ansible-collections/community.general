@@ -22,7 +22,7 @@
 
 - name: Install dependencies
   become: true
-  package:
+  ansible.builtin.package:
     name:
       - "{{ openjdk_pkg }}"
       - unzip

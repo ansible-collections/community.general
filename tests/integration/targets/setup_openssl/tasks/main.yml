@@ -23,13 +23,13 @@
 
 - name: Install OpenSSL
   become: true
-  package:
+  ansible.builtin.package:
     name: '{{ openssl_package_name }}'
   when: not ansible_facts.os_family == 'Darwin'
 
 - name: Install cryptography
   become: true
-  package:
+  ansible.builtin.package:
     name: '{{ cryptography_package_name_python3 }}'
   when: not cryptography_from_pip
 
@@ -42,7 +42,7 @@
 
 - name: Install pyOpenSSL
   become: true
-  package:
+  ansible.builtin.package:
     name: '{{ pyopenssl_package_name_python3 }}'
   when: pyopenssl_package_name_python3 is defined
 
