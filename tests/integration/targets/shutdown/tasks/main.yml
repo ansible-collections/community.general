@@ -96,7 +96,7 @@
   when: ansible_facts.system == 'VMKernel'
 
 - name: Ensure that systemd-sysv is absent in Ubuntu and Debian
-  apt:
+  ansible.builtin.apt:
     name: sytemd-sysv
     state: absent
   when: ansible_facts.distribution in ['Ubuntu', 'Debian']
@@ -116,7 +116,7 @@
     - '"systemd-sysv" not in ansible_facts.packages'
 
 - name: Install systemd_sysv in case it has been removed in test
-  apt:
+  ansible.builtin.apt:
     name: systemd-sysv
     state: present
   when:
