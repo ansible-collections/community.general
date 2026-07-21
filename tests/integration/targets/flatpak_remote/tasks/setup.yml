@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install flatpak on Fedora
-  dnf:
+  ansible.builtin.dnf:
     name: flatpak
     state: present
   when: ansible_facts.distribution == 'Fedora'
 - name: Install flatpak package on Ubuntu
-  apt:
+  ansible.builtin.apt:
     name: flatpak
     state: present
   when: ansible_facts.distribution == 'Ubuntu'

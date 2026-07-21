@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install https transport for apt
-  apt:
+  ansible.builtin.apt:
     name: apt-transport-https
     state: latest
     force: true
 
 - name: Install Mosquitto Server
-  apt:
+  ansible.builtin.apt:
     name: mosquitto
     state: latest
   register: result

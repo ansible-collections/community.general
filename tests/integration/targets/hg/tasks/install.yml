@@ -33,12 +33,12 @@
   when: ansible_facts.pkg_mgr in ['apk', 'community.general.apk', 'pacman', 'community.general.pacman', 'pkgng', 'community.general.pkgng', 'zypper', 'community.general.zypper']
 
 - name: install mercurial (dnf)
-  dnf:
+  ansible.builtin.dnf:
     name: mercurial
   when: ansible_facts.pkg_mgr == 'dnf'
 
 - name: install mercurial (yum)
-  yum:
+  ansible.builtin.yum:
     name: mercurial
   when: ansible_facts.pkg_mgr == 'yum'
 

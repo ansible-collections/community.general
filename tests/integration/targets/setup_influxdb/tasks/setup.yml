@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install https transport for apt and ca-certificates
-  apt: name={{ item }} state=latest force=yes
+  ansible.builtin.apt: name={{ item }} state=latest force=yes
   with_items:
     - apt-transport-https
     - ca-certificates
