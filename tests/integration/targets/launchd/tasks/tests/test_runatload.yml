@@ -25,7 +25,7 @@
       - test_1_launchd_start_result.status.status_code == '0'
 
 - name: "[{{ item }}] Validate that RunAtLoad is set to true"
-  replace:
+  ansible.builtin.replace:
     path: "{{ launchd_plist_location }}"
     regexp: |
       \s+<key>RunAtLoad</key>
