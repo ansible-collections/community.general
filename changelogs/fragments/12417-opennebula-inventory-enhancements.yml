@@ -1,0 +1,7 @@
+minor_changes:
+  - "opennebula inventory plugin - expose ``UNAME`` (VM owner) and ``GNAME`` (VM group)
+     as host variables, enabling ``keyed_groups`` based on ownership
+     (https://github.com/ansible-collections/community.general/pull/12417)."
+  - "opennebula inventory plugin - add ``prefer_existing_ansible_host`` option to skip
+     setting ``ansible_host`` when the host already has one from an earlier inventory source
+     (https://github.com/ansible-collections/community.general/pull/12417)."
