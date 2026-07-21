@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install influxdb python module
-  pip: name=influxdb
+  ansible.builtin.pip: name=influxdb
 
 - name: Test add admin user in check mode
   block:

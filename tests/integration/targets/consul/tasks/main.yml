@@ -15,7 +15,7 @@
     consul_cmd: '{{ remote_tmp_dir }}/consul'
   block:
     - name: Install py-consul
-      pip:
+      ansible.builtin.pip:
         name: py-consul
         extra_args: "-c {{ remote_constraints }}"
       register: result

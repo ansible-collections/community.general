@@ -10,7 +10,7 @@
     - ca-certificates
 
 - name: Install apt_key dependencies
-  pip: name={{ item }}
+  ansible.builtin.pip: name={{ item }}
   with_items:
     - pyOpenSSL
     - ndg-httpsclient

@@ -35,7 +35,7 @@
 
 - name: Install cryptography (pip)
   become: true
-  pip:
+  ansible.builtin.pip:
     name: cryptography>=3.3
     extra_args: "-c {{ remote_constraints }}"
   when: cryptography_from_pip

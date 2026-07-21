@@ -14,7 +14,7 @@
   notify: cleanup redis
 
 - name: Install redis module
-  pip:
+  ansible.builtin.pip:
     name: "{{ redis_module }}"
     extra_args: "-c {{ remote_constraints }}"
     state: present

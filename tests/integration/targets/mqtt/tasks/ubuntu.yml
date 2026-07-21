@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install pip packages
-  pip:
+  ansible.builtin.pip:
     name: paho-mqtt>=1.4.0
     state: present
 

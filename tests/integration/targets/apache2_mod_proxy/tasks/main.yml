@@ -70,7 +70,7 @@
     state: restarted
 
 - name: Install BeautifulSoup
-  pip:
+  ansible.builtin.pip:
     name: BeautifulSoup4
     extra_args: "-c {{ remote_constraints }}"
 

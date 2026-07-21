@@ -51,13 +51,13 @@
         dest: "{{ process_file }}"
 
     - name: Install virtualenv on Arch Linux
-      pip:
+      ansible.builtin.pip:
         name: virtualenv
         state: present
       when: ansible_facts.os_family == 'Archlinux'
 
     - name: install dependencies
-      pip:
+      ansible.builtin.pip:
         name: "{{ item }}"
         virtualenv: "{{ process_venv }}"
         virtualenv_command: "{{ virtualenv_command }}"

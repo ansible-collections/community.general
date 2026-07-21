@@ -19,13 +19,13 @@
     virtualenv {{ tmp_django_root.path }}/venv
 
 - name: Update python package pip
-  pip:
+  ansible.builtin.pip:
     name: pip
     state: latest
     virtualenv: "{{ tmp_django_root.path }}/venv"
 
 - name: Install python package django
-  pip:
+  ansible.builtin.pip:
     name: django
     state: present
     virtualenv: "{{ tmp_django_root.path }}/venv"

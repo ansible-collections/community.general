@@ -17,7 +17,7 @@
 
     # NOTE: If the system does not support smtpd-tls (python 2.6 and older) we do basic tests
     - name: Attempt to install smtpd-tls
-      pip:
+      ansible.builtin.pip:
         name: smtpd-tls
         state: present
       ignore_errors: true

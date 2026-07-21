@@ -15,7 +15,7 @@
     state: present
 
 - name: Install required library
-  pip:
+  ansible.builtin.pip:
     name: django
     state: present
     virtualenv: "{{ tmp_django_root.path }}/venv"

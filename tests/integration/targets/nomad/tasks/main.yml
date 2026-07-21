@@ -12,14 +12,14 @@
     or ansible_facts.os_family == 'Darwin'
 
 - name: Install python-nomad
-  pip:
+  ansible.builtin.pip:
     name: python-nomad
     extra_args: "-c {{ remote_constraints }}"
   register: result
   until: result is success
 
 - name: Install jmespath
-  pip:
+  ansible.builtin.pip:
     name: jmespath
     extra_args: "-c {{ remote_constraints }}"
   register: result

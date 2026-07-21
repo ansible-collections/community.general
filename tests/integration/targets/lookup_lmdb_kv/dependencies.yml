@@ -6,7 +6,7 @@
 - hosts: localhost
   tasks:
     - name: Install LMDB Python package
-      pip:
+      ansible.builtin.pip:
         name: lmdb
       environment:
         LMDB_PURE: "1"
