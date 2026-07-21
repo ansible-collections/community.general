@@ -22,7 +22,7 @@
   register: skiaparser_1_installed_2
 
 - name: Stat skiaparser;1
-  stat:
+  ansible.builtin.stat:
     path: "{{ android_sdk_location }}/skiaparser/1"
   register: skiaparser_1_stat
 
@@ -66,7 +66,7 @@
   register: new_root_package
 
 - name: Check package is installed
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/skiaparser/1"
   register: new_root_package_stat
 

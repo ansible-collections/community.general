@@ -57,7 +57,7 @@
   register: hg_interpreter
 
 - name: stat the mercurial interpreter
-  stat:
+  ansible.builtin.stat:
     path: "{{ hg_interpreter.stdout[2:] }}"
   register: stat_hg_interpreter
 

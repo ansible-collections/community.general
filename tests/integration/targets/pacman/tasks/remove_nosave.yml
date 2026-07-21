@@ -35,7 +35,7 @@
         state: absent
 
     - name: Make sure {{config_file}}.pacsave exists
-      stat:
+      ansible.builtin.stat:
         path: '{{config_file}}.pacsave'
       register: pacsave_st_1
 
@@ -67,7 +67,7 @@
         state: absent
 
     - name: Make sure {{config_file}}.pacsave does not exist
-      stat:
+      ansible.builtin.stat:
         path: '{{config_file}}.pacsave'
       register: pacsave_st_2
 

@@ -23,7 +23,7 @@
     remove: true
 
 - name: Stat result files
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/{{ filename }}"
   loop:
     - dest.txt

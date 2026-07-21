@@ -19,7 +19,7 @@
 - debug: var=mount_root_dir
 
 - name: Check the file test01.cfg is deleted
-  stat:
+  ansible.builtin.stat:
     path: "{{ mount_root_dir }}/test01.cfg"
   register: check_file
 

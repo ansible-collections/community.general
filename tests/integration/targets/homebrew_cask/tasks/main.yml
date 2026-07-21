@@ -15,7 +15,7 @@
   when: ansible_facts.distribution in ['MacOSX']
 
 - name: Get owner of brew binary
-  stat:
+  ansible.builtin.stat:
     path: "{{ brew_which.stdout }}"
   register: brew_stat
   when: ansible_facts.distribution in ['MacOSX']

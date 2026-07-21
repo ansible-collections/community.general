@@ -33,7 +33,7 @@
       register: npm_install_no_bin_links_disabled
 
     - name: 'Make sure .bin folder has been created'
-      stat:
+      ansible.builtin.stat:
         path: "{{ remote_dir }}/node_modules/.bin"
       register: npm_dotbin_folder_disabled
 
@@ -54,7 +54,7 @@
       register: npm_install_no_bin_links_enabled
 
     - name: 'Make sure .bin folder has not been created'
-      stat:
+      ansible.builtin.stat:
         path: "{{ remote_dir }}/node_modules/.bin"
       register: npm_dotbin_folder_enabled
 

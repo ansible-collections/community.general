@@ -17,7 +17,7 @@
   become: true
 
 - name: Determine whether the app is installed
-  stat:
+  ansible.builtin.stat:
     path: /Applications/Rested.app
   register: install_status
 
@@ -45,7 +45,7 @@
       - install_check.msg == "Installed 1 app(s)"
 
 - name: Determine whether the app is installed
-  stat:
+  ansible.builtin.stat:
     path: /Applications/Rested.app
   register: install_status
 
@@ -67,7 +67,7 @@
       - install.msg == "Installed 1 app(s)"
 
 - name: Determine whether the app is installed
-  stat:
+  ansible.builtin.stat:
     path: /Applications/Rested.app
   register: install_status
 
@@ -108,7 +108,7 @@
       - uninstall_check.msg == "Uninstalled 1 app(s)"
 
 - name: Determine whether the app is installed
-  stat:
+  ansible.builtin.stat:
     path: /Applications/Rested.app
   register: install_status
 
@@ -131,7 +131,7 @@
       - uninstall.msg == "Uninstalled 1 app(s)"
 
 - name: Determine whether the app is installed
-  stat:
+  ansible.builtin.stat:
     path: /Applications/Rested.app
   register: uninstall_status
 

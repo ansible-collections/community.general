@@ -45,7 +45,7 @@
   register: archive_file_options
 
 - name: Retrieve archive file information - file options ({{ format }})
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
   register: archive_file_options_stat
 
@@ -69,7 +69,7 @@
   register: archive_nonascii
 
 - name: Retrieve archive file information - non-ascii ({{ format }})
-  stat:
+  ansible.builtin.stat:
     path: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
   register: archive_nonascii_stat
 

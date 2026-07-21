@@ -37,12 +37,12 @@
 # Get results
 
 - name: "stat foobarrc (must not exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc }}"
   register: diversion_4
 
 - name: "stat foobarrc.distrib (must exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc_distrib }}"
   register: diversion_5
 
@@ -101,12 +101,12 @@
 # Check results
 
 - name: "stat foobarrc (must exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc }}"
   register: diversion_4
 
 - name: "stat foobarrc.distrib (must not exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc_distrib }}"
   register: diversion_5
 
@@ -187,12 +187,12 @@
 # Check results
 
 - name: "stat foobarrc (must not exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc }}"
   register: diversion_6
 
 - name: "stat foobarrc.distrib (must exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc_distrib }}"
   register: diversion_7
 
@@ -261,17 +261,17 @@
 # Check results
 
 - name: "stat foobarrc (must exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc }}"
   register: diversion_4
 
 - name: "stat foobarrc.ansible (must exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc_ansible }}"
   register: diversion_5
 
 - name: "stat foobarrc.distrib (must not exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc_distrib }}"
   register: diversion_6
 
@@ -354,17 +354,17 @@
 # Check results
 
 - name: "stat foobarrc (must exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc }}"
   register: diversion_6
 
 - name: "stat foobarrc.distrib (must not exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc_distrib }}"
   register: diversion_7
 
 - name: "stat foobarrc.ansible (must not exist)"
-  stat:
+  ansible.builtin.stat:
     path: "{{ foobarrc_ansible }}"
   register: diversion_8
 
