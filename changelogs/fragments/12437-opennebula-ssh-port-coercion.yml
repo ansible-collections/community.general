@@ -1,0 +1,3 @@
+bugfixes:
+  - "opennebula inventory plugin - coerce ``SSH_PORT`` to an integer before setting
+     ``ansible_port`` (https://github.com/ansible-collections/community.general/pull/12437)."
