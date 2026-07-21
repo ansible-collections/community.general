@@ -119,7 +119,7 @@
   when: ansible_facts.os_family == 'Suse'
 
 - name: Pause between stop and start postgresql
-  pause:
+  ansible.builtin.pause:
     seconds: 5
   when: ansible_facts.os_family == 'Suse'
 
@@ -219,7 +219,7 @@
   ansible.builtin.service: name={{ postgresql_service }} state=started
 
 - name: Pause between start and stop
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 - name: Kill all postgres processes
@@ -234,7 +234,7 @@
   when: terminate is not succeeded
 
 - name: Pause between stop and start
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 - name: Start postgresql service
