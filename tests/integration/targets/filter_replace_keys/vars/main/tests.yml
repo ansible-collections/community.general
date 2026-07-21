@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 tests:
-  - ansible.builtin.template: default.j2
+  - template: default.j2
     group:
       - d: By default, match keys that equal any of the attributes before.
         tt:
@@ -16,7 +16,7 @@ tests:
     result:
       - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
       - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
-  - ansible.builtin.template: mp.j2
+  - template: mp.j2
     group:
       - d: Replace keys that starts with any of the attributes before.
         mp: starts_with
@@ -39,7 +39,7 @@ tests:
     result:
       - {a0: A0, a1: B0, k2_x2: [C0], k3_x3: foo}
       - {a0: A1, a1: B1, k2_x2: [C1], k3_x3: bar}
-  - ansible.builtin.template: mp.j2
+  - template: mp.j2
     group:
       - d: If more keys match the same attribute before the last one will be used.
         mp: regex
@@ -56,7 +56,7 @@ tests:
     result:
       - X: foo
       - X: bar
-  - ansible.builtin.template: mp.j2
+  - template: mp.j2
     group:
       - d: If there are more matches for a key the first one will be used.
         mp: starts_with
