@@ -22,30 +22,50 @@
     ### copy local file with unicode filename and content
 
     - name: create local file with unicode filename and content
-      ansible.builtin.lineinfile: dest={{ local_tmp }}-汉语/汉语.txt create=true line=汉语
+      ansible.builtin.lineinfile:
+        dest: "{{ local_tmp }}-汉语/汉语.txt"
+        create: true
+        line: "汉语"
       delegate_to: localhost
     - name: remove remote file with unicode filename and content
-      action: "{{ action_prefix }}file path={{ remote_tmp }}-汉语/汉语.txt state=absent"
+      ansible.builtin.file:
+        path: "{{ remote_tmp }}-汉语/汉语.txt"
+        state: absent
     - name: create remote directory with unicode name
-      action: "{{ action_prefix }}file path={{ remote_tmp }}-汉语 state=directory"
+      ansible.builtin.file:
+        path: "{{ remote_tmp }}-汉语"
+        state: directory
     - name: copy local file with unicode filename and content
-      action: "{{ action_prefix }}copy src={{ local_tmp }}-汉语/汉语.txt dest={{ remote_tmp }}-汉语/汉语.txt"
+      ansible.builtin.copy:
+        src: "{{ local_tmp }}-汉语/汉语.txt"
+        dest: "{{ remote_tmp }}-汉语/汉语.txt"
 
     ### fetch remote file with unicode filename and content
 
     - name: remove local file with unicode filename and content
-      ansible.builtin.file: path={{ local_tmp }}-汉语/汉语.txt state=absent
+      ansible.builtin.file:
+        path: "{{ local_tmp }}-汉语/汉语.txt"
+        state: absent
       delegate_to: localhost
     - name: fetch remote file with unicode filename and content
-      ansible.builtin.fetch: src={{ remote_tmp }}-汉语/汉语.txt dest={{ local_tmp }}-汉语/汉语.txt fail_on_missing=true validate_checksum=true flat=true
+      ansible.builtin.fetch:
+        src: "{{ remote_tmp }}-汉语/汉语.txt"
+        dest: "{{ local_tmp }}-汉语/汉语.txt"
+        fail_on_missing: true
+        validate_checksum: true
+        flat: true
 
     ### remove local and remote temp files
 
     - name: remove local temp file
-      ansible.builtin.file: path={{ local_tmp }}-汉语 state=absent
+      ansible.builtin.file:
+        path: "{{ local_tmp }}-汉语"
+        state: absent
       delegate_to: localhost
     - name: remove remote temp file
-      action: "{{ action_prefix }}file path={{ remote_tmp }}-汉语 state=absent"
+      ansible.builtin.file:
+        path: "{{ remote_tmp }}-汉语"
+        state: absent
 
     ### test wait_for_connection plugin
     - ansible.builtin.wait_for_connection:

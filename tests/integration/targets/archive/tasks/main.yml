@@ -13,7 +13,9 @@
 
 # Test setup
 - name: prep our files
-  ansible.builtin.copy: src={{ item }} dest={{remote_tmp_dir}}/{{ item }}
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{remote_tmp_dir}}/{{ item }}"
   with_items:
     - foo.txt
     - bar.txt
@@ -44,11 +46,15 @@
 
 # Install dependencies
 - name: Ensure zip is present to create test archive (yum)
-  ansible.builtin.dnf: name=zip state=latest
+  ansible.builtin.dnf:
+    name: zip
+    state: latest
   when: ansible_facts.pkg_mgr == 'yum'
 
 - name: Ensure zip is present to create test archive (apt)
-  ansible.builtin.apt: name=zip state=latest
+  ansible.builtin.apt:
+    name: zip
+    state: latest
   when: ansible_facts.pkg_mgr == 'apt'
 
 - name: Define formats to test

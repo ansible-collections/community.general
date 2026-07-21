@@ -21,8 +21,7 @@
         - "{{ role_path }}/vars"
 
 - name: "{{ ansible_facts.os_family | upper }} | Install 7zip package"
-  action: "{{ ansible_facts.pkg_mgr }}"
-  args:
+  ansible.builtin.package:
     name: "{{ iso_extract_7zip_package }}"
     state: present
   when: ansible_facts.distribution != 'MacOSX'

@@ -10,11 +10,9 @@
   listen: cleanup redis
 
 - name: remove redis packages
-  action: "{{ ansible_facts.pkg_mgr }}"
-  args:
-    name: "{{ item }}"
+  ansible.builtin.package:
+    name: "{{ redis_packages[ansible_facts.distribution] }}"
     state: absent
-  loop: "{{ redis_packages[ansible_facts.distribution] }}"
   listen: cleanup redis
 
 - name: remove pip packages

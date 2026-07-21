@@ -4,17 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install https transport for apt and ca-certificates
-  ansible.builtin.apt: name={{ item }} state=latest force=yes
-  with_items:
-    - apt-transport-https
-    - ca-certificates
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+    state: latest
+    force: true
 
 - name: Install apt_key dependencies
-  ansible.builtin.pip: name={{ item }}
-  with_items:
-    - pyOpenSSL
-    - ndg-httpsclient
-    - pyasn1
+  ansible.builtin.pip:
+    name:
+      - pyOpenSSL
+      - ndg-httpsclient
+      - pyasn1
 
 - name: Make sure python3-debian is installed
   ansible.builtin.apt:

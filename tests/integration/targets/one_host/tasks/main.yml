@@ -11,7 +11,8 @@
 
 # ENVIRONMENT PREPARACTION
 
-- ansible.builtin.set_fact: test_number= 0
+- ansible.builtin.set_fact:
+    test_number: 0
 
 - name: "test_{{test_number}}: copy fixtures to test host"
   ansible.builtin.copy:
@@ -24,7 +25,8 @@
 
 # SETUP INITIAL TESTING CONDITION
 
-- ansible.builtin.set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: ensure the tests hosts are absent"
   one_host:
@@ -44,7 +46,8 @@
 
 # NOT EXISTING HOSTS
 
-- ansible.builtin.set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: attempt to enable a host that does not exists"
   one_host:
@@ -74,7 +77,8 @@
 
 # ---
 
-- ansible.builtin.set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: delete an unexisting host"
   one_host:
@@ -98,7 +102,8 @@
 
 # HOST ENABLEMENT
 
-- ansible.builtin.set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 
 - name: "test_{{test_number}}: enable the test hosts"
@@ -124,7 +129,8 @@
 
 # TEMPLATE MANAGEMENT
 
-- ansible.builtin.set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: setup template values on hosts"
   one_host:
@@ -154,7 +160,8 @@
 
 # ---
 
-- ansible.builtin.set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: setup equivalent template values on hosts"
   one_host:
@@ -184,7 +191,8 @@
 
 # HOST DISABLEMENT
 
-- ansible.builtin.set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: disable the test hosts"
   one_host:
@@ -209,7 +217,8 @@
 
 # HOST OFFLINE
 
-- ansible.builtin.set_fact: test_number={{ test_number | int + 1 }}
+- ansible.builtin.set_fact:
+    test_number: "{{ test_number | int + 1 }}"
 
 - name: "test_{{test_number}}: offline the test hosts"
   one_host:

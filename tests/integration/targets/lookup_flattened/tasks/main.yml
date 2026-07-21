@@ -8,17 +8,23 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: test with_flattened
-  ansible.builtin.set_fact: '{{ item }}=flattened'
-  with_community.general.flattened:
-    - - a__
-    - - b__
-      - - c__
-        - d__
-- name: verify with_flattened results
+- name: Test community.general.flattened
+  ansible.builtin.set_fact:
+    result: "{{ query('community.general.flattened', input) }}"
+  vars:
+    input:
+      - - a__
+      - - b__
+        - - c__
+          - d__
+
+- name: Verify community.general.flattened results
   ansible.builtin.assert:
     that:
-      - a__ == 'flattened'
-      - b__ == 'flattened'
-      - c__ == 'flattened'
-      - d__ == 'flattened'
+      - result == expected
+  vars:
+    expected:
+      - a__
+      - b__
+      - c__
+      - d__
