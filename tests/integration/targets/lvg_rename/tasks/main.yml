@@ -17,9 +17,9 @@
 
 - name: Test lvg_rename module
   block:
-    - import_tasks: setup.yml
+    - ansible.builtin.import_tasks: setup.yml
 
-    - import_tasks: test.yml
+    - ansible.builtin.import_tasks: test.yml
 
   always:
-    - import_tasks: teardown.yml
+    - ansible.builtin.import_tasks: teardown.yml

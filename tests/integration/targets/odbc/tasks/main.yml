@@ -19,24 +19,24 @@
     # Test for proper failures without pyodbc
     #
     # Some of the docker images already have pyodbc installed on it
-    - include_tasks: no_pyodbc.yml
+    - ansible.builtin.include_tasks: no_pyodbc.yml
       when: ansible_facts.os_family != 'FreeBSD' and ansible_facts.os_family != 'Suse' and ansible_facts.os_family != 'Debian'
 
     #
     # Install PostgreSQL ODBC driver from AUR on Arch Linux
     #
-    - include_tasks: install_arch_odbc.yml
+    - ansible.builtin.include_tasks: install_arch_odbc.yml
       when: ansible_facts.os_family == 'Archlinux'
 
     #
     # Get pyodbc installed
     #
-    - include_tasks: install_pyodbc.yml
+    - ansible.builtin.include_tasks: install_pyodbc.yml
 
     #
     # Test missing parameters & invalid DSN
     #
-    - include_tasks: negative_tests.yml
+    - ansible.builtin.include_tasks: negative_tests.yml
 
     #
     # Setup DSN per env

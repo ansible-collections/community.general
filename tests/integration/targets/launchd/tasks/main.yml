@@ -18,7 +18,7 @@
         - not launchctl_check.stat.exists
 
     - name: Run tests
-      include_tasks: test.yml
+      ansible.builtin.include_tasks: test.yml
       with_items:
         - test_unknown
         - test_start_stop

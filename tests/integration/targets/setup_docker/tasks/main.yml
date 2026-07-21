@@ -22,7 +22,7 @@
           paths:
             - "{{ role_path }}/vars"
     - name: Include distribution specific tasks
-      include_tasks: "{{ lookup('first_found', params) }}"
+      ansible.builtin.include_tasks: "{{ lookup('first_found', params) }}"
       vars:
         params:
           files: "{{ distro_lookup_names }}"

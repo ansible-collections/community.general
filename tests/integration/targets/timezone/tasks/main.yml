@@ -82,7 +82,7 @@
         msg: "{{ original_timezone }}"
 
     - block:
-        - include_tasks: test.yml
+        - ansible.builtin.include_tasks: test.yml
       always:
         - name: Restore original system timezone - {{ original_timezone.diff.before.name }}
           timezone:

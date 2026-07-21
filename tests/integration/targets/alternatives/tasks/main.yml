@@ -9,7 +9,7 @@
 
 - name: 'setup: create a dummy alternative'
   block:
-    - import_tasks: setup.yml
+    - ansible.builtin.import_tasks: setup.yml
 
     ##############
     # Test parameters:
@@ -17,7 +17,7 @@
     # with / without alternatives defined in alternatives file ('with_alternatives' variable)
     # auto / manual ('mode' variable)
 
-    - include_tasks: tests.yml
+    - ansible.builtin.include_tasks: tests.yml
       with_nested:
         - [true, false] # with_link
         - [true, false] # with_alternatives
@@ -28,45 +28,45 @@
     ##########
     # Priority
     - block:
-        - include_tasks: remove_links.yml
-        - include_tasks: setup_test.yml
+        - ansible.builtin.include_tasks: remove_links.yml
+        - ansible.builtin.include_tasks: setup_test.yml
         # at least two iterations again
-        - include_tasks: tests_set_priority.yml
+        - ansible.builtin.include_tasks: tests_set_priority.yml
           with_sequence: start=3 end=4
       vars:
         with_alternatives: true
         mode: auto
 
     - block:
-        - include_tasks: remove_links.yml
-        - include_tasks: setup_test.yml
+        - ansible.builtin.include_tasks: remove_links.yml
+        - ansible.builtin.include_tasks: setup_test.yml
         # at least two iterations again
-        - include_tasks: tests_set_priority.yml
+        - ansible.builtin.include_tasks: tests_set_priority.yml
           with_sequence: start=3 end=4
       vars:
         with_alternatives: false
         mode: auto
 
     # Test that path is checked: alternatives must fail when path is nonexistent
-    - import_tasks: path_is_checked.yml
+    - ansible.builtin.import_tasks: path_is_checked.yml
 
     # Test that subcommands commands work
-    - import_tasks: subcommands.yml
+    - ansible.builtin.import_tasks: subcommands.yml
 
     # Test operation of the 'state' parameter
     - block:
-        - include_tasks: remove_links.yml
-        - include_tasks: tests_state.yml
+        - ansible.builtin.include_tasks: remove_links.yml
+        - ansible.builtin.include_tasks: tests_state.yml
 
     # Test for the family parameter
     - block:
-        - include_tasks: remove_links.yml
-        - include_tasks: tests_family.yml
+        - ansible.builtin.include_tasks: remove_links.yml
+        - ansible.builtin.include_tasks: tests_family.yml
       when: ansible_facts.os_family == 'RedHat'
 
   # Cleanup
   always:
-    - include_tasks: remove_links.yml
+    - ansible.builtin.include_tasks: remove_links.yml
 
     - file:
         path: '{{ item }}'

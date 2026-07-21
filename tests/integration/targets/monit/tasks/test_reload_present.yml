@@ -33,7 +33,7 @@
 - name: start process
   shell: "{{ process_run_cmd }}"
 
-- import_tasks: check_state.yml
+- ansible.builtin.import_tasks: check_state.yml
   vars:
     reason: verify service running
     service_state: "up"

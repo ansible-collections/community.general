@@ -38,7 +38,7 @@
           ansible.builtin.set_fact:
             dev: "/dev/{{ memory_disk_cmd.stdout }}"
 
-    - include_tasks: '{{ action }}.yml'
+    - ansible.builtin.include_tasks: '{{ action }}.yml'
 
   always:
     - name: 'Detach loop device used for LVM'

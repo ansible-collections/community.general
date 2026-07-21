@@ -21,7 +21,7 @@
       - src_file: "{{ test_dir }}/test02.cfg"
         dest_file: "/test02.cfg"
 
-- include_tasks: iso_mount.yml
+- ansible.builtin.include_tasks: iso_mount.yml
   vars:
     iso_name: "{{ dest_iso_name }}"
 

@@ -12,7 +12,7 @@
   connection: local
   block:
     - name: Include tasks to create ssl materials on the controller
-      include_tasks: prepare.yml
+      ansible.builtin.include_tasks: prepare.yml
 
 - set_fact:
     ssl_backends: ['openssl']
@@ -24,7 +24,7 @@
 - when: has_java_keytool
   block:
     - name: Include tasks to play with 'certificate' and 'private_key' contents
-      include_tasks: tests.yml
+      ansible.builtin.include_tasks: tests.yml
       vars:
         remote_cert: false
       loop: "{{ ssl_backends }}"
@@ -32,10 +32,10 @@
         loop_var: ssl_backend
 
     - name: Include tasks to create ssl materials on the remote host
-      include_tasks: prepare.yml
+      ansible.builtin.include_tasks: prepare.yml
 
     - name: Include tasks to play with 'certificate_path' and 'private_key_path' locations
-      include_tasks: tests.yml
+      ansible.builtin.include_tasks: tests.yml
       vars:
         remote_cert: true
       loop: "{{ ssl_backends }}"

@@ -19,7 +19,7 @@
     # https://bugs.launchpad.net/ufw/+bug/1810082
     state: disabled
 - name: "Loading tasks from {{ item }}"
-  include_tasks: "{{ item }}"
+  ansible.builtin.include_tasks: "{{ item }}"
 - name: Reset to factory defaults
   ufw:
     state: reset

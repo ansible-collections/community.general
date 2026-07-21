@@ -71,7 +71,7 @@
         delay: 10
         timeout: 60
 
-    - import_tasks: nomad_job.yml
+    - ansible.builtin.import_tasks: nomad_job.yml
   always:
 
     - name: kill nomad

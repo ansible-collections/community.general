@@ -147,7 +147,7 @@
         or ansible_facts.distribution_version is version('14.3', '>=')
       block:
         - name: Setup testjail
-          include_tasks: setup-testjail.yml
+          ansible.builtin.include_tasks: setup-testjail.yml
 
         - name: Enable nginx in test jail
           sysrc:

@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - block:
-    - include_tasks: install.yml
-    - include_tasks: lock_bash.yml
-    - include_tasks: lock_updates.yml
+    - ansible.builtin.include_tasks: install.yml
+    - ansible.builtin.include_tasks: lock_bash.yml
+    - ansible.builtin.include_tasks: lock_updates.yml
   when: ansible_facts.os_family == 'RedHat'
 ...

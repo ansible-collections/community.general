@@ -29,14 +29,14 @@
             - '{{ ansible_facts.os_family }}.yml'
             - 'defaults.yml'
 
-    - include_tasks: '{{ item }}'
+    - ansible.builtin.include_tasks: '{{ item }}'
       with_first_found:
         - files:
             - 'install_{{ ansible_facts.distribution }}.yml' # CentOS
             - 'install_{{ ansible_facts.os_family }}.yml'    # RedHat
             - 'install_{{ ansible_facts.system }}.yml'       # Linux
 
-    - include_tasks: test.yml
+    - ansible.builtin.include_tasks: test.yml
       with_items:
         - { username: '', password: '' }
         - { username: 'testétest', password: 'passéword' } # non-ASCII credentials
@@ -44,7 +44,7 @@
         loop_var: credentials
 
   always:
-    - include_tasks: '{{ item }}'
+    - ansible.builtin.include_tasks: '{{ item }}'
       with_first_found:
         - files:
             - 'uninstall_{{ ansible_facts.distribution }}.yml' # CentOS

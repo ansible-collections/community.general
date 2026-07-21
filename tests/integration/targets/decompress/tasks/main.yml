@@ -72,19 +72,19 @@
 # Run tests
 - name: Run core tests
   block:
-    - include_tasks: core.yml
+    - ansible.builtin.include_tasks: core.yml
       loop: "{{ formats }}"
       loop_control:
         loop_var: format
-    - import_tasks: cleanup.yml
+    - ansible.builtin.import_tasks: cleanup.yml
 
 
 - name: Run idempotency and check mode tests
   block:
-    - import_tasks: misc.yml
-    - import_tasks: cleanup.yml
+    - ansible.builtin.import_tasks: misc.yml
+    - ansible.builtin.import_tasks: cleanup.yml
 
 - name: Run tests for destination file
   block:
-    - import_tasks: dest.yml
-    - import_tasks: cleanup.yml
+    - ansible.builtin.import_tasks: dest.yml
+    - ansible.builtin.import_tasks: cleanup.yml

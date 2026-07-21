@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- import_tasks: check_state.yml
+- ansible.builtin.import_tasks: check_state.yml
   vars:
     reason: verify initial service state
     service_state: "{{ initial_state }}"
@@ -20,7 +20,7 @@
       - result is success
       - result is changed
 
-- import_tasks: check_state.yml
+- ansible.builtin.import_tasks: check_state.yml
   vars:
     reason: check service state after action
     service_state: "{{ expected_state }}"

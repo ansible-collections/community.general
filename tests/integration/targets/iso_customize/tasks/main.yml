@@ -15,7 +15,7 @@
 - set_fact:
     test_dir: '{{ remote_tmp_dir }}/test_iso_customize'
 
-- include_tasks: prepare.yml
+- ansible.builtin.include_tasks: prepare.yml
 
 - name: Create iso file with a specified file and directory
   community.general.iso_create:
@@ -25,7 +25,7 @@
     dest_iso: "{{ test_dir }}/test.iso"
     interchange_level: 3
 
-- include_tasks: iso_customize.yml
+- ansible.builtin.include_tasks: iso_customize.yml
   vars:
     dest_iso_name: "iso_customize.iso"
 
@@ -37,7 +37,7 @@
     dest_iso: "{{ test_dir }}/test.iso"
     rock_ridge: "1.09"
 
-- include_tasks: iso_customize.yml
+- ansible.builtin.include_tasks: iso_customize.yml
   vars:
     dest_iso_name: "iso_customize_rr.iso"
 
@@ -51,7 +51,7 @@
     joliet: 3
     vol_ident: AUTOINSTALL
 
-- include_tasks: iso_customize.yml
+- ansible.builtin.include_tasks: iso_customize.yml
   vars:
     dest_iso_name: "iso_customize_joliet.iso"
 
@@ -63,7 +63,7 @@
     dest_iso: "{{ test_dir }}/test.iso"
     udf: true
 
-- include_tasks: iso_customize.yml
+- ansible.builtin.include_tasks: iso_customize.yml
   vars:
     dest_iso_name: "iso_customize_udf.iso"
 
@@ -75,16 +75,16 @@
     dest_iso: "{{ test_dir }}/test1.iso"
     interchange_level: 3
 
-- include_tasks: iso_customize_add_files.yml
+- ansible.builtin.include_tasks: iso_customize_add_files.yml
   vars:
     dest_iso_name: "iso_customize_add.iso"
 
-- include_tasks: iso_customize_delete_files.yml
+- ansible.builtin.include_tasks: iso_customize_delete_files.yml
   vars:
     dest_iso_name: "iso_customize_delete.iso"
 
 # Test: misc exception
-- include_tasks: iso_customize_exception.yml
+- ansible.builtin.include_tasks: iso_customize_exception.yml
   vars:
     dest_iso_name: "iso_customize_exception.iso"
 

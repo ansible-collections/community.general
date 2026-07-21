@@ -18,7 +18,7 @@
     path: '{{ remote_tmp_dir }}/node_modules'
     state: absent
 
-- include_tasks: tests.yml
+- ansible.builtin.include_tasks: tests.yml
   vars:
     node_bin_path: /usr/bin
     yarn_bin_path: /usr/bin

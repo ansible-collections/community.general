@@ -11,10 +11,10 @@
 
 # ============================================================
 
-- include_tasks: run_alpine.yml
+- ansible.builtin.include_tasks: run_alpine.yml
   when: ansible_facts.os_family == 'Alpine'
 
-- include_tasks: run.yml
+- ansible.builtin.include_tasks: run.yml
   vars:
     nodejs_version: '{{ item.node_version }}'
     nodejs_path: 'node-v{{ nodejs_version }}-{{ ansible_facts.system|lower }}-{{ nodejs_arch }}'

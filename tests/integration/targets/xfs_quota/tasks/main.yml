@@ -25,9 +25,9 @@
         state: present
       become: true
 
-    - include_tasks: uquota.yml
-    - include_tasks: gquota.yml
-    - include_tasks: pquota.yml
+    - ansible.builtin.include_tasks: uquota.yml
+    - ansible.builtin.include_tasks: gquota.yml
+    - ansible.builtin.include_tasks: pquota.yml
 
   always:
     - name: cleanup test user

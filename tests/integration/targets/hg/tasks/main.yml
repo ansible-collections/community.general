@@ -16,12 +16,12 @@
 
 - block:
     - name: install mercurial
-      include_tasks: install.yml
+      ansible.builtin.include_tasks: install.yml
       when: has_hg is failed
 
     - name: test mercurial
-      include_tasks: run-tests.yml
+      ansible.builtin.include_tasks: run-tests.yml
 
     - name: uninstall mercurial
-      include_tasks: uninstall.yml
+      ansible.builtin.include_tasks: uninstall.yml
       when: has_hg is failed

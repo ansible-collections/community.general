@@ -16,11 +16,11 @@
 
 - name: Test lvol module
   block:
-    - import_tasks: setup.yml
+    - ansible.builtin.import_tasks: setup.yml
 
-    - import_tasks: test_thinpool.yml
+    - ansible.builtin.import_tasks: test_thinpool.yml
 
-    - import_tasks: test_pvs.yml
+    - ansible.builtin.import_tasks: test_pvs.yml
 
   always:
-    - import_tasks: teardown.yml
+    - ansible.builtin.import_tasks: teardown.yml

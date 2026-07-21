@@ -4,4 +4,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Integration tests
-  import_tasks: tasks.yml
+  ansible.builtin.import_tasks: tasks.yml
