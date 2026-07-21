@@ -49,7 +49,7 @@
     system: true
 
 - name: Create user for wildfly
-  user:
+  ansible.builtin.user:
     name: '{{ wf_user }}'
     system: true
     group: '{{ wf_user }}'
