@@ -12,7 +12,7 @@
     bar: "foobarbaz"
   tasks:
     - name: Convert more complex data structure (from vars file)
-      set_fact:
+      ansible.builtin.set_fact:
         complex: "{{ foobar | community.general.to_toml }}"
         complex_redact: "{{ foobar | community.general.to_toml(redact_sensitive_values=true) }}"
 
@@ -29,7 +29,7 @@
           a_list = ["<redacted>", 2025-02-03T04:05:06, "Hello!", true, false]
 
     - name: Convert more complex data structure (from vars)
-      set_fact:
+      ansible.builtin.set_fact:
         complex: "{{ data | community.general.to_toml }}"
         complex_redact: "{{ data | community.general.to_toml(redact_sensitive_values=true) }}"
       vars:

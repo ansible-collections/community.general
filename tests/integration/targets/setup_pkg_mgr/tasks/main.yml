@@ -8,19 +8,19 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- set_fact:
+- ansible.builtin.set_fact:
     pkg_mgr: community.general.pkgng
     ansible_pkg_mgr: community.general.pkgng
     cacheable: true
   when: ansible_facts.os_family == "FreeBSD"
 
-- set_fact:
+- ansible.builtin.set_fact:
     pkg_mgr: community.general.zypper
     ansible_pkg_mgr: community.general.zypper
     cacheable: true
   when: ansible_facts.os_family == "Suse"
 
-- set_fact:
+- ansible.builtin.set_fact:
     pkg_mgr: community.general.pacman
     ansible_pkg_mgr: community.general.pacman
     cacheable: true

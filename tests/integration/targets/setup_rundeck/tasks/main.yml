@@ -17,7 +17,7 @@
   when: ansible_facts.os_family in ['Debian', 'RedHat']
 
 - name: Set Rundeck base dir
-  set_fact:
+  ansible.builtin.set_fact:
     rdeck_base: /home/rundeck
 
 - name: Install OpenJDK

@@ -52,7 +52,7 @@
   when: ansible_facts.pkg_mgr == 'apt'
 
 - name: Define formats to test
-  set_fact:
+  ansible.builtin.set_fact:
     formats:
       - tar
       - zip

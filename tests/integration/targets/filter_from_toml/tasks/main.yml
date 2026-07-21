@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Convert TOML string to dictionary
-  set_fact:
+  ansible.builtin.set_fact:
     actual_dict: "{{ toml_document | community.general.from_toml }}"
 
 - ansible.builtin.assert:

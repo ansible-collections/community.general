@@ -67,7 +67,7 @@
 
 ###################################################
 - name: Set requirements file path
-  set_fact:
+  ansible.builtin.set_fact:
     reqs_file: '{{ remote_tmp_dir }}/reqs.yaml'
 
 - name: Copy requirements file

@@ -47,13 +47,13 @@
       when: ansible_facts.distribution != "MacOSX"
     - ansible.builtin.assert:
         that: ansible_facts.architecture in ['i386', 'x86_64', 'amd64', 'arm64', 'aarch64']
-    - set_fact:
+    - ansible.builtin.set_fact:
         consul_arch: '386'
       when: ansible_facts.architecture == 'i386'
-    - set_fact:
+    - ansible.builtin.set_fact:
         consul_arch: amd64
       when: ansible_facts.architecture in ['x86_64', 'amd64']
-    - set_fact:
+    - ansible.builtin.set_fact:
         consul_arch: arm64
       when: ansible_facts.architecture in ['arm64', 'aarch64']
     - name: Download consul binary
@@ -87,7 +87,7 @@
         - name: Bootstrap ACL
           consul_acl_bootstrap:
           register: consul_bootstrap_result
-        - set_fact:
+        - ansible.builtin.set_fact:
             consul_management_token: '{{ consul_bootstrap_result.result.SecretID }}'
         - name: Create some data
           ansible.builtin.command: '{{ consul_cmd }} kv put -token={{consul_management_token}} data/value{{ item }} foo{{ item }}'

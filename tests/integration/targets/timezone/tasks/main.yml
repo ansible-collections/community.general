@@ -13,12 +13,12 @@
 ##
 
 - name: set config file path on Debian
-  set_fact:
+  ansible.builtin.set_fact:
     timezone_config_file: '/etc/timezone'
   when: ansible_facts.os_family == 'Debian'
 
 - name: set config file path on RedHat
-  set_fact:
+  ansible.builtin.set_fact:
     timezone_config_file: '/etc/sysconfig/clock'
   when: ansible_facts.os_family == 'RedHat'
 
@@ -27,12 +27,12 @@
 ##
 
 - name: set config file path on Debian
-  set_fact:
+  ansible.builtin.set_fact:
     hwclock_config_file: '/etc/default/rcS'
   when: ansible_facts.os_family == 'Debian'
 
 - name: set config file path on RedHat
-  set_fact:
+  ansible.builtin.set_fact:
     hwclock_config_file: '/etc/sysconfig/clock'
   when: ansible_facts.os_family == 'RedHat'
 

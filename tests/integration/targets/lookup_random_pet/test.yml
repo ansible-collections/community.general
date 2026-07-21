@@ -7,7 +7,7 @@
   gather_facts: false
   tasks:
     - name: Call plugin
-      set_fact:
+      ansible.builtin.set_fact:
         result1: "{{ query('community.general.random_pet', words=3) }}"
         result2: "{{ query('community.general.random_pet', length=3) }}"
         result3: "{{ query('community.general.random_pet', prefix='kubernetes') }}"

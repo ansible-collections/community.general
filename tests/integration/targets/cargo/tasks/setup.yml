@@ -8,7 +8,7 @@
       ansible.builtin.package:
         name: cargo
         state: present
-    - set_fact:
+    - ansible.builtin.set_fact:
         has_cargo: true
   when:
     - ansible_facts.system != 'FreeBSD'
@@ -19,7 +19,7 @@
       ansible.builtin.package:
         name: rust
         state: present
-    - set_fact:
+    - ansible.builtin.set_fact:
         has_cargo: true
   when:
     - ansible_facts.system == 'FreeBSD'
@@ -33,5 +33,5 @@
         force: true
     - name: Install rustup cargo
       ansible.builtin.command: /tmp/sh.rustup.rs -y
-    - set_fact:
+    - ansible.builtin.set_fact:
         rustup_cargo_bin: "{{ lookup('env', 'HOME') }}/.cargo/bin/cargo"

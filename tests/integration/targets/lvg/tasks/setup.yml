@@ -36,7 +36,7 @@
   ansible.builtin.command: "losetup -f {{ remote_tmp_dir }}/img4"
 
 - name: "Affect name on disk to work on"
-  set_fact:
+  ansible.builtin.set_fact:
     loop_device1: "{{ loop_device1.stdout }}"
     loop_device2: "{{ loop_device2.stdout }}"
     loop_device3: "{{ loop_device3.stdout }}"

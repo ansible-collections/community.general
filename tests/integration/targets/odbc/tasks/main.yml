@@ -42,22 +42,22 @@
     # Setup DSN per env
     #
     - name: Changing DSN for Suse
-      set_fact:
+      ansible.builtin.set_fact:
         dsn: "DRIVER={PSQL};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
       when: ansible_facts.os_family == 'Suse' or ansible_facts.os_family == 'Alpine'
 
     - name: Changing DSN for Alpine
-      set_fact:
+      ansible.builtin.set_fact:
         dsn: "DRIVER={/usr/lib/psqlodbcw.so};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
       when: ansible_facts.os_family == 'Alpine'
 
     - name: Changing DSN for Debian
-      set_fact:
+      ansible.builtin.set_fact:
         dsn: "DRIVER={PostgreSQL Unicode};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
       when: ansible_facts.os_family == 'Debian'
 
     - name: Changing DSN for Arch Linux
-      set_fact:
+      ansible.builtin.set_fact:
         dsn: "DRIVER={/usr/lib/psqlodbcw.so};Server=localhost;Port=5432;Database=postgres;Uid={{ my_user }};Pwd={{ my_pass_decrypted }};UseUnicode=True"
       when: ansible_facts.os_family == 'Archlinux'
 

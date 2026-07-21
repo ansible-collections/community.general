@@ -7,7 +7,7 @@
   gather_facts: false
   tasks:
     - name: Call plugin
-      set_fact:
+      ansible.builtin.set_fact:
         result1: "{{ query('community.general.random_string') }}"
         result2: "{{ query('community.general.random_string', length=0) }}"
         result3: "{{ query('community.general.random_string', length=10) }}"
@@ -25,7 +25,7 @@
         result15: "{{ query('community.general.random_string', seed='1234') }}"
 
     - name: Raise error when impossible constraints are provided
-      set_fact:
+      ansible.builtin.set_fact:
         impossible: "{{ query('community.general.random_string', upper=false, lower=false, special=false, numbers=false) }}"
       ignore_errors: true
       register: impossible_result

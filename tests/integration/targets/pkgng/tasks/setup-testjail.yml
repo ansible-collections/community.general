@@ -56,7 +56,7 @@
     enabled: true
 
 - name: Redirect logs depending on verbosity
-  set_fact:
+  ansible.builtin.set_fact:
     pkgng_jail_log_redirect: "2>&1 | tee -a /tmp/ezjail.log {{ '> /dev/null' if ansible_verbosity < 2 else '' }}"
 
 - name: Has ezjail

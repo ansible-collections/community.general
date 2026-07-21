@@ -35,7 +35,7 @@
   register: lxml_version
 
 - name: Set lxml capabilities as variables
-  set_fact:
+  ansible.builtin.set_fact:
     # NOTE: Some tests require predictable element attribute order,
     #       which is only guaranteed starting from lxml v3.0alpha1
     lxml_predictable_attribute_order: '{{ lxml_version.stdout is version("3", ">=") }}'

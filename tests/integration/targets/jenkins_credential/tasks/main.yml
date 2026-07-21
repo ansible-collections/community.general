@@ -25,7 +25,7 @@
     success_msg: "Token and tokenUuid successfully returned"
 
 - name: Set token facts
-  set_fact:
+  ansible.builtin.set_fact:
     token: "{{ token_result.token }}"
     tokenUuid: "{{ token_result.token_uuid }}"
 

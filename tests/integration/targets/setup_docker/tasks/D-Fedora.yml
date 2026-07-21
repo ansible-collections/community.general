@@ -29,5 +29,5 @@
   notify: Remove Docker packages
 
 - name: Inform that docker is installed
-  set_fact:
+  ansible.builtin.set_fact:
     has_docker: true

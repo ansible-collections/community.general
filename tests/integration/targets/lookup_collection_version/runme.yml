@@ -28,7 +28,7 @@
             == ['0.0.1', '*', '*', '0.0.1', none]
 
     - name: Invalid FQCN
-      set_fact:
+      ansible.builtin.set_fact:
         test: "{{ query('community.general.collection_version', 'foo.bar.baz') }}"
       ignore_errors: true
       register: invalid_fqcn
