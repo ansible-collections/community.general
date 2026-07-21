@@ -51,7 +51,7 @@
   check_mode: true
   diff: true
   register: comparison
-  # command: diff /tmp/ansible-xml-namespaced-beers-1.xml /tmp/ansible-xml-namespaced-beers-2.xml
+  # ansible.builtin.command: diff /tmp/ansible-xml-namespaced-beers-1.xml /tmp/ansible-xml-namespaced-beers-2.xml
 
 - name: Test expected result
   ansible.builtin.assert:

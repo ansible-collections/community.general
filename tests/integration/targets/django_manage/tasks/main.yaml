@@ -27,12 +27,12 @@
     mode: preserve
 
 - name: Create project
-  command:
+  ansible.builtin.command:
     chdir: "{{ tmp_django_root.path }}/startproj"
     cmd: "{{ tmp_django_root.path }}/venv/bin/django-admin startproject test_django_manage_1"
 
 - name: Create app
-  command:
+  ansible.builtin.command:
     chdir: "{{ tmp_django_root.path }}/startproj"
     cmd: "{{ tmp_django_root.path }}/venv/bin/django-admin startapp app1"
 

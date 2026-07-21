@@ -241,7 +241,7 @@
   register: edge_case_2
 
 - name: find visudo
-  command:
+  ansible.builtin.command:
     cmd: which visudo
   register: which_visudo
   when: ansible_facts.os_family != 'Darwin'

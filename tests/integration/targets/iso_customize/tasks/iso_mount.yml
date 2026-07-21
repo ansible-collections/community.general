@@ -7,7 +7,7 @@
 
 - block:
     - name: "Mount customized ISO on MAC"
-      command: "hdiutil attach {{ test_dir }}/{{ iso_name }} -mountroot {{ test_dir }}/iso_mount"
+      ansible.builtin.command: "hdiutil attach {{ test_dir }}/{{ iso_name }} -mountroot {{ test_dir }}/iso_mount"
 
     # For MAC, we have different root directory for different type of ISO
     - set_fact:

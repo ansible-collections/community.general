@@ -5,12 +5,12 @@
 
 # Get systemd version and if it doesn't exist don't run these tests.
 - name: check systemd version
-  command: "systemctl --version"
+  ansible.builtin.command: "systemctl --version"
   register: systemd_version
   ignore_errors: true
 
 - name: check homectl version
-  command: homectl --version
+  ansible.builtin.command: homectl --version
   register: homectl_version
   ignore_errors: true
 
@@ -41,7 +41,7 @@
         state: present
 
     - name: verify user added
-      command: homectl inspect james
+      ansible.builtin.command: homectl inspect james
       register: james_info
 
     - name: Add the user 'tom' with a zsh shell, uid of 1000, and gid of 1000
@@ -126,7 +126,7 @@
       register: diana_create_checkmode_out
 
     - name: Verify user 'diana' was not created with check_mode
-      command: homectl inspect diana
+      ansible.builtin.command: homectl inspect diana
       register: user_diana_exists
       ignore_errors: true
 
@@ -140,7 +140,7 @@
       register: jake_checkmode_out
 
     - name: Verify user 'jake' was not modified and still has all mount options
-      command: homectl inspect jake
+      ansible.builtin.command: homectl inspect jake
       register: user_jake_details_out
 
     - name: Modify user 'jake' with only noexec mount option

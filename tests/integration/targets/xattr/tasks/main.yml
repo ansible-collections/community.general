@@ -12,7 +12,7 @@
   ansible.builtin.include_tasks: setup.yml
 
 - name: Check availability of xattr support
-  command: setfattr -n user.foo {{ test_file }}
+  ansible.builtin.command: setfattr -n user.foo {{ test_file }}
   ignore_errors: true
   register: xattr
 

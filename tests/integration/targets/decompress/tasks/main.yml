@@ -40,7 +40,7 @@
 - name: Ensure xz is present to create compressed file (macOS)
   block:
     - name: Find brew binary
-      command: which brew
+      ansible.builtin.command: which brew
       register: brew_which
     - name: Get owner of brew binary
       ansible.builtin.stat:

@@ -4,5 +4,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Remove loop_device4 LVM device
-  command: "lvmdevices --delpvid {{ loop_device4_pvid_result.stdout }}"
+  ansible.builtin.command: "lvmdevices --delpvid {{ loop_device4_pvid_result.stdout }}"
   ignore_errors: true

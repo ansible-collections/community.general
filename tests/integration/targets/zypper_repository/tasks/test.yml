@@ -8,7 +8,7 @@
   register: before
 
 - name: ensure zypper ref works
-  command: zypper -n ref
+  ansible.builtin.command: zypper -n ref
 
 - block:
     - ansible.builtin.include_tasks: 'zypper_repository.yml'
@@ -37,7 +37,7 @@
           - before.stdout == after.stdout
 
     - name: ensure zypper ref still works
-      command: zypper -n ref
+      ansible.builtin.command: zypper -n ref
 
 - block:
     - ansible.builtin.include_tasks: 'zypper_repository.yml'

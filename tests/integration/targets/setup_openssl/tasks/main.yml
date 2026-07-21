@@ -51,5 +51,5 @@
   register: openssl_version
 
 - name: register cryptography version
-  command: "{{ ansible_facts.python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
+  ansible.builtin.command: "{{ ansible_facts.python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
   register: cryptography_version

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: start supervisord
-  command: 'supervisord -c {{ remote_dir }}/supervisord.conf'
+  ansible.builtin.command: 'supervisord -c {{ remote_dir }}/supervisord.conf'
 
 - name: wait_for supervisord
   ansible.builtin.wait_for:

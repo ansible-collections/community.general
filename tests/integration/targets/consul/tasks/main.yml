@@ -64,13 +64,13 @@
       register: result
       until: result is success
     - name: Remove macOS quarantine attribute from consul binary
-      command: xattr -d com.apple.quarantine {{ consul_cmd }}
+      ansible.builtin.command: xattr -d com.apple.quarantine {{ consul_cmd }}
       when: ansible_facts.system == 'Darwin'
       ignore_errors: true
     - vars:
         remote_dir: '{{ echo_remote_tmp_dir.stdout }}'
       block:
-        - command: echo {{ remote_tmp_dir }}
+        - ansible.builtin.command: echo {{ remote_tmp_dir }}
           register: echo_remote_tmp_dir
         - name: Create configuration file
           ansible.builtin.template:
@@ -90,7 +90,7 @@
         - set_fact:
             consul_management_token: '{{ consul_bootstrap_result.result.SecretID }}'
         - name: Create some data
-          command: '{{ consul_cmd }} kv put -token={{consul_management_token}} data/value{{ item }} foo{{ item }}'
+          ansible.builtin.command: '{{ consul_cmd }} kv put -token={{consul_management_token}} data/value{{ item }} foo{{ item }}'
           loop:
             - 1
             - 2

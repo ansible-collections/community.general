@@ -113,7 +113,7 @@
   ansible.builtin.assert:
     that:
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-add-element-implicitly.xml /tmp/ansible-xml-beers-implicit.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-add-element-implicitly.xml /tmp/ansible-xml-beers-implicit.xml
 
 
 # Now we repeat the same, just to ensure proper use of namespaces

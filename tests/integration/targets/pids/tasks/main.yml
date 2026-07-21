@@ -41,7 +41,7 @@
     mode: "0644"
 
 - name: Compile fake 'sleep' binary
-  command: cc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
+  ansible.builtin.command: cc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
 
 - name: Copy templated helper script
   ansible.builtin.template:
@@ -50,7 +50,7 @@
     mode: "0755"
 
 - name: "Run the fake 'sleep' binary"
-  command: sh {{ remote_tmp_dir }}/obtainpid.sh
+  ansible.builtin.command: sh {{ remote_tmp_dir }}/obtainpid.sh
   async: 100
   poll: 0
 
@@ -90,7 +90,7 @@
   register: newpid
 
 - name: Gather all processes to make debugging easier
-  command: ps aux
+  ansible.builtin.command: ps aux
   register: result
   no_log: true
 

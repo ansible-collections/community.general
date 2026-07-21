@@ -464,7 +464,7 @@
                 debug:
                   msg: sample debug msg
               - name: Skipped task
-                command: ls /
+                ansible.builtin.command: ls /
                 when: false
         expected_output:
           - "foo"

@@ -43,7 +43,7 @@
       - install_again_check is not changed
 
 - name: Check package has been installed correctly (hello-world)
-  command: hello-world
+  ansible.builtin.command: hello-world
   environment:
     PATH: /snap/bin/
 

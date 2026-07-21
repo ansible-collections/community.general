@@ -32,25 +32,25 @@
   when: ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int >= 7
 
 - name: start UDP server on port 5555
-  command: nc -u -l -p 5555
+  ansible.builtin.command: nc -u -l -p 5555
   async: 1000
   poll: 0
   when: (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int >= 7) or ansible_facts.os_family == "Debian"
 
 - name: start UDP server on port 5555
-  command: nc -u -l 5555
+  ansible.builtin.command: nc -u -l 5555
   async: 1000
   poll: 0
   when: ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int < 7
 
 - name: start TCP server on port 5556
-  command: "nc -l -p 5556"
+  ansible.builtin.command: "nc -l -p 5556"
   async: 1000
   poll: 0
   when: (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int >= 7) or ansible_facts.os_family == "Debian"
 
 - name: start TCP server on port 5556
-  command: "nc -l 5556"
+  ansible.builtin.command: "nc -l 5556"
   async: 1000
   poll: 0
   when: ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int < 7
@@ -106,7 +106,7 @@
   when: (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version|int >= 7) or ansible_facts.os_family == "Debian"
 
 - name: kill all async commands
-  command: "kill -9 {{ item.pid }}"
+  ansible.builtin.command: "kill -9 {{ item.pid }}"
   loop: "{{ [tcp_listen, udp_listen]|flatten }}"
   when: item.name == 'nc'
   ignore_errors: true

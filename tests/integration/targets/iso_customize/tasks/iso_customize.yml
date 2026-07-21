@@ -47,7 +47,7 @@
 
 - block:
     - name: Get the content of file test02.cfg
-      command: "cat {{ mount_root_dir }}/test02.cfg"
+      ansible.builtin.command: "cat {{ mount_root_dir }}/test02.cfg"
       register: get_file_content
 
     - set_fact:

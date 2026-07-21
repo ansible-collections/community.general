@@ -31,7 +31,7 @@
     that:
       - xmlresponse is not changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-pretty-print-only.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-pretty-print-only.xml /tmp/ansible-xml-beers.xml
 
 
 # NOTE: Jinja2 templating eats trailing newlines
@@ -55,7 +55,7 @@
     that:
       - xmlresponse is changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-pretty-print-only.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-pretty-print-only.xml /tmp/ansible-xml-beers.xml
 
 
 # NOTE: Jinja2 templating eats trailing newlines
@@ -82,4 +82,4 @@
     that:
       - xmlresponse_modification is changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-pretty-print.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-pretty-print.xml /tmp/ansible-xml-beers.xml

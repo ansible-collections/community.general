@@ -80,7 +80,7 @@
   when: ansible_facts.distribution == 'MacOSX'
   block:
     - name: MACOS | Find brew binary
-      command: which brew
+      ansible.builtin.command: which brew
       register: brew_which
 
     - name: MACOS | Get owner of brew binary

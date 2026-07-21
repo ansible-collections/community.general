@@ -15,7 +15,7 @@
         state: present
 
     - name: Check Go version
-      command: go version
+      ansible.builtin.command: go version
       register: go_version_output
       changed_when: false
 

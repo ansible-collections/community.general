@@ -35,4 +35,4 @@
     that:
       - add_children_with_attributes_unicode is changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-add-children-with-attributes-unicode.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-add-children-with-attributes-unicode.xml /tmp/ansible-xml-beers.xml

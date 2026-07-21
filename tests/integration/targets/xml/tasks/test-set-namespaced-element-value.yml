@@ -43,7 +43,7 @@
   check_mode: true
   diff: true
   register: comparison
-  # command: diff -u {{ role_path }}/results/test-set-namespaced-element-value.xml /tmp/ansible-xml-namespaced-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-set-namespaced-element-value.xml /tmp/ansible-xml-namespaced-beers.xml
 
 - name: Test expected result
   ansible.builtin.assert:

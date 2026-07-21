@@ -15,13 +15,13 @@
   notify: Remove file
 
 - name: Obtain loop device name
-  command:
+  ansible.builtin.command:
     cmd: losetup -f
   changed_when: false
   register: losetup_name
 
 - name: Create loopback device
-  command:
+  ansible.builtin.command:
     cmd: losetup -f /bigfile
   changed_when: true
   register: losetup_cmd

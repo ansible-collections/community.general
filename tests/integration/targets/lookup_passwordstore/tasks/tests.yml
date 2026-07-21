@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Check name of gpg2 binary
-  command: which gpg2
+  ansible.builtin.command: which gpg2
   register: gpg2_check
   ignore_errors: true
 
@@ -13,7 +13,7 @@
     gpg2_bin: '{{ "gpg2" if gpg2_check is successful else "gpg" }}'
 
 - name: Stop gpg-agent so we can remove any locks on the GnuPG dir
-  command: gpgconf --kill gpg-agent
+  ansible.builtin.command: gpgconf --kill gpg-agent
   ignore_errors: true
 
 - name: Remove previous password files and directory
@@ -25,7 +25,7 @@
     - "~/.password-store"
 
 - name: Get path of pass executable
-  command: which pass
+  ansible.builtin.command: which pass
   register: result
 
 - name: Store path of pass executable
@@ -33,7 +33,7 @@
     passpath: "{{ result.stdout }}"
 
 - name: Move original pass into place if there was a leftover
-  command:
+  ansible.builtin.command:
     argv:
       - mv
       - "{{ passpath }}.testorig"
@@ -44,7 +44,7 @@
 # having gopass is not required for this test, but we store
 # its path in case it is installed, so we can restore it
 - name: Try to find gopass in path
-  command: which gopass
+  ansible.builtin.command: which gopass
   register: result
 
 - name: Store path of gopass executable
@@ -52,7 +52,7 @@
     gopasspath: "{{ result.stdout }}"
 
 - name: Move original gopass into place if there was a leftover
-  command:
+  ansible.builtin.command:
     argv:
       - mv
       - "{{ gopasspath }}.testorig"
@@ -61,7 +61,7 @@
     removes: "{{ gopasspath }}.testorig"
 
 - name: Get versions of tools
-  command: "{{ item }} --version"
+  ansible.builtin.command: "{{ item }} --version"
   register: versions
   loop:
     - "{{ gpg2_bin }}"
@@ -86,10 +86,10 @@
   ansible.builtin.shell: echo "D3E1CC8934E97270CEB066023AF1BD3619AB496A:6:" | {{ gpg2_bin }} --import-ownertrust
 
 - name: Initialise pass passwordstore
-  command: pass init ansible-test
+  ansible.builtin.command: pass init ansible-test
 
 - name: Initialise gopass passwordstore
-  command: gopass init --path $HOME/.gopass-store ansible-test
+  ansible.builtin.command: gopass init --path $HOME/.gopass-store ansible-test
   args:
     creates: "{{ lookup('env','HOME') }}/.gopass-store"
 
@@ -132,7 +132,7 @@
 - name: Test pass compatibility shim detection
   block:
     - name: Move original pass out of the way
-      command:
+      ansible.builtin.command:
         argv:
           - mv
           - "{{ passpath }}"
@@ -170,7 +170,7 @@
 
   always:
     - name: Move original pass back into place
-      command:
+      ansible.builtin.command:
         argv:
           - mv
           - "{{ passpath }}.testorig"
@@ -190,7 +190,7 @@
       register: gopass_check
 
     - name: Move original gopass out of the way
-      command:
+      ansible.builtin.command:
         argv:
           - mv
           - "{{ gopasspath }}"
@@ -229,7 +229,7 @@
         state: absent
 
     - name: Move original gopass back into place
-      command:
+      ansible.builtin.command:
         argv:
           - mv
           - "{{ gopasspath }}.testorig"

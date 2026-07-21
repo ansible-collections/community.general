@@ -87,25 +87,25 @@
     loop_var: postgresql_package_item
 
 - name: initialize postgres (FreeBSD)
-  command: /usr/local/etc/rc.d/postgresql oneinitdb
+  ansible.builtin.command: /usr/local/etc/rc.d/postgresql oneinitdb
   when: ansible_facts.os_family == "FreeBSD"
 
 - name: Initialize postgres (RedHat systemd)
-  command: postgresql-setup initdb
+  ansible.builtin.command: postgresql-setup initdb
   when: ansible_facts.os_family == "RedHat" and ansible_facts.service_mgr == "systemd"
 
 - name: Initialize postgres (RedHat sysv)
-  command: /sbin/service postgresql initdb
+  ansible.builtin.command: /sbin/service postgresql initdb
   when: ansible_facts.os_family == "RedHat" and ansible_facts.service_mgr != "systemd"
 
 - name: Initialize postgres (Archlinux)
-  command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
+  ansible.builtin.command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
   args:
     creates: /var/lib/postgres/data/PG_VERSION
   when: ansible_facts.os_family == "Archlinux"
 
 - name: Initialize postgres (Alpine)
-  command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgresql/data'"
+  ansible.builtin.command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgresql/data'"
   when: ansible_facts.os_family == "Alpine"
 
 - name: Initialize postgres (Debian)
@@ -195,7 +195,7 @@
       when: locale_present is failed
 
     - name: Generate locale (RedHat)
-      command: localedef -f ISO-8859-1 -i {{ item.locale }} {{ item.locale }}
+      ansible.builtin.command: localedef -f ISO-8859-1 -i {{ item.locale }} {{ item.locale }}
       when: item is failed
       with_items: '{{ locale_present.results }}'
   when: ansible_facts.os_family == 'RedHat' and ansible_facts.distribution != 'Fedora'

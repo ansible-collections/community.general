@@ -28,7 +28,7 @@
     that:
       - set_children_elements is changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-set-children-elements.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-set-children-elements.xml /tmp/ansible-xml-beers.xml
 
 - name: Setup test fixture
   ansible.builtin.copy:
@@ -60,7 +60,7 @@
     that:
       - set_children_elements is changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-set-children-elements.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-set-children-elements.xml /tmp/ansible-xml-beers.xml
 
 
 - name: Set child elements (again)
@@ -83,4 +83,4 @@
     that:
       - set_children_again is not changed
       - comparison is not changed  # identical
-  # command: diff -u {{ role_path }}/results/test-set-children-elements.xml /tmp/ansible-xml-beers.xml
+  # ansible.builtin.command: diff -u {{ role_path }}/results/test-set-children-elements.xml /tmp/ansible-xml-beers.xml

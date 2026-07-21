@@ -22,7 +22,7 @@
     creates: "{{ ansible_env.HOME }}/ansible/bin/uv"
 
 - name: Check if Python 3.14 exists already
-  command: uv python find 3.14
+  ansible.builtin.command: uv python find 3.14
   ignore_errors: true
   register: check_python_314_exists
   changed_when: false
@@ -81,7 +81,7 @@
       - reinstall_python.python_paths | length >= 1
 
 - name: Check if Python 3.13.5 exists already
-  command: uv python find 3.13.5
+  ansible.builtin.command: uv python find 3.13.5
   ignore_errors: true
   register: check_python_3135_exists
   changed_when: false

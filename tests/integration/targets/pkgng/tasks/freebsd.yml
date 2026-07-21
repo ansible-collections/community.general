@@ -97,7 +97,7 @@
       ansible.builtin.import_tasks: create-outofdate-pkg.yml
 
     - name: Install out-of-date test package
-      command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
+      ansible.builtin.command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
       register: pkgng_example4_prepare
 
     - name: Check for any available package upgrades (checkmode)
@@ -153,7 +153,7 @@
       ansible.builtin.import_tasks: create-outofdate-pkg.yml
 
     - name: Install out-of-date test package
-      command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
+      ansible.builtin.command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
       register: pkgng_example4_nopower_prepare
 
     - name: Check for any available package upgrades with unprivileged user
@@ -226,7 +226,7 @@
   ansible.builtin.import_tasks: create-outofdate-pkg.yml
 
 - name: Install out-of-date test package
-  command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
+  ansible.builtin.command: 'pkg add {{ pkgng_test_outofdate_pkg_path }}'
   register: pkgng_example6_prepare
 
 - name: Upgrade and/or install two packages
@@ -316,7 +316,7 @@
   register: pkgng_example8_add_annotation_failure
 
 - name: Verify annotation is actually there
-  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
+  ansible.builtin.command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
   register: pkgng_example8_add_annotation_verify
 
 - name: Install and annotate single package (checkmode, not changed)
@@ -334,7 +334,7 @@
   register: pkgng_example8_add_annotation_checkmode_change
 
 - name: Verify check_mode did not add an annotation
-  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8_checkmode'
+  ansible.builtin.command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8_checkmode'
   register: pkgng_example8_add_annotation_checkmode_change_verify
 
 - name: Modify annotation on single package
@@ -351,7 +351,7 @@
   register: pkgng_example8_modify_annotation_failure
 
 - name: Verify annotation has been modified
-  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
+  ansible.builtin.command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
   register: pkgng_example8_modify_annotation_verify
 
 - name: Remove annotation on single package
@@ -361,7 +361,7 @@
   register: pkgng_example8_remove_annotation
 
 - name: Verify annotation has been removed
-  command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
+  ansible.builtin.command: 'pkg annotate -q -S {{ pkgng_test_pkg_name }} ansibletest_example8'
   register: pkgng_example8_remove_annotation_verify
 
 - name: Ensure pkgng annotations on single packages work correctly
@@ -391,7 +391,7 @@
   register: pkgng_example9_add_annotation
 
 - name: Verify annotation is actually there
-  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  ansible.builtin.command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
   register: pkgng_example9_add_annotation_verify
   # Assert, below, tests that stdout includes:
   # ```
@@ -408,7 +408,7 @@
   register: pkgng_example9_multiple_annotation
 
 - name: Verify multiple operations succeeded
-  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  ansible.builtin.command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
   register: pkgng_example9_multiple_annotation_verify
   # Assert, below, tests that stdout includes:
   # ```
@@ -424,7 +424,7 @@
   register: pkgng_example9_add_annotation_old
 
 - name: Verify annotation is actually there
-  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  ansible.builtin.command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
   register: pkgng_example9_add_annotation_old_verify
   # Assert, below, tests that stdout includes:
   # ```
@@ -459,7 +459,7 @@
     - '=notag'
 
 - name: Verify invalid annotate strings did not add annotations
-  command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
+  ansible.builtin.command: 'pkg info -q -A {{ pkgng_test_pkg_name }}'
   register: pkgng_example8_invalid_annotation_verify
 
 - name: Ensure invalid annotate strings fail safely
@@ -544,4 +544,4 @@
     - name: Stop and remove testjail
       failed_when: false
       changed_when: false
-      command: "ezjail-admin delete -wf testjail"
+      ansible.builtin.command: "ezjail-admin delete -wf testjail"

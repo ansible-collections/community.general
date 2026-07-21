@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: MACOS | Find brew binary
-  command: which brew
+  ansible.builtin.command: which brew
   register: brew_which
 
 - name: MACOS | Get owner of brew binary

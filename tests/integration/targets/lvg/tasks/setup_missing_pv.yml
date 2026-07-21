@@ -15,4 +15,4 @@
   register: loop_device4_pvid_result
 
 - name: Detach loop_device4
-  command: "losetup -d {{ loop_device4 }}"
+  ansible.builtin.command: "losetup -d {{ loop_device4 }}"

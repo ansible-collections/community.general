@@ -217,7 +217,7 @@
     dest: "{{ remote_tmp_dir | expanduser }}/zypper2/empty.spec"
 
 - name: build rpm
-  command: |
+  ansible.builtin.command: |
     rpmbuild -bb \
     --define "_topdir {{remote_tmp_dir | expanduser }}/zypper2/rpm-build"
     --define "_builddir %{_topdir}" \
@@ -294,7 +294,7 @@
     dest: "{{ remote_tmp_dir | expanduser }}/zypper2/post_error.spec"
 
 - name: build rpm
-  command: |
+  ansible.builtin.command: |
     rpmbuild -bb \
     --define "_topdir {{remote_tmp_dir | expanduser }}/zypper2/rpm-build"
     --define "_builddir %{_topdir}" \
@@ -564,7 +564,7 @@
       loop: "{{ looplist }}"
 
     - name: build rpms with duplicate files
-      command: |
+      ansible.builtin.command: |
         rpmbuild -bb \
         --define "_topdir {{remote_tmp_dir | expanduser }}/zypper2/rpm-build"
         --define "_builddir %{_topdir}" \

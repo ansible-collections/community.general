@@ -70,7 +70,7 @@
     repo: http://download.videolan.org/pub/vlc/SuSE/{{ os_repository_name_videolan }}/
 
 - name: check refreshoption
-  command: zypper -x lr testrefresh
+  ansible.builtin.command: zypper -x lr testrefresh
   register: zypper_result
 
 - name: verify autorefresh option set properly
@@ -86,7 +86,7 @@
     repo: http://download.videolan.org/pub/vlc/SuSE/{{ os_repository_name_videolan }}/
 
 - name: check refreshoption
-  command: zypper -x lr testprio
+  ansible.builtin.command: zypper -x lr testprio
   register: zypper_result
 
 - name: verify priority option set properly
@@ -104,12 +104,12 @@
     - chrome2
 
 - name: check repo is updated by url
-  command: zypper lr chrome1
+  ansible.builtin.command: zypper lr chrome1
   register: zypper_result1
   ignore_errors: true
 
 - name: check repo is updated by url
-  command: zypper lr chrome2
+  ansible.builtin.command: zypper lr chrome2
   register: zypper_result2
 
 - name: ensure same url cause update of existing repo even if name differ
@@ -130,7 +130,7 @@
     - http://download.opensuse.org/repositories/devel:/languages:/ruby/{{ os_repository_name }}/
 
 - name: check repo is updated by name
-  command: zypper lr samename
+  ansible.builtin.command: zypper lr samename
   register: zypper_result
 
 - name: ensure url get updated on repo with same name
@@ -187,7 +187,7 @@
           - remove_repo is changed
 
     - name: get list of files in /etc/zypp/repos.d/
-      command: ls /etc/zypp/repos.d/
+      ansible.builtin.command: ls /etc/zypp/repos.d/
       changed_when: false
       register: releaseverrepo_etc_zypp_reposd
 
@@ -239,7 +239,7 @@
       register: added_by_repo_file
 
     - name: get repository details from zypper
-      command: zypper lr systemsmanagement_Uyuni_Stable
+      ansible.builtin.command: zypper lr systemsmanagement_Uyuni_Stable
       register: get_repository_details_from_zypper
 
     - name: verify adding via .repo file was successful
@@ -267,7 +267,7 @@
       register: removed_by_repo_file
 
     - name: get list of files in /etc/zypp/repos.d/
-      command: ls /etc/zypp/repos.d/
+      ansible.builtin.command: ls /etc/zypp/repos.d/
       changed_when: false
       register: etc_zypp_reposd
 
@@ -292,7 +292,7 @@
       register: added_by_repo_local_file
 
     - name: get repository details for systemsmanagement_Uyuni_Utils from zypper
-      command: zypper lr systemsmanagement_Uyuni_Utils
+      ansible.builtin.command: zypper lr systemsmanagement_Uyuni_Utils
       register: get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils
 
     - name: verify adding repository via local .repo file was successful

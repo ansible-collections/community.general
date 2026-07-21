@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: verify that git is installed so this test can continue
-  command: which git
+  ansible.builtin.command: which git
   register: git_installed
   ignore_errors: true
 
