@@ -62,7 +62,7 @@
 
     - name: Copy initial config ldif file
       become: true
-      copy:
+      ansible.builtin.copy:
         src: 'files/{{ item }}'
         dest: '/tmp/{{ item }}'
         owner: root

@@ -569,7 +569,7 @@
 
 
 - name: test-values 22 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
 
       # Some comment to test
@@ -718,7 +718,7 @@
 
 
 - name: test-values 25 - Clean test file
-  copy:
+  ansible.builtin.copy:
     content: ""
     dest: "{{ output_file }}"
     force: true
@@ -858,7 +858,7 @@
 
 
 - name: test-value 29 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = cocktail
@@ -899,7 +899,7 @@
 
 
 - name: test-value 30 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = cocktail
@@ -942,7 +942,7 @@
 
 
 - name: test-value 31 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = cocktail
@@ -981,7 +981,7 @@
 
 
 - name: test-value 32 - Create starting ini file
-  copy:
+  ansible.builtin.copy:
     content: |
       [drinks]
       fav = cocktail

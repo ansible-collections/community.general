@@ -46,7 +46,7 @@
 
     - name: copy process file
       become: true
-      copy:
+      ansible.builtin.copy:
         src: httpd_echo.py
         dest: "{{ process_file }}"
 

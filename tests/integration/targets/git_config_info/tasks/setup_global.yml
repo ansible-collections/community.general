@@ -11,6 +11,6 @@
     state: absent
 
 - name: setup global config
-  copy:
+  ansible.builtin.copy:
     src: gitconfig
     dest: ~/.gitconfig

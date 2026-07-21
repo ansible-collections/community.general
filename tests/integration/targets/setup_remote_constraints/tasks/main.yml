@@ -13,6 +13,6 @@
     remote_constraints: "{{ remote_tmp_dir }}/constraints.txt"
 
 - name: copy constraints.txt to remote host
-  copy:
+  ansible.builtin.copy:
     src: "{{ role_path }}/../../../utils/constraints.txt"
     dest: "{{ remote_constraints }}"

@@ -41,7 +41,7 @@
       - pkgng_test_outofdate_pkg_tempfile.files | count == 1
 
 - name: Copy the created package file to the expected location
-  copy:
+  ansible.builtin.copy:
     remote_src: true
     src: '{{ pkgng_test_outofdate_pkg_tempfile.files[0].path }}'
     dest: '{{ pkgng_test_outofdate_pkg_path }}'

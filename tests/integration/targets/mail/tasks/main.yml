@@ -24,7 +24,7 @@
       register: smtpd_tls
 
     - name: Install test smtpserver
-      copy:
+      ansible.builtin.copy:
         src: '{{ item }}'
         dest: '{{ remote_tmp_dir }}/{{ item }}'
       loop:

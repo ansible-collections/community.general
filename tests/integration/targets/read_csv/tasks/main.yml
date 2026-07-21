@@ -10,7 +10,7 @@
 
 # Create basic CSV file
 - name: Create unique CSV file
-  copy:
+  ansible.builtin.copy:
     content: &users_content |
       name,uid,gid,gecos
       dag,500,500,Dag Wieërs
@@ -55,7 +55,7 @@
 
 # Create basic CSV file using semi-colon
 - name: Create non-unique CSV file using semi-colon
-  copy:
+  ansible.builtin.copy:
     content: |
       name;uid;gid;gecos
       dag;500;500;Dag Wieërs
@@ -100,7 +100,7 @@
 
 # Create basic CSV file without header
 - name: Create unique CSV file without header
-  copy:
+  ansible.builtin.copy:
     content: |
       dag,500,500,Dag Wieërs
       jeroen,501,500,Jeroen Hoekx
@@ -128,7 +128,7 @@
 
 # Create broken file
 - name: Create unique CSV file
-  copy:
+  ansible.builtin.copy:
     content: |
       name,uid,gid,gecos
       dag,500,500,Dag Wieërs
@@ -151,7 +151,7 @@
 
 # Create basic CSV file with BOM
 - name: Create unique CSV file with BOM
-  copy:
+  ansible.builtin.copy:
     content: "{{ bom + content }}"
     dest: "{{ remote_tmp_dir }}/users_bom.csv"
   vars:

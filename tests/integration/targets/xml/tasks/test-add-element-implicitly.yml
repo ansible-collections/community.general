@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Setup test fixture
-  copy:
+  ansible.builtin.copy:
     src: fixtures/ansible-xml-beers.xml
     dest: /tmp/ansible-xml-beers-implicit.xml
 
@@ -102,7 +102,7 @@
     pretty_print: true
 
 - name: Compare to expected result
-  copy:
+  ansible.builtin.copy:
     src: results/test-add-element-implicitly.xml
     dest: /tmp/ansible-xml-beers-implicit.xml
   check_mode: true

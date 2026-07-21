@@ -212,7 +212,7 @@
     state: directory
 
 - name: copy spec file
-  copy:
+  ansible.builtin.copy:
     src: empty.spec
     dest: "{{ remote_tmp_dir | expanduser }}/zypper2/empty.spec"
 
@@ -289,7 +289,7 @@
     state: directory
 
 - name: copy spec file
-  copy:
+  ansible.builtin.copy:
     src: post_error.spec
     dest: "{{ remote_tmp_dir | expanduser }}/zypper2/post_error.spec"
 

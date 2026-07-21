@@ -7,7 +7,7 @@
 # TEST 01: state=present
 
 - name: "create foobarrc for tests"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ foobarrc }}"
     content: "{{ foobarrc_oldtext }}"
 

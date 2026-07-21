@@ -251,7 +251,7 @@
   ##
 
     - name: set timezone manually by coping zone info file to /etc/localtime
-      copy:
+      ansible.builtin.copy:
         src: /usr/share/zoneinfo/Etc/UTC
         dest: /etc/localtime
         remote_src: true
@@ -462,7 +462,7 @@
         ##
 
         - name: create /etc/adjtime without UTC/LOCAL
-          copy:
+          ansible.builtin.copy:
             content: '0.0 0 0\n0'
             dest: /etc/adjtime
 

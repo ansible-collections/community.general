@@ -14,7 +14,7 @@
 - set_fact: test_number= 0
 
 - name: "test_{{test_number}}: copy fixtures to test host"
-  copy:
+  ansible.builtin.copy:
     src: testhost/tmp/opennebula-fixtures.json.gz
     dest: /tmp
   when:

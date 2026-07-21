@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "create a blocking ruleset with a DROP policy"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ iptables_tests }}"
     content: |
       *filter
@@ -121,7 +121,7 @@
 
 
 - name: "create a blocking ruleset with a REJECT rule"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ iptables_tests }}"
     content: |
       *filter

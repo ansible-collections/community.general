@@ -8,7 +8,7 @@
     test_limit_file: "/tmp/limits.conf"
 
 - name: Copy temporary limits.conf
-  copy:
+  ansible.builtin.copy:
     src: test_pam_limits.conf
     dest: "{{ test_limit_file }}"
 

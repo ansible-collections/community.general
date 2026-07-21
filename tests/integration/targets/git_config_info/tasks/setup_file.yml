@@ -11,6 +11,6 @@
     state: absent
 
 - name: set up file config
-  copy:
+  ansible.builtin.copy:
     src: gitconfig
     dest: "{{ remote_tmp_dir }}/gitconfig_file"

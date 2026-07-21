@@ -44,7 +44,7 @@
       - remove_files is not changed
 
 - name: Copy source files - remove source directory ({{ format }})
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ remote_tmp_dir }}/{{ item }}"
   with_items:
@@ -58,7 +58,7 @@
     state: directory
 
 - name: Copy source files to temporary directory - remove source directory ({{ format }})
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ remote_tmp_dir }}/tmpdir/{{ item }}"
   with_items:
@@ -108,7 +108,7 @@
     state: directory
 
 - name: Copy source files to temporary directory - remove source excluding path ({{ format }})
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ remote_tmp_dir }}/tmpdir/{{ item }}"
   with_items:
@@ -147,7 +147,7 @@
     state: file
 
 - name: Copy source files to temporary directory - remove source excluding sub path ({{ format }})
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ remote_tmp_dir }}/tmpdir/{{ item }}"
   with_items:
@@ -184,7 +184,7 @@
     state: file
 
 - name: Copy source files to temporary directory - remove source with nested paths ({{ format }})
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ remote_tmp_dir }}/tmpdir/{{ item }}"
   with_items:

@@ -7,7 +7,7 @@
   gather_facts: false
   tasks:
     - name: create file without content
-      copy:
+      ansible.builtin.copy:
         content: ""
         dest: "{{ remote_tmp }}/test_empty.txt"
         force: false

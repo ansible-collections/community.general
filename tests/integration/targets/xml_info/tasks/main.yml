@@ -56,7 +56,7 @@
       </business>
 
 - name: Write test XML to file
-  copy:
+  ansible.builtin.copy:
     content: "{{ xml_info_test_xml }}"
     dest: /tmp/ansible-xml-info-beers.xml
 

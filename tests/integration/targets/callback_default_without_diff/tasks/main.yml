@@ -30,13 +30,13 @@
                 gather_facts: true
                 tasks:
                   - name: Create file
-                    copy:
+                    ansible.builtin.copy:
                       dest: "{{ tempfile.path }}"
                       content: |
                         Foo bar
 
                   - name: Modify file
-                    copy:
+                    ansible.builtin.copy:
                       dest: "{{ tempfile.path }}"
                       content: |
                         Foo bar

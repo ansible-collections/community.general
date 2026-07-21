@@ -5,7 +5,7 @@
 
 # Reset ssh_config before testing options
 - name: Copy sample config file
-  copy:
+  ansible.builtin.copy:
     src: 'files/ssh_config_test'
     dest: '{{ ssh_config_test }}'
 
@@ -292,7 +292,7 @@
 # Reset ssh_config before testing options with proxyjump
 
 - name: Copy sample config file
-  copy:
+  ansible.builtin.copy:
     src: 'files/ssh_config_test'
     dest: '{{ ssh_config_test }}'
 

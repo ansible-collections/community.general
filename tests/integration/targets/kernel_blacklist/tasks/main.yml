@@ -8,7 +8,7 @@
     bl_file: '{{ remote_tmp_dir }}/blacklist-ansible.conf'
 
 - name: copy blacklist file
-  copy:
+  ansible.builtin.copy:
     src: 'files/blacklist'
     dest: '{{ bl_file }}'
 

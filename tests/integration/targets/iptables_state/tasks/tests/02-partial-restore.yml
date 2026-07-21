@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "Create initial rule set to use"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ iptables_tests }}"
     content: |
       *filter
@@ -29,7 +29,7 @@
   poll: 0
 
 - name: "Create partial ruleset only specifying input"
-  copy:
+  ansible.builtin.copy:
     dest: "{{ iptables_tests }}"
     content: |
       *filter

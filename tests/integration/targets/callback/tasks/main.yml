@@ -20,7 +20,7 @@
       register: temporary_playbook_files
 
     - name: Set temporary playbook file content
-      copy:
+      ansible.builtin.copy:
         content: "{{ test.playbook }}"
         dest: "{{ temporary_playbook_files.results[test_idx].path }}"
       loop: "{{ tests }}"

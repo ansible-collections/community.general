@@ -6,7 +6,7 @@
 ## testing ignore_spaces option
 
 - name: test-ignore_spaces 1 (commented line updated) - create test file
-  copy:
+  ansible.builtin.copy:
     dest: "{{ output_file }}"
     content: "[foo]\n; bar=baz\n"
 
@@ -35,7 +35,7 @@
       - result.msg == 'option changed'
 
 - name: test-ignore_spaces 2 (uncommented line updated) - create test file
-  copy:
+  ansible.builtin.copy:
     dest: "{{ output_file }}"
     content: "[foo]\nbar=baz\n"
 
@@ -64,7 +64,7 @@
       - result.msg == 'option changed'
 
 - name: test-ignore_spaces 3 (spaces on top of no spaces) - create test file
-  copy:
+  ansible.builtin.copy:
     dest: "{{ output_file }}"
     content: "[foo]\nbar=baz\n"
 
@@ -93,7 +93,7 @@
       - result.msg == "OK"
 
 - name: test-ignore_spaces 4 (no spaces on top of spaces) - create test file
-  copy:
+  ansible.builtin.copy:
     dest: "{{ output_file }}"
     content: "[foo]\nbar = baz\n"
 
