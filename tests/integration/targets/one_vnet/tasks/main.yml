@@ -15,7 +15,7 @@
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
     name: bridge-network
-    template: |
+    ansible.builtin.template: |
       VN_MAD  = "bridge"
       BRIDGE  = "br0"
       BRIDGE_TYPE  = "linux"
@@ -41,7 +41,7 @@
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
     name: bridge-network
-    template: |
+    ansible.builtin.template: |
       VN_MAD  = "bridge"
       BRIDGE  = "br0"
       BRIDGE_TYPE  = "linux"
@@ -66,7 +66,7 @@
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
     name: bridge-network
-    template: |
+    ansible.builtin.template: |
       VN_MAD  = "bridge"
       BRIDGE  = "br0"
       BRIDGE_TYPE  = "linux"
@@ -137,7 +137,7 @@
     api_password: "{{ opennebula_password }}"
     id: 0
     state: present
-    template: |
+    ansible.builtin.template: |
       VN_MAD  = "bridge"
       BRIDGE  = "br0"
       BRIDGE_TYPE  = "linux"

@@ -23,7 +23,7 @@
 - block:
   # OpenSUSE Leap>=15.0 don't include password-store in main repo
     - name: SUSE | Add security:privacy repo
-      template:
+      ansible.builtin.template:
         src: security-privacy.repo.j2
         dest: /etc/zypp/repos.d/security:privacy.repo
 

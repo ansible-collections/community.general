@@ -558,7 +558,7 @@
       - 2
   block:
     - name: Deploy spec files to build 2 packages with duplicate files.
-      template:
+      ansible.builtin.template:
         src: duplicate.spec.j2
         dest: "{{ remote_tmp_dir | expanduser }}/zypper2/duplicate{{ item }}.spec"
       loop: "{{ looplist }}"

@@ -34,7 +34,7 @@
     timeout: 10
 
 - name: "[{{ item }}] Deploy a new test service configuration with a new port 21213"
-  template:
+  ansible.builtin.template:
     src: "modified.{{ launchd_service_name }}.plist.j2"
     dest: "{{ launchd_plist_location }}"
   become: true

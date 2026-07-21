@@ -17,7 +17,7 @@
       register: yarn_installed_version
 
     - name: 'Create dummy package.json'
-      template:
+      ansible.builtin.template:
         src: package.j2
         dest: '{{ remote_tmp_dir }}/package.json'
 

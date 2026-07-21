@@ -10,7 +10,7 @@
         - '{{ ansible_facts.os_family }}.yml'
         - default.yml
       paths: ../vars
-- template:
+- ansible.builtin.template:
     src: dummy_command
     dest: /usr/bin/dummy{{ item }}
     owner: root
