@@ -78,7 +78,7 @@
       register: original_timezone
 
     - name: Value of original_timezone
-      debug:
+      ansible.builtin.debug:
         msg: "{{ original_timezone }}"
 
     - block:

@@ -12,7 +12,8 @@
     name: pycdlib
     extra_args: "-c {{ remote_constraints }}"
   register: install_pycdlib
-- debug: var=install_pycdlib
+- ansible.builtin.debug:
+    var: install_pycdlib
 
 - set_fact:
     output_test_dir: '{{ remote_tmp_dir }}/test_iso_create'
@@ -35,13 +36,15 @@
     interchange_level: 3
   register: iso_result
   check_mode: true
-- debug: var=iso_result
+- ansible.builtin.debug:
+    var: iso_result
 
 - name: Check if iso file created
   ansible.builtin.stat:
     path: "{{ output_test_dir }}/test.iso"
   register: iso_file
-- debug: var=iso_file
+- ansible.builtin.debug:
+    var: iso_file
 - ansible.builtin.assert:
     that:
       - iso_result is changed
@@ -54,7 +57,8 @@
     dest_iso: "{{ output_test_dir }}/test.iso"
     interchange_level: 3
   register: iso_result
-- debug: var=iso_result
+- ansible.builtin.debug:
+    var: iso_result
 
 - name: Check if iso file created
   ansible.builtin.stat:
@@ -74,7 +78,8 @@
     dest_iso: "{{ output_test_dir }}/test1.iso"
     interchange_level: 3
   register: iso_result
-- debug: var=iso_result
+- ansible.builtin.debug:
+    var: iso_result
 
 - name: Check if iso file created
   ansible.builtin.stat:
@@ -93,7 +98,8 @@
     dest_iso: "{{ output_test_dir }}/test2.iso"
     vol_ident: "OEMDRV"
   register: iso_result
-- debug: var=iso_result
+- ansible.builtin.debug:
+    var: iso_result
 
 - name: Check if iso file created
   ansible.builtin.stat:
@@ -112,7 +118,8 @@
     dest_iso: "{{ output_test_dir }}/test3.iso"
     rock_ridge: "1.09"
   register: iso_result
-- debug: var=iso_result
+- ansible.builtin.debug:
+    var: iso_result
 
 - name: Check if iso file created
   ansible.builtin.stat:
@@ -131,7 +138,8 @@
     dest_iso: "{{ output_test_dir }}/test4.iso"
     joliet: 3
   register: iso_result
-- debug: var=iso_result
+- ansible.builtin.debug:
+    var: iso_result
 
 - name: Check if iso file created
   ansible.builtin.stat:
@@ -150,7 +158,8 @@
     dest_iso: "{{ output_test_dir }}/test5.iso"
     udf: true
   register: iso_result
-- debug: var=iso_result
+- ansible.builtin.debug:
+    var: iso_result
 
 - name: Check if iso file created
   ansible.builtin.stat:

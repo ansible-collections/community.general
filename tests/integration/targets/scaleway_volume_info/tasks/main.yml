@@ -14,7 +14,7 @@
   register: volumes
 
 - name: Display volumes variable
-  debug:
+  ansible.builtin.debug:
     var: volumes
 
 - name: Ensure retrieval of volumes info is success
@@ -28,7 +28,7 @@
   register: ams1_volumes
 
 - name: Display volumes variable
-  debug:
+  ansible.builtin.debug:
     var: ams1_volumes
 
 - name: Ensure retrieval of volumes info is success

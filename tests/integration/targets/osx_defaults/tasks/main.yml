@@ -45,7 +45,7 @@
     state: list
   register: apple_measure_value
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ apple_measure_value['value'] }}"
 
 - set_fact:
@@ -91,7 +91,7 @@
     state: list
   register: list_fake_value
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ list_fake_value }}"
 
 - name: Check if fake value is listed
@@ -107,7 +107,7 @@
     value: sample
   register: present_fake_value
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ present_fake_value }}"
 
 - name: Check if fake is created
@@ -123,7 +123,7 @@
     state: list
   register: list_fake
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ list_fake }}"
 
 - name: Delete a fake setting
@@ -133,7 +133,7 @@
     state: absent
   register: absent_task
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ absent_task }}"
 
 - name: Check if fake setting is deleted
@@ -149,7 +149,7 @@
     state: absent
   register: absent_task
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ absent_task }}"
 
 - name: Check if fake setting is not deleted
@@ -165,7 +165,7 @@
   register: absent_check_mode_task
   check_mode: true
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ absent_check_mode_task }}"
 
 - name: Check delete operation with check mode

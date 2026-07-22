@@ -56,7 +56,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert user federation created
@@ -109,7 +109,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert user federation created (admin realm)
@@ -162,7 +162,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert user federation unchanged
@@ -217,7 +217,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert user federation unchanged (admin realm)
@@ -288,7 +288,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert user federation created
@@ -312,7 +312,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert user federation deleted
@@ -334,7 +334,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert user federation unchanged
@@ -403,7 +403,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Assert user federation created

@@ -9,11 +9,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # FIXME: Unfortunately ansible_facts.selinux could be a boolean or a dictionary !
-- debug:
+- ansible.builtin.debug:
     msg: SELinux is disabled
   when: ansible_facts.selinux is defined and ansible_facts.selinux == False
 
-- debug:
+- ansible.builtin.debug:
     msg: SELinux is {{ ansible_facts.selinux.status }}
   when: ansible_facts.selinux is defined and ansible_facts.selinux != False
 

@@ -22,7 +22,7 @@
       - latin_capital_i == (roman_numeral_one | community.general.unicode_normalize(form='NFKC'))
 
 - name: Register invalid input type
-  debug:
+  ansible.builtin.debug:
     msg: "{{ 1 | community.general.unicode_normalize }}"
   ignore_errors: true
   register: invalid_input_type
@@ -33,7 +33,7 @@
       - invalid_input_type is failed
 
 - name: Register invalid form selection
-  debug:
+  ansible.builtin.debug:
     msg: "{{ 'arbitrary text' | community.general.unicode_normalize(form='invalid') }}"
   ignore_errors: true
   register: invalid_form_selection

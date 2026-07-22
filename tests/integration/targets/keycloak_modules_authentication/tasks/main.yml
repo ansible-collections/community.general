@@ -50,7 +50,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Remove created realm role
@@ -65,7 +65,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Get Keycloak token
@@ -98,7 +98,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Remove created realm role
@@ -113,7 +113,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Create new realm role with invalid auth token and valid refresh token
@@ -131,7 +131,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Remove created realm role
@@ -146,7 +146,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Create new realm role with invalid auth token and valid username/password
@@ -163,7 +163,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Remove created realm role
@@ -178,7 +178,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Create new realm role with invalid auth token, invalid refresh token, and valid username/password
@@ -196,7 +196,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Remove created realm role
@@ -211,7 +211,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: PREPARE - Temporarily disable public login in master admin-cli
@@ -266,7 +266,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: Reset temporarily disabled public login in master admin-cli
@@ -294,7 +294,7 @@
   register: result
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: result
 
 ### Unhappy path tests

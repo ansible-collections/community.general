@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Show Node.js Download URL
-  debug:
+  ansible.builtin.debug:
     var: nodejs_download
 
 - name: Download Node.js

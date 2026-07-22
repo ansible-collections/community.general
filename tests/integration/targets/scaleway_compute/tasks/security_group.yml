@@ -16,7 +16,8 @@
     organization_default: false
   register: security_group
 
-- debug: var=security_group
+- ansible.builtin.debug:
+    var: security_group
 
 - block:
     - name: Create a server with security_group (Check)
@@ -32,7 +33,8 @@
 
       register: server_creation_check_task
 
-    - debug: var=server_creation_check_task
+    - ansible.builtin.debug:
+        var: server_creation_check_task
 
     - ansible.builtin.assert:
         that:
@@ -52,7 +54,8 @@
 
       register: server_creation_task
 
-    - debug: var=server_creation_task
+    - ansible.builtin.debug:
+        var: server_creation_task
 
     - ansible.builtin.assert:
         that:
@@ -72,7 +75,8 @@
 
       register: server_creation_confirmation_task
 
-    - debug: var=server_creation_confirmation_task
+    - ansible.builtin.debug:
+        var: server_creation_confirmation_task
 
     - ansible.builtin.assert:
         that:
@@ -93,7 +97,8 @@
 
       register: server_creation_confirmation_task
 
-    - debug: var=server_creation_confirmation_task
+    - ansible.builtin.debug:
+        var: server_creation_confirmation_task
 
     - ansible.builtin.assert:
         that:
@@ -112,7 +117,8 @@
 
       register: server_creation_confirmation_task
 
-    - debug: var=server_creation_confirmation_task
+    - ansible.builtin.debug:
+        var: server_creation_confirmation_task
 
     - ansible.builtin.assert:
         that:
@@ -132,7 +138,8 @@
 
       register: server_destroy_task
 
-    - debug: var=server_destroy_task
+    - ansible.builtin.debug:
+        var: server_destroy_task
 
     - ansible.builtin.assert:
         that:

@@ -69,7 +69,7 @@
     - gopass
 
 - name: Output versions of tools
-  debug:
+  ansible.builtin.debug:
     msg: "{{ versions.results | map(attribute='stdout_lines') }}"
 
 # How to generate a new GPG key:

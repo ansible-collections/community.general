@@ -14,7 +14,7 @@
   register: security_groups
 
 - name: Display security_groups variable
-  debug:
+  ansible.builtin.debug:
     var: security_groups
 
 - name: Ensure retrieval of security groups info is success
@@ -28,7 +28,7 @@
   register: ams1_security_groups
 
 - name: Display security_groups variable (AMS1)
-  debug:
+  ansible.builtin.debug:
     var: ams1_security_groups
 
 - name: Ensure retrieval of security groups info is success (AMS1)

@@ -9,7 +9,7 @@
   register: result
 
 - name: Show results
-  debug:
+  ansible.builtin.debug:
     var: result
 
 - name: assert failing dependency

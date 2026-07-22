@@ -23,7 +23,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
         expected_output:
           - ""
@@ -48,7 +48,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
         expected_output:
           - "Sample output Sample playbook message"
@@ -76,7 +76,7 @@
               ansible_callback_diy_playbook_on_play_start_msg: Sample output {{ ansible_callback_diy.play.name }}
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
         expected_output:
           - "Sample output Sample play name"
@@ -101,7 +101,7 @@
               ansible_callback_diy_playbook_on_task_start_msg: Sample output {{ ansible_callback_diy.task.name }}
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
         expected_output:
           - ""
@@ -124,7 +124,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_playbook_on_task_start_msg: Sample output {{ ansible_callback_diy.task.name }}
@@ -149,7 +149,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_runner_on_ok_msg: Sample output {{ ansible_callback_diy.result.output.msg }}
@@ -173,7 +173,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
                 failed_when: true
                 ignore_errors: true
@@ -199,7 +199,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
                 when: false
                 vars:
@@ -224,7 +224,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg {{ item }}
                 loop:
                   - sample item 1
@@ -254,7 +254,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg {{ item }}
                 loop:
                   - sample item 1
@@ -294,7 +294,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg {{ item }}
                 loop:
                   - sample item 1
@@ -356,7 +356,7 @@
                 {% endfor %}
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
         expected_output:
           - ""
@@ -382,7 +382,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_playbook_on_task_start_msg: ''
@@ -406,7 +406,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_runner_on_ok_msg: ''
@@ -429,7 +429,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
                 vars:
                   ansible_callback_diy_runner_on_ok_msg: Sample output {{ ansible_callback_diy.result.output.msg }}
@@ -455,13 +455,13 @@
             gather_facts: false
             tasks:
               - name: A loop
-                debug:
+                ansible.builtin.debug:
                   msg: "{{ item }}"
                 loop:
                   - 1
                   - 2
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
               - name: Skipped task
                 ansible.builtin.command: ls /

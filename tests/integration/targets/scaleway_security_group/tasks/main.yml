@@ -22,7 +22,8 @@
     organization_default: false
   register: security_group_creation
 
-- debug: var=security_group_creation
+- ansible.builtin.debug:
+    var: security_group_creation
 
 - name: Ensure security groups check facts is success
   ansible.builtin.assert:
@@ -44,7 +45,8 @@
         organization_default: false
       register: security_group_creation
 
-    - debug: var=security_group_creation
+    - ansible.builtin.debug:
+        var: security_group_creation
 
     - name: Ensure security groups facts is success
       ansible.builtin.assert:
@@ -65,7 +67,8 @@
         organization_default: false
       register: security_group_creation
 
-    - debug: var=security_group_creation
+    - ansible.builtin.debug:
+        var: security_group_creation
 
     - name: Ensure security groups duplicate facts is success
       ansible.builtin.assert:
@@ -87,7 +90,8 @@
         organization_default: false
       register: security_group_deletion
 
-    - debug: var=security_group_deletion
+    - ansible.builtin.debug:
+        var: security_group_deletion
 
     - name: Ensure security groups delete check facts is success
       ansible.builtin.assert:
@@ -109,7 +113,8 @@
         organization_default: false
       register: security_group_deletion
 
-    - debug: var=security_group_deletion
+    - ansible.builtin.debug:
+        var: security_group_deletion
 
     - name: Ensure security groups delete facts is success
       ansible.builtin.assert:
@@ -130,7 +135,8 @@
     organization_default: false
   register: security_group_deletion
 
-- debug: var=security_group_deletion
+- ansible.builtin.debug:
+    var: security_group_deletion
 
 - name: Ensure security groups delete duplicate facts is success
   ansible.builtin.assert:

@@ -20,10 +20,10 @@
       ansible.builtin.shell: apache2ctl -M | sort
       register: modules_after
     - name: modules_before
-      debug:
+      ansible.builtin.debug:
         var: modules_before
     - name: modules_after
-      debug:
+      ansible.builtin.debug:
         var: modules_after
     - name: ensure that all test modules are disabled again
       ansible.builtin.assert:

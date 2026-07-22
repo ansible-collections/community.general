@@ -14,7 +14,7 @@
     description: bla bla bla
     issuetype: Task
   register: issue
-- debug:
+- ansible.builtin.debug:
     msg: Issue={{ issue }}
 - name: assert test ticket
   ansible.builtin.assert:
@@ -105,7 +105,7 @@
     that:
       - transition_resolved is changed
 
-- debug:
+- ansible.builtin.debug:
     msg:
       - Issue = {{ issue.meta.key }}
       - URL = {{ issue.meta.self }}

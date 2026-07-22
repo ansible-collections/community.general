@@ -238,7 +238,7 @@
     script: |
       SELECT service_broker_guid, * FROM sys.databases WHERE name = 'master'
   register: result_databases
-- debug:
+- ansible.builtin.debug:
     var: result_databases
 - name: check types
   ansible.builtin.assert:
