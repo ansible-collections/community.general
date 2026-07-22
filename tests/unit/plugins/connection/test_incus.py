@@ -8,6 +8,7 @@ import typing as t
 from io import StringIO
 
 import pytest
+from ansible.errors import AnsibleError
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
 
@@ -284,3 +285,75 @@ def test_build_command(mocker, testcase):
     built = conn._build_command(testcase["input"]["cmd"])
     tc_cmd = cli_preamble + testcase["output"]
     assert built == tc_cmd, f"\n   built = {built}\ntestcase = {tc_cmd}"
+
+
+def _make_conn(mocker):
+    mocker.patch("ansible.module_utils.common.process.get_bin_path").return_value = "/test/bin/incus"
+    play_context = PlayContext()
+    play_context.shell = "sh"
+    conn = connection_loader.get("community.general.incus", play_context, StringIO())
+    conn.set_option("remote_addr", "server1")
+    conn.set_option("remote_user", "root")
+    return conn
+
+
+def test_put_file_transfer_failure(mocker, tmp_path):
+    """A failed ``incus file push`` must raise instead of silently succeeding."""
+    conn = _make_conn(mocker)
+
+    src = tmp_path / "payload"
+    src.write_text("data")
+
+    process = mocker.MagicMock()
+    process.communicate.return_value = (b"", b"Error: not authorized\n")
+    process.returncode = 1
+    mocker.patch("ansible_collections.community.general.plugins.connection.incus.Popen", return_value=process)
+
+    with pytest.raises(AnsibleError) as exc:
+        conn.put_file(str(src), "/tmp/dest")
+
+    assert "failed to transfer file to instance server1" in str(exc.value)
+    assert "Error: not authorized" in str(exc.value)
+
+
+def test_put_file_transfer_success(mocker, tmp_path):
+    """A successful ``incus file push`` must not raise."""
+    conn = _make_conn(mocker)
+
+    src = tmp_path / "payload"
+    src.write_text("data")
+
+    process = mocker.MagicMock()
+    process.communicate.return_value = (b"", b"")
+    process.returncode = 0
+    mocker.patch("ansible_collections.community.general.plugins.connection.incus.Popen", return_value=process)
+
+    conn.put_file(str(src), "/tmp/dest")
+
+
+def test_fetch_file_transfer_failure(mocker):
+    """A failed ``incus file pull`` must raise instead of silently succeeding."""
+    conn = _make_conn(mocker)
+
+    process = mocker.MagicMock()
+    process.communicate.return_value = (b"", b"Error: Instance is not running.\n")
+    process.returncode = 1
+    mocker.patch("ansible_collections.community.general.plugins.connection.incus.Popen", return_value=process)
+
+    with pytest.raises(AnsibleError) as exc:
+        conn.fetch_file("/tmp/src", "/tmp/dest")
+
+    assert "failed to transfer file from instance server1" in str(exc.value)
+    assert "Error: Instance is not running." in str(exc.value)
+
+
+def test_fetch_file_transfer_success(mocker):
+    """A successful ``incus file pull`` must not raise."""
+    conn = _make_conn(mocker)
+
+    process = mocker.MagicMock()
+    process.communicate.return_value = (b"", b"")
+    process.returncode = 0
+    mocker.patch("ansible_collections.community.general.plugins.connection.incus.Popen", return_value=process)
+
+    conn.fetch_file("/tmp/src", "/tmp/dest")
