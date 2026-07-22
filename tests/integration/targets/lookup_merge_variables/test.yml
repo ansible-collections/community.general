@@ -8,7 +8,7 @@
   hosts: localhost
   tasks:
     - name: Include test data
-      include_vars: vars.yml
+      ansible.builtin.include_vars: vars.yml
 
     # Test the default behavior
     - name: Test merge list

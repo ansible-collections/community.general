@@ -15,5 +15,5 @@
         dest: /usr/local/bin/wsl.exe
         mode: '0755'
     - name: Install paramiko
-      pip:
+      ansible.builtin.pip:
         name: "paramiko>=3.0.0"

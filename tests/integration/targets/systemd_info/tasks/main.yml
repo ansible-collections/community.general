@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: skip Alpine
-  meta: end_host
+  ansible.builtin.meta: end_host
   when: ansible_facts.distribution == 'Alpine'
 
 - name: check ansible_facts.service_mgr

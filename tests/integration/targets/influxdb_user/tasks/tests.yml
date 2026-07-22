@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install influxdb python module
-  pip: name=influxdb
+  ansible.builtin.pip: name=influxdb
 
 - name: Test add admin user in check mode
   block:
@@ -43,7 +43,7 @@
 - name: Enable authentication and restart service
   block:
     - name: Enable authentication
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/influxdb/influxdb.conf
         regexp: 'auth-enabled ='
         line: '  auth-enabled = true'

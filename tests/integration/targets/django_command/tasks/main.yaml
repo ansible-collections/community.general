@@ -4,7 +4,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 - name: Create temporary test directory
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
     suffix: .django_command
   register: tmp_django_root
@@ -19,13 +19,13 @@
     virtualenv {{ tmp_django_root.path }}/venv
 
 - name: Update python package pip
-  pip:
+  ansible.builtin.pip:
     name: pip
     state: latest
     virtualenv: "{{ tmp_django_root.path }}/venv"
 
 - name: Install python package django
-  pip:
+  ansible.builtin.pip:
     name: django
     state: present
     virtualenv: "{{ tmp_django_root.path }}/venv"

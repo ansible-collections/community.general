@@ -16,7 +16,7 @@
 
 - block:
     - name: Install legacycrypt on Python 3.13+ (non-Archlinux)
-      pip:
+      ansible.builtin.pip:
         name: legacycrypt
       when:
         - ansible_facts.python_version is version("3.13", ">=")

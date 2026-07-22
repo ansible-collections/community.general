@@ -18,7 +18,7 @@
   listen: cleanup redis
 
 - name: remove pip packages
-  pip:
+  ansible.builtin.pip:
     name: redis
     state: absent
   listen: cleanup redis

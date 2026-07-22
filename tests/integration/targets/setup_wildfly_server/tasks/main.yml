@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Skip unsupported platforms
-  meta: end_play
+  ansible.builtin.meta: end_play
   # Not being effectively tested and bound to be removed in 14.0.0 with jboss module deprecation
 
 - name: Install java
@@ -22,12 +22,12 @@
     state: directory
 
 - name: Download wildfly
-  get_url:
+  ansible.builtin.get_url:
     url: 'https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/setup_wildfly_server/wildfly-{{ wf_version }}.tar.gz'
     dest: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
 
 - name: Unarchive tar
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
     dest: '{{ wf_tmp_dir }}'
     remote_src: true
@@ -44,12 +44,12 @@
     state: link
 
 - name: Create group for wildfly
-  group:
+  ansible.builtin.group:
     name: '{{ wf_user }}'
     system: true
 
 - name: Create user for wildfly
-  user:
+  ansible.builtin.user:
     name: '{{ wf_user }}'
     system: true
     group: '{{ wf_user }}'

@@ -11,7 +11,7 @@
     pvs: "{{ loop_device1 }}"
 
 - name: "get lvm facts"
-  setup:
+  ansible.builtin.setup:
 
 - debug: var=ansible_facts.lvm
 
@@ -29,7 +29,7 @@
     remove_extra_pvs: false
 
 - name: "get lvm facts"
-  setup:
+  ansible.builtin.setup:
 
 - debug: var=ansible_facts.lvm
 

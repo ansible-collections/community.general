@@ -9,23 +9,23 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Exit when Suse because it causes CI problems
-- meta: end_play
+- ansible.builtin.meta: end_play
   when: ansible_facts.os_family == 'Suse'
 
 # To avoid hangings on service start/stop postgres during CI runs:
-- meta: end_play
+- ansible.builtin.meta: end_play
   when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
 
 # Temporary disable Fedora 34
-- meta: end_play
+- ansible.builtin.meta: end_play
   when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '34'
 
 # Temporary disable Fedora 44
-- meta: end_play
+- ansible.builtin.meta: end_play
   when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '44'
 
 - name: Include distribution and Python version specific variables
-  include_vars: '{{ lookup(''first_found'', params) }}'
+  ansible.builtin.include_vars: '{{ lookup(''first_found'', params) }}'
   vars:
     params:
       files:
@@ -119,7 +119,7 @@
   when: ansible_facts.os_family == 'Suse'
 
 - name: Pause between stop and start postgresql
-  pause:
+  ansible.builtin.pause:
     seconds: 5
   when: ansible_facts.os_family == 'Suse'
 
@@ -210,7 +210,7 @@
   when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version is version('24', '>=')
 
 - name: enable postgresql service (FreeBSD)
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/rc.conf
     line: postgresql_enable="YES"
   when: ansible_facts.os_family == "FreeBSD"
@@ -219,7 +219,7 @@
   ansible.builtin.service: name={{ postgresql_service }} state=started
 
 - name: Pause between start and stop
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 - name: Kill all postgres processes
@@ -234,7 +234,7 @@
   when: terminate is not succeeded
 
 - name: Pause between stop and start
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 - name: Start postgresql service

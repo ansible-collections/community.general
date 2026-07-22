@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create temporary directory for package creation
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
   register: pkgng_test_outofdate_pkg_tempdir
 

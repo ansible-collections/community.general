@@ -10,7 +10,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: variables username, password, container, tld must be set
-  fail:
+  ansible.builtin.fail:
     msg: 'Please set the variables: username, password, container and tld.'
   when: username is not defined or password is not defined or container is not defined or tld is not defined
 

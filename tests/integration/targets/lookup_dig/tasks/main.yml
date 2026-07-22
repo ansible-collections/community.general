@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Install dnspython library
-  pip:
+  ansible.builtin.pip:
     name: dnspython
     state: present
     extra_args: "-c {{ remote_constraints }}"

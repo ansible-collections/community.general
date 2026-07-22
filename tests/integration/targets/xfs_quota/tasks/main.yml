@@ -20,7 +20,7 @@
 
 - block:
     - name: Create test user
-      user:
+      ansible.builtin.user:
         name: xfsquotauser
         state: present
       become: true
@@ -31,7 +31,7 @@
 
   always:
     - name: cleanup test user
-      user:
+      ansible.builtin.user:
         name: xfsquotauser
         state: absent
       become: true

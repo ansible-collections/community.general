@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Include OS-specific variables
-  include_vars: '{{ lookup("first_found", params) }}'
+  ansible.builtin.include_vars: '{{ lookup("first_found", params) }}'
   vars:
     params:
       files:
@@ -82,7 +82,7 @@
         - { path: "{{ android_sdk_location }}/cmdline-tools/latest", state: "directory" }
 
     - name: Download Android command line tools
-      unarchive:
+      ansible.builtin.unarchive:
         src: "{{ commandline_tools_link }}"
         dest: "{{ android_cmdline_temp_dir }}"
         remote_src: true

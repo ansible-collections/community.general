@@ -22,7 +22,7 @@
     ### copy local file with unicode filename and content
 
     - name: create local file with unicode filename and content
-      lineinfile: dest={{ local_tmp }}-汉语/汉语.txt create=true line=汉语
+      ansible.builtin.lineinfile: dest={{ local_tmp }}-汉语/汉语.txt create=true line=汉语
       delegate_to: localhost
     - name: remove remote file with unicode filename and content
       action: "{{ action_prefix }}file path={{ remote_tmp }}-汉语/汉语.txt state=absent"

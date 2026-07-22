@@ -20,13 +20,13 @@
     - projid
     - projects
 - name: Add test xfs quota project id
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/projid
     line: xft_quotaval:99999
     state: present
   become: true
 - name: Add test xfs quota project path
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/projects
     line: 99999:{{ remote_tmp_dir }}/pquota/test
     state: present
@@ -171,13 +171,13 @@
         path: '{{ remote_tmp_dir }}/img-pquota'
         state: absent
     - name: Remove xfs quota project id
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/projid
         regexp: ^xft_quotaval:99999$
         state: absent
       become: true
     - name: Remove xfs quota project path
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/projects
         regexp: ^99999:.*$
         state: absent

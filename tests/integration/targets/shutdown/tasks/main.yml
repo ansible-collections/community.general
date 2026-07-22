@@ -103,7 +103,7 @@
   register: systemd_sysv_install
 
 - name: Gather package facts
-  package_facts:
+  ansible.builtin.package_facts:
     manager: apt
   when: ansible_facts.distribution in ['Ubuntu', 'Debian']
 

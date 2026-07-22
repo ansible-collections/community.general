@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: make sure we have the ansible_facts.os_family and ansible_facts.distribution_version facts
-  setup:
+  ansible.builtin.setup:
     gather_subset: distribution
   when: ansible_facts == {}
 

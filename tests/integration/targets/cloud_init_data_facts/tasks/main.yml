@@ -37,7 +37,7 @@
           - udev
 
     - name: Ensure systemd-network user exists
-      user:
+      ansible.builtin.user:
         name: systemd-network
         state: present
       when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version|int >= 37

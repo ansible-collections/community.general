@@ -30,7 +30,7 @@
         cmd: pacman --sync --print-format "%l" {{file_pkg}}
       register: file_pkg_url
     - name: Download {{file_pkg}} pkg
-      get_url:
+      ansible.builtin.get_url:
         url: '{{file_pkg_url.stdout}}'
         dest: '{{file_pkg_path}}'
 

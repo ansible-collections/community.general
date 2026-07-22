@@ -21,7 +21,7 @@
     mode: '755'
 
 - name: rewrite shebang in the test daemon script
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /usr/local/sbin/ansible_test_service
     line: "#!{{ ansible_python_interpreter | realpath }}"
     insertbefore: BOF

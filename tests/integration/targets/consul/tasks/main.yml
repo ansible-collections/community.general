@@ -15,7 +15,7 @@
     consul_cmd: '{{ remote_tmp_dir }}/consul'
   block:
     - name: Install py-consul
-      pip:
+      ansible.builtin.pip:
         name: py-consul
         extra_args: "-c {{ remote_constraints }}"
       register: result
@@ -57,7 +57,7 @@
         consul_arch: arm64
       when: ansible_facts.architecture in ['arm64', 'aarch64']
     - name: Download consul binary
-      unarchive:
+      ansible.builtin.unarchive:
         src: '{{ consul_uri }}'
         dest: '{{ remote_tmp_dir }}'
         remote_src: true
@@ -79,7 +79,7 @@
         - name: Start Consul (dev mode enabled)
           ansible.builtin.shell: nohup {{ consul_cmd }} agent -dev -config-file {{ remote_tmp_dir }}/consul_config.hcl </dev/null >/dev/null 2>&1 &
         - name: Wait for Consul HTTP API to be ready
-          wait_for:
+          ansible.builtin.wait_for:
             host: localhost
             port: 8500
             delay: 3
