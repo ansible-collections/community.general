@@ -216,7 +216,7 @@ ansible_core = "2.21"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 docker = [
     "fedora43",
-    # "alpine323",
+    "alpine323",
     "ubuntu2204",
     "ubuntu2404",
 ]
@@ -243,7 +243,7 @@ docker = [
     "fedora44",
     "ubuntu2604",
     "ubuntu2404",
-    "alpine323",
+    "alpine324",
 ]
 
 [[sessions.ansible_test_integration.groups.sessions]]
@@ -280,7 +280,7 @@ docker = "quay.io/ansible-community/test-image:archlinux"
 ansible_core = "devel"
 target = [ "azp/posix/vm/" ]
 remote = [
-    "alpine/3.23",
+    "alpine/3.24",
     # "fedora/44",
     "ubuntu/26.04",
     "ubuntu/24.04",
