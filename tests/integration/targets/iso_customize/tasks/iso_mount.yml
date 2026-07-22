@@ -11,14 +11,14 @@
       ansible.builtin.command: "hdiutil attach {{ test_dir }}/{{ iso_name }} -mountroot {{ test_dir }}/iso_mount"
 
     # For MAC, we have different root directory for different type of ISO
-    - set_fact:
+    - ansible.builtin.set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount/disk_image"
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount/AUTOINSTALL"
       when: iso_name.find('joliet') != -1
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount/CDROM"
       when: iso_name.find('udf') != -1
   when: ansible_facts.distribution == "MacOSX"
@@ -34,7 +34,7 @@
         fstype: "iso9660"
         state: mounted
 
-    - set_fact:
+    - ansible.builtin.set_fact:
         mount_root_dir: "{{ test_dir }}/iso_mount"
   when:
     - ansible_facts.distribution != "MacOSX"

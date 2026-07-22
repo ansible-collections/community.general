@@ -9,7 +9,7 @@
   register: updates
 
 - name: Set local facts
-  set_fact:
+  ansible.builtin.set_fact:
     _packages: "{{ (updates.results | map(attribute='name') | list)[:5] }}"
 
 - ansible.builtin.debug:

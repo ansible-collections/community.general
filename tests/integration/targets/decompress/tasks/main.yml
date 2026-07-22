@@ -14,7 +14,7 @@
   register: orig_file_stat
 
 - name: Set supported formats
-  set_fact:
+  ansible.builtin.set_fact:
     formats:
       - bz2
       - gz

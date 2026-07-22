@@ -17,7 +17,7 @@
           foo: "{{ foo }}"
 
     - name: Convert values to YAML
-      set_fact:
+      ansible.builtin.set_fact:
         vstr: "{{ 'foo' | community.general.to_yaml }}"
         vvstr: "{{ foo | community.general.to_yaml }}"
         vvstr_redact: "{{ foo | community.general.to_yaml(redact_sensitive_values=true) }}"
@@ -42,7 +42,7 @@
           - 'vdict == "{a: b, 1: 2}\n"'
 
     - name: Convert values to nice YAML
-      set_fact:
+      ansible.builtin.set_fact:
         vstr: "{{ 'foo' | community.general.to_nice_yaml }}"
         vvstr: "{{ foo | community.general.to_nice_yaml }}"
         vvstr_redact: "{{ foo | community.general.to_nice_yaml(redact_sensitive_values=true) }}"
@@ -67,7 +67,7 @@
           - 'vdict == "a: b\n1: 2\n"'
 
     - name: Convert more complex data structure (from vars file)
-      set_fact:
+      ansible.builtin.set_fact:
         complex: "{{ foobar | community.general.to_yaml }}"
         complex_redact: "{{ foobar | community.general.to_yaml(redact_sensitive_values=true) }}"
         complex_nice: "{{ foobar | community.general.to_nice_yaml }}"
@@ -104,7 +104,7 @@
           a_value: 123
 
     - name: Convert more complex data structure (from vars)
-      set_fact:
+      ansible.builtin.set_fact:
         complex: "{{ data | community.general.to_yaml }}"
         complex_redact: "{{ data | community.general.to_yaml(redact_sensitive_values=true) }}"
         complex_nice: "{{ data | community.general.to_nice_yaml }}"

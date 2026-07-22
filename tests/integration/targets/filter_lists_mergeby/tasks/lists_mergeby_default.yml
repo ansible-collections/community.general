@@ -45,7 +45,7 @@
 - name: 4.First argument must be list
   block:
     - name: First argument must be list set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ {'x': 'y'} | community.general.lists_mergeby(list2, 'name') }}"
       register: result
       ignore_errors: true
@@ -63,7 +63,7 @@
 - name: 5.Second argument must be list
   block:
     - name: Second argument must be list set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ list1 | community.general.lists_mergeby({'x': 'y'}, 'name') }}"
       register: result
       ignore_errors: true
@@ -81,7 +81,7 @@
 - name: 6.First arguments after the lists must be string
   block:
     - name: First arguments after the lists must be string set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ list1 | community.general.lists_mergeby(list2, {'x': 'y'}) }}"
       register: result
       ignore_errors: true
@@ -99,7 +99,7 @@
 - name: 7.Elements of list must be dictionaries
   block:
     - name: Elements of list must be dictionaries set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ list4 | community.general.lists_mergeby(list2, 'name') }}"
       register: result
       ignore_errors: true
@@ -117,7 +117,7 @@
 - name: 8.Merge 3 lists by attribute name. 1 list in params.
   block:
     - name: Merge 3 lists by attribute name. 1 list in params. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list1, list2] | community.general.lists_mergeby(list5, 'name') }}"
     - name: Merge 3 lists by attribute name. 1 list in params. debug
       ansible.builtin.debug:
@@ -131,7 +131,7 @@
 - name: 9.Merge 3 lists by attribute name. No list in the params.
   block:
     - name: Merge 3 lists by attribute name. No list in the params. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list1, list2, list5] | community.general.lists_mergeby('name') }}"
     - name: Merge 3 lists by attribute name. No list in the params. debug
       ansible.builtin.debug:
@@ -147,7 +147,7 @@
 - name: 100.Merge 2 lists by attribute name. list_merge='replace'
   block:
     - name: Merge 2 lists by attribute name. list_merge='replace'. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list100, list101] | community.general.lists_mergeby('name') }}"
     - name: Merge 2 lists by attribute name. list_merge='replace'. debug
       ansible.builtin.debug:

@@ -14,7 +14,7 @@
 - ansible.builtin.debug:
     var: ansible_facts.distribution_version
 
-- set_fact:
+- ansible.builtin.set_fact:
     validate_certs: false
   when: (ansible_facts.distribution == "MacOSX" and ansible_facts.distribution_version == "10.11.1")
 

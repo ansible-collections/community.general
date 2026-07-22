@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: set destination filename
-  set_fact:
+  ansible.builtin.set_fact:
     bl_file: '{{ remote_tmp_dir }}/blacklist-ansible.conf'
 
 - name: copy blacklist file

@@ -10,7 +10,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: record the output directory
-  set_fact:
+  ansible.builtin.set_fact:
     output_file: "{{ remote_tmp_dir }}/foo.ini"
     non_existing_file: "{{ remote_tmp_dir }}/bar.ini"
 

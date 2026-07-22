@@ -54,7 +54,7 @@
   register: output_content
 
 - name: test-value 3 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected3: |
 
       [drinks]
@@ -98,7 +98,7 @@
   register: output_content
 
 - name: test-value 5 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected5: |
 
       [drinks]
@@ -128,7 +128,7 @@
   register: output_content
 
 - name: test-value 6 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected6: |
 
       [drinks]
@@ -156,7 +156,7 @@
   register: output_content
 
 - name: test-value 7 - get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content7: "{{ output_content.content | b64decode }}"
 
 - name: test-value 7 - assert 'changed' is true and content is empty
@@ -183,7 +183,7 @@
   register: output_content
 
 - name: test-value 8 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content8: "{{ output_content.content | b64decode }}"
     expected8: |
 
@@ -265,7 +265,7 @@
   register: output_content
 
 - name: test-value 12 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content12: "{{ output_content.content | b64decode }}"
     expected12: |
 
@@ -294,7 +294,7 @@
   register: output_content
 
 - name: test-value 13 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content13: "{{ output_content.content | b64decode }}"
     expected13: |
 
@@ -325,7 +325,7 @@
   register: output_content
 
 - name: test-value 14 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content14: "{{ output_content.content | b64decode }}"
     expected14: |
 
@@ -356,7 +356,7 @@
   register: output_content
 
 - name: test-value 15 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content15: "{{ output_content.content | b64decode }}"
     expected15: |
 
@@ -392,7 +392,7 @@
   register: output_content
 
 - name: test-value 16 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected16: |+
       beverage = coke
 
@@ -420,7 +420,7 @@
   register: output_content
 
 - name: test-value 17 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected17: |+
       beverage = water
 
@@ -448,7 +448,7 @@
   register: output_content
 
 - name: test-value 18 - get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content18: "{{ output_content.content | b64decode }}"
 
 - name: test-value 18 - assert 'changed' is true and option is removed (no section)
@@ -480,7 +480,7 @@
   register: output_content
 
 - name: test-value 19 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected19: |
       like = tea
 
@@ -531,7 +531,7 @@
   register: output_content
 
 - name: test-value 20 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected20: "\n[extensions]\nevolve = \nregress = \nimprove = \n[foobar]\nfoo = \n"
     content20: "{{ output_content.content | b64decode }}"
 
@@ -567,7 +567,7 @@
   register: output_content
 
 - name: test-value 21 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected21: |
       [section1]
       var1=aaa

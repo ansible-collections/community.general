@@ -52,7 +52,7 @@
       - result.end_state.realmRoles == []
       - result.end_state.subGroups == []
 
-- set_fact:
+- ansible.builtin.set_fact:
     test_group_id: "{{ result.end_state.id }}"
 
 - name: Group creation rerun (test for idempotency)

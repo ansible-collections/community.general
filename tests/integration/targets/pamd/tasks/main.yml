@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Set value for temp limit configuration
-  set_fact:
+  ansible.builtin.set_fact:
     test_pamd_file: "/tmp/pamd_file"
 
 - name: Create temporary pam.d file

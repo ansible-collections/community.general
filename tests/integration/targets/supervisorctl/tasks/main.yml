@@ -19,7 +19,7 @@
 
     - ansible.builtin.command: 'echo {{ remote_tmp_dir }}'
       register: echo
-    - set_fact:
+    - ansible.builtin.set_fact:
         remote_dir: '{{ echo.stdout }}'
 
     - include_vars: '{{ item }}'

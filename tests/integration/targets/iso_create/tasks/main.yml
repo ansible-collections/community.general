@@ -15,7 +15,7 @@
 - ansible.builtin.debug:
     var: install_pycdlib
 
-- set_fact:
+- ansible.builtin.set_fact:
     output_test_dir: '{{ remote_tmp_dir }}/test_iso_create'
 
 # - ansible.builtin.include_tasks: prepare_dest_dir.yml

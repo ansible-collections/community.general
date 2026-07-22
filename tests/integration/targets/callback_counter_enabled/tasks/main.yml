@@ -23,10 +23,10 @@
             gather_facts: false
             tasks:
               - name: First task
-                set_fact:
+                ansible.builtin.set_fact:
                   counter_test: first
               - name: Second task
-                set_fact:
+                ansible.builtin.set_fact:
                   counter_test: second
         expected_output:
           - ""
@@ -51,7 +51,7 @@
             gather_facts: false
             tasks:
               - name: Loop task
-                set_fact:
+                ansible.builtin.set_fact:
                   dummy_fact: "{{ item }}"
                 loop:
                   - item_a
@@ -79,7 +79,7 @@
             gather_facts: false
             tasks:
               - name: Delegated loop task
-                set_fact:
+                ansible.builtin.set_fact:
                   dummy_fact: "{{ item }}"
                 loop:
                   - item_a

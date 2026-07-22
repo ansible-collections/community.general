@@ -25,7 +25,7 @@
       - result['name'] == 'testsession'
       - "'session_id' in result"
 
-- set_fact:
+- ansible.builtin.set_fact:
     session_id: "{{ result['session_id'] }}"
 
 - name: list sessions after creation
@@ -33,7 +33,7 @@
     state: list
   register: result
 
-- set_fact:
+- ansible.builtin.set_fact:
     session_count: "{{ result['sessions'] | length }}"
 
 - ansible.builtin.assert:

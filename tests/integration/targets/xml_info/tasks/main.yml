@@ -34,11 +34,11 @@
   register: lxml_version
 
 - name: Set lxml capabilities as variables
-  set_fact:
+  ansible.builtin.set_fact:
     lxml_xpath_attribute_result_attrname: '{{ lxml_version.stdout is version("2.3.0", ">=") }}'
 
 - name: Define test XML content
-  set_fact:
+  ansible.builtin.set_fact:
     xml_info_test_xml: |
       <?xml version='1.0' encoding='UTF-8'?>
       <business type="bar">

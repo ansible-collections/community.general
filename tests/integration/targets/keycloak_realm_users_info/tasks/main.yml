@@ -92,7 +92,7 @@
     var: user_infos
 
 - name: add missing group info for comparison
-  set_fact:
+  ansible.builtin.set_fact:
     user_info_with_groups: "{{ [user_infos.users[0] | combine({'groups': ['test', 'test2']}), user_infos.users[1] | combine({'groups': []}) ] }}"
 
 - name: Assert user info is returned correctly

@@ -40,7 +40,7 @@
   register: install_tox
 
 - name: set fact latest_tox_version
-  set_fact:
+  ansible.builtin.set_fact:
     latest_tox_version: "{{ install_tox.application.tox.version }}"
 
 - name: install application tox again

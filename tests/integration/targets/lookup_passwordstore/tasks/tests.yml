@@ -9,7 +9,7 @@
   ignore_errors: true
 
 - name: Set gpg2 binary name
-  set_fact:
+  ansible.builtin.set_fact:
     gpg2_bin: '{{ "gpg2" if gpg2_check is successful else "gpg" }}'
 
 - name: Stop gpg-agent so we can remove any locks on the GnuPG dir
@@ -29,7 +29,7 @@
   register: result
 
 - name: Store path of pass executable
-  set_fact:
+  ansible.builtin.set_fact:
     passpath: "{{ result.stdout }}"
 
 - name: Move original pass into place if there was a leftover
@@ -48,7 +48,7 @@
   register: result
 
 - name: Store path of gopass executable
-  set_fact:
+  ansible.builtin.set_fact:
     gopasspath: "{{ result.stdout }}"
 
 - name: Move original gopass into place if there was a leftover
@@ -103,19 +103,19 @@
     loop_var: backend
 
 - name: Change passwordstore location explicitly
-  set_fact:
+  ansible.builtin.set_fact:
     passwordstore: "{{ lookup('env','HOME') }}/.password-store"
 
 - name: Make sure password store still works with explicit location set
-  set_fact:
+  ansible.builtin.set_fact:
     newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
 
 - name: Change passwordstore location to a non-existent place
-  set_fact:
+  ansible.builtin.set_fact:
     passwordstore: "somenonexistentplace"
 
 - name: Try reading from non-existent passwordstore location
-  set_fact:
+  ansible.builtin.set_fact:
     newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
   ignore_errors: true
   register: eval_error
@@ -149,7 +149,7 @@
         mode: '0755'
 
     - name: Try reading from non-existent passwordstore location with different pass utility
-      set_fact:
+      ansible.builtin.set_fact:
         newpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
       environment:
         PATH: "/tmp"
@@ -160,7 +160,7 @@
           - newpass == "shim_ok"
 
     - name: Try to read folder as passname with a different pass utility
-      set_fact:
+      ansible.builtin.set_fact:
         newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
     - name: Verify password received from shim
@@ -214,7 +214,7 @@
         mode: '0755'
 
     - name: Try to read folder as passname using gopass mock
-      set_fact:
+      ansible.builtin.set_fact:
         newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
     - name: Verify password received from gopass mock

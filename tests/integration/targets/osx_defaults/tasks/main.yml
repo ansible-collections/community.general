@@ -48,11 +48,11 @@
 - ansible.builtin.debug:
     msg: "{{ apple_measure_value['value'] }}"
 
-- set_fact:
+- ansible.builtin.set_fact:
     new_value: "Centimeters"
   when: apple_measure_value['value'] == 'Inches' or apple_measure_value['value'] == None
 
-- set_fact:
+- ansible.builtin.set_fact:
     new_value: "Inches"
   when: apple_measure_value['value'] == 'Centimeters'
 

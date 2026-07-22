@@ -5,10 +5,10 @@
 
 - ansible.builtin.import_tasks: setup.yml
 - name: Set default environment
-  set_fact:
+  ansible.builtin.set_fact:
     cargo_environment: {}
 - name: Set special environment to work around cargo bugs
-  set_fact:
+  ansible.builtin.set_fact:
     cargo_environment:
       # See https://github.com/rust-lang/cargo/issues/10230#issuecomment-1201662729:
       CARGO_NET_GIT_FETCH_WITH_CLI: "true"

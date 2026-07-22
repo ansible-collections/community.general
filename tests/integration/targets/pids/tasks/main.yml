@@ -31,7 +31,7 @@
       - emptypids.pids == []
 
 - name: "Picking a random process name"
-  set_fact:
+  ansible.builtin.set_fact:
     random_name: some-random-long-name-{{ 10000000000 + (9999999999 | random) }}
 
 - name: Copy the fake 'sleep' source code

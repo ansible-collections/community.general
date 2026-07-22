@@ -33,7 +33,7 @@
   register: output_content
 
 - name: test-section 1 - Create expected result
-  set_fact:
+  ansible.builtin.set_fact:
     expected1: |
       [drinks]
       fav = lemonade
@@ -85,7 +85,7 @@
   register: output_content
 
 - name: test-section 2 - Create expected result
-  set_fact:
+  ansible.builtin.set_fact:
     expected1: |
       [drinks]
       fav = lemonade
@@ -137,7 +137,7 @@
   register: output_content
 
 - name: test-section 3 - Create expected result
-  set_fact:
+  ansible.builtin.set_fact:
     expected1: |
       [drinks]
       fav = lemonade
@@ -187,7 +187,7 @@
   register: output_content
 
 - name: test-section 4 - Create expected result
-  set_fact:
+  ansible.builtin.set_fact:
     expected1: |
       [drinks]
       fav = lemonade
@@ -228,7 +228,7 @@
   register: output_content
 
 - name: test-section 5 - Create expected result
-  set_fact:
+  ansible.builtin.set_fact:
     expected1: |
       [drinks]
       fav = lemonade
@@ -274,7 +274,7 @@
   register: output_content
 
 - name: test-section 6 - Create expected result
-  set_fact:
+  ansible.builtin.set_fact:
     expected1: |
       [drinks]
       fav = lemonade
@@ -319,7 +319,7 @@
   register: output_content
 
 - name: test-section 7 - Create expected result
-  set_fact:
+  ansible.builtin.set_fact:
     expected1: |
       [drinks]
       fav = lemonade
