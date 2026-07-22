@@ -6,7 +6,7 @@
 # Initialise environment
 
 - name: Register variables
-  set_fact:
+  ansible.builtin.set_fact:
     sudoers_path: /etc/sudoers.d
     alt_sudoers_path: /etc/sudoers_alt
 

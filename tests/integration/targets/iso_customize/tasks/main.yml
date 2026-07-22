@@ -12,7 +12,7 @@
   meta: end_play
   when: ansible_facts.distribution in ['Alpine']
 
-- set_fact:
+- ansible.builtin.set_fact:
     test_dir: '{{ remote_tmp_dir }}/test_iso_customize'
 
 - ansible.builtin.include_tasks: prepare.yml

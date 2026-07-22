@@ -3,13 +3,13 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- set_fact:
+- ansible.builtin.set_fact:
     os_repository_name_videolan: Leap_{{ ansible_facts.distribution_version }}
     os_repository_name: "openSUSE_Leap_{{ ansible_facts.distribution_version }}"
     os_release_ver: "{{ ansible_facts.distribution.replace(' ', '_') }}"
   when: ansible_facts.distribution == 'openSUSE Leap'
 
-- set_fact:
+- ansible.builtin.set_fact:
     os_repository_name_videolan: Tumbleweed
     os_repository_name: openSUSE_Tumbleweed
     os_release_ver: "{{ ansible_facts.distribution.replace(' ', '_') }}"

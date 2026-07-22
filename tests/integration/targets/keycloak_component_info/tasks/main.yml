@@ -108,7 +108,7 @@
       - result.components[0].name == federation
 
 - name: Save ldap id
-  set_fact:
+  ansible.builtin.set_fact:
     myLdapId: "{{ result.components[0].id }}"
 
 - name: Retrive ldap subcomponents info

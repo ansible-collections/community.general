@@ -15,5 +15,5 @@
     state: started
 
 - name: Inform that snap is installed
-  set_fact:
+  ansible.builtin.set_fact:
     has_snap: true

@@ -23,7 +23,7 @@
     success_msg: "Success: All units collected."
 
 - name: Build all units list
-  set_fact:
+  ansible.builtin.set_fact:
     shell_units: "{{ all_units.stdout_lines | map('split') | list }}"
 
 - name: Check all units properties

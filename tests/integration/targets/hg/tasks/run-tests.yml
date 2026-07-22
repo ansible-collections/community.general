@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: set variables for tests
-  set_fact:
+  ansible.builtin.set_fact:
     repo: "http://hg.code.sf.net/p/cg-hg-test-repo/hgtest"
     checkout_dir: "{{ remote_tmp_dir }}/hg_project_test"
 

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Set value for temp limit configuration
-  set_fact:
+  ansible.builtin.set_fact:
     test_limit_file: "/tmp/limits.conf"
 
 - name: Copy temporary limits.conf

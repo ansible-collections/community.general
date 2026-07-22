@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Test 1
-  set_fact:
+  ansible.builtin.set_fact:
     loop_result: >-
       {{
         query('community.general.dependent',
@@ -33,7 +33,7 @@
         key3: 82
 
 - name: Test 2
-  set_fact:
+  ansible.builtin.set_fact:
     loop_result: >-
       {{ query('community.general.dependent',
                dict([['a', [1, 2, 3]]]),

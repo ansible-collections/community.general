@@ -14,10 +14,10 @@
     - name: Include tasks to create ssl materials on the controller
       ansible.builtin.include_tasks: prepare.yml
 
-- set_fact:
+- ansible.builtin.set_fact:
     ssl_backends: ['openssl']
 
-- set_fact:
+- ansible.builtin.set_fact:
     ssl_backends: "{{ ssl_backends + ['cryptography'] }}"
   when: cryptography_version.stdout is version('3.0', '>=')
 

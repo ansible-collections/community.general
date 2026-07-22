@@ -6,7 +6,7 @@
 
 - block:
     - name: 'Fetch secrets using "etcd3" lookup'
-      set_fact:
+      ansible.builtin.set_fact:
         etcdoutkey1: "{{ lookup('community.general.etcd3', etcd3_prefix, prefix=True) }}"
         etcdoutkey2: "{{ lookup('community.general.etcd3', etcd3_singlekey) }}"
         key_inexistent: "{{ lookup('community.general.etcd3', 'inexistent_key') }}"

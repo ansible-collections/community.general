@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: create random string
-  set_fact:
+  ansible.builtin.set_fact:
     zone_name: "{{ 65535 | random | string }}.ansible.example.com"
 
 - name: create zone with incorrect API key

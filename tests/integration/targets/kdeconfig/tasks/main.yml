@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Set paths
-  set_fact:
+  ansible.builtin.set_fact:
     output_file: "{{ remote_tmp_dir }}/kdeconf"
     kwriteconf_fake: "{{ remote_tmp_dir }}/kwriteconf"
 

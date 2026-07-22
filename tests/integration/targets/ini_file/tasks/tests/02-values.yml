@@ -57,7 +57,7 @@
   register: output_content
 
 - name: test-values 3 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected3: |
 
       [drinks]
@@ -90,7 +90,7 @@
   register: output_content
 
 - name: test-values 4 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected4: |
 
       [drinks]
@@ -122,7 +122,7 @@
   register: output_content
 
 - name: test-values 5 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected5: |
 
       [drinks]
@@ -208,7 +208,7 @@
   register: output_content
 
 - name: test-values 9 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected9: |
 
       [drinks]
@@ -239,7 +239,7 @@
   register: output_content
 
 - name: test-values 10 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected10: |
 
       [drinks]
@@ -280,7 +280,7 @@
   register: output_content
 
 - name: test-values 11 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected11: |
 
       [drinks]
@@ -331,7 +331,7 @@
   register: output_content
 
 - name: test-values 13 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected13: |
 
       [drinks]
@@ -366,7 +366,7 @@
   register: output_content
 
 - name: test-values 14 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected14: |
 
       [drinks]
@@ -436,7 +436,7 @@
   register: output_content
 
 - name: test-values 17 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected17: |
 
       [drinks]
@@ -467,7 +467,7 @@
   register: output_content
 
 - name: test-values 18 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected18: |
 
       [drinks]
@@ -520,7 +520,7 @@
   register: output_content
 
 - name: test-values 20 - get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content20: "{{ output_content.content | b64decode }}"
 
 - name: test-values 20 - assert 'changed' is true and content is empty
@@ -551,7 +551,7 @@
   register: output_content
 
 - name: test-values 21 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected21: |
 
       [drinks]
@@ -602,7 +602,7 @@
   register: output_content
 
 - name: test-values 22 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected22: |
 
       # Some comment to test
@@ -645,7 +645,7 @@
   register: output_content
 
 - name: test-values 23 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected23: |
 
       # Some comment to test
@@ -689,7 +689,7 @@
   register: output_content
 
 - name: test-values 24 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected24: |
 
       # Some comment to test
@@ -740,7 +740,7 @@
   register: output_content
 
 - name: test-values 25 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected25: |+
       beverage = coke
       beverage = pepsi
@@ -773,7 +773,7 @@
   register: output_content
 
 - name: test-values 26 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected26: |+
       beverage = water
       beverage = orange juice
@@ -802,7 +802,7 @@
   register: output_content
 
 - name: test-values 27 - get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     content27: "{{ output_content.content | b64decode }}"
 
 - name: test-values 27 - assert changed (no section)
@@ -841,7 +841,7 @@
   register: output_content
 
 - name: test-values 28 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected28: |
       like = tea
       like = coffee
@@ -883,7 +883,7 @@
   register: output_content
 
 - name: test-value 29 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected29: |
       [drinks]
       beverage = water
@@ -925,7 +925,7 @@
   register: output_content
 
 - name: test-value 30 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected30: |
       [drinks]
       beverage = water
@@ -965,7 +965,7 @@
   register: output_content
 
 - name: test-value 31 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected31: |
       [drinks]
       beverage = water
@@ -1006,7 +1006,7 @@
   register: output_content
 
 - name: test-value 32 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected32: |
       [drinks]
       fav = cocktail

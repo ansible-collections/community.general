@@ -23,7 +23,7 @@
     executable: /bin/bash
 
 - name: Read crumb value
-  set_fact:
+  ansible.builtin.set_fact:
     crumb_data: "{{ lookup('file', 'crumb.json') | from_json }}"
 
 - name: Create Jenkins folder 'test'

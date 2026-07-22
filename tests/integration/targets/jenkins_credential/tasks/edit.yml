@@ -13,7 +13,7 @@
   register: token_result
 
 - name: Set token in vars
-  set_fact:
+  ansible.builtin.set_fact:
     token: "{{ token_result.token }}"
     tokenUuid: "{{ token_result.token_uuid }}"
 

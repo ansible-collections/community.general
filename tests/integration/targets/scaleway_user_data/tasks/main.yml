@@ -22,7 +22,7 @@
 
 - debug: var=server_creation_task
 
-- set_fact:
+- ansible.builtin.set_fact:
     server_id: "{{ server_creation_task.msg.id }}"
 
 - debug: var=server_id

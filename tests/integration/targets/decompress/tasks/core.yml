@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Set mode for decompressed file ({{ format }} test)
-  set_fact:
+  ansible.builtin.set_fact:
     decompressed_mode: "0640"
 
 - name: Simple decompress ({{ format }} test)

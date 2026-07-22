@@ -6,7 +6,7 @@
 - name: 101.Merge 2 lists by attribute name. list_merge='keep'
   block:
     - name: Merge 2 lists by attribute name. list_merge='keep'. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list100, list101]|
                      community.general.lists_mergeby('name', list_merge='keep') }}"
     - name: Merge 2 lists by attribute name. list_merge='keep'. debug
@@ -25,7 +25,7 @@
 - name: 102.Merge 2 lists by attribute name. list_merge='append'
   block:
     - name: Merge 2 lists by attribute name. list_merge='append'. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list100, list101]|
                      community.general.lists_mergeby('name', list_merge='append') }}"
     - name: Merge 2 lists by attribute name. list_merge='append'. debug
@@ -44,7 +44,7 @@
 - name: 103.Merge 2 lists by attribute name. list_merge='prepend'
   block:
     - name: Merge 2 lists by attribute name. list_merge='prepend'. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list100, list101]|
                      community.general.lists_mergeby('name', list_merge='prepend') }}"
     - name: Merge 2 lists by attribute name. list_merge='prepend'. debug
@@ -63,7 +63,7 @@
 - name: 104.Merge 2 lists by attribute name. list_merge='append_rp'
   block:
     - name: Merge 2 lists by attribute name. list_merge='append_rp'. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list102, list103]|
                      community.general.lists_mergeby('name', list_merge='append_rp') }}"
     - name: Merge 2 lists by attribute name. list_merge='append_rp'. debug
@@ -82,7 +82,7 @@
 - name: 105.Merge 2 lists by attribute name. list_merge='prepend_rp'
   block:
     - name: Merge 2 lists by attribute name. list_merge='prepend_rp'. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list102, list103]|
                      community.general.lists_mergeby('name', list_merge='prepend_rp') }}"
     - name: Merge 2 lists by attribute name. list_merge='prepend_rp'. debug
@@ -103,7 +103,7 @@
 - name: 200.Merge by name. recursive=True list_merge='append_rp'
   block:
     - name: Merge by name. recursive=True list_merge='append_rp'. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list200, list201]|
                      community.general.lists_mergeby('name',
                                                      recursive=True,
@@ -124,7 +124,7 @@
 - name: 201.Merge by name. recursive=False list_merge='append_rp'
   block:
     - name: Merge by name. recursive=False list_merge='append_rp'. set
-      set_fact:
+      ansible.builtin.set_fact:
         my_list: "{{ [list200, list201]|
                      community.general.lists_mergeby('name',
                                                      recursive=False,

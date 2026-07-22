@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: test with_flattened
-  set_fact: '{{ item }}=flattened'
+  ansible.builtin.set_fact: '{{ item }}=flattened'
   with_community.general.flattened:
     - - a__
     - - b__

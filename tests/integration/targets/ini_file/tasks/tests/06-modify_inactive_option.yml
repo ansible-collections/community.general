@@ -30,7 +30,7 @@
   register: output_content
 
 - name: test-modify_inactive_option 1 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected1: |
 
       [section1]
@@ -72,7 +72,7 @@
   register: output_content
 
 - name: test-modify_inactive_option 2 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected2: |
 
       [section1]
@@ -106,7 +106,7 @@
   register: output_content
 
 - name: test-modify_inactive_option 3 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected3: |
 
       [section1]
@@ -148,7 +148,7 @@
   register: output_content
 
 - name: test-modify_inactive_option 4 - set expected content and get current ini file content
-  set_fact:
+  ansible.builtin.set_fact:
     expected4: |
 
       [section1]

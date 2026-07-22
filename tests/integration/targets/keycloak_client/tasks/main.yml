@@ -168,7 +168,7 @@
       - desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.direct_grant | length > 0
 
 - name: Backup flow UUIDs
-  set_fact:
+  ansible.builtin.set_fact:
     flow_browser_uuid: "{{ desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.browser }}"
     flow_direct_grant_uuid: "{{ desire_client_with_flow_binding_overrides.end_state.authenticationFlowBindingOverrides.direct_grant }}"
 

@@ -14,7 +14,7 @@
       nginx_version: 1.25.3
   register: result
 
-- set_fact:
+- ansible.builtin.set_fact:
     nginx_service: "{{result.service}}"
 
 - ansible.builtin.assert:

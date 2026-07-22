@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: record the output directory
-  set_fact: deploy_helper_test_root={{remote_tmp_dir}}/deploy_helper_test_root
+  ansible.builtin.set_fact: deploy_helper_test_root={{remote_tmp_dir}}/deploy_helper_test_root
 
 - name: State=query with default parameters
   deploy_helper: path={{ deploy_helper_test_root }} state=query
