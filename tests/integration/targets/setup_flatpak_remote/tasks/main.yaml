@@ -14,7 +14,7 @@
       ansible_facts.distribution == 'Ubuntu' and not ansible_facts.distribution_major_version | int < 16
   block:
     - name: Copy repo into place
-      unarchive:
+      ansible.builtin.unarchive:
         src: repo.tar.xz
         dest: '{{ remote_tmp_dir }}'
         owner: root

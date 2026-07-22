@@ -8,7 +8,7 @@
 # https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/jails-ezjail.html
 #
 - name: Setup cloned interfaces
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/rc.conf
     regexp: ^cloned_interfaces=lo1
     line: cloned_interfaces=lo1
@@ -36,14 +36,14 @@
 
 - name: Configure ezjail to use http
   when: ansible_facts.distribution_version is version('11.01', '>')
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /usr/local/etc/ezjail.conf
     regexp: ^ezjail_ftphost
     line: ezjail_ftphost=http://ftp.freebsd.org
 
 - name: Configure ezjail to use archive for old freebsd releases
   when: ansible_facts.distribution_version is version('11.01', '<=')
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /usr/local/etc/ezjail.conf
     regexp: ^ezjail_ftphost
     line: ezjail_ftphost=http://ftp-archive.freebsd.org
@@ -80,7 +80,7 @@
   changed_when: false
 
 - name: Configure testjail to use Cloudflare DNS
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /usr/jails/testjail/etc/resolv.conf
     regexp: "^nameserver[[:blank:]]+{{ item }}$"
     line: "nameserver {{ item }}"

@@ -15,7 +15,7 @@
 - name: Distribution specific
   block:
     - name: Include distribution specific vars
-      include_vars: "{{ lookup('first_found', params) }}"
+      ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
       vars:
         params:
           files: "{{ distro_lookup_names }}"

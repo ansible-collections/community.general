@@ -33,11 +33,11 @@
         cmd: pacman --sync --print-format "%l" {{url_pkg}}
       register: url_pkg_stdout
     - name: Download {{url_pkg}} pkg
-      get_url:
+      ansible.builtin.get_url:
         url: '{{url_pkg_stdout.stdout}}'
         dest: '{{url_pkg_path}}/{{url_pkg_filename}}'
     - name: Download {{url_pkg}} pkg sig
-      get_url:
+      ansible.builtin.get_url:
         url: '{{url_pkg_stdout.stdout}}.sig'
         dest: '{{url_pkg_path}}/{{url_pkg_filename}}.sig'
     - name: Host {{url_pkg}}
@@ -46,7 +46,7 @@
       async: 90
       poll: 0
     - name: Wait for http.server to come up online
-      wait_for:
+      ansible.builtin.wait_for:
         host: 'localhost'
         port: '{{http_port}}'
         state: started
@@ -56,7 +56,7 @@
         cmd: pacman --sync --print-format "%l" {{file_pkg}}
       register: file_pkg_url
     - name: Download {{file_pkg}} pkg
-      get_url:
+      ansible.builtin.get_url:
         url: '{{file_pkg_url.stdout}}'
         dest: '{{file_pkg_path}}'
 

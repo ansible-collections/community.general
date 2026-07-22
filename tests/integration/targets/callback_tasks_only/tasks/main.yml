@@ -10,7 +10,7 @@
 
 - block:
     - name: Create temporary file
-      tempfile:
+      ansible.builtin.tempfile:
       register: tempfile
 
     - name: Run tests

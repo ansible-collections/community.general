@@ -15,7 +15,7 @@
           - debugedit
 
     - name: Create user
-      user:
+      ansible.builtin.user:
         name: '{{ username }}'
         home: '/home/{{ username }}'
         create_home: true

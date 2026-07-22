@@ -11,7 +11,7 @@
 - name: Setup OpenLDAP on Debian or Ubuntu
   block:
     - name: Include OS-specific variables
-      include_vars: '{{ ansible_facts.os_family }}.yml'
+      ansible.builtin.include_vars: '{{ ansible_facts.os_family }}.yml'
 
     - name: Install OpenLDAP server and tools
       become: true
@@ -38,7 +38,7 @@
         creates: "/root/slapd_configured"
 
     - name: Enable secure ldap
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/default/slapd
         regexp: "^SLAPD_SERVICES"
         line: 'SLAPD_SERVICES="ldap:/// ldaps:/// ldapi:///"'

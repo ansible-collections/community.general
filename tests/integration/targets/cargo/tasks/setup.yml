@@ -26,7 +26,7 @@
 
 - block:
     - name: Download rustup
-      get_url:
+      ansible.builtin.get_url:
         url: https://sh.rustup.rs
         dest: /tmp/sh.rustup.rs
         mode: "0750"

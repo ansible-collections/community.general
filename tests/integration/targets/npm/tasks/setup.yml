@@ -8,7 +8,7 @@
     var: nodejs_download
 
 - name: Download Node.js
-  unarchive:
+  ansible.builtin.unarchive:
     src: '{{ nodejs_download }}'
     dest: '{{ remote_tmp_dir }}'
     remote_src: true

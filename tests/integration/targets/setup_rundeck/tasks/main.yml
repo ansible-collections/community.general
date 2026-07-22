@@ -9,11 +9,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Skip unsupported platforms
-  meta: end_play
+  ansible.builtin.meta: end_play
   when: ansible_facts.distribution not in ['CentOS', 'Fedora', 'Debian', 'Ubuntu']
 
 - name: Include OS-specific variables
-  include_vars: '{{ ansible_facts.os_family }}.yml'
+  ansible.builtin.include_vars: '{{ ansible_facts.os_family }}.yml'
   when: ansible_facts.os_family in ['Debian', 'RedHat']
 
 - name: Set Rundeck base dir
@@ -36,6 +36,6 @@
     RDECK_BASE: "{{ rdeck_base }}"
 
 - name: Wait for Rundeck port 4440
-  wait_for:
+  ansible.builtin.wait_for:
     host: localhost
     port: 4440

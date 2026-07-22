@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Don't run this test for non-MacOS systems.
-- meta: end_play
+- ansible.builtin.meta: end_play
   when: ansible_facts.distribution != 'MacOSX'
 
 - name: MACOS | Find brew binary

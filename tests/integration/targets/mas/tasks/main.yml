@@ -27,7 +27,7 @@
       - install_status.stat.exists == false
 
 - name: Wait until the OS-internal cache was updated
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 # Installation
@@ -77,7 +77,7 @@
       - install_status.stat.exists == true
 
 - name: Wait until the OS-internal cache was updated
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 - name: Install Rested again
@@ -141,7 +141,7 @@
       - uninstall_status.stat.exists == false
 
 - name: Wait until the OS-internal cache was updated
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 - name: Uninstall Rested again

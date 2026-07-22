@@ -8,7 +8,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- meta: end_play
+- ansible.builtin.meta: end_play
   when: ansible_facts.os_family not in ['Debian', 'Suse']
 
 - name: Enable mod_proxy
@@ -23,7 +23,7 @@
     - lbmethod_byrequests
 
 - name: Add port 81
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "/etc/apache2/{{ 'ports.conf' if ansible_facts.os_family == 'Debian' else 'listen.conf' }}"
     line: Listen 81
 
@@ -70,7 +70,7 @@
     state: restarted
 
 - name: Install BeautifulSoup
-  pip:
+  ansible.builtin.pip:
     name: BeautifulSoup4
     extra_args: "-c {{ remote_constraints }}"
 

@@ -9,13 +9,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Attempt installation of latest 'psutil' version
-  pip:
+  ansible.builtin.pip:
     name: psutil
   ignore_errors: true
   register: psutil_latest_install
 
 - name: Install greatest 'psutil' version which will work with all pip versions
-  pip:
+  ansible.builtin.pip:
     name: psutil < 5.7.0
   when: psutil_latest_install is failed
 
@@ -55,7 +55,7 @@
   poll: 0
 
 - name: "Wait for one second to make sure that the fake 'sleep' binary has actually been started"
-  pause:
+  ansible.builtin.pause:
     seconds: 1
 
 - name: "Checking the process IDs (PIDs) of fake 'sleep' binary"

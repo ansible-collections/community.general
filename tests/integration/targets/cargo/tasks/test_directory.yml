@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create temp directory
-  tempfile:
+  ansible.builtin.tempfile:
     state: directory
   register: temp_directory
 

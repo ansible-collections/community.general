@@ -14,7 +14,7 @@
     msg: '{{ role_path|basename }}'
 - ansible.builtin.import_tasks: setup.yml
 
-- include_vars: "{{ lookup('first_found', search) }}"
+- ansible.builtin.include_vars: "{{ lookup('first_found', search) }}"
   vars:
     search:
       files:

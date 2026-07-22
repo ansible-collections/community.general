@@ -12,7 +12,7 @@
     - not (ansible_facts.os_family == 'Alpine' and ansible_facts.distribution_version is version('3.15', '<'))  # TODO
   block:
     - name: Include distribution specific variables
-      include_vars: '{{ lookup(''first_found'', search) }}'
+      ansible.builtin.include_vars: '{{ lookup(''first_found'', search) }}'
       vars:
         search:
           files:

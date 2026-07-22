@@ -25,7 +25,7 @@
 
 # Needed for MacOSX !
 - name: Install lxml
-  pip:
+  ansible.builtin.pip:
     name: lxml
     state: present
 

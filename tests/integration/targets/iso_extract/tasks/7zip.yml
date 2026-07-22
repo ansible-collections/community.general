@@ -6,11 +6,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Gather facts
-  setup:
+  ansible.builtin.setup:
   become: true
 
 - name: Include distribution specific variables
-  include_vars: "{{ lookup('first_found', params) }}"
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
   vars:
     params:
       files:

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Include Jenkins user variables
-  include_vars: "{{ role_path }}/vars/credentials.yml"
+  ansible.builtin.include_vars: "{{ role_path }}/vars/credentials.yml"
 
 - name: Make sure Jenkins is ready
   uri:

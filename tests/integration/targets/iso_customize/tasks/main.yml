@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Skip some platforms which does not support ansible.posix.mount
-  meta: end_play
+  ansible.builtin.meta: end_play
   when: ansible_facts.distribution in ['Alpine']
 
 - ansible.builtin.set_fact:

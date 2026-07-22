@@ -198,7 +198,7 @@
     state: saved
 
 - name: "add a table header in comments (# *mangle)"
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ iptables_tests }}"
     line: "# *mangle"
 

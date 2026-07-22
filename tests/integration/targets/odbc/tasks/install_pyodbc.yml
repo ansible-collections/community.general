@@ -8,5 +8,5 @@
     name: "{{ packages[ansible_facts.os_family] }}"
 
 - name: "Install pyodbc"
-  pip:
+  ansible.builtin.pip:
     name: pyodbc

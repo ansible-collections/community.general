@@ -6,5 +6,5 @@
 - hosts: localhost
   tasks:
     - name: Install Petname Python package
-      pip:
+      ansible.builtin.pip:
         name: petname

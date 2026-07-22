@@ -35,7 +35,7 @@
       register: iso_customized
 
     - name: compare size
-      fail: msg="Check we have nothing changed for customized ISO"
+      ansible.builtin.fail: msg="Check we have nothing changed for customized ISO"
       when: iso_orginal.stat.size != iso_customized.stat.size
 
 - name: "Testcase: delete the non-existing file in ISO"
