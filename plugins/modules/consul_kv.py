@@ -37,7 +37,7 @@ options:
       - The action to take with the supplied key and value. If the state is V(present) and O(value) is set, the key contents
         is set to the value supplied and RV(ignore:changed) is set to V(true) only if the value was different to the current contents.
         If the state is V(present) and O(value) is not set, the existing value associated to the key is returned.
-        This behavior is B(deprecated) and will be removed in community.general 15.0.0. Use
+        This behavior will be B(deprecated) in the future. Use
         M(community.general.consul_kv_info) to read key/value entries instead. The state
         V(absent) is used to remove the key/value pair, again RV(ignore:changed) is set to V(true) only if the key actually existed
         prior to the removal. An attempt can be made to obtain or free the lock associated with a key/value pair with the
@@ -54,8 +54,8 @@ options:
   value:
     description:
       - The value should be associated with the given key, required if O(state) is V(present).
-      - Omitting O(value) with O(state=present) to read a key is B(deprecated) and will be removed in
-        community.general 15.0.0. Use M(community.general.consul_kv_info) instead.
+      - Omitting O(value) with O(state=present) to read a key will be B(deprecated) in the future.
+        Use M(community.general.consul_kv_info) instead.
     type: str
   recurse:
     description:
@@ -88,9 +88,9 @@ options:
 
 
 EXAMPLES = r"""
-# Reading a key with consul_kv (state=present, no value) is deprecated.
+# Reading a key with consul_kv (state=present, no value) will be deprecated.
 # Use community.general.consul_kv_info instead:
-- name: Retrieve a value from the key/value store (deprecated, use consul_kv_info)
+- name: Retrieve a value from the key/value store (use consul_kv_info instead)
   community.general.consul_kv:
     key: somekey
   register: retrieved_key
@@ -183,12 +183,6 @@ def lock(module, consul_module, state):
 
 
 def get_value(module, consul_module):
-    module.deprecate(
-        "Using community.general.consul_kv with state=present without providing a value to read "
-        "a key is deprecated. Use community.general.consul_kv_info instead.",
-        version="15.0.0",
-        collection_name="community.general",
-    )
     key = module.params["key"]
     index, existing = consul_module.kv_get(
         key,

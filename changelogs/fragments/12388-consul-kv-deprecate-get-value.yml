@@ -1,6 +1,0 @@
-deprecated_features:
-  - consul_kv - using the module with O(state=present) without providing O(value) to read a key is
-    deprecated. Use the new M(community.general.consul_kv_info) module instead. The read functionality
-    will be removed in community.general 15.0.0
-    (https://github.com/ansible-collections/community.general/issues/12388,
-    https://github.com/ansible-collections/community.general/pull/12455).
