@@ -310,9 +310,7 @@ class Connection(ConnectionBase):
         _stdout, stderr = process.communicate()
 
         if process.returncode != 0:
-            raise AnsibleError(
-                f"failed to transfer file to instance {self._instance()}: {to_text(stderr).strip()}"
-            )
+            raise AnsibleError(f"failed to transfer file to instance {self._instance()}: {to_text(stderr).strip()}")
 
     def fetch_file(self, in_path, out_path):
         """fetch a file from Incus to local"""
@@ -337,9 +335,7 @@ class Connection(ConnectionBase):
         _stdout, stderr = process.communicate()
 
         if process.returncode != 0:
-            raise AnsibleError(
-                f"failed to transfer file from instance {self._instance()}: {to_text(stderr).strip()}"
-            )
+            raise AnsibleError(f"failed to transfer file from instance {self._instance()}: {to_text(stderr).strip()}")
 
     def close(self):
         """close the connection (nothing to do here)"""
