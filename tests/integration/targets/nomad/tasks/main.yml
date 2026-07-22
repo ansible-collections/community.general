@@ -75,4 +75,4 @@
   always:
 
     - name: kill nomad
-      ansible.builtin.shell: pkill nomad
+      ansible.builtin.command: pkill nomad

@@ -11,7 +11,7 @@
   block:
 
     # Get the version of Yarn and register to a variable
-    - ansible.builtin.shell: '{{ yarn_bin_path }}/yarn --version'
+    - ansible.builtin.command: '{{ yarn_bin_path }}/yarn --version'
       environment:
         PATH: '{{ node_bin_path }}:{{ ansible_facts.env.PATH }}'
       register: yarn_installed_version

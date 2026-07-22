@@ -15,7 +15,7 @@
   environment:
     PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
   block:
-    - ansible.builtin.shell: npm --version
+    - ansible.builtin.command: npm --version
       register: npm_version
 
     - ansible.builtin.debug:

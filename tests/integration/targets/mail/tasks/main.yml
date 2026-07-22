@@ -35,7 +35,7 @@
     # FIXME: Verify the mail after it was send would be nice
     #        This would require either dumping the content, or registering async task output
     - name: Start test smtpserver
-      ansible.builtin.shell: '{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
+      ansible.builtin.command: '{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
       async: 45
       poll: 0
       register: smtpserver
