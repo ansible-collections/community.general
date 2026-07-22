@@ -23,7 +23,7 @@
         state: present
 
     - name: Modify {{config_file}}
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: '{{config_file}}'
         block: |
           # something something
@@ -54,7 +54,7 @@
         state: present
 
     - name: Modify {{config_file}}
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: '{{config_file}}'
         block: |
           # something something

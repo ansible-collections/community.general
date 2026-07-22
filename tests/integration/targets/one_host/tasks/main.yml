@@ -235,7 +235,7 @@
 # TEARDOWN
 
 - name: fetch fixtures
-  fetch:
+  ansible.builtin.fetch:
     src: /tmp/opennebula-fixtures.json.gz
     dest: targets/one_host/files
   when:

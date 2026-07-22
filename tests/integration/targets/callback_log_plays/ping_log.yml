@@ -6,4 +6,4 @@
 - hosts: localhost
   gather_facts: false
   tasks:
-    - ping:
+    - ansible.builtin.ping:

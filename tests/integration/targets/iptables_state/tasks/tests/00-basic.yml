@@ -9,7 +9,7 @@
     state: absent
 
 - name: "ensure our next rule is not there (iptables)"
-  iptables:
+  ansible.builtin.iptables:
     chain: OUTPUT
     jump: ACCEPT
     state: absent
@@ -195,7 +195,7 @@
 
 
 - name: "change iptables state (iptables)"
-  iptables:
+  ansible.builtin.iptables:
     chain: OUTPUT
     jump: ACCEPT
 
