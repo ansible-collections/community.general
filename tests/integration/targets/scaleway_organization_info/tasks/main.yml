@@ -13,7 +13,7 @@
   register: organizations
 
 - name: Display organizations variable
-  debug:
+  ansible.builtin.debug:
     var: organizations
 
 - name: Ensure retrieval of organizations info is success

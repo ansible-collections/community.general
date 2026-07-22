@@ -24,7 +24,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
         expected_output:
           - ""
@@ -49,7 +49,7 @@
             gather_facts: false
             tasks:
               - name: Sample task name
-                debug:
+                ansible.builtin.debug:
                   msg: sample debug msg
         expected_output:
           - ""

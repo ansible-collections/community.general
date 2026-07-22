@@ -31,7 +31,8 @@
       page: 1
   register: first_page
 
-- debug: var=first_page
+- ansible.builtin.debug:
+    var: first_page
 
 - ansible.builtin.assert:
     that:
@@ -45,7 +46,8 @@
       page: 2
   register: second_page
 
-- debug: var=second_page
+- ansible.builtin.debug:
+    var: second_page
 
 - ansible.builtin.assert:
     that:

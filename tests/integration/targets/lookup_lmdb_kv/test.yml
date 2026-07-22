@@ -5,9 +5,9 @@
 
 - hosts: localhost
   tasks:
-    - debug:
+    - ansible.builtin.debug:
         msg: '{{ query("community.general.lmdb_kv", "nl", "be", "lu", db="jp.mdb") }}'
-    - debug:
+    - ansible.builtin.debug:
         var: item.1
       loop: '{{ query("community.general.lmdb_kv", db="jp.mdb") }}'
     - ansible.builtin.assert:

@@ -88,7 +88,7 @@
   register: user_infos
 
 - name: debug
-  debug:
+  ansible.builtin.debug:
     var: user_infos
 
 - name: add missing group info for comparison

@@ -16,7 +16,8 @@
   vars:
     iso_name: "{{ dest_iso_name }}"
 
-- debug: var=mount_root_dir
+- ansible.builtin.debug:
+    var: mount_root_dir
 
 - name: Check the file /preseed/ubuntu.seed is added
   ansible.builtin.stat:

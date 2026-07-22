@@ -10,13 +10,15 @@
     delete_files:
       - "test01.cfg"
 
-- debug: var=ansible_facts.distribution
+- ansible.builtin.debug:
+    var: ansible_facts.distribution
 
 - ansible.builtin.include_tasks: iso_mount.yml
   vars:
     iso_name: "{{ dest_iso_name }}"
 
-- debug: var=mount_root_dir
+- ansible.builtin.debug:
+    var: mount_root_dir
 
 - name: Check the file test01.cfg is deleted
   ansible.builtin.stat:

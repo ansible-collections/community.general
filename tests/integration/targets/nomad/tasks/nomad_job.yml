@@ -65,7 +65,7 @@
     use_ssl: false
   register: list_nomad_jobs
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ list_nomad_jobs }}"
 
 - name: run check delete nomad job
@@ -98,7 +98,7 @@
     use_ssl: false
   register: list_nomad_jobs
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ list_nomad_jobs }}"
 
 - name: assert idempotence

@@ -11,7 +11,8 @@
       or (ansible_facts.os_family == 'RedHat' and ansible_facts.distribution != 'Fedora'
           and ansible_facts.distribution_major_version | int >= 8)
   block:
-    - debug: var=copr_chroot
+    - ansible.builtin.debug:
+        var: copr_chroot
     - name: enable copr project
       copr:
         host: copr.fedorainfracloud.org

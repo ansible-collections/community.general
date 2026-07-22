@@ -22,7 +22,7 @@
             gather_facts: false
             tasks:
               - name: Sample task
-                debug:
+                ansible.builtin.debug:
                   msg: This is a test
         expected_output:
           - ""
@@ -46,7 +46,7 @@
             gather_facts: false
             tasks:
               - name: Sample task
-                debug:
+                ansible.builtin.debug:
                   msg: This is a test
         expected_output:
           - ""
@@ -55,7 +55,7 @@
           - "TASK [Sample task] *************************************************************"
           - ""
           - "- name: Sample task"
-          - "  debug:"
+          - "  ansible.builtin.debug:"
           - "    msg: This is a test"
           - ""
           - "ok: [testhost] => {"
@@ -75,7 +75,7 @@
             gather_facts: false
             tasks:
               - name: Sample task
-                debug: msg="This is a test"
+                ansible.builtin.debug: msg="This is a test"
         expected_output:
           - ""
           - "PLAY [testhost] ****************************************************************"
@@ -83,7 +83,7 @@
           - "TASK [Sample task] *************************************************************"
           - ""
           - "- name: Sample task"
-          - "  debug: msg=\"This is a test\""
+          - "  ansible.builtin.debug: msg=\"This is a test\""
           - ""
           - "ok: [testhost] => {"
           - "    \"msg\": \"This is a test\""
@@ -105,7 +105,7 @@
                 when: True
                 vars:
                   test_var: "Hello World"
-                debug:
+                ansible.builtin.debug:
                   var: test_var
         expected_output:
           - ""
@@ -117,7 +117,7 @@
           - "  when: true"
           - "  vars:"
           - "    test_var: Hello World"
-          - "  debug:"
+          - "  ansible.builtin.debug:"
           - "    var: test_var"
           - ""
           - "ok: [testhost] => {"

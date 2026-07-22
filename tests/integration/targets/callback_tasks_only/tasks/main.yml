@@ -62,7 +62,7 @@
                 gather_facts: false
                 tasks:
                   - name: A task
-                    debug:
+                    ansible.builtin.debug:
                       msg: Test.
             expected_output:
               - ""

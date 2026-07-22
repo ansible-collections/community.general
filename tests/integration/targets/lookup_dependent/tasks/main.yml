@@ -66,7 +66,7 @@
         b: 4
 
 - name: Test 3
-  debug:
+  ansible.builtin.debug:
     var: item
   with_community.general.dependent:
     - var1:
@@ -122,7 +122,7 @@
       - dependent.results[6].item.var3 == "G"
 
 - name: "Test 4: template failure"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}"
   with_community.general.dependent:
     - a:
@@ -140,7 +140,7 @@
         "Caught \"'foo' is undefined" in eval_error.msg
 
 - name: "Test 5: same variable name reused"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}"
   with_community.general.dependent:
     - a: x
@@ -156,7 +156,7 @@
         "Caught \"'x' is undefined" in eval_error.msg
 
 - name: "Test 6: multi-value dict"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}"
   with_community.general.dependent:
     - a: x
@@ -172,7 +172,7 @@
         'Parameter 0 must be a one-element dictionary, got 2 elements' in eval_error.msg
 
 - name: "Test 7: empty dict"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}"
   with_community.general.dependent:
     - {}

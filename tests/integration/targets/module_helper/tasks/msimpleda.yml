@@ -47,7 +47,7 @@
   register: simple2
 
 - name: Show results
-  debug:
+  ansible.builtin.debug:
     var: simple2
 
 - name: assert simple2

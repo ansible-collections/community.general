@@ -79,7 +79,7 @@
       - "('24mo' | community.general.to_years(month=30, year=360)) == 2"
 
 - name: test fail unknown unit
-  debug:
+  ansible.builtin.debug:
     msg: "{{ '1s' | community.general.to_time_unit('lightyears') }}"
   ignore_errors: true
   register: res
@@ -91,7 +91,7 @@
       - "'to_time_unit() can not convert to the following unit: lightyears' in res.msg"
 
 - name: test fail unknown string
-  debug:
+  ansible.builtin.debug:
     msg: "{{ '1 s' | community.general.to_time_unit('s') }}"
   ignore_errors: true
   register: res
@@ -103,7 +103,7 @@
       - "'to_time_unit() can not interpret following string' in res.msg"
 
 - name: test fail unknown kwarg
-  debug:
+  ansible.builtin.debug:
     msg: "{{ '1s' | community.general.to_time_unit('s', second=23) }}"
   ignore_errors: true
   register: res

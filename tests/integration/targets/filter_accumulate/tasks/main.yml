@@ -15,13 +15,13 @@
 
 
 - name: Filter | Accumulate | Test invalid values | Integer
-  debug:
+  ansible.builtin.debug:
     var: "1 | community.general.accumulate"
   register: integer_result
   ignore_errors: true
 
 - name: Filter | Accumulate | Test invalid values | Non uniform list
-  debug:
+  ansible.builtin.debug:
     var: "['aa', 1] | community.general.accumulate"
   register: non_uniform_list_result
   ignore_errors: true

@@ -66,7 +66,7 @@
   diff: true
 
 - name: Debugging output for hard limit test
-  debug:
+  ansible.builtin.debug:
     msg: "{{ hard_limit_test }}"
 
 - name: Check if changes made

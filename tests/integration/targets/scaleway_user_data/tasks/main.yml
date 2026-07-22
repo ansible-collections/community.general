@@ -20,12 +20,14 @@
 
   register: server_creation_task
 
-- debug: var=server_creation_task
+- ansible.builtin.debug:
+    var: server_creation_task
 
 - set_fact:
     server_id: "{{ server_creation_task.msg.id }}"
 
-- debug: var=server_id
+- ansible.builtin.debug:
+    var: server_id
 
 - name: Patch user_data cloud-init configuration (Check)
   check_mode: true
@@ -36,7 +38,8 @@
       cloud-init: "{{ cloud_init_script }}"
   register: user_data_check_task
 
-- debug: var=user_data_check_task
+- ansible.builtin.debug:
+    var: user_data_check_task
 
 - ansible.builtin.assert:
     that:
@@ -51,7 +54,8 @@
       cloud-init: "{{ cloud_init_script }}"
   register: user_data_task
 
-- debug: var=user_data_task
+- ansible.builtin.debug:
+    var: user_data_task
 
 - ansible.builtin.assert:
     that:
@@ -66,7 +70,8 @@
       cloud-init: "{{ cloud_init_script }}"
   register: user_data_confirmation_task
 
-- debug: var=user_data_confirmation_task
+- ansible.builtin.debug:
+    var: user_data_confirmation_task
 
 - ansible.builtin.assert:
     that:
@@ -84,4 +89,5 @@
     wait: true
   register: server_destroy_task
 
-- debug: var=server_destroy_task
+- ansible.builtin.debug:
+    var: server_destroy_task
