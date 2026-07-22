@@ -14,7 +14,7 @@
     cmd: 'mkfs.minix {{ dev }}'
 
 - name: 'Get UUID of the new filesystem'
-  ansible.builtin.shell:
+  ansible.builtin.shell:  # noqa: command-instead-of-shell
     cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid
@@ -28,7 +28,7 @@
   ignore_errors: true
 
 - name: 'Get UUID of the filesystem'
-  ansible.builtin.shell:
+  ansible.builtin.shell:  # noqa: command-instead-of-shell
     cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid2
@@ -48,7 +48,7 @@
   register: fs_result2
 
 - name: 'Get UUID of the new filesystem'
-  ansible.builtin.shell:
+  ansible.builtin.shell:  # noqa: command-instead-of-shell
     cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid3
