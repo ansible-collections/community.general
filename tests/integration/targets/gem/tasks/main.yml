@@ -130,7 +130,7 @@
       register: install_gem_result
 
     - name: Find gems in custom directory
-      find:
+      ansible.builtin.find:
         paths: "{{ remote_tmp_dir }}/gems/gems"
         file_type: directory
         contains: gist
@@ -152,7 +152,7 @@
       register: install_gem_result
 
     - name: Find gems in custom directory
-      find:
+      ansible.builtin.find:
         paths: "{{ remote_tmp_dir }}/gems/gems"
         file_type: directory
         contains: gist

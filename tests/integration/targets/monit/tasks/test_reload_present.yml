@@ -39,7 +39,7 @@
     service_state: "up"
 
 - name: add process config
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: "{{ monitrc }}"
     block: |
       check process httpd_echo with matching "httpd_echo"

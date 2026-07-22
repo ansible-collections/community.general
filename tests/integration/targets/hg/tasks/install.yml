@@ -38,7 +38,7 @@
   when: ansible_facts.pkg_mgr == 'dnf'
 
 - name: install mercurial (yum)
-  ansible.builtin.yum:
+  ansible.builtin.dnf:
     name: mercurial
   when: ansible_facts.pkg_mgr == 'yum'
 

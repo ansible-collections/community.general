@@ -66,7 +66,7 @@ EXAMPLES = r"""
 - hosts: chroots
   connection: community.general.chroot
   tasks:
-    - debug:
+    - ansible.builtin.debug:
         msg: "This is coming from chroot environment"
 """
 

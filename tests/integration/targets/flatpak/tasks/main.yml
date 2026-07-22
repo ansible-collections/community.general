@@ -47,7 +47,7 @@
   always:
 
     - name: Check HTTP server status
-      async_status:
+      ansible.builtin.async_status:
         jid: "{{ webserver_status.ansible_job_id }}"
       ignore_errors: true
 

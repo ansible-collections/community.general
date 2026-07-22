@@ -29,7 +29,7 @@
 # pkg switched from .txz to .pkg in version 1.17.0
 # Might as well look for all valid pkg extensions.
 - name: Find created package file
-  find:
+  ansible.builtin.find:
     path: '{{ pkgng_test_outofdate_pkg_tempdir.path }}'
     use_regex: true
     pattern: '.*\.(pkg|tzst|t[xbg]z|tar)'

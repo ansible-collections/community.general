@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "ensure our next rule is not there (iptables)"
-  iptables:
+  ansible.builtin.iptables:
     table: nat
     chain: INPUT
     jump: ACCEPT
@@ -128,7 +128,7 @@
 
 
 - name: "change NAT table (iptables)"
-  iptables:
+  ansible.builtin.iptables:
     table: nat
     chain: INPUT
     jump: ACCEPT

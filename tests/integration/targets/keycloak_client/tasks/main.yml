@@ -10,7 +10,7 @@
   until: result is success
 
 - name: Wait for Keycloak
-  uri:
+  ansible.builtin.uri:
     url: "{{ url }}/admin/"
     status_code: 200
     validate_certs: false

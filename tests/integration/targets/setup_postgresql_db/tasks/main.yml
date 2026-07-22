@@ -172,7 +172,7 @@
 
 - block:
     - name: Install langpacks (RHEL8)
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name:
           - glibc-langpack-es
           - glibc-langpack-pt
