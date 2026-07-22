@@ -545,6 +545,8 @@ files:
   $modules/consul:
     ignore: colin-nolan Hakon
     maintainers: $team_consul
+  $modules/consul_kv_info.py:
+    maintainers: $team_consul Shreyashxredhat
   $modules/copr.py:
     maintainers: schlupov
   $modules/cpanm.py:
