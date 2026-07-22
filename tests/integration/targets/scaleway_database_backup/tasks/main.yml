@@ -10,7 +10,7 @@
 
 - name: Create a backup (Check)
   check_mode: true
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     name: '{{ scaleway_name }}'
     state: present
     region: '{{ scaleway_region }}'
@@ -28,7 +28,7 @@
       - backup_creation_check_task is changed
 
 - name: Create a backup
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     name: '{{ scaleway_name }}'
     state: present
     region: '{{ scaleway_region }}'
@@ -47,7 +47,7 @@
       - backup_creation_task is changed
 
 - name: Create a backup (Confirmation)
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     name: '{{ scaleway_name }}'
     state: present
     region: '{{ scaleway_region }}'
@@ -67,7 +67,7 @@
 
 - name: Patch backup name (Check)
   check_mode: true
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     name: '{{ scaleway_name }}-changed'
     state: present
     region: '{{ scaleway_region }}'
@@ -85,7 +85,7 @@
       - backup_patching_check_task is changed
 
 - name: Patch backup name
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     name: '{{ scaleway_name }}-changed'
     state: present
     region: '{{ scaleway_region }}'
@@ -103,7 +103,7 @@
       - backup_patching_task is changed
 
 - name: Patch backup name (Confirmation)
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     name: '{{ scaleway_name }}-changed'
     state: present
     region: '{{ scaleway_region }}'
@@ -122,7 +122,7 @@
 
 - name: Export backup (Check)
   check_mode: true
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: exported
     region: '{{ scaleway_region }}'
@@ -137,7 +137,7 @@
       - backup_export_check_task is changed
 
 - name: Export backup
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: exported
     region: '{{ scaleway_region }}'
@@ -154,7 +154,7 @@
       - backup_export_task.metadata.download_url != ""
 
 - name: Export backup (Confirmation)
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: exported
     region: '{{ scaleway_region }}'
@@ -171,7 +171,7 @@
 
 - name: Restore backup (Check)
   check_mode: true
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: restored
     region: '{{ scaleway_region }}'
@@ -188,7 +188,7 @@
       - backup_restore_check_task is changed
 
 - name: Restore backup
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: restored
     region: '{{ scaleway_region }}'
@@ -207,7 +207,7 @@
 
 - name: Delete backup (Check)
   check_mode: true
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: absent
     region: '{{ scaleway_region }}'
@@ -222,7 +222,7 @@
       - backup_delete_check_task is changed
 
 - name: Delete backup
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: absent
     region: '{{ scaleway_region }}'
@@ -237,7 +237,7 @@
       - backup_delete_task is changed
 
 - name: Delete backup (Confirmation)
-  scaleway_database_backup:
+  community.general.scaleway_database_backup:
     id: '{{ backup_creation_task.metadata.id }}'
     state: absent
     region: '{{ scaleway_region }}'

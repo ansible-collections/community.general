@@ -9,7 +9,7 @@
     dest: /tmp/ansible-xml-namespaced-beers-xml.xml
 
 - name: Set child elements
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-namespaced-beers-xml.xml
     xpath: /bus:business/ber:beers
     namespaces:
@@ -26,7 +26,7 @@
     remote_src: true
 
 - name: Set child elements again
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-namespaced-beers-xml.xml
     xpath: /bus:business/ber:beers
     namespaces:

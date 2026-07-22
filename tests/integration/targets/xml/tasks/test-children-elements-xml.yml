@@ -10,7 +10,7 @@
 
 
 - name: Add child element with xml format
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/beers
     input_type: xml

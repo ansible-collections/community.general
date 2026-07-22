@@ -6,7 +6,7 @@
 # test_grow_reduce already checks the base case with default parameters (remove additional PVs)
 
 - name: "Create volume group on first disk"
-  lvg:
+  community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device1 }}"
 
@@ -24,7 +24,7 @@
         ansible_facts.lvm.pvs[loop_device2].vg == ""'
 
 - name: "Extend to second disk AND keep first disk"
-  lvg:
+  community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device2 }}"
     remove_extra_pvs: false

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: update dummy alternative
-  alternatives:
+  community.general.alternatives:
     name: dummy
     path: '/usr/bin/dummy{{ item }}'
     link: /usr/bin/dummy
@@ -28,7 +28,7 @@
   ansible.builtin.command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 60 + item|int }}' '{{ alternatives_dir }}/dummy'"
 
 - name: update dummy priority
-  alternatives:
+  community.general.alternatives:
     name: dummy
     path: '/usr/bin/dummy{{ item }}'
     link: /usr/bin/dummy
@@ -39,7 +39,7 @@
   ansible.builtin.command: "grep -Pzq '/bin/dummy{{ item }}\\n{{ 70 + item|int }}' '{{ alternatives_dir }}/dummy'"
 
 - name: no change without priority
-  alternatives:
+  community.general.alternatives:
     name: dummy
     path: '/usr/bin/dummy{{ item }}'
     link: /usr/bin/dummy

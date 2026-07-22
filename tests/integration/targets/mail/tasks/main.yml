@@ -41,13 +41,13 @@
       register: smtpserver
 
     - name: Send a basic test-mail
-      mail:
+      community.general.mail:
         port: 10025
         subject: Test mail 1 (smtp)
         secure: never
 
     - name: Send a test-mail with body and specific recipient
-      mail:
+      community.general.mail:
         port: 10025
         from: ansible@localhost
         to: root@localhost
@@ -56,7 +56,7 @@
         secure: never
 
     - name: Send a test-mail with attachment
-      mail:
+      community.general.mail:
         port: 10025
         from: ansible@localhost
         to: root@localhost
@@ -67,7 +67,7 @@
 
     # NOTE: This might fail if smtpd-tls is missing or python 2.7.8 or older is used
     - name: Send a test-mail using starttls
-      mail:
+      community.general.mail:
         port: 10025
         from: ansible@localhost
         to: root@localhost
@@ -80,7 +80,7 @@
 
     # NOTE: This might fail if smtpd-tls is missing or python 2.7.8 or older is used
     - name: Send a test-mail using TLS
-      mail:
+      community.general.mail:
         port: 10465
         from: ansible@localhost
         to: root@localhost
@@ -100,7 +100,7 @@
       when: smtpd_tls is succeeded and tls_support is failed and starttls_support is succeeded
 
     - name: Send a test-mail with body, specific recipient and specific ehlohost
-      mail:
+      community.general.mail:
         port: 10025
         ehlohost: some.domain.tld
         from: ansible@localhost

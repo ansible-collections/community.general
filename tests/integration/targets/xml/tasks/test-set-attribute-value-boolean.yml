@@ -13,7 +13,7 @@
 
 
 - name: "Set '/business/rating/@subjective' to boolean false (unquoted YAML boolean) - must fail"
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     attribute: subjective
@@ -30,7 +30,7 @@
 
 
 - name: "Set '/business/rating' text content to boolean true (unquoted YAML boolean) - must fail"
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     value: true
@@ -46,7 +46,7 @@
 
 
 - name: "Set '/business/rating/@subjective' to quoted string 'false' - must succeed"
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     attribute: subjective

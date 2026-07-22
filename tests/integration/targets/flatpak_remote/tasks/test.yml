@@ -6,7 +6,7 @@
 # state=present
 
 - name: Test addition - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     state: present
@@ -20,7 +20,7 @@
     msg: "state=present shall add flatpak when absent"
 
 - name: Test idempotency of addition - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     state: present
@@ -34,7 +34,7 @@
     msg: "state=present shall not do anything when flatpak is already present"
 
 - name: Test updating remote url does not do anything - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     flatpakrepo_url: https://a.different/repo.flatpakrepo
     state: present
@@ -51,7 +51,7 @@
 # enabled=false
 
 - name: Test deactivation - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     enabled: false
     method: "{{ method }}"
@@ -64,7 +64,7 @@
     msg: "enable=false shall disable flatpak remote when enabled"
 
 - name: Test idempotency of deactivation - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     enabled: false
     method: "{{ method }}"
@@ -80,7 +80,7 @@
 # enabled=false
 
 - name: Test activation - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     enabled: true
     method: "{{ method }}"
@@ -93,7 +93,7 @@
     msg: "enable=true shall enable flatpak remote when disabled"
 
 - name: Test idempotency of activation - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     enabled: true
     method: "{{ method }}"
@@ -109,7 +109,7 @@
 # state=absent
 
 - name: Test removal - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     state: absent
     method: "{{ method }}"
@@ -122,7 +122,7 @@
     msg: "state=absent shall remove flatpak when present"
 
 - name: Test idempotency of removal - {{ method }}
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     state: absent
     method: "{{ method }}"

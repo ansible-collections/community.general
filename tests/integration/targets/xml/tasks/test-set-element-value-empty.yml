@@ -10,7 +10,7 @@
 
 
 - name: Set '/business/website/address' to empty string.
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/website/address
     value: ''

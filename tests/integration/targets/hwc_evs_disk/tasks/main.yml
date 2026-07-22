@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: delete a disk
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"
@@ -17,7 +17,7 @@
     state: absent
 # ----------------------------------------------------------
 - name: create a disk
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"
@@ -30,7 +30,7 @@
       result is changed
 # ------------------------------------------------------------
 - name: test create a disk in check mode
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"
@@ -44,7 +44,7 @@
       result is changed
 # ----------------------------------------------------------------------------
 - name: create a disk that already exists
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"
@@ -58,7 +58,7 @@
       - result is not changed
 # ----------------------------------------------------------
 - name: delete a disk (check mode)
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"
@@ -72,7 +72,7 @@
       result is changed
 # ----------------------------------------------------------
 - name: delete a disk
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"
@@ -85,7 +85,7 @@
       result is changed
 # ----------------------------------------------------------------------------
 - name: delete a disk that does not exist (check mode)
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"
@@ -99,7 +99,7 @@
       - result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a disk that does not exist
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"

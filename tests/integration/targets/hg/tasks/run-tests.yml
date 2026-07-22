@@ -16,7 +16,7 @@
   ansible.builtin.shell: which hg
 
 - name: initial checkout
-  hg:
+  community.general.hg:
     repo: "{{ repo }}"
     dest: "{{ checkout_dir }}"
   register: hg_result
@@ -32,7 +32,7 @@
       - "hg_result.changed"
 
 - name: repeated checkout
-  hg:
+  community.general.hg:
     repo: "{{ repo }}"
     dest: "{{ checkout_dir }}"
   register: hg_result2
@@ -62,7 +62,7 @@
       - "not hg_result2.changed"
 
 - name: Checkout non-existent repo clone
-  hg:
+  community.general.hg:
     repo: "http://hg.code.sf.net/p/cg-hg-test-repo1"
     clone: false
     update: false

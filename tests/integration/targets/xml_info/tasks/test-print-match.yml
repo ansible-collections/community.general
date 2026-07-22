@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: paths returns matching xpath paths in matches
-  xml_info:
+  community.general.xml_info:
     path: /tmp/ansible-xml-info-beers.xml
     xpath: /business/beers/beer
     what: paths
@@ -21,7 +21,7 @@
       - "'/business/beers/beer[3]' in paths_result.matches"
 
 - name: paths with no matches returns empty matches list
-  xml_info:
+  community.general.xml_info:
     path: /tmp/ansible-xml-info-beers.xml
     xpath: /business/nonexistent
     what: paths

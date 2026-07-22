@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "Prepare VG for missing PV"
-  lvg:
+  community.general.lvg:
     vg: vg_with_missing_pv
     pvs:
       - "{{ loop_device3 }}"

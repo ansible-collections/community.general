@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get ip information and register it in a variable
-  scaleway_ip_info:
+  community.general.scaleway_ip_info:
     region: par1
   register: ips
 
@@ -23,7 +23,7 @@
       - ips is success
 
 - name: Get ip information and register it in a variable
-  scaleway_ip_info:
+  community.general.scaleway_ip_info:
     region: ams1
   register: ips_ams1
 

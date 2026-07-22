@@ -22,7 +22,7 @@
       COMMIT
 
 - name: "Restore initial state"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_tests }}"
     state: restored
   async: "{{ ansible_timeout }}"
@@ -40,7 +40,7 @@
       COMMIT
 
 - name: "Check restoring partial state"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_tests }}"
     state: restored
   check_mode: true
@@ -53,7 +53,7 @@
       - iptables_state is not changed
 
 - name: "Restore partial state"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_tests }}"
     state: restored
   register: iptables_state

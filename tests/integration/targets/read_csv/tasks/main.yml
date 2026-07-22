@@ -19,7 +19,7 @@
 
 # Read a CSV file and access user 'dag'
 - name: Read users from CSV file and return a dictionary
-  read_csv:
+  community.general.read_csv:
     path: "{{ remote_tmp_dir }}/users_unique.csv"
     key: name
   register: users_unique
@@ -37,7 +37,7 @@
 
 # Read a CSV file and access the first item
 - name: Read users from CSV file and return a list
-  read_csv:
+  community.general.read_csv:
     path: "{{ remote_tmp_dir }}/users_unique.csv"
   register: users_unique
 
@@ -65,7 +65,7 @@
 
 # Read a CSV file and access user 'dag'
 - name: Read users from CSV file and return a dictionary
-  read_csv:
+  community.general.read_csv:
     path: "{{ remote_tmp_dir }}/users_nonunique.csv"
     key: name
     unique: false
@@ -86,7 +86,7 @@
 
 # Read a CSV file using an non-existing dialect
 - name: Read users from CSV file and return a dictionary
-  read_csv:
+  community.general.read_csv:
     path: "{{ remote_tmp_dir }}/users_nonunique.csv"
     dialect: placebo
   register: users_placebo
@@ -108,7 +108,7 @@
 
 # Read a CSV file and access user 'dag'
 - name: Read users from CSV file and return a dictionary
-  read_csv:
+  community.general.read_csv:
     path: "{{ remote_tmp_dir }}/users_noheader.csv"
     key: name
     fieldnames: name,uid,gid,gecos
@@ -137,7 +137,7 @@
 
 # Read a broken CSV file using strict
 - name: Read users from a broken CSV file
-  read_csv:
+  community.general.read_csv:
     path: "{{ remote_tmp_dir }}/users_broken.csv"
     key: name
     strict: true
@@ -160,7 +160,7 @@
 
  # Read a CSV file and access the first item
 - name: Read users from CSV file and return a list
-  read_csv:
+  community.general.read_csv:
     path: "{{ remote_tmp_dir }}/users_bom.csv"
   register: users_bom
 

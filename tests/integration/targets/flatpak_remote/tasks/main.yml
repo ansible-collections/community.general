@@ -17,7 +17,7 @@
     # executable override
 
     - name: Test executable override
-      flatpak_remote:
+      community.general.flatpak_remote:
         name: irrelevant
         remote: irrelevant
         state: present

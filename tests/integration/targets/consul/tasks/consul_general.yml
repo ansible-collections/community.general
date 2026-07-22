@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: ensure unknown scheme fails
-  consul_session:
+  community.general.consul_session:
     state: info
     id: dummy
     scheme: non_existent
@@ -17,7 +17,7 @@
       - result is failed
 
 - name: ensure SSL certificate is checked
-  consul_session:
+  community.general.consul_session:
     state: info
     id: dummy
     port: 8501
@@ -33,7 +33,7 @@
       - "'certificate verify failed' in result.msg"
 
 - name: ensure SSL certificate isn't checked when validate_certs is disabled
-  consul_session:
+  community.general.consul_session:
     state: info
     id: dummy
     port: 8501
@@ -48,7 +48,7 @@
       - result is changed
 
 - name: ensure a secure connection is possible
-  consul_session:
+  community.general.consul_session:
     state: info
     id: dummy
     port: 8501
@@ -62,7 +62,7 @@
       - result is changed
 
 - name: ensure connection errors are handled properly
-  consul_session:
+  community.general.consul_session:
     state: info
     id: dummy
     token: "{{ consul_management_token }}"

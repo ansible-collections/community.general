@@ -64,7 +64,7 @@
     # Test if state=present and not deployed, check_mode:
     - name: jboss - deploy war in check_mode, the default deploy_path
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         src: '{{ war_file_1_path }}'
       check_mode: true
@@ -87,7 +87,7 @@
     # Test if state=present and not deployed, actual mode:
     - name: jboss - deploy war
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: helloworld-1.war
         deploy_path: '{{ deploy_dir }}'
         src: '{{ war_file_1_path }}'
@@ -109,7 +109,7 @@
     # Test if state=present and deployed in check mode, try again:
     - name: jboss - try again to deploy war in check_mode, war is deployed now
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         src: '{{ war_file_1_path }}'
         deploy_path: '{{ deploy_dir }}'
@@ -122,7 +122,7 @@
     # Test if state=present and deployed, try again:
     - name: jboss - try again to deploy war in actual mode, war is deployed now
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         src: '{{ war_file_1_path }}'
         deploy_path: '{{ deploy_dir }}'
@@ -144,7 +144,7 @@
     # Test if state=absent and deployed:
     - name: jboss - undeploy war in check_mode, war is deployed
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         deploy_path: '{{ deploy_dir }}'
         state: absent
@@ -166,7 +166,7 @@
     # Test if state=absent and deployed:
     - name: jboss - undeploy war in actual mode, war is deployed
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         deploy_path: '{{ deploy_dir }}'
         state: absent
@@ -187,7 +187,7 @@
     # Test if state=absent and undeployed:
     - name: jboss - undeploy war in check_mode, war is undeployed
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         deploy_path: '{{ deploy_dir }}'
         state: absent
@@ -200,7 +200,7 @@
     # Test if state=absent and undeployed:
     - name: jboss - undeploy war in actual_mode, war is undeployed
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         deploy_path: '{{ deploy_dir }}'
         state: absent
@@ -212,7 +212,7 @@
     # Test fake src:
     - name: jboss - test fake src
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         deploy_path: '{{ deploy_dir }}'
         src: '{{ fake_src_path }}'
@@ -227,7 +227,7 @@
     # Test errors where state=present and src is not passed:
     - name: jboss - must fail when state=present and src is not passed
       <<: *task_parameters
-      jboss:
+      community.general.jboss:
         deployment: '{{ war_file_1 }}'
         state: present
       ignore_errors: true

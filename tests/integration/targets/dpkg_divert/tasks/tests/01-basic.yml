@@ -13,27 +13,27 @@
 
 
 - name: "divert foobarrc (check mode, must report a change)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: present
   register: diversion_0
   check_mode: true
 
 - name: "divert foobarrc (must report a change)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: present
   register: diversion_1
 
 
 - name: "divert foobarrc (must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: present
   register: diversion_2
 
 - name: "divert foobarrc (check mode, must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: present
   register: diversion_3
@@ -43,14 +43,14 @@
 # Ensure that 'rename' has no effect when state is not changed
 
 - name: "divert foobarrc (rename, must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: present
     rename: true
   register: diversion_4
 
 - name: "divert foobarrc (check mode, rename, must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: present
     rename: true
@@ -95,27 +95,27 @@
 # TEST 02: state=absent
 
 - name: "remove diversion for foobarrc (check mode, must report a change)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
   register: diversion_0
   check_mode: true
 
 - name: "remove diversion for foobarrc (must report a change)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
   register: diversion_1
 
 
 - name: "remove diversion for foobarrc (must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
   register: diversion_2
 
 - name: "remove diversion for foobarrc (check mode, must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
   register: diversion_3
@@ -155,32 +155,32 @@
 # TEST 03: holder=ansible
 
 - name: "create foobarrc diversion with defaults"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
 
 
 - name: "update foobarrc diversion holder (check mode, must report a change)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     holder: "ansible"
   register: diversion_0
   check_mode: true
 
 - name: "update foobarrc diversion holder (must report a change)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     holder: "ansible"
   register: diversion_1
 
 
 - name: "update foobarrc diversion holder (must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     holder: "ansible"
   register: diversion_2
 
 - name: "update foobarrc diversion holder (check mode, must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     holder: "ansible"
   register: diversion_3
@@ -216,7 +216,7 @@
     quiet: true
 
 - name: "remove foobarrc diversion"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
 
@@ -225,32 +225,32 @@
 # TEST 04: divert=/etc/foobarrc.ansible
 
 - name: "create foobarrc diversion with defaults"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
 
 
 - name: "update foobarrc divert path (check mode, must report a change)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     divert: "{{ foobarrc_ansible }}"
   register: diversion_0
   check_mode: true
 
 - name: "update foobarrc divert path (must report a change)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     divert: "{{ foobarrc_ansible }}"
   register: diversion_1
 
 
 - name: "update foobarrc divert path (must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     divert: "{{ foobarrc_ansible }}"
   register: diversion_2
 
 - name: "update foobarrc divert path (check mode, must NOT report a change, idempotency)"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     divert: "{{ foobarrc_ansible }}"
   register: diversion_3
@@ -286,6 +286,6 @@
     quiet: true
 
 - name: "remove foobarrc diversion"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent

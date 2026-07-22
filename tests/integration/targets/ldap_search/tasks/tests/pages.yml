@@ -10,7 +10,7 @@
 ## Search ##########################################################
 ####################################################################
 - name: Test paged search for all users
-  ldap_search:
+  community.general.ldap_search:
     dn: "ou=users,dc=example,dc=com"
     scope: "onelevel"
     page_size: 1

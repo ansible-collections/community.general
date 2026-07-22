@@ -10,7 +10,7 @@
 
 
 - name: Pretty print
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/beers
     pretty_print: true

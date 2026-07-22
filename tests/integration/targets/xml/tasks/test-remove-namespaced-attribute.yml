@@ -10,7 +10,7 @@
 
 
 - name: Remove namespaced '/bus:business/rat:rating/@attr:subjective'
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-namespaced-beers.xml
     xpath: /bus:business/rat:rating/@attr:subjective
     namespaces:

@@ -6,7 +6,7 @@
 - ansible.builtin.import_tasks: setup_value.yml
 
 - name: unsetting value with check mode
-  git_config:
+  community.general.git_config:
     name: "{{ option_name }}"
     scope: "{{ option_scope }}"
     state: absent
@@ -14,7 +14,7 @@
   register: unset_result
 
 - name: getting value
-  git_config_info:
+  community.general.git_config_info:
     name: "{{ option_name }}"
     scope: "{{ option_scope }}"
   register: get_result

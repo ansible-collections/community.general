@@ -10,7 +10,7 @@
 ## Search ##########################################################
 ####################################################################
 - name: Test simple search for a user
-  ldap_search:
+  community.general.ldap_search:
     dn: "ou=users,dc=example,dc=com"
     scope: "onelevel"
     filter: "(uid=ldaptest)"
@@ -25,7 +25,7 @@
       - output.results.0.displayName == "LDAP Test"
 
 - name: Test simple search for a user with no results
-  ldap_search:
+  community.general.ldap_search:
     dn: "ou=users,dc=example,dc=com"
     scope: "onelevel"
     filter: "(uid=nonexistent)"

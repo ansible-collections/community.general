@@ -8,7 +8,7 @@
     dest: /tmp/ansible-xml-doctype.xml
 
 - name: Set '/foo/@value' to '1' (file has DOCTYPE)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-doctype.xml
     xpath: /foo
     attribute: value
@@ -33,7 +33,7 @@
       - comparison is not changed
 
 - name: Set '/foo/@value' to '1' again (idempotency)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-doctype.xml
     xpath: /foo
     attribute: value

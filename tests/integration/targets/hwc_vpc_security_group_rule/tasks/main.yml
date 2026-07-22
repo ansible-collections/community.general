@@ -10,12 +10,12 @@
 
 # Pre-test setup
 - name: create a security group
-  hwc_vpc_security_group:
+  community.general.hwc_vpc_security_group:
     name: "ansible_network_security_group_test"
     state: present
   register: sg
 - name: delete a security group rule
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -26,7 +26,7 @@
     state: absent
 # ----------------------------------------------------------
 - name: create a security group rule (check mode)
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -44,7 +44,7 @@
       - result.changed
 # ----------------------------------------------------------
 - name: create a security group rule
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -60,7 +60,7 @@
       - result is changed
 # ----------------------------------------------------------
 - name: create a security group rule (idemponent)
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -76,7 +76,7 @@
       - not result.changed
 # ----------------------------------------------------------------------------
 - name: create a security group rule that already exists
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -93,7 +93,7 @@
       - result is not changed
 # ----------------------------------------------------------
 - name: delete a security group rule (check mode)
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -110,7 +110,7 @@
       - result is changed
 # ----------------------------------------------------------
 - name: delete a security group rule
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -126,7 +126,7 @@
       - result is changed
 # ----------------------------------------------------------
 - name: delete a security group rule (idemponent)
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -142,7 +142,7 @@
       - not result.changed
 # ----------------------------------------------------------------------------
 - name: delete a security group rule that does not exist
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"
@@ -160,7 +160,7 @@
 # ---------------------------------------------------------
 # Post-test teardown
 - name: delete a security group
-  hwc_vpc_security_group:
+  community.general.hwc_vpc_security_group:
     name: "ansible_network_security_group_test"
     state: absent
   register: sg

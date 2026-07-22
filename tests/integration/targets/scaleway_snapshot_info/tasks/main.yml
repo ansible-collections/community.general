@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get snapshot information and register it in a variable
-  scaleway_snapshot_info:
+  community.general.scaleway_snapshot_info:
     region: par1
   register: snapshots
 
@@ -23,7 +23,7 @@
       - snapshots is success
 
 - name: Get snapshot information and register it in a variable (AMS1)
-  scaleway_snapshot_info:
+  community.general.scaleway_snapshot_info:
     region: ams1
   register: ams1_snapshots
 

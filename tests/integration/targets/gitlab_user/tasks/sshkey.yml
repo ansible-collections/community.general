@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create gitlab user with sshkey credentials
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"
@@ -28,7 +28,7 @@
       - gitlab_user_sshkey is changed
 
 - name: Create gitlab user again
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"
@@ -47,7 +47,7 @@
       - gitlab_user_sshkey_again is not changed
 
 - name: Update gitlab user ssh key when key material changes
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"
@@ -67,7 +67,7 @@
       - gitlab_user_sshkey_updated is changed
 
 - name: Update gitlab user ssh key again
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"
@@ -87,7 +87,7 @@
       - gitlab_user_sshkey_updated_again is not changed
 
 - name: Add expires_at to an already created gitlab user with ssh key
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"
@@ -108,7 +108,7 @@
       - gitlab_user_created_user_sshkey_expires_at is not changed
 
 - name: Remove created gitlab user
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"
@@ -124,7 +124,7 @@
       - gitlab_user_sshkey_remove is changed
 
 - name: Create gitlab user with sshkey and expires_at
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"
@@ -144,7 +144,7 @@
       - gitlab_user_sshkey_expires_at is changed
 
 - name: Create gitlab user with sshkey and expires_at again
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"
@@ -164,7 +164,7 @@
       - gitlab_user_sshkey_expires_at_again is not changed
 
 - name: Remove created gitlab user
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     email: "{{ gitlab_user_email }}"

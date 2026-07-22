@@ -10,7 +10,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Check if name is required for present
-  osx_defaults:
+  community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     type: string
@@ -24,7 +24,7 @@
       - "'following are missing: value' in missing_value['msg']"
 
 - name: Change value of AppleMeasurementUnits to centimeter in check_mode
-  osx_defaults:
+  community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     type: string
@@ -39,7 +39,7 @@
       - measure_task_check_mode.changed
 
 - name: Find the current value of AppleMeasurementUnits
-  osx_defaults:
+  community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     state: list
@@ -57,7 +57,7 @@
   when: apple_measure_value['value'] == 'Centimeters'
 
 - name: Change value of AppleMeasurementUnits to {{ new_value }}
-  osx_defaults:
+  community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     type: string
@@ -71,7 +71,7 @@
       - change_value.changed
 
 - name: Again change value of AppleMeasurementUnits to {{ new_value }}
-  osx_defaults:
+  community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     type: string
@@ -85,7 +85,7 @@
       - not change_value.changed
 
 - name: Check a fake setting for delete operation
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_value
     key: ExampleKeyToRemove
     state: list
@@ -100,7 +100,7 @@
       - not list_fake_value.changed
 
 - name: Create a fake setting for delete operation
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_value
     key: ExampleKeyToRemove
     state: present
@@ -117,7 +117,7 @@
   when: present_fake_value.changed
 
 - name: List a fake setting
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_value
     key: ExampleKeyToRemove
     state: list
@@ -127,7 +127,7 @@
     msg: "{{ list_fake }}"
 
 - name: Delete a fake setting
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_value
     key: ExampleKeyToRemove
     state: absent
@@ -143,7 +143,7 @@
   when: present_fake_value.changed
 
 - name: Try deleting a fake setting again
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_value
     key: ExampleKeyToRemove
     state: absent
@@ -158,7 +158,7 @@
       - not absent_task.changed
 
 - name: Delete operation in check_mode
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_value
     key: ExampleKeyToRemove
     state: absent
@@ -175,7 +175,7 @@
 
 
 - name: Use different data types and check if it works with them
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_values
     key: "{{ item.key }}"
     type: "{{ item.type }}"
@@ -198,7 +198,7 @@
   with_items: "{{ test_data_types.results }}"
 
 - name: Use different data types and delete them
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_values
     key: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -213,13 +213,13 @@
 
 
 - name: Ensure test key does not exist
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_array_value
     key: ExampleArrayKey
     state: absent
 
 - name: add array value for the first time
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_array_value
     key: ExampleArrayKey
     value:
@@ -232,7 +232,7 @@
     that: test_array_add.changed
 
 - name: add for the second time, should be skipped
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_array_value
     key: ExampleArrayKey
     value:
@@ -245,7 +245,7 @@
     that: not test_array_add.changed
 
 - name: Clean up test key
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_array_value
     key: ExampleArrayKey
     state: absent
@@ -256,13 +256,13 @@
 
 
 - name: Ensure dict test key does not exist
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_dict_value
     key: ExampleDictKey
     state: absent
 
 - name: Write dict value for the first time
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_dict_value
     key: ExampleDictKey
     type: dict
@@ -275,7 +275,7 @@
     that: test_dict_write.changed
 
 - name: Write same dict value again, should not change
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_dict_value
     key: ExampleDictKey
     type: dict
@@ -288,7 +288,7 @@
     that: not test_dict_write.changed
 
 - name: Write different dict value, should change
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_dict_value
     key: ExampleDictKey
     type: dict
@@ -301,7 +301,7 @@
     that: test_dict_write.changed
 
 - name: Add new key via dict_add
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_dict_value
     key: ExampleDictKey
     type: dict
@@ -314,7 +314,7 @@
     that: test_dict_add.changed
 
 - name: Add same key via dict_add again, should not change
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_dict_value
     key: ExampleDictKey
     type: dict
@@ -327,7 +327,7 @@
     that: not test_dict_add.changed
 
 - name: Use dict_add on non-existent key, should create it
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_dict_value
     key: ExampleDictKeyNew
     type: dict
@@ -340,7 +340,7 @@
     that: test_dict_add_new.changed
 
 - name: Clean up dict test keys
-  osx_defaults:
+  community.general.osx_defaults:
     domain: com.ansible.fake_dict_value
     key: "{{ item }}"
     state: absent

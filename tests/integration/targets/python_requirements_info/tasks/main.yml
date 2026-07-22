@@ -15,7 +15,7 @@
   when: ansible_facts.distribution == 'MacOSX' and ansible_facts.distribution_version is version('15', '>=')
 
 - name: run python_requirements_info module
-  python_requirements_info:
+  community.general.python_requirements_info:
   register: basic_info
 
 - name: ensure python_requirements_info returns desired info
@@ -26,7 +26,7 @@
       - basic_info.python_version_info == ansible_facts.python.version
 
 - name: run python_requirements_info module
-  python_requirements_info:
+  community.general.python_requirements_info:
     dependencies:
       - notreal<1
       - pip>1
@@ -39,7 +39,7 @@
       - "'notreal' in dep_info.not_found"
 
 - name: wrong specs
-  python_requirements_info:
+  community.general.python_requirements_info:
     dependencies:
       - ansible<
   register: wrong_spec1

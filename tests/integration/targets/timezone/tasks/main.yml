@@ -73,7 +73,7 @@
     - not (ansible_facts.distribution == 'Archlinux')  # TODO
   block:
     - name: set timezone to Etc/UTC
-      timezone:
+      community.general.timezone:
         name: Etc/UTC
       register: original_timezone
 
@@ -85,6 +85,6 @@
         - ansible.builtin.include_tasks: test.yml
       always:
         - name: Restore original system timezone - {{ original_timezone.diff.before.name }}
-          timezone:
+          community.general.timezone:
             name: "{{ original_timezone.diff.before.name }}"
           when: original_timezone is changed and original_timezone.diff.before.name != 'n/a'

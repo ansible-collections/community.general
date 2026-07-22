@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create customer (check mode)
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -24,7 +24,7 @@
       - result is changed
 
 - name: Create customer
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -38,7 +38,7 @@
       - result is changed
 
 - name: Test customer creation idempotency
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -52,7 +52,7 @@
       - result is not changed
 
 - name: Delete customer (check mode)
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -68,7 +68,7 @@
       - result is changed
 
 - name: Delete customer
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -83,7 +83,7 @@
       - result is changed
 
 - name: Test customer deletion idempotency
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -98,7 +98,7 @@
       - result is not changed
 
 - name: Delete non-existing customer (check mode)
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_username: "{{ alerta_user }}"
     api_password: "{{ alerta_password }}"
@@ -114,7 +114,7 @@
       - result is not changed
 
 - name: Create customer with api key
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_key: "{{ alerta_key }}"
     customer: customer1
@@ -127,7 +127,7 @@
       - result is changed
 
 - name: Delete customer with api key
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_key: "{{ alerta_key }}"
     customer: customer1
@@ -141,7 +141,7 @@
       - result is changed
 
 - name: Use wrong api key
-  alerta_customer:
+  community.general.alerta_customer:
     alerta_url: "{{ alerta_url }}"
     api_key: wrong_key
     customer: customer1

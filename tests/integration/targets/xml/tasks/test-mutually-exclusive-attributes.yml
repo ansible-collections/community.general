@@ -10,7 +10,7 @@
 
 
 - name: Specify both children to add and a value
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     add_children:
       - child01

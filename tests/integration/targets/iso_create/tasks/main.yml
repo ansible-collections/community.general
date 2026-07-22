@@ -29,7 +29,7 @@
     - test_dir
 
 - name: Test check mode
-  iso_create:
+  community.general.iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
@@ -51,7 +51,7 @@
       - iso_file.stat.exists == False
 
 - name: Create iso file with a specified file
-  iso_create:
+  community.general.iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test.iso"
@@ -71,7 +71,7 @@
       - iso_file.stat.exists == True
 
 - name: Create iso file with a specified file and folder
-  iso_create:
+  community.general.iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
       - "{{ remote_tmp_dir }}/test_dir"
@@ -92,7 +92,7 @@
       - iso_file.stat.exists == True
 
 - name: Create iso file with volume identification string
-  iso_create:
+  community.general.iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test2.iso"
@@ -112,7 +112,7 @@
       - iso_file.stat.exists == True
 
 - name: Create iso file with Rock Ridge extension
-  iso_create:
+  community.general.iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test3.iso"
@@ -132,7 +132,7 @@
       - iso_file.stat.exists == True
 
 - name: Create iso file with Joliet extension
-  iso_create:
+  community.general.iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test4.iso"
@@ -152,7 +152,7 @@
       - iso_file.stat.exists == True
 
 - name: Create iso file with UDF enabled
-  iso_create:
+  community.general.iso_create:
     src_files:
       - "{{ remote_tmp_dir }}/test1.cfg"
     dest_iso: "{{ output_test_dir }}/test5.iso"

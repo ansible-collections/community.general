@@ -10,7 +10,7 @@
 ## Increment #######################################################
 ####################################################################
 - name: Test increment by default
-  ldap_inc:
+  community.general.ldap_inc:
     bind_dn: "cn=admin,dc=example,dc=com"
     bind_pw: "Test1234!"
     dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
@@ -27,7 +27,7 @@
       - output.rfc4525
 
 - name: Test defined increment
-  ldap_inc:
+  community.general.ldap_inc:
     bind_dn: "cn=admin,dc=example,dc=com"
     bind_pw: "Test1234!"
     dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
@@ -45,7 +45,7 @@
       - output.rfc4525
 
 - name: Test defined increment by 0
-  ldap_inc:
+  community.general.ldap_inc:
     bind_dn: "cn=admin,dc=example,dc=com"
     bind_pw: "Test1234!"
     dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
@@ -62,7 +62,7 @@
       - output.value == "1003"
 
 - name: Test defined negative increment
-  ldap_inc:
+  community.general.ldap_inc:
     bind_dn: "cn=admin,dc=example,dc=com"
     bind_pw: "Test1234!"
     dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"
@@ -80,7 +80,7 @@
       - output.rfc4525
 
 - name: Test forcing classic method instead of automatic detection
-  ldap_inc:
+  community.general.ldap_inc:
     bind_dn: "cn=admin,dc=example,dc=com"
     bind_pw: "Test1234!"
     dn: "cn=ldapinctest,ou=sequence,dc=example,dc=com"

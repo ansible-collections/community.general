@@ -15,7 +15,7 @@
 
 - block:
     - name: Create {{ gitlab_project_name }} project
-      gitlab_project:
+      community.general.gitlab_project:
         api_url: "{{ gitlab_host }}"
         validate_certs: true
         api_token: "{{ gitlab_api_token }}"
@@ -26,7 +26,7 @@
         state: present
 
     - name: Create Issue
-      gitlab_issue:
+      community.general.gitlab_issue:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         description: "Test description"
@@ -41,7 +41,7 @@
           - gitlab_issue_create is changed
 
     - name: Create Issue ( Idempotency test )
-      gitlab_issue:
+      community.general.gitlab_issue:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         description: "Test description"
@@ -56,7 +56,7 @@
           - gitlab_issue_create_idempotence is not changed
 
     - name: Update Issue Test ( Additions )
-      gitlab_issue:
+      community.general.gitlab_issue:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         assignee_ids: "{{ gitlab_assignee_ids }}"
@@ -78,7 +78,7 @@
           - gitlab_issue_update_additions.issue.milestone.title == "{{ gitlab_milestone_search }}"
 
     - name: Update Issue Test ( Persistence )
-      gitlab_issue:
+      community.general.gitlab_issue:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         description_path: "{{ gitlab_description_path }}"
@@ -96,7 +96,7 @@
           - gitlab_issue_update_persistence.issue.assignees[0].username == "{{ gitlab_assignee_ids[0] }}"
 
     - name: Update Issue Test ( Removals )
-      gitlab_issue:
+      community.general.gitlab_issue:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         assignee_ids: []
@@ -117,7 +117,7 @@
           - gitlab_issue_update_removal.issue.milestone == None
 
     - name: Delete Issue
-      gitlab_issue:
+      community.general.gitlab_issue:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -132,7 +132,7 @@
 
   always:
     - name: Delete Issue
-      gitlab_issue:
+      community.general.gitlab_issue:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -141,7 +141,7 @@
         state: absent
       register: gitlab_issue_delete
     - name: Clean up {{ gitlab_project_name }}
-      gitlab_project:
+      community.general.gitlab_project:
         api_url: "{{ gitlab_host }}"
         validate_certs: false
         api_token: "{{ gitlab_api_token }}"

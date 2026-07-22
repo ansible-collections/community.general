@@ -14,7 +14,7 @@
     - ansible.builtin.debug:
         var: copr_chroot
     - name: enable copr project
-      copr:
+      community.general.copr:
         host: copr.fedorainfracloud.org
         state: enabled
         name: '{{ copr_fullname }}'
@@ -30,7 +30,7 @@
 
     - name: enable copr project
       check_mode: true
-      copr:
+      community.general.copr:
         state: enabled
         name: '{{ copr_fullname }}'
         chroot: '{{ copr_chroot }}'
@@ -86,7 +86,7 @@
             that: result.changed | bool
 
     - name: remove copr project
-      copr:
+      community.general.copr:
         state: absent
         name: '{{ copr_fullname }}'
       register: result
@@ -107,7 +107,7 @@
         that: not result.stat.exists | bool
 
     - name: disable copr project
-      copr:
+      community.general.copr:
         state: disabled
         name: '{{ copr_fullname }}'
         chroot: '{{ copr_chroot }}'
@@ -143,7 +143,7 @@
   always:
     - name: clean up
       ignore_errors: true
-      copr:
+      community.general.copr:
         host: copr.fedorainfracloud.org
         state: absent
         name: '{{ copr_fullname }}'

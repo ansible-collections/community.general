@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get server information and register it in a variable
-  scaleway_server_info:
+  community.general.scaleway_server_info:
     region: par1
   register: servers
 
@@ -23,7 +23,7 @@
       - servers is success
 
 - name: Get server information and register it in a variable
-  scaleway_server_info:
+  community.general.scaleway_server_info:
     region: ams1
   register: ams1_servers
 

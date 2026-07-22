@@ -16,7 +16,7 @@
 
     # executable override
     - name: Test executable override
-      flatpak:
+      community.general.flatpak:
         name: com.dummy.App1
         remote: dummy-remote
         state: present

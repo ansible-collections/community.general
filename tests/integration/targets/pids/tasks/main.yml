@@ -20,7 +20,7 @@
   when: psutil_latest_install is failed
 
 - name: "Checking the empty result"
-  pids:
+  community.general.pids:
     name: "blahblah"
   register: emptypids
 
@@ -59,28 +59,28 @@
     seconds: 1
 
 - name: "Checking the process IDs (PIDs) of fake 'sleep' binary"
-  pids:
+  community.general.pids:
     name: "{{ random_name }}"
   register: pids
 
 - name: "Checking that exact non-substring matches are required"
-  pids:
+  community.general.pids:
     name: "{{ random_name[0:25] }}"
   register: exactpidmatch
 
 - name: "Checking that patterns can be used with the pattern option"
-  pids:
+  community.general.pids:
     pattern: "{{ random_name[0:25] }}"
   register: pattern_pid_match
 
 - name: "Checking that case-insensitive patterns can be used with the pattern option"
-  pids:
+  community.general.pids:
     pattern: "{{ random_name[0:25] | upper }}"
     ignore_case: true
   register: caseinsensitive_pattern_pid_match
 
 - name: "Checking that .* includes test pid"
-  pids:
+  community.general.pids:
     pattern: .*
   register: match_all
 
@@ -109,7 +109,7 @@
       - newpid.content | b64decode | trim | int in match_all.pids
 
 - name: "Register output of bad input pattern"
-  pids:
+  community.general.pids:
     pattern: (unterminated
   register: bad_pattern_result
   ignore_errors: true

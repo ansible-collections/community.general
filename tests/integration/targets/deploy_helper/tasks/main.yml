@@ -13,7 +13,7 @@
     deploy_helper_test_root: "{{remote_tmp_dir}}/deploy_helper_test_root"
 
 - name: State=query with default parameters
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     state: query
 - name: Assert State=query with default parameters
@@ -31,7 +31,7 @@
       - "deploy_helper.new_release_path == deploy_helper.releases_path ~ '/' ~ deploy_helper.new_release"
 
 - name: State=query with relative overridden paths
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     current_path: CURRENT_PATH
     releases_path: RELEASES_PATH
@@ -46,7 +46,7 @@
       - "deploy_helper.new_release_path == deploy_helper.releases_path ~ '/' ~ deploy_helper.new_release"
 
 - name: State=query with absolute overridden paths
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     current_path: /CURRENT_PATH
     releases_path: /RELEASES_PATH
@@ -61,7 +61,7 @@
       - "deploy_helper.new_release_path == deploy_helper.releases_path ~ '/' ~ deploy_helper.new_release"
 
 - name: State=query with overridden unfinished_filename
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     unfinished_filename: UNFINISHED_DEPLOY
     state: query
@@ -76,7 +76,7 @@
     state: absent
 
 - name: State=present with default parameters
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     state: present
 - ansible.builtin.stat:
@@ -110,7 +110,7 @@
     dest: "{{ deploy_helper.releases_path }}/third/{{ deploy_helper.unfinished_filename }}"
 
 - name: State=finalize with default parameters
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     release: "{{ deploy_helper.new_release }}"
     state: finalize
@@ -136,7 +136,7 @@
     that:
       - "not third_release_path.stat.exists"
       - "releases_count.stdout|trim == '6'"
-- deploy_helper:
+- community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     release: "{{ deploy_helper.new_release }}"
     state: query
@@ -146,7 +146,7 @@
       - "deploy_helper.new_release == deploy_helper.previous_release"
 
 - name: State=absent with default parameters
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     state: absent
 - ansible.builtin.stat:
@@ -161,7 +161,7 @@
     msg: "Clearing all release data and facts ---------"
 
 - name: State=present with shared_path set to False
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     state: present
     shared_path: ''
@@ -199,7 +199,7 @@
 - ansible.builtin.shell: "ls {{ deploy_helper_test_root }}/releases | wc -l"
   register: before_releases_count
 - name: State=clean with keep_releases=3
-  deploy_helper:
+  community.general.deploy_helper:
     path: "{{ deploy_helper_test_root }}"
     release: "{{ deploy_helper.new_release }}"
     state: clean

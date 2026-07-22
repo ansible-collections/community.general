@@ -10,7 +10,7 @@
 
 
 - name: Count child element
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers-unicode.xml
     xpath: /business/beers/beer
     count: true

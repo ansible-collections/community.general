@@ -9,7 +9,7 @@
     service_state: "{{ initial_state }}"
 
 - name: change httpd_echo process state to {{ state }}
-  monit:
+  community.general.monit:
     name: httpd_echo
     state: "{{ state }}"
   register: result
@@ -26,7 +26,7 @@
     service_state: "{{ expected_state }}"
 
 - name: try change state again to {{ state }}
-  monit:
+  community.general.monit:
     name: httpd_echo
     state: "{{ state }}"
   register: result

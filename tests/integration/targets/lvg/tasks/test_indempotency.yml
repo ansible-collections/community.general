@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create volume group on disk device
-  lvg:
+  community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device1 }}"
 
 - name: Create the volume group again to verify idempotence
-  lvg:
+  community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device1 }}"
   register: repeat_vg_create

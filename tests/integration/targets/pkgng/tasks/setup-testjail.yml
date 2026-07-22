@@ -31,7 +31,7 @@
     enabled: true
 
 - name: Install ezjail
-  pkgng:
+  community.general.pkgng:
     name: ezjail
 
 - name: Configure ezjail to use http

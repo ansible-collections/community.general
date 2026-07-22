@@ -85,7 +85,7 @@
 
 # an example for a request acquiring information
 - name: Get KEA DHCP6 status
-  kea_command:
+  community.general.kea_command:
     command: status-get
     rv_unchanged: [0]
     socket: /run/kea/kea6-ctrl-socket
@@ -98,7 +98,7 @@
 
 # ensure socket option works
 - name: Get KEA DHCP4 status
-  kea_command:
+  community.general.kea_command:
     command: status-get
     rv_unchanged: [0]
     socket: /run/kea/kea4-ctrl-socket
@@ -107,7 +107,7 @@
 
 # an example for requests modifying state
 - name: Remove existing leases for 192.0.2.66, if any
-  kea_command:
+  community.general.kea_command:
     command: lease4-del
     arguments:
       ip-address: "192.0.2.66"
@@ -117,7 +117,7 @@
   ignore_errors: true
 
 - name: Add DHCP lease for 192.0.2.66
-  kea_command:
+  community.general.kea_command:
     command: lease4-add
     arguments:
       ip-address: "192.0.2.66"
@@ -128,7 +128,7 @@
 
 # these all ignore_errors so the network teardown runs in all cases
 - name: An unknown command
-  kea_command:
+  community.general.kea_command:
     command: get-status
     rv_unchanged: [0]
   register: uc_status

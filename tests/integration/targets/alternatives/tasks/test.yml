@@ -8,7 +8,7 @@
 
 - block:
     - name: set alternative (using link parameter)
-      alternatives:
+      community.general.alternatives:
         name: dummy
         path: '/usr/bin/dummy{{ item }}'
         link: '/usr/bin/dummy'
@@ -23,7 +23,7 @@
 
 - block:
     - name: set alternative (without link parameter)
-      alternatives:
+      community.general.alternatives:
         name: dummy
         path: '/usr/bin/dummy{{ item }}'
       register: alternative

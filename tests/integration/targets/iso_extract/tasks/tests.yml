@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Extract the iso
-  iso_extract:
+  community.general.iso_extract:
     image: '{{ output_test_dir }}/test.iso'
     dest: '{{ output_test_dir }}'
     files:
@@ -20,7 +20,7 @@
       - iso_extract_test0 is changed
 
 - name: Extract the iso again
-  iso_extract:
+  community.general.iso_extract:
     image: '{{ output_test_dir }}/test.iso'
     dest: '{{ output_test_dir }}'
     files:
@@ -42,7 +42,7 @@
   when: in_check_mode
 
 - name: Extract the iso using files with leading slash
-  iso_extract:
+  community.general.iso_extract:
     image: '{{ output_test_dir }}/test.iso'
     dest: '{{ output_test_dir }}'
     files:

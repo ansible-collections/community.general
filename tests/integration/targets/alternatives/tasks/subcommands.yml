@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Try with subcommands
-  alternatives:
+  community.general.alternatives:
     name: dummymain
     path: '/usr/bin/dummy1'
     link: '/usr/bin/dummymain'
@@ -47,7 +47,7 @@
     var: result.stdout_lines
 
 - name: Subcommands are not removed if not specified
-  alternatives:
+  community.general.alternatives:
     name: dummymain
     path: '/usr/bin/dummy1'
     link: '/usr/bin/dummymain'
@@ -68,7 +68,7 @@
       - cmd.stdout == "dummy2"
 
 - name: Subcommands are removed if set to an empty list
-  alternatives:
+  community.general.alternatives:
     name: dummymain
     path: '/usr/bin/dummy1'
     link: '/usr/bin/dummymain'
@@ -101,7 +101,7 @@
     var: result.stdout_lines
 
 - name: Install other alternative with subcommands
-  alternatives:
+  community.general.alternatives:
     name: dummymain
     path: '/usr/bin/dummy3'
     link: '/usr/bin/dummymain'
@@ -144,7 +144,7 @@
     var: result.stdout_lines
 
 - name: Switch to first alternative
-  alternatives:
+  community.general.alternatives:
     name: dummymain
     path: '/usr/bin/dummy1'
   register: alternative
@@ -184,7 +184,7 @@
     var: result.stdout_lines
 
 - name: Switch to second alternative
-  alternatives:
+  community.general.alternatives:
     name: dummymain
     path: '/usr/bin/dummy3'
   register: alternative

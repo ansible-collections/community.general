@@ -6,7 +6,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a started service in check mode"
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
   become: true
@@ -22,7 +22,7 @@
 
 
 - name: "[{{ item }}] Given a started service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
   become: true
@@ -43,7 +43,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a stopped service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: stopped
   become: true
@@ -62,7 +62,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a stopped service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: stopped
   become: true
@@ -81,7 +81,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a started service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
   become: true
@@ -99,7 +99,7 @@
       - test_4_launchd_start_result.status.status_code == '0'
 
 - name: "[{{ item }}] And when service is started again..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
   become: true

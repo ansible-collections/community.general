@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "Create volume group on first disk"
-  lvg:
+  community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device1 }}"
 
@@ -22,7 +22,7 @@
          ansible_facts.lvm.pvs[loop_device2].vg == ""'
 
 - name: "Extend to second disk AND reduce from the first disk"
-  lvg:
+  community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device2 }}"
 
