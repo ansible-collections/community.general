@@ -17,7 +17,6 @@ skip_list:
   - args
   - avoid-implicit
   - command-instead-of-module
-  - command-instead-of-shell
   - complexity
   - fqcn
   - galaxy
