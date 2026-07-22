@@ -15,7 +15,6 @@ skip_list:
 
   # To be checked and maybe fixed:
   - args
-  - avoid-implicit
   - command-instead-of-module
   - command-instead-of-shell
   - complexity

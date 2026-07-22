@@ -5,8 +5,8 @@
 
 # Regression test for https://github.com/ansible-collections/community.general/pull/2578#issuecomment-868092282
 - name: Create UTF-8 test file
-  ansible.builtin.copy:
-    content: !!binary |
+  community.general.write_binary_file:
+    content: |
       W2FwcDptYWluXQphdmFpbGFibGVfbGFuZ3VhZ2VzID0gZW4gZnIgZXMgZGUgcHQgamEgbHQgemhf
       VFcgaWQgZGEgcHRfQlIgcnUgc2wgaXQgbmxfTkwgdWsgdGEgc2kgY3MgbmIgaHUKIyBGdWxsIGxh
       bmd1YWdlIG5hbWVzIGluIG5hdGl2ZSBsYW5ndWFnZSAoY29tbWEgc2VwYXJhdGVkKQphdmFpbGFi

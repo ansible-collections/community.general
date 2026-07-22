@@ -542,14 +542,14 @@
 
 
 - name: test-value 21 - Create starting ini file
-  ansible.builtin.copy:
+  community.general.write_binary_file:
     # The content below is the following text file with BOM:
     # [section1]
     # var1=aaa
     # var2=bbb
     # [section2]
     # var3=ccc
-    content: !!binary |
+    content: |
       77u/W3NlY3Rpb24xXQp2YXIxPWFhYQp2YXIyPWJiYgpbc2VjdGlvbjJdCnZhcjM9Y2NjCg==
     dest: "{{ output_file }}"
 
