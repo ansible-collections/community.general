@@ -323,7 +323,7 @@ EXAMPLES = r"""
         state: 'running'
 
     - name: Reboot instance forcibly
-      ecs:
+      community.general.ali_instance:
         alicloud_access_key: '{{ alicloud_access_key }}'
         alicloud_secret_key: '{{ alicloud_secret_key }}'
         alicloud_region: '{{ alicloud_region }}'
@@ -332,7 +332,7 @@ EXAMPLES = r"""
         force: '{{ force }}'
 
     - name: Add instances to an security group
-      ecs:
+      community.general.ali_instance:
         alicloud_access_key: '{{ alicloud_access_key }}'
         alicloud_secret_key: '{{ alicloud_secret_key }}'
         alicloud_region: '{{ alicloud_region }}'
