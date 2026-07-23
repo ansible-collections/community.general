@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: request reload with invalid API key
-  memset_dns_reload:
+  community.general.memset_dns_reload:
     api_key: "wa9aerahhie0eekee9iaphoorovooyia"
   ignore_errors: true
   register: result
@@ -21,7 +21,7 @@
       - result is not successful
 
 - name: request reload and poll
-  memset_dns_reload:
+  community.general.memset_dns_reload:
     api_key: "{{ api_key }}"
     poll: true
   register: result

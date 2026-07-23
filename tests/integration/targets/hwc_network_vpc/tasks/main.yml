@@ -23,7 +23,7 @@
 # ----------------------------------------------------------------------------
 # Pre-test setup
 - name: delete a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     identity_endpoint: "{{ identity_endpoint }}"
     user: "{{ user }}"
     password: "{{ password }}"
@@ -35,7 +35,7 @@
     state: absent
 # ----------------------------------------------------------
 - name: create a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     identity_endpoint: "{{ identity_endpoint }}"
     user: "{{ user }}"
     password: "{{ password }}"
@@ -52,7 +52,7 @@
       - result is changed
 # ----------------------------------------------------------------------------
 - name: create a vpc that already exists
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     identity_endpoint: "{{ identity_endpoint }}"
     user: "{{ user }}"
     password: "{{ password }}"
@@ -70,7 +70,7 @@
       - result is not changed
 # ----------------------------------------------------------
 - name: delete a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     identity_endpoint: "{{ identity_endpoint }}"
     user: "{{ user }}"
     password: "{{ password }}"
@@ -87,7 +87,7 @@
       - result is changed
 # ----------------------------------------------------------------------------
 - name: delete a vpc that does not exist
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     identity_endpoint: "{{ identity_endpoint }}"
     user: "{{ user }}"
     password: "{{ password }}"

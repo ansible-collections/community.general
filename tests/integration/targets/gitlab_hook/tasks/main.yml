@@ -14,7 +14,7 @@
     state: present
 
 - name: Create {{ gitlab_project_name }}
-  gitlab_project:
+  community.general.gitlab_project:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -22,7 +22,7 @@
     state: present
 
 - name: Cleanup GitLab hook
-  gitlab_hook:
+  community.general.gitlab_hook:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -31,7 +31,7 @@
     state: absent
 
 - name: Create GitLab Hook
-  gitlab_hook:
+  community.general.gitlab_hook:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -47,7 +47,7 @@
 
 
 - name: Create GitLab Hook ( Idempotency test )
-  gitlab_hook:
+  community.general.gitlab_hook:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -62,7 +62,7 @@
       - gitlab_hook_state_again is not changed
 
 - name: Remove GitLab hook
-  gitlab_hook:
+  community.general.gitlab_hook:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"

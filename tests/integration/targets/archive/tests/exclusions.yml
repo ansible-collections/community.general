@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Archive - exclusion patterns ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_exclusion_patterns.{{ format }}"
     format: "{{ format }}"
@@ -23,7 +23,7 @@
     state: absent
 
 - name: Archive - exclude path ({{ format }})
-  archive:
+  community.general.archive:
     path:
       - "{{ remote_tmp_dir }}/sub/subfile.txt"
       - "{{ remote_tmp_dir }}"

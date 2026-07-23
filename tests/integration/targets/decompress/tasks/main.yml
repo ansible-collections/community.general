@@ -47,7 +47,7 @@
         path: "{{ brew_which.stdout }}"
       register: brew_stat
     - name: "Install package"
-      homebrew:
+      community.general.homebrew:
         name: xz
         state: present
         update_homebrew: false

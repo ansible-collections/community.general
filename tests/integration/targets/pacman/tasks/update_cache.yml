@@ -4,16 +4,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Make sure package cache is updated
-  pacman:
+  community.general.pacman:
     update_cache: true
 
 - name: Update package cache again (should not be changed)
-  pacman:
+  community.general.pacman:
     update_cache: true
   register: update_cache_idem
 
 - name: Update package cache again with force=true (should be changed)
-  pacman:
+  community.general.pacman:
     update_cache: true
     force: true
   register: update_cache_force

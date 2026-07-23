@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get volume information and register it in a variable
-  scaleway_volume_info:
+  community.general.scaleway_volume_info:
     region: par1
   register: volumes
 
@@ -23,7 +23,7 @@
       - volumes is success
 
 - name: Get volume information and register it in a variable (AMS1)
-  scaleway_volume_info:
+  community.general.scaleway_volume_info:
     region: ams1
   register: ams1_volumes
 

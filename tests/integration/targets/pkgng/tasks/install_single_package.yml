@@ -12,7 +12,7 @@
   register: pkgng_install_stat_before
 
 - name: Install package
-  pkgng: &pkgng_install_params
+  community.general.pkgng: &pkgng_install_params
     name: '{{ pkgng_test_pkg_name }}'
     jail: '{{ pkgng_test_jail | default(omit) }}'
     chroot: '{{ pkgng_test_chroot | default(omit) }}'
@@ -20,14 +20,14 @@
   register: pkgng_install
 
 - name: Remove package (checkmode)
-  pkgng:
+  community.general.pkgng:
     <<: *pkgng_install_params
     state: absent
   check_mode: true
   register: pkgng_install_checkmode
 
 - name: Install package (idempotent, cached)
-  pkgng:
+  community.general.pkgng:
     <<: *pkgng_install_params
     cached: true
   register: pkgng_install_idempotent_cached
@@ -41,7 +41,7 @@
   register: pkgng_install_stat_after
 
 - name: Upgrade package (orig, no globs)
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_category }}/{{ pkgng_test_pkg_name }}'
     state: latest
     use_globs: false
@@ -51,7 +51,7 @@
   register: pkgng_upgrade_orig_noglobs
 
 - name: Remove test package (if requested)
-  pkgng:
+  community.general.pkgng:
     <<: *pkgng_install_params
     state: absent
   when: 'pkgng_test_install_cleanup | default(False)'

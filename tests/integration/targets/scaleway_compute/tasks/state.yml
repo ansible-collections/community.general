@@ -5,7 +5,7 @@
 
 - name: Create a server (Check)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     image: '{{ scaleway_image_id }}'
@@ -24,7 +24,7 @@
       - server_creation_check_task is changed
 
 - name: Create a server
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     image: '{{ scaleway_image_id }}'
@@ -44,7 +44,7 @@
       - server_creation_task is changed
 
 - name: Create a server (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     image: '{{ scaleway_image_id }}'
@@ -65,7 +65,7 @@
 
 - name: Patch server tags (Check)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     image: '{{ scaleway_image_id }}'
@@ -86,7 +86,7 @@
       - server_patching_check_task is changed
 
 - name: Patch server tags
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     image: '{{ scaleway_image_id }}'
@@ -108,7 +108,7 @@
       - server_patching_task is changed
 
 - name: Patch server tags (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     image: '{{ scaleway_image_id }}'
@@ -131,7 +131,7 @@
 
 - name: Run it (Check mode)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: running
     image: '{{ scaleway_image_id }}'
@@ -152,7 +152,7 @@
       - server_run_check_task is changed
 
 - name: Run it
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: running
     image: '{{ scaleway_image_id }}'
@@ -174,7 +174,7 @@
       - server_run_task is changed
 
 - name: Run it
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: running
     image: '{{ scaleway_image_id }}'
@@ -197,7 +197,7 @@
 
 - name: Reboot it (Check mode)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: restarted
     image: '{{ scaleway_image_id }}'
@@ -218,7 +218,7 @@
       - server_reboot_check_task is changed
 
 - name: Reboot it
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: restarted
     image: '{{ scaleway_image_id }}'
@@ -241,7 +241,7 @@
 
 - name: Stop it (Check mode)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: stopped
     image: '{{ scaleway_image_id }}'
@@ -262,7 +262,7 @@
       - server_stop_check_task is changed
 
 - name: Stop it
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: stopped
     image: '{{ scaleway_image_id }}'
@@ -284,7 +284,7 @@
       - server_stop_task is changed
 
 - name: Stop it (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: stopped
     image: '{{ scaleway_image_id }}'
@@ -307,7 +307,7 @@
 
 - name: Destroy it (Check mode)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: absent
     image: '{{ scaleway_image_id }}'
@@ -328,7 +328,7 @@
       - server_destroy_check_task is changed
 
 - name: Destroy it
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: absent
     image: '{{ scaleway_image_id }}'
@@ -350,7 +350,7 @@
       - server_destroy_task is changed
 
 - name: Destroy it (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: absent
     image: '{{ scaleway_image_id }}'
@@ -373,7 +373,7 @@
 
 - name: Testing for unauthorized organization
   ignore_errors: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     image: '{{ scaleway_image_id }}'
@@ -392,7 +392,7 @@
 
 - name: Testing for unexisting image
   ignore_errors: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     image: this-image-does-not-exists

@@ -6,12 +6,12 @@
 - ansible.builtin.import_tasks: "setup_file.yml"
 
 - name: getting all system configs
-  git_config_info:
+  community.general.git_config_info:
     scope: system
   register: get_result1
 
 - name: getting all system configs for a key
-  git_config_info:
+  community.general.git_config_info:
     name: user.name
     scope: system
   register: get_result2

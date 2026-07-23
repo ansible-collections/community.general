@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: reload monit when process is missing
-  monit:
+  community.general.monit:
     name: httpd_echo
     state: reloaded
   register: result
@@ -16,7 +16,7 @@
       - result is changed
 
 - name: test process not present
-  monit:
+  community.general.monit:
     name: httpd_echo
     state: present
     timeout: 5
@@ -24,7 +24,7 @@
   failed_when: result is not skip and result is success
 
 - name: test monitor missing process
-  monit:
+  community.general.monit:
     name: httpd_echo
     state: monitored
   register: result
@@ -61,7 +61,7 @@
   delay: 0.5
 
 - name: test process present again
-  monit:
+  community.general.monit:
     name: httpd_echo
     state: present
   register: result

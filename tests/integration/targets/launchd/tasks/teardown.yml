@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: "[{{ item }}] Unload service"
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: unloaded
   become: true

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: stop py1 service
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'pys:py1'
     state: stopped
     # test with 'server_url' parameter
@@ -13,7 +13,7 @@
   when: credentials.username == ''
 
 - name: stop py1 service
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'pys:py1'
     state: stopped
     # test with unix socket
@@ -41,7 +41,7 @@
   failed_when: is_py1_alive is success
 
 - name: try again to stop py1 service (without auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: pys:py1
     state: stopped
     # test with 'server_url' parameter
@@ -50,7 +50,7 @@
   when: credentials.username == ''
 
 - name: try again to stop py1 service (with auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: pys:py1
     state: stopped
     # test with unix socket

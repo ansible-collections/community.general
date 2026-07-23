@@ -14,7 +14,7 @@
     state: present
 
 - name: Create {{ gitlab_project_name }}
-  gitlab_project:
+  community.general.gitlab_project:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"
@@ -61,7 +61,7 @@
       - delete_branch is changed
 
 - name: Clean up {{ gitlab_project_name }}
-  gitlab_project:
+  community.general.gitlab_project:
     server_url: "{{ gitlab_host }}"
     validate_certs: false
     login_token: "{{ gitlab_login_token }}"

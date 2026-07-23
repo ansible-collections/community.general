@@ -10,7 +10,7 @@
 
 # Create a new template
 - name: Create a new network
-  one_vnet:
+  community.general.one_vnet:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -36,7 +36,7 @@
 
 # Updating a network
 - name: Update an existing network
-  one_vnet:
+  community.general.one_vnet:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -61,7 +61,7 @@
 
 # Testing idempotence using the same template as in previous task
 - name: Update an existing network with the same changes again
-  one_vnet:
+  community.general.one_vnet:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -87,7 +87,7 @@
 
 # Deletion of networks
 - name: Delete a nonexisting network
-  one_vnet:
+  community.general.one_vnet:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -101,7 +101,7 @@
       - result is not changed
 
 - name: Delete an existing network
-  one_vnet:
+  community.general.one_vnet:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -116,7 +116,7 @@
 
 # Trying to run with wrong arguments
 - name: Try to create use network with state=present and without the template parameter
-  one_vnet:
+  community.general.one_vnet:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -131,7 +131,7 @@
       - result is failed
 
 - name: Try to create network with template but without specifying the name parameter
-  one_vnet:
+  community.general.one_vnet:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -157,7 +157,7 @@
       - result is failed
 
 - name: Try to use both ID and name at the same time
-  one_vnet:
+  community.general.one_vnet:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"

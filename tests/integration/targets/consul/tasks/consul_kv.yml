@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create a key
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
     value: somevalue
     token: "{{ consul_management_token }}"
@@ -21,7 +21,7 @@
 #       - lookup('community.general.consul_kv', 'somekey', token=consul_management_token) == 'somevalue'
 
 - name: Update a key with the same data
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
     value: somevalue
     token: "{{ consul_management_token }}"
@@ -33,7 +33,7 @@
       - result.data.Value == 'somevalue'
 
 - name: Remove a key from the store
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
     state: absent
     token: "{{ consul_management_token }}"
@@ -45,7 +45,7 @@
       - result.data.Value == 'somevalue'
 
 - name: Remove a non-existant key from the store
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
     state: absent
     token: "{{ consul_management_token }}"

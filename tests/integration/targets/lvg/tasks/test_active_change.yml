@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create volume group on disk device
-  lvg:
+  community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device1 }}"
 
@@ -12,7 +12,7 @@
   loop:
     - lv1
     - lv2
-  lvol:
+  community.general.lvol:
     vg: testvg
     lv: "{{ item }}"
     size: 2m
@@ -21,7 +21,7 @@
   loop:
     - lv1
     - lv2
-  lvol:
+  community.general.lvol:
     vg: testvg
     lv: "{{ item }}"
     snapshot: "{{ item }}_snap"
@@ -38,7 +38,7 @@
       - "'active' == item"
 
 - name: Deactivate volume group
-  lvg:
+  community.general.lvg:
     state: inactive
     vg: testvg
   register: vg_deactivate_result
@@ -54,7 +54,7 @@
       - "'active' not in deactivated_lv_status_result.stdout"
 
 - name: Deactivate volume group again to verify idempotence
-  lvg:
+  community.general.lvg:
     state: inactive
     vg: testvg
   register: repeated_vg_deactivate_result
@@ -65,7 +65,7 @@
       - repeated_vg_deactivate_result is not changed
 
 - name: Activate volume group in check mode
-  lvg:
+  community.general.lvg:
     state: active
     vg: testvg
   register: check_mode_vg_activate_result
@@ -82,7 +82,7 @@
       - "'active' not in check_mode_activate_lv_status_result.stdout"
 
 - name: Activate volume group
-  lvg:
+  community.general.lvg:
     state: active
     vg: testvg
   register: vg_activate_result
@@ -103,7 +103,7 @@
       - "'active' == item"
 
 - name: Activate volume group again to verify idempontency
-  lvg:
+  community.general.lvg:
     state: active
     vg: testvg
   register: repeated_vg_activate_result
@@ -114,13 +114,13 @@
       - repeated_vg_activate_result is not changed
 
 - name: Deactivate lv2 in testvg
-  lvol:
+  community.general.lvol:
     vg: testvg
     lv: lv2
     active: false
 
 - name: Activate volume group again to verify partially activated vg activation
-  lvg:
+  community.general.lvg:
     state: active
     vg: testvg
   register: partial_vg_activate_result
@@ -141,7 +141,7 @@
       - "'active' == item"
 
 - name: Deactivate volume group in check mode
-  lvg:
+  community.general.lvg:
     state: inactive
     vg: testvg
   register: check_mode_vg_deactivate_result

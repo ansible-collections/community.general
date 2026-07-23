@@ -14,13 +14,13 @@
     state: directory
 
 - name: Create EMAIL cron var
-  cronvar:
+  community.general.cronvar:
     name: EMAIL
     value: doug@ansibmod.con.com
   register: create_cronvar1
 
 - name: Create EMAIL cron var again
-  cronvar:
+  community.general.cronvar:
     name: EMAIL
     value: doug@ansibmod.con.com
   register: create_cronvar2
@@ -30,7 +30,7 @@
   register: varcheck1
 
 - name: Modify EMAIL cron var
-  cronvar:
+  community.general.cronvar:
     name: EMAIL
     value: jane@ansibmod.con.com
   register: create_cronvar3
@@ -40,13 +40,13 @@
   register: varcheck2
 
 - name: Remove EMAIL cron var
-  cronvar:
+  community.general.cronvar:
     name: EMAIL
     state: absent
   register: remove_cronvar1
 
 - name: Remove EMAIL cron var again
-  cronvar:
+  community.general.cronvar:
     name: EMAIL
     state: absent
   register: remove_cronvar2
@@ -57,14 +57,14 @@
   failed_when: varcheck3.rc == 0
 
 - name: Add cron var to custom file
-  cronvar:
+  community.general.cronvar:
     name: TESTVAR
     value: somevalue
     cron_file: cronvar_test
   register: custom_cronfile1
 
 - name: Add cron var to custom file again
-  cronvar:
+  community.general.cronvar:
     name: TESTVAR
     value: somevalue
     cron_file: cronvar_test
@@ -75,7 +75,7 @@
   register: custom_varcheck1
 
 - name: Change cron var in custom file
-  cronvar:
+  community.general.cronvar:
     name: TESTVAR
     value: newvalue
     cron_file: cronvar_test
@@ -86,7 +86,7 @@
   register: custom_varcheck2
 
 - name: Remove cron var from custom file
-  cronvar:
+  community.general.cronvar:
     name: TESTVAR
     value: newvalue
     cron_file: cronvar_test
@@ -94,7 +94,7 @@
   register: custom_remove_cronvar1
 
 - name: Remove cron var from custom file again
-  cronvar:
+  community.general.cronvar:
     name: TESTVAR
     value: newvalue
     cron_file: cronvar_test
@@ -141,7 +141,7 @@
       'EMPTY_VAR=""' in result.stdout
 
 - name: Attempt to add cron variable to non-existent parent directory
-  cronvar:
+  community.general.cronvar:
     name: NOPARENT_VAR
     value: noparentval
     cron_file: /nonexistent/foo

@@ -6,7 +6,7 @@
 # - ansible.builtin.import_tasks: setup_no_value.yml
 
 - name: setting value
-  git_config:
+  community.general.git_config:
     name: core.hooksPath
     value: '~/foo/bar'
     state: present
@@ -14,7 +14,7 @@
   register: set_result1
 
 - name: setting value again
-  git_config:
+  community.general.git_config:
     name: core.hooksPath
     value: '~/foo/bar'
     state: present
@@ -22,7 +22,7 @@
   register: set_result2
 
 - name: getting value
-  git_config_info:
+  community.general.git_config_info:
     name: core.hooksPath
     scope: global
   register: get_result

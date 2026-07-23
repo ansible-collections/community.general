@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Add an alternative with a family
-  alternatives:
+  community.general.alternatives:
     name: dummy
     path: /usr/bin/dummy1
     link: /usr/bin/dummy
@@ -16,7 +16,7 @@
   ansible.builtin.shell: 'grep family1 {{ alternatives_dir }}/dummy'
 
 - name: Add two alternatives with different families
-  alternatives:
+  community.general.alternatives:
     name: dummy
     path: '/usr/bin/dummy{{ item.n }}'
     link: /usr/bin/dummy
@@ -30,7 +30,7 @@
 
 # Here we select the whole family of alternatives
 - name: Set family as an alternatives
-  alternatives:
+  community.general.alternatives:
     name: dummy
     family: family2
     state: selected
@@ -50,7 +50,7 @@
       - cmd.stdout == "dummy2"
 
 - name: Remove the alternative with the highest priority that belongs to the family
-  alternatives:
+  community.general.alternatives:
     name: dummy
     path: '/usr/bin/dummy2'
     state: absent

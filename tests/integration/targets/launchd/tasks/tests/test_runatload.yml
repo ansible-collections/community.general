@@ -6,7 +6,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a started service with RunAtLoad set to true..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
     enabled: true

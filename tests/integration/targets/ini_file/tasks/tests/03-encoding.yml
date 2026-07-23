@@ -17,7 +17,7 @@
       jSwg4LeD4LeS4LaC4LeE4La9LCDEjGVza3ksIEJva23DpWwsIE1hZ3lhcgo=
     dest: '{{ output_file }}'
 - name: Add entries
-  ini_file:
+  community.general.ini_file:
     section: "{{ item.section }}"
     option: "{{ item.option }}"
     value: "{{ item.value }}"

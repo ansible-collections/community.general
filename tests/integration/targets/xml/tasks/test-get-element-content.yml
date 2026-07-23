@@ -10,7 +10,7 @@
 
 
 - name: Get element attributes
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     content: attribute
@@ -24,7 +24,7 @@
       - get_element_attribute.matches[0]['rating']['subjective'] == 'true'
 
 - name: Get element attributes (should fail)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     content: attribute
@@ -38,7 +38,7 @@
       - get_element_attribute_wrong is failed
 
 - name: Get element text
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     content: text

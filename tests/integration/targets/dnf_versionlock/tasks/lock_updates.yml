@@ -27,7 +27,7 @@
           - clear_locklist.locklist_post | length == 0
 
     - name: Lock packages with updates
-      dnf_versionlock:
+      community.general.dnf_versionlock:
         name: "{{ _packages }}"
         state: present
       register: lock_packages
@@ -49,7 +49,7 @@
           - update_locked_packages is not changed
 
     - name: Unlock packages with updates
-      dnf_versionlock:
+      community.general.dnf_versionlock:
         name: "{{ _packages }}"
         state: absent
       register: unlock_packages

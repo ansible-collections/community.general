@@ -168,7 +168,7 @@
     mode: '0644'
 
 - name: Generate locales (Debian)
-  locale_gen:
+  community.general.locale_gen:
     name: '{{ item }}'
     state: present
   with_items:

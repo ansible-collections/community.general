@@ -11,7 +11,7 @@
     content: "[foo]\n; bar=baz\n"
 
 - name: test-ignore_spaces 1 - set new value
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: foo
     option: bar
@@ -40,7 +40,7 @@
     content: "[foo]\nbar=baz\n"
 
 - name: test-ignore_spaces 2 - set new value
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: foo
     option: bar
@@ -69,7 +69,7 @@
     content: "[foo]\nbar=baz\n"
 
 - name: test-ignore_spaces 3 - try to set value
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: foo
     option: bar
@@ -98,7 +98,7 @@
     content: "[foo]\nbar = baz\n"
 
 - name: test-ignore_spaces 4 - try to set value
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: foo
     option: bar

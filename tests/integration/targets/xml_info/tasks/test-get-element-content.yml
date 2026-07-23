@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get element attributes
-  xml_info:
+  community.general.xml_info:
     path: /tmp/ansible-xml-info-beers.xml
     xpath: /business/rating
     what: content_attributes
@@ -19,7 +19,7 @@
       - get_element_attribute.content_attributes[0].attributes.subjective == 'true'
 
 - name: Get element text
-  xml_info:
+  community.general.xml_info:
     path: /tmp/ansible-xml-info-beers.xml
     xpath: /business/rating
     what: content_text

@@ -16,7 +16,7 @@
     foobarrc: "/etc/foobarrc"
 
 - name: "remove foobarrc diversion"
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
   become: true

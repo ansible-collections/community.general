@@ -8,7 +8,7 @@
     username: ansible-regular-user
   block:
     - name: Install dependencies
-      pacman:
+      community.general.pacman:
         state: present
         name:
           - fakeroot
@@ -44,13 +44,13 @@
         chdir: '/home/{{ username }}/{{ package_name }}'
 
     - name: Install package
-      pacman:
+      community.general.pacman:
         state: present
         name:
           - '/home/{{ username }}/{{ package_name }}/{{ package_name }}-1.0.0-1-any.pkg.tar.zst'
 
     - name: Remove package (check mode)
-      pacman:
+      community.general.pacman:
         state: absent
         name:
           - '{{ package_name }}'
@@ -58,14 +58,14 @@
       register: remove_1
 
     - name: Remove package
-      pacman:
+      community.general.pacman:
         state: absent
         name:
           - '{{ package_name }}'
       register: remove_2
 
     - name: Remove package (idempotent)
-      pacman:
+      community.general.pacman:
         state: absent
         name:
           - '{{ package_name }}'

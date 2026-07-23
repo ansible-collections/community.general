@@ -9,7 +9,7 @@
     state: present
 
 - name: MQTT non-TLS endpoint
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo
     qos: 1
@@ -21,7 +21,7 @@
       - result is success
 
 - name: Send a test message to TLS1.1 endpoint, no client version specified
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo-tls
     qos: 1
@@ -37,7 +37,7 @@
       - result is success
 
 - name: Send a test message to TLS1.2 endpoint, no client version specified
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo-tls
     qos: 1
@@ -55,7 +55,7 @@
 # TODO(Uncomment when TLS1.3 is supported in moquitto and ubuntu version)
 #
 # - name: Send a test message to TLS1.3 endpoint
-#  mqtt:
+#  community.general.mqtt:
 #    topic: /node/s/bar/blurb
 #    payload: foo-tls
 #    qos: 1
@@ -71,7 +71,7 @@
 #       - result is success
 
 - name: Send a message, client TLS1.1, server (required) TLS1.2 - Expected failure
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo-tls
     qos: 1
@@ -91,7 +91,7 @@
 # TODO(Uncomment when TLS1.3 is supported in moquitto and ubuntu version)
 #
 # - name: Send a message, client TLS1.1, server (required) TLS1.3 - Expected failure
-#  mqtt:
+#  community.general.mqtt:
 #    topic: /node/s/bar/blurb
 #    payload: foo-tls
 #    qos: 1
@@ -109,7 +109,7 @@
 #      - result is success
 
 - name: Send a message, client TLS1.2, server (required) TLS1.1 - Expected failure
-  mqtt:
+  community.general.mqtt:
     topic: /node/s/bar/blurb
     payload: foo-tls
     qos: 1
@@ -129,7 +129,7 @@
 # TODO(Uncomment when TLS1.3 is supported in moquitto and ubuntu version)
 #
 # - name: Send a message, client TLS1.2, server (required) TLS1.3 - Expected failure
-#  mqtt:
+#  community.general.mqtt:
 #    topic: /node/s/bar/blurb
 #    payload: foo-tls
 #    qos: 1

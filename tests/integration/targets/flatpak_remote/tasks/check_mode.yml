@@ -8,7 +8,7 @@
 # state=present
 
 - name: Test addition of absent flatpak remote (check mode)
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     state: present
@@ -22,7 +22,7 @@
     msg: "Adding an absent flatpak remote shall mark module execution as changed"
 
 - name: Test non-existent idempotency of addition of absent flatpak remote (check mode)
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     state: present
@@ -42,7 +42,7 @@
 # state=absent
 
 - name: Test removal of absent flatpak remote not doing anything in check mode
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flatpak-test
     state: absent
   register: removal_result
@@ -60,7 +60,7 @@
 # state=present
 
 - name: Test addition of present flatpak remote (check mode)
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-test-remote
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     state: present
@@ -76,7 +76,7 @@
 # state=absent
 
 - name: Test removal of present flatpak remote not doing anything in check mode
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-test-remote
     state: absent
   register: removal_result
@@ -89,7 +89,7 @@
     msg: "Removing a present flatpak remote shall mark module execution as changed"
 
 - name: Test non-existent idempotency of removal of present flatpak remote (check mode)
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-test-remote
     state: absent
   register: double_removal_result
@@ -111,7 +111,7 @@
 # enabled=true
 
 - name: Test activation of disabled flatpak remote (check mode)
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-disabled-test-remote
     enabled: true
   register: activation_result
@@ -124,7 +124,7 @@
     msg: "Enabling an disabled flatpak remote shall mark module execution as changed"
 
 - name: Test non-existent idempotency of activation of disabled flatpak remote (check mode)
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-disabled-test-remote
     enabled: true
   register: double_activation_result
@@ -143,7 +143,7 @@
 # enabled=false
 
 - name: Test deactivation of disabled flatpak remote not doing anything in check mode
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-disabled-test-remote
     enabled: false
   register: deactivation_result
@@ -161,7 +161,7 @@
 # enabled=true
 
 - name: Test activation of enabled flatpak remote (check mode)
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-enabled-test-remote
     enabled: true
   register: activation_result
@@ -176,7 +176,7 @@
 # enabled=false
 
 - name: Test deactivation of enabled flatpak remote not doing anything in check mode
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-enabled-test-remote
     enabled: false
   register: deactivation_result
@@ -189,7 +189,7 @@
     msg: "Disabling a enabled flatpak remote shall mark module execution as changed"
 
 - name: Test non-existent idempotency of deactivation of enabled flatpak remote (check mode)
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: check-mode-enabled-test-remote
     enabled: false
   register: double_deactivation_result

@@ -10,13 +10,13 @@
 
 # Pre-test setup
 - name: create a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
     state: present
   register: vpc
 - name: delete a subnet
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -25,7 +25,7 @@
     state: absent
 # ---------------------------------------------------------
 - name: create a subnet (check mode)
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -41,7 +41,7 @@
       - result.changed
 # ---------------------------------------------------------
 - name: create a subnet
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -55,7 +55,7 @@
       result is changed
 # ---------------------------------------------------------
 - name: create a subnet (idemponent)
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -70,7 +70,7 @@
       - not result.changed
 # ----------------------------------------------------------------------------
 - name: create a subnet that already exists
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -85,7 +85,7 @@
       - result is not changed
 # ---------------------------------------------------------
 - name: delete a subnet (check mode)
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -100,7 +100,7 @@
       - result is changed
 # ---------------------------------------------------------
 - name: delete a subnet
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -114,7 +114,7 @@
       - result is changed
 # ---------------------------------------------------------
 - name: delete a subnet (idemponent)
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -129,7 +129,7 @@
       - not result.changed
 # ----------------------------------------------------------------------------
 - name: delete a subnet that does not exist
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"
@@ -145,7 +145,7 @@
 # --------------------------------------------------------
 # Post-test teardown
 - name: delete a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
     state: absent

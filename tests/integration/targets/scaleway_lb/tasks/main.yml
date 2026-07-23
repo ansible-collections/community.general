@@ -10,7 +10,7 @@
 
 - name: Create a load-balancer (Check)
   check_mode: true
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: present
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
@@ -33,7 +33,7 @@
       - lb_creation_check_task is changed
 
 - name: Create load-balancer
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: present
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
@@ -62,7 +62,7 @@
       - lb_creation_task.scaleway_lb.status == "ready"
 
 - name: Create load-balancer (Confirmation)
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: present
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
@@ -91,7 +91,7 @@
 
 - name: Update load-balancer (Check)
   check_mode: true
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: present
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
@@ -114,7 +114,7 @@
       - lb_update_check_task is changed
 
 - name: Update load-balancer
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: present
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
@@ -143,7 +143,7 @@
       - lb_update_task.scaleway_lb.status == "ready"
 
 - name: Update load-balancer (Confirmation)
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: present
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
@@ -172,7 +172,7 @@
 
 - name: Delete load-balancer (Check)
   check_mode: true
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: absent
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
@@ -191,7 +191,7 @@
       - lb_deletion_check_task is changed
 
 - name: Delete load-balancer
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: absent
     name: '{{ name }}'
     region: '{{ scaleway_region }}'
@@ -211,7 +211,7 @@
       - lb_deletion_task is changed
 
 - name: Delete load-balancer (Confirmation)
-  scaleway_lb:
+  community.general.scaleway_lb:
     state: absent
     name: '{{ name }}'
     region: '{{ scaleway_region }}'

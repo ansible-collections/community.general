@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Count beer elements
-  xml_info:
+  community.general.xml_info:
     path: /tmp/ansible-xml-info-beers.xml
     xpath: /business/beers/beer
     what: count
@@ -17,7 +17,7 @@
       - beers.count == 3
 
 - name: Count beer elements with xpath count mode
-  xml_info:
+  community.general.xml_info:
     path: /tmp/ansible-xml-info-beers.xml
     xpath: /business/beers/beer
     what: count

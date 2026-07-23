@@ -18,7 +18,7 @@
   changed_when: false
 
 - name: Install ezjail
-  pkgng:
+  community.general.pkgng:
     name: ezjail
 
 - name: Configure ezjail to use http

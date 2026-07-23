@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: list sessions
-  consul_session:
+  community.general.consul_session:
     state: list
   register: result
 
@@ -14,7 +14,7 @@
       - "'sessions' in result"
 
 - name: create a session
-  consul_session:
+  community.general.consul_session:
     state: present
     name: testsession
   register: result
@@ -29,7 +29,7 @@
     session_id: "{{ result['session_id'] }}"
 
 - name: list sessions after creation
-  consul_session:
+  community.general.consul_session:
     state: list
   register: result
 
@@ -42,7 +42,7 @@
       - (result['sessions'] | selectattr('ID', 'match', '^' ~ session_id ~ '$') | first)['Name'] == 'testsession'
 
 - name: fetch info about a session
-  consul_session:
+  community.general.consul_session:
     state: info
     id: '{{ session_id }}'
   register: result
@@ -52,7 +52,7 @@
       - result is changed
 
 - name: ensure 'id' parameter is required when state=info
-  consul_session:
+  community.general.consul_session:
     state: info
     name: test
   register: result
@@ -63,7 +63,7 @@
       - result is failed
 
 - name: delete a session
-  consul_session:
+  community.general.consul_session:
     state: absent
     id: '{{ session_id }}'
   register: result
@@ -73,7 +73,7 @@
       - result is changed
 
 - name: list sessions after deletion
-  consul_session:
+  community.general.consul_session:
     state: list
   register: result
 
@@ -83,7 +83,7 @@
       - (result['sessions'] | selectattr('ID', 'equalto', session_id) | list | length) == 0
 
 - name: ensure session can be created with a ttl
-  consul_session:
+  community.general.consul_session:
     state: present
     name: session-with-ttl
     ttl: 180  # sec

@@ -26,7 +26,7 @@
   when: "ansible_facts.os_family == 'Suse'"
 
 - name: Enable mod_slotmem_shm on SuSE
-  apache2_module:
+  community.general.apache2_module:
     name: slotmem_shm
     state: present
   when: "ansible_facts.os_family == 'Suse'"

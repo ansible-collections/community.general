@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get organization information and register it in a variable
-  scaleway_organization_info:
+  community.general.scaleway_organization_info:
   register: organizations
 
 - name: Display organizations variable

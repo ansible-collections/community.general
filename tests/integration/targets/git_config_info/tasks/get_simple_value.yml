@@ -6,21 +6,21 @@
 - ansible.builtin.include_tasks: "{{ item.import_file }}"
 
 - name: getting simple file value1
-  git_config_info:
+  community.general.git_config_info:
     name: user.name
     scope: "{{ item.git_scope }}"
     path: "{{ item.git_file | default(omit) }}"
   register: get_result1
 
 - name: getting simple file value2
-  git_config_info:
+  community.general.git_config_info:
     name: "credential.https://some.com.username"
     scope: "{{ item.git_scope }}"
     path: "{{ item.git_file | default(omit) }}"
   register: get_result2
 
 - name: getting not existing value
-  git_config_info:
+  community.general.git_config_info:
     name: "user.email"
     scope: "{{ item.git_scope }}"
     path: "{{ item.git_file | default(omit) }}"

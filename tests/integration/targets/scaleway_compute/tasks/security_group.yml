@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create a scaleway security_group
-  scaleway_security_group:
+  community.general.scaleway_security_group:
     state: present
     region: '{{ scaleway_region }}'
     name: test_compute
@@ -22,7 +22,7 @@
 - block:
     - name: Create a server with security_group (Check)
       check_mode: true
-      scaleway_compute:
+      community.general.scaleway_compute:
         name: '{{ scaleway_name }}'
         state: present
         image: '{{ scaleway_image_id }}'
@@ -42,7 +42,7 @@
           - server_creation_check_task is changed
 
     - name: Create a server
-      scaleway_compute:
+      community.general.scaleway_compute:
         name: '{{ scaleway_name }}'
         state: present
         image: '{{ scaleway_image_id }}'
@@ -63,7 +63,7 @@
           - server_creation_task is changed
 
     - name: Create a server with security_group (Confirmation)
-      scaleway_compute:
+      community.general.scaleway_compute:
         name: '{{ scaleway_name }}'
         state: present
         image: '{{ scaleway_image_id }}'
@@ -85,7 +85,7 @@
 
     - name: Keep current security_group (Check)
       check_mode: true
-      scaleway_compute:
+      community.general.scaleway_compute:
         name: '{{ scaleway_name }}'
         state: present
         image: '{{ scaleway_image_id }}'
@@ -106,7 +106,7 @@
           - server_creation_confirmation_task is not changed
 
     - name: Keep current security_group
-      scaleway_compute:
+      community.general.scaleway_compute:
         name: '{{ scaleway_name }}'
         state: present
         image: '{{ scaleway_image_id }}'
@@ -127,7 +127,7 @@
 
   always:
     - name: Destroy it
-      scaleway_compute:
+      community.general.scaleway_compute:
         name: '{{ scaleway_name }}'
         state: absent
         image: '{{ scaleway_image_id }}'
@@ -147,7 +147,7 @@
           - server_destroy_task is changed
 
     - name: Create a scaleway security_group
-      scaleway_security_group:
+      community.general.scaleway_security_group:
         state: absent
         region: '{{ scaleway_region }}'
         name: test_compute

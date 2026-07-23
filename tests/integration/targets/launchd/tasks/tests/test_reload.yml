@@ -6,7 +6,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a started service in check_mode"
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
   become: true
@@ -20,7 +20,7 @@
       - test_1_launchd_start_result_check_mode is changed
 
 - name: "[{{ item }}] Given a started service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
   become: true
@@ -40,7 +40,7 @@
   become: true
 
 - name: "[{{ item }}] When reloading the service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: reloaded
   become: true
@@ -57,7 +57,7 @@
       - test_1_launchd_reload_result.status.current_pid == '-'
 
 - name: "[{{ item }}] Start the service with the new configuration..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
   become: true

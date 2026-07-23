@@ -10,21 +10,21 @@
 
 
 - name: Add 2nd '/business/rating' with value 'пять'
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business
     add_children:
       - rating: пять
 
 - name: Set '/business/rating' to 'пять'
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     value: пять
   register: set_element_first_run
 
 - name: Set '/business/rating' to 'false'... again
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     value: пять

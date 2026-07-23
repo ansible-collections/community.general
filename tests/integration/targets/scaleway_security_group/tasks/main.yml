@@ -10,7 +10,7 @@
 
 - name: Create security group check
   check_mode: true
-  scaleway_security_group:
+  community.general.scaleway_security_group:
     state: present
     region: '{{ scaleway_region }}'
     name: security_group
@@ -33,7 +33,7 @@
 
 - block:
     - name: Create security group
-      scaleway_security_group:
+      community.general.scaleway_security_group:
         state: present
         region: '{{ scaleway_region }}'
         name: security_group
@@ -55,7 +55,7 @@
           - security_group_creation is changed
 
     - name: Create security group duplicate
-      scaleway_security_group:
+      community.general.scaleway_security_group:
         state: present
         region: '{{ scaleway_region }}'
         name: security_group
@@ -78,7 +78,7 @@
 
     - name: Delete security group check
       check_mode: true
-      scaleway_security_group:
+      community.general.scaleway_security_group:
         state: absent
         region: '{{ scaleway_region }}'
         name: security_group
@@ -101,7 +101,7 @@
 
   always:
     - name: Delete security group
-      scaleway_security_group:
+      community.general.scaleway_security_group:
         state: absent
         region: '{{ scaleway_region }}'
         name: security_group
@@ -123,7 +123,7 @@
           - security_group_deletion is changed
 
 - name: Delete security group duplicate
-  scaleway_security_group:
+  community.general.scaleway_security_group:
     state: absent
     region: '{{ scaleway_region }}'
     name: security_group

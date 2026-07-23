@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: run check deploy nomad job
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: present
     use_ssl: false
@@ -13,7 +13,7 @@
   check_mode: true
 
 - name: run create nomad job
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: present
     use_ssl: false
@@ -22,14 +22,14 @@
   register: job_deployed
 
 - name: get nomad job deployed
-  nomad_job_info:
+  community.general.nomad_job_info:
     host: localhost
     use_ssl: false
     name: example
   register: get_nomad_job
 
 - name: get list of nomad jobs
-  nomad_job_info:
+  community.general.nomad_job_info:
     host: localhost
     use_ssl: false
   register: list_nomad_jobs
@@ -43,7 +43,7 @@
       - list_nomad_jobs.result | length == 1
 
 - name: run check deploy job idempotence
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: present
     use_ssl: false
@@ -52,7 +52,7 @@
   check_mode: true
 
 - name: run create nomad job idempotence
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: present
     use_ssl: false
@@ -60,7 +60,7 @@
   register: job_deployed_idempotence
 
 - name: get list of nomad jobs
-  nomad_job_info:
+  community.general.nomad_job_info:
     host: localhost
     use_ssl: false
   register: list_nomad_jobs
@@ -69,7 +69,7 @@
     msg: "{{ list_nomad_jobs }}"
 
 - name: run check delete nomad job
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: absent
     use_ssl: false
@@ -78,7 +78,7 @@
   check_mode: true
 
 - name: run delete nomad job
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: absent
     use_ssl: false
@@ -86,14 +86,14 @@
   register: job_deleted
 
 - name: get job deleted
-  nomad_job_info:
+  community.general.nomad_job_info:
     host: localhost
     use_ssl: false
     name: example
   register: get_job_delete
 
 - name: get list of nomad jobs
-  nomad_job_info:
+  community.general.nomad_job_info:
     host: localhost
     use_ssl: false
   register: list_nomad_jobs

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create a policy with rules
-  consul_policy:
+  community.general.consul_policy:
     name: foo-access
     rules: |
         key "foo" {
@@ -22,7 +22,7 @@
       - result.operation == 'create'
 
 - name: Update the rules associated to a policy
-  consul_policy:
+  community.general.consul_policy:
     name: foo-access
     rules: |
         key "foo" {
@@ -42,7 +42,7 @@
       - result.operation == 'update'
 
 - name: Update reports not changed when updating again without changes
-  consul_policy:
+  community.general.consul_policy:
     name: foo-access
     rules: |
         key "foo" {
@@ -62,7 +62,7 @@
       - result.operation is not defined
 
 - name: Remove a policy
-  consul_policy:
+  community.general.consul_policy:
     name: foo-access
     state: absent
   register: result

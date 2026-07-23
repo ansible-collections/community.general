@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: start py1 service (without auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'pys:py1'
     state: started
     config: '{{ remote_dir }}/supervisord.conf'
@@ -12,7 +12,7 @@
   when: credentials.username == ''
 
 - name: start py1 service (with auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'pys:py1'
     state: started
     server_url: http://127.0.0.1:9001
@@ -37,7 +37,7 @@
     executable: "{{ ansible_facts.python.executable }}"
 
 - name: try again to start py1 service (without auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: pys:py1
     state: started
     config: '{{ remote_dir }}/supervisord.conf'
@@ -45,7 +45,7 @@
   when: credentials.username == ''
 
 - name: try again to start py1 service (with auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: pys:py1
     state: started
     server_url: http://127.0.0.1:9001
@@ -70,7 +70,7 @@
 - ansible.builtin.import_tasks: start_supervisord.yml
 
 - name: start py1 service (without auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'pys:py1'
     state: started
     config: '{{ remote_dir }}/supervisord.conf'
@@ -78,7 +78,7 @@
   when: credentials.username == ''
 
 - name: start py1 service (with auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'pys:py1'
     state: started
     server_url: http://127.0.0.1:9001
@@ -96,7 +96,7 @@
 #############################################################
 
 - name: Check an error occurs when wrong credentials are used
-  supervisorctl:
+  community.general.supervisorctl:
     name: pys:py1
     state: started
     server_url: http://127.0.0.1:9001
@@ -107,7 +107,7 @@
   when: credentials.username != ''
 
 - name: Check an error occurs when wrong URL is used
-  supervisorctl:
+  community.general.supervisorctl:
     name: pys:py1
     state: started
     server_url: http://127.0.0.1:9002
@@ -115,7 +115,7 @@
   failed_when: result is success or result is not failed
 
 - name: Check an error occurs when wrong config path is used
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'pys:py1'
     state: started
     config: '{{ remote_dir }}/supervisord_not_here.conf'
@@ -123,7 +123,7 @@
   failed_when: result is success or result is not failed
 
 - name: Check an error occurs wrong name is used (without auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'invalid'
     state: started
     config: '{{ remote_dir }}/supervisord.conf'
@@ -132,7 +132,7 @@
   when: credentials.username == ''
 
 - name: Check an error occurs wrong name is used (with auth)
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'invalid'
     state: started
     config: '{{ remote_dir }}/supervisord.conf'

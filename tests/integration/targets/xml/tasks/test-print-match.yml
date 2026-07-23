@@ -9,7 +9,7 @@
     dest: /tmp/ansible-xml-beers.xml
 
 - name: print_match returns matching xpath paths in matches
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/beers/beer
     print_match: true
@@ -25,7 +25,7 @@
       - "'/business/beers/beer[3]' in print_match_result.matches"
 
 - name: print_match with no matches returns empty matches list
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/nonexistent
     print_match: true

@@ -19,7 +19,7 @@
   register: brew_stat
 
 # - name: Use ignored-pinned option while upgrading all
-#   homebrew:
+#   community.general.homebrew:
 #     upgrade_all: true
 #     upgrade_options: ignore-pinned
 #   become: true
@@ -37,14 +37,14 @@
 
   block:
     - name: Make sure {{ package_name }} package is not installed
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: absent
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
     - name: Install {{ package_name }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: present
       become: true
@@ -59,7 +59,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Again install {{ package_name }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: present
       become: true
@@ -74,7 +74,7 @@
           - "package_result.unchanged_pkgs == ['gnu-tar']"
 
     - name: Unlink {{ package_name }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: unlinked
       become: true
@@ -89,7 +89,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Link {{ package_name }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: linked
       become: true
@@ -104,7 +104,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Uninstall {{ package_name }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: absent
       become: true
@@ -119,7 +119,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Again uninstall {{ package_name }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: absent
       become: true
@@ -134,7 +134,7 @@
           - "package_result.unchanged_pkgs == ['gnu-tar']"
 
     - name: Upgrade {{ package_name }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: latest
       become: true
@@ -149,7 +149,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Again upgrade {{ package_name }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_name }}"
         state: latest
       become: true
@@ -170,21 +170,21 @@
 
   block:
     - name: Make sure {{ package_names }} packages are not installed
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: absent
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
     - name: Install only {{ package_names[0] }} package using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names[0] }}"
         state: present
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
     - name: Install {{ package_names }} packages using homebrew (one is already installed)
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: present
       become: true
@@ -199,7 +199,7 @@
           - "package_result.unchanged_pkgs == ['gnu-tar']"
 
     - name: Again install {{ package_names }} packages using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: present
       become: true
@@ -214,7 +214,7 @@
           - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
 
     - name: Unlink {{ package_names }} packages using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: unlinked
       become: true
@@ -229,7 +229,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Link {{ package_names }} packages using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: linked
       become: true
@@ -244,7 +244,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Uninstall {{ package_names }} packages using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: absent
       become: true
@@ -259,7 +259,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Again uninstall {{ package_names }} packages using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: absent
       become: true
@@ -274,7 +274,7 @@
           - "package_result.unchanged_pkgs | sort == ['gnu-tar', 'gnu-time']"
 
     - name: Upgrade {{ package_names }} packages using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: latest
       become: true
@@ -289,7 +289,7 @@
           - "package_result.unchanged_pkgs == []"
 
     - name: Again upgrade {{ package_names }} packages using homebrew
-      homebrew:
+      community.general.homebrew:
         name: "{{ package_names }}"
         state: latest
       become: true
@@ -333,7 +333,7 @@
           - "terraform_install_result.unchanged_pkgs == []"
 
     - name: Remove terraform
-      homebrew:
+      community.general.homebrew:
         name: hashicorp/tap/terraform
         state: absent
       become: true
@@ -401,7 +401,7 @@
           - "ascii_reinstall_result.unchanged_pkgs == ['thezoraiz/ascii-image-converter/ascii-image-converter']"
 
     - name: Remove ascii from full tap name
-      homebrew:
+      community.general.homebrew:
         name: TheZoraiz/ascii-image-converter/ascii-image-converter
         state: absent
       register: ascii_uninstall_result
@@ -416,7 +416,7 @@
           - "ascii_uninstall_result.unchanged_pkgs == []"
 
     - name: Again remove ascii from full tap name
-      homebrew:
+      community.general.homebrew:
         name: TheZoraiz/ascii-image-converter/ascii-image-converter
         state: absent
       register: ascii_again_uninstall_result
@@ -447,7 +447,7 @@
           - "ascii_install_result.unchanged_pkgs == []"
 
     - name: Remove ascii from regular name
-      homebrew:
+      community.general.homebrew:
         name: ascii-image-converter
         state: absent
       become: true

@@ -28,7 +28,7 @@
 
 # UNINSTALL
 - name: uninstall hello
-  zypper:
+  community.general.zypper:
     name: hello
     state: removed
   register: zypper_result
@@ -51,7 +51,7 @@
 
 # UNINSTALL AGAIN
 - name: uninstall hello again
-  zypper:
+  community.general.zypper:
     name: hello
     state: removed
   register: zypper_result
@@ -63,7 +63,7 @@
 
 # INSTALL
 - name: install hello
-  zypper:
+  community.general.zypper:
     name: hello
     state: present
   register: zypper_result
@@ -87,7 +87,7 @@
 
 # INSTALL AGAIN
 - name: install hello again
-  zypper:
+  community.general.zypper:
     name: hello
     state: present
   register: zypper_result
@@ -99,7 +99,7 @@
 
 # Multiple packages
 - name: uninstall hello and metamail
-  zypper:
+  community.general.zypper:
     name:
       - hello
       - metamail
@@ -123,7 +123,7 @@
       - "rpm_metamail_result.rc != 0"
 
 - name: install hello and metamail
-  zypper:
+  community.general.zypper:
     name:
       - hello
       - metamail
@@ -149,7 +149,7 @@
       - "rpm_metamail_result.rc == 0"
 
 - name: uninstall hello and metamail
-  zypper:
+  community.general.zypper:
     name:
       - hello
       - metamail
@@ -157,7 +157,7 @@
 
 # INSTALL nonexistent package
 - name: install hello from url
-  zypper:
+  community.general.zypper:
     name: doesnotexist
     state: present
   register: zypper_result
@@ -181,7 +181,7 @@
     state: touch
 
 - name: install broken rpm
-  zypper:
+  community.general.zypper:
     name: "{{remote_tmp_dir | expanduser}}/zypper1/broken.rpm"
     state: present
   register: zypper_result
@@ -198,12 +198,12 @@
 
 # Build and install an empty rpm
 - name: uninstall empty
-  zypper:
+  community.general.zypper:
     name: empty
     state: removed
 
 - name: install rpmbuild
-  zypper:
+  community.general.zypper:
     name: rpmbuild
     state: present
 
@@ -235,7 +235,7 @@
   register: rpm_build_result
 
 - name: install empty rpm
-  zypper:
+  community.general.zypper:
     name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/empty-1-0.noarch.rpm"
     disable_gpg_check: true
   register: zypper_result
@@ -253,12 +253,12 @@
       - "rpm_result.rc == 0"
 
 - name: uninstall empty
-  zypper:
+  community.general.zypper:
     name: empty
     state: removed
 
 - name: extract from rpm
-  zypper:
+  community.general.zypper:
     name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/empty-1-0.noarch.rpm"
     state: installed
     disable_gpg_check: true
@@ -276,12 +276,12 @@
 
 # Build and install an empty rpm with error in post script
 - name: uninstall post_error
-  zypper:
+  community.general.zypper:
     name: post_error
     state: removed
 
 - name: install rpmbuild
-  zypper:
+  community.general.zypper:
     name: rpmbuild
     state: present
 
@@ -313,7 +313,7 @@
   register: rpm_build_result
 
 - name: install post_error rpm with skip_post_errors
-  zypper:
+  community.general.zypper:
     name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/post_error-1-0.noarch.rpm"
     disable_gpg_check: true
     skip_post_errors: true
@@ -332,12 +332,12 @@
       - "rpm_result.rc == 0"
 
 - name: uninstall post_error
-  zypper:
+  community.general.zypper:
     name: post_error
     state: removed
 
 - name: install post_error rpm without skip_post_errors
-  zypper:
+  community.general.zypper:
     name: "{{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/post_error-1-0.noarch.rpm"
     disable_gpg_check: true
   register: zypper_result
@@ -356,24 +356,24 @@
       - "rpm_result.rc == 0"
 
 - name: uninstall post_error
-  zypper:
+  community.general.zypper:
     name: post_error
     state: removed
 
 # test simultaneous remove and install using +- prefixes
 
 - name: install hello to prep next task
-  zypper:
+  community.general.zypper:
     name: hello
     state: present
 
 - name: remove metamail to prep next task
-  zypper:
+  community.general.zypper:
     name: metamail
     state: absent
 
 - name: install and remove in the same run, with +- prefix
-  zypper:
+  community.general.zypper:
     name:
       - -hello
       - +metamail
@@ -381,7 +381,7 @@
   register: zypper_res1
 
 - name: install and remove again, leave out plus
-  zypper:
+  community.general.zypper:
     name:
       - metamail
       - -hello
@@ -389,7 +389,7 @@
   register: zypper_res1a
 
 - name: in and rm swapped
-  zypper:
+  community.general.zypper:
     name:
       - -metamail
       - hello
@@ -397,13 +397,13 @@
   register: zypper_res1b
 
 - name: install metamail
-  zypper:
+  community.general.zypper:
     name: metamail
     state: absent
   register: zypper_res2
 
 - name: remove hello
-  zypper:
+  community.general.zypper:
     name: hello
     state: present
   register: zypper_res3
@@ -420,7 +420,7 @@
 
 
 - name: install and remove with state=absent
-  zypper:
+  community.general.zypper:
     name:
       - metamail
       - +hello
@@ -435,7 +435,7 @@
       - zypper_res.msg == "Can not combine '+' prefix with state=remove/absent."
 
 - name: try rm patch
-  zypper:
+  community.general.zypper:
     name: openSUSE-2016-128
     type: patch
     state: absent
@@ -447,7 +447,7 @@
       - zypper_patch.msg.startswith('Can not remove patches.')
 
 - name: try rm URL
-  zypper:
+  community.general.zypper:
     name: "{{ hello_package_url }}"
     state: absent
   ignore_errors: true
@@ -458,20 +458,20 @@
       - zypper_rm.msg.startswith('Can not remove via URL.')
 
 - name: remove pattern update_test
-  zypper:
+  community.general.zypper:
     name: update_test
     type: pattern
     state: absent
 
 - name: install pattern update_test
-  zypper:
+  community.general.zypper:
     name: update_test
     type: pattern
     state: present
   register: zypper_install_pattern1
 
 - name: install pattern update_test again
-  zypper:
+  community.general.zypper:
     name: update_test
     type: pattern
     state: present
@@ -483,18 +483,18 @@
       - zypper_install_pattern2 is not changed
 
 - name: remove hello
-  zypper:
+  community.general.zypper:
     name: hello
     state: absent
 
 - name: install via URL
-  zypper:
+  community.general.zypper:
     state: present
     name: "{{ hello_package_url }}"
   register: zypperin1
 
 - name: test install
-  zypper:
+  community.general.zypper:
     name: hello
     state: present
   register: zypperin2
@@ -507,14 +507,14 @@
 
 # check for https://github.com/ansible/ansible/issues/20139
 - name: run updatecache
-  zypper:
+  community.general.zypper:
     name: hello
     state: present
     update_cache: true
   register: zypper_result_update_cache
 
 - name: run updatecache in check mode
-  zypper:
+  community.general.zypper:
     name: hello
     state: present
     update_cache: true
@@ -529,19 +529,19 @@
       - zypper_result_update_cache_check is not changed
 
 # - name: ensure no previous netcat package still exists
-#   zypper:
+#   community.general.zypper:
 #     name:
 #       - netcat-openbsd
 #       - gnu-netcat
 #     state: absent
 #
 # - name: install netcat-openbsd which conflicts with gnu-netcat
-#   zypper:
+#   community.general.zypper:
 #     name: netcat-openbsd
 #     state: present
 #
 # - name: try installation of gnu-netcat which should fail due to the conflict
-#   zypper:
+#   community.general.zypper:
 #     name: gnu-netcat
 #     state: present
 #   ignore_errors: true
@@ -553,7 +553,7 @@
 #       - "'conflicts with netcat-openbsd provided' in zypper_pkg_conflict.stdout"
 #
 # - name: retry installation of gnu-netcat with force_resolution set to choose a resolution
-#   zypper:
+#   community.general.zypper:
 #     name: gnu-netcat
 #     state: present
 #    force_resolution: True
@@ -583,7 +583,7 @@
       loop: "{{ looplist }}"
 
     - name: install duplicate rpms
-      zypper:
+      community.general.zypper:
         name: >-
           {{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
         disable_gpg_check: true
@@ -606,7 +606,7 @@
           - '"duplicate1" in duplicate_out.content | b64decode'
 
     - name: install duplicate rpms
-      zypper:
+      community.general.zypper:
         name: >-
           {{ remote_tmp_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
         disable_gpg_check: true
@@ -628,7 +628,7 @@
           - '"duplicate2" in duplicate_out.content | b64decode'
 
     - name: Remove installed duplicate rpms
-      zypper:
+      community.general.zypper:
         name: "duplicate{{ item }}-1-0"
         state: absent
       loop: "{{ looplist }}"

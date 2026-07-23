@@ -6,7 +6,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given a started service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: started
   become: true
@@ -14,7 +14,7 @@
 
 
 - name: "[{{ item }}] When unloading the service in check mode"
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: unloaded
   become: true
@@ -29,7 +29,7 @@
 
 
 - name: "[{{ item }}] When unloading the service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: unloaded
   become: true
@@ -48,7 +48,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Given an unloaded service on an unloaded service..."
-  launchd:
+  community.general.launchd:
     name: "{{ launchd_service_name }}"
     state: unloaded
   become: true

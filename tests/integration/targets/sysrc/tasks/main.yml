@@ -20,20 +20,20 @@
     ## sysrc - example - set mysqlpidfile
     ##
     - name: Configure mysql pid file
-      sysrc:
+      community.general.sysrc:
         name: mysql_pidfile
         value: /tmp/mysql.pid
       register: sysrc_example1
 
     - name: Configure mysql pid file (checkmode)
-      sysrc:
+      community.general.sysrc:
         name: mysql_pidfile
         value: checkmode
       check_mode: true
       register: sysrc_example1_checkmode
 
     - name: Configure mysql pid file (idempotent)
-      sysrc:
+      community.general.sysrc:
         name: mysql_pidfile
         value: /tmp/mysql.pid
       register: sysrc_example1_idempotent
@@ -55,7 +55,7 @@
     ## sysrc - example - Enable accf_http kld in /boot/loader.conf
     ##
     - name: Enable accf_http kld in /boot/loader.conf
-      sysrc:
+      community.general.sysrc:
         name: accf_http_load
         state: present
         value: "YES"
@@ -63,7 +63,7 @@
       register: sysrc_example2
 
     - name: Enable accf_http kld in /boot/loader.conf (checkmode)
-      sysrc:
+      community.general.sysrc:
         name: accf_http_load
         state: present
         value: "NO"
@@ -72,7 +72,7 @@
       register: sysrc_example2_checkmode
 
     - name: Enable accf_http kld in /boot/loader.conf (idempotent)
-      sysrc:
+      community.general.sysrc:
         name: accf_http_load
         state: present
         value: "YES"
@@ -96,19 +96,19 @@
     ## sysrc - example - Add gif0 interface
     ##
     - name: Set cloned_interfaces
-      sysrc:
+      community.general.sysrc:
         name: cloned_interfaces
         value: "lo0"
 
     - name: Add gif0 interface
-      sysrc:
+      community.general.sysrc:
         name: cloned_interfaces
         state: value_present
         value: "gif0"
       register: sysrc_example3
 
     - name: Add gif1 interface (checkmode)
-      sysrc:
+      community.general.sysrc:
         name: cloned_interfaces
         state: value_present
         value: "gif1"
@@ -116,7 +116,7 @@
       register: sysrc_example3_checkmode
 
     - name: Add gif0 interface (idempotent)
-      sysrc:
+      community.general.sysrc:
         name: cloned_interfaces
         state: value_present
         value: "gif0"
@@ -150,14 +150,14 @@
           ansible.builtin.include_tasks: setup-testjail.yml
 
         - name: Enable nginx in test jail
-          sysrc:
+          community.general.sysrc:
             name: nginx_enable
             value: "YES"
             jail: testjail
           register: sysrc_example4
 
         - name: Enable nginx in test jail (checkmode)
-          sysrc:
+          community.general.sysrc:
             name: nginx_enable
             value: "NO"
             jail: testjail
@@ -165,7 +165,7 @@
           register: sysrc_example4_checkmode
 
         - name: Enable nginx in test jail (idempotent)
-          sysrc:
+          community.general.sysrc:
             name: nginx_enable
             value: "YES"
             jail: testjail
@@ -192,25 +192,25 @@
     ## sysrc - Test Absent
     ##
     - name: Set sysrc_absent to test removal
-      sysrc:
+      community.general.sysrc:
         name: sysrc_absent
         value: test
 
     - name: Remove sysrc_absent (checkmode)
-      sysrc:
+      community.general.sysrc:
         name: sysrc_absent
         state: absent
       check_mode: true
       register: sysrc_absent_checkmode
 
     - name: Remove sysrc_absent
-      sysrc:
+      community.general.sysrc:
         name: sysrc_absent
         state: absent
       register: sysrc_absent
 
     - name: Remove sysrc_absent (idempotent)
-      sysrc:
+      community.general.sysrc:
         name: sysrc_absent
         state: absent
       register: sysrc_absent_idempotent
@@ -231,12 +231,12 @@
     ## sysrc - Test alternate delimiter
     ##
     - name: Set sysrc_delim to known value
-      sysrc:
+      community.general.sysrc:
         name: sysrc_delim
         value: "t1,t2"
 
     - name: Add to value with delimiter (not-exists)
-      sysrc:
+      community.general.sysrc:
         name: sysrc_delim_create
         state: value_present
         delim: ","
@@ -244,7 +244,7 @@
       register: sysrc_delim_create
 
     - name: Add to value with delimiter
-      sysrc:
+      community.general.sysrc:
         name: sysrc_delim
         state: value_present
         delim: ","
@@ -252,7 +252,7 @@
       register: sysrc_delim
 
     - name: Add to value with delimiter (checkmode)
-      sysrc:
+      community.general.sysrc:
         name: sysrc_delim
         state: value_present
         delim: ","
@@ -261,7 +261,7 @@
       register: sysrc_delim_checkmode
 
     - name: Add to value with delimiter (idempotent)
-      sysrc:
+      community.general.sysrc:
         name: sysrc_delim
         state: value_present
         delim: ","
@@ -286,7 +286,7 @@
     ## sysrc - value_absent
     ##
     - name: Remove value (when not exists)
-      sysrc:
+      community.general.sysrc:
         name: sysrc_value_absent_delete
         state: value_absent
         delim: ","
@@ -294,7 +294,7 @@
       register: sysrc_value_absent_ignored
 
     - name: Remove value from sysrc_delim
-      sysrc:
+      community.general.sysrc:
         name: sysrc_delim
         state: value_absent
         value: t3
@@ -302,7 +302,7 @@
       register: sysrc_value_absent
 
     - name: Remove value from sysrc_delim (checkmode)
-      sysrc:
+      community.general.sysrc:
         name: sysrc_delim
         state: value_absent
         value: t2
@@ -311,7 +311,7 @@
       register: sysrc_value_absent_checkmode
 
     - name: Remove value from sysrc_delim (idempotent
-      sysrc:
+      community.general.sysrc:
         name: sysrc_delim
         state: value_absent
         value: t3
@@ -342,13 +342,13 @@
       block:
 
         - name: Add spamd_flags
-          sysrc:
+          community.general.sysrc:
             name: spamd_flags
             value: "{{ value_1 }}"
           register: sysrc_equals_sign_1
 
         - name: Change spamd_flags
-          sysrc:
+          community.general.sysrc:
             name: spamd_flags
             value: "{{ value_2 }}"
           register: sysrc_equals_sign_2
@@ -371,7 +371,7 @@
     ## sysrc - #10004 state=absent when using default settings will report `changed=true`
     ##
     - name: Test that a key from /etc/defaults/rc.conf is not used to mark changed
-      sysrc:
+      community.general.sysrc:
         name: dumpdev
         state: absent
         path: /tmp/10004.conf
@@ -379,7 +379,7 @@
       failed_when: sysrc_10004_absent.changed
 
     - name: Test that a delimited key from /etc/defaults/rc.conf is not used to mark changed
-      sysrc:
+      community.general.sysrc:
         name: rc_conf_files
         state: value_absent
         path: /tmp/10004.conf
@@ -387,7 +387,7 @@
       failed_when: sysrc_10004_value_absent.changed
 
     - name: Test that a key from /etc/defaults/rc.conf is not used to mark changed without a path
-      sysrc:
+      community.general.sysrc:
         name: static_routes
         state: absent
       register: sysrc_absent_default
@@ -402,7 +402,7 @@
         dest: /tmp/10394.conf
 
     - name: Change value for k1
-      sysrc:
+      community.general.sysrc:
         name: k1
         value: v2
         path: /tmp/10394.conf
@@ -423,7 +423,7 @@
     ## sysrc - additional tests
     ##
     - name: Ensure failure on OID style name since sysrc does not support them
-      sysrc:
+      community.general.sysrc:
         name: not.valid.var
         value: test
       register: sysrc_name_check

@@ -13,7 +13,7 @@
 
 
 - name: "restore state from the test file (check_mode, must report a change)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_tests }}"
     state: restored
   register: iptables_state
@@ -28,7 +28,7 @@
 - name: "fail to restore state from the test file"
   block:
     - name: "restore state from the test file (bad policies, expected error -> rollback)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_tests }}"
         state: restored
       register: iptables_state
@@ -60,7 +60,7 @@
 - name: "fail to restore state from the test file (again)"
   block:
     - name: "try again, with a higher timeout (bad policies, same expected error)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_tests }}"
         state: restored
       register: iptables_state
@@ -92,7 +92,7 @@
 
 
 - name: "restore state from backup (must NOT report a change)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: restored
   register: iptables_state
@@ -106,7 +106,7 @@
 
 
 - name: "restore state from backup (mangle, must NOT report a change)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     table: mangle
     state: restored
@@ -132,7 +132,7 @@
 - name: "fail to restore state from the test file (again)"
   block:
     - name: "restore state from the test file (bad rules, expected error -> rollback)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_tests }}"
         state: restored
       register: iptables_state
@@ -164,7 +164,7 @@
 - name: "fail to restore state from the test file (again)"
   block:
     - name: "try again, with a higher timeout (bad rules, same expected error)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_tests }}"
         state: restored
       register: iptables_state

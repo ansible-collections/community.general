@@ -10,7 +10,7 @@
 
 
 - name: Remove non-existing '/business/rating/@subjective'
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating/@subjective
     state: absent

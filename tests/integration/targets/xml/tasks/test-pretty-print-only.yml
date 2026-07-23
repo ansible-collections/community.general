@@ -12,7 +12,7 @@
   ansible.builtin.shell: sed 's/^[ ]*//g' < /tmp/ansible-xml-beers.xml.orig > /tmp/ansible-xml-beers.xml
 
 - name: Pretty print without modification
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     pretty_print: true
   register: pretty_print_only

@@ -6,7 +6,7 @@
 # -----------------------------------------------------------
 
 - name: "[{{ item }}] Expect that an error occurs when an unknown service is used."
-  launchd:
+  community.general.launchd:
     name: com.acme.unknownservice
     state: started
   register: result

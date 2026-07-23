@@ -13,7 +13,7 @@
 
 # Core functionality tests
 - name: Archive - no options ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_no_opts.{{ format }}"
     format: "{{ format }}"
@@ -37,7 +37,7 @@
     state: absent
 
 - name: Archive - file options ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_file_options.{{ format }}"
     format: "{{ format }}"
@@ -62,7 +62,7 @@
     state: absent
 
 - name: Archive - non-ascii ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_nonascii_くらとみ.{{ format }}"
     format: "{{ format }}"
@@ -85,7 +85,7 @@
     state: absent
 
 - name: Archive - single target ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/foo.txt"
     dest: "{{ remote_tmp_dir }}/archive_single_target.{{ format }}"
     format: "{{ format }}"
@@ -128,7 +128,7 @@
     state: absent
 
 - name: Archive - path list ({{ format }})
-  archive:
+  community.general.archive:
     path:
       - "{{ remote_tmp_dir }}/empty.txt"
       - "{{ remote_tmp_dir }}/foo.txt"
@@ -154,7 +154,7 @@
     state: absent
 
 - name: Archive - missing paths ({{ format }})
-  archive:
+  community.general.archive:
     path:
       - "{{ remote_tmp_dir }}/*.txt"
       - "{{ remote_tmp_dir }}/dne.txt"

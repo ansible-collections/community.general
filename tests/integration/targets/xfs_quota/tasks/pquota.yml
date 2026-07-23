@@ -8,7 +8,7 @@
 
     '
 - name: Create XFS filesystem
-  filesystem:
+  community.general.filesystem:
     dev: '{{ remote_tmp_dir }}/img-pquota'
     fstype: xfs
 - name: Create xfs related files
@@ -47,7 +47,7 @@
         state: directory
       become: true
     - name: Apply default project limits
-      xfs_quota:
+      community.general.xfs_quota:
         bsoft: '{{ pquota_default_bsoft }}'
         bhard: '{{ pquota_default_bhard }}'
         isoft: '{{ pquota_default_isoft }}'
@@ -69,7 +69,7 @@
           - test_pquota_default_before.rtbsoft == pquota_default_rtbsoft|human_to_bytes
           - test_pquota_default_before.rtbhard == pquota_default_rtbhard|human_to_bytes
     - name: Apply project limits
-      xfs_quota:
+      community.general.xfs_quota:
         bsoft: '{{ pquota_project_bsoft }}'
         bhard: '{{ pquota_project_bhard }}'
         isoft: '{{ pquota_project_isoft }}'
@@ -92,7 +92,7 @@
           - test_pquota_project_before.rtbsoft == pquota_project_rtbsoft|human_to_bytes
           - test_pquota_project_before.rtbhard == pquota_project_rtbhard|human_to_bytes
     - name: Re-apply default project limits
-      xfs_quota:
+      community.general.xfs_quota:
         bsoft: '{{ pquota_default_bsoft }}'
         bhard: '{{ pquota_default_bhard }}'
         isoft: '{{ pquota_default_isoft }}'
@@ -108,7 +108,7 @@
         that:
           - not test_pquota_default_after.changed
     - name: Re-apply project limits
-      xfs_quota:
+      community.general.xfs_quota:
         bsoft: '{{ pquota_project_bsoft }}'
         bhard: '{{ pquota_project_bhard }}'
         isoft: '{{ pquota_project_isoft }}'
@@ -125,7 +125,7 @@
         that:
           - test_pquota_project_after is not changed
     - name: Reset default project limits
-      xfs_quota:
+      community.general.xfs_quota:
         mountpoint: '{{ remote_tmp_dir }}/pquota'
         state: absent
         type: project
@@ -142,7 +142,7 @@
           - test_reset_pquota_default.rtbsoft == 0
           - test_reset_pquota_default.rtbhard == 0
     - name: Reset project limits for xft_quotaval
-      xfs_quota:
+      community.general.xfs_quota:
         mountpoint: '{{ remote_tmp_dir }}/pquota'
         name: xft_quotaval
         state: absent

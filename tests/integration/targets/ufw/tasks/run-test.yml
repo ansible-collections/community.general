@@ -10,10 +10,10 @@
     # Waiting one second fixes this problem.
     seconds: 1
 - name: Reset ufw to factory defaults
-  ufw:
+  community.general.ufw:
     state: reset
 - name: Disable ufw
-  ufw:
+  community.general.ufw:
     # Some versions of ufw have a bug which won't disable on reset.
     # That's why we explicitly deactivate here. See
     # https://bugs.launchpad.net/ufw/+bug/1810082
@@ -21,5 +21,5 @@
 - name: "Loading tasks from {{ item }}"
   ansible.builtin.include_tasks: "{{ item }}"
 - name: Reset to factory defaults
-  ufw:
+  community.general.ufw:
     state: reset
