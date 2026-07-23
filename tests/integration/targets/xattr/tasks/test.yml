@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Set attributes
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     key: user.foo
     value: bar
   register: xattr_set_result
 
 - name: Get attributes
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
   register: xattr_get_all_result
 
 - name: Get specific attribute
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     key: foo
   register: xattr_get_specific_result
@@ -30,7 +30,7 @@
       - "not xattr_get_specific_result.changed"
 
 - name: Set attribute again
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     namespace: user
     key: foo
@@ -42,14 +42,14 @@
       - "not xattr_set_again_result.changed"
 
 - name: Unset attribute
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     key: foo
     state: absent
   register: xattr_unset_result
 
 - name: Get attributes
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
   register: xattr_get_after_unset_result
 
@@ -60,7 +60,7 @@
       - "not xattr_get_after_unset_result.changed"
 
 - name: Unset attribute again
-  xattr:
+  community.general.xattr:
     path: "{{ test_file }}"
     namespace: user
     key: foo

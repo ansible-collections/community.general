@@ -9,7 +9,7 @@
     dest: /tmp/ansible-xml-beers.xml
 
 - name: Set child elements - empty list
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/beers
     set_children: []
@@ -36,7 +36,7 @@
     dest: /tmp/ansible-xml-beers.xml
 
 - name: Set child elements
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/beers
     set_children: &children
@@ -64,7 +64,7 @@
 
 
 - name: Set child elements (again)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/beers
     set_children: *children

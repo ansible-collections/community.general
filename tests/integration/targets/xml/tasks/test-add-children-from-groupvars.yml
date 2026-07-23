@@ -10,7 +10,7 @@
 
 
 - name: Add child element
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/beers
     add_children: '{{ bad_beers }}'

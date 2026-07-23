@@ -8,17 +8,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Clean up test project
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project
     state: absent
 
 - name: Clean up test project
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project-renamed
     state: absent
 
 - name: Create test project
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project
     config:
       features.images: "false"
@@ -36,7 +36,7 @@
       - "'create' in results.actions"
 
 - name: Create test project again with merge_project set to true
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project
     merge_project: true
     config:
@@ -54,7 +54,7 @@
       - "{{ results.actions | length }} == 0"
 
 - name: Create test project again with merge_project set to false
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project
     merge_project: false
     config:
@@ -72,7 +72,7 @@
       - "'apply_projects_configs' in results.actions"
 
 - name: Update project test => update description
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project
     merge_project: false
     description: "ansible test project"
@@ -91,7 +91,7 @@
       - "'apply_projects_configs' in results.actions"
 
 - name: Update project test => update project config
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project
     merge_project: false
     description: "ansible test project"
@@ -110,7 +110,7 @@
       - "'apply_projects_configs' in results.actions"
 
 - name: Rename project test
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project
     new_name: ansible-test-project-renamed
     merge_project: true
@@ -130,7 +130,7 @@
       - "'rename' in results.actions"
 
 - name: Clean up test project
-  lxd_project:
+  community.general.lxd_project:
     name: ansible-test-project-renamed
     state: absent
   register: results

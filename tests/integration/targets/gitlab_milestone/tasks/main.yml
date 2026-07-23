@@ -18,7 +18,7 @@
   ### Group milestone
   ###
     - name: Create {{ gitlab_project_group }}
-      gitlab_group:
+      community.general.gitlab_group:
         api_url: "{{ gitlab_host }}"
         validate_certs: true
         api_token: "{{ gitlab_api_token }}"
@@ -26,14 +26,14 @@
         state: present
 
     - name: Purge all group milestones for check_mode test
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         group: "{{ gitlab_project_group }}"
         purge: true
 
     - name: Group milestone - Add a milestone in check_mode
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         group: "{{ gitlab_project_group }}"
@@ -48,7 +48,7 @@
           - gitlab_group_milestone_state is changed
 
     - name: Purge all group milestones for project milestone test - cannot exist with same name
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         group: "{{ gitlab_project_group }}"
@@ -56,7 +56,7 @@
       register: gitlab_group_milestone_purged
 
     - name: Group milestone - Create milestone {{ gitlab_first_milestone }} and {{ gitlab_second_milestone }}
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         group: "{{ gitlab_project_group }}"
@@ -80,7 +80,7 @@
           - gitlab_group_milestone_create.milestones.added[1] == "{{ gitlab_second_milestone }}"
 
     - name: Group milestone - Create milestone ( Idempotency test )
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         group: "{{ gitlab_project_group }}"
@@ -97,7 +97,7 @@
           - gitlab_group_milestone_create_idempotence is not changed
 
     - name: Group milestone - Update milestone {{ gitlab_first_milestone }} changing dates
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         group: "{{ gitlab_project_group }}"
@@ -118,7 +118,7 @@
           - gitlab_group_milestone_update.milestones.updated[0] == "{{ gitlab_first_milestone }}"
 
     - name: Group milestone - Update milestone Test ( Additions )
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         group: "{{ gitlab_project_group }}"
@@ -138,7 +138,7 @@
           - gitlab_group_milestone_update_additions.milestones.updated[0] == "{{ gitlab_second_milestone }}"
 
     - name: Group milestone - Delete milestone {{ gitlab_second_milestone }}
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         group: "{{ gitlab_project_group }}"
@@ -158,7 +158,7 @@
           - gitlab_group_milestone_delete.milestones.removed[0] == "{{ gitlab_second_milestone }}"
 
     - name: Group milestone - Create group milestone {{ gitlab_second_milestone }} again purging the other
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         group: "{{ gitlab_project_group }}"
@@ -183,7 +183,7 @@
   ### Project milestone
   ###
     - name: Purge all group milestones for project milestone test - cannot exist with same name
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         group: "{{ gitlab_project_group }}"
@@ -191,7 +191,7 @@
       register: gitlab_group_milestone_purged
 
     - name: Create {{ gitlab_project_name }}
-      gitlab_project:
+      community.general.gitlab_project:
         api_url: "{{ gitlab_host }}"
         validate_certs: true
         api_token: "{{ gitlab_api_token }}"
@@ -202,14 +202,14 @@
         state: present
 
     - name: Purge all milestones for check_mode test
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
         purge: true
 
     - name: Add a milestone in check_mode
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -225,7 +225,7 @@
           - gitlab_first_milestone_state is changed
 
     - name: Create milestone {{ gitlab_first_milestone }} and {{ gitlab_second_milestone }}
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -249,7 +249,7 @@
           - gitlab_milestones_create.milestones.added[1] == "{{ gitlab_second_milestone }}"
 
     - name: Create milestone ( Idempotency test )
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -266,7 +266,7 @@
           - gitlab_first_milestone_create_idempotence is not changed
 
     - name: Update milestone {{ gitlab_first_milestone }} changing dates
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -287,7 +287,7 @@
           - gitlab_first_milestone_update.milestones.updated[0] == "{{ gitlab_first_milestone }}"
 
     - name: Update milestone Test ( Additions )
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -307,7 +307,7 @@
           - gitlab_first_milestone_update_additions.milestones.updated[0] == "{{ gitlab_second_milestone }}"
 
     - name: Delete milestone {{ gitlab_second_milestone }}
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -327,7 +327,7 @@
           - gitlab_first_milestone_delete.milestones.removed[0] == "{{ gitlab_second_milestone }}"
 
     - name: Create milestone {{ gitlab_second_milestone }} again purging the other
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -350,7 +350,7 @@
 
   always:
     - name: Delete milestones
-      gitlab_milestone:
+      community.general.gitlab_milestone:
         api_token: "{{ gitlab_api_token }}"
         api_url: "{{ gitlab_host }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -371,7 +371,7 @@
           - gitlab_first_milestone_always_delete.milestones.updated|length == 0
 
     - name: Clean up {{ gitlab_project_name }}
-      gitlab_project:
+      community.general.gitlab_project:
         api_url: "{{ gitlab_host }}"
         validate_certs: false
         api_token: "{{ gitlab_api_token }}"
@@ -380,7 +380,7 @@
         state: absent
 
     - name: Clean up {{ gitlab_project_group }}
-      gitlab_group:
+      community.general.gitlab_group:
         api_url: "{{ gitlab_host }}"
         validate_certs: true
         api_token: "{{ gitlab_api_token }}"

@@ -14,13 +14,13 @@
     state: present
 
 - name: purge all variables for check_mode test
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     purge: true
 
 - name: add a variable value in check_mode
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -35,7 +35,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: apply add value from check_mode test
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -49,7 +49,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: apply same value again again
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -63,7 +63,7 @@
       - gitlab_instance_variable_state is not changed
 
 - name: change protected attribute
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -78,7 +78,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: revert protected attribute
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -93,7 +93,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: change masked attribute
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -108,7 +108,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: revert masked attribute by not mention it
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -123,7 +123,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: revert again masked attribute by not mention it (idempotent)
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -137,7 +137,7 @@
       - gitlab_instance_variable_state is not changed
 
 - name: set all attributes
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -154,7 +154,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: set again all attributes (idempotent)
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -171,7 +171,7 @@
       - gitlab_instance_variable_state is not changed
 
 - name: revert both (masked and protected) attribute
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -186,7 +186,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: change a variable value in check_mode again
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -201,7 +201,7 @@
       - gitlab_instance_variable_state is not changed
 
 - name: apply again the value change from check_mode test
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -215,13 +215,13 @@
       - gitlab_instance_variable_state is not changed
 
 - name: purge all variables again
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     purge: true
 
 - name: set two test variables
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -241,7 +241,7 @@
       - gitlab_instance_variable_state.instance_variable.updated|length == 0
 
 - name: re-set two test variables
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -261,7 +261,7 @@
       - gitlab_instance_variable_state.instance_variable.updated|length == 0
 
 - name: edit one variable
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -281,7 +281,7 @@
       - gitlab_instance_variable_state.instance_variable.updated[0] == "ACCESS_KEY_ID"
 
 - name: append one variable
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -301,7 +301,7 @@
       - gitlab_instance_variable_state.instance_variable.added[0] == "some"
 
 - name: re-set all variables
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -323,7 +323,7 @@
       - gitlab_instance_variable_state.instance_variable.updated|length == 0
 
 - name: set one variables and purge all others
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -342,7 +342,7 @@
       - gitlab_instance_variable_state.instance_variable.updated|length == 0
 
 - name: only one variable is left
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -362,7 +362,7 @@
       - gitlab_instance_variable_state.instance_variable.untouched[0] == "some"
 
 - name: test integer values
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -381,7 +381,7 @@
       - gitlab_instance_variable_state.instance_variable.updated|length == 1
 
 - name: test float values
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -400,7 +400,7 @@
       - gitlab_instance_variable_state.instance_variable.updated|length == 1
 
 - name: delete the last left variable
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     state: absent
@@ -419,7 +419,7 @@
       - gitlab_instance_variable_state.instance_variable.removed[0] == "some"
 
 - name: add one variable with variable_type file
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -441,7 +441,7 @@
       # - gitlab_instance_variable_state.instance_variable.added[0] == "my_test_var"
 
 - name: change variable_type attribute
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -456,7 +456,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: revert variable_type attribute
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -471,7 +471,7 @@
       - gitlab_instance_variable_state is changed
 
 - name: delete the variable_type file variable
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     state: absent
@@ -490,7 +490,7 @@
       - gitlab_instance_variable_state.instance_variable.removed[0] == "my_test_var"
 
 - name: set complete page and purge existing ones
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -545,7 +545,7 @@
       - gitlab_instance_variable_state.instance_variable.untouched|length == 0
 
 - name: check that no variables are left
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     purge: true
@@ -561,7 +561,7 @@
       - gitlab_instance_variable_state.instance_variable.updated|length == 0
 
 - name: throw error when state is present but no value is given
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     variables:
@@ -576,7 +576,7 @@
       - gitlab_instance_variable_state is not changed
 
 - name: set a new variable to delete it later
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     purge: true
@@ -591,7 +591,7 @@
       - gitlab_instance_variable_state.changed
 
 - name: delete variable without referencing its value
-  gitlab_instance_variable:
+  community.general.gitlab_instance_variable:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     state: absent

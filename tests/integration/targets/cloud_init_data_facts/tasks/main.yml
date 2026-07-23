@@ -48,7 +48,7 @@
         state: restarted
 
     - name: test gather cloud-init facts in check mode
-      cloud_init_data_facts:
+      community.general.cloud_init_data_facts:
       check_mode: true
       register: result
     - name: verify test gather cloud-init facts in check mode
@@ -62,7 +62,7 @@
           - not cloud_init_data_facts.status.v1.stage
 
     - name: test gather cloud-init facts
-      cloud_init_data_facts:
+      community.general.cloud_init_data_facts:
       register: result
     - name: verify test gather cloud-init facts
       ansible.builtin.assert:

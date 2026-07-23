@@ -12,7 +12,7 @@
     extra_pkg_outfmt: sdparm
   block:
     - name: Make sure that test packages are not installed
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg}}'
@@ -35,7 +35,7 @@
         dest: '{{file_pkg_path}}'
 
     - name: Install packages from mixed sources as dependency (check mode)
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url.stdout}}'
@@ -45,7 +45,7 @@
       register: install_1
 
     - name: Install packages from mixed sources as explicit
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url.stdout}}'
@@ -54,7 +54,7 @@
       register: install_2
 
     - name: Install packages from mixed sources with new packages being installed as dependency - (idempotency)
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url.stdout}}'
@@ -63,7 +63,7 @@
       register: install_3
 
     - name: Install new package with already installed packages from mixed sources as dependency
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url.stdout}}'
@@ -73,7 +73,7 @@
       register: install_4
 
     - name: Set install reason for all packages to dependency
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url.stdout}}'

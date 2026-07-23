@@ -89,7 +89,7 @@
       register: brew_stat
 
     - name: MACOS | Install package
-      homebrew:
+      community.general.homebrew:
         name:
           - gnupg2
           - pass

@@ -14,7 +14,7 @@
     state: present
 
 - name: Set project approval settings
-  gitlab_project_approvals:
+  community.general.gitlab_project_approvals:
     api_url: "{{ gitlab_api_url }}"
     validate_certs: false
     api_token: "{{ gitlab_api_token }}"
@@ -34,7 +34,7 @@
       - approval_result is changed
 
 - name: Re-run project approval for idempotency
-  gitlab_project_approvals:
+  community.general.gitlab_project_approvals:
     api_url: "{{ gitlab_api_url }}"
     validate_certs: false
     api_token: "{{ gitlab_api_token }}"
@@ -54,7 +54,7 @@
       - approval_result_idem is not changed
 
 - name: Reset project approval settings
-  gitlab_project_approvals:
+  community.general.gitlab_project_approvals:
     api_url: "{{ gitlab_api_url }}"
     validate_certs: false
     api_token: "{{ gitlab_api_token }}"

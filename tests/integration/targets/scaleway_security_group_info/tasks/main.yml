@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get security group information and register it in a variable
-  scaleway_security_group_info:
+  community.general.scaleway_security_group_info:
     region: par1
   register: security_groups
 
@@ -23,7 +23,7 @@
       - security_groups is success
 
 - name: Get security group information and register it in a variable (AMS1)
-  scaleway_security_group_info:
+  community.general.scaleway_security_group_info:
     region: ams1
   register: ams1_security_groups
 

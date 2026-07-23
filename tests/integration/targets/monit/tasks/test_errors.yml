@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Check an error occurs when wrong process name is used
-  monit:
+  community.general.monit:
     name: missing
     state: started
   register: result

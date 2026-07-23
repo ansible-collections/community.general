@@ -22,7 +22,7 @@
         var: npm_version.stdout
 
     - name: 'Install simple package with no_bin_links disabled'
-      npm:
+      community.general.npm:
         path: '{{ remote_dir }}'
         executable: '{{ node_path }}/npm'
         state: present
@@ -43,7 +43,7 @@
         state: absent
 
     - name: 'Install simple package with no_bin_links enabled'
-      npm:
+      community.general.npm:
         path: '{{ remote_dir }}'
         executable: '{{ node_path }}/npm'
         state: present

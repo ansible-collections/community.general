@@ -10,7 +10,7 @@
 
 # Checks for existence
 - name: Get info by ID
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -23,7 +23,7 @@
       - result is not changed
 
 - name: Get info by list of ID
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -39,7 +39,7 @@
       - result is not changed
 
 - name: Get info by list of ID
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -52,7 +52,7 @@
       - result is not changed
 
 - name: Gather all info
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -64,7 +64,7 @@
       - result is not changed
 
 - name: Gather info by regex
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -77,7 +77,7 @@
       - result is not changed
 
 - name: Gather info by regex and ignore upper/lower cases
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -91,7 +91,7 @@
 
 # Updating an image
 - name: Clone image without name
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -105,7 +105,7 @@
       - result is changed
 
 - name: Clone image with name
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -120,7 +120,7 @@
       - result is changed
 
 - name: Disable image
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -134,7 +134,7 @@
       - result is changed
 
 - name: Enable image
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -148,7 +148,7 @@
       - result is changed
 
 - name: Make image persistent
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -162,7 +162,7 @@
       - result is changed
 
 - name: Make image non-persistent
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -177,7 +177,7 @@
 
 # Testing errors
 - name: Try to use name and ID a the same time
-  one_image_info:
+  community.general.one_image_info:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"

@@ -22,7 +22,7 @@
         var: npm_version.stdout
 
     - name: 'Install simple package without dependency'
-      npm:
+      community.general.npm:
         path: '{{ remote_dir }}'
         state: present
         name: '{{ package }}'
@@ -34,7 +34,7 @@
           - npm_install is changed
 
     - name: 'Reinstall simple package without dependency'
-      npm:
+      community.general.npm:
         path: '{{ remote_dir }}'
         state: present
         name: '{{ package }}'
@@ -52,7 +52,7 @@
         state: absent
 
     - name: 'reinstall simple package'
-      npm:
+      community.general.npm:
         path: '{{ remote_dir }}'
         state: present
         name: '{{ package }}'

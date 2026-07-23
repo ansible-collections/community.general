@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Testing the module without pyodbc
-  odbc:
+  community.general.odbc:
     dsn: "Test"
     query: "SELECT * FROM nothing"
   ignore_errors: true

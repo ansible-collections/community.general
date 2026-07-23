@@ -19,7 +19,7 @@
 # Basic checks about invalid param/value handling.
 #
 - name: "trigger error about invalid param"
-  iptables_state:
+  community.general.iptables_state:
     name: foobar
   register: iptables_state
   ignore_errors: true
@@ -33,7 +33,7 @@
 
 
 - name: "trigger error about missing param 'state'"
-  iptables_state:
+  community.general.iptables_state:
     path: foobar
   register: iptables_state
   ignore_errors: true
@@ -47,7 +47,7 @@
 
 
 - name: "trigger error about missing param 'path'"
-  iptables_state:
+  community.general.iptables_state:
     state: saved
   register: iptables_state
   ignore_errors: true
@@ -61,7 +61,7 @@
 
 
 - name: "trigger error about invalid value for param 'state'"
-  iptables_state:
+  community.general.iptables_state:
     path: foobar
     state: present
   register: iptables_state
@@ -82,7 +82,7 @@
 # - check_mode
 #
 - name: "save state (check_mode, must report a change)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
   register: iptables_state
@@ -97,7 +97,7 @@
 
 
 - name: "save state (must report a change)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
   register: iptables_state
@@ -111,7 +111,7 @@
 
 
 - name: "save state (idempotency, must NOT report a change)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
   register: iptables_state
@@ -125,7 +125,7 @@
 
 
 - name: "save state (check_mode, must NOT report a change)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
   register: iptables_state
@@ -146,7 +146,7 @@
 - name: "state=restored check_mode=true changed=false"
   block:
     - name: "restore state (check_mode, must NOT report a change, no warning)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_saved }}"
         state: restored
       register: iptables_state
@@ -172,7 +172,7 @@
 - name: "state=restored changed=false"
   block:
     - name: "restore state (must NOT report a change, warning about rollback & async)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_saved }}"
         state: restored
       register: iptables_state
@@ -203,7 +203,7 @@
 - name: "state=restored changed=true"
   block:
     - name: "restore state (check_mode, must report a change)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_saved }}"
         state: restored
       register: iptables_state
@@ -229,7 +229,7 @@
 - name: "state=restored changed=true"
   block:
     - name: "restore state (must report a change, async, no warning)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_saved }}"
         state: restored
       register: iptables_state
@@ -257,7 +257,7 @@
 - name: "state=restored changed=false"
   block:
     - name: "restore state (must NOT report a change, async, no warning)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_saved }}"
         state: restored
       register: iptables_state
@@ -284,7 +284,7 @@
 - name: "state=restored changed=false"
   block:
     - name: "restore state (check_mode=yes, must NOT report a change, no warning)"
-      iptables_state:
+      community.general.iptables_state:
         path: "{{ iptables_saved }}"
         state: restored
       register: iptables_state

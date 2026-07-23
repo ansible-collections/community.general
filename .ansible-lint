@@ -17,7 +17,6 @@ skip_list:
   - args
   - command-instead-of-module
   - complexity
-  - fqcn
   - galaxy
   - ignore-errors
   - jinja

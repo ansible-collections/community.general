@@ -17,21 +17,21 @@
   when: ansible_facts.distribution == 'Ubuntu'
 
 - name: Install dummy remote for user
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: dummy-remote
     state: present
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     method: user
 
 - name: Install dummy remote for system
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: dummy-remote
     state: present
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     method: system
 
 - name: Remove (if necessary) flatpak for testing check mode on absent flatpak
-  flatpak:
+  community.general.flatpak:
     name:
       - com.dummy.App1
       - com.dummy.App3
@@ -40,7 +40,7 @@
     no_dependencies: true
 
 - name: Add flatpak for testing check mode on present flatpak
-  flatpak:
+  community.general.flatpak:
     name: com.dummy.App2
     remote: dummy-remote
     state: present

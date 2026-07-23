@@ -10,7 +10,7 @@
 
 
 - name: Set '/business/rating/@subjective' to 'нет'
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-beers.xml
     xpath: /business/rating
     attribute: subjective

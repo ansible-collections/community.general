@@ -8,7 +8,7 @@
 
     '
 - name: Create XFS filesystem
-  filesystem:
+  community.general.filesystem:
     dev: '{{ remote_tmp_dir }}/img-gquota'
     fstype: xfs
 - block:
@@ -22,7 +22,7 @@
         opts: gquota
         state: mounted
     - name: Apply default group limits
-      xfs_quota:
+      community.general.xfs_quota:
         bsoft: '{{ gquota_default_bsoft }}'
         bhard: '{{ gquota_default_bhard }}'
         isoft: '{{ gquota_default_isoft }}'
@@ -44,7 +44,7 @@
           - test_gquota_default_before.rtbsoft == gquota_default_rtbsoft|human_to_bytes
           - test_gquota_default_before.rtbhard == gquota_default_rtbhard|human_to_bytes
     - name: Apply group limits
-      xfs_quota:
+      community.general.xfs_quota:
         bsoft: '{{ gquota_group_bsoft }}'
         bhard: '{{ gquota_group_bhard }}'
         isoft: '{{ gquota_group_isoft }}'
@@ -67,7 +67,7 @@
           - test_gquota_group_before.rtbsoft == gquota_group_rtbsoft|human_to_bytes
           - test_gquota_group_before.rtbhard == gquota_group_rtbhard|human_to_bytes
     - name: Re-apply default group limits
-      xfs_quota:
+      community.general.xfs_quota:
         bsoft: '{{ gquota_default_bsoft }}'
         bhard: '{{ gquota_default_bhard }}'
         isoft: '{{ gquota_default_isoft }}'
@@ -83,7 +83,7 @@
         that:
           - not test_gquota_default_after.changed
     - name: Re-apply group limits
-      xfs_quota:
+      community.general.xfs_quota:
         bsoft: '{{ gquota_group_bsoft }}'
         bhard: '{{ gquota_group_bhard }}'
         isoft: '{{ gquota_group_isoft }}'
@@ -100,7 +100,7 @@
         that:
           - not test_gquota_group_after.changed
     - name: Reset default group limits
-      xfs_quota:
+      community.general.xfs_quota:
         mountpoint: '{{ remote_tmp_dir }}/gquota'
         state: absent
         type: group
@@ -117,7 +117,7 @@
           - test_reset_gquota_default.rtbsoft == 0
           - test_reset_gquota_default.rtbhard == 0
     - name: Reset group limits for xfsquotauser
-      xfs_quota:
+      community.general.xfs_quota:
         mountpoint: '{{ remote_tmp_dir }}/gquota'
         name: xfsquotauser
         state: absent

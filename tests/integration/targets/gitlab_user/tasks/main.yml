@@ -14,7 +14,7 @@
     state: present
 
 - name: Clean up gitlab user
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     name: ansible_test_user
     username: ansible_test_user
@@ -26,7 +26,7 @@
 
 
 - name: Create gitlab user
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
@@ -43,7 +43,7 @@
       - gitlab_user_state is changed
 
 - name: Create gitlab user again
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: root@localhost
     name: ansible_test_user
@@ -62,7 +62,7 @@
 
 
 - name: Update User Test => Make User Admin
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
@@ -80,7 +80,7 @@
       - gitlab_user_state.user.is_admin == True
 
 - name: Update User Test => Make User Admin (Again)
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
@@ -98,7 +98,7 @@
       - gitlab_user_state.user.is_admin == True
 
 - name: Update User Test => Remove Admin Rights
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
@@ -117,7 +117,7 @@
 
 
 - name: Update User Test => Try Changing Mail without Confirmation Skipping
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: foo@bar.baz
     name: "{{ gitlab_user }}"
@@ -135,7 +135,7 @@
       - gitlab_user_state.user.email == gitlab_user_email
 
 - name: Update User Test => Change Mail with Confirmation Skip
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: foo@bar.baz
     name: "{{ gitlab_user }}"
@@ -153,7 +153,7 @@
       - gitlab_user_state.user.email == 'foo@bar.baz'
 
 - name: Update User Test => Change Mail with Confirmation Skip (Again)
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: foo@bar.baz
     name: "{{ gitlab_user }}"
@@ -171,7 +171,7 @@
       - gitlab_user_state.user.email == 'foo@bar.baz'
 
 - name: Update User Test => Revert to original Mail Address
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
@@ -190,7 +190,7 @@
 
 
 - name: Update User Test => Change User Password
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     validate_certs: false
 
@@ -216,7 +216,7 @@
       - gitlab_user_state is not changed
 
 - name: Update User Test => Reset User Password
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     validate_certs: false
 
@@ -236,7 +236,7 @@
       - gitlab_user_state is not changed
 
 - name: Update User Test => Check that password was reset
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: "{{ gitlab_host }}"
     validate_certs: false
 

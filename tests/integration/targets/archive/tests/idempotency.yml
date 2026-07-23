@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Archive - file content idempotency ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
     format: "{{ format }}"
@@ -17,7 +17,7 @@
     path: "{{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive second time - file content idempotency ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
     format: "{{ format }}"
@@ -42,7 +42,7 @@
     path: "{{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive - file name idempotency ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
     format: "{{ format }}"
@@ -52,7 +52,7 @@
   ansible.builtin.command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
 
 - name: Archive again - file name idempotency ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
     format: "{{ format }}"
@@ -72,7 +72,7 @@
   ansible.builtin.command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive - single file content idempotency ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/foo.txt"
     dest: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
     format: "{{ format }}"
@@ -85,7 +85,7 @@
     path: "{{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive second time - single file content idempotency ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/foo.txt"
     dest: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
     format: "{{ format }}"
@@ -110,7 +110,7 @@
     path: "{{ remote_tmp_dir }}/foo.txt"
 
 - name: Archive - single file name idempotency ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/foo.txt"
     dest: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
     format: "{{ format }}"
@@ -120,7 +120,7 @@
   ansible.builtin.command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
 
 - name: Archive again - single file name idempotency ({{ format }})
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/fii.txt"
     dest: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
     format: "{{ format }}"

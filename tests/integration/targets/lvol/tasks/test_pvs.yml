@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create logical volume (testlv1) with pvs set as comma separated string
-  lvol:
+  community.general.lvol:
     vg: testvg1
     lv: testlv1
     size: 50%PVS
@@ -18,7 +18,7 @@
       - css_pvs_create_testlv1_result is changed
 
 - name: Create logical volume (testlv1) with pvs set as list
-  lvol:
+  community.general.lvol:
     vg: testvg1
     lv: testlv1
     size: 50%PVS
@@ -34,7 +34,7 @@
       - list_pvs_create_testlv1_result is not changed
 
 - name: Create logical volume (testlv2) with pvs set as list
-  lvol:
+  community.general.lvol:
     vg: testvg2
     lv: testlv2
     size: 50%PVS
@@ -50,7 +50,7 @@
       - list_pvs_create_testlv2_result is changed
 
 - name: Create logical volume (testlv2) with pvs set as comma separated string
-  lvol:
+  community.general.lvol:
     vg: testvg2
     lv: testlv2
     size: 50%PVS

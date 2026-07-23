@@ -28,7 +28,7 @@
   changed_when: false
 
 - name: Install Python 3.14 in check mode
-  uv_python:
+  community.general.uv_python:
     version: "3.14"
     state: present
   check_mode: true
@@ -42,7 +42,7 @@
       - install_check_mode.python_versions | length >= 1
 
 - name: Install Python 3.14
-  uv_python:
+  community.general.uv_python:
     version: "3.14"
     state: present
   register: install_python
@@ -67,7 +67,7 @@
   when: not python_path_stats.stat.exists
 
 - name: Re-install Python 3.14
-  uv_python:
+  community.general.uv_python:
     version: "3.14"
     state: present
   register: reinstall_python
@@ -87,7 +87,7 @@
   changed_when: false
 
 - name: Install Python 3.13.5
-  uv_python:
+  community.general.uv_python:
     version: 3.13.5
   register: install_python_3135
 
@@ -100,7 +100,7 @@
       - install_python_3135.python_paths | length >= 1
 
 - name: Re-install Python 3.13.5
-  uv_python:
+  community.general.uv_python:
     version: 3.13.5
     state: present
   register: reinstall_python
@@ -113,7 +113,7 @@
       - '"3.13.5" in reinstall_python.python_versions'
 
 - name: Remove uninstalled Python 3.10 # removes latest patch version for 3.10 if exists
-  uv_python:
+  community.general.uv_python:
     version: "3.10"
     state: absent
   register: remove_python
@@ -126,7 +126,7 @@
       - remove_python.python_versions | length == 0
 
 - name: Remove Python 3.13.5 in check mode
-  uv_python:
+  community.general.uv_python:
     version: 3.13.5
     state: absent
   check_mode: true
@@ -146,7 +146,7 @@
       - remove_python_in_check_mode.python_paths | length >= 1
 
 - name: Remove Python 3.13.5
-  uv_python:
+  community.general.uv_python:
     version: 3.13.5
     state: absent
   register: remove_python
@@ -165,7 +165,7 @@
       - '"3.13.5" in remove_python.python_versions'
 
 - name: Remove Python 3.13.5 again
-  uv_python:
+  community.general.uv_python:
     version: 3.13.5
     state: absent
   register: remove_python
@@ -179,7 +179,7 @@
       - remove_python.python_paths | length == 0
 
 - name: Upgrade Python 3.13
-  uv_python:
+  community.general.uv_python:
     version: 3.13
     state: latest
   register: upgrade_python
@@ -193,7 +193,7 @@
       - upgrade_python.python_paths | length >= 1
 
 - name: Upgrade Python 3.13 in check mode
-  uv_python:
+  community.general.uv_python:
     version: 3.13
     state: latest
   check_mode: true
@@ -207,7 +207,7 @@
       - upgrade_python.python_versions | length >= 1
 
 - name: Upgrade Python 3.13 again
-  uv_python:
+  community.general.uv_python:
     version: 3.13
     state: latest
   check_mode: true
@@ -221,7 +221,7 @@
       - upgrade_python.python_versions | length >= 1
 
 - name: Install unsupported Python version in check mode
-  uv_python:
+  community.general.uv_python:
     version: 2.0
     state: present
   register: unsupported_python_check_mode
@@ -236,7 +236,7 @@
       - '"Version 2.0 is not available." in unsupported_python_check_mode.msg'
 
 - name: Install unsupported Python version
-  uv_python:
+  community.general.uv_python:
     state: present
     version: 2.0
   register: unsupported_python
@@ -249,7 +249,7 @@
       - unsupported_python.failed is true
 
 - name: Install unsupported Python version with latest state
-  uv_python:
+  community.general.uv_python:
     version: "2.0"
     state: latest
   register: unsupported_python
@@ -262,7 +262,7 @@
       - unsupported_python.failed is true
 
 - name: Delete Python 3.13 version
-  uv_python:
+  community.general.uv_python:
     version: "3.13"
     state: absent
   register: uninstall_result
@@ -276,7 +276,7 @@
       - '"3.13" in uninstall_result.python_versions[0]'
 
 - name: No specified version
-  uv_python:
+  community.general.uv_python:
     state: latest
     version: ""
   ignore_errors: true
@@ -289,7 +289,7 @@
       - '"Unsupported version format" in no_version.msg'
 
 - name: Unsupported version format given
-  uv_python:
+  community.general.uv_python:
     state: latest
     version: "3.8.post2"
   ignore_errors: true

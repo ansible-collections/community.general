@@ -10,7 +10,7 @@
 
 
 - name: Set namespaced '/bus:business/rat:rating' to '11'
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-namespaced-beers.xml
     namespaces:
       bus: http://test.business
@@ -22,7 +22,7 @@
   register: set_element_first_run
 
 - name: Set namespaced '/bus:business/rat:rating' to '11' again
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-namespaced-beers.xml
     namespaces:
       bus: http://test.business

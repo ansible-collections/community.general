@@ -15,7 +15,7 @@
 
 - block:
     - name: "001: Enforce maintenance mode for {{ model_name }} with a note about why [check_mode test]"
-      spectrum_model_attrs: &mm_enabled_args
+      community.general.spectrum_model_attrs: &mm_enabled_args
         url: "{{ oneclick_url }}"
         username: "{{ oneclick_username }}"
         password: "{{ oneclick_password }}"
@@ -42,7 +42,7 @@
           - mm_enabled_check_mode.changed_attrs.isManaged == "false"
 
     - name: "002: Enforce maintenance mode for {{ model_name }} with a note about why"
-      spectrum_model_attrs:
+      community.general.spectrum_model_attrs:
         <<: *mm_enabled_args
       register: mm_enabled
       check_mode: false
@@ -59,7 +59,7 @@
           - mm_enabled.changed_attrs.isManaged == "false"
 
     - name: "003: Enforce maintenance mode for {{ model_name }} with a note about why [idempontence test]"
-      spectrum_model_attrs:
+      community.general.spectrum_model_attrs:
         <<: *mm_enabled_args
       register: mm_enabled_idp
       check_mode: false

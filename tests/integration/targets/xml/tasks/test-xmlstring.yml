@@ -13,7 +13,7 @@
 
 # NOTE: Jinja2 templating eats trailing newlines
 - name: Read from xmlstring (not using pretty_print)
-  xml:
+  community.general.xml:
     xmlstring: "{{ lookup('file', '{{ role_path }}/fixtures/ansible-xml-beers.xml') }}"
     xpath: .
   register: xmlresponse
@@ -36,7 +36,7 @@
 
 # NOTE: Jinja2 templating eats trailing newlines
 - name: Read from xmlstring (using pretty_print)
-  xml:
+  community.general.xml:
     xmlstring: "{{ lookup('file', '{{ role_path }}/fixtures/ansible-xml-beers.xml') }}"
     pretty_print: true
   register: xmlresponse
@@ -60,7 +60,7 @@
 
 # NOTE: Jinja2 templating eats trailing newlines
 - name: Read from xmlstring
-  xml:
+  community.general.xml:
     xmlstring: "{{ lookup('file', '{{ role_path }}/fixtures/ansible-xml-beers.xml') }}"
     xpath: /business/beers
     pretty_print: true

@@ -10,7 +10,7 @@
 ## Search ##########################################################
 ####################################################################
 - name: Test for ldap schema output
-  ldap_search:
+  community.general.ldap_search:
     dn: "ou=users,dc=example,dc=com"
     scope: "onelevel"
     schema: true

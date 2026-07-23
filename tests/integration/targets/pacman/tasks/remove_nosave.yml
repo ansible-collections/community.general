@@ -8,7 +8,7 @@
     config_file: /etc/mdadm.conf
   block:
     - name: Make sure that {{ package_name }} is not installed
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
 
@@ -18,7 +18,7 @@
         state: absent
 
     - name: Install {{ package_name }}
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: present
 
@@ -30,7 +30,7 @@
           # on 2 lines
 
     - name: Remove {{ package_name }} - generate pacsave
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: absent
 
@@ -49,7 +49,7 @@
         state: absent
 
     - name: Install {{ package_name }}
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         state: present
 
@@ -61,7 +61,7 @@
           # on 2 lines
 
     - name: Remove {{ package_name }} - nosave
-      pacman:
+      community.general.pacman:
         name: '{{ package_name }}'
         remove_nosave: true
         state: absent

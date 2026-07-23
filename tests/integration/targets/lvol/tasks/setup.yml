@@ -43,14 +43,14 @@
     loop_device4: "{{ loop_device4.stdout }}"
 
 - name: Create testvg1 volume group on disk devices
-  lvg:
+  community.general.lvg:
     vg: testvg1
     pvs:
       - "{{ loop_device1 }}"
       - "{{ loop_device2 }}"
 
 - name: Create testvg2 volume group on disk devices
-  lvg:
+  community.general.lvg:
     vg: testvg2
     pvs:
       - "{{ loop_device3 }}"

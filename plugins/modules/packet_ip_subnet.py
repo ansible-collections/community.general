@@ -91,7 +91,7 @@ EXAMPLES = r"""
   hosts: localhost
   tasks:
 
-    - packet_device:
+    - community.general.packet_device:
         project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
         hostnames: myserver
         operating_system: ubuntu_16_04

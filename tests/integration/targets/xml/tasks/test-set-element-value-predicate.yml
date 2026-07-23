@@ -13,7 +13,7 @@
     dest: /tmp/ansible-xml-items.xml
 
 - name: Update items via predicate (create_if_missing=false, first run - matches)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-items.xml
     xpath: /business/items/item[text()='value_a']
     value: value_c
@@ -21,7 +21,7 @@
   register: set_predicate_first_run
 
 - name: Update items via predicate (create_if_missing=false, second run - predicate no longer matches)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-items.xml
     xpath: /business/items/item[text()='value_a']
     value: value_c
@@ -54,7 +54,7 @@
     dest: /tmp/ansible-xml-items.xml
 
 - name: Set value on non-existent element (create_if_missing=false)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-items.xml
     xpath: /business/items/nonexistent
     value: something
@@ -74,7 +74,7 @@
     dest: /tmp/ansible-xml-items.xml
 
 - name: Set value on non-existent element (create_if_missing=true, should create)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-items.xml
     xpath: /business/items/item[text()='value_z']
     value: value_z
@@ -82,7 +82,7 @@
   register: set_predicate_create
 
 - name: Set same value again (create_if_missing=true, should be idempotent)
-  xml:
+  community.general.xml:
     path: /tmp/ansible-xml-items.xml
     xpath: /business/items/item[text()='value_z']
     value: value_z

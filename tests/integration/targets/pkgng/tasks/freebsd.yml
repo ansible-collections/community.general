@@ -7,7 +7,7 @@
 ## pkgng - prepare test environment
 ##
 - name: Remove test package
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     state: absent
 
@@ -21,7 +21,7 @@
 ## pkgng - example - state=latest for already up-to-date package
 ##
 - name: Upgrade package (idempotent)
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     state: latest
   register: pkgng_example2
@@ -43,19 +43,19 @@
   register: pkgng_example3_stat_before
 
 - name: Install package (checkmode)
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
   check_mode: true
   register: pkgng_example3_checkmode
 
 - name: Remove package
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     state: absent
   register: pkgng_example3
 
 - name: Remove package (idempotent)
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     state: absent
   register: pkgng_example3_idempotent
@@ -101,33 +101,33 @@
       register: pkgng_example4_prepare
 
     - name: Check for any available package upgrades (checkmode)
-      pkgng:
+      community.general.pkgng:
         name: '*'
         state: latest
       check_mode: true
       register: pkgng_example4_wildcard_checkmode
 
     - name: Check for available package upgrade (checkmode)
-      pkgng:
+      community.general.pkgng:
         name: '{{ pkgng_test_pkg_name }}'
         state: latest
       check_mode: true
       register: pkgng_example4_checkmode
 
     - name: Upgrade out-of-date package
-      pkgng:
+      community.general.pkgng:
         name: '{{ pkgng_test_pkg_name }}'
         state: latest
       register: pkgng_example4
 
     - name: Upgrade out-of-date package (idempotent)
-      pkgng:
+      community.general.pkgng:
         name: '{{ pkgng_test_pkg_name }}'
         state: latest
       register: pkgng_example4_idempotent
 
     - name: Remove test out-of-date package
-      pkgng:
+      community.general.pkgng:
         name: '{{ pkgng_test_pkg_name }}'
         state: absent
 
@@ -159,14 +159,14 @@
     - name: Check for any available package upgrades with unprivileged user
       become: true
       become_user: powerless
-      pkgng:
+      community.general.pkgng:
         name: '*'
         state: latest
       register: pkgng_example4_nopower_wildcard
       ignore_errors: true
 
     - name: Remove test out-of-date package
-      pkgng:
+      community.general.pkgng:
         name: '{{ pkgng_test_pkg_name }}'
         state: absent
 
@@ -180,14 +180,14 @@
 ## pkgng - example - Install multiple packages in one command
 ##
 - name: Remove test package (checkmode)
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     state: absent
   check_mode: true
   register: pkgng_example5_prepare
 
 - name: Install three packages
-  pkgng:
+  community.general.pkgng:
     name:
       - '{{ pkgng_test_pkg_name }}'
       - fish
@@ -195,7 +195,7 @@
   register: pkgng_example5
 
 - name: Remove three packages
-  pkgng:
+  community.general.pkgng:
     name:
       - '{{ pkgng_test_pkg_name }}'
       - fish
@@ -216,7 +216,7 @@
 ## pkgng - example - state=latest multiple packages, some already installed
 ##
 - name: Remove test package (checkmode)
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     state: absent
   check_mode: true
@@ -230,7 +230,7 @@
   register: pkgng_example6_prepare
 
 - name: Upgrade and/or install two packages
-  pkgng:
+  community.general.pkgng:
     name:
       - '{{ pkgng_test_pkg_name }}'
       - fish
@@ -238,7 +238,7 @@
   register: pkgng_example6
 
 - name: Remove two packages
-  pkgng:
+  community.general.pkgng:
     name:
       - '{{ pkgng_test_pkg_name }}'
       - fish
@@ -270,20 +270,20 @@
   when: ansible_facts.distribution_version is version('12.01', '>=')
   block:
     - name: Install GNU autotools
-      pkgng:
+      community.general.pkgng:
         name: autotools
         state: latest
       register: pkgng_example7_prepare_install
 
     - name: Remove GNU autotools and run pkg autoremove
-      pkgng:
+      community.general.pkgng:
         name: autotools
         state: absent
         autoremove: true
       register: pkgng_example7
 
     - name: Check if autoremove uninstalled known autotools dependencies
-      pkgng:
+      community.general.pkgng:
         name:
           - autoconf
           - automake
@@ -303,13 +303,13 @@
 ## pkgng - example - single annotations
 ##
 - name: Install and annotate single package
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: '+ansibletest_example8=added'
   register: pkgng_example8_add_annotation
 
 - name: Should fail to add duplicate annotation
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: '+ansibletest_example8=duplicate'
   ignore_errors: true
@@ -320,14 +320,14 @@
   register: pkgng_example8_add_annotation_verify
 
 - name: Install and annotate single package (checkmode, not changed)
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: '+ansibletest_example8=added'
   check_mode: true
   register: pkgng_example8_add_annotation_checkmode_nochange
 
 - name: Install and annotate single package (checkmode, changed)
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: '+ansibletest_example8_checkmode=added'
   check_mode: true
@@ -338,13 +338,13 @@
   register: pkgng_example8_add_annotation_checkmode_change_verify
 
 - name: Modify annotation on single package
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: ':ansibletest_example8=modified'
   register: pkgng_example8_modify_annotation
 
 - name: Should fail to modify missing annotation
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: ':ansiblemissing=modified'
   ignore_errors: true
@@ -355,7 +355,7 @@
   register: pkgng_example8_modify_annotation_verify
 
 - name: Remove annotation on single package
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: '-ansibletest_example8'
   register: pkgng_example8_remove_annotation
@@ -383,7 +383,7 @@
 ## pkgng - example - multiple annotations
 ##
 - name: Annotate single package with multiple annotations
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation:
       - '+ansibletest_example9_1=added'
@@ -400,7 +400,7 @@
   # ```
 
 - name: Multiple annotation operations on single package
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation:
       - ':ansibletest_example9_1=modified'
@@ -418,7 +418,7 @@
   # ```
 
 - name: Add multiple annotations with old syntax
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: '+ansibletest_example9_4=added,+ansibletest_example9_5=added'
   register: pkgng_example9_add_annotation_old
@@ -447,7 +447,7 @@
 ## pkgng - example - invalid annotation strings
 ##
 - name: Should fail on invalid annotate strings
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     annotation: '{{ item }}'
   ignore_errors: true
@@ -482,7 +482,7 @@
 # NOTE: testing for failure here to not have to set up our own
 #       or depend on a third-party, alternate package repo
 - name: Should fail with invalid pkgsite
-  pkgng:
+  community.general.pkgng:
     name: '{{ pkgng_test_pkg_name }}'
     pkgsite: DoesNotExist
   ignore_errors: true

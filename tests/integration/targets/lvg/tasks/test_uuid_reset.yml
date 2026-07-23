@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Create volume group on disk device
-  lvg:
+  community.general.lvg:
     vg: testvg
     pvs: "{{ loop_device1 }}"
 
@@ -17,7 +17,7 @@
   register: orig_pv_uuid_cmd_result
 
 - name: Deactivate and reset vg/pv uuid
-  lvg:
+  community.general.lvg:
     state: inactive
     vg: testvg
     pvs: "{{ loop_device1 }}"
@@ -41,13 +41,13 @@
       - orig_pv_uuid_cmd_result.stdout != new_pv_uuid_cmd_result.stdout
 
 - name: Reset vg uuid again to verify non-idempotence
-  lvg:
+  community.general.lvg:
     vg: testvg
     reset_vg_uuid: true
   register: repeat_vg_uuid_reset
 
 - name: Reset pv uuid again to verify non-idempotence
-  lvg:
+  community.general.lvg:
     vg: testvg
     reset_pv_uuid: true
     pvs: "{{ loop_device1 }}"
@@ -70,14 +70,14 @@
       - new_pv_uuid_cmd_result.stdout != repeat_pv_uuid_cmd_result.stdout
 
 - name: Reset vg uuid in check mode
-  lvg:
+  community.general.lvg:
     vg: testvg
     reset_vg_uuid: true
   register: check_mode_vg_uuid_reset
   check_mode: true
 
 - name: Reset pv uuid in check mode
-  lvg:
+  community.general.lvg:
     vg: testvg
     reset_pv_uuid: true
     pvs: "{{ loop_device1 }}"
@@ -101,7 +101,7 @@
       - check_mode_pv_uuid_cmd_result.stdout == repeat_pv_uuid_cmd_result.stdout
 
 - name: Activate volume group
-  lvg:
+  community.general.lvg:
     state: active
     vg: testvg
   register: vg_activate

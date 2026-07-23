@@ -11,7 +11,7 @@
     state: absent
 
 - name: "get state (table filter)"
-  iptables_state:
+  community.general.iptables_state:
     table: filter
     state: saved
     path: "{{ iptables_saved }}"
@@ -29,7 +29,7 @@
 
 
 - name: "get state (table nat)"
-  iptables_state:
+  community.general.iptables_state:
     table: nat
     state: saved
     path: "{{ iptables_saved }}"
@@ -48,7 +48,7 @@
 
 
 - name: "save state (table filter)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
     table: filter
@@ -67,7 +67,7 @@
 
 
 - name: "save state (table nat)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
     table: nat
@@ -87,7 +87,7 @@
 
 
 - name: "save state (any table)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
   register: iptables_state
@@ -106,7 +106,7 @@
 
 
 - name: "restore state (table nat, must NOT report a change, no warning)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: restored
     table: nat
@@ -136,7 +136,7 @@
 
 
 - name: "restore state (table nat, must report a change, no warning)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: restored
     table: nat
@@ -160,7 +160,7 @@
 
 
 - name: "get raw and mangle tables states"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
     table: "{{ item }}"
@@ -172,7 +172,7 @@
 
 
 - name: "save state (any table)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_saved }}"
     state: saved
   register: iptables_state
@@ -192,7 +192,7 @@
 
 
 - name: "save filter table into a test file"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_tests }}"
     table: filter
     state: saved
@@ -204,7 +204,7 @@
 
 
 - name: "restore state (table filter, must NOT report a change, no warning)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_tests }}"
     table: filter
     state: restored
@@ -232,7 +232,7 @@
 
 
 - name: "restore state (any table, must NOT report a change, no warning)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_tests }}"
     state: restored
   register: iptables_state
@@ -259,7 +259,7 @@
 
 
 - name: "restore state (table mangle, must fail, no warning)"
-  iptables_state:
+  community.general.iptables_state:
     path: "{{ iptables_tests }}"
     table: mangle
     state: restored

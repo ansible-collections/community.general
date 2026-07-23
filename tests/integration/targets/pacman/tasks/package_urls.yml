@@ -16,7 +16,7 @@
     extra_pkg_outfmt: sdparm
   block:
     - name: Make sure that test packages are not installed
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg}}'
@@ -61,7 +61,7 @@
         dest: '{{file_pkg_path}}'
 
     - name: Install packages from mixed sources (check mode)
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url}}'
@@ -70,7 +70,7 @@
       register: install_1
 
     - name: Install packages from url (check mode, cached)
-      pacman:
+      community.general.pacman:
         name:
           - '{{url_pkg_url}}'
       check_mode: true
@@ -81,7 +81,7 @@
         state: absent
 
     - name: Install packages from mixed sources
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url}}'
@@ -93,14 +93,14 @@
         state: absent
 
     - name: Install packages from mixed sources - (idempotency)
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url}}'
           - '{{file_pkg_path}}'
       register: install_3
     - name: Install packages from url - (idempotency, cached)
-      pacman:
+      community.general.pacman:
         name:
           - '{{url_pkg_url}}'
       register: install_3c
@@ -110,7 +110,7 @@
         state: absent
 
     - name: Install packages with their regular names (idempotency)
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg}}'
@@ -122,7 +122,7 @@
         state: absent
 
     - name: Install new package with already installed packages from mixed sources
-      pacman:
+      community.general.pacman:
         name:
           - '{{reg_pkg}}'
           - '{{url_pkg_url}}'
@@ -135,7 +135,7 @@
         state: absent
 
     - name: Uninstall packages - mixed sources (check mode)
-      pacman:
+      community.general.pacman:
         state: absent
         name:
           - '{{reg_pkg}}'
@@ -144,7 +144,7 @@
       check_mode: true
       register: uninstall_1
     - name: Uninstall packages - url (check mode, cached)
-      pacman:
+      community.general.pacman:
         state: absent
         name:
           - '{{url_pkg_url}}'
@@ -156,7 +156,7 @@
         state: absent
 
     - name: Uninstall packages - mixed sources
-      pacman:
+      community.general.pacman:
         state: absent
         name:
           - '{{reg_pkg}}'
@@ -169,7 +169,7 @@
         state: absent
 
     - name: Uninstall packages - mixed sources (idempotency)
-      pacman:
+      community.general.pacman:
         state: absent
         name:
           - '{{reg_pkg}}'
@@ -178,7 +178,7 @@
       register: uninstall_3
 
     - name: Uninstall package - url (idempotency, cached)
-      pacman:
+      community.general.pacman:
         state: absent
         name:
           - '{{url_pkg_url}}'

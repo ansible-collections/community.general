@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Remove test volume group
-  lvg:
+  community.general.lvg:
     vg: testvg
     force: true
     state: absent

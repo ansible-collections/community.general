@@ -25,14 +25,14 @@
 
 # Run twice without lzma backport installed, to make sure it does not crash
 - name: Archive - pre-test - first run
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_pretest_1.tar"
     format: "tar"
   register: pretest_1
 
 - name: Archive - pre-test - second run
-  archive:
+  community.general.archive:
     path: "{{ remote_tmp_dir }}/*.txt"
     dest: "{{ remote_tmp_dir }}/archive_pretest_1.tar"
     format: "tar"

@@ -10,7 +10,7 @@
 - when: "'--setautoactivation' in vgcreate_help_result.stdout"
   block:
     - name: Create autoactivated volume group on disk device
-      lvg:
+      community.general.lvg:
         state: active
         vg: vg_autoact_test
         pvs: "{{ loop_device2 }}"
@@ -24,13 +24,13 @@
         that: "'enabled' == active_vg_autoact_status_result.stdout"
 
     - name: Remove vg_autoact_test for the next test
-      lvg:
+      community.general.lvg:
         state: absent
         vg: vg_autoact_test
         force: true
 
     - name: Create auttoactivation disabled volume group on disk device
-      lvg:
+      community.general.lvg:
         state: inactive
         vg: vg_autoact_test
         pvs: "{{ loop_device2 }}"
@@ -44,13 +44,13 @@
         that: "inactive_vg_autoact_status_result.stdout | length == 0"
 
     - name: Remove vg_autoact_test for the next test
-      lvg:
+      community.general.lvg:
         state: absent
         vg: vg_autoact_test
         force: true
 
     - name: Create auttoactivation disabled by option volume group on disk device
-      lvg:
+      community.general.lvg:
         state: active
         vg: vg_autoact_test
         vg_options: "--setautoactivation n"
@@ -65,7 +65,7 @@
         that: "inactive_by_option_vg_autoact_status_result.stdout | length == 0"
   always:
     - name: Cleanup vg_autoact_test
-      lvg:
+      community.general.lvg:
         state: absent
         vg: vg_autoact_test
         force: true

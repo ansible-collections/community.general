@@ -41,7 +41,7 @@
       when: ansible_facts.distribution in ['MacOSX']
 
     - name: MACOS | Install 7zip package
-      homebrew:
+      community.general.homebrew:
         name: p7zip
         state: present
         update_homebrew: false

@@ -23,7 +23,7 @@
 # Create a new template
 
 - name: "Create a new TEMPLATE"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -76,7 +76,7 @@
 # Updating a template
 
 - name: "Update an existing TEMPLATE"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -126,7 +126,7 @@
       - result is changed
 
 - name: "Update an existing TEMPLATE with the same changes again"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -179,7 +179,7 @@
 # Deletion of templates
 
 - name: "Delete a nonexisting TEMPLATE"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -198,7 +198,7 @@
       - result is not changed
 
 - name: "Delete an existing TEMPLATE"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -220,7 +220,7 @@
 # Usage without `template` parameter
 
 - name: "Try to create use one_template with state=present and without the template parameter"
-  one_template:
+  community.general.one_template:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"

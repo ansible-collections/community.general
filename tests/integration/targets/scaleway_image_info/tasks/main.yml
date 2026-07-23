@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Get image information and register it in a variable
-  scaleway_image_info:
+  community.general.scaleway_image_info:
     region: par1
   register: images
 
@@ -23,7 +23,7 @@
       - images is success
 
 - name: Get image information from ams1 and register it in a variable
-  scaleway_image_info:
+  community.general.scaleway_image_info:
     region: ams1
   register: images_ams1
 

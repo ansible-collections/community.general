@@ -6,14 +6,14 @@
 - ansible.builtin.import_tasks: setup_value.yml
 
 - name: unsetting "push.pushoption"
-  git_config:
+  community.general.git_config:
     name: push.pushoption
     scope: global
     state: absent
   register: unset_result
 
 - name: getting all pushoptions values
-  git_config_info:
+  community.general.git_config_info:
     name: push.pushoption
     scope: global
   register: get_all_result

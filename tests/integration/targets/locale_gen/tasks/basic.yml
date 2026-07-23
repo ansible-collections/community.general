@@ -9,7 +9,7 @@
   ignore_errors: true
 
 - name: Make sure the locale is not installed {{ locale_basic.localegen }}
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ locale_basic.localegen }}"
     state: absent
 
@@ -24,7 +24,7 @@
       - locale_basic.skip_removal or locale_basic.locales | intersect(cleaned.stdout_lines) == []
 
 - name: Install the locale {{ locale_basic.localegen }}
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ locale_basic.localegen }}"
     state: present
   register: output_present
@@ -41,7 +41,7 @@
       - locale_basic.skip_removal or output_present is changed
 
 - name: Install the locale a second time {{ locale_basic.localegen }}
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ locale_basic.localegen }}"
     state: present
   register: output_present_idempotent
@@ -61,7 +61,7 @@
   when: locale_basic.skip_removal is false
   block:
     - name: Remove the locale {{ locale_basic.localegen }}
-      locale_gen:
+      community.general.locale_gen:
         name: "{{ locale_basic.localegen }}"
         state: absent
       register: output_absent
@@ -78,7 +78,7 @@
           - output_absent is changed
 
     - name: Remove the locale a second time {{ locale_basic.localegen }}
-      locale_gen:
+      community.general.locale_gen:
         name: "{{ locale_basic.localegen }}"
         state: absent
       register: output_absent_idempotent
@@ -96,7 +96,7 @@
 
 # Cleanup
 - name: Reinstall the locale we tested against if it was initially installed {{ locale_basic.localegen }}
-  locale_gen:
+  community.general.locale_gen:
     name: "{{ locale_basic.localegen }}"
     state: present
   when: locale_basic.locales | intersect(initial_state.stdout_lines) != []

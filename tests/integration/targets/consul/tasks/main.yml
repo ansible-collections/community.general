@@ -85,7 +85,7 @@
             delay: 3
             timeout: 60
         - name: Bootstrap ACL
-          consul_acl_bootstrap:
+          community.general.consul_acl_bootstrap:
           register: consul_bootstrap_result
         - ansible.builtin.set_fact:
             consul_management_token: '{{ consul_bootstrap_result.result.SecretID }}'

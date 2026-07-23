@@ -16,7 +16,7 @@
     dest: "{{ output_file }}"
 
 - name: test-modify_inactive_option 1 - set value for foo with modify_inactive_option set to true
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: section1
     option: foo
@@ -58,7 +58,7 @@
     dest: "{{ output_file }}"
 
 - name: test-modify_inactive_option 2 - set value for foo with modify_inactive_option set to false
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: section1
     option: foo
@@ -91,7 +91,7 @@
 
 
 - name: test-modify_inactive_option 3 - remove foo=bar with modify_inactive_option set to true to ensure it doesn't have effect for removal
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: section1
     option: foo
@@ -134,7 +134,7 @@
     dest: "{{ output_file }}"
 
 - name: test-modify_inactive_option 4 - set value for foo with modify_inactive_option set to true
-  ini_file:
+  community.general.ini_file:
     path: "{{ output_file }}"
     section: section1
     option: foo

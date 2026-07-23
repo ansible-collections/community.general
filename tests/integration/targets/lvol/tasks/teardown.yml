@@ -7,7 +7,7 @@
   loop:
     - testvg1
     - testvg2
-  lvg:
+  community.general.lvg:
     vg: "{{ item }}"
     force: true
     state: absent

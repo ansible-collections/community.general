@@ -8,7 +8,7 @@
 ##
 
 - name: set timezone to Australia/Brisbane (checkmode)
-  timezone:
+  community.general.timezone:
     name: Australia/Brisbane
   check_mode: true
   register: timezone_set_checkmode
@@ -39,7 +39,7 @@
     - ansible_facts.os_family == 'Debian'
 
 - name: set timezone to Australia/Brisbane
-  timezone:
+  community.general.timezone:
     name: Australia/Brisbane
   register: timezone_set
 
@@ -67,7 +67,7 @@
     - ansible_facts.os_family == 'Debian'
 
 - name: set timezone to Australia/Brisbane again
-  timezone:
+  community.general.timezone:
     name: Australia/Brisbane
   register: timezone_again
 
@@ -77,7 +77,7 @@
       - not timezone_again.changed
 
 - name: set timezone to Australia/Brisbane again in checkmode
-  timezone:
+  community.general.timezone:
     name: Australia/Brisbane
   register: timezone_again_checkmode
 
@@ -104,11 +104,11 @@
 
 - block:
     - name: set timezone to Etc/UTC
-      timezone:
+      community.general.timezone:
         name: Etc/UTC
 
     - name: change timezone from Etc/UTC to UTC
-      timezone:
+      community.general.timezone:
         name: UTC
       register: timezone_etcutc_to_utc
 
@@ -120,7 +120,7 @@
           - timezone_etcutc_to_utc.diff.after.name == 'UTC'
 
     - name: change timezone from UTC to Etc/UTC
-      timezone:
+      community.general.timezone:
         name: Etc/UTC
       register: timezone_utc_to_etcutc
 
@@ -148,7 +148,7 @@
       ansible.builtin.command: cp /dev/null {{ timezone_config_file }}
 
     - name: set timezone to Europe/Belgrade (empty config file)
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
       register: timezone_empty_conf
 
@@ -174,7 +174,7 @@
         state: absent
 
     - name: set timezone to Europe/Belgrade (no config file)
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
       register: timezone_missing_conf
 
@@ -202,7 +202,7 @@
         force: true
 
     - name: set timezone to Europe/Belgrade (over symlink)
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
       register: timezone_symllink
 
@@ -230,7 +230,7 @@
         force: true
 
     - name: set timezone to Europe/Belgrade (over broken symlink)
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
       register: timezone_symllink_broken
 
@@ -257,7 +257,7 @@
         remote_src: true
 
     - name: set timezone to Europe/Belgrade (over copied file)
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
       register: timezone_copied
 
@@ -299,11 +299,11 @@
 
 - block:
     - name: set hwclock to local
-      timezone:
+      community.general.timezone:
         hwclock: local
 
     - name: set hwclock to UTC (checkmode)
-      timezone:
+      community.general.timezone:
         hwclock: UTC
       check_mode: true
       register: hwclock_set_checkmode
@@ -326,7 +326,7 @@
       when: ansible_facts.service_mgr != 'systemd'
 
     - name: set hwclock to UTC
-      timezone:
+      community.general.timezone:
         hwclock: UTC
       register: hwclock_set
 
@@ -346,7 +346,7 @@
       when: ansible_facts.service_mgr != 'systemd'
 
     - name: set hwclock to RTC again
-      timezone:
+      community.general.timezone:
         hwclock: UTC
       register: hwclock_again
 
@@ -356,7 +356,7 @@
           - not hwclock_again.changed
 
     - name: set hwclock to RTC again (checkmode)
-      timezone:
+      community.general.timezone:
         hwclock: UTC
       check_mode: true
       register: hwclock_again_checkmode
@@ -385,7 +385,7 @@
             - '{{ hwclock_config_file }}'
 
         - name: set hwclock to UTC with deleted /etc/adjtime and conf file
-          timezone:
+          community.general.timezone:
             hwclock: UTC
           register: hwclock_set_utc_deleted_adjtime_and_conf
 
@@ -409,7 +409,7 @@
             - /etc/adjtime
 
         - name: set hwclock to UTC with deleted /etc/adjtime
-          timezone:
+          community.general.timezone:
             hwclock: UTC
           register: hwclock_set_utc_deleted_adjtime_utc
 
@@ -421,7 +421,7 @@
               - hwclock_set_utc_deleted_adjtime_utc.diff.before.hwclock == 'UTC'
 
         - name: set hwclock to LOCAL with deleted /etc/adjtime
-          timezone:
+          community.general.timezone:
             hwclock: local
           register: hwclock_set_local_deleted_adjtime_local
 
@@ -445,7 +445,7 @@
             - '{{ hwclock_config_file }}'
 
         - name: set hwclock to UTC with deleted conf
-          timezone:
+          community.general.timezone:
             hwclock: UTC
           register: hwclock_set_utc_deleted_conf
 
@@ -467,7 +467,7 @@
             dest: /etc/adjtime
 
         - name: set hwclock to UTC with broken /etc/adjtime
-          timezone:
+          community.general.timezone:
             hwclock: UTC
           register: hwclock_set_utc_broken_adjtime
 
@@ -479,7 +479,7 @@
               - hwclock_set_utc_broken_adjtime.diff.before.hwclock == 'UTC'
 
         - name: set hwclock to LOCAL with broken /etc/adjtime
-          timezone:
+          community.general.timezone:
             hwclock: local
           register: hwclock_set_local_broken_adjtime
 
@@ -502,12 +502,12 @@
     ##
 
     - name: set timezone to Etc/UTC and hwclock to local
-      timezone:
+      community.general.timezone:
         name: Etc/UTC
         hwclock: local
 
     - name: set timezone to Europe/Belgrade and hwclock to UTC (checkmode)
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
         hwclock: UTC
       check_mode: true
@@ -549,7 +549,7 @@
       when: ansible_facts.service_mgr != 'systemd'
 
     - name: set timezone to Europe/Belgrade and hwclock to UTC
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
         hwclock: UTC
       register: tzclock_set
@@ -586,7 +586,7 @@
       when: ansible_facts.service_mgr != 'systemd'
 
     - name: set timezone to Europe/Belgrade and hwclock to UTC again
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
         hwclock: UTC
       register: tzclock_set_again
@@ -597,7 +597,7 @@
           - not tzclock_set_again.changed
 
     - name: set timezone to Europe/Belgrade and hwclock to UTC again (checkmode)
-      timezone:
+      community.general.timezone:
         name: Europe/Belgrade
         hwclock: UTC
       register: tzclock_set_again_checkmode

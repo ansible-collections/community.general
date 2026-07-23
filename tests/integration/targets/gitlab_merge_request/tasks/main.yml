@@ -15,7 +15,7 @@
 
 - block:
     - name: Create {{ gitlab_project_name }}
-      gitlab_project:
+      community.general.gitlab_project:
         api_url: "{{ gitlab_host }}"
         validate_certs: true
         api_token: "{{ gitlab_api_token }}"
@@ -26,7 +26,7 @@
         state: present
 
     - name: Create branch {{ gitlab_source_branch }}
-      gitlab_branch:
+      community.general.gitlab_branch:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -35,7 +35,7 @@
         state: present
 
     - name: Create Merge Request
-      gitlab_merge_request:
+      community.general.gitlab_merge_request:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -57,7 +57,7 @@
           - gitlab_merge_request_create is changed
 
     - name: Create Merge Request ( Idempotency test )
-      gitlab_merge_request:
+      community.general.gitlab_merge_request:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -79,7 +79,7 @@
           - gitlab_merge_request_create_idempotence is not changed
 
     - name: Update Merge Request Test
-      gitlab_merge_request:
+      community.general.gitlab_merge_request:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -103,7 +103,7 @@
           - "'### Description\n\nMerge Request test description' in gitlab_merge_request_udpate.mr.description"
 
     - name: Delete Merge Request
-      gitlab_merge_request:
+      community.general.gitlab_merge_request:
         api_url: "{{ gitlab_host }}"
         api_token: "{{ gitlab_api_token }}"
         project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
@@ -120,7 +120,7 @@
 
   always:
     - name: Clean up {{ gitlab_project_name }}
-      gitlab_project:
+      community.general.gitlab_project:
         api_url: "{{ gitlab_host }}"
         validate_certs: false
         api_token: "{{ gitlab_api_token }}"

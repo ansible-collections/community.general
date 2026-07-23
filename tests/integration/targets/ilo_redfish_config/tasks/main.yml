@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Set NTP Servers
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetNTPServers
     baseuri: "{{ baseuri }}"
@@ -14,7 +14,7 @@
     attribute_value: 1.2.3.4
 
 - name: Set DNS Server
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetDNSserver
     baseuri: "{{ baseuri }}"
@@ -24,7 +24,7 @@
     attribute_value: 192.168.1.1
 
 - name: Set Domain name
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetDomainName
     baseuri: "{{ baseuri }}"
@@ -34,7 +34,7 @@
     attribute_value: tst.sgp.hp.mfg
 
 - name: Disable WINS Reg
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetWINSReg
     baseuri: "{{ baseuri }}"
@@ -43,7 +43,7 @@
     attribute_name: WINSRegistration
 
 - name: Set TimeZone
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetTimeZone
     baseuri: "{{ baseuri }}"

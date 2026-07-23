@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Make sure volume is not there before tests
-  scaleway_volume:
+  community.general.scaleway_volume:
     name: ansible-test-volume
     state: absent
     region: '{{ scaleway_region }}'
@@ -21,7 +21,7 @@
       - server_creation_check_task is success
 
 - name: Create volume
-  scaleway_volume:
+  community.general.scaleway_volume:
     name: ansible-test-volume
     state: present
     region: '{{ scaleway_region }}'
@@ -39,7 +39,7 @@
       - server_creation_check_task is changed
 
 - name: Make sure volume is deleted
-  scaleway_volume:
+  community.general.scaleway_volume:
     name: ansible-test-volume
     state: absent
     region: '{{ scaleway_region }}'

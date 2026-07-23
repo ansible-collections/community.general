@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Count nodes in an XML string
-  xml_info:
+  community.general.xml_info:
     xmlstring: "{{ xml_info_test_xml }}"
     xpath: /business/beers/beer
     what: count
@@ -17,7 +17,7 @@
       - count_result.count == 3
 
 - name: Get element text from an XML string
-  xml_info:
+  community.general.xml_info:
     xmlstring: "{{ xml_info_test_xml }}"
     xpath: /business/rating
     what: content_text
@@ -32,7 +32,7 @@
       - text_result.content_text[0].text == '10'
 
 - name: Get paths from an XML string
-  xml_info:
+  community.general.xml_info:
     xmlstring: "{{ xml_info_test_xml }}"
     xpath: /business/beers/beer
     what: paths

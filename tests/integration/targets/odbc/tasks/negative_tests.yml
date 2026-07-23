@@ -12,7 +12,7 @@
 # Invalid DSN in the module
 #
 - name: "Test with an invalid DSN"
-  odbc:
+  community.general.odbc:
     dsn: "t1"
     query: "SELECT * FROM nothing"
   register: results

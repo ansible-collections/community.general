@@ -6,7 +6,7 @@
 - ansible.builtin.include_tasks: "{{ item.import_file }}"
 
 - name: getting only a single value (as string) from an option with multiple values in the git config file
-  git_config_info:
+  community.general.git_config_info:
     name: push.pushoption
     scope: "{{ item.git_scope }}"
     path: "{{ item.git_file | default(omit) }}"

@@ -30,7 +30,7 @@
       - check_file.stat.exists == False
 
 - name: Umount ISO
-  mount:
+  ansible.posix.mount:
     path: "{{ mount_root_dir }}"
     fstab: "{{ test_dir }}/temp.fstab"
     state: unmounted

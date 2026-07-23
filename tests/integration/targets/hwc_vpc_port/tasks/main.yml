@@ -10,13 +10,13 @@
 
 # Pre-test setup
 - name: create a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
     state: present
   register: vpc
 - name: create a subnet
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     gateway_ip: "192.168.100.32"
     name: "ansible_network_subnet_test"
     dhcp_enable: true
@@ -25,13 +25,13 @@
     state: present
   register: subnet
 - name: delete a port
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: absent
 # ----------------------------------------------------------
 - name: create a port (check mode)
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: present
@@ -43,7 +43,7 @@
       - result is changed
 # ----------------------------------------------------------
 - name: create a port
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: present
@@ -54,7 +54,7 @@
       - result is changed
 # ----------------------------------------------------------
 - name: create a port (idemponent)
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: present
@@ -65,7 +65,7 @@
       - not result.changed
 # ----------------------------------------------------------------------------
 - name: create a port that already exists
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: present
@@ -77,7 +77,7 @@
       - result is not changed
 # ----------------------------------------------------------
 - name: delete a port (check mode)
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: absent
@@ -89,7 +89,7 @@
       - result is changed
 # ----------------------------------------------------------
 - name: delete a port
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: absent
@@ -100,7 +100,7 @@
       - result is changed
 # ----------------------------------------------------------
 - name: delete a port (idemponent)
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: absent
@@ -112,7 +112,7 @@
       - not result.changed
 # ----------------------------------------------------------------------------
 - name: delete a port that does not exist
-  hwc_vpc_port:
+  community.general.hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
     state: absent
@@ -125,7 +125,7 @@
 # ---------------------------------------------------------
 # Post-test teardown
 - name: delete a subnet
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     gateway_ip: "192.168.100.32"
     name: "ansible_network_subnet_test"
     dhcp_enable: true
@@ -134,7 +134,7 @@
     state: absent
   register: subnet
 - name: delete a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
     state: absent

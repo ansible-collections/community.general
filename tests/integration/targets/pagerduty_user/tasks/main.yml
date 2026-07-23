@@ -9,7 +9,7 @@
     state: present
 
 - name: Create a user account on PagerDuty
-  pagerduty_user:
+  community.general.pagerduty_user:
     access_token: '{{ pd_api_access_token }}'
     pd_user: '{{ fullname }}'
     pd_email: '{{ email }}'
@@ -18,7 +18,7 @@
     state: present
 
 - name: Remove a user account from PagerDuty
-  pagerduty_user:
+  community.general.pagerduty_user:
     access_token: "{{ pd_api_access_token }}"
     pd_user: "{{ fullname }}"
     pd_email: "{{ email }}"

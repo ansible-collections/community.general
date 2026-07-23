@@ -10,7 +10,7 @@
 
 # Checks for existence
 - name: Make sure image is present by ID
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -24,7 +24,7 @@
       - result is not changed
 
 - name: Make sure image is present by ID
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -39,7 +39,7 @@
 
 # Updating an image
 - name: Clone image without name
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -53,7 +53,7 @@
       - result is changed
 
 - name: Clone image with name
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -68,7 +68,7 @@
       - result is changed
 
 - name: Disable image
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -82,7 +82,7 @@
       - result is changed
 
 - name: Enable image
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -96,7 +96,7 @@
       - result is changed
 
 - name: Make image persistent
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -110,7 +110,7 @@
       - result is changed
 
 - name: Make image non-persistent
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -125,7 +125,7 @@
 
 # Testing idempotence using the same tasks
 - name: Make image non-persistent
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -141,7 +141,7 @@
 
 # Delete images
 - name: Deleting non-existing image
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -155,7 +155,7 @@
       - result is not changed
 
 - name: Delete an existing image
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -170,7 +170,7 @@
 
 # Trying to run with wrong arguments
 - name: Try to use name and ID at the same time
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -185,7 +185,7 @@
       - result is failed
 
 - name: Try to rename image without specifying new name
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
@@ -200,7 +200,7 @@
       - result is failed
 
 - name: Try to rename image without specifying new name
-  one_image:
+  community.general.one_image:
     api_url: "{{ opennebula_url }}"
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"

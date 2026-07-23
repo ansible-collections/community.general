@@ -14,7 +14,7 @@
     state: present
 
 - name: Add a User to A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
@@ -23,7 +23,7 @@
     state: present
 
 - name: Remove a User from A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
@@ -31,7 +31,7 @@
     state: absent
 
 - name: Add a list of Users to A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
@@ -40,7 +40,7 @@
     state: present
 
 - name: Remove a list of Users to A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
@@ -48,7 +48,7 @@
     state: absent
 
 - name: Add a list of Users with Dedicated Access Levels to A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
@@ -56,7 +56,7 @@
     state: present
 
 - name: Remove a list of Users with Dedicated Access Levels to A GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
@@ -64,7 +64,7 @@
     state: absent
 
 - name: Add a user, remove all others which might be on this access level
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'

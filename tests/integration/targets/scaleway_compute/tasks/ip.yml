@@ -5,7 +5,7 @@
 
 - name: Create a server with no IP (Check)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -25,7 +25,7 @@
       - server_creation_absent_check_task is changed
 
 - name: Create a server
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -46,7 +46,7 @@
       - server_creation_absent_task is changed
 
 - name: Create a server (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -70,7 +70,7 @@
 
 - name: Patch server tags (Check)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: dynamic
@@ -90,7 +90,7 @@
       - ip_patching_check_task is changed
 
 - name: Patch server tags
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: dynamic
@@ -110,7 +110,7 @@
       - ip_patching_task is changed
 
 - name: Patch server tags (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: dynamic
@@ -134,7 +134,7 @@
 
 - name: Patch server tags (Check)
   check_mode: true
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -154,7 +154,7 @@
       - remove_ip_check_task is changed
 
 - name: Patch server tags
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -175,7 +175,7 @@
       - remove_ip_task is changed
 
 - name: Patch server tags (Confirmation)
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: present
     public_ip: absent
@@ -196,7 +196,7 @@
       - remove_ip_confirmation_task is not changed
 
 - name: Destroy it
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: '{{ scaleway_name }}'
     state: absent
     image: '{{ scaleway_image_id }}'
