@@ -43,7 +43,7 @@
   when: ansible_facts.service_mgr == 'systemd' and ansible_facts.distribution == 'Fedora'
 
 - name: Kill all postgres processes
-  ansible.builtin.shell: 'pkill -u {{ pg_user }}'
+  ansible.builtin.command: 'pkill -u {{ pg_user }}'
   become: true
   when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
   ignore_errors: true
@@ -231,7 +231,7 @@
     seconds: 5
 
 - name: Kill all postgres processes
-  ansible.builtin.shell: 'pkill -u {{ pg_user }}'
+  ansible.builtin.command: 'pkill -u {{ pg_user }}'
   become: true
   when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
   ignore_errors: true

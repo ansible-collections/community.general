@@ -22,7 +22,7 @@
 
 # Execute current selected 'dummy' and ensure it's the alternative we expect
 - name: Execute the current dummy command
-  ansible.builtin.shell: dummy
+  ansible.builtin.command: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -45,7 +45,7 @@
   ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
 
 - name: Execute the current dummy command
-  ansible.builtin.shell: dummy
+  ansible.builtin.command: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -67,7 +67,7 @@
   ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^manual$"'
 
 - name: Execute the current dummy command
-  ansible.builtin.shell: dummy
+  ansible.builtin.command: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -89,7 +89,7 @@
   ansible.builtin.shell: 'head -n1 {{ alternatives_dir }}/dummy | grep "^auto$"'
 
 - name: Execute the current dummy command
-  ansible.builtin.shell: dummy
+  ansible.builtin.command: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed
@@ -106,12 +106,12 @@
     state: absent
 
 - name: Ensure that the link group is in auto mode
-  ansible.builtin.shell: 'grep "/usr/bin/dummy2" {{ alternatives_dir }}/dummy'
+  ansible.builtin.command: 'grep "/usr/bin/dummy2" {{ alternatives_dir }}/dummy'
   register: cmd
   failed_when: cmd.rc == 0
 
 - name: Execute the current dummy command
-  ansible.builtin.shell: dummy
+  ansible.builtin.command: dummy
   register: cmd
 
 - name: Ensure that the expected command was executed

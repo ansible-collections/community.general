@@ -76,7 +76,7 @@
         - ldap_inc_config.ldif
 
     - name: Configure admin password for cn=config
-      ansible.builtin.shell: "ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/{{ item }}"
+      ansible.builtin.command: "ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/{{ item }}"
       loop:
         - rootpw_cnconfig.ldif
         - cert_cnconfig.ldif
@@ -84,7 +84,7 @@
 
     - name: Add initial config
       become: true
-      ansible.builtin.shell: 'ldapadd -H ldapi:/// -x -D "cn=admin,dc=example,dc=com" -w Test1234! -f /tmp/{{ item }}'
+      ansible.builtin.command: 'ldapadd -H ldapi:/// -x -D "cn=admin,dc=example,dc=com" -w Test1234! -f /tmp/{{ item }}'
       loop:
         - initial_config.ldif
         - ldap_inc_config.ldif

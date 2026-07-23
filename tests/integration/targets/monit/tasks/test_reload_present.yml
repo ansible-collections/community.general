@@ -31,7 +31,7 @@
   failed_when: result is not skip and result is success
 
 - name: start process
-  ansible.builtin.shell: "{{ process_run_cmd }}"
+  ansible.builtin.command: "{{ process_run_cmd }}"
 
 - ansible.builtin.import_tasks: check_state.yml
   vars:

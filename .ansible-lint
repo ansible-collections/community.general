@@ -16,7 +16,6 @@ skip_list:
   # To be checked and maybe fixed:
   - args
   - command-instead-of-module
-  - command-instead-of-shell
   - complexity
   - fqcn
   - galaxy

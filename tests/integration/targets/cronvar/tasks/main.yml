@@ -131,7 +131,7 @@
     state: present
 
 - name: Assert empty var present
-  ansible.builtin.shell: crontab -l
+  ansible.builtin.command: crontab -l
   register: result
   changed_when: false
 

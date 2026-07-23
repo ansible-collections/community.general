@@ -15,7 +15,7 @@
       register: fs_result
 
     - name: "Get UUID of created filesystem"
-      ansible.builtin.shell:
+      ansible.builtin.shell:  # noqa: command-instead-of-shell
         cmd: "{{ get_uuid_cmd }}"
       changed_when: false
       register: uuid
@@ -28,7 +28,7 @@
       register: fs_resetuuid_result
 
     - name: "Get UUID of the filesystem"
-      ansible.builtin.shell:
+      ansible.builtin.shell:  # noqa: command-instead-of-shell
         cmd: "{{ get_uuid_cmd }}"
       changed_when: false
       register: uuid2
