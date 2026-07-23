@@ -215,7 +215,10 @@ class Connection(ConnectionBase):
         local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        process.communicate()
+        _stdout, stderr = process.communicate()
+
+        if process.returncode != 0:
+            raise AnsibleError(f"failed to transfer file to instance {self._host()}: {to_text(stderr).strip()}")
 
     def fetch_file(self, in_path, out_path):
         """fetch a file from lxd to local"""
@@ -231,7 +234,10 @@ class Connection(ConnectionBase):
         local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
         process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        process.communicate()
+        _stdout, stderr = process.communicate()
+
+        if process.returncode != 0:
+            raise AnsibleError(f"failed to transfer file from instance {self._host()}: {to_text(stderr).strip()}")
 
     def close(self):
         """close the connection (nothing to do here)"""
