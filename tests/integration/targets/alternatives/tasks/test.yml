@@ -36,7 +36,7 @@
   when: not with_link
 
 - name: execute dummy command
-  ansible.builtin.shell: dummy
+  ansible.builtin.command: dummy
   register: cmd
 
 - name: check expected command was executed

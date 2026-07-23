@@ -30,7 +30,7 @@
 
 # the yum module does not have an autoremove parameter
 - name: uninstall packages which were not originally installed (yum)
-  ansible.builtin.shell: yum -y autoremove mercurial
+  ansible.builtin.command: yum -y autoremove mercurial
   when: ansible_facts.pkg_mgr == 'yum'
 
 - name: uninstall packages which were not originally installed

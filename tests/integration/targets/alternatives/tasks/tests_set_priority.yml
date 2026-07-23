@@ -12,7 +12,7 @@
   register: alternative
 
 - name: execute dummy command
-  ansible.builtin.shell: dummy
+  ansible.builtin.command: dummy
   register: cmd
 
 - name: check if link group is in manual mode

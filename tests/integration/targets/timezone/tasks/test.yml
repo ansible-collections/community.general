@@ -91,7 +91,7 @@
 ##
 
 - name: check dpkg-reconfigure
-  ansible.builtin.shell: type dpkg-reconfigure
+  ansible.builtin.shell: type dpkg-reconfigure  # noqa: command-instead-of-shell
   register: check_dpkg_reconfigure
   ignore_errors: true
   changed_when: false

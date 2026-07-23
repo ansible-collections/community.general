@@ -9,10 +9,10 @@
     creates: "{{ remote_tmp_dir }}/tmp_mount/test_file"
 
 - name: Growing the second loop device file to 1500MB
-  ansible.builtin.shell: truncate -s 1500M {{ remote_tmp_dir }}/test_lvm_pv_02.img
+  ansible.builtin.command: truncate -s 1500M {{ remote_tmp_dir }}/test_lvm_pv_02.img
 
 - name: Refreshing the second loop device
-  ansible.builtin.shell: losetup -c {{ loop_device_02.stdout }}
+  ansible.builtin.command: losetup -c {{ loop_device_02.stdout }}
 
 - name: Resizing the second physical volume
   community.general.lvm_pv:

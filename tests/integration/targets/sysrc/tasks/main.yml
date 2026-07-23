@@ -9,11 +9,11 @@
     - ansible_facts.distribution == 'FreeBSD'
   block:
     - name: Cache original contents of /etc/rc.conf
-      ansible.builtin.shell: "cat /etc/rc.conf"
+      ansible.builtin.command: "cat /etc/rc.conf"
       register: cached_etc_rcconf_content
 
     - name: Cache original contents of /boot/loader.conf
-      ansible.builtin.shell: "cat /boot/loader.conf"
+      ansible.builtin.command: "cat /boot/loader.conf"
       register: cached_boot_loaderconf_content
 
     ##
@@ -409,7 +409,7 @@
       register: sysrc_10394_changed
 
     - name: Get file content
-      ansible.builtin.shell: "cat /tmp/10394.conf"
+      ansible.builtin.command: "cat /tmp/10394.conf"
       register: sysrc_10394_content
 
     - name: Ensure sysrc changed k1 from v1 to v2
