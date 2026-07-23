@@ -80,11 +80,11 @@ options:
 import os
 import re
 import shlex
-from subprocess import PIPE, Popen, call
+from subprocess import PIPE, Popen
 
 from ansible.errors import AnsibleConnectionFailure, AnsibleError, AnsibleFileNotFound
 from ansible.module_utils.common.process import get_bin_path
-from ansible.module_utils.common.text.converters import to_bytes
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.connection import ConnectionBase
 
 
@@ -306,7 +306,11 @@ class Connection(ConnectionBase):
 
         local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
-        call(local_cmd)
+        process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        _stdout, stderr = process.communicate()
+
+        if process.returncode != 0:
+            raise AnsibleError(f"failed to transfer file to instance {self._instance()}: {to_text(stderr).strip()}")
 
     def fetch_file(self, in_path, out_path):
         """fetch a file from Incus to local"""
@@ -327,7 +331,11 @@ class Connection(ConnectionBase):
 
         local_cmd = [to_bytes(i, errors="surrogate_or_strict") for i in local_cmd]
 
-        call(local_cmd)
+        process = Popen(local_cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        _stdout, stderr = process.communicate()
+
+        if process.returncode != 0:
+            raise AnsibleError(f"failed to transfer file from instance {self._instance()}: {to_text(stderr).strip()}")
 
     def close(self):
         """close the connection (nothing to do here)"""
