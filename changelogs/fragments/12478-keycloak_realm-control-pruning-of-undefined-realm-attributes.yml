@@ -1,0 +1,2 @@
+minor_changes:
+  - keycloak_realm - add parameter prune_undefined_realm_attributes to control whether undefined realm attributes get pruned (https://github.com/ansible-collections/community.general/issues/12478, https://github.com/ansible-collections/community.general/pull/12479/).

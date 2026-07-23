@@ -96,3 +96,90 @@
       - result.end_state.clientOfflineSessionMaxLifespan == 200
       - result.end_state.oauth2DeviceCodeLifespan == 700
       - result.end_state.oauth2DevicePollingInterval == 800
+
+- name: Modify realm attributes without pruning undefined attributes. Step 1 - Introduce custom realm attributes
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    prune_undefined_realm_attributes: false
+    state: present
+    attributes:
+      custom-realm-attribute-1: 123
+      custom-realm-attribute-2: true
+  register: result
+
+- name: Assert realm attribute without pruning undefined data result (Step 1)
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state.attributes["custom-realm-attribute-1"] == "123"
+      - result.end_state.attributes["custom-realm-attribute-2"] == "true"
+
+- name: Modify realm attributes without pruning undefined attributes. Step 2 - Verify unchanged custom realm attributes
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    prune_undefined_realm_attributes: false
+    state: present
+    attributes:
+      custom-realm-attribute-2: false
+  register: result
+
+- name: Assert realm attribute without pruning undefined data result (Step 2)
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state.attributes["custom-realm-attribute-1"] == "123" # should still be 123
+      - result.end_state.attributes["custom-realm-attribute-2"] == "false"
+
+- name: Modify realm attributes with pruning undefined attributes
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    prune_undefined_realm_attributes: true
+    state: present
+    attributes:
+      custom-realm-attribute-3: custom-attribute-3
+  register: result
+
+- name: Assert realm attribute with pruning undefined data result
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state.attributes["custom-realm-attribute-1"] is not defined
+      - result.end_state.attributes["custom-realm-attribute-2"] is not defined
+      - result.end_state.attributes["custom-realm-attribute-3"] == "custom-attribute-3"
+
+- name: Modify realm attributes prunes undefined attributes by default
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+    attributes:
+      custom-realm-attribute-4: custom-attribute-4
+  register: result
+
+- name: Assert realm attribute with pruning undefined data result
+  ansible.builtin.assert:
+    that:
+      - result is changed
+      - result.end_state.attributes["custom-realm-attribute-1"] is not defined
+      - result.end_state.attributes["custom-realm-attribute-2"] is not defined
+      - result.end_state.attributes["custom-realm-attribute-3"] is not defined
+      - result.end_state.attributes["custom-realm-attribute-4"] == "custom-attribute-4"
