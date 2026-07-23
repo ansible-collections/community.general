@@ -265,7 +265,8 @@
     extra_args_precommand: --root {{ remote_tmp_dir | expanduser }}/testdir/
 
 - name: check that dir var is exist
-  ansible.builtin.stat: path={{ remote_tmp_dir | expanduser }}/testdir/var
+  ansible.builtin.stat:
+    path: "{{ remote_tmp_dir | expanduser }}/testdir/var"
   register: stat_result
 
 - name: check that we extract rpm package in testdir folder and folder var is exist

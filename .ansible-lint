@@ -27,7 +27,6 @@ skip_list:
   - latest
   - literal-compare
   - name
-  - no-free-form
   - no-handler
   - package-latest
   - risky-file-permissions

@@ -49,7 +49,9 @@
   ignore_errors: true
 
 - name: stop postgresql service
-  ansible.builtin.service: name={{ postgresql_service }} state=stopped
+  ansible.builtin.service:
+    name: "{{ postgresql_service }}"
+    state: stopped
   ignore_errors: true
 
 - name: remove old db (RedHat or Suse)
@@ -115,7 +117,9 @@
   when: ansible_facts.os_family == 'Debian'
 
 - name: Initialize postgres (Suse)
-  ansible.builtin.service: name=postgresql state=stopped
+  ansible.builtin.service:
+    name: postgresql
+    state: stopped
   when: ansible_facts.os_family == 'Suse'
 
 - name: Pause between stop and start postgresql
@@ -150,7 +154,9 @@
   when: ansible_facts.distribution == 'Archlinux'
 
 - name: Initialize postgres (Suse)
-  ansible.builtin.service: name=postgresql state=started
+  ansible.builtin.service:
+    name: postgresql
+    state: started
   when: ansible_facts.os_family == 'Suse'
 
 - name: Copy pg_hba into place
@@ -216,7 +222,9 @@
   when: ansible_facts.os_family == "FreeBSD"
 
 - name: start postgresql service
-  ansible.builtin.service: name={{ postgresql_service }} state=started
+  ansible.builtin.service:
+    name: "{{ postgresql_service }}"
+    state: started
 
 - name: Pause between start and stop
   ansible.builtin.pause:
@@ -230,7 +238,9 @@
   register: terminate
 
 - name: Stop postgresql service
-  ansible.builtin.service: name={{ postgresql_service }} state=stopped
+  ansible.builtin.service:
+    name: "{{ postgresql_service }}"
+    state: stopped
   when: terminate is not succeeded
 
 - name: Pause between stop and start
@@ -238,7 +248,9 @@
     seconds: 5
 
 - name: Start postgresql service
-  ansible.builtin.service: name={{ postgresql_service }} state=started
+  ansible.builtin.service:
+    name: "{{ postgresql_service }}"
+    state: started
 
 - name: copy control file for dummy ext
   ansible.builtin.copy:
