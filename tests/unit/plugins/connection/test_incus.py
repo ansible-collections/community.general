@@ -12,6 +12,8 @@ from ansible.errors import AnsibleError
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
 
+import ansible_collections.community.general.plugins.connection  # noqa: F401 # pylint: disable=unused-import
+
 BUILD_CMD_TEST_CASES: list[dict[str, t.Any]] = [
     dict(
         id="sh simple",
