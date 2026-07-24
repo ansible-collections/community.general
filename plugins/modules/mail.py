@@ -109,6 +109,11 @@ options:
         description: The Content-ID used to reference the image from the body, without the enclosing angle brackets.
         type: str
         required: true
+      mime_type:
+        description:
+          - The MIME type of the image, for example V(image/png).
+          - If not set, it is guessed from the file name, falling back to V(image/png).
+        type: str
   headers:
     description:
       - A list of headers which should be added to the message.
@@ -245,8 +250,8 @@ EXAMPLES = r"""
     secure: starttls
 """
 
-import os
 import mimetypes
+import os
 import smtplib
 import ssl
 import traceback
@@ -284,6 +289,7 @@ def main():
                 options=dict(
                     path=dict(type="path", required=True),
                     cid=dict(type="str", required=True),
+                    mime_type=dict(type="str"),
                 ),
             ),
             headers=dict(type="list", elements="str", default=[]),
@@ -450,15 +456,15 @@ def main():
         try:
             with open(filename, "rb") as fp:
                 data = fp.read()
-            subtype = (mimetypes.guess_type(filename)[0] or "image/png").split("/", 1)[1]
-            part = MIMEImage(data, _subtype=subtype)
+            mime_type = image["mime_type"] or mimetypes.guess_type(filename)[0] or "image/png"
+            part = MIMEImage(data, _subtype=mime_type.split("/", 1)[-1])
             part.add_header("Content-ID", f"<{image['cid']}>")
             part.add_header("Content-Disposition", "inline", filename=os.path.basename(filename))
             msg.attach(part)
         except Exception as e:
             module.fail_json(
                 rc=1,
-                msg=f"Failed to send community.general.mail: can't embed inline image {filename}: {e}",
+                msg=f"Error while embedding {filename!r}: {e}",
                 exception=traceback.format_exc(),
             )
 
