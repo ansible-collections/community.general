@@ -91,6 +91,29 @@ options:
     type: list
     elements: path
     default: []
+  inline:
+    description:
+      - A list of images to embed inline in the message body via C(Content-ID).
+      - Each image can be referenced from an HTML O(body) with C(<img src="cid:CID">), which avoids hosting the image on an
+        external URL and dodges remote-image blocking.
+    type: list
+    elements: dict
+    default: []
+    version_added: 13.3.0
+    suboptions:
+      path:
+        description: Path to the image file.
+        type: path
+        required: true
+      cid:
+        description: The Content-ID used to reference the image from the body, without the enclosing angle brackets.
+        type: str
+        required: true
+      mime_type:
+        description:
+          - The MIME type of the image, for example V(image/png).
+          - If not set, it is guessed from the file name. The task fails if the type cannot be guessed.
+        type: str
   headers:
     description:
       - A list of headers which should be added to the message.
@@ -176,6 +199,19 @@ EXAMPLES = r"""
     charset: us-ascii
   delegate_to: localhost
 
+- name: Send an HTML e-mail with a logo embedded inline
+  community.general.mail:
+    host: localhost
+    port: 25
+    to: John Smith <john.smith@example.com>
+    subject: Ansible-report
+    subtype: html
+    body: '<img src="cid:logo" alt="logo"><p>System {{ ansible_hostname }} has been provisioned.</p>'
+    inline:
+      - path: /tmp/logo.png
+        cid: logo
+  delegate_to: localhost
+
 - name: Sending an e-mail using the remote machine, not the Ansible controller node
   community.general.mail:
     host: localhost
@@ -214,6 +250,7 @@ EXAMPLES = r"""
     secure: starttls
 """
 
+import mimetypes
 import os
 import smtplib
 import ssl
@@ -221,6 +258,7 @@ import traceback
 from email import encoders
 from email.header import Header
 from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr, formatdate, make_msgid, parseaddr
@@ -244,6 +282,16 @@ def main():
             subject=dict(type="str", required=True, aliases=["msg"]),
             body=dict(type="str"),
             attach=dict(type="list", elements="path", default=[]),
+            inline=dict(
+                type="list",
+                elements="dict",
+                default=[],
+                options=dict(
+                    path=dict(type="path", required=True),
+                    cid=dict(type="str", required=True),
+                    mime_type=dict(type="str"),
+                ),
+            ),
             headers=dict(type="list", elements="str", default=[]),
             charset=dict(type="str", default="utf-8"),
             subtype=dict(type="str", default="plain", choices=["html", "plain"]),
@@ -266,6 +314,7 @@ def main():
     subject = module.params.get("subject")
     body = module.params.get("body")
     attach_files = module.params.get("attach")
+    inline_images = module.params.get("inline")
     headers = module.params.get("headers")
     charset = module.params.get("charset")
     subtype = module.params.get("subtype")
@@ -399,6 +448,27 @@ def main():
             module.fail_json(
                 rc=1,
                 msg=f"Failed to send community.general.mail: can't attach file {filename}: {e}",
+                exception=traceback.format_exc(),
+            )
+
+    for image in inline_images:
+        filename = image["path"]
+        mime_type = image["mime_type"] or mimetypes.guess_type(filename)[0]
+        if not mime_type:
+            module.fail_json(
+                msg=f"Could not determine the MIME type of {filename!r}; please set the mime_type suboption."
+            )
+        try:
+            with open(filename, "rb") as fp:
+                data = fp.read()
+            part = MIMEImage(data, _subtype=mime_type.split("/", 1)[-1])
+            part.add_header("Content-ID", f"<{image['cid']}>")
+            part.add_header("Content-Disposition", "inline", filename=os.path.basename(filename))
+            msg.attach(part)
+        except Exception as e:
+            module.fail_json(
+                rc=1,
+                msg=f"Error while embedding {filename!r}: {e}",
                 exception=traceback.format_exc(),
             )
 
