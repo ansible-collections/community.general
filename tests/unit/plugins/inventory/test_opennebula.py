@@ -417,4 +417,19 @@ def test_populate(inventory, mocker):
     assert host_gitlab.get_vars()["ansible_host"] == "185.165.1.3"
 
     # check for custom ssh port
-    assert host_gitlab.get_vars()["ansible_port"] == "8822"
+    assert host_gitlab.get_vars()["ansible_port"] == 8822
+
+
+def test_coerce_ssh_port():
+    coerce = InventoryModule._coerce_ssh_port
+    assert coerce("22") == 22
+    assert coerce(22) == 22
+    assert coerce({"#text": "8822"}) == 8822
+    assert coerce({"text": "443"}) == 443
+    assert coerce(None) is None
+    assert coerce("") is None
+    assert coerce(False) is None
+    assert coerce({"unexpected": ""}) is None
+    assert coerce("0") is None
+    assert coerce("99999") is None
+    assert coerce("not_a_port") is None

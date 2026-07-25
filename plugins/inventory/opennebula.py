@@ -212,6 +212,33 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         return result
 
+    @staticmethod
+    def _coerce_ssh_port(raw):
+        """Return a valid TCP port number, or ``None`` if the value is unusable.
+
+        XML-RPC responses from OpenNebula sometimes wrap scalar values in a
+        dict (for example ``{"#text": "22"}``).  Passing that through to
+        ``ansible_port`` breaks OpenSSH with errors like
+        ``Connection to UNKNOWN port 65535``.
+        """
+        if raw in (None, "", False):
+            return None
+        if isinstance(raw, dict):
+            raw = (
+                raw.get("#text")
+                or raw.get("text")
+                or next((v for v in raw.values() if isinstance(v, (str, int)) and str(v).strip()), None)
+            )
+            if raw is None:
+                return None
+        try:
+            port = int(str(raw).strip(), 10)
+        except (TypeError, ValueError):
+            return None
+        if port < 1 or port > 65535:
+            return None
+        return port
+
     def _populate(self):
         hostname_preference = self.get_option("hostname")
         group_by_labels = self.get_option("group_by_labels")
@@ -239,8 +266,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             if hostname_preference != "name":
                 self.inventory.set_variable(hostname, "ansible_host", server[hostname_preference])
 
-            if server.get("SSH_PORT"):
-                self.inventory.set_variable(hostname, "ansible_port", server["SSH_PORT"])
+            ssh_port = self._coerce_ssh_port(server.get("SSH_PORT"))
+            if ssh_port is not None:
+                self.inventory.set_variable(hostname, "ansible_port", ssh_port)
 
             # handle construcable implementation: get composed variables if any
             self._set_composite_vars(self.get_option("compose"), server, hostname, strict=strict)
