@@ -447,7 +447,7 @@ plugin_routing:
     linode:
       deprecation:
         removal_version: 14.0.0
-        warning_text: The module relies on the deprecated Linode API v3; use community.general.linode_v4 instead.
+        warning_text: The module relies on the sunset Linode API v3; use community.general.linode_v4 instead.
     logicmonitor:
       tombstone:
         removal_version: 1.0.0

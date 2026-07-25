@@ -13,7 +13,7 @@ description:
   - Manage Linode Public Cloud instances and optionally wait for it to be 'running'.
 deprecated:
   removed_in: 14.0.0
-  why: The module relies on Linode's legacy API v3, which has been deprecated by Linode, and on the unmaintained C(linode-python) library.
+  why: The module relies on Linode's legacy API v3, which has been sunset by Linode, and on the unmaintained C(linode-python) library.
   alternative: Use M(community.general.linode_v4) instead, which uses the Linode API v4.
 extends_documentation_fragment:
   - community.general._attributes
