@@ -444,6 +444,10 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.ldap_attrs instead.
+    linode:
+      deprecation:
+        removal_version: 14.0.0
+        warning_text: The module relies on the deprecated Linode API v3; use community.general.linode_v4 instead.
     logicmonitor:
       tombstone:
         removal_version: 1.0.0
