@@ -112,7 +112,7 @@ options:
       mime_type:
         description:
           - The MIME type of the image, for example V(image/png).
-          - If not set, it is guessed from the file name, falling back to V(image/png).
+          - If not set, it is guessed from the file name. The task fails if the type cannot be guessed.
         type: str
   headers:
     description:
@@ -453,10 +453,14 @@ def main():
 
     for image in inline_images:
         filename = image["path"]
+        mime_type = image["mime_type"] or mimetypes.guess_type(filename)[0]
+        if not mime_type:
+            module.fail_json(
+                msg=f"Could not determine the MIME type of {filename!r}; please set the mime_type suboption."
+            )
         try:
             with open(filename, "rb") as fp:
                 data = fp.read()
-            mime_type = image["mime_type"] or mimetypes.guess_type(filename)[0] or "image/png"
             part = MIMEImage(data, _subtype=mime_type.split("/", 1)[-1])
             part.add_header("Content-ID", f"<{image['cid']}>")
             part.add_header("Content-Disposition", "inline", filename=os.path.basename(filename))
