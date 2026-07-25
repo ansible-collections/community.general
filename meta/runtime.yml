@@ -434,8 +434,10 @@ plugin_routing:
     kubevirt_vm:
       redirect: community.kubevirt.kubevirt_vm
     lldp:
-      # TODO: introduce deprecation warning in 14.0.0
       redirect: community.general.lldp_facts
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The lldp module has been renamed to lldp_facts.
     layman:
       deprecation:
         removal_version: 14.0.0

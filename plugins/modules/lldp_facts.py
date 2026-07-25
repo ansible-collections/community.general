@@ -11,8 +11,8 @@ module: lldp_facts
 requirements:
   - C(lldpctl), usually provided by the C(lldpd) package.
   - The module was renamed from C(lldp) to C(lldp_facts) in community.general 13.0.0.
-    The old name is available as an alias. Eventually a deprecation message will be shown
-    when the old name is used.
+    The old name is available as an alias. Since community.general 14.0.0,
+    a deprecation message will be shown when the old name is used.
 short_description: Get details reported by LLDP
 description:
   - Reads LLDP data from C(lldpd) using the CLI tool C(lldpctl).
