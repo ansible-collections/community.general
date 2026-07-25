@@ -104,6 +104,9 @@ plugin_routing:
         warning_text: The "HTTP Data Collector API" used by the plugin has been deprecated in Azure and replaced with the "Logs Ingestion API".  Please migrate to the 'community.general.loganalytics_ingestion' plugin.
     osx_say:
       redirect: community.general.say
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.osx_say to community.general.say will be removed in community.general 18.0.0. Please update your roles/playbooks.
     stderr:
       tombstone:
         removal_version: 2.0.0
@@ -117,18 +120,33 @@ plugin_routing:
   connection:
     docker:
       redirect: community.docker.docker
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker to community.docker.docker will be removed in community.general 18.0.0. Please update your roles/playbooks.
     oc:
       redirect: community.okd.oc
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.oc to community.okd.oc will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_pct_remote:
       redirect: community.proxmox.proxmox_pct_remote
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_pct_remote to community.proxmox.proxmox_pct_remote will be removed in community.general 18.0.0. Please update your roles/playbooks.
   lookup:
     gcp_storage_file:
       redirect: community.google.gcp_storage_file
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcp_storage_file to community.google.gcp_storage_file will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hashi_vault:
       redirect: community.hashi_vault.hashi_vault
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hashi_vault to community.hashi_vault.hashi_vault will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hiera:
       tombstone:
         removal_version: 13.0.0
@@ -139,10 +157,19 @@ plugin_routing:
         warning_text: Company was acquired in 2021 and service was ceased afterwards.
     nios:
       redirect: infoblox.nios_modules.nios_lookup
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios to infoblox.nios_modules.nios_lookup will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_next_ip:
       redirect: infoblox.nios_modules.nios_next_ip
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_next_ip to infoblox.nios_modules.nios_next_ip will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_next_network:
       redirect: infoblox.nios_modules.nios_next_network
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_next_network to infoblox.nios_modules.nios_next_network will be removed in community.general 18.0.0. Please update your roles/playbooks.
   modules:
     ali_instance_facts:
       tombstone:
@@ -170,6 +197,9 @@ plugin_routing:
         warning_text: DNS fails to resolve the API endpoint used by the module since Oct 2024. See https://github.com/ansible-collections/community.general/issues/10318 for details.
     cisco_spark:
       redirect: community.general.cisco_webex
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.cisco_spark to community.general.cisco_webex will be removed in community.general 18.0.0. Please update your roles/playbooks.
     clc_alert_policy:
       tombstone:
         removal_version: 11.0.0
@@ -220,58 +250,127 @@ plugin_routing:
         warning_text: Service and its endpoints are no longer available.
     docker_compose:
       redirect: community.docker.docker_compose
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_compose to community.docker.docker_compose will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_config:
       redirect: community.docker.docker_config
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_config to community.docker.docker_config will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_container:
       redirect: community.docker.docker_container
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_container to community.docker.docker_container will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_container_info:
       redirect: community.docker.docker_container_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_container_info to community.docker.docker_container_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_host_info:
       redirect: community.docker.docker_host_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_host_info to community.docker.docker_host_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_image:
       redirect: community.docker.docker_image
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_image to community.docker.docker_image will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_image_facts:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use community.docker.docker_image_info instead.
     docker_image_info:
       redirect: community.docker.docker_image_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_image_info to community.docker.docker_image_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_login:
       redirect: community.docker.docker_login
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_login to community.docker.docker_login will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_network:
       redirect: community.docker.docker_network
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_network to community.docker.docker_network will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_network_info:
       redirect: community.docker.docker_network_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_network_info to community.docker.docker_network_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_node:
       redirect: community.docker.docker_node
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_node to community.docker.docker_node will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_node_info:
       redirect: community.docker.docker_node_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_node_info to community.docker.docker_node_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_prune:
       redirect: community.docker.docker_prune
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_prune to community.docker.docker_prune will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_secret:
       redirect: community.docker.docker_secret
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_secret to community.docker.docker_secret will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_service:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use community.docker.docker_compose instead.
     docker_stack:
       redirect: community.docker.docker_stack
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_stack to community.docker.docker_stack will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_stack_info:
       redirect: community.docker.docker_stack_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_stack_info to community.docker.docker_stack_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_stack_task_info:
       redirect: community.docker.docker_stack_task_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_stack_task_info to community.docker.docker_stack_task_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm:
       redirect: community.docker.docker_swarm
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm to community.docker.docker_swarm will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm_info:
       redirect: community.docker.docker_swarm_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm_info to community.docker.docker_swarm_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm_service:
       redirect: community.docker.docker_swarm_service
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm_service to community.docker.docker_swarm_service will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm_service_info:
       redirect: community.docker.docker_swarm_service_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm_service_info to community.docker.docker_swarm_service_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_volume:
       redirect: community.docker.docker_volume
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_volume to community.docker.docker_volume will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_volume_info:
       redirect: community.docker.docker_volume_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_volume_info to community.docker.docker_volume_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     facter:
       tombstone:
         removal_version: 12.0.0
@@ -287,6 +386,9 @@ plugin_routing:
         warning_text: Use the modules from the theforeman.foreman collection instead.
     gc_storage:
       redirect: community.google.gc_storage
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gc_storage to community.google.gc_storage will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcdns_record:
       tombstone:
         removal_version: 2.0.0
@@ -301,24 +403,54 @@ plugin_routing:
         warning_text: Use google.cloud.gcp_compute_instance instead.
     gce_eip:
       redirect: community.google.gce_eip
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_eip to community.google.gce_eip will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_img:
       redirect: community.google.gce_img
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_img to community.google.gce_img will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_instance_template:
       redirect: community.google.gce_instance_template
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_instance_template to community.google.gce_instance_template will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_labels:
       redirect: community.google.gce_labels
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_labels to community.google.gce_labels will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_lb:
       redirect: community.google.gce_lb
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_lb to community.google.gce_lb will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_mig:
       redirect: community.google.gce_mig
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_mig to community.google.gce_mig will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_net:
       redirect: community.google.gce_net
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_net to community.google.gce_net will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_pd:
       redirect: community.google.gce_pd
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_pd to community.google.gce_pd will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_snapshot:
       redirect: community.google.gce_snapshot
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_snapshot to community.google.gce_snapshot will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce_tag:
       redirect: community.google.gce_tag
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce_tag to community.google.gce_tag will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcp_backend_service:
       tombstone:
         removal_version: 2.0.0
@@ -343,12 +475,18 @@ plugin_routing:
         warning_text: Use google.cloud.gcp_compute_url_map instead.
     gcpubsub:
       redirect: community.google.gcpubsub
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcpubsub to community.google.gcpubsub will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcpubsub_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.google.gcpubsub_info instead.
     gcpubsub_info:
       redirect: community.google.gcpubsub_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcpubsub_info to community.google.gcpubsub_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcspanner:
       tombstone:
         removal_version: 2.0.0
@@ -361,14 +499,29 @@ plugin_routing:
           instead.
     hana_query:
       redirect: community.sap_libs.sap_hdbsql
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hana_query to community.sap_libs.sap_hdbsql will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner_failover_ip:
       redirect: community.hrobot.failover_ip
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner_failover_ip to community.hrobot.failover_ip will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner_failover_ip_info:
       redirect: community.hrobot.failover_ip_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner_failover_ip_info to community.hrobot.failover_ip_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner_firewall:
       redirect: community.hrobot.firewall
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner_firewall to community.hrobot.firewall will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner_firewall_info:
       redirect: community.hrobot.firewall_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner_firewall_info to community.hrobot.firewall_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hipchat:
       tombstone:
         removal_version: 11.0.0
@@ -399,12 +552,18 @@ plugin_routing:
         warning_text: Use ibm.power_aix.lvol instead. The C(ibm.power_aix) collection is actively maintained by IBM.
     idrac_firmware:
       redirect: dellemc.openmanage.idrac_firmware
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.idrac_firmware to dellemc.openmanage.idrac_firmware will be removed in community.general 18.0.0. Please update your roles/playbooks.
     idrac_redfish_facts:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.idrac_redfish_info instead.
     idrac_server_config_profile:
       redirect: dellemc.openmanage.idrac_server_config_profile
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.idrac_server_config_profile to dellemc.openmanage.idrac_server_config_profile will be removed in community.general 18.0.0. Please update your roles/playbooks.
     installp:
       deprecation:
         removal_version: 15.0.0
@@ -423,16 +582,34 @@ plugin_routing:
         warning_text: Use the modules from the theforeman.foreman collection instead.
     kubevirt_cdi_upload:
       redirect: community.kubevirt.kubevirt_cdi_upload
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_cdi_upload to community.kubevirt.kubevirt_cdi_upload will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_preset:
       redirect: community.kubevirt.kubevirt_preset
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_preset to community.kubevirt.kubevirt_preset will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_pvc:
       redirect: community.kubevirt.kubevirt_pvc
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_pvc to community.kubevirt.kubevirt_pvc will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_rs:
       redirect: community.kubevirt.kubevirt_rs
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_rs to community.kubevirt.kubevirt_rs will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_template:
       redirect: community.kubevirt.kubevirt_template
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_template to community.kubevirt.kubevirt_template will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_vm:
       redirect: community.kubevirt.kubevirt_vm
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_vm to community.kubevirt.kubevirt_vm will be removed in community.general 18.0.0. Please update your roles/playbooks.
     lldp:
       # TODO: introduce deprecation warning in 14.0.0
       redirect: community.general.lldp_facts
@@ -504,42 +681,93 @@ plugin_routing:
         warning_text: Use community.general.nginx_status_info instead.
     nios_a_record:
       redirect: infoblox.nios_modules.nios_a_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_a_record to infoblox.nios_modules.nios_a_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_aaaa_record:
       redirect: infoblox.nios_modules.nios_aaaa_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_aaaa_record to infoblox.nios_modules.nios_aaaa_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_cname_record:
       redirect: infoblox.nios_modules.nios_cname_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_cname_record to infoblox.nios_modules.nios_cname_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_dns_view:
       redirect: infoblox.nios_modules.nios_dns_view
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_dns_view to infoblox.nios_modules.nios_dns_view will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_fixed_address:
       redirect: infoblox.nios_modules.nios_fixed_address
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_fixed_address to infoblox.nios_modules.nios_fixed_address will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_host_record:
       redirect: infoblox.nios_modules.nios_host_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_host_record to infoblox.nios_modules.nios_host_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_member:
       redirect: infoblox.nios_modules.nios_member
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_member to infoblox.nios_modules.nios_member will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_mx_record:
       redirect: infoblox.nios_modules.nios_mx_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_mx_record to infoblox.nios_modules.nios_mx_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_naptr_record:
       redirect: infoblox.nios_modules.nios_naptr_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_naptr_record to infoblox.nios_modules.nios_naptr_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_network:
       redirect: infoblox.nios_modules.nios_network
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_network to infoblox.nios_modules.nios_network will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_network_view:
       redirect: infoblox.nios_modules.nios_network_view
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_network_view to infoblox.nios_modules.nios_network_view will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_nsgroup:
       redirect: infoblox.nios_modules.nios_nsgroup
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_nsgroup to infoblox.nios_modules.nios_nsgroup will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_ptr_record:
       redirect: infoblox.nios_modules.nios_ptr_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_ptr_record to infoblox.nios_modules.nios_ptr_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_srv_record:
       redirect: infoblox.nios_modules.nios_srv_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_srv_record to infoblox.nios_modules.nios_srv_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_txt_record:
       redirect: infoblox.nios_modules.nios_txt_record
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_txt_record to infoblox.nios_modules.nios_txt_record will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios_zone:
       redirect: infoblox.nios_modules.nios_zone
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios_zone to infoblox.nios_modules.nios_zone will be removed in community.general 18.0.0. Please update your roles/playbooks.
     oci_vcn:
       tombstone:
         removal_version: 13.0.0
         warning_text: Use oracle.oci.oci_network_vcn instead.
     ome_device_info:
       redirect: dellemc.openmanage.ome_device_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.ome_device_info to dellemc.openmanage.ome_device_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     one_image_facts:
       tombstone:
         removal_version: 3.0.0
@@ -715,48 +943,114 @@ plugin_routing:
         warning_text: Use ovirt.ovirt.ovirt_vmpool_info instead.
     postgresql_copy:
       redirect: community.postgresql.postgresql_copy
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_copy to community.postgresql.postgresql_copy will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_db:
       redirect: community.postgresql.postgresql_db
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_db to community.postgresql.postgresql_db will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_ext:
       redirect: community.postgresql.postgresql_ext
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_ext to community.postgresql.postgresql_ext will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_idx:
       redirect: community.postgresql.postgresql_idx
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_idx to community.postgresql.postgresql_idx will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_info:
       redirect: community.postgresql.postgresql_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_info to community.postgresql.postgresql_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_lang:
       redirect: community.postgresql.postgresql_lang
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_lang to community.postgresql.postgresql_lang will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_membership:
       redirect: community.postgresql.postgresql_membership
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_membership to community.postgresql.postgresql_membership will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_owner:
       redirect: community.postgresql.postgresql_owner
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_owner to community.postgresql.postgresql_owner will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_pg_hba:
       redirect: community.postgresql.postgresql_pg_hba
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_pg_hba to community.postgresql.postgresql_pg_hba will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_ping:
       redirect: community.postgresql.postgresql_ping
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_ping to community.postgresql.postgresql_ping will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_privs:
       redirect: community.postgresql.postgresql_privs
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_privs to community.postgresql.postgresql_privs will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_publication:
       redirect: community.postgresql.postgresql_publication
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_publication to community.postgresql.postgresql_publication will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_query:
       redirect: community.postgresql.postgresql_query
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_query to community.postgresql.postgresql_query will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_schema:
       redirect: community.postgresql.postgresql_schema
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_schema to community.postgresql.postgresql_schema will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_sequence:
       redirect: community.postgresql.postgresql_sequence
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_sequence to community.postgresql.postgresql_sequence will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_set:
       redirect: community.postgresql.postgresql_set
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_set to community.postgresql.postgresql_set will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_slot:
       redirect: community.postgresql.postgresql_slot
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_slot to community.postgresql.postgresql_slot will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_subscription:
       redirect: community.postgresql.postgresql_subscription
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_subscription to community.postgresql.postgresql_subscription will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_table:
       redirect: community.postgresql.postgresql_table
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_table to community.postgresql.postgresql_table will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_tablespace:
       redirect: community.postgresql.postgresql_tablespace
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_tablespace to community.postgresql.postgresql_tablespace will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_user:
       redirect: community.postgresql.postgresql_user
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_user to community.postgresql.postgresql_user will be removed in community.general 18.0.0. Please update your roles/playbooks.
     postgresql_user_obj_stat_info:
       redirect: community.postgresql.postgresql_user_obj_stat_info
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql_user_obj_stat_info to community.postgresql.postgresql_user_obj_stat_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     profitbricks:
       tombstone:
         removal_version: 11.0.0
@@ -782,91 +1076,145 @@ plugin_routing:
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox to community.proxmox.proxmox will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_backup:
       redirect: community.proxmox.proxmox_backup
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_backup to community.proxmox.proxmox_backup will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_backup_info:
       redirect: community.proxmox.proxmox_backup_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_backup_info to community.proxmox.proxmox_backup_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_disk:
       redirect: community.proxmox.proxmox_disk
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_disk to community.proxmox.proxmox_disk will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_domain_info:
       redirect: community.proxmox.proxmox_domain_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_domain_info to community.proxmox.proxmox_domain_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_group_info:
       redirect: community.proxmox.proxmox_group_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_group_info to community.proxmox.proxmox_group_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_kvm:
       redirect: community.proxmox.proxmox_kvm
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_kvm to community.proxmox.proxmox_kvm will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_nic:
       redirect: community.proxmox.proxmox_nic
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_nic to community.proxmox.proxmox_nic will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_node_info:
       redirect: community.proxmox.proxmox_node_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_node_info to community.proxmox.proxmox_node_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_pool:
       redirect: community.proxmox.proxmox_pool
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_pool to community.proxmox.proxmox_pool will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_pool_member:
       redirect: community.proxmox.proxmox_pool_member
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_pool_member to community.proxmox.proxmox_pool_member will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_snap:
       redirect: community.proxmox.proxmox_snap
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_snap to community.proxmox.proxmox_snap will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_storage_contents_info:
       redirect: community.proxmox.proxmox_storage_contents_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_storage_contents_info to community.proxmox.proxmox_storage_contents_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_storage_info:
       redirect: community.proxmox.proxmox_storage_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_storage_info to community.proxmox.proxmox_storage_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_tasks_info:
       redirect: community.proxmox.proxmox_tasks_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_tasks_info to community.proxmox.proxmox_tasks_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_template:
       redirect: community.proxmox.proxmox_template
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_template to community.proxmox.proxmox_template will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_user_info:
       redirect: community.proxmox.proxmox_user_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_user_info to community.proxmox.proxmox_user_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_vm_info:
       redirect: community.proxmox.proxmox_vm_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox_vm_info to community.proxmox.proxmox_vm_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     purefa_facts:
       tombstone:
         removal_version: 3.0.0
@@ -1001,8 +1349,14 @@ plugin_routing:
         warning_text: RHN is EOL.
     sapcar_extract:
       redirect: community.sap_libs.sapcar_extract
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.sapcar_extract to community.sap_libs.sapcar_extract will be removed in community.general 18.0.0. Please update your roles/playbooks.
     sap_task_list_execute:
       redirect: community.sap_libs.sap_task_list_execute
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.sap_task_list_execute to community.sap_libs.sap_task_list_execute will be removed in community.general 18.0.0. Please update your roles/playbooks.
     scaleway_image_facts:
       tombstone:
         removal_version: 3.0.0
@@ -1133,6 +1487,9 @@ plugin_routing:
   doc_fragments:
     _gcp:
       redirect: community.google._gcp
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general._gcp to community.google._gcp will be removed in community.general 18.0.0. Please update your roles/playbooks.
     dimensiondata:
       tombstone:
         removal_version: 13.0.0
@@ -1143,14 +1500,29 @@ plugin_routing:
         warning_text: Service and its endpoints are no longer available.
     docker:
       redirect: community.docker.docker
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker to community.docker.docker will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner:
       redirect: community.hrobot.robot
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner to community.hrobot.robot will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_common_options:
       redirect: community.kubevirt.kubevirt_common_options
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_common_options to community.kubevirt.kubevirt_common_options will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt_vm_options:
       redirect: community.kubevirt.kubevirt_vm_options
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt_vm_options to community.kubevirt.kubevirt_vm_options will be removed in community.general 18.0.0. Please update your roles/playbooks.
     nios:
       redirect: infoblox.nios_modules.nios
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.nios to infoblox.nios_modules.nios will be removed in community.general 18.0.0. Please update your roles/playbooks.
     oracle:
       tombstone:
         removal_version: 13.0.0
@@ -1177,11 +1549,17 @@ plugin_routing:
         warning_text: Code is unmaintained here and official Oracle collection is available for a number of years.
     postgresql:
       redirect: community.postgresql.postgresql
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql to community.postgresql.postgresql will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox:
       redirect: community.proxmox.proxmox
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox to community.proxmox.proxmox will be removed in community.general 18.0.0. Please update your roles/playbooks.
     purestorage:
       tombstone:
         removal_version: 12.0.0
@@ -1206,24 +1584,48 @@ plugin_routing:
         warning_text: Service and its endpoints are no longer available.
     docker.common:
       redirect: community.docker.common
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker.common to community.docker.common will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker.swarm:
       redirect: community.docker.swarm
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker.swarm to community.docker.swarm will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcdns:
       redirect: community.google.gcdns
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcdns to community.google.gcdns will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gce:
       redirect: community.google.gce
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gce to community.google.gce will be removed in community.general 18.0.0. Please update your roles/playbooks.
     gcp:
       redirect: community.google.gcp
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.gcp to community.google.gcp will be removed in community.general 18.0.0. Please update your roles/playbooks.
     hetzner:
       redirect: community.hrobot.robot
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.hetzner to community.hrobot.robot will be removed in community.general 18.0.0. Please update your roles/playbooks.
     known_hosts:
       tombstone:
         removal_version: 13.0.0
         warning_text: This code is not used by community.general. If you want to use it in another collection, please copy it over.
     kubevirt:
       redirect: community.kubevirt.kubevirt
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt to community.kubevirt.kubevirt will be removed in community.general 18.0.0. Please update your roles/playbooks.
     net_tools.nios.api:
       redirect: infoblox.nios_modules.api
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.net_tools.nios.api to infoblox.nios_modules.api will be removed in community.general 18.0.0. Please update your roles/playbooks.
     oracle.oci_utils:
       tombstone:
         removal_version: 13.0.0
@@ -1234,11 +1636,17 @@ plugin_routing:
         warning_text: DNS fails to resolve the API endpoint used by the module.
     postgresql:
       redirect: community.postgresql.postgresql
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.postgresql to community.postgresql.postgresql will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox:
       redirect: community.proxmox.proxmox
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox to community.proxmox.proxmox will be removed in community.general 18.0.0. Please update your roles/playbooks.
     pure:
       tombstone:
         removal_version: 12.0.0
@@ -1249,8 +1657,14 @@ plugin_routing:
         warning_text: This module util relied on the deprecated package pyrax.
     remote_management.dellemc.dellemc_idrac:
       redirect: dellemc.openmanage.dellemc_idrac
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.remote_management.dellemc.dellemc_idrac to dellemc.openmanage.dellemc_idrac will be removed in community.general 18.0.0. Please update your roles/playbooks.
     remote_management.dellemc.ome:
       redirect: dellemc.openmanage.ome
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.remote_management.dellemc.ome to dellemc.openmanage.ome will be removed in community.general 18.0.0. Please update your roles/playbooks.
     saslprep:
       tombstone:
         removal_version: 13.0.0
@@ -1258,15 +1672,27 @@ plugin_routing:
   inventory:
     docker_machine:
       redirect: community.docker.docker_machine
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_machine to community.docker.docker_machine will be removed in community.general 18.0.0. Please update your roles/playbooks.
     docker_swarm:
       redirect: community.docker.docker_swarm
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.docker_swarm to community.docker.docker_swarm will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox:
       redirect: community.proxmox.proxmox
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.proxmox to community.proxmox.proxmox will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt:
       redirect: community.kubevirt.kubevirt
+      deprecation:
+        removal_version: 18.0.0
+        warning_text: The redirection of community.general.kubevirt to community.kubevirt.kubevirt will be removed in community.general 18.0.0. Please update your roles/playbooks.
     stackpath_compute:
       tombstone:
         removal_version: 11.0.0
