@@ -11,8 +11,7 @@ import pytest
 from ansible.errors import AnsibleError
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
-
-import ansible_collections.community.general.plugins.connection  # noqa: F401 # pylint: disable=unused-import
+from ansible.release import __version__ as ansible_release
 
 BUILD_CMD_TEST_CASES: list[dict[str, t.Any]] = [
     dict(
@@ -299,6 +298,7 @@ def _make_conn(mocker):
     return conn
 
 
+@pytest.mark.skipif(tuple(int(x) for x in ansible_release.split(".")[:2]) < (2, 18), reason="ansible-core < 2.18")
 def test_put_file_transfer_failure(mocker, tmp_path):
     """A failed ``incus file push`` must raise instead of silently succeeding."""
     conn = _make_conn(mocker)
@@ -318,6 +318,7 @@ def test_put_file_transfer_failure(mocker, tmp_path):
     assert "Error: not authorized" in str(exc.value)
 
 
+@pytest.mark.skipif(tuple(int(x) for x in ansible_release.split(".")[:2]) < (2, 18), reason="ansible-core < 2.18")
 def test_put_file_transfer_success(mocker, tmp_path):
     """A successful ``incus file push`` must not raise."""
     conn = _make_conn(mocker)
@@ -333,6 +334,7 @@ def test_put_file_transfer_success(mocker, tmp_path):
     conn.put_file(str(src), "/tmp/dest")
 
 
+@pytest.mark.skipif(tuple(int(x) for x in ansible_release.split(".")[:2]) < (2, 18), reason="ansible-core < 2.18")
 def test_fetch_file_transfer_failure(mocker):
     """A failed ``incus file pull`` must raise instead of silently succeeding."""
     conn = _make_conn(mocker)
@@ -349,6 +351,7 @@ def test_fetch_file_transfer_failure(mocker):
     assert "Error: Instance is not running." in str(exc.value)
 
 
+@pytest.mark.skipif(tuple(int(x) for x in ansible_release.split(".")[:2]) < (2, 18), reason="ansible-core < 2.18")
 def test_fetch_file_transfer_success(mocker):
     """A successful ``incus file pull`` must not raise."""
     conn = _make_conn(mocker)
