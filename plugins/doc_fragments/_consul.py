@@ -12,31 +12,32 @@ class ModuleDocFragment:
     # Common parameters for Consul modules
     DOCUMENTATION = r"""
 options:
+  addr:
+    description:
+      - The address of the Consul agent, in the V(host:port) or V(scheme://host:port) form. The scheme and the port are
+        optional, the host is not.
+      - O(host), O(port) and O(scheme) take precedence over the components of this option.
+      - If unset, the value of the E(CONSUL_HTTP_ADDR) environment variable is used when set. An address these modules
+        cannot use, a C(unix://) socket for example, makes the module fail, unless O(host), O(port) and O(scheme) are all
+        set, in which case the address is not consulted at all.
+    type: str
+    version_added: 13.3.0
   host:
     description:
       - Host of the Consul agent.
-      - If unset, the host component of the E(CONSUL_HTTP_ADDR) environment variable is used when set.
-        A value that cannot be parsed is ignored with a warning.
-        This is supported since community.general 13.3.0.
-    default: localhost
+      - If unset, the host component of O(addr) is used, and V(localhost) when O(addr) is not set either.
     type: str
   port:
     type: int
     description:
       - The port on which the consul agent is running.
-      - If unset, the port component of the E(CONSUL_HTTP_ADDR) environment variable is used when set.
-        A value that cannot be parsed is ignored with a warning.
-        This is supported since community.general 13.3.0.
-    default: 8500
+      - If unset, the port component of O(addr) is used, and V(8500) when that does not specify one either.
   scheme:
     description:
-      - The protocol scheme on which the Consul agent is running. Defaults to V(http) and can be set to V(https) for secure
-        connections.
-      - If unset, a C(true) value in the E(CONSUL_HTTP_SSL) environment variable selects V(https), otherwise the scheme component
-        of E(CONSUL_HTTP_ADDR) is used when set. A C(false) E(CONSUL_HTTP_SSL) does not downgrade an V(https) scheme in
-        E(CONSUL_HTTP_ADDR). An E(CONSUL_HTTP_SSL) value that is not a valid boolean is treated as C(true) with a warning.
-        This is supported since community.general 13.3.0.
-    default: http
+      - The protocol scheme on which the Consul agent is running.
+      - If unset, a C(true) value in the E(CONSUL_HTTP_SSL) environment variable selects V(https), otherwise the scheme
+        component of O(addr) is used, and V(http) when that does not specify one either. A C(false) E(CONSUL_HTTP_SSL) does
+        not downgrade an V(https) O(addr).
     type: str
   validate_certs:
     type: bool
