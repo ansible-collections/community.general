@@ -1,0 +1,2 @@
+bugfixes:
+  - ini_file - do not delete comment-only lines that contain the option name (https://github.com/ansible-collections/community.general/issues/11919, https://github.com/ansible-collections/community.general/pull/12083).

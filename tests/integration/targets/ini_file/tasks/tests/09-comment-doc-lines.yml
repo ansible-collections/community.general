@@ -1,0 +1,101 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## regression for https://github.com/ansible-collections/community.general/issues/11919
+
+- name: test-comment-doc-lines 1 - create test file with doc comments
+  ansible.builtin.copy:
+    content: |
+
+      [PHP]
+      ;   Integer = Enables the buffer and sets its maximum size in bytes.
+      ; Note: This directive is hardcoded to Off for the CLI SAPI
+      ; Default Value: Off
+      ; output_buffering
+      ; Development Value: 4096
+      ; Production Value: 4096
+      ; https://php.net/output-buffering
+      ;output_buffering = 4096
+
+    dest: "{{ output_file }}"
+
+- name: test-comment-doc-lines 1 - set output_buffering with exclusive and modify_inactive_option
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: PHP
+    option: output_buffering
+    value: '123'
+    state: present
+    exclusive: true
+    modify_inactive_option: true
+  register: result1
+
+- name: test-comment-doc-lines 1 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-comment-doc-lines 1 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected1: |
+
+      [PHP]
+      ;   Integer = Enables the buffer and sets its maximum size in bytes.
+      ; Note: This directive is hardcoded to Off for the CLI SAPI
+      ; Default Value: Off
+      ; output_buffering
+      ; Development Value: 4096
+      ; Production Value: 4096
+      ; https://php.net/output-buffering
+      output_buffering = 123
+
+    content1: "{{ output_content.content | b64decode }}"
+
+- name: test-comment-doc-lines 1 - assert doc comments kept and commented config replaced
+  ansible.builtin.assert:
+    that:
+      - result1 is changed
+      - content1 == expected1
+
+
+- name: test-comment-doc-lines 2 - create test file with only commented config
+  ansible.builtin.copy:
+    content: |
+
+      [PHP]
+      ;output_buffering = 4096
+
+    dest: "{{ output_file }}"
+
+- name: test-comment-doc-lines 2 - set output_buffering with exclusive and modify_inactive_option
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: PHP
+    option: output_buffering
+    value: '123'
+    state: present
+    exclusive: true
+    modify_inactive_option: true
+  register: result2
+
+- name: test-comment-doc-lines 2 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: test-comment-doc-lines 2 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected2: |
+
+      [PHP]
+      output_buffering = 123
+
+    content2: "{{ output_content.content | b64decode }}"
+
+- name: test-comment-doc-lines 2 - assert commented config replaced in place
+  ansible.builtin.assert:
+    that:
+      - result2 is changed
+      - content2 == expected2
