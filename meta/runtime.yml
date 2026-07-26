@@ -133,9 +133,6 @@ plugin_routing:
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_pct_remote to community.proxmox.proxmox_pct_remote will be removed in community.general 18.0.0. Please update your roles/playbooks.
   lookup:
     gcp_storage_file:
       redirect: community.google.gcp_storage_file
@@ -1076,145 +1073,91 @@ plugin_routing:
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox to community.proxmox.proxmox will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_backup:
       redirect: community.proxmox.proxmox_backup
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_backup to community.proxmox.proxmox_backup will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_backup_info:
       redirect: community.proxmox.proxmox_backup_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_backup_info to community.proxmox.proxmox_backup_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_disk:
       redirect: community.proxmox.proxmox_disk
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_disk to community.proxmox.proxmox_disk will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_domain_info:
       redirect: community.proxmox.proxmox_domain_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_domain_info to community.proxmox.proxmox_domain_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_group_info:
       redirect: community.proxmox.proxmox_group_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_group_info to community.proxmox.proxmox_group_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_kvm:
       redirect: community.proxmox.proxmox_kvm
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_kvm to community.proxmox.proxmox_kvm will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_nic:
       redirect: community.proxmox.proxmox_nic
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_nic to community.proxmox.proxmox_nic will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_node_info:
       redirect: community.proxmox.proxmox_node_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_node_info to community.proxmox.proxmox_node_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_pool:
       redirect: community.proxmox.proxmox_pool
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_pool to community.proxmox.proxmox_pool will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_pool_member:
       redirect: community.proxmox.proxmox_pool_member
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_pool_member to community.proxmox.proxmox_pool_member will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_snap:
       redirect: community.proxmox.proxmox_snap
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_snap to community.proxmox.proxmox_snap will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_storage_contents_info:
       redirect: community.proxmox.proxmox_storage_contents_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_storage_contents_info to community.proxmox.proxmox_storage_contents_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_storage_info:
       redirect: community.proxmox.proxmox_storage_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_storage_info to community.proxmox.proxmox_storage_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_tasks_info:
       redirect: community.proxmox.proxmox_tasks_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_tasks_info to community.proxmox.proxmox_tasks_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_template:
       redirect: community.proxmox.proxmox_template
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_template to community.proxmox.proxmox_template will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_user_info:
       redirect: community.proxmox.proxmox_user_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_user_info to community.proxmox.proxmox_user_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     proxmox_vm_info:
       redirect: community.proxmox.proxmox_vm_info
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox_vm_info to community.proxmox.proxmox_vm_info will be removed in community.general 18.0.0. Please update your roles/playbooks.
     purefa_facts:
       tombstone:
         removal_version: 3.0.0
@@ -1557,9 +1500,6 @@ plugin_routing:
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox to community.proxmox.proxmox will be removed in community.general 18.0.0. Please update your roles/playbooks.
     purestorage:
       tombstone:
         removal_version: 12.0.0
@@ -1644,9 +1584,6 @@ plugin_routing:
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox to community.proxmox.proxmox will be removed in community.general 18.0.0. Please update your roles/playbooks.
     pure:
       tombstone:
         removal_version: 12.0.0
@@ -1685,9 +1622,6 @@ plugin_routing:
       deprecation:
         removal_version: 15.0.0
         warning_text: The proxmox content has been moved to community.proxmox.
-      deprecation:
-        removal_version: 18.0.0
-        warning_text: The redirection of community.general.proxmox to community.proxmox.proxmox will be removed in community.general 18.0.0. Please update your roles/playbooks.
     kubevirt:
       redirect: community.kubevirt.kubevirt
       deprecation:
