@@ -1,0 +1,93 @@
+---
+# Copyright (c) 2026 Ilya Bogdanov (@zeerayne) <zeerayne1337@gmail.com>
+# Copyright (c) 2026 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# - Tests with method={{ method }} -------------------------
+
+# state=present (mask) - app not masked
+
+- name: Test masking - {{ method }}
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    method: "{{ method }}"
+    state: present
+  register: mask_result
+
+- name: Verify masking test result - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - mask_result is changed
+    msg: "state=present shall mask flatpak app when not masked"
+
+- name: Test idempotency of masking - {{ method }}
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    method: "{{ method }}"
+    state: present
+  register: double_mask_result
+
+- name: Verify idempotency of masking test result - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - double_mask_result is not changed
+    msg: "state=present shall not do anything when flatpak app is already masked"
+
+
+# state=absent (unmask) - app is masked
+
+- name: Test unmasking - {{ method }}
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    method: "{{ method }}"
+    state: absent
+  register: unmask_result
+
+- name: Verify unmasking test result - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - unmask_result is changed
+    msg: "state=absent shall unmask flatpak app when masked"
+
+- name: Test idempotency of unmasking - {{ method }}
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    method: "{{ method }}"
+    state: absent
+  register: double_unmask_result
+
+- name: Verify idempotency of unmasking test result - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - double_unmask_result is not changed
+    msg: "state=absent shall not do anything when flatpak app is not masked"
+
+
+# state=present (mask) - app already masked after unmask
+
+- name: Test re-masking after unmask - {{ method }}
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    method: "{{ method }}"
+    state: present
+  register: remask_result
+
+- name: Verify re-masking test result - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - remask_result is changed
+    msg: "state=present shall mask flatpak app after it was unmasked"
+
+- name: Test idempotency of re-masking - {{ method }}
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    method: "{{ method }}"
+    state: present
+  register: double_remask_result
+
+- name: Verify idempotency of re-masking test result - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - double_remask_result is not changed
+    msg: "state=present shall not do anything when flatpak app is already masked"

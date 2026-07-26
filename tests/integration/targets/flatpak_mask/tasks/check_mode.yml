@@ -1,0 +1,96 @@
+---
+# Copyright (c) 2026 Ilya Bogdanov (@zeerayne) <zeerayne1337@gmail.com>
+# Copyright (c) 2026 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# - Tests with app not masked ------ ------------------------
+
+# state=present on not masked app
+
+- name: Test masking of not masked app (check mode)
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    state: present
+  register: mask_result
+  check_mode: true
+
+- name: Verify masking of not masked app test result (check mode)
+  ansible.builtin.assert:
+    that:
+      - mask_result is changed
+    msg: "Masking a not masked app shall mark module execution as changed in check mode"
+
+- name: Test non-existent idempotency of masking of not masked app (check mode)
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    state: present
+  register: double_mask_result
+  check_mode: true
+
+- name: Verify non-existent idempotency of masking of not masked app test result (check mode)
+  ansible.builtin.assert:
+    that:
+      - double_mask_result is changed
+    msg: "Masking a not masked app a second time shall still mark module execution as changed in check mode"
+
+# state=absent on not masked app
+
+- name: Test unmasking of not masked app in check mode
+  community.general.flatpak_mask:
+    name: io.github.shiftey.Desktop
+    state: absent
+  register: unmask_result
+  check_mode: true
+
+- name: Verify unmasking of not masked app test result (check mode)
+  ansible.builtin.assert:
+    that:
+      - unmask_result is not changed
+    msg: "Unmasking a not masked app shall mark module execution as not changed in check mode"
+
+
+# - Tests with app masked ------ ----------------------------
+
+# state=present on masked app
+
+- name: Test masking of masked app in check mode
+  community.general.flatpak_mask:
+    name: check-mode-masked-app
+    state: present
+  register: mask_result
+  check_mode: true
+
+- name: Verify masking of masked app test result (check mode)
+  ansible.builtin.assert:
+    that:
+      - mask_result is not changed
+    msg: "Masking a masked app shall mark module execution as not changed in check mode"
+
+# state=absent on masked app
+
+- name: Test unmasking of masked app (check mode)
+  community.general.flatpak_mask:
+    name: check-mode-masked-app
+    state: absent
+  register: unmask_result
+  check_mode: true
+
+- name: Verify unmasking of masked app test result (check mode)
+  ansible.builtin.assert:
+    that:
+      - unmask_result is changed
+    msg: "Unmasking a masked app shall mark module execution as changed in check mode"
+
+- name: Test non-existent idempotency of unmasking of masked app (check mode)
+  community.general.flatpak_mask:
+    name: check-mode-masked-app
+    state: absent
+  register: double_unmask_result
+  check_mode: true
+
+- name: Verify non-existent idempotency of unmasking of masked app test result (check mode)
+  ansible.builtin.assert:
+    that:
+      - double_unmask_result is changed
+    msg: "Unmasking a masked app a second time shall still mark module execution as changed in check mode"
