@@ -1,5 +1,5 @@
 ---
-# Copyright (c) 2025, Shreyash Bhosale (@Shreyashxredhat)
+# Copyright (c) 2026, Shreyash Bhosale (@Shreyashxredhat)
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,7 +11,8 @@
 - ansible.builtin.assert:
     that:
       - result is not changed
-      - result.data.Value == 'foo1'
+      - result.data | length == 1
+      - result.data[0].Value == 'foo1'
       - result.index is defined
 
 - name: Read a non-existent key
@@ -22,7 +23,7 @@
 - ansible.builtin.assert:
     that:
       - result is not changed
-      - result.data is none
+      - result.data | length == 0
 
 - name: Read all keys under a prefix
   consul_kv_info:

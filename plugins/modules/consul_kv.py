@@ -84,17 +84,12 @@ options:
       - The name of the datacenter to query. If unspecified, the query defaults to the datacenter of the Consul agent on O(host).
     type: str
     version_added: 10.0.0
+seealso:
+  - module: community.general.consul_kv_info
 """
 
 
 EXAMPLES = r"""
-# Reading a key with consul_kv (state=present, no value) will be deprecated.
-# Use community.general.consul_kv_info instead:
-- name: Retrieve a value from the key/value store (use consul_kv_info instead)
-  community.general.consul_kv:
-    key: somekey
-  register: retrieved_key
-
 - name: Add or update the value associated with a key in the key/value store
   community.general.consul_kv:
     key: somekey

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2025, Shreyash Bhosale <shreyashpb16@gmail.com>
+# Copyright (c) 2026, Shreyash Bhosale <shrbhosa@redhat.com>
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -9,10 +9,9 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: consul_kv_info
 short_description: Retrieve entries from the key/value store of a Consul cluster
-version_added: 13.4.0
+version_added: 13.3.0
 description:
   - Retrieve one or more key/value entries from a Consul cluster.
-  - If O(recurse) is V(true), all entries sharing the prefix specified by O(key) are returned.
   - See U(https://developer.hashicorp.com/consul/api-docs/kv) for more details.
 author:
   - Shreyash Bhosale (@Shreyashxredhat)
@@ -24,7 +23,7 @@ extends_documentation_fragment:
   - community.general._attributes.info_module
 attributes:
   action_group:
-    version_added: 13.4.0
+    version_added: 13.3.0
 options:
   key:
     description:
@@ -64,13 +63,12 @@ EXAMPLES = r"""
 RETURN = r"""
 data:
   description:
-    - The KV entry or list of entries.
-    - When O(recurse) is V(false), this is a single dictionary with the keys C(Key), C(Value), C(Flags), and others
-      returned by the Consul API.
-    - When O(recurse) is V(true), this is a list of such dictionaries.
-    - V(null) if the key does not exist.
+    - The list of KV entries matching the query.
+    - Each element is a dictionary with the keys C(Key), C(Value), C(Flags), and others returned by the Consul API.
+    - The list is empty if the key does not exist.
   returned: always
-  type: raw
+  type: list
+  elements: dict
 index:
   description:
     - The Consul index value from the C(X-Consul-Index) response header.
@@ -91,9 +89,8 @@ from ansible_collections.community.general.plugins.module_utils._consul import (
 )
 
 
-def _decode_value(entry):
-    if entry.get("Value") is not None:
-        entry["Value"] = base64.b64decode(entry["Value"])
+def _decode_value(value):
+    return None if value is None else base64.b64decode(value)
 
 
 def _quote_key(key):
@@ -109,16 +106,16 @@ def _kv_get(consul_module, key, recurse=False, dc=None):
     except RequestError as e:
         if e.status == HTTPStatus.NOT_FOUND:
             index = e.response_headers.get("X-Consul-Index") if e.response_headers else None
-            return index, None
+            return index, []
         raise
     index = headers.get("X-Consul-Index") if headers is not None else None
     if not body:
-        return index, None
+        return index, []
     for entry in body:
-        _decode_value(entry)
+        entry["Value"] = _decode_value(entry.get("Value"))
     if recurse:
         return index, body
-    return index, body[0]
+    return index, [body[0]]
 
 
 def main():
