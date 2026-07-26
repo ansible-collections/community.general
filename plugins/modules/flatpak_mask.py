@@ -20,12 +20,12 @@ options:
       - The application ID or pattern to mask (e.g., org.gtk.Gtk3theme.Adwaita-dark).
     required: true
     type: str
-    aliases: [ app ]
+    aliases: [app]
   state:
     description:
       - Whether the application should be masked (present) or unmasked (absent).
     type: str
-    choices: [ present, absent ]
+    choices: [present, absent]
     default: present
   method:
     description:
@@ -73,14 +73,14 @@ class FlatpakMaskModule(AnsibleModule):
         check_cmd.insert(1, f"--{self.method}")
 
         rc, out, err = self.run_command(check_cmd)
-        
+
         masked_apps = [line.strip() for line in out.splitlines()]
         return self.app_name in masked_apps
 
     def apply_mask(self):
         set_cmd = [self.flatpak_bin, "mask", self.app_name]
         set_cmd.insert(1, f"--{self.method}")
-        
+
         rc, out, err = self.run_command(set_cmd)
         if rc != 0:
             self.fail_json(msg=f"Failed to mask flatpak app: {err}", rc=rc, out=out, err=err)
@@ -88,7 +88,7 @@ class FlatpakMaskModule(AnsibleModule):
     def apply_unmask(self):
         set_cmd = [self.flatpak_bin, "mask", "--remove", self.app_name]
         set_cmd.insert(1, f"--{self.method}")
-        
+
         rc, out, err = self.run_command(set_cmd)
         if rc != 0:
             self.fail_json(msg=f"Failed to unmask flatpak app: {err}", rc=rc, out=out, err=err)
@@ -110,10 +110,10 @@ class FlatpakMaskModule(AnsibleModule):
                 self.apply_mask()
             else:
                 self.apply_unmask()
-            
+
         self.exit_json(
-            changed=changed, 
-            name=self.app_name, 
+            changed=changed,
+            name=self.app_name,
             state=self.state,
             masked=(self.state == "present")
         )
