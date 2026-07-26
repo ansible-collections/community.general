@@ -1,0 +1,2 @@
+deprecated_features:
+  - linode - Linode has sunset its legacy API v3; the module will be removed from community.general 14.0.0. Use ``community.general.linode_v4`` instead (https://github.com/ansible-collections/community.general/pull/12467).
