@@ -5,246 +5,281 @@
 from __future__ import annotations
 
 import pytest
-from ansible.module_utils import _internal
 from ansible.module_utils.basic import AnsibleFallbackNotFound
-from ansible.module_utils.common import warnings as _warnings
 from ansible.module_utils.common.arg_spec import ModuleArgumentSpecValidator
-from ansible.module_utils.common.warnings import get_warning_messages
 
 from ansible_collections.community.general.plugins.module_utils import _consul
+
+CONSUL_ENV_VARS = (
+    "CONSUL_HTTP_ADDR",
+    "CONSUL_HTTP_SSL",
+    "CONSUL_HTTP_SSL_VERIFY",
+    "CONSUL_HTTP_TOKEN",
+    "CONSUL_CACERT",
+)
 
 
 @pytest.fixture(autouse=True)
 def scrub_consul_env(monkeypatch):
-    for name in ("CONSUL_HTTP_ADDR", "CONSUL_HTTP_SSL", "CONSUL_HTTP_SSL_VERIFY", "CONSUL_HTTP_TOKEN", "CONSUL_CACERT"):
+    for name in CONSUL_ENV_VARS:
         monkeypatch.delenv(name, raising=False)
-    # The parse cache and the warning store are process-global; both must be
-    # fresh so warning assertions cannot leak between cases. warn() only
-    # records to the store when not running as controller code, so pin the
-    # flag like ansible-core's own warning tests do (absent on older cores).
-    _consul._parse_addr.cache_clear()
-    monkeypatch.setattr(_warnings, "_global_warnings", type(_warnings._global_warnings)())
-    monkeypatch.setattr(_internal, "is_controller", False, raising=False)
 
 
-HOST_CASES = [
-    ("consul.example.com:8500", "consul.example.com"),
-    ("http://consul.example.com:8500", "consul.example.com"),
-    ("https://consul.example.com", "consul.example.com"),
-    ("consul.example.com", "consul.example.com"),
-    ("[2001:db8::1]:8500", "[2001:db8::1]"),
+class FailJson(Exception):
+    pass
+
+
+class ModuleStub:
+    """Just enough AnsibleModule for resolve_connection_params."""
+
+    def __init__(self, params):
+        self.params = params
+        self.fail_msg = None
+        self.no_log_values = set()
+
+    def fail_json(self, msg, **kwargs):
+        self.fail_msg = msg
+        raise FailJson(msg)
+
+
+def resolve(explicit=None):
+    """Run the real argument spec, then the resolution, like a module does."""
+    result = ModuleArgumentSpecValidator(_consul.AUTH_ARGUMENTS_SPEC).validate(explicit or {})
+    assert result.error_messages == []
+    module = ModuleStub(dict(result.validated_parameters))
+    _consul.resolve_connection_params(module)
+    return module.params
+
+
+ADDR_CASES = [
+    # (addr, host, port, scheme)
+    ("consul.example.com:8501", "consul.example.com", 8501, "http"),
+    ("http://consul.example.com:8501", "consul.example.com", 8501, "http"),
+    ("https://consul.example.com:8501", "consul.example.com", 8501, "https"),
+    # each component is optional and falls back on its own
+    ("consul.example.com", "consul.example.com", 8500, "http"),
+    ("https://consul.example.com", "consul.example.com", 8500, "https"),
+    ("https://consul.example.com/", "consul.example.com", 8500, "https"),
+    # IPv6 addresses stay bracketed so the composed URL is valid
+    ("[2001:db8::1]:8501", "[2001:db8::1]", 8501, "http"),
+    ("https://[2001:db8::1]", "[2001:db8::1]", 8500, "https"),
 ]
 
 
-@pytest.mark.parametrize("addr, expected", HOST_CASES)
-def test_env_consul_host(monkeypatch, addr, expected):
+@pytest.mark.parametrize("addr, host, port, scheme", ADDR_CASES)
+def test_addr_option_components(addr, host, port, scheme):
+    params = resolve({"addr": addr})
+    assert (params["host"], params["port"], params["scheme"]) == (host, port, scheme)
+
+
+@pytest.mark.parametrize("addr, host, port, scheme", ADDR_CASES)
+def test_addr_environment_components(monkeypatch, addr, host, port, scheme):
     monkeypatch.setenv("CONSUL_HTTP_ADDR", addr)
-    assert _consul.env_consul_host() == expected
+    params = resolve()
+    assert (params["host"], params["port"], params["scheme"]) == (host, port, scheme)
 
 
-PORT_CASES = [
-    ("consul.example.com:8501", 8501),
-    ("https://consul.example.com:8501", 8501),
-    ("[2001:db8::1]:8500", 8500),
+def test_defaults_without_addr():
+    params = resolve()
+    assert (params["host"], params["port"], params["scheme"]) == ("localhost", 8500, "http")
+
+
+EXPLICIT_WINS_CASES = [
+    ({"host": "explicit.example.com"}, "explicit.example.com", 8501, "https"),
+    ({"port": 9999}, "addr.example.com", 9999, "https"),
+    ({"scheme": "http"}, "addr.example.com", 8501, "http"),
+    (
+        {"host": "explicit.example.com", "port": 9999, "scheme": "http"},
+        "explicit.example.com",
+        9999,
+        "http",
+    ),
 ]
 
 
-@pytest.mark.parametrize("addr, expected", PORT_CASES)
-def test_env_consul_port(monkeypatch, addr, expected):
-    monkeypatch.setenv("CONSUL_HTTP_ADDR", addr)
-    assert _consul.env_consul_port() == expected
+@pytest.mark.parametrize("explicit, host, port, scheme", EXPLICIT_WINS_CASES)
+def test_explicit_options_win_over_addr(monkeypatch, explicit, host, port, scheme):
+    monkeypatch.setenv("CONSUL_HTTP_ADDR", "https://addr.example.com:8501")
+    params = resolve(explicit)
+    assert (params["host"], params["port"], params["scheme"]) == (host, port, scheme)
 
 
-SCHEME_CASES = [
-    # (CONSUL_HTTP_SSL, CONSUL_HTTP_ADDR, expected)
+def test_addr_option_wins_over_environment(monkeypatch):
+    monkeypatch.setenv("CONSUL_HTTP_ADDR", "http://environment.example.com:8500")
+    params = resolve({"addr": "https://option.example.com:8501"})
+    assert (params["host"], params["port"], params["scheme"]) == ("option.example.com", 8501, "https")
+
+
+SSL_CASES = [
+    # (CONSUL_HTTP_SSL, addr, expected scheme)
     ("true", None, "https"),
     ("1", None, "https"),
+    ("yes", None, "https"),
+    # a true value selects https even when the address says http
     ("true", "http://consul.example.com:8500", "https"),
-    # a false CONSUL_HTTP_SSL must not downgrade an https address
+    # a false value does not downgrade an https address
     ("false", "https://consul.example.com:8500", "https"),
-    (None, "https://consul.example.com:8500", "https"),
-    (None, "http://consul.example.com:8500", "http"),
+    ("false", "http://consul.example.com:8500", "http"),
+    ("false", None, "http"),
+    # an empty variable counts as unset, like the consul CLI treats it
+    ("", "https://consul.example.com:8500", "https"),
 ]
 
 
-@pytest.mark.parametrize("tls, addr, expected", SCHEME_CASES)
-def test_env_consul_scheme(monkeypatch, tls, addr, expected):
-    if tls is not None:
-        monkeypatch.setenv("CONSUL_HTTP_SSL", tls)
+@pytest.mark.parametrize("tls, addr, scheme", SSL_CASES)
+def test_consul_http_ssl(monkeypatch, tls, addr, scheme):
+    monkeypatch.setenv("CONSUL_HTTP_SSL", tls)
     if addr is not None:
         monkeypatch.setenv("CONSUL_HTTP_ADDR", addr)
-    assert _consul.env_consul_scheme() == expected
+    assert resolve()["scheme"] == scheme
 
 
-FALLBACK_NOT_FOUND_CASES = [
-    # (env, callable) -> no usable value in the environment
-    ({}, _consul.env_consul_host),
-    ({}, _consul.env_consul_port),
-    ({}, _consul.env_consul_scheme),
-    ({"CONSUL_HTTP_ADDR": "consul.example.com"}, _consul.env_consul_port),
-    ({"CONSUL_HTTP_ADDR": "consul.example.com:8500"}, _consul.env_consul_scheme),
-    ({"CONSUL_HTTP_SSL": "false"}, _consul.env_consul_scheme),
-    # set-but-empty variables count as unset, like the consul CLI treats them
-    ({"CONSUL_HTTP_ADDR": ""}, _consul.env_consul_host),
-    ({"CONSUL_HTTP_SSL": ""}, _consul.env_consul_scheme),
-    # addresses the consul CLI accepts but the modules cannot honor faithfully
-    # are ignored, so playbooks that never relied on the variable keep working
-    ({"CONSUL_HTTP_ADDR": "unix:///var/run/consul.sock"}, _consul.env_consul_host),
-    ({"CONSUL_HTTP_ADDR": "https://proxy.example.com:443/consul"}, _consul.env_consul_host),
-    ({"CONSUL_HTTP_ADDR": "http://user:pass@consul.example.com:8500"}, _consul.env_consul_host),
-    ({"CONSUL_HTTP_ADDR": "http://consul.example.com:8500?dc=dc1"}, _consul.env_consul_host),
-    ({"CONSUL_HTTP_ADDR": "   "}, _consul.env_consul_host),
-    # an address without a host is ignored entirely, no component is half-used
-    ({"CONSUL_HTTP_ADDR": "http://:8500"}, _consul.env_consul_host),
-    ({"CONSUL_HTTP_ADDR": "http://:8500"}, _consul.env_consul_port),
-    ({"CONSUL_HTTP_ADDR": "https://"}, _consul.env_consul_scheme),
-    ({"CONSUL_HTTP_ADDR": ":8500"}, _consul.env_consul_port),
+def test_explicit_scheme_wins_over_consul_http_ssl(monkeypatch):
+    monkeypatch.setenv("CONSUL_HTTP_SSL", "true")
+    assert resolve({"scheme": "http"})["scheme"] == "http"
+
+
+# Addresses these modules cannot use fail instead of silently connecting
+# somewhere else. Only shapes every supported Python rejects belong in the
+# parse-failure cases: newer interpreters reject more bracket forms.
+UNUSABLE_ADDR_CASES = [
+    ("unix:///var/run/consul.sock", "unsupported scheme"),
+    ("ftp://consul.example.com:8500", "unsupported scheme"),
+    ("https://consul.example.com:8500/prefix", "must not contain a path"),
+    ("https://consul.example.com:8500?dc=dc1", "must not contain a query"),
+    ("https://user:pass@consul.example.com:8500", "must not contain credentials"),
+    ("https://", "does not contain a host"),
+    ("http://:8500", "does not contain a host"),
+    ("consul.example.com:notaport", "cannot be parsed"),
+    ("consul.example.com:99999", "cannot be parsed"),
+    ("2001:db8::1", "cannot be parsed"),
+    ("[::1", "cannot be parsed"),
 ]
 
 
-@pytest.mark.parametrize("env, func", FALLBACK_NOT_FOUND_CASES)
-def test_fallback_not_found(monkeypatch, env, func):
-    for key, value in env.items():
-        monkeypatch.setenv(key, value)
-    with pytest.raises(AnsibleFallbackNotFound):
-        func()
-    assert get_warning_messages() == ()
+@pytest.mark.parametrize("addr, reason", UNUSABLE_ADDR_CASES)
+def test_unusable_addr_option_fails(addr, reason):
+    with pytest.raises(FailJson) as exc:
+        resolve({"addr": addr})
+    assert reason in str(exc.value)
+    # the address may embed credentials, so the failure must not repeat it
+    assert addr not in str(exc.value)
 
 
-def test_trailing_slash_is_tolerated(monkeypatch):
-    monkeypatch.setenv("CONSUL_HTTP_ADDR", "https://consul.example.com:8501/")
-    assert _consul.env_consul_host() == "consul.example.com"
-    assert _consul.env_consul_port() == 8501
-    assert _consul.env_consul_scheme() == "https"
-
-
-# Fallback callables may only raise AnsibleFallbackNotFound; ansible-core's
-# set_fallbacks catches nothing else, so an unparsable value must warn and
-# fall back instead of raising. Only shapes every supported Python rejects
-# belong here: newer interpreters reject more bracket forms than older ones.
-MALFORMED_ADDR_CASES = [
-    "consul.example.com:notaport",
-    "consul.example.com:99999",
-    "2001:db8::1",
-    "[::1",
-]
-
-
-@pytest.mark.parametrize("addr", MALFORMED_ADDR_CASES)
-@pytest.mark.parametrize("func", [_consul.env_consul_host, _consul.env_consul_port, _consul.env_consul_scheme])
-def test_malformed_addr_warns_and_falls_back(monkeypatch, addr, func):
+@pytest.mark.parametrize("addr, reason", UNUSABLE_ADDR_CASES)
+def test_unusable_addr_environment_fails(monkeypatch, addr, reason):
     monkeypatch.setenv("CONSUL_HTTP_ADDR", addr)
-    with pytest.raises(AnsibleFallbackNotFound):
-        func()
-    warnings = get_warning_messages()
-    assert len(warnings) == 1
-    assert "CONSUL_HTTP_ADDR" in warnings[0]
-    # the value may embed credentials, so the warning must not echo it
-    assert addr not in warnings[0]
+    with pytest.raises(FailJson) as exc:
+        resolve()
+    assert reason in str(exc.value)
+    assert addr not in str(exc.value)
 
 
-def test_malformed_addr_warns_once_across_consumers(monkeypatch):
-    monkeypatch.setenv("CONSUL_HTTP_ADDR", "[::1")
-    for func in (_consul.env_consul_host, _consul.env_consul_port, _consul.env_consul_scheme):
-        with pytest.raises(AnsibleFallbackNotFound):
-            func()
-    assert len(get_warning_messages()) == 1
+@pytest.mark.parametrize("addr, reason", UNUSABLE_ADDR_CASES)
+def test_unusable_addr_is_ignored_when_nothing_is_needed(monkeypatch, addr, reason):
+    # A task that spells out its connection must not be broken by an address
+    # exported for the consul CLI that these modules happen not to support.
+    monkeypatch.setenv("CONSUL_HTTP_ADDR", addr)
+    params = resolve({"host": "consul.example.com", "port": 8501, "scheme": "https"})
+    assert (params["host"], params["port"], params["scheme"]) == ("consul.example.com", 8501, "https")
 
 
-def test_invalid_ssl_boolean_warns_and_selects_https(monkeypatch):
-    # An unparsable CONSUL_HTTP_SSL must not silently pick plaintext: the
-    # token fallback would still apply and be sent over http.
+def test_invalid_consul_http_ssl_is_ignored_when_scheme_is_set(monkeypatch):
     monkeypatch.setenv("CONSUL_HTTP_SSL", "maybe")
-    assert _consul.env_consul_scheme() == "https"
-    warnings = get_warning_messages()
-    assert len(warnings) == 1
-    assert "CONSUL_HTTP_SSL" in warnings[0]
-    # a value in the wrong variable may be a credential, never echo it
-    assert "maybe" not in warnings[0]
+    params = resolve({"host": "consul.example.com", "port": 8501, "scheme": "https"})
+    assert params["scheme"] == "https"
+
+
+def test_embedded_password_is_registered_for_masking(monkeypatch):
+    # ansible-core echoes the module arguments back with the result, so a
+    # password in the address has to be masked there as well as kept out of
+    # the failure message.
+    monkeypatch.setenv("CONSUL_HTTP_ADDR", "https://user:s3cr3t@consul.example.com:8501")
+    result = ModuleArgumentSpecValidator(_consul.AUTH_ARGUMENTS_SPEC).validate({})
+    module = ModuleStub(dict(result.validated_parameters))
+    module.no_log_values = set()
+    with pytest.raises(FailJson):
+        _consul.resolve_connection_params(module)
+    assert "s3cr3t" in module.no_log_values
+
+
+@pytest.mark.parametrize(
+    "addr, password",
+    [
+        ("https://user:s3cr3t@consul.example.com:8501", "s3cr3t"),
+        ("https://consul.example.com:8501", None),
+        ("[::1", None),
+    ],
+)
+def test_addr_password(addr, password):
+    assert _consul.addr_password(addr) == password
+
+
+@pytest.mark.parametrize("tls", ["maybe", "2", "tru", "null"])
+def test_invalid_consul_http_ssl_fails(monkeypatch, tls):
+    monkeypatch.setenv("CONSUL_HTTP_SSL", tls)
+    with pytest.raises(FailJson) as exc:
+        resolve()
+    assert "CONSUL_HTTP_SSL" in str(exc.value)
+
+
+@pytest.mark.parametrize("addr", ["", "   "])
+def test_blank_addr_is_unset(monkeypatch, addr):
+    monkeypatch.setenv("CONSUL_HTTP_ADDR", addr)
+    params = resolve()
+    assert (params["host"], params["port"], params["scheme"]) == ("localhost", 8500, "http")
+
+
+def test_surrounding_whitespace_is_tolerated(monkeypatch):
+    monkeypatch.setenv("CONSUL_HTTP_ADDR", "  https://consul.example.com:8501  ")
+    params = resolve()
+    assert (params["host"], params["port"], params["scheme"]) == ("consul.example.com", 8501, "https")
 
 
 NONEMPTY_FALLBACK_CASES = [
-    ({"CONSUL_HTTP_TOKEN": "tok"}, ["CONSUL_HTTP_TOKEN"], "tok"),
-    ({"CONSUL_CACERT": "/etc/ssl/ca.pem"}, ["CONSUL_CACERT"], "/etc/ssl/ca.pem"),
+    ("token", "CONSUL_HTTP_TOKEN", "s3cr3t"),
+    ("ca_path", "CONSUL_CACERT", "/etc/ssl/ca.pem"),
+    ("addr", "CONSUL_HTTP_ADDR", "consul.example.com"),
 ]
 
 
-@pytest.mark.parametrize("env, names, expected", NONEMPTY_FALLBACK_CASES)
-def test_nonempty_env_fallback(monkeypatch, env, names, expected):
-    for key, value in env.items():
-        monkeypatch.setenv(key, value)
-    assert _consul.nonempty_env_fallback(*names) == expected
+@pytest.mark.parametrize("option, name, value", NONEMPTY_FALLBACK_CASES)
+def test_environment_fills_option(monkeypatch, option, name, value):
+    monkeypatch.setenv(name, value)
+    assert resolve()[option] == value
 
 
-NONEMPTY_FALLBACK_UNSET_CASES = [
-    ({}, ["CONSUL_HTTP_TOKEN"]),
-    ({"CONSUL_HTTP_TOKEN": ""}, ["CONSUL_HTTP_TOKEN"]),
-]
+@pytest.mark.parametrize("option, name, value", NONEMPTY_FALLBACK_CASES)
+def test_empty_environment_variable_counts_as_unset(monkeypatch, option, name, value):
+    monkeypatch.setenv(name, "")
+    assert resolve()[option] is None
 
 
-@pytest.mark.parametrize("env, names", NONEMPTY_FALLBACK_UNSET_CASES)
-def test_nonempty_env_fallback_unset(monkeypatch, env, names):
-    for key, value in env.items():
-        monkeypatch.setenv(key, value)
-    with pytest.raises(AnsibleFallbackNotFound):
-        _consul.nonempty_env_fallback(*names)
-
-
-# The cases below run the spec through ansible-core's own argument handling,
-# pinning the fallback contract itself rather than the callables in isolation.
-
-
-def validate_spec():
-    return ModuleArgumentSpecValidator(_consul.AUTH_ARGUMENTS_SPEC).validate({})
-
-
-def test_spec_resolves_env(monkeypatch):
-    monkeypatch.setenv("CONSUL_HTTP_ADDR", "https://consul.example.com:8501")
-    monkeypatch.setenv("CONSUL_HTTP_TOKEN", "tok")
+def test_validate_certs_from_environment(monkeypatch):
     monkeypatch.setenv("CONSUL_HTTP_SSL_VERIFY", "false")
-    monkeypatch.setenv("CONSUL_CACERT", "/etc/ssl/ca.pem")
-    result = validate_spec()
-    assert result.error_messages == []
-    parameters = result.validated_parameters
-    assert parameters["host"] == "consul.example.com"
-    assert parameters["port"] == 8501
-    assert parameters["scheme"] == "https"
-    assert parameters["token"] == "tok"
-    assert parameters["validate_certs"] is False
-    assert parameters["ca_path"] == "/etc/ssl/ca.pem"
+    assert resolve()["validate_certs"] is False
 
 
-def test_spec_defaults_without_env():
-    result = validate_spec()
-    assert result.error_messages == []
-    parameters = result.validated_parameters
-    assert parameters["host"] == "localhost"
-    assert parameters["port"] == 8500
-    assert parameters["scheme"] == "http"
-    assert parameters["token"] is None
+def test_validate_certs_defaults_to_true():
+    assert resolve()["validate_certs"] is True
 
 
-@pytest.mark.parametrize("addr", MALFORMED_ADDR_CASES)
-def test_spec_survives_malformed_addr(monkeypatch, addr):
-    monkeypatch.setenv("CONSUL_HTTP_ADDR", addr)
-    result = validate_spec()
-    assert result.error_messages == []
-    assert result.validated_parameters["host"] == "localhost"
-    assert result.validated_parameters["port"] == 8500
-    assert len(get_warning_messages()) == 1
-
-
-def test_spec_survives_invalid_ssl_boolean(monkeypatch):
-    monkeypatch.setenv("CONSUL_HTTP_SSL", "maybe")
-    result = validate_spec()
-    assert result.error_messages == []
-    assert result.validated_parameters["scheme"] == "https"
-    assert len(get_warning_messages()) == 1
-
-
-def test_spec_rejects_invalid_ssl_verify_cleanly(monkeypatch):
-    # garbage CONSUL_HTTP_SSL_VERIFY reaches the type='bool' coercion and must
-    # surface as a clean validation error, never an exception
+def test_invalid_validate_certs_fails_cleanly(monkeypatch):
+    # garbage reaches the type='bool' coercion and must surface as a clean
+    # validation error rather than an exception
     monkeypatch.setenv("CONSUL_HTTP_SSL_VERIFY", "maybe")
-    result = validate_spec()
+    result = ModuleArgumentSpecValidator(_consul.AUTH_ARGUMENTS_SPEC).validate({})
     assert result.error_messages
+
+
+def test_nonempty_env_fallback(monkeypatch):
+    monkeypatch.setenv("CONSUL_HTTP_TOKEN", "s3cr3t")
+    assert _consul.nonempty_env_fallback("CONSUL_HTTP_TOKEN") == "s3cr3t"
+
+
+@pytest.mark.parametrize("value", [None, ""])
+def test_nonempty_env_fallback_unset(monkeypatch, value):
+    if value is not None:
+        monkeypatch.setenv("CONSUL_HTTP_TOKEN", value)
+    with pytest.raises(AnsibleFallbackNotFound):
+        _consul.nonempty_env_fallback("CONSUL_HTTP_TOKEN")
