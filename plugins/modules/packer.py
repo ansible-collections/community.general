@@ -121,13 +121,6 @@ options:
       - Corresponds to V(-cleanup) flag.
     type: bool
     default: false
-  env_vars:
-    description:
-      - Environment variables to set for Packer process.
-      - Useful for cloud provider credentials.
-    type: dict
-    required: false
-    default: {}
   artifact_name:
     description:
       - Name of the artifact to check for existence.
@@ -217,16 +210,6 @@ EXAMPLES = r"""
     name: format-template
     state: formatted
     template: template.pkr.hcl
-
-- name: Build with environment variables
-  community.general.packer:
-    name: env-build
-    state: build
-    template: template.pkr.hcl
-    env_vars:
-      AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
-      AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
-    log_level: debug
 
 - name: Build local artifact (VirtualBox)
   community.general.packer:
@@ -326,7 +309,6 @@ class PackerModule:
         self.timeout = self.params.get("timeout")
         self.chdir = self.params.get("chdir")
         self.cleanup = self.params.get("cleanup")
-        self.env_vars = self.params.get("env_vars") or {}
         self.artifact_name = self.params.get("artifact_name")
         self.artifact_region = self.params.get("artifact_region")
         self.artifact_type = self.params.get("artifact_type", "none")
@@ -506,24 +488,17 @@ class PackerModule:
         cmd = self._build_command(command)
         self.result["cmd"] = " ".join(cmd)
 
-        env = os.environ.copy()
-        env.update(self.env_vars)
         cwd = self.chdir or os.getcwd()
 
         try:
             start_time = datetime.now(timezone.utc).isoformat() + "Z"
 
-            result = subprocess.run(
+            rc, stdout, stderr = self.module.run_command(
                 cmd,
-                capture_output=True,
-                text=True,
                 cwd=cwd,
-                env=env,
                 timeout=self.timeout if self.timeout > 0 else None,
-                check=False,
+                check_rc=False,
             )
-
-            rc, stdout, stderr = result.returncode, result.stdout, result.stderr
 
             self.build_output = stdout
 
@@ -561,11 +536,6 @@ class PackerModule:
 
             return result_dict
 
-        except subprocess.TimeoutExpired:
-            self.module.fail_json(
-                msg=f"Packer command timed out after {self.timeout} seconds",
-                cmd=" ".join(cmd),
-            )
         except Exception as e:
             self.module.fail_json(
                 msg=f"Error executing Packer: {str(e)}",
@@ -645,7 +615,6 @@ def main() -> None:
             timeout=dict(type="int", required=False, default=3600),
             chdir=dict(type="path", required=False),
             cleanup=dict(type="bool", required=False, default=False),
-            env_vars=dict(type="dict", required=False, default={}),
             artifact_name=dict(type="str", required=False),
             artifact_region=dict(type="str", required=False),
             artifact_type=dict(

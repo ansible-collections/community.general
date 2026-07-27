@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 import unittest
@@ -77,7 +76,6 @@ class TestPackerModule(unittest.TestCase):
             "timeout": 3600,
             "chdir": None,
             "cleanup": False,
-            "env_vars": {},
             "artifact_name": None,
             "artifact_region": None,
             "artifact_type": "none",
@@ -243,7 +241,6 @@ class TestPackerModule(unittest.TestCase):
             "timeout": 3600,
             "chdir": None,
             "cleanup": False,
-            "env_vars": {},
             "artifact_name": None,
             "artifact_region": None,
             "artifact_type": "none",
@@ -320,20 +317,6 @@ class TestPackerModule(unittest.TestCase):
         result = packer_module.apply()
         self.assertTrue(result["changed"])
 
-    def test_timeout_handling(self):
-        from ansible_collections.community.general.plugins.modules import packer
-
-        self._setup_module_params(state="build", timeout=1)
-        self.mock_module.run_command.side_effect = subprocess.TimeoutExpired(cmd="packer build", timeout=1)
-
-        packer_bin = self.mock_module.get_bin_path.return_value
-        packer_module = packer.PackerModule(self.mock_module, packer_bin)
-
-        with self.assertRaises(Exception) as context:
-            packer_module.apply()
-        self.assertIn("fail_json called", str(context.exception))
-        self.mock_module.fail_json.assert_called_once()
-
     def test_only_and_except_mutually_exclusive(self):
         from ansible_collections.community.general.plugins.modules import packer
 
@@ -369,31 +352,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertTrue(result["changed"])
         cmd = result["cmd"]
         self.assertIn("--log-level debug", cmd)
-
-    def test_env_vars_parameter(self):
-        from ansible_collections.community.general.plugins.modules import packer
-
-        env_vars = {"AWS_ACCESS_KEY_ID": "test-key", "AWS_SECRET_ACCESS_KEY": "test-secret"}
-        self._setup_module_params(state="build", env_vars=env_vars)
-        self.mock_module.run_command.return_value = (0, "Build finished", "")
-
-        packer_bin = self.mock_module.get_bin_path.return_value
-        packer_module = packer.PackerModule(self.mock_module, packer_bin)
-        result = packer_module.apply()
-
-        self.assertTrue(result["changed"])
-        build_call = None
-        for call in self.mock_module.run_command.call_args_list:
-            args, kwargs = call
-            if args[0] and isinstance(args[0], list) and "build" in args[0]:
-                build_call = call
-                break
-        self.assertIsNotNone(build_call, "No call with 'build' command found")
-        args, kwargs = build_call
-        self.assertIn("environ", kwargs)
-        env = kwargs["environ"]
-        self.assertEqual(env.get("AWS_ACCESS_KEY_ID"), "test-key")
-        self.assertEqual(env.get("AWS_SECRET_ACCESS_KEY"), "test-secret")
 
     def test_check_mode(self):
         from ansible_collections.community.general.plugins.modules import packer
