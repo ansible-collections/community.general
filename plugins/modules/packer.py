@@ -507,63 +507,59 @@ class PackerModule:
         cmd = self._build_command(command)
         self.result["cmd"] = " ".join(cmd)
 
-        env = os.environ.copy()
-        env.update(self.env_vars)
         cwd = self.chdir or os.getcwd()
 
+        old_env = os.environ.copy()
         try:
-            start_time = datetime.now(timezone.utc).isoformat() + "Z"
+            os.environ.update(self.env_vars)
 
-            # Для передачи окружения используем параметр environ, а не env
             rc, stdout, stderr = self.module.run_command(
                 cmd,
                 cwd=cwd,
-                environ=env,  # <-- замените env на environ
                 timeout=self.timeout if self.timeout > 0 else None,
                 check_rc=False,
             )
+        finally:
+            os.environ.clear()
+            os.environ.update(old_env)
 
-            self.build_output = stdout
+        self.build_output = stdout
 
-            artifacts = []
-            artifacts_count = 0
-            if command == "build" and rc == 0:
-                artifacts = self._parse_build_output(stdout)
-                artifacts_count = len(artifacts)
+        start_time = datetime.now(timezone.utc).isoformat() + "Z"
 
+        artifacts = []
+        artifacts_count = 0
+        if command == "build" and rc == 0:
+            artifacts = self._parse_build_output(stdout)
+            artifacts_count = len(artifacts)
+
+        changed = False
+        if command == "build":
+            changed = True
+        elif command == "fmt":
+            changed = rc == 0 and stdout != ""
+        elif command in ["validate", "inspect"]:
             changed = False
-            if command == "build":
-                changed = True
-            elif command == "fmt":
-                changed = rc == 0 and stdout != ""
-            elif command in ["validate", "inspect"]:
-                changed = False
 
-            result_dict = {
-                "changed": changed,
-                "stdout": stdout,
-                "stderr": stderr,
-                "rc": rc,
-                "cmd": " ".join(cmd),
-                "packer_version": self._check_packer_version(),
-            }
+        result_dict = {
+            "changed": changed,
+            "stdout": stdout,
+            "stderr": stderr,
+            "rc": rc,
+            "cmd": " ".join(cmd),
+            "packer_version": self._check_packer_version(),
+        }
 
-            if command == "build":
-                result_dict["started"] = start_time
-                result_dict["artifacts"] = artifacts
-                result_dict["artifacts_count"] = artifacts_count
+        if command == "build":
+            result_dict["started"] = start_time
+            result_dict["artifacts"] = artifacts
+            result_dict["artifacts_count"] = artifacts_count
 
-            if rc != 0:
-                result_dict["failed"] = True
-                self.module.fail_json(msg="Packer command failed", **result_dict)
-            else:
-                return result_dict
+        if rc != 0:
+            result_dict["failed"] = True
+            self.module.fail_json(msg="Packer command failed", **result_dict)
 
-        except Exception as e:
-            self.module.fail_json(
-                msg=f"Error executing Packer: {to_native(e)}",
-                cmd=" ".join(cmd),
-            )
+        return result_dict
 
     def _should_build(self) -> bool:
         """Determine if we need to build based on state and artifact existence."""

@@ -1144,7 +1144,7 @@ files:
     labels: pacman
     maintainers: grawlinson
   $modules/packer.py:
-      maintainers: a-gabidullin
+    maintainers: a-gabidullin
   $modules/pagerduty.py:
     ignore: bpennypacker
     labels: pagerduty
