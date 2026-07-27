@@ -222,8 +222,11 @@ class TestPackerModule(unittest.TestCase):
             packer_module.apply()
         self.assertIn("fail_json called", str(context.exception))
 
-    def test_packer_not_installed(self):
+    @patch("os.getcwd")
+    def test_packer_not_installed(self, mock_getcwd):
         from ansible_collections.community.general.plugins.modules import packer
+
+        mock_getcwd.return_value = self.test_dir
 
         mock_module_for_test = Mock()
         mock_module_for_test.params = {
