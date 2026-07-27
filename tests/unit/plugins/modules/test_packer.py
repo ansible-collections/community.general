@@ -47,7 +47,6 @@ class TestPackerModule(unittest.TestCase):
         self.mock_module.check_mode = False
         self.mock_module.get_bin_path = Mock(return_value="/usr/local/bin/packer")
         self.mock_module.warn = Mock()
-        # Мок для run_command — будет переопределяться в каждом тесте
         self.mock_module.run_command = Mock(return_value=(0, "", ""))
         self.mock_ansible_basic.AnsibleModule.return_value = self.mock_module
 
@@ -300,7 +299,6 @@ class TestPackerModule(unittest.TestCase):
             artifact_region="us-west-2",
         )
 
-        # Первый запуск: артефакт существует, сборка пропускается
         with patch.object(packer.PackerModule, "_artifact_exists", return_value=True):
             packer_bin = self.mock_module.get_bin_path.return_value
             packer_module = packer.PackerModule(self.mock_module, packer_bin)
@@ -308,7 +306,6 @@ class TestPackerModule(unittest.TestCase):
             self.assertFalse(result["changed"])
             self.assertIn("already exists", str(result.get("msg", "")))
 
-        # Второй запуск: force=True, сборка выполняется
         self._setup_module_params(
             state="build",
             artifact_type="ami",
@@ -327,7 +324,6 @@ class TestPackerModule(unittest.TestCase):
         from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", timeout=1)
-        # Симулируем TimeoutExpired в run_command
         self.mock_module.run_command.side_effect = subprocess.TimeoutExpired(cmd="packer build", timeout=1)
 
         packer_bin = self.mock_module.get_bin_path.return_value
@@ -386,19 +382,16 @@ class TestPackerModule(unittest.TestCase):
         result = packer_module.apply()
 
         self.assertTrue(result["changed"])
-        # Проверяем, что в вызове run_command переданы переменные окружения
-        # Найдём вызов с командой, содержащей 'build'
         build_call = None
         for call in self.mock_module.run_command.call_args_list:
             args, kwargs = call
-            # args[0] — это список аргументов команды
             if args[0] and isinstance(args[0], list) and "build" in args[0]:
                 build_call = call
                 break
         self.assertIsNotNone(build_call, "No call with 'build' command found")
         args, kwargs = build_call
-        self.assertIn("env", kwargs)
-        env = kwargs["env"]
+        self.assertIn("environ", kwargs)
+        env = kwargs["environ"]
         self.assertEqual(env.get("AWS_ACCESS_KEY_ID"), "test-key")
         self.assertEqual(env.get("AWS_SECRET_ACCESS_KEY"), "test-secret")
 

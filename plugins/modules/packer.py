@@ -334,7 +334,6 @@ class PackerModule:
         self.output_dir = self.params.get("output_dir")
         self.log_level = self.params.get("log_level", "info")
 
-        # Map state to packer command
         self.state_to_command = {
             "build": "build",
             "absent": "build",
@@ -343,7 +342,6 @@ class PackerModule:
             "formatted": "fmt",
         }
 
-        # Store output for parsing
         self.build_output = ""
 
     def _check_packer_version(self) -> str:
@@ -401,26 +399,21 @@ class PackerModule:
         if self.force:
             return False
 
-        # For local builds, check if output directory exists
         if self.artifact_type == "none" and self.output_dir:
             if os.path.exists(self.output_dir):
                 return True
 
-        # Placeholder for cloud artifact checks
         return False
 
     def _build_command(self, command: str) -> list[str]:
         """Build the Packer command line."""
         cmd = [self.packer_bin]
 
-        # Add log level if not default
         if self.log_level != "info":
             cmd.extend(["--log-level", self.log_level])
 
-        # Add command
         cmd.append(command)
 
-        # Add template for relevant commands
         if command in ["build", "validate", "inspect"]:
             if self.template:
                 cmd.append(self.template)
@@ -428,7 +421,6 @@ class PackerModule:
             if self.template:
                 cmd.append(self.template)
 
-        # Build-specific flags
         if command == "build":
             if self.force:
                 cmd.append("-force")
@@ -437,25 +429,20 @@ class PackerModule:
             if self.cleanup:
                 cmd.append("-cleanup")
 
-        # Common flags
         if not self.color:
             cmd.append("-no-color")
         if self.machine_readable:
             cmd.append("-machine-readable")
 
-        # Variables
         for key, value in self.variables.items():
-            # Handle string values properly
             if isinstance(value, str) and (" " in value or '"' in value):
                 cmd.extend(["-var", f'{key}="{value}"'])
             else:
                 cmd.extend(["-var", f"{key}={value}"])
 
-        # Variable files
         for var_file in self.var_files:
             cmd.extend(["-var-file", var_file])
 
-        # Builder filters
         if self.only:
             cmd.extend(["-only", ",".join(self.only)])
         if self.except_builders:
@@ -488,10 +475,8 @@ class PackerModule:
         if self.machine_readable:
             return self._parse_machine_readable_output(output)
 
-        # Parse human-readable output
         lines = output.splitlines()
         for line in lines:
-            # Look for artifact lines
             if "Artifact" in line and "built" in line and ":" in line:
                 parts = line.split(":")
                 if len(parts) >= 2:
@@ -505,7 +490,6 @@ class PackerModule:
                             }
                         )
 
-            # Look for AMI lines (AWS specific)
             if "ami-" in line and ("created" in line or "AMIs" in line):
                 match = re.search(r"(ami-[a-zA-Z0-9]+)", line)
                 if match:
@@ -530,10 +514,11 @@ class PackerModule:
         try:
             start_time = datetime.now(timezone.utc).isoformat() + "Z"
 
+            # Для передачи окружения используем параметр environ, а не env
             rc, stdout, stderr = self.module.run_command(
                 cmd,
                 cwd=cwd,
-                env=env,
+                environ=env,  # <-- замените env на environ
                 timeout=self.timeout if self.timeout > 0 else None,
                 check_rc=False,
             )
@@ -584,20 +569,14 @@ class PackerModule:
         """Determine if we need to build based on state and artifact existence."""
         if self.state != "build":
             return False
-
         if self.force:
             return True
-
-        if self._artifact_exists():
-            return False
-
-        return True
+        return not self._artifact_exists()
 
     def apply(self) -> dict[str, object]:
         """Apply Packer configuration and build if needed."""
         self._validate_parameters()
 
-        # Handle absent state
         if self.state == "absent":
             self.module.warn(
                 "State 'absent' is not fully implemented. "
@@ -607,11 +586,9 @@ class PackerModule:
             self.result["msg"] = "Absent state is not implemented. Use 'force: true' to force rebuild."
             return self.result
 
-        # Handle formatting - doesn't require validation
         if self.state == "formatted":
             return self._execute_packer("fmt")
 
-        # Check if build is needed
         if self.state == "build" and not self._should_build():
             self.result["changed"] = False
             self.result["msg"] = (
@@ -619,16 +596,13 @@ class PackerModule:
             )
             return self.result
 
-        # Execute Packer
         command = self.state_to_command.get(self.state)
         if not command:
             self.module.fail_json(msg=f"Unsupported state: {self.state}")
 
         if self.state in ["validated", "inspected"]:
-            # These are read-only operations
             return self._execute_packer(command)
 
-        # For build state, build the image
         if self.state == "build":
             result = self._execute_packer("build")
             self.result.update(result)
