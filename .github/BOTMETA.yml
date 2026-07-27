@@ -620,6 +620,8 @@ files:
     maintainers: $team_flatpak
   $modules/flatpak_remote.py:
     maintainers: $team_flatpak
+  $modules/flatpak_mask.py:
+    maintainers: zeerayne
   $modules/gandi_livedns.py:
     maintainers: gthiemonge
   $modules/gconftool2.py:
