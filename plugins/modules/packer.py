@@ -276,6 +276,7 @@ changed:
 import os
 import re
 from datetime import datetime, timezone
+from typing import Any, Dict, List
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -287,7 +288,7 @@ class PackerModule:
         self.module = module
         self.params = module.params
         self.packer_bin = packer_bin
-        self.result: dict[str, object] = {
+        self.result: Dict[str, Any] = {
             "changed": False,
             "stdout": "",
             "stderr": "",
@@ -315,7 +316,7 @@ class PackerModule:
         self.output_dir = self.params.get("output_dir")
         self.log_level = self.params.get("log_level", "info")
 
-        self.state_to_command = {
+        self.state_to_command: Dict[str, str] = {
             "build": "build",
             "absent": "build",
             "validated": "validate",
@@ -328,7 +329,7 @@ class PackerModule:
     def _check_packer_version(self) -> str:
         """Get Packer version using module.run_command."""
         try:
-            rc, stdout, stderr = self.module.run_command(
+            rc, stdout, _stderr = self.module.run_command(
                 [self.packer_bin, "version"],
                 check_rc=False,
             )
@@ -339,7 +340,7 @@ class PackerModule:
                     return match.group(1)
                 return version_line.strip()
             return "unknown"
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             return "unknown"
 
     def _validate_parameters(self) -> None:
@@ -386,7 +387,7 @@ class PackerModule:
 
         return False
 
-    def _build_command(self, command: str) -> list[str]:
+    def _build_command(self, command: str) -> List[str]:
         """Build the Packer command line."""
         cmd = [self.packer_bin]
 
@@ -431,7 +432,7 @@ class PackerModule:
 
         return cmd
 
-    def _parse_machine_readable_output(self, output: str) -> list[dict]:
+    def _parse_machine_readable_output(self, output: str) -> List[Dict[str, str]]:
         """Parse machine-readable output for artifacts."""
         artifacts = []
         for line in output.splitlines():
@@ -449,7 +450,7 @@ class PackerModule:
                     artifacts.append(artifact)
         return artifacts
 
-    def _parse_build_output(self, output: str) -> list[dict]:
+    def _parse_build_output(self, output: str) -> List[Dict[str, str]]:
         """Parse build output to extract artifacts."""
         artifacts = []
 
@@ -483,7 +484,7 @@ class PackerModule:
 
         return artifacts
 
-    def _execute_packer(self, command: str) -> dict[str, object]:
+    def _execute_packer(self, command: str) -> Dict[str, Any]:
         """Execute Packer command."""
         cmd = self._build_command(command)
         self.result["cmd"] = " ".join(cmd)
@@ -550,7 +551,7 @@ class PackerModule:
             return True
         return not self._artifact_exists()
 
-    def apply(self) -> dict[str, object]:
+    def apply(self) -> Dict[str, Any]:
         """Apply Packer configuration and build if needed."""
         self._validate_parameters()
 
