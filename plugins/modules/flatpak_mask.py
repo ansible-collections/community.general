@@ -14,6 +14,21 @@ short_description: Mask flatpak applications
 description:
   - This module masks flatpak applications, preventing them from being installed or updated.
   - It replicates the behavior of "flatpak mask".
+author:
+  - Ilya Bogdanov (@zeerayne)
+requirements:
+  - flatpak
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+    details:
+      - This action does not modify state.
+  diff_mode:
+    support: none
+    details:
+      - This module does not support diff mode.
 options:
   name:
     description:
@@ -34,8 +49,6 @@ options:
     type: str
     choices: [system, user]
     default: system
-author:
-  - Automation
 """
 
 EXAMPLES = r"""
@@ -60,7 +73,7 @@ class FlatpakMaskModule(AnsibleModule):
                 state=dict(type="str", default="present", choices=["present", "absent"]),
                 method=dict(type="str", default="system", choices=["user", "system"]),
             ),
-            supports_check_mode=True
+            supports_check_mode=True,
         )
 
         self.app_name = self.params["name"]
@@ -111,16 +124,13 @@ class FlatpakMaskModule(AnsibleModule):
             else:
                 self.apply_unmask()
 
-        self.exit_json(
-            changed=changed,
-            name=self.app_name,
-            state=self.state,
-            masked=(self.state == "present")
-        )
+        self.exit_json(changed=changed, name=self.app_name, state=self.state, masked=(self.state == "present"))
+
 
 def main():
     module = FlatpakMaskModule()
     module.run()
+
 
 if __name__ == "__main__":
     main()
