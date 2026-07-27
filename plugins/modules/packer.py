@@ -295,7 +295,6 @@ import re
 from datetime import datetime, timezone
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_native
 
 
 class PackerModule:
@@ -503,63 +502,75 @@ class PackerModule:
         return artifacts
 
     def _execute_packer(self, command: str) -> dict[str, object]:
-        """Execute Packer command using module.run_command."""
+        """Execute Packer command."""
         cmd = self._build_command(command)
         self.result["cmd"] = " ".join(cmd)
 
+        env = os.environ.copy()
+        env.update(self.env_vars)
         cwd = self.chdir or os.getcwd()
 
-        old_env = os.environ.copy()
         try:
-            os.environ.update(self.env_vars)
+            start_time = datetime.now(timezone.utc).isoformat() + "Z"
 
-            rc, stdout, stderr = self.module.run_command(
+            result = subprocess.run(
                 cmd,
+                capture_output=True,
+                text=True,
                 cwd=cwd,
+                env=env,
                 timeout=self.timeout if self.timeout > 0 else None,
-                check_rc=False,
+                check=False,
             )
-        finally:
-            os.environ.clear()
-            os.environ.update(old_env)
 
-        self.build_output = stdout
+            rc, stdout, stderr = result.returncode, result.stdout, result.stderr
 
-        start_time = datetime.now(timezone.utc).isoformat() + "Z"
+            self.build_output = stdout
 
-        artifacts = []
-        artifacts_count = 0
-        if command == "build" and rc == 0:
-            artifacts = self._parse_build_output(stdout)
-            artifacts_count = len(artifacts)
+            artifacts = []
+            artifacts_count = 0
+            if command == "build" and rc == 0:
+                artifacts = self._parse_build_output(stdout)
+                artifacts_count = len(artifacts)
 
-        changed = False
-        if command == "build":
-            changed = True
-        elif command == "fmt":
-            changed = rc == 0 and stdout != ""
-        elif command in ["validate", "inspect"]:
             changed = False
+            if command == "build":
+                changed = True
+            elif command == "fmt":
+                changed = rc == 0 and stdout != ""
+            elif command in ["validate", "inspect"]:
+                changed = False
 
-        result_dict = {
-            "changed": changed,
-            "stdout": stdout,
-            "stderr": stderr,
-            "rc": rc,
-            "cmd": " ".join(cmd),
-            "packer_version": self._check_packer_version(),
-        }
+            result_dict = {
+                "changed": changed,
+                "stdout": stdout,
+                "stderr": stderr,
+                "rc": rc,
+                "cmd": " ".join(cmd),
+                "packer_version": self._check_packer_version(),
+            }
 
-        if command == "build":
-            result_dict["started"] = start_time
-            result_dict["artifacts"] = artifacts
-            result_dict["artifacts_count"] = artifacts_count
+            if command == "build":
+                result_dict["started"] = start_time
+                result_dict["artifacts"] = artifacts
+                result_dict["artifacts_count"] = artifacts_count
 
-        if rc != 0:
-            result_dict["failed"] = True
-            self.module.fail_json(msg="Packer command failed", **result_dict)
+            if rc != 0:
+                result_dict["failed"] = True
+                self.module.fail_json(msg="Packer command failed", **result_dict)
 
-        return result_dict
+            return result_dict
+
+        except subprocess.TimeoutExpired:
+            self.module.fail_json(
+                msg=f"Packer command timed out after {self.timeout} seconds",
+                cmd=" ".join(cmd),
+            )
+        except Exception as e:
+            self.module.fail_json(
+                msg=f"Error executing Packer: {str(e)}",
+                cmd=" ".join(cmd),
+            )
 
     def _should_build(self) -> bool:
         """Determine if we need to build based on state and artifact existence."""
