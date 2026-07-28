@@ -34,7 +34,7 @@ options:
     description:
       - The type of compression to use.
     type: str
-    choices: [bz2, gz, tar, xz, zip]
+    choices: [bz2, gz, tar, xz, zip, zstd]
     default: gz
   dest:
     description:
@@ -71,13 +71,16 @@ options:
     type: bool
     default: false
 notes:
-  - Can produce C(gzip), C(bzip2), C(lzma), and C(zip) compressed files or archives.
+  - Can produce C(gzip), C(bzip2), C(lzma), C(zip), and C(zstd) compressed files or archives.
   - This module uses C(tarfile), C(zipfile), C(gzip), C(bz2), and C(lzma) packages on the target host to create archives. These are
     part of the Python standard library.
+  - The C(zstd) compression format requires the C(zstandard) Python library to be installed on the target host.
+    Install it with C(pip install zstandard).
 seealso:
   - module: ansible.builtin.unarchive
 author:
   - Ben Doherty (@bendoh)
+  - Leonardo (@aardbol)
 """
 
 EXAMPLES = r"""
@@ -135,6 +138,14 @@ EXAMPLES = r"""
     dest: /path/file.tar.gz
     format: gz
     force_archive: true
+
+- name: Create a zstd archive of multiple files.
+  community.general.archive:
+    path:
+      - /path/to/foo
+      - /path/to/bar
+    dest: /path/archive.tar.zst
+    format: zstd
 """
 
 RETURN = r"""
@@ -193,6 +204,14 @@ from zlib import crc32
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
+ZSTANDARD_IMP_ERR = None
+try:
+    import zstandard
+    HAS_ZSTANDARD = True
+except ImportError:
+    HAS_ZSTANDARD = False
+    ZSTANDARD_IMP_ERR = format_exc()
+
 STATE_ABSENT = "absent"
 STATE_ARCHIVED = "archive"
 STATE_COMPRESSED = "compress"
@@ -226,7 +245,7 @@ def matches_exclusion_patterns(path, exclusion_patterns):
 
 
 def is_archive(path):
-    return re.search(rb"\.(tar|tar\.(gz|bz2|xz)|tgz|tbz2|zip)$", os.path.basename(path), re.IGNORECASE)
+    return re.search(rb"\.(tar|tar\.(gz|bz2|xz|zst)|tgz|tbz2|tzst|zip)$", os.path.basename(path), re.IGNORECASE)
 
 
 def strip_prefix(prefix, string):
@@ -346,6 +365,8 @@ class Archive(metaclass=abc.ABCMeta):
         except Exception as e:
             if self.format in ("zip", "tar"):
                 archive_format = self.format
+            elif self.format == "zstd":
+                archive_format = "tar.zst"
             else:
                 archive_format = f"tar.{self.format}"
             self.module.fail_json(
@@ -455,6 +476,14 @@ class Archive(metaclass=abc.ABCMeta):
             f = bz2.BZ2File(path, mode)
         elif self.format == "xz":
             f = lzma.LZMAFile(path, mode)
+        elif self.format == "zstd":
+            if not HAS_ZSTANDARD:
+                self.module.fail_json(
+                    msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
+                    exception=ZSTANDARD_IMP_ERR,
+                )
+                return None
+            f = zstandard.open(path, mode)
         else:
             self.module.fail_json(msg=f"{self.format} is not a valid format")
 
@@ -523,6 +552,10 @@ class TarArchive(Archive):
             with lzma.open(_to_native(self.destination), "wb") as f:
                 f.write(self.fileIO.getvalue())
             self.fileIO.close()
+        elif self.format == "zstd":
+            with zstandard.open(_to_native(self.destination), "wb") as f:
+                f.write(self.fileIO.getvalue())
+            self.fileIO.close()
 
     def contains(self, name):
         try:
@@ -537,6 +570,15 @@ class TarArchive(Archive):
         # python3 tarfile module allows xz format but for python2 we have to create the tarfile
         # in memory and then compress it with lzma.
         elif self.format == "xz":
+            self.fileIO = io.BytesIO()
+            self.file = tarfile.open(fileobj=self.fileIO, mode="w")
+        elif self.format == "zstd":
+            if not HAS_ZSTANDARD:
+                self.module.fail_json(
+                    msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
+                    exception=ZSTANDARD_IMP_ERR,
+                )
+                return
             self.fileIO = io.BytesIO()
             self.file = tarfile.open(fileobj=self.fileIO, mode="w")
         elif self.format == "tar":
@@ -559,6 +601,15 @@ class TarArchive(Archive):
                     archive = tarfile.open(fileobj=f)
                     checksums = {(info.name, info.chksum) for info in archive.getmembers()}
                     archive.close()
+            elif self.format == "zstd":
+                decompressor = zstandard.ZstdDecompressor()
+                with open(_to_native_ascii(path), "rb") as f:
+                    reader = decompressor.stream_reader(f)
+                    tar_data = reader.read()
+                buf = io.BytesIO(tar_data)
+                archive = tarfile.open(fileobj=buf)
+                checksums = {(info.name, info.chksum) for info in archive.getmembers()}
+                archive.close()
             else:
                 archive = tarfile.open(_to_native_ascii(path), f"r|{self.format}")
                 checksums = {(info.name, info.chksum) for info in archive.getmembers()}
@@ -592,7 +643,7 @@ def create_module() -> AnsibleModule:
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type="list", elements="path", required=True),
-            format=dict(type="str", default="gz", choices=["bz2", "gz", "tar", "xz", "zip"]),
+            format=dict(type="str", default="gz", choices=["bz2", "gz", "tar", "xz", "zip", "zstd"]),
             dest=dict(type="path"),
             exclude_path=dict(type="list", elements="path", default=[]),
             exclusion_patterns=dict(type="list", elements="path"),
