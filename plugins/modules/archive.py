@@ -314,6 +314,12 @@ class Archive(metaclass=abc.ABCMeta):
                 msg='Error, must specify "dest" when archiving multiple files or trees',
             )
 
+        if self.format == "zstd" and not HAS_ZSTANDARD:
+            module.fail_json(
+                msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
+                exception=ZSTANDARD_IMP_ERR,
+            )
+
         if self.remove:
             self._check_removal_safety()
 
@@ -480,12 +486,6 @@ class Archive(metaclass=abc.ABCMeta):
         elif self.format == "xz":
             f = lzma.LZMAFile(path, mode)
         elif self.format == "zstd":
-            if not HAS_ZSTANDARD:
-                self.module.fail_json(
-                    msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
-                    exception=ZSTANDARD_IMP_ERR,
-                )
-                return None
             f = zstandard.open(path, mode)
         else:
             self.module.fail_json(msg=f"{self.format} is not a valid format")
@@ -576,12 +576,6 @@ class TarArchive(Archive):
             self.fileIO = io.BytesIO()
             self.file = tarfile.open(fileobj=self.fileIO, mode="w")
         elif self.format == "zstd":
-            if not HAS_ZSTANDARD:
-                self.module.fail_json(
-                    msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
-                    exception=ZSTANDARD_IMP_ERR,
-                )
-                return
             self.fileIO = io.BytesIO()
             self.file = tarfile.open(fileobj=self.fileIO, mode="w")
         elif self.format == "tar":
