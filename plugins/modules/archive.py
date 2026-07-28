@@ -75,8 +75,8 @@ notes:
   - Can produce C(gzip), C(bzip2), C(lzma), C(zip), and C(zstd) compressed files or archives.
   - This module uses C(tarfile), C(zipfile), C(gzip), C(bz2), and C(lzma) packages on the target host to create archives. These are
     part of the Python standard library.
-  - The C(zstd) compression format requires the C(zstandard) Python library to be installed on the target host.
-    Install it with C(pip install zstandard).
+requirements:
+  - zstandard for O(format=zstd)
 seealso:
   - module: ansible.builtin.unarchive
 author:
