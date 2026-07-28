@@ -111,6 +111,11 @@ options:
       - If this is present it always results in a change as it cannot be retrieved from GitLab.
       - It shows up in the C(X-GitLab-Token) HTTP request header.
     type: str
+  custom_webhook_template:
+    description:
+      - Custom webhook template for the project webhook
+    type: str
+    version_added: '13.3.0'
 """
 
 EXAMPLES = r"""
@@ -206,6 +211,7 @@ class GitLabHook:
             "wiki_page_events": options["wiki_page_events"],
             "enable_ssl_verification": options["enable_ssl_verification"],
             "token": options["token"],
+            "custom_webhook_template": options["custom_webhook_template"]
         }
 
         # Because we have already call userExists in main()
@@ -308,6 +314,7 @@ def main():
             releases_events=dict(type="bool"),
             hook_validate_certs=dict(type="bool", default=False, aliases=["enable_ssl_verification"]),
             token=dict(type="str", no_log=True),
+            custom_webhook_template=dict(type="str"),
         )
     )
 
@@ -343,6 +350,7 @@ def main():
     releases_events = module.params["releases_events"]
     enable_ssl_verification = module.params["hook_validate_certs"]
     hook_token = module.params["token"]
+    custom_webhook_template = module.params["custom_webhook_template"]
 
     gitlab_hook = GitLabHook(module, gitlab_instance)
 
@@ -377,6 +385,7 @@ def main():
                 "releases_events": releases_events,
                 "enable_ssl_verification": enable_ssl_verification,
                 "token": hook_token,
+                "custom_webhook_template": custom_webhook_template
             },
         ):
             module.exit_json(
