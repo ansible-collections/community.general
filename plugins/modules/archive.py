@@ -33,6 +33,7 @@ options:
   format:
     description:
       - The type of compression to use.
+      - Support for V(zstd) has been added in community.general 13.3.0.
     type: str
     choices: [bz2, gz, tar, xz, zip, zstd]
     default: gz
