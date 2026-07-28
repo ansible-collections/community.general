@@ -207,6 +207,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_native
 ZSTANDARD_IMP_ERR = None
 try:
     import zstandard
+
     HAS_ZSTANDARD = True
 except ImportError:
     HAS_ZSTANDARD = False

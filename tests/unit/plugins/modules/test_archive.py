@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import io
 from unittest.mock import MagicMock, Mock, mock_open, patch
+
 import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     ModuleTestCase,
