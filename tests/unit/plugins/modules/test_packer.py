@@ -75,14 +75,25 @@ class TestPackerModule(unittest.TestCase):
             "machine_readable": False,
             "chdir": None,
             "cleanup": False,
-            "artifact_name": None,
-            "artifact_region": None,
-            "artifact_type": "none",
-            "output_dir": None,
             "log_level": "info",
         }
         default_params.update(params)
         self.mock_module.params = default_params
+
+    def test_init_template(self):
+        from ansible_collections.community.general.plugins.modules import packer
+
+        self._setup_module_params(state="init")
+        self.mock_module.run_command.return_value = (0, "Plugins installed successfully", "")
+
+        packer_bin = self.mock_module.get_bin_path.return_value
+        packer_module = packer.PackerModule(self.mock_module, packer_bin)
+        result = packer_module.apply()
+
+        self.assertFalse(result["changed"])
+        self.assertEqual(result["rc"], 0)
+        self.assertIn("Plugins installed", result["stdout"])
+        self.assertIn("init", result["cmd"])
 
     def test_validate_template(self):
         from ansible_collections.community.general.plugins.modules import packer
@@ -105,6 +116,7 @@ class TestPackerModule(unittest.TestCase):
         self.mock_module.run_command.return_value = (
             0,
             (
+                "--> null.test: null artifact\n"
                 "Build 'null.test' finished after 1 second.\n"
                 "==> Builds finished. The artifacts of successful builds are:\n"
                 "--> null.test: null artifact\n"
@@ -119,6 +131,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertTrue(result["changed"])
         self.assertEqual(result["rc"], 0)
         self.assertIn("artifacts", result)
+        self.assertIn("null.test", result["artifacts"][0]["type"])
 
     def test_build_with_force(self):
         from ansible_collections.community.general.plugins.modules import packer
@@ -242,10 +255,6 @@ class TestPackerModule(unittest.TestCase):
             "machine_readable": False,
             "chdir": None,
             "cleanup": False,
-            "artifact_name": None,
-            "artifact_region": None,
-            "artifact_type": "none",
-            "output_dir": None,
             "log_level": "info",
         }
         mock_module_for_test.fail_json = Mock(side_effect=Exception("fail_json called"))
@@ -274,7 +283,8 @@ class TestPackerModule(unittest.TestCase):
         from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", machine_readable=True)
-        mock_output = "artifact,0,us-west-2,ami-12345678\nartifact,1,us-east-1,ami-87654321\n"
+        # Реальный формат Packer: artifact,<build_index>,<type>,<id>
+        mock_output = "artifact,0,amazon-ebs,ami-12345678\nartifact,1,docker,my-image:latest\n"
         self.mock_module.run_command.return_value = (0, mock_output, "")
 
         packer_bin = self.mock_module.get_bin_path.return_value
@@ -284,39 +294,10 @@ class TestPackerModule(unittest.TestCase):
         self.assertTrue(result["changed"])
         artifacts = result.get("artifacts", [])
         self.assertEqual(len(artifacts), 2)
+        self.assertEqual(artifacts[0]["type"], "amazon-ebs")
         self.assertEqual(artifacts[0]["name"], "ami-12345678")
-        self.assertEqual(artifacts[0]["region"], "us-west-2")
-
-    def test_artifact_check(self):
-        from ansible_collections.community.general.plugins.modules import packer
-
-        self._setup_module_params(
-            state="build",
-            artifact_type="ami",
-            artifact_name="ami-12345678",
-            artifact_region="us-west-2",
-        )
-
-        with patch.object(packer.PackerModule, "_artifact_exists", return_value=True):
-            packer_bin = self.mock_module.get_bin_path.return_value
-            packer_module = packer.PackerModule(self.mock_module, packer_bin)
-            result = packer_module.apply()
-            self.assertFalse(result["changed"])
-            self.assertIn("already exists", str(result.get("msg", "")))
-
-        self._setup_module_params(
-            state="build",
-            artifact_type="ami",
-            artifact_name="ami-12345678",
-            artifact_region="us-west-2",
-            force=True,
-        )
-        self.mock_module.run_command.return_value = (0, "Build finished", "")
-
-        packer_bin = self.mock_module.get_bin_path.return_value
-        packer_module = packer.PackerModule(self.mock_module, packer_bin)
-        result = packer_module.apply()
-        self.assertTrue(result["changed"])
+        self.assertEqual(artifacts[1]["type"], "docker")
+        self.assertEqual(artifacts[1]["name"], "my-image:latest")
 
     def test_only_and_except_mutually_exclusive(self):
         from ansible_collections.community.general.plugins.modules import packer

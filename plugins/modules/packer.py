@@ -11,147 +11,107 @@ version_added: 1.0.0
 short_description: Manage HashiCorp Packer builds
 description:
   - Manage Packer builds and templates.
-  - Supports building, validating, inspecting, and formatting Packer templates.
-  - Provides idempotent build management with artifact existence checking.
+  - Supports building, validating, inspecting, formatting, and initializing Packer templates.
+  - For idempotent builds, use V(force) or external artifact checks.
 author: "Aleksandr Gabidullin (@a-gabidullin)"
 requirements:
   - packer >= 1.7.0
-attributes:
-  check_mode:
-    description: Can run in check_mode and report changes without making them.
-    support: none
-  diff_mode:
-    description: Will return a diff of changes.
-    support: none
 options:
   name:
     description:
-      - Name of the Packer build configuration.
-      - Used for identification and artifact tracking.
+      - Name of the Packer build configuration (for identification).
     type: str
     required: true
   state:
     description:
-      - Desired state of the Packer resource.
+      - Desired operation to perform.
       - V(build) builds the image from template.
       - V(validate) validates the template without building.
       - V(inspect) shows template information without building.
       - V(fmt) formats the template file.
+      - V(init) initializes the template (installs required plugins).
       - V(absent) is a no-op (use V(force=true) to rebuild).
     type: str
     required: true
-    choices: [build, validate, inspect, fmt, absent]
+    choices: [build, validate, inspect, fmt, init, absent]
   template:
     description:
-      - Path to the Packer template file.
+      - Path to the Packer template file or directory.
       - Required for all states except V(absent).
-      - Supports HCL2 and JSON formats.
     type: path
     required: false
   variables:
     description:
-      - Dictionary of variables to pass to Packer.
-      - Corresponds to V(-var) option.
+      - Dictionary of variables to pass to Packer (V(-var)).
     type: dict
     required: false
     default: {}
   var_files:
     description:
-      - List of variable files to load.
-      - Corresponds to V(-var-file) option.
+      - List of variable files to load (V(-var-file)).
     type: list
     elements: path
     required: false
     default: []
   only:
     description:
-      - Build only the specified builders.
-      - Corresponds to V(-only) option.
+      - Build only the specified builders (V(-only)).
     type: list
     elements: str
     required: false
   except_builders:
     description:
-      - Build all builders except the specified ones.
-      - Corresponds to V(-except) option.
+      - Build all builders except the specified ones (V(-except)).
     type: list
     elements: str
     required: false
     aliases: [except]
   force:
     description:
-      - Force rebuilding even if artifacts exist.
-      - Corresponds to V(-force) flag.
+      - Force rebuilding (passes V(-force) flag).
     type: bool
     default: false
   parallel:
     description:
-      - Enable parallel building.
-      - Set to V(false) to build sequentially.
+      - Enable parallel building (V(-parallel=false) to disable).
     type: bool
     default: true
   color:
     description:
-      - Enable colored output.
-      - Set to V(false) for non-interactive environments.
+      - Enable colored output (V(-no-color) if false).
     type: bool
     default: true
   machine_readable:
     description:
-      - Output in machine-readable format.
-      - Useful for parsing output in automation.
-      - Recommended for CI/CD pipelines.
+      - Output in machine-readable format (V(-machine-readable)).
+      - Recommended for parsing artifacts reliably.
     type: bool
     default: false
   chdir:
     description:
       - Change to this directory before running Packer.
-      - Useful when template references relative paths.
     type: path
     required: false
   cleanup:
     description:
-      - Clean up temporary files after build.
-      - Corresponds to V(-cleanup) flag.
+      - Clean up temporary files after build (V(-cleanup)).
     type: bool
     default: false
-  artifact_name:
-    description:
-      - Name of the artifact to check for existence.
-      - Used with V(state=build) to determine if rebuild is needed.
-      - For AWS AMI, specify the AMI ID.
-      - For Docker, specify the image tag.
-    type: str
-    required: false
-  artifact_region:
-    description:
-      - Cloud region where the artifact exists.
-      - Required for cloud artifacts (AWS, Azure, GCP).
-    type: str
-    required: false
-  artifact_type:
-    description:
-      - Type of artifact to check.
-      - Used to determine the appropriate existence check method.
-    type: str
-    choices: [ami, docker, azure, gcp, vsphere, openstack, none]
-    default: none
-  output_dir:
-    description:
-      - Directory where Packer artifacts will be stored.
-      - Used for local builders (virtualbox, qemu, etc.).
-    type: path
-    required: false
   log_level:
     description:
-      - Set the log level for Packer.
-      - Useful for debugging.
+      - Set the log level (V(--log-level)).
     type: str
     choices: [trace, debug, info, warn, error]
     default: info
 """
 
 EXAMPLES = r"""
+- name: Initialize Packer template (install plugins)
+  community.general.packer:
+    name: init-template
+    state: init
+    template: aws-ubuntu.pkr.hcl
+
 - name: Build AWS AMI with Packer
   community.general.packer:
     name: my-ami
@@ -160,9 +120,6 @@ EXAMPLES = r"""
     variables:
       aws_region: us-west-2
       instance_type: t2.micro
-    artifact_type: ami
-    artifact_name: ami-12345678
-    artifact_region: us-west-2
     force: false
 
 - name: Validate Packer template
@@ -210,8 +167,6 @@ EXAMPLES = r"""
     name: local-build
     state: build
     template: virtualbox.pkr.hcl
-    output_dir: /var/lib/packer/builds
-    artifact_type: none
     force: true
 """
 
@@ -247,9 +202,9 @@ artifacts:
   type: list
   elements: dict
   sample:
-    - name: ami-12345678
-      region: us-west-2
-      type: amazon-ebs
+    - type: amazon-ebs
+      name: ami-12345678
+      build_index: 0
 artifacts_count:
   description: Number of artifacts created
   returned: when state is build and build successful
@@ -302,13 +257,7 @@ class PackerModule:
         self.machine_readable = self.params.get("machine_readable")
         self.chdir = self.params.get("chdir")
         self.cleanup = self.params.get("cleanup")
-        self.artifact_name = self.params.get("artifact_name")
-        self.artifact_region = self.params.get("artifact_region")
-        self.artifact_type = self.params.get("artifact_type", "none")
-        self.output_dir = self.params.get("output_dir")
         self.log_level = self.params.get("log_level", "info")
-
-        self.build_output = ""
 
     def _check_packer_version(self) -> str:
         """Get Packer version using module.run_command."""
@@ -329,11 +278,11 @@ class PackerModule:
 
     def _validate_parameters(self) -> None:
         """Validate module parameters."""
-        if self.state in ["build", "validate", "inspect"]:
+        if self.state in ["build", "validate", "inspect", "init"]:
             if not self.template:
-                self.module.fail_json(msg=f"Template file is required for state: {self.state}")
+                self.module.fail_json(msg=f"Template file/directory is required for state: {self.state}")
             if not os.path.exists(self.template):
-                self.module.fail_json(msg=f"Template file does not exist: {self.template}")
+                self.module.fail_json(msg=f"Template file/directory does not exist: {self.template}")
 
         if self.state == "fmt" and not self.template:
             self.module.fail_json(msg="Template file is required for state: fmt")
@@ -341,32 +290,12 @@ class PackerModule:
         if self.only and self.except_builders:
             self.module.fail_json(msg="'only' and 'except_builders' parameters are mutually exclusive")
 
-        if self.artifact_type != "none" and not self.artifact_name:
-            self.module.fail_json(msg=f"'artifact_name' is required when artifact_type is '{self.artifact_type}'")
-
-        if self.artifact_type in ["ami", "azure", "gcp"] and not self.artifact_region:
-            self.module.fail_json(msg=f"'artifact_region' is required for artifact_type: {self.artifact_type}")
-
         if self.chdir and not os.path.exists(self.chdir):
             self.module.fail_json(msg=f"Working directory does not exist: {self.chdir}")
 
         for var_file in self.var_files:
             if not os.path.exists(var_file):
                 self.module.fail_json(msg=f"Variable file does not exist: {var_file}")
-
-    def _artifact_exists(self) -> bool:
-        """Check if the artifact already exists."""
-        if self.artifact_type == "none" or not self.artifact_name:
-            return False
-
-        if self.force:
-            return False
-
-        if self.artifact_type == "none" and self.output_dir:
-            if os.path.exists(self.output_dir):
-                return True
-
-        return False
 
     def _build_command(self, command: str) -> list[str]:
         """Build the Packer command line."""
@@ -377,7 +306,7 @@ class PackerModule:
 
         cmd.append(command)
 
-        if command in ["build", "validate", "inspect"]:
+        if command in ["build", "validate", "inspect", "init"]:
             if self.template:
                 cmd.append(self.template)
         elif command == "fmt":
@@ -392,29 +321,37 @@ class PackerModule:
             if self.cleanup:
                 cmd.append("-cleanup")
 
-        if not self.color:
-            cmd.append("-no-color")
-        if self.machine_readable:
-            cmd.append("-machine-readable")
+        # Для init эти опции не применяются
+        if command != "init":
+            if not self.color:
+                cmd.append("-no-color")
+            if self.machine_readable:
+                cmd.append("-machine-readable")
 
-        for key, value in self.variables.items():
-            if isinstance(value, str) and (" " in value or '"' in value):
-                cmd.extend(["-var", f'{key}="{value}"'])
-            else:
-                cmd.extend(["-var", f"{key}={value}"])
+        # Переменные и var-файлы только для команд, которые их поддерживают
+        if command in ["build", "validate", "inspect"]:
+            for key, value in self.variables.items():
+                if isinstance(value, str) and (" " in value or '"' in value):
+                    cmd.extend(["-var", f'{key}="{value}"'])
+                else:
+                    cmd.extend(["-var", f"{key}={value}"])
 
-        for var_file in self.var_files:
-            cmd.extend(["-var-file", var_file])
+            for var_file in self.var_files:
+                cmd.extend(["-var-file", var_file])
 
-        if self.only:
+        if self.only and command == "build":
             cmd.extend(["-only", ",".join(self.only)])
-        if self.except_builders:
+        if self.except_builders and command == "build":
             cmd.extend(["-except", ",".join(self.except_builders)])
 
         return cmd
 
     def _parse_machine_readable_output(self, output: str) -> list[dict[str, str]]:
-        """Parse machine-readable output for artifacts."""
+        """
+        Parse machine-readable output for artifacts.
+        Real format: artifact,<build_index>,<artifact_type>,<artifact_id>
+        Example: artifact,0,amazon-ebs,ami-12345678
+        """
         artifacts = []
         for line in output.splitlines():
             if not line.startswith("artifact,"):
@@ -422,10 +359,11 @@ class PackerModule:
 
             parts = line.split(",")
             if len(parts) >= 4:
+                # parts[1] = build index, parts[2] = type, parts[3] = id
                 artifact = {
-                    "type": parts[1] if len(parts) > 1 else "",
-                    "region": parts[2] if len(parts) > 2 else "",
-                    "name": parts[3] if len(parts) > 3 else "",
+                    "type": parts[2],
+                    "name": parts[3],
+                    "build_index": parts[1],
                 }
                 if artifact["name"]:
                     artifacts.append(artifact)
@@ -435,31 +373,32 @@ class PackerModule:
         """Parse build output to extract artifacts."""
         artifacts = []
 
+        # Если включен machine-readable, используем специализированный парсер
         if self.machine_readable:
             return self._parse_machine_readable_output(output)
 
         lines = output.splitlines()
         for line in lines:
-            if "Artifact" in line and "built" in line and ":" in line:
-                parts = line.split(":")
-                if len(parts) >= 2:
-                    artifact_name = parts[1].strip()
-                    artifact_type = parts[0].replace("Artifact", "").strip()
-                    if artifact_name:
-                        artifacts.append(
-                            {
-                                "name": artifact_name,
-                                "type": artifact_type,
-                            }
-                        )
-
-            if "ami-" in line and ("created" in line or "AMIs" in line):
-                match = re.search(r"(ami-[a-zA-Z0-9]+)", line)
-                if match:
+            # Стандартный вывод Packer: "--> <builder>: <artifact_description>"
+            # Пример: "--> amazon-ebs: AMI ami-12345678"
+            match = re.match(r"^-->\s+(.+?):\s+(.+)$", line.strip())
+            if match:
+                builder = match.group(1).strip()
+                artifact_desc = match.group(2).strip()
+                artifacts.append(
+                    {
+                        "type": builder,
+                        "name": artifact_desc,
+                    }
+                )
+            # Fallback: поиск AMI ID для AWS (на случай, если формат изменился)
+            elif "ami-" in line and ("created" in line or "AMIs" in line):
+                ami_match = re.search(r"(ami-[a-zA-Z0-9]+)", line)
+                if ami_match:
                     artifacts.append(
                         {
-                            "name": match.group(1),
-                            "type": "ami",
+                            "type": "amazon-ebs",
+                            "name": ami_match.group(1),
                         }
                     )
 
@@ -481,8 +420,6 @@ class PackerModule:
                 check_rc=False,
             )
 
-            self.build_output = stdout
-
             artifacts = []
             artifacts_count = 0
             if command == "build" and rc == 0:
@@ -494,7 +431,7 @@ class PackerModule:
                 changed = True
             elif command == "fmt":
                 changed = rc == 0 and stdout != ""
-            elif command in ["validate", "inspect"]:
+            elif command in ["validate", "inspect", "init"]:
                 changed = False
 
             result_dict = {
@@ -523,14 +460,6 @@ class PackerModule:
                 cmd=" ".join(cmd),
             )
 
-    def _should_build(self) -> bool:
-        """Determine if we need to build based on state and artifact existence."""
-        if self.state != "build":
-            return False
-        if self.force:
-            return True
-        return not self._artifact_exists()
-
     def apply(self) -> dict[str, object]:
         """Apply Packer configuration and build if needed."""
         self._validate_parameters()
@@ -544,28 +473,19 @@ class PackerModule:
             self.result["msg"] = "Absent state is not implemented. Use 'force: true' to force rebuild."
             return self.result
 
-        # Для состояний, которые напрямую соответствуют командам Packer
-        if self.state == "fmt":
-            return self._execute_packer("fmt")
+        if self.state in ["fmt", "init"]:
+            return self._execute_packer(self.state)
 
-        if self.state == "build" and not self._should_build():
-            self.result["changed"] = False
-            self.result["msg"] = (
-                f"Artifact '{self.artifact_name}' already exists, no build needed (use 'force: true' to rebuild)"
-            )
-            return self.result
-
-        # Для validate и inspect команда совпадает с state
         if self.state in ["validate", "inspect"]:
             return self._execute_packer(self.state)
 
-        # Для build (если нужно строить)
         if self.state == "build":
+            # Всегда строим (идемпотентность на усмотрение пользователя)
             result = self._execute_packer("build")
             self.result.update(result)
             return self.result
 
-        # fallback (не должно достигаться)
+        # fallback
         self.module.fail_json(msg=f"Unsupported state: {self.state}")
 
 
@@ -577,7 +497,7 @@ def main() -> None:
             state=dict(
                 type="str",
                 required=True,
-                choices=["build", "validate", "inspect", "fmt", "absent"],
+                choices=["build", "validate", "inspect", "fmt", "init", "absent"],
             ),
             template=dict(type="path", required=False),
             variables=dict(type="dict", required=False, default={}),
@@ -595,15 +515,6 @@ def main() -> None:
             machine_readable=dict(type="bool", required=False, default=False),
             chdir=dict(type="path", required=False),
             cleanup=dict(type="bool", required=False, default=False),
-            artifact_name=dict(type="str", required=False),
-            artifact_region=dict(type="str", required=False),
-            artifact_type=dict(
-                type="str",
-                required=False,
-                choices=["ami", "docker", "azure", "gcp", "vsphere", "openstack", "none"],
-                default="none",
-            ),
-            output_dir=dict(type="path", required=False),
             log_level=dict(
                 type="str",
                 required=False,
