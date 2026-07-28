@@ -212,6 +212,7 @@ try:
 except ImportError:
     HAS_ZSTANDARD = False
     ZSTANDARD_IMP_ERR = format_exc()
+    zstandard = None
 
 STATE_ABSENT = "absent"
 STATE_ARCHIVED = "archive"
@@ -619,7 +620,7 @@ class TarArchive(Archive):
             try:
                 # The python implementations of gzip, bz2, and lzma do not support restoring compressed files
                 # to their original names so only file checksum is returned
-                f = self._open_compressed_file(_to_native_ascii(path), "r")
+                f = self._open_compressed_file(_to_native_ascii(path), "rb")
                 checksum = 0
                 while True:
                     chunk = f.read(16 * 1024 * 1024)
