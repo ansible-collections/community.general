@@ -11,8 +11,8 @@
 - name: Determine Python versions
   ansible.builtin.set_fact:
     python_3_14: "3.14"
-    python_3_13: "3.13"
-    python_3_13_5: "3.13.5"
+    python_3_13: "3.{{ 12 if ansible_facts.python.version.minor == 13 else 13 }}"
+    python_3_13_5: "3.{{ 12 if ansible_facts.python.version.minor == 13 else 13 }}.5"
 
 - name: Install uv python package
   ansible.builtin.pip:
