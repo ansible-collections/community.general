@@ -1,2 +1,2 @@
 minor_changes:
-  - archive - add ``zstd`` as a format choice for ``community.general.archive`` (https://github.com/ansible-collections/community.general/issues/3455).
+  - archive - add ``zstd`` as a format choice for ``community.general.archive`` (https://github.com/ansible-collections/community.general/issues/3455, https://github.com/ansible-collections/community.general/pull/12497).
