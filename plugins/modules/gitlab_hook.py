@@ -210,7 +210,7 @@ class GitLabHook:
             "wiki_page_events": options["wiki_page_events"],
             "enable_ssl_verification": options["enable_ssl_verification"],
             "token": options["token"],
-            "custom_webhook_template": options["custom_webhook_template"]
+            "custom_webhook_template": options["custom_webhook_template"],
         }
 
         # Because we have already call userExists in main()
@@ -384,7 +384,7 @@ def main():
                 "releases_events": releases_events,
                 "enable_ssl_verification": enable_ssl_verification,
                 "token": hook_token,
-                "custom_webhook_template": custom_webhook_template
+                "custom_webhook_template": custom_webhook_template,
             },
         ):
             module.exit_json(
