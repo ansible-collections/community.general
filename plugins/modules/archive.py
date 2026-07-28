@@ -72,7 +72,7 @@ options:
     type: bool
     default: false
 notes:
-  - Can produce C(gzip), C(bzip2), C(lzma), C(zip), and C(zstd) compressed files or archives.
+  - Can produce C(gzip), C(bzip2), C(lzma), C(zstd), and C(zip) compressed files or archives.
   - This module uses C(tarfile), C(zipfile), C(gzip), C(bz2), and C(lzma) packages on the target host to create archives. These are
     part of the Python standard library.
 requirements:
