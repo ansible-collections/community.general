@@ -115,7 +115,6 @@ options:
     description:
       - Custom webhook template for the project webhook
     type: str
-    version_added: '13.3.0'
 """
 
 EXAMPLES = r"""
