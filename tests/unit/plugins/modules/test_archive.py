@@ -168,6 +168,7 @@ class TestTarArchiveZstd(ModuleTestCase):
         self.os_path_islink.stop()
         super().tearDown()
 
+    @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", True)
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
     def test_tar_archive_open_zstd(self, mock_tarfile):
         with set_module_args(dict(path=["/foo/bar", "/foo/baz"], dest="/foo/out.tar.zst", format="zstd")):
@@ -183,6 +184,7 @@ class TestTarArchiveZstd(ModuleTestCase):
             assert isinstance(archive.fileIO, io.BytesIO)
             mock_tarfile.open.assert_called_once_with(fileobj=archive.fileIO, mode="w")
 
+    @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", True)
     @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
     def test_tar_archive_close_zstd(self, mock_tarfile, mock_zstandard):
@@ -201,6 +203,7 @@ class TestTarArchiveZstd(ModuleTestCase):
             archive.file.close.assert_called_once()
             mock_zstandard.open.assert_called_once()
 
+    @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", True)
     @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
     @patch("builtins.open", mock_open(read_data=b"fake zstd data"))
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
