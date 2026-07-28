@@ -50,8 +50,8 @@
 - name: Verify Python 3.14 installation
   ansible.builtin.assert:
     that:
-      - install_python.changed == check_python_314_exists.failed
-      - install_python.failed is false
+      - (install_python is changed) == (check_python_314_exists is failed)
+      - install_python is not failed
       - install_python.python_versions | length >= 1
       - install_python.python_paths | length >= 1
 
@@ -94,8 +94,8 @@
 - name: Verify Python 3.13.5 installation
   ansible.builtin.assert:
     that:
-      - install_python_3135.changed == check_python_3135_exists.failed
-      - install_python_3135.failed is false
+      - (install_python_3135 is changed) == (check_python_3135_exists is failed)
+      - install_python_3135 is not failed
       - '"3.13.5" in install_python_3135.python_versions'
       - install_python_3135.python_paths | length >= 1
 
@@ -108,8 +108,8 @@
 - name: Verify Python 3.13.5 installation
   ansible.builtin.assert:
     that:
-      - reinstall_python.changed is false
-      - reinstall_python.failed is false
+      - reinstall_python is not changed
+      - reinstall_python is not failed
       - '"3.13.5" in reinstall_python.python_versions'
 
 - name: Remove uninstalled Python 3.10 # removes latest patch version for 3.10 if exists
@@ -121,8 +121,8 @@
 - name: Verify Python 3.10 deletion
   ansible.builtin.assert:
     that:
-      - remove_python.changed is false
-      - remove_python.failed is false
+      - remove_python is not changed
+      - remove_python is not failed
       - remove_python.python_versions | length == 0
 
 - name: Remove Python 3.13.5 in check mode
@@ -135,11 +135,11 @@
 - name: Verify Python 3.13.5 deletion in check mode
   ansible.builtin.assert:
     that:
-      - remove_python_in_check_mode.changed == install_python_3135.changed
-      - remove_python_in_check_mode.failed is false
+      - (remove_python_in_check_mode is changed) == (install_python_3135 is changed)
+      - remove_python_in_check_mode is not failed
 
 - name: Additional check for Python 3.13.5 deletion in check mode
-  when: install_python_3135.changed is true
+  when: install_python_3135 is changed
   ansible.builtin.assert:
     that:
       - '"3.13.5" in remove_python_in_check_mode.python_versions'
@@ -154,11 +154,11 @@
 - name: Verify Python 3.13.5 deletion
   ansible.builtin.assert:
     that:
-      - remove_python.changed == install_python_3135.changed
-      - remove_python.failed is false
+      - (remove_python is changed) == (install_python_3135 is changed)
+      - remove_python is not failed
 
 - name: Additional check for Python 3.13.5 deletion
-  when: install_python_3135.changed is true
+  when: install_python_3135 is changed
   ansible.builtin.assert:
     that:
       - remove_python.python_paths | length >= 1
@@ -173,8 +173,8 @@
 - name: Verify Python 3.13.5 deletion again
   ansible.builtin.assert:
     that:
-      - remove_python.changed is false
-      - remove_python.failed is false
+      - remove_python is not changed
+      - remove_python is not failed
       - remove_python.python_versions | length == 0
       - remove_python.python_paths | length == 0
 
@@ -187,8 +187,8 @@
 - name: Verify Python 3.13 upgrade
   ansible.builtin.assert:
     that:
-      - upgrade_python.changed is true
-      - upgrade_python.failed is false
+      - upgrade_python is changed
+      - upgrade_python is not failed
       - upgrade_python.python_versions | length >= 1
       - upgrade_python.python_paths | length >= 1
 
@@ -202,8 +202,8 @@
 - name: Verify Python 3.13 upgrade in check mode
   ansible.builtin.assert:
     that:
-      - upgrade_python.changed is false
-      - upgrade_python.failed is false
+      - upgrade_python is not changed
+      - upgrade_python is not failed
       - upgrade_python.python_versions | length >= 1
 
 - name: Upgrade Python 3.13 again
@@ -216,8 +216,8 @@
 - name: Verify Python 3.13 upgrade again
   ansible.builtin.assert:
     that:
-      - upgrade_python.changed is false
-      - upgrade_python.failed is false
+      - upgrade_python is not changed
+      - upgrade_python is not failed
       - upgrade_python.python_versions | length >= 1
 
 - name: Install unsupported Python version in check mode
@@ -231,8 +231,8 @@
 - name: Verify unsupported Python 2.0 install in check mode
   ansible.builtin.assert:
     that:
-      - unsupported_python_check_mode.changed is false
-      - unsupported_python_check_mode.failed is true
+      - unsupported_python_check_mode is not changed
+      - unsupported_python_check_mode is failed
       - '"Version 2.0 is not available." in unsupported_python_check_mode.msg'
 
 - name: Install unsupported Python version
@@ -245,8 +245,8 @@
 - name: Verify unsupported Python 2.0 install
   ansible.builtin.assert:
     that:
-      - unsupported_python.changed is false
-      - unsupported_python.failed is true
+      - unsupported_python is not changed
+      - unsupported_python is failed
 
 - name: Install unsupported Python version with latest state
   community.general.uv_python:
@@ -258,8 +258,8 @@
 - name: Verify Python 2.0 install with latest state
   ansible.builtin.assert:
     that:
-      - unsupported_python.changed is false
-      - unsupported_python.failed is true
+      - unsupported_python is not changed
+      - unsupported_python is failed
 
 - name: Delete Python 3.13 version
   community.general.uv_python:
@@ -270,8 +270,8 @@
 - name: Verify Python 3.13 deletion
   ansible.builtin.assert:
     that:
-      - uninstall_result.changed is true
-      - uninstall_result.failed is false
+      - uninstall_result is changed
+      - uninstall_result is not failed
       - uninstall_result.python_versions | length >= 1
       - '"3.13" in uninstall_result.python_versions[0]'
 
@@ -285,7 +285,7 @@
 - name: Verify failure when no version is specified
   ansible.builtin.assert:
     that:
-      - no_version.failed is true
+      - no_version is failed
       - '"Unsupported version format" in no_version.msg'
 
 - name: Unsupported version format given
@@ -298,5 +298,5 @@
 - name: Verify failure when unsupported version format is specified
   ansible.builtin.assert:
     that:
-      - wrong_version.failed is true
+      - wrong_version is failed
       - '"Unsupported version format" in wrong_version.msg'
