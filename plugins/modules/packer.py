@@ -19,10 +19,10 @@ requirements:
 attributes:
   check_mode:
     description: Can run in check_mode and report changes without making them.
-    support: full
+    support: none
   diff_mode:
     description: Will return a diff of changes.
-    support: full
+    support: none
 options:
   name:
     description:
@@ -34,13 +34,13 @@ options:
     description:
       - Desired state of the Packer resource.
       - V(build) builds the image from template.
+      - V(validate) validates the template without building.
+      - V(inspect) shows template information without building.
+      - V(fmt) formats the template file.
       - V(absent) is a no-op (use V(force=true) to rebuild).
-      - V(validated) only validates the template without building.
-      - V(inspected) shows template information without building.
-      - V(formatted) formats the template file.
     type: str
     required: true
-    choices: [build, absent, validated, inspected, formatted]
+    choices: [build, validate, inspect, fmt, absent]
   template:
     description:
       - Path to the Packer template file.
@@ -103,12 +103,6 @@ options:
       - Recommended for CI/CD pipelines.
     type: bool
     default: false
-  timeout:
-    description:
-      - Timeout for the Packer command in seconds.
-      - Set to V(0) for no timeout.
-    type: int
-    default: 3600
   chdir:
     description:
       - Change to this directory before running Packer.
@@ -174,7 +168,7 @@ EXAMPLES = r"""
 - name: Validate Packer template
   community.general.packer:
     name: template-validation
-    state: validated
+    state: validate
     template: template.pkr.hcl
     var_files:
       - dev.pkrvars.hcl
@@ -201,14 +195,14 @@ EXAMPLES = r"""
 - name: Inspect template structure
   community.general.packer:
     name: inspect-template
-    state: inspected
+    state: inspect
     template: template.pkr.hcl
   register: packer_inspect
 
 - name: Format Packer template
   community.general.packer:
     name: format-template
-    state: formatted
+    state: fmt
     template: template.pkr.hcl
 
 - name: Build local artifact (VirtualBox)
@@ -276,7 +270,6 @@ changed:
 import os
 import re
 from datetime import datetime, timezone
-from typing import Any, Dict, List
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -288,7 +281,7 @@ class PackerModule:
         self.module = module
         self.params = module.params
         self.packer_bin = packer_bin
-        self.result: Dict[str, Any] = {
+        self.result: dict[str, object] = {
             "changed": False,
             "stdout": "",
             "stderr": "",
@@ -307,7 +300,6 @@ class PackerModule:
         self.parallel = self.params.get("parallel")
         self.color = self.params.get("color")
         self.machine_readable = self.params.get("machine_readable")
-        self.timeout = self.params.get("timeout")
         self.chdir = self.params.get("chdir")
         self.cleanup = self.params.get("cleanup")
         self.artifact_name = self.params.get("artifact_name")
@@ -315,14 +307,6 @@ class PackerModule:
         self.artifact_type = self.params.get("artifact_type", "none")
         self.output_dir = self.params.get("output_dir")
         self.log_level = self.params.get("log_level", "info")
-
-        self.state_to_command: Dict[str, str] = {
-            "build": "build",
-            "absent": "build",
-            "validated": "validate",
-            "inspected": "inspect",
-            "formatted": "fmt",
-        }
 
         self.build_output = ""
 
@@ -340,19 +324,19 @@ class PackerModule:
                     return match.group(1)
                 return version_line.strip()
             return "unknown"
-        except Exception:  # pylint: disable=broad-exception-caught
+        except Exception:
             return "unknown"
 
     def _validate_parameters(self) -> None:
         """Validate module parameters."""
-        if self.state in ["build", "validated", "inspected"]:
+        if self.state in ["build", "validate", "inspect"]:
             if not self.template:
                 self.module.fail_json(msg=f"Template file is required for state: {self.state}")
             if not os.path.exists(self.template):
                 self.module.fail_json(msg=f"Template file does not exist: {self.template}")
 
-        if self.state == "formatted" and not self.template:
-            self.module.fail_json(msg="Template file is required for state: formatted")
+        if self.state == "fmt" and not self.template:
+            self.module.fail_json(msg="Template file is required for state: fmt")
 
         if self.only and self.except_builders:
             self.module.fail_json(msg="'only' and 'except_builders' parameters are mutually exclusive")
@@ -362,9 +346,6 @@ class PackerModule:
 
         if self.artifact_type in ["ami", "azure", "gcp"] and not self.artifact_region:
             self.module.fail_json(msg=f"'artifact_region' is required for artifact_type: {self.artifact_type}")
-
-        if self.timeout < 0:
-            self.module.fail_json(msg="'timeout' must be a positive integer")
 
         if self.chdir and not os.path.exists(self.chdir):
             self.module.fail_json(msg=f"Working directory does not exist: {self.chdir}")
@@ -387,7 +368,7 @@ class PackerModule:
 
         return False
 
-    def _build_command(self, command: str) -> List[str]:
+    def _build_command(self, command: str) -> list[str]:
         """Build the Packer command line."""
         cmd = [self.packer_bin]
 
@@ -432,7 +413,7 @@ class PackerModule:
 
         return cmd
 
-    def _parse_machine_readable_output(self, output: str) -> List[Dict[str, str]]:
+    def _parse_machine_readable_output(self, output: str) -> list[dict[str, str]]:
         """Parse machine-readable output for artifacts."""
         artifacts = []
         for line in output.splitlines():
@@ -450,7 +431,7 @@ class PackerModule:
                     artifacts.append(artifact)
         return artifacts
 
-    def _parse_build_output(self, output: str) -> List[Dict[str, str]]:
+    def _parse_build_output(self, output: str) -> list[dict[str, str]]:
         """Parse build output to extract artifacts."""
         artifacts = []
 
@@ -484,7 +465,7 @@ class PackerModule:
 
         return artifacts
 
-    def _execute_packer(self, command: str) -> Dict[str, Any]:
+    def _execute_packer(self, command: str) -> dict[str, object]:
         """Execute Packer command."""
         cmd = self._build_command(command)
         self.result["cmd"] = " ".join(cmd)
@@ -497,7 +478,6 @@ class PackerModule:
             rc, stdout, stderr = self.module.run_command(
                 cmd,
                 cwd=cwd,
-                timeout=self.timeout if self.timeout > 0 else None,
                 check_rc=False,
             )
 
@@ -551,7 +531,7 @@ class PackerModule:
             return True
         return not self._artifact_exists()
 
-    def apply(self) -> Dict[str, Any]:
+    def apply(self) -> dict[str, object]:
         """Apply Packer configuration and build if needed."""
         self._validate_parameters()
 
@@ -564,7 +544,8 @@ class PackerModule:
             self.result["msg"] = "Absent state is not implemented. Use 'force: true' to force rebuild."
             return self.result
 
-        if self.state == "formatted":
+        # Для состояний, которые напрямую соответствуют командам Packer
+        if self.state == "fmt":
             return self._execute_packer("fmt")
 
         if self.state == "build" and not self._should_build():
@@ -574,19 +555,18 @@ class PackerModule:
             )
             return self.result
 
-        command = self.state_to_command.get(self.state)
-        if not command:
-            self.module.fail_json(msg=f"Unsupported state: {self.state}")
+        # Для validate и inspect команда совпадает с state
+        if self.state in ["validate", "inspect"]:
+            return self._execute_packer(self.state)
 
-        if self.state in ["validated", "inspected"]:
-            return self._execute_packer(command)
-
+        # Для build (если нужно строить)
         if self.state == "build":
             result = self._execute_packer("build")
             self.result.update(result)
             return self.result
 
-        return self.result
+        # fallback (не должно достигаться)
+        self.module.fail_json(msg=f"Unsupported state: {self.state}")
 
 
 def main() -> None:
@@ -597,7 +577,7 @@ def main() -> None:
             state=dict(
                 type="str",
                 required=True,
-                choices=["build", "absent", "validated", "inspected", "formatted"],
+                choices=["build", "validate", "inspect", "fmt", "absent"],
             ),
             template=dict(type="path", required=False),
             variables=dict(type="dict", required=False, default={}),
@@ -613,7 +593,6 @@ def main() -> None:
             parallel=dict(type="bool", required=False, default=True),
             color=dict(type="bool", required=False, default=True),
             machine_readable=dict(type="bool", required=False, default=False),
-            timeout=dict(type="int", required=False, default=3600),
             chdir=dict(type="path", required=False),
             cleanup=dict(type="bool", required=False, default=False),
             artifact_name=dict(type="str", required=False),
@@ -635,7 +614,7 @@ def main() -> None:
         mutually_exclusive=[
             ("only", "except_builders"),
         ],
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
 
     packer_bin = module.get_bin_path("packer", required=True)

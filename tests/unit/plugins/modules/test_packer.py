@@ -73,7 +73,6 @@ class TestPackerModule(unittest.TestCase):
             "parallel": True,
             "color": True,
             "machine_readable": False,
-            "timeout": 3600,
             "chdir": None,
             "cleanup": False,
             "artifact_name": None,
@@ -88,7 +87,7 @@ class TestPackerModule(unittest.TestCase):
     def test_validate_template(self):
         from ansible_collections.community.general.plugins.modules import packer
 
-        self._setup_module_params(state="validated")
+        self._setup_module_params(state="validate")
         self.mock_module.run_command.return_value = (0, "Template validated successfully", "")
 
         packer_bin = self.mock_module.get_bin_path.return_value
@@ -186,7 +185,7 @@ class TestPackerModule(unittest.TestCase):
     def test_inspect_template(self):
         from ansible_collections.community.general.plugins.modules import packer
 
-        self._setup_module_params(state="inspected")
+        self._setup_module_params(state="inspect")
         self.mock_module.run_command.return_value = (0, "Template inspection output", "")
 
         packer_bin = self.mock_module.get_bin_path.return_value
@@ -199,7 +198,7 @@ class TestPackerModule(unittest.TestCase):
     def test_format_template(self):
         from ansible_collections.community.general.plugins.modules import packer
 
-        self._setup_module_params(state="formatted")
+        self._setup_module_params(state="fmt")
         self.mock_module.run_command.return_value = (0, self.template_path, "")
 
         packer_bin = self.mock_module.get_bin_path.return_value
@@ -241,7 +240,6 @@ class TestPackerModule(unittest.TestCase):
             "parallel": True,
             "color": True,
             "machine_readable": False,
-            "timeout": 3600,
             "chdir": None,
             "cleanup": False,
             "artifact_name": None,
@@ -355,19 +353,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertTrue(result["changed"])
         cmd = result["cmd"]
         self.assertIn("--log-level debug", cmd)
-
-    def test_check_mode(self):
-        from ansible_collections.community.general.plugins.modules import packer
-
-        self._setup_module_params(state="build")
-        self.mock_module.check_mode = True
-        self.mock_module.run_command.return_value = (0, "Build finished", "")
-
-        packer_bin = self.mock_module.get_bin_path.return_value
-        packer_module = packer.PackerModule(self.mock_module, packer_bin)
-        result = packer_module.apply()
-
-        self.assertTrue(result["changed"])
 
 
 if __name__ == "__main__":
