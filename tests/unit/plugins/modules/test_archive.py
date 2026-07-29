@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 import io
-from unittest.mock import MagicMock, Mock, mock_open, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
@@ -205,7 +205,6 @@ class TestTarArchiveZstd(ModuleTestCase):
 
     @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", True)
     @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
-    @patch("builtins.open", mock_open(read_data=b"fake zstd data"))
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
     def test_tar_archive_get_checksums_zstd(self, mock_tarfile, mock_zstandard):
         with set_module_args(dict(path=["/foo/bar", "/foo/baz"], dest="/foo/out.tar.zst", format="zstd")):
@@ -219,14 +218,12 @@ class TestTarArchiveZstd(ModuleTestCase):
             mock_tar.getmembers.return_value = [mock_info]
             mock_tarfile.open.return_value = mock_tar
 
-            mock_reader = MagicMock()
-            mock_reader.read.return_value = b"fake tar data"
-            mock_decompressor = MagicMock()
-            mock_decompressor.stream_reader.return_value = mock_reader
-            mock_zstandard.ZstdDecompressor.return_value = mock_decompressor
+            mock_zstd_file = MagicMock()
+            mock_zstd_file.__enter__ = Mock(return_value=mock_zstd_file)
+            mock_zstandard.open.return_value = mock_zstd_file
 
             checksums = archive._get_checksums("/foo/out.tar.zst")
 
-            mock_zstandard.ZstdDecompressor.assert_called_once()
-            mock_tarfile.open.assert_called_once()
+            mock_zstandard.open.assert_called_once()
+            mock_tarfile.open.assert_called_once_with(fileobj=mock_zstd_file, mode="r|")
             assert checksums == {("file.txt", 12345)}

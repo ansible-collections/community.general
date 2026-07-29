@@ -599,14 +599,10 @@ class TarArchive(Archive):
                     checksums = {(info.name, info.chksum) for info in archive.getmembers()}
                     archive.close()
             elif self.format == "zstd":
-                decompressor = zstandard.ZstdDecompressor()
-                with open(_to_native_ascii(path), "rb") as f:
-                    reader = decompressor.stream_reader(f)
-                    tar_data = reader.read()
-                buf = io.BytesIO(tar_data)
-                archive = tarfile.open(fileobj=buf)
-                checksums = {(info.name, info.chksum) for info in archive.getmembers()}
-                archive.close()
+                with zstandard.open(_to_native_ascii(path), "rb") as f:
+                    archive = tarfile.open(fileobj=f, mode="r|")
+                    checksums = {(info.name, info.chksum) for info in archive.getmembers()}
+                    archive.close()
             else:
                 archive = tarfile.open(_to_native_ascii(path), f"r|{self.format}")
                 checksums = {(info.name, info.chksum) for info in archive.getmembers()}
