@@ -270,12 +270,12 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 def match_opt(option, line):
     option = re.escape(option)
-    return re.match(rf"\s*(?P<comment>[#;]?)\s*{option}\s*(?P<sep>=|$)\s*(?P<value>.*)", line)
+    return re.match(rf"(?: |\t)*(?P<comment>[#;]?)(?: |\t)*{option}(?: |\t)*(?P<sep>=|$)(?: |\t)*(?P<value>.*)", line)
 
 
 def match_active_opt(option, line):
     option = re.escape(option)
-    return re.match(rf"\s*(?P<comment>){option}\s*(?P<sep>=|$)\s*(?P<value>.*)", line)
+    return re.match(rf"(?: |\t)*(?P<comment>){option}(?: |\t)*(?P<sep>=|$)(?: |\t)*(?P<value>.*)", line)
 
 
 def update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg):
