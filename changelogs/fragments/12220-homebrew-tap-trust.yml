@@ -1,2 +1,2 @@
 minor_changes:
-  - homebrew_tap - add ``trust`` option to control whether Homebrew trusts the tapped repositories (https://github.com/ansible-collections/community.general/issues/12220).
+  - homebrew_tap - add ``trust`` option to control whether Homebrew trusts the tapped repositories (https://github.com/ansible-collections/community.general/issues/12220, https://github.com/ansible-collections/community.general/pull/12503).
