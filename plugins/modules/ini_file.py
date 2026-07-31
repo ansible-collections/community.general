@@ -270,21 +270,21 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 def match_opt(option, line):
     option = re.escape(option)
-    return re.match(f"( |\t)*([#;]?)( |\t)*({option})( |\t)*(=|$)( |\t)*(.*)", line)
+    return re.match(rf"(?: |\t)*(?P<comment>[#;]?)(?: |\t)*{option}(?: |\t)*(?P<sep>=|$)(?: |\t)*(?P<value>.*)", line)
 
 
 def match_active_opt(option, line):
     option = re.escape(option)
-    return re.match(f"()()( |\t)*({option})( |\t)*(=|$)( |\t)*(.*)", line)
+    return re.match(rf"(?: |\t)*(?P<comment>){option}(?: |\t)*(?P<sep>=|$)(?: |\t)*(?P<value>.*)", line)
 
 
 def update_section_line(option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg):
     option_changed = None
     if ignore_spaces:
         old_match = match_opt(option, section_lines[index])
-        if not old_match.group(2):
+        if not old_match.group("comment"):
             new_match = match_opt(option, newline)
-            option_changed = old_match.group(8) != new_match.group(8)
+            option_changed = old_match.group("value") != new_match.group("value")
     if option_changed is None:
         option_changed = section_lines[index] != newline
     if option_changed:
@@ -301,7 +301,7 @@ def check_section_has_values(section_has_values, section_lines):
         for condition in section_has_values:
             for line in section_lines:
                 match = match_opt(condition["option"], line)
-                if match and (len(condition["values"]) == 0 or match.group(8) in condition["values"]):
+                if match and (len(condition["values"]) == 0 or match.group("value") in condition["values"]):
                     break
             else:
                 return False
@@ -442,8 +442,8 @@ def do_ini(
         for index, line in enumerate(section_lines):
             if match_function(option, line):
                 match = match_function(option, line)
-                if values and match.group(8) in values:
-                    matched_value = match.group(8)
+                if values and match.group("value") in values:
+                    matched_value = match.group("value")
                     if not matched_value and allow_no_value:
                         # replace existing option with no value line(s)
                         newline = f"{option}\n"
@@ -470,8 +470,8 @@ def do_ini(
             for index, line in enumerate(section_lines):
                 line_match = match_function(option, line) if not changed_lines[index] else None
                 # skip comment-only lines (e.g. "; output_buffering" with no "="):
-                # group(2) is the comment char, group(6) is "=" or "" (end-of-line match)
-                if line_match and not (line_match.group(2) and not line_match.group(6)):
+                # "comment" is the comment char, "sep" is "=" or "" (end-of-line match)
+                if line_match and not (line_match.group("comment") and not line_match.group("sep")):
                     newline = f"{option}{sep}{values.pop(0)}\n"
                     (changed, msg) = update_section_line(
                         option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg
@@ -482,7 +482,7 @@ def do_ini(
         for index in range(len(section_lines) - 1, 0, -1):
             line_match = match_function(option, section_lines[index]) if not changed_lines[index] else None
             # skip comment-only lines (no "=") — only remove active or commented config lines
-            if line_match and not (line_match.group(2) and not line_match.group(6)):
+            if line_match and not (line_match.group("comment") and not line_match.group("sep")):
                 del section_lines[index]
                 del changed_lines[index]
                 changed = True
@@ -529,7 +529,7 @@ def do_ini(
                 new_section_lines = [
                     i
                     for i in section_lines
-                    if not (match_active_opt(option, i) and match_active_opt(option, i).group(8) in values)
+                    if not (match_active_opt(option, i) and match_active_opt(option, i).group("value") in values)
                 ]
                 if section_lines != new_section_lines:
                     changed = True
