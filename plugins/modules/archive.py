@@ -600,9 +600,8 @@ class TarArchive(Archive):
                     archive.close()
             elif self.format == "zstd":
                 with zstandard.open(_to_native_ascii(path), "rb") as f:
-                    archive = tarfile.open(fileobj=f, mode="r|")
-                    checksums = {(info.name, info.chksum) for info in archive.getmembers()}
-                    archive.close()
+                    with tarfile.open(fileobj=f, mode="r|") as archive:
+                        checksums = {(info.name, info.chksum) for info in archive.getmembers()}
             else:
                 archive = tarfile.open(_to_native_ascii(path), f"r|{self.format}")
                 checksums = {(info.name, info.chksum) for info in archive.getmembers()}
