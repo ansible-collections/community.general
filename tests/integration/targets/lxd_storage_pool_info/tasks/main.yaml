@@ -1,0 +1,69 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get information about all storage pools
+  community.general.lxd_storage_pool_info:
+  register: pool_info_all
+
+- name: Verify pools information was retrieved
+  assert:
+    that:
+      - pool_info_all is not changed
+      - pool_info_all is success
+      - pool_info_all.storage_pools is defined
+      - pool_info_all.storage_pools is iterable
+
+- name: Get information about default pool
+  community.general.lxd_storage_pool_info:
+    name: default
+  register: pool_info_default
+
+- name: Verify default pool information
+  assert:
+    that:
+      - pool_info_default is not changed
+      - pool_info_default is success
+      - pool_info_default.storage_pools | length == 1
+      - pool_info_default.storage_pools[0].name == 'default'
+
+- name: Test filtering by pool type (dir)
+  community.general.lxd_storage_pool_info:
+    type:
+      - dir
+  register: pool_info_dir
+
+- name: Verify type filtering works
+  assert:
+    that:
+      - pool_info_dir is not changed
+      - pool_info_dir is success
+      - pool_info_dir.storage_pools is defined
+
+- name: Test with non-existent pool (should fail)
+  community.general.lxd_storage_pool_info:
+    name: nonexistent-pool-12345
+  register: pool_info_nonexistent
+  ignore_errors: true
+
+- name: Verify error handling for non-existent pool
+  assert:
+    that:
+      - pool_info_nonexistent is failed
+
+- name: Test check mode
+  community.general.lxd_storage_pool_info:
+  check_mode: true
+  register: pool_info_check
+
+- name: Verify check mode works
+  assert:
+    that:
+      - pool_info_check is not changed
+      - pool_info_check is success
+      - pool_info_check.storage_pools is defined

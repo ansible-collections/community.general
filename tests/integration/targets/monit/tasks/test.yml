@@ -1,0 +1,33 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# order is important
+- import_tasks: test_reload_present.yml
+
+- import_tasks: test_state.yml
+  vars:
+    state: stopped
+    initial_state: up
+    expected_state: down
+
+- import_tasks: test_state.yml
+  vars:
+    state: started
+    initial_state: down
+    expected_state: up
+
+- import_tasks: test_state.yml
+  vars:
+    state: unmonitored
+    initial_state: up
+    expected_state: down
+
+- import_tasks: test_state.yml
+  vars:
+    state: monitored
+    initial_state: down
+    expected_state: up
+
+- import_tasks: test_errors.yml

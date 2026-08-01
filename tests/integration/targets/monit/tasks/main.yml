@@ -1,0 +1,93 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- when:
+    - ansible_facts.os_family != 'Suse'
+  block:
+    - name: Install EPEL repository (only effective in RHEL)
+      include_role:
+        name: setup_epel
+
+    - name: create required directories
+      become: true
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop:
+        - /var/lib/monit
+        - /var/run/monit
+        - "{{ process_root }}"
+
+    - name: install monit
+      become: true
+      package:
+        name: monit
+        state: present
+
+    - include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
+            - '{{ ansible_facts.os_family }}.yml'
+            - 'defaults.yml'
+
+    - name: monit config
+      become: true
+      template:
+        src: "monitrc.j2"
+        dest: "{{ monitrc }}"
+
+    - name: copy process file
+      become: true
+      copy:
+        src: httpd_echo.py
+        dest: "{{ process_file }}"
+
+    - name: Install virtualenv on Arch Linux
+      pip:
+        name: virtualenv
+        state: present
+      when: ansible_facts.os_family == 'Archlinux'
+
+    - name: install dependencies
+      pip:
+        name: "{{ item }}"
+        virtualenv: "{{ process_venv }}"
+        virtualenv_command: "{{ virtualenv_command }}"
+        extra_args: "-c {{ remote_constraints }}"
+      loop:
+        - setuptools
+        - python-daemon
+
+    - name: restart monit
+      become: true
+      service:
+        name: monit
+        state: restarted
+
+    - include_tasks: test.yml
+
+  always:
+    - name: stop monit
+      become: true
+      service:
+        name: monit
+        state: stopped
+
+    - name: uninstall monit
+      become: true
+      package:
+        name: monit
+        state: absent
+
+    - name: remove process files
+      file:
+        path: "{{ process_root }}"
+        state: absent

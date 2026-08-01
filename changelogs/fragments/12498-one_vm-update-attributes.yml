@@ -1,0 +1,5 @@
+minor_changes:
+  - one_vm - add ``update_attributes`` parameter to merge USER_TEMPLATE key/value pairs
+    onto existing VMs via the ``one.vm.update`` API with append/merge semantics, enabling
+    idempotent attribute updates on running VMs without teardown
+    (https://github.com/ansible-collections/community.general/issues/12498, https://github.com/ansible-collections/community.general/pull/12499).

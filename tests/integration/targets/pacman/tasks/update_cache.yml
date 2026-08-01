@@ -1,0 +1,27 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Make sure package cache is updated
+  pacman:
+    update_cache: true
+
+- name: Update package cache again (should not be changed)
+  pacman:
+    update_cache: true
+  register: update_cache_idem
+
+- name: Update package cache again with force=true (should be changed)
+  pacman:
+    update_cache: true
+    force: true
+  register: update_cache_force
+
+- name: Check conditions
+  assert:
+    that:
+      - update_cache_idem is not changed
+      - update_cache_idem.cache_updated == false
+      - update_cache_force is changed
+      - update_cache_force.cache_updated == true

@@ -1,0 +1,14 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# -----------------------------------------------------------
+
+- name: "[{{ item }}] Expect that an error occurs when an unknown service is used."
+  launchd:
+    name: com.acme.unknownservice
+    state: started
+  register: result
+  failed_when:
+    - not '"Unable to infer the path of com.acme.unknownservice service plist file and it was not found among active services" in result.msg'

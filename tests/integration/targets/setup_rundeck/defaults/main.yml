@@ -1,0 +1,15 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+rundeck_version: 5.11.1-20250415
+rundeck_cli_version: "2.0.8"
+
+rundeck_war_url:
+  "https://packagecloud.io/pagerduty/rundeck/packages/java/org.rundeck/\
+  rundeck-{{ rundeck_version }}.war/artifacts/rundeck-{{ rundeck_version }}.war/download"
+
+rundeck_cli_url:
+  "https://github.com/rundeck/rundeck-cli/releases/download/\
+  v{{ rundeck_cli_version }}/rundeck-cli-{{ rundeck_cli_version }}-all.jar"

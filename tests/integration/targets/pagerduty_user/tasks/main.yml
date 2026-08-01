@@ -1,0 +1,25 @@
+# Test code for pagerduty_user module
+#
+# Copyright (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Install required library
+  pip:
+    name: pdpyras
+    state: present
+
+- name: Create a user account on PagerDuty
+  pagerduty_user:
+    access_token: '{{ pd_api_access_token }}'
+    pd_user: '{{ fullname }}'
+    pd_email: '{{ email }}'
+    pd_role: '{{ pd_role }}'
+    pd_teams: '{{ pd_team }}'
+    state: present
+
+- name: Remove a user account from PagerDuty
+  pagerduty_user:
+    access_token: "{{ pd_api_access_token }}"
+    pd_user: "{{ fullname }}"
+    pd_email: "{{ email }}"
+    state: "absent"

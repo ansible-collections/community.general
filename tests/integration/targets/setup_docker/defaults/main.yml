@@ -1,0 +1,14 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+distro_lookup_names:
+  - "D-{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml"
+  - "D-{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
+  - "{{ ansible_facts.os_family }}-{{ ansible_facts.distribution_major_version }}.yml"
+  - "D-{{ ansible_facts.distribution }}.yml"
+  - "{{ ansible_facts.os_family }}.yml"
+  - "default.yml"
+
+has_docker: false

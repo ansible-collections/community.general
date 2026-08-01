@@ -1,0 +1,13 @@
+{#
+Copyright (c) Ansible Project
+GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+SPDX-License-Identifier: GPL-3.0-or-later
+#}
+
+[security_privacy]
+name=Crypto applications and utilities (openSUSE_Leap_{{ ansible_facts.distribution_version }})
+type=rpm-md
+baseurl=http://download.opensuse.org/repositories/security:/privacy/openSUSE_Leap_{{ ansible_facts.distribution_version }}/
+gpgcheck=1
+gpgkey=http://download.opensuse.org/repositories/security:/privacy/openSUSE_Leap_{{ ansible_facts.distribution_version }}/repodata/repomd.xml.key
+enabled=1

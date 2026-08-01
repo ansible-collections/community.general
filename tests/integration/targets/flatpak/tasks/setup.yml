@@ -1,0 +1,59 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install flatpak on Fedora
+  dnf:
+    name: flatpak
+    state: present
+  become: true
+  when: ansible_facts.distribution == 'Fedora'
+
+- name: Install flatpak package on Ubuntu
+  apt:
+    name: flatpak
+    state: present
+  when: ansible_facts.distribution == 'Ubuntu'
+
+- name: Install dummy remote for user
+  flatpak_remote:
+    name: dummy-remote
+    state: present
+    flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+    method: user
+
+- name: Install dummy remote for system
+  flatpak_remote:
+    name: dummy-remote
+    state: present
+    flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+    method: system
+
+- name: Remove (if necessary) flatpak for testing check mode on absent flatpak
+  flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App3
+    remote: dummy-remote
+    state: absent
+    no_dependencies: true
+
+- name: Add flatpak for testing check mode on present flatpak
+  flatpak:
+    name: com.dummy.App2
+    remote: dummy-remote
+    state: present
+    no_dependencies: true
+
+- name: Copy HTTP server
+  copy:
+    src: serve.py
+    dest: '{{ remote_tmp_dir }}/serve.py'
+    mode: '0755'
+
+- name: Start HTTP server
+  command: '{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/serve.py 127.0.0.1 8000 /tmp/flatpak/'
+  async: 120
+  poll: 0
+  register: webserver_status

@@ -1,0 +1,339 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Initialise environment
+
+- name: Register variables
+  set_fact:
+    sudoers_path: /etc/sudoers.d
+    alt_sudoers_path: /etc/sudoers_alt
+
+- name: Install sudo package
+  ansible.builtin.package:
+    name: sudo
+  when: ansible_facts.os_family != 'Darwin'
+
+- name: Ensure sudoers directory exists
+  ansible.builtin.file:
+    path: "{{ sudoers_path }}"
+    state: directory
+    recurse: true
+
+- name: Ensure alternative sudoers directory exists
+  ansible.builtin.file:
+    path: "{{ alt_sudoers_path }}"
+    state: directory
+    recurse: true
+
+
+# Run module and collect data
+
+- name: Create first rule
+  community.general.sudoers:
+    name: my-sudo-rule-1
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+  register: rule_1
+
+- name: Stat my-sudo-rule-1 file
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/my-sudo-rule-1"
+  register: rule_1_stat
+
+- name: Grab contents of my-sudo-rule-1
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-1"
+  register: rule_1_contents
+
+- name: Create first rule again
+  community.general.sudoers:
+    name: my-sudo-rule-1
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+  register: rule_1_again
+
+
+- name: Create second rule with two commands
+  community.general.sudoers:
+    name: my-sudo-rule-2
+    state: present
+    user: alice
+    commands:
+      - /usr/local/bin/command1
+      - /usr/local/bin/command2
+  register: rule_2
+
+- name: Grab contents of my-sudo-rule-2
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-2"
+  register: rule_2_contents
+
+
+- name: Create rule requiring a password
+  community.general.sudoers:
+    name: my-sudo-rule-3
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    nopassword: false
+  register: rule_3
+
+- name: Grab contents of my-sudo-rule-3
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-3"
+  register: rule_3_contents
+
+
+- name: Create rule using a group
+  community.general.sudoers:
+    name: my-sudo-rule-4
+    state: present
+    group: students
+    commands: /usr/local/bin/command
+  register: rule_4
+
+- name: Grab contents of my-sudo-rule-4
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-4"
+  register: rule_4_contents
+
+
+- name: Create rule in a alternative directory
+  community.general.sudoers:
+    name: my-sudo-rule-5
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    sudoers_path: "{{ alt_sudoers_path }}"
+  register: rule_5
+
+- name: Grab contents of my-sudo-rule-5 (in alternative directory)
+  ansible.builtin.slurp:
+    src: "{{ alt_sudoers_path }}/my-sudo-rule-5"
+  register: rule_5_contents
+
+- name: Create rule to runas another user
+  community.general.sudoers:
+    name: my-sudo-rule-6
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    runas: bob
+    sudoers_path: "{{ sudoers_path }}"
+  register: rule_6
+
+- name: Grab contents of my-sudo-rule-6 (in alternative directory)
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-6"
+  register: rule_6_contents
+
+- name: Create rule to allow user to sudo just on host-1
+  community.general.sudoers:
+    name: my-sudo-rule-7
+    state: present
+    user: alice
+    host: host-1
+    commands: /usr/local/bin/command
+  register: rule_7
+
+- name: Grab contents of my-sudo-rule-7
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-7"
+  register: rule_7_contents
+
+- name: Create rule with setenv parameters
+  community.general.sudoers:
+    name: my-sudo-rule-8
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    setenv: true
+  register: rule_8
+
+- name: Grab contents of my-sudo-rule-8
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-8"
+  register: rule_8_contents
+
+- name: Create rule with noexec parameters
+  community.general.sudoers:
+    name: my-sudo-rule-9
+    state: present
+    user: alice
+    commands: /usr/local/bin/command
+    noexec: true
+  register: rule_9
+
+- name: Grab contents of my-sudo-rule-9
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-9"
+  register: rule_9_contents
+
+- name: Create rule with defaults directives for a group
+  community.general.sudoers:
+    name: my-sudo-rule-10
+    state: present
+    group: operators
+    commands: ALL
+    nopassword: false
+    defaults:
+      - "!targetpw"
+  register: rule_10
+
+- name: Grab contents of my-sudo-rule-10
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-10"
+  register: rule_10_contents
+
+- name: Create rule with defaults directives for a user
+  community.general.sudoers:
+    name: my-sudo-rule-11
+    state: present
+    user: alice
+    commands: ALL
+    nopassword: false
+    defaults:
+      - "!targetpw"
+      - "env_reset"
+  register: rule_11
+
+- name: Grab contents of my-sudo-rule-11
+  ansible.builtin.slurp:
+    src: "{{ sudoers_path }}/my-sudo-rule-11"
+  register: rule_11_contents
+
+- name: Revoke rule 1
+  community.general.sudoers:
+    name: my-sudo-rule-1
+    state: absent
+  register: revoke_rule_1
+
+- name: Stat rule 1
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/my-sudo-rule-1"
+  register: revoke_rule_1_stat
+
+
+# Validation testing
+
+- name: Attempt command without full path to executable
+  community.general.sudoers:
+    name: edge-case-1
+    state: present
+    user: alice
+    commands: systemctl
+  ignore_errors: true
+  register: edge_case_1
+
+
+- name: Attempt command without full path to executable, but disabling validation
+  community.general.sudoers:
+    name: edge-case-2
+    state: present
+    user: alice
+    commands: systemctl
+    validation: absent
+    sudoers_path: "{{ alt_sudoers_path }}"
+  register: edge_case_2
+
+- name: find visudo
+  command:
+    cmd: which visudo
+  register: which_visudo
+  when: ansible_facts.os_family != 'Darwin'
+
+- name: Prevent visudo being executed
+  file:
+    path: "{{ which_visudo.stdout }}"
+    mode: '-x'
+  when: ansible_facts.os_family != 'Darwin'
+
+- name: Attempt command without full path to executable, but enforcing validation with no visudo present
+  community.general.sudoers:
+    name: edge-case-3
+    state: present
+    user: alice
+    commands: systemctl
+    validation: required
+  ignore_errors: true
+  when: ansible_facts.os_family != 'Darwin'
+  register: edge_case_3
+
+- name: Revoke non-existing rule
+  community.general.sudoers:
+    name: non-existing-rule
+    state: absent
+  register: revoke_non_existing_rule
+
+- name: Stat non-existing rule
+  ansible.builtin.stat:
+    path: "{{ sudoers_path }}/non-existing-rule"
+  register: revoke_non_existing_rule_stat
+
+
+# Run assertions
+
+- name: Check rule 1 file stat
+  ansible.builtin.assert:
+    that:
+      - rule_1_stat.stat.exists
+      - rule_1_stat.stat.isreg
+      - rule_1_stat.stat.mode == '0440'
+
+- name: Check changed status
+  ansible.builtin.assert:
+    that:
+      - rule_1 is changed
+      - rule_1_again is not changed
+      - rule_5 is changed
+      - revoke_rule_1 is changed
+      - revoke_non_existing_rule is not changed
+
+- name: Check contents
+  vars:
+    expected_result_rule10: |
+      Defaults:%operators !targetpw
+      %operators ALL= ALL
+    expected_result_rule11: |
+      Defaults:alice !targetpw
+      Defaults:alice env_reset
+      alice ALL= ALL
+  ansible.builtin.assert:
+    that:
+      - "rule_1_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_2_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command1, /usr/local/bin/command2\n'"
+      - "rule_3_contents['content'] | b64decode == 'alice ALL= /usr/local/bin/command\n'"
+      - "rule_4_contents['content'] | b64decode == '%students ALL=NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_5_contents['content'] | b64decode == 'alice ALL=NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_6_contents['content'] | b64decode == 'alice ALL=(bob)NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_7_contents['content'] | b64decode == 'alice host-1=NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_8_contents['content'] | b64decode == 'alice ALL=NOPASSWD:SETENV: /usr/local/bin/command\n'"
+      - "rule_9_contents['content'] | b64decode == 'alice ALL=NOEXEC:NOPASSWD: /usr/local/bin/command\n'"
+      - "rule_10_contents['content'] | b64decode == expected_result_rule10"
+      - "rule_11_contents['content'] | b64decode == expected_result_rule11"
+
+- name: Check revocation stat
+  ansible.builtin.assert:
+    that:
+      - not revoke_rule_1_stat.stat.exists
+      - not revoke_non_existing_rule_stat.stat.exists
+
+- name: Check edge case responses
+  ansible.builtin.assert:
+    that:
+      - edge_case_1 is failed
+      - "'Failed to validate sudoers rule' in edge_case_1.msg"
+      - edge_case_1.stdout is defined
+      - edge_case_1.stderr is defined
+      - edge_case_2 is not failed
+
+- name: Check missing validation edge case
+  ansible.builtin.assert:
+    that:
+      - edge_case_3 is failed
+      - "'Failed to find required executable' in edge_case_3.msg"
+  when: ansible_facts.os_family != 'Darwin'

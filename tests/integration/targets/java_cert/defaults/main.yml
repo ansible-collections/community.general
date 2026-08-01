@@ -1,0 +1,19 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+test_pkcs12_path: testpkcs.p12
+test_keystore_path: keystore.jks
+test_keystore2_path: "{{ remote_tmp_dir }}/keystore2.jks"
+test_keystore2_password: changeit
+test_cert_path: "{{ remote_tmp_dir }}/cert.pem"
+test_key_path: "{{ remote_tmp_dir }}/key.pem"
+test_csr_path: "{{ remote_tmp_dir }}/req.csr"
+test_cert2_path: "{{ remote_tmp_dir }}/cert2.pem"
+test_key2_path: "{{ remote_tmp_dir }}/key2.pem"
+test_csr2_path: "{{ remote_tmp_dir }}/req2.csr"
+test_pkcs_path: "{{ remote_tmp_dir }}/cert.p12"
+test_pkcs2_path: "{{ remote_tmp_dir }}/cert2.p12"
+test_ssl: setupSSLServer.py
+test_ssl_port: 21500

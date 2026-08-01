@@ -1,0 +1,52 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install https transport for apt and ca-certificates
+  apt: name={{ item }} state=latest force=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+
+- name: Install apt_key dependencies
+  pip: name={{ item }}
+  with_items:
+    - pyOpenSSL
+    - ndg-httpsclient
+    - pyasn1
+
+- name: Make sure python3-debian is installed
+  ansible.builtin.apt:
+    name: python3-debian
+    state: present
+
+- name: Add InfluxDB repository
+  ansible.builtin.deb822_repository:
+    update_cache: true
+    name: influxdb
+    types: deb
+    signed_by: https://repos.influxdata.com/influxdb.key
+    uris:
+      - https://repos.influxdata.com/ubuntu
+    suites:
+      - trusty
+    components:
+      - stable
+    state: present
+  register: apt_repo
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: apt_repo is changed
+
+- name: Install InfluxDB
+  ansible.builtin.apt:
+    name: influxdb
+    state: latest
+
+- name: Start InfluxDB service
+  ansible.builtin.service:
+    name: influxdb
+    state: started

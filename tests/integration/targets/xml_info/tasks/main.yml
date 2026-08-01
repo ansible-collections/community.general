@@ -1,0 +1,70 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install lxml (FreeBSD)
+  package:
+    name: 'py{{ ansible_facts.python.version.major }}{{ ansible_facts.python.version.minor }}-lxml'
+    state: present
+  when: ansible_facts.os_family == "FreeBSD"
+
+- name: Install requirements (RHEL 8)
+  package:
+    name:
+      - libxml2-devel
+      - libxslt-devel
+      - python3-lxml
+    state: present
+  when: ansible_facts.distribution == "RedHat" and ansible_facts.distribution_major_version == "8"
+
+# Needed for MacOSX !
+- name: Install lxml
+  pip:
+    name: lxml
+    state: present
+
+- name: Get lxml version
+  command: "{{ ansible_python_interpreter }} -c 'from lxml import etree; print(\".\".join(str(v) for v in etree.LXML_VERSION))'"
+  register: lxml_version
+
+- name: Set lxml capabilities as variables
+  set_fact:
+    lxml_xpath_attribute_result_attrname: '{{ lxml_version.stdout is version("2.3.0", ">=") }}'
+
+- name: Define test XML content
+  set_fact:
+    xml_info_test_xml: |
+      <?xml version='1.0' encoding='UTF-8'?>
+      <business type="bar">
+        <name>Tasty Beverage Co.</name>
+        <beers>
+          <beer>Rochefort 10</beer>
+          <beer>St. Bernardus Abbot 12</beer>
+          <beer>Schlitz</beer>
+        </beers>
+        <rating subjective="true">10</rating>
+        <website>
+          <mobilefriendly/>
+          <address>https://tastybeverageco.com</address>
+        </website>
+      </business>
+
+- name: Write test XML to file
+  copy:
+    content: "{{ xml_info_test_xml }}"
+    dest: /tmp/ansible-xml-info-beers.xml
+
+- name: Only run the tests when lxml v2.3.0+
+  when: lxml_xpath_attribute_result_attrname
+  block:
+
+    - include_tasks: test-count.yml
+    - include_tasks: test-print-match.yml
+    - include_tasks: test-get-element-content.yml
+    - include_tasks: test-xmlstring.yml

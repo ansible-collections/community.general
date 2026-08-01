@@ -1,0 +1,113 @@
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  environ_data: &env-data {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true, data: cool_password}
+  environ_norc: &env-norc {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
+  - id: test_kinit_default
+    input:
+      state: present
+      password: cool_password
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/klist]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: ''
+        - command: [/testbin/kinit]
+          environ: *env-data
+          rc: 0
+          out: ''
+          err: ''
+  - id: test_kinit_principal
+    input:
+      state: present
+      password: cool_password
+      principal: admin@IPA.TEST
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/klist, -l]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/kinit, admin@IPA.TEST]
+          environ: *env-data
+          rc: 0
+          out: ''
+          err: ''
+  - id: test_kdestroy_default
+    input:
+      state: absent
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/klist]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/kdestroy]
+          environ: *env-norc
+          rc: 0
+          out: ''
+          err: ''
+  - id: test_kdestroy_principal
+    input:
+      state: absent
+      principal: admin@IPA.TEST
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/klist, -l]
+          environ: *env-def
+          rc: 0
+          out: admin@IPA.TEST
+          err: ''
+        - command: [/testbin/kdestroy, -p, admin@IPA.TEST]
+          environ: *env-norc
+          rc: 0
+          out: ''
+          err: ''
+  - id: test_kdestroy_cache_name
+    input:
+      state: absent
+      cache_name: KEYRING:persistent:0:0
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/klist, -l]
+          environ: *env-def
+          rc: 0
+          out: KEYRING:persistent:0:0
+          err: ''
+        - command: [/testbin/kdestroy, -c, KEYRING:persistent:0:0]
+          environ: *env-norc
+          rc: 0
+          out: ''
+          err: ''
+  - id: test_kdestroy_all
+    input:
+      state: absent
+      kdestroy_all: true
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/kdestroy, -A]
+          environ: *env-norc
+          rc: 0
+          out: ''
+          err: ''

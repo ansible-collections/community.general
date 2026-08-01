@@ -1,0 +1,40 @@
+# Copyright (c) 2022, Ansible Project
+# Copyright (c) 2022, VMware, Inc. All Rights Reserved.
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: install pycdlib
+  ansible.builtin.pip:
+    name: pycdlib
+    extra_args: "-c {{ remote_constraints }}"
+
+- name: Make sure the previous testing sub-directory is deleted
+  ansible.builtin.file:
+    path: '{{ test_dir }}'
+    state: absent
+
+- name: Create our testing sub-directory
+  ansible.builtin.file:
+    path: '{{ test_dir }}'
+    state: directory
+
+- name: Create sub directory to mount customized ISO
+  ansible.builtin.file:
+    path: '{{ test_dir }}/iso_mount'
+    state: directory
+
+- name: Create temporary file test01.cfg for testing
+  ansible.builtin.file:
+    path: "{{ test_dir }}/test01.cfg"
+    state: touch
+
+- name: Add a line to the file test01.cfg and make sure it succeed
+  ansible.builtin.lineinfile:
+    path: "{{ test_dir }}/test01.cfg"
+    regexp: "^aaa"
+    line: "aaa"
+
+- name: Create temporary file test02.cfg for testing
+  ansible.builtin.file:
+    path: "{{ test_dir }}/test02.cfg"
+    state: touch

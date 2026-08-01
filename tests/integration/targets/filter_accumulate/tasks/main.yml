@@ -1,0 +1,35 @@
+---
+# Copyright (c), Max Gautier <mg@max.gautier.name>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Filter | Accumulate | Test valid values
+  assert:
+    that:
+      - "'abc' | community.general.accumulate == ['a', 'ab', 'abc']"
+      - "['a', 'b'] | community.general.accumulate == ['a', 'ab']"
+      - "[1, 2, 3] | community.general.accumulate == [1, 3, 6]"
+      - "[['foo'],['bar'],['foobar']] | community.general.accumulate == [['foo'], ['foo', 'bar'], ['foo', 'bar', 'foobar']]"
+      - "'path/to/file' | split('/') | map('split', '/') | community.general.accumulate | map('join', '/') == ['path', 'path/to', 'path/to/file']"
+      - "[{'foo':1}, {'bar':2}] | map('dict2items') | community.general.accumulate | map('items2dict') == [{'foo':1}, {'foo':1, 'bar':2}]"
+
+
+- name: Filter | Accumulate | Test invalid values | Integer
+  debug:
+    var: "1 | community.general.accumulate"
+  register: integer_result
+  ignore_errors: true
+
+- name: Filter | Accumulate | Test invalid values | Non uniform list
+  debug:
+    var: "['aa', 1] | community.general.accumulate"
+  register: non_uniform_list_result
+  ignore_errors: true
+
+- name: Filter | Accumulate | Test invalid values | Check errors
+  assert:
+    that:
+      - integer_result is failed
+      - integer_result.msg is search('Invalid value type')
+      - non_uniform_list_result is failed
+      - non_uniform_list_result.msg is search('can only concatenate str')

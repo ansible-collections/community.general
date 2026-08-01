@@ -1,0 +1,109 @@
+# Copyright (c) 2023, Steffen Scheib <steffen@scheib.me>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+name: to_ini
+short_description: Converts a dictionary to the INI file format
+version_added: 8.2.0
+author: Steffen Scheib (@sscheib)
+description:
+  - Converts a dictionary to the INI file format.
+options:
+  _input:
+    description: The dictionary that should be converted to the INI format.
+    type: dictionary
+    required: true
+  no_extra_spaces:
+    description:
+      - Do not insert spaces before and after V(=) symbol.
+    type: bool
+    default: false
+    version_added: 13.0.0
+seealso:
+  - plugin: ansible.builtin.ini
+    plugin_type: lookup
+  - module: community.general.ini_file
+  - plugin: community.general.from_ini
+    plugin_type: filter
+"""
+
+EXAMPLES = r"""
+- name: Define a dictionary
+  ansible.builtin.set_fact:
+    my_dict:
+      section_name:
+        key_name: 'key value'
+
+      another_section:
+        connection: 'ssh'
+
+- name: Write dictionary to INI file
+  ansible.builtin.copy:
+    dest: /tmp/test.ini
+    content: '{{ my_dict | community.general.to_ini }}'
+
+  # /tmp/test.ini will look like this:
+  # [section_name]
+  # key_name = key value
+  #
+  # [another_section]
+  # connection = ssh
+"""
+
+RETURN = r"""
+_value:
+  description: A string formatted as INI file.
+  type: string
+"""
+
+from collections.abc import Mapping
+from configparser import ConfigParser
+from io import StringIO
+
+from ansible.errors import AnsibleFilterError
+
+
+class IniParser(ConfigParser):
+    """Implements a configparser which sets the correct optionxform"""
+
+    def __init__(self):
+        super().__init__(interpolation=None)
+        self.optionxform = str
+
+
+def to_ini(obj, *, no_extra_spaces=False):
+    """Read the given dict and return an INI formatted string"""
+
+    if not isinstance(obj, Mapping):
+        raise AnsibleFilterError(f"to_ini requires a dict, got {type(obj)}")
+    if not isinstance(no_extra_spaces, bool):
+        raise AnsibleFilterError(f"no_extra_spaces must be a boolean, got {type(no_extra_spaces)}")
+
+    ini_parser = IniParser()
+
+    try:
+        ini_parser.read_dict(obj)
+    except Exception as ex:
+        raise AnsibleFilterError(f"to_ini failed to parse given dict:{ex}", orig_exc=ex) from ex
+
+    # catching empty dicts
+    if obj == dict():
+        raise AnsibleFilterError("to_ini received an empty dict. An empty dict cannot be converted.")
+
+    config = StringIO()
+    ini_parser.write(config, space_around_delimiters=not no_extra_spaces)
+
+    # config.getvalue() returns two \n at the end
+    # with the below insanity, we remove the very last character of
+    # the resulting string
+    return "".join(config.getvalue().rsplit(config.getvalue()[-1], 1))
+
+
+class FilterModule:
+    """Query filter"""
+
+    def filters(self):
+        return {"to_ini": to_ini}

@@ -1,0 +1,74 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Set project approval settings
+  gitlab_project_approvals:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: false
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    approvals_before_merge: 2
+    reset_approvals_on_push: false
+    disable_overriding_approvers_per_merge_request: true
+    merge_requests_author_approval: true
+    merge_requests_disable_committers_approval: true
+    selective_code_owner_removals: true
+    require_password_to_approve: true
+    require_reauthentication_to_approve: true
+  register: approval_result
+
+- assert:
+    that:
+      - approval_result is changed
+
+- name: Re-run project approval for idempotency
+  gitlab_project_approvals:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: false
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    approvals_before_merge: 2
+    reset_approvals_on_push: false
+    disable_overriding_approvers_per_merge_request: true
+    merge_requests_author_approval: true
+    merge_requests_disable_committers_approval: true
+    selective_code_owner_removals: true
+    require_password_to_approve: true
+    require_reauthentication_to_approve: true
+  register: approval_result_idem
+
+- assert:
+    that:
+      - approval_result_idem is not changed
+
+- name: Reset project approval settings
+  gitlab_project_approvals:
+    api_url: "{{ gitlab_api_url }}"
+    validate_certs: false
+    api_token: "{{ gitlab_api_token }}"
+    project: "{{ gitlab_project_name }}"
+    approvals_before_merge: 0
+    reset_approvals_on_push: true
+    disable_overriding_approvers_per_merge_request: false
+    merge_requests_author_approval: false
+    merge_requests_disable_committers_approval: false
+    selective_code_owner_removals: false
+    require_password_to_approve: false
+    require_reauthentication_to_approve: false
+  register: approval_result
+
+- assert:
+    that:
+      - approval_result is changed

@@ -1,0 +1,15 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+names1:
+  - srv.example.com
+  - 9rv.example.com
+  - -rv.example.com
+  - srv
+  - 9rv
+  - -rv
+  - s_v
+names2: [9rv, -rv, s_v]
+names3: [9rv, srv.x, s_v.x.y, s_v-.x.y]

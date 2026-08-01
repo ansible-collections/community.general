@@ -1,0 +1,4 @@
+bugfixes:
+  - "pamd - handle non-PAM lines such as authselect template directives without crashing
+    (https://github.com/ansible-collections/community.general/issues/5850,
+    https://github.com/ansible-collections/community.general/pull/12137)."

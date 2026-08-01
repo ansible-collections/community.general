@@ -1,0 +1,18 @@
+---
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+scaleway_region: fr-par
+container_namespace_name: cn-ansible-test
+name: cn-ansible-test
+description: Container used for testing scaleway_container ansible module
+updated_description: Container used for testing scaleway_container ansible module (Updated description)
+environment_variables:
+  MY_VAR: my_value
+secret_environment_variables:
+  MY_SECRET_VAR: my_secret_value
+updated_secret_environment_variables:
+  MY_SECRET_VAR: my_other_secret_value
+image: rg.fr-par.scw.cloud/namespace-ansible-ci/nginx:latest
+port: 80

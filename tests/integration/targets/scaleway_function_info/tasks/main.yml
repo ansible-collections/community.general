@@ -1,0 +1,62 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2022, Guillaume MARTINEZ <lunik@tiwabbit.fr>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create function_namespace
+  community.general.scaleway_function_namespace:
+    state: present
+    name: '{{ function_namespace_name }}'
+    region: '{{ scaleway_region }}'
+    project_id: '{{ scw_project }}'
+    description: '{{ description }}'
+  register: integration_function_namespace
+
+- name: Create function
+  community.general.scaleway_function:
+    state: present
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+    description: '{{ description }}'
+    environment_variables: '{{ environment_variables }}'
+    secret_environment_variables: '{{ secret_environment_variables }}'
+
+- name: Get function info
+  community.general.scaleway_function_info:
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+  register: fn_info_task
+
+- ansible.builtin.debug:
+    var: fn_info_task
+
+- name: Check module call result
+  ansible.builtin.assert:
+    that:
+      - fn_info_task is success
+      - fn_info_task is not changed
+
+- name: Delete function
+  community.general.scaleway_function:
+    state: absent
+    name: '{{ name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    namespace_id: '{{ integration_function_namespace.function_namespace.id }}'
+    runtime: '{{ runtime }}'
+
+- name: Delete function namespace
+  community.general.scaleway_function_namespace:
+    state: absent
+    name: '{{ function_namespace_name }}'
+    region: '{{ scaleway_region }}'
+    description: '{{ description }}'
+    project_id: '{{ scw_project }}'

@@ -1,0 +1,144 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Archive - file content idempotency ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
+    format: "{{ format }}"
+  register: file_content_idempotency_before
+
+- name: Modify file - file content idempotency ({{ format }})
+  lineinfile:
+    line: bar.txt
+    regexp: "^foo.txt$"
+    path: "{{ remote_tmp_dir }}/foo.txt"
+
+- name: Archive second time - file content idempotency ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
+    format: "{{ format }}"
+  register: file_content_idempotency_after
+
+- name: Assert task status is changed - file content idempotency ({{ format }})
+  assert:
+    that:
+      - file_content_idempotency_after is changed
+  # Only ``zip`` archives are guaranteed to compare file content checksums rather than header checksums
+  when: "format == 'zip'"
+
+- name: Remove archive - file content idempotency ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_file_content_idempotency.{{ format }}"
+    state: absent
+
+- name: Modify file back - file content idempotency ({{ format }})
+  lineinfile:
+    line: foo.txt
+    regexp: "^bar.txt$"
+    path: "{{ remote_tmp_dir }}/foo.txt"
+
+- name: Archive - file name idempotency ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
+    format: "{{ format }}"
+  register: file_name_idempotency_before
+
+- name: Rename file - file name idempotency ({{ format }})
+  command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
+
+- name: Archive again - file name idempotency ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
+    format: "{{ format }}"
+  register: file_name_idempotency_after
+
+- name: Check task status - file name idempotency ({{ format }})
+  assert:
+    that:
+      - file_name_idempotency_after is changed
+
+- name: Remove archive - file name idempotency ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_file_name_idempotency.{{ format }}"
+    state: absent
+
+- name: Rename file back - file name idempotency ({{ format }})
+  command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"
+
+- name: Archive - single file content idempotency ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
+    format: "{{ format }}"
+  register: single_file_content_idempotency_before
+
+- name: Modify file - single file content idempotency ({{ format }})
+  lineinfile:
+    line: bar.txt
+    regexp: "^foo.txt$"
+    path: "{{ remote_tmp_dir }}/foo.txt"
+
+- name: Archive second time - single file content idempotency ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
+    format: "{{ format }}"
+  register: single_file_content_idempotency_after
+
+- name: Assert task status is changed - single file content idempotency ({{ format }})
+  assert:
+    that:
+      - single_file_content_idempotency_after is changed
+  # ``tar`` archives are not guaranteed to identify changes to file content if the file meta properties are unchanged.
+  when: "format != 'tar'"
+
+- name: Remove archive - single file content idempotency ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_single_file_content_idempotency.{{ format }}"
+    state: absent
+
+- name: Modify file back - single file content idempotency ({{ format }})
+  lineinfile:
+    line: foo.txt
+    regexp: "^bar.txt$"
+    path: "{{ remote_tmp_dir }}/foo.txt"
+
+- name: Archive - single file name idempotency ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/foo.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
+    format: "{{ format }}"
+  register: single_file_name_idempotency_before
+
+- name: Rename file - single file name idempotency ({{ format }})
+  command: "mv {{ remote_tmp_dir }}/foo.txt {{ remote_tmp_dir }}/fii.txt"
+
+- name: Archive again - single file name idempotency ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/fii.txt"
+    dest: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
+    format: "{{ format }}"
+  register: single_file_name_idempotency_after
+
+
+# The gz, bz2, and xz formats do not store the original file name
+# so it is not possible to identify a change in this scenario.
+- name: Check task status - single file name idempotency ({{ format }})
+  assert:
+    that:
+      - single_file_name_idempotency_after is changed
+  when: "format in ('tar', 'zip')"
+
+- name: Remove archive - single file name idempotency ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_single_file_name_idempotency.{{ format }}"
+    state: absent
+
+- name: Rename file back - single file name idempotency ({{ format }})
+  command: "mv {{ remote_tmp_dir }}/fii.txt {{ remote_tmp_dir }}/foo.txt"

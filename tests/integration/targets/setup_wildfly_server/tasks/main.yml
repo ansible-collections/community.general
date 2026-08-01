@@ -1,0 +1,106 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Skip unsupported platforms
+  meta: end_play
+  # Not being effectively tested and bound to be removed in 14.0.0 with jboss module deprecation
+
+- name: Install java
+  package:
+    name: java-1.8.0-openjdk-devel
+
+- name: Create wf_tmp_dir
+  file:
+    path: '{{ wf_tmp_dir }}'
+    state: directory
+
+- name: Download wildfly
+  get_url:
+    url: 'https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/setup_wildfly_server/wildfly-{{ wf_version }}.tar.gz'
+    dest: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
+
+- name: Unarchive tar
+  unarchive:
+    src: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
+    dest: '{{ wf_tmp_dir }}'
+    remote_src: true
+
+- name: Remove tar
+  file:
+    path: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}.tar.gz'
+    state: absent
+
+- name: Create symlink
+  file:
+    src: '{{ wf_tmp_dir }}/wildfly-{{ wf_version }}'
+    dest: '{{ wf_tmp_dir }}/wildfly'
+    state: link
+
+- name: Create group for wildfly
+  group:
+    name: '{{ wf_user }}'
+    system: true
+
+- name: Create user for wildfly
+  user:
+    name: '{{ wf_user }}'
+    system: true
+    group: '{{ wf_user }}'
+    home: '{{ wf_homedir }}'
+
+- name: Set permissions
+  file:
+    path: '{{ remote_tmp_dir }}'
+    state: directory
+    owner: '{{ wf_user }}'
+    group: '{{ wf_user }}'
+    recurse: true
+
+- name: Create config file
+  copy:
+    src: wildfly.conf
+    dest: '{{ wf_homedir }}/wildfly.conf'
+    mode: "0644"
+
+- name: Create launcher
+  template:
+    src: launch.sh.j2
+    dest: '{{ wf_homedir }}/bin/launch.sh'
+    mode: "0755"
+
+- name: Make scripts executable
+  shell: 'chmod +rx {{ wf_homedir }}/bin/*.sh'
+
+- name: Create service file
+  template:
+    src: wildfly.service.j2
+    dest: '{{ wf_service_file_path }}'
+    mode: "0644"
+
+- name: Create directories for testing the default deploy_path
+  become: true
+  file:
+    path: '{{ default_deploy_root }}'
+    state: directory
+    recurse: true
+    owner: '{{ wf_user }}'
+    group: '{{ wf_user }}'
+
+- name: Create simlink for testing the default deploy_path
+  file:
+    state: link
+    src: '{{ deploy_dir }}'
+    dest: '{{ default_deploy_root }}/deployments'
+
+- name: Reload systemd and start wildfly
+  systemd:
+    daemon_reload: true
+    name: wildfly
+    state: started

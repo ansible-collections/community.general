@@ -1,0 +1,2 @@
+minor_changes:
+  - kopia_repository, kopia_repository_info - normalize handling of CLI parameters across all ``kopia_*`` modules (https://github.com/ansible-collections/community.general/pull/12360).

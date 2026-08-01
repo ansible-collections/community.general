@@ -1,0 +1,22 @@
+# Copyright (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: test failing dependency
+  mdepfail:
+    a: 123
+  ignore_errors: true
+  register: result
+
+- name: Show results
+  debug:
+    var: result
+
+- name: assert failing dependency
+  assert:
+    that:
+      - result is failed
+      - '"Failed to import" in result.msg'
+      - '"nopackagewiththisname" in result.msg'
+      - '"ModuleNotFoundError:" in result.exception or "ImportError:" in result.exception or "(traceback unavailable)" in result.exception'
+      - '"nopackagewiththisname" in result.exception or "(traceback unavailable)" in result.exception'

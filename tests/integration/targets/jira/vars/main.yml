@@ -1,0 +1,11 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+uri: https://xxxx.atlassian.net/
+user: xxx@xxxx.xxx
+pasw: supersecret
+proj: ABC
+user1: 6574474636373822y7338
+user2: 6574474636373822y73959696

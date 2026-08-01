@@ -1,0 +1,10 @@
+dn: ou=sequence,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: sequence
+
+dn: cn=ldapinctest,ou=sequence,dc=example,dc=com
+uidNumber: 1000
+objectClass: top
+objectClass: uidNext
+cn: ldapinctest

@@ -1,0 +1,4 @@
+bugfixes:
+  - "redfish_config - fix ``KeyError: 'ret'`` when ``SetManagerNic`` cannot find a matching NIC
+    (https://github.com/ansible-collections/community.general/issues/5892,
+    https://github.com/ansible-collections/community.general/pull/12124)."

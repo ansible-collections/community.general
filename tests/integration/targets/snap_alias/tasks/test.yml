@@ -1,0 +1,159 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Ensure snap 'hello-world' is not installed
+  community.general.snap:
+    name: hello-world
+    state: absent
+
+- name: Ensure snap 'hello-world' is installed fresh
+  community.general.snap:
+    name: hello-world
+
+################################################################################
+
+- name: Create snap alias (check mode)
+  community.general.snap_alias:
+    name: hello-world
+    alias: hw
+  check_mode: true
+  register: alias_single_0
+
+- name: Create snap alias
+  community.general.snap_alias:
+    name: hello-world
+    alias: hw
+  register: alias_single_1
+
+- name: Create snap alias (check mode idempotent)
+  community.general.snap_alias:
+    name: hello-world
+    alias: hw
+  check_mode: true
+  register: alias_single_2
+
+- name: Create snap alias (idempotent)
+  community.general.snap_alias:
+    name: hello-world
+    alias: hw
+  register: alias_single_3
+
+- name: assert single alias
+  assert:
+    that:
+      - alias_single_0 is changed
+      - alias_single_1 is changed
+      - alias_single_2 is not changed
+      - alias_single_3 is not changed
+      - 'alias_single_1.snap_aliases["hello-world"] == ["hw"]'
+      - 'alias_single_3.snap_aliases["hello-world"] == ["hw"]'
+
+- name: Create multiple aliases (check mode)
+  community.general.snap_alias:
+    name: hello-world
+    aliases: [hw, hw2, hw3]
+  check_mode: true
+  register: alias_multi_0
+
+- name: Create multiple aliases
+  community.general.snap_alias:
+    name: hello-world
+    aliases: [hw, hw2, hw3]
+  register: alias_multi_1
+
+- name: Create multiple aliases (check mode idempotent)
+  community.general.snap_alias:
+    name: hello-world
+    aliases: [hw, hw2, hw3]
+  check_mode: true
+  register: alias_multi_2
+
+- name: Create multiple aliases (idempotent)
+  community.general.snap_alias:
+    name: hello-world
+    aliases: [hw, hw2, hw3]
+  register: alias_multi_3
+
+- name: assert multi alias
+  assert:
+    that:
+      - alias_multi_0 is changed
+      - alias_multi_1 is changed
+      - alias_multi_2 is not changed
+      - alias_multi_3 is not changed
+      - 'alias_multi_1.snap_aliases["hello-world"] == ["hw", "hw2", "hw3"]'
+      - 'alias_multi_3.snap_aliases["hello-world"] == ["hw", "hw2", "hw3"]'
+
+- name: Remove one specific alias (check mode)
+  community.general.snap_alias:
+    alias: hw
+    state: absent
+  check_mode: true
+  register: alias_remove_0
+
+- name: Remove one specific alias
+  community.general.snap_alias:
+    alias: hw
+    state: absent
+  register: alias_remove_1
+
+- name: Remove one specific alias (check mode idempotent)
+  community.general.snap_alias:
+    alias: hw
+    state: absent
+  check_mode: true
+  register: alias_remove_2
+
+- name: Remove one specific alias (idempotent)
+  community.general.snap_alias:
+    alias: hw
+    state: absent
+  register: alias_remove_3
+
+- name: assert remove alias
+  assert:
+    that:
+      - alias_remove_0 is changed
+      - alias_remove_1 is changed
+      - alias_remove_2 is not changed
+      - alias_remove_3 is not changed
+      - 'alias_remove_1.snap_aliases["hello-world"] == ["hw2", "hw3"]'
+      - 'alias_remove_3.snap_aliases["hello-world"] == ["hw2", "hw3"]'
+
+- name: Remove all aliases for snap (check mode)
+  community.general.snap_alias:
+    name: hello-world
+    state: absent
+  check_mode: true
+  register: alias_remove_all_0
+
+- name: Remove all aliases for snap
+  community.general.snap_alias:
+    name: hello-world
+    state: absent
+  register: alias_remove_all_1
+
+- name: Remove all aliases for snap (check mode idempotent)
+  community.general.snap_alias:
+    name: hello-world
+    state: absent
+  check_mode: true
+  register: alias_remove_all_2
+
+- name: Remove all aliases for snap (idempotent)
+  community.general.snap_alias:
+    name: hello-world
+    state: absent
+  register: alias_remove_all_3
+
+- name: assert remove_all alias
+  assert:
+    that:
+      - alias_remove_all_0 is changed
+      - alias_remove_all_1 is changed
+      - alias_remove_all_2 is not changed
+      - alias_remove_all_3 is not changed
+      - 'alias_remove_all_1.snap_aliases["hello-world"] == []'
+      - 'alias_remove_all_3.snap_aliases["hello-world"] == []'

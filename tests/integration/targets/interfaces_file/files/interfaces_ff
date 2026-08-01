@@ -1,0 +1,11 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+iface eno1 inet static
+  address   1.2.3.4
+  netmask   255.255.255.0
+  gateway   1.2.3.1
+  up route add -net 1.2.3.4 netmask 255.255.255.0 gw 1.2.3.1 eno1
+  up ip addr add 4.3.2.1/32 dev eno1
+  down ip addr add 4.3.2.1/32 dev eno1

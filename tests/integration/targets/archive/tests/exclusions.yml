@@ -1,0 +1,44 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Archive - exclusion patterns ({{ format }})
+  archive:
+    path: "{{ remote_tmp_dir }}/*.txt"
+    dest: "{{ remote_tmp_dir }}/archive_exclusion_patterns.{{ format }}"
+    format: "{{ format }}"
+    exclusion_patterns: b?r.*
+  register: archive_exclusion_patterns
+
+- name: Assert that only included files are archived - exclusion patterns ({{ format }})
+  assert:
+    that:
+      - archive_exclusion_patterns is changed
+      - "'bar.txt' not in archive_exclusion_patterns.archived"
+
+- name: Remove archive - exclusion patterns ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_exclusion_patterns.{{ format }}"
+    state: absent
+
+- name: Archive - exclude path ({{ format }})
+  archive:
+    path:
+      - "{{ remote_tmp_dir }}/sub/subfile.txt"
+      - "{{ remote_tmp_dir }}"
+    exclude_path:
+      - "{{ remote_tmp_dir }}"
+    dest: "{{ remote_tmp_dir }}/archive_exclude_paths.{{ format }}"
+    format: "{{ format }}"
+  register: archive_excluded_paths
+
+- name: Assert that excluded paths do not influence archive root - exclude path ({{ format }})
+  assert:
+    that:
+      - archive_excluded_paths.arcroot != remote_tmp_dir
+
+- name: Remove archive - exclude path ({{ format }})
+  file:
+    path: "{{ remote_tmp_dir }}/archive_exclude_paths.{{ format }}"
+    state: absent

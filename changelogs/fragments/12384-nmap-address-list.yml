@@ -1,0 +1,2 @@
+minor_changes:
+  - nmap inventory plugin - allow ``address`` to be a list of networks/IP ranges to scan, in addition to a single string (https://github.com/ansible-collections/community.general/issues/12379, https://github.com/ansible-collections/community.general/pull/12384).

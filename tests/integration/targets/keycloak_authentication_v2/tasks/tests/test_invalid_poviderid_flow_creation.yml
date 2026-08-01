@@ -1,0 +1,62 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+- name: Setup Test
+  ansible.builtin.include_tasks:
+    file: test_setup.yml
+
+- name: Flow Creation/Update <Integration Test Flow with invalid providerid in execution>
+  community.general.keycloak_authentication_v2:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: Integration Test Flow with invalid providerid in execution
+    state: present
+    authenticationExecutions:
+      - providerId: idp-review-profile
+        requirement: REQUIRED
+        authenticationConfig:
+          alias: Integration Test Flow - review profile config
+          config:
+            update.profile.on.first.login: "missing"
+      - subFlow: Integration Test Flow - User creation or linking
+        requirement: REQUIRED
+        authenticationExecutions:
+          - providerId: invalid-providerid
+            requirement: ALTERNATIVE
+          - subFlow: Integration Test Flow - Handle Existing Account
+            requirement: ALTERNATIVE
+            authenticationExecutions:
+              - providerId: another-invalid-providerid
+                requirement: REQUIRED
+      - providerId: auth-cookie
+        requirement: REQUIRED
+  ignore_errors: true
+  register: invalid_providerid_in_flow_result
+
+- name: Verify that invalid providerId causes failure
+  ansible.builtin.assert:
+    that:
+      - invalid_providerid_in_flow_result is failed
+      - invalid_providerid_in_flow_result is not changed
+      - >-
+        invalid_providerid_in_flow_result.msg == "Validation of executions failed: The following execution providerIds are unknown and therefore invalid: 'invalid-providerid', 'another-invalid-providerid'"
+
+- name: Retrieve access token
+  ansible.builtin.include_tasks:
+    file: ../actions/fetch_access_token.yml
+
+- name: Assert that the flow did not get created
+  ansible.builtin.uri:
+    url: "{{ url }}/admin/realms/{{ realm }}/authentication/flows/Integration%20Test%20Flow%20with%20invalid%20providerid%20in%20execution/executions"
+    method: GET
+    headers:
+      Accept: application/json
+      User-agent: Ansible
+      Authorization: "Bearer {{ access_token }}"
+    return_content: true
+    status_code: 404
+  register: flow_response

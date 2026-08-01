@@ -1,0 +1,2 @@
+bugfixes:
+  - xenserver_guest_info - use fallback chain for determining VDI format from ``sm_config`` keys ``image-format``, ``vdi_type``, ``type``, defaulting to ``raw`` (https://github.com/ansible-collections/community.general/pull/12119, https://github.com/ansible-collections/community.general/pull/12215).

@@ -1,0 +1,99 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# test-snapd-upower-observe-consumer declares a single plug: upower-observe
+# which auto-connects to the :upower-observe system slot.
+# We use this well-known test snap to exercise connect/disconnect.
+
+- name: Ensure snap 'test-snapd-upower-observe-consumer' is not installed
+  community.general.snap:
+    name: test-snapd-upower-observe-consumer
+    state: absent
+
+- name: Ensure snap 'test-snapd-upower-observe-consumer' is installed
+  community.general.snap:
+    name: test-snapd-upower-observe-consumer
+
+################################################################################
+
+- name: Disconnect upower-observe plug (ensure clean state)
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+    state: absent
+
+- name: Connect upower-observe plug (check mode)
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+  check_mode: true
+  register: connect_0
+
+- name: Connect upower-observe plug
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+  register: connect_1
+
+- name: Connect upower-observe plug (check mode idempotent)
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+  check_mode: true
+  register: connect_2
+
+- name: Connect upower-observe plug (idempotent)
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+  register: connect_3
+
+- name: Assert connect results
+  assert:
+    that:
+      - connect_0 is changed
+      - connect_1 is changed
+      - connect_2 is not changed
+      - connect_3 is not changed
+
+################################################################################
+
+- name: Disconnect upower-observe plug (check mode)
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+    state: absent
+  check_mode: true
+  register: disconnect_0
+
+- name: Disconnect upower-observe plug
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+    state: absent
+  register: disconnect_1
+
+- name: Disconnect upower-observe plug (check mode idempotent)
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+    state: absent
+  check_mode: true
+  register: disconnect_2
+
+- name: Disconnect upower-observe plug (idempotent)
+  community.general.snap_connect:
+    plug: test-snapd-upower-observe-consumer:upower-observe
+    slot: ":upower-observe"
+    state: absent
+  register: disconnect_3
+
+- name: Assert disconnect results
+  assert:
+    that:
+      - disconnect_0 is changed
+      - disconnect_1 is changed
+      - disconnect_2 is not changed
+      - disconnect_3 is not changed

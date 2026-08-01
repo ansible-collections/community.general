@@ -1,0 +1,37 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: test apache2_module
+  block:
+    - name: get list of enabled modules
+      shell: apache2ctl -M | sort
+      register: modules_before
+    - name: include only on supported systems
+      include_tasks: actualtest.yml
+  always:
+    - name: get list of enabled modules
+      shell: apache2ctl -M | sort
+      register: modules_after
+    - name: modules_before
+      debug:
+        var: modules_before
+    - name: modules_after
+      debug:
+        var: modules_after
+    - name: ensure that all test modules are disabled again
+      assert:
+        that: modules_before.stdout == modules_after.stdout
+  when: ansible_facts.os_family in ['Debian', 'Suse']
+  # CentOS/RHEL does not have a2enmod/a2dismod
+
+- name: include misleading warning test
+  include_tasks: 635-apache2-misleading-warning.yml
+  when: ansible_facts.os_family in ['Debian']
+  # Suse has mpm_event module compiled within the base apache2

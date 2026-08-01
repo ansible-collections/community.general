@@ -1,0 +1,58 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# NOTE This is currently disabled for performance reasons!
+
+- name: Make sure package is not installed (bpytop)
+  community.general.snap:
+    name: bpytop
+    state: absent
+
+- name: Download bpytop snap
+  ansible.builtin.command:
+    cmd: snap download bpytop
+    chdir: "{{ remote_tmp_dir }}"
+  register: bpytop_download
+
+- name: Test block
+  vars:
+    snap_file: "{{ (bpytop_download.stdout_lines[-1] | split(' '))[-1] }}"
+    snap_path: "{{ remote_tmp_dir }}/{{ snap_file }}"
+  block:
+    # Test for https://github.com/ansible-collections/community.general/issues/5715
+    - name: Install package from file (check)
+      community.general.snap:
+        name: "{{ snap_path }}"
+        dangerous: true
+        state: present
+      check_mode: true
+      register: install_dangerous_check
+
+    - name: Install package from file
+      community.general.snap:
+        name: "{{ snap_path }}"
+        dangerous: true
+        state: present
+      register: install_dangerous
+
+    - name: Install package from file (again)
+      community.general.snap:
+        name: "{{ snap_path }}"
+        dangerous: true
+        state: present
+      register: install_dangerous_idempot
+
+- name: Remove package
+  community.general.snap:
+    name: bpytop
+    state: absent
+  register: remove_dangerous
+
+- assert:
+    that:
+      - install_dangerous_check is changed
+      - install_dangerous is changed
+      - install_dangerous_idempot is not changed
+      - remove_dangerous is changed

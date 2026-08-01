@@ -1,0 +1,92 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Include Jenkins user variables
+  include_vars: "{{ role_path }}/vars/credentials.yml"
+
+- name: Make sure Jenkins is ready
+  uri:
+    url: http://localhost:8080/login
+    status_code: 200
+    return_content: false
+    timeout: 30
+  register: result
+  retries: 10
+  delay: 5
+  until: result.status == 200
+
+- name: Get Jenkins crumb and save cookie
+  shell: |
+    curl -s -c cookies.txt -u FishLegs:MeatLug http://localhost:8080/crumbIssuer/api/json > crumb.json
+  args:
+    executable: /bin/bash
+
+- name: Read crumb value
+  set_fact:
+    crumb_data: "{{ lookup('file', 'crumb.json') | from_json }}"
+
+- name: Create Jenkins folder 'test'
+  shell: |
+    curl -b cookies.txt -u {{ jenkins_username }}:{{ jenkins_password }} \
+      -H "{{ crumb_data.crumbRequestField }}: {{ crumb_data.crumb }}" \
+      -H "Content-Type: application/xml" \
+      --data-binary @- http://localhost:8080/createItem?name=test <<EOF
+    <com.cloudbees.hudson.plugins.folder.Folder plugin="cloudbees-folder@6.15">
+      <description>Test Folder</description>
+      <properties/>
+    </com.cloudbees.hudson.plugins.folder.Folder>
+    EOF
+  args:
+    executable: /bin/bash
+
+- name: Create output directory
+  ansible.builtin.file:
+    path: "{{ output_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: "{{ output_dir }}/private.key"
+    size: 2048
+    type: RSA
+
+- name: Generate CSR (certificate signing request)
+  community.crypto.openssl_csr:
+    path: "{{ output_dir }}/request.csr"
+    privatekey_path: "{{ output_dir }}/private.key"
+    common_name: "dummy.local"
+
+- name: Generate self-signed certificate
+  community.crypto.x509_certificate:
+    path: "{{ output_dir }}/cert.pem"
+    privatekey_path: "{{ output_dir }}/private.key"
+    csr_path: "{{ output_dir }}/request.csr"
+    provider: selfsigned
+
+- name: Create PKCS#12 (.p12) file
+  community.crypto.openssl_pkcs12:
+    path: "{{ output_dir }}/certificate.p12"
+    privatekey_path: "{{ output_dir }}/private.key"
+    certificate_path: "{{ output_dir }}/cert.pem"
+    friendly_name: "dummy-cert"
+    passphrase: "12345678901234"
+
+- name: Copy cert.pem to github.pem
+  ansible.builtin.copy:
+    src: "{{ output_dir }}/cert.pem"
+    dest: "{{ output_dir }}/github.pem"
+    remote_src: true
+
+- name: Copy private.key to my-secret.pem
+  ansible.builtin.copy:
+    src: "{{ output_dir }}/private.key"
+    dest: "{{ output_dir }}/my-secret.pem"
+    remote_src: true
+
+- name: Generate dummy SSH key
+  community.crypto.openssh_keypair:
+    path: "{{ output_dir }}/ssh_key"
+    type: rsa
+    size: 2048

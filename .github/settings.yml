@@ -1,0 +1,11 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# DO NOT MODIFY
+
+# Settings: https://probot.github.io/apps/settings/
+# Pull settings from https://github.com/ansible-collections/.github/blob/master/.github/settings.yml
+
+_extends: ".github"

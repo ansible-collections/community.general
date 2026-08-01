@@ -1,0 +1,168 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Remove keycloak client to avoid failures from previous failed runs
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: absent
+
+- name: Create keycloak client with authorization services enabled
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    enabled: true
+    public_client: false
+    service_accounts_enabled: true
+    authorization_services_enabled: true
+
+- name: Create first custom policy (check_mode)
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: FirstCustomPolicy
+    state: present
+    policy_type: script-policy-1.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  check_mode: true
+  register: result
+
+- name: Assert that first custom policy was not created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "FirstCustomPolicy"
+      - result.end_state.type == "script-policy-1.js"
+      - result.msg == 'Would create custom policy FirstCustomPolicy'
+
+- name: Create first custom policy
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: FirstCustomPolicy
+    state: present
+    policy_type: script-policy-1.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  register: result
+
+- name: Assert that first custom policy was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "FirstCustomPolicy"
+      - result.end_state.type == "script-policy-1.js"
+      - result.msg == 'Custom policy FirstCustomPolicy created'
+
+- name: Attempt to update first custom policy (not possible)
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: FirstCustomPolicy
+    state: present
+    policy_type: script-policy-2.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  register: result
+
+- name: Assert that first custom policy was not modified
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "FirstCustomPolicy"
+      - result.end_state.type == "script-policy-2.js"
+      - result.msg == 'Custom policy FirstCustomPolicy already exists'
+
+# Ensure that we can create multiple instances of the custom policy
+- name: Create second instance of the custom policy
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: SecondCustomPolicy
+    state: present
+    policy_type: script-policy-1.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  register: result
+
+- name: Assert that second instance of the custom policy was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "SecondCustomPolicy"
+      - result.end_state.type == "script-policy-1.js"
+      - result.msg == 'Custom policy SecondCustomPolicy created'
+
+- name: Remove second instance of the custom policy (check_mode)
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: SecondCustomPolicy
+    state: absent
+    policy_type: script-policy-1.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  check_mode: true
+  register: result
+
+- name: Assert that second custom policy was not removed
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == 'Would remove custom policy SecondCustomPolicy'
+
+- name: Remove second instance of the custom policy
+  community.general.keycloak_authz_custom_policy:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    name: SecondCustomPolicy
+    state: absent
+    policy_type: script-policy-1.js
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+  register: result
+
+- name: Assert that second custom policy was removed
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == 'Custom policy SecondCustomPolicy removed'
+
+- name: Remove keycloak client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: absent

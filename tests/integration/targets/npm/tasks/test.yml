@@ -1,0 +1,65 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: 'Remove any node modules'
+  file:
+    path: '{{ remote_dir }}/node_modules'
+    state: absent
+
+- vars:
+    # sample: node-v8.2.0-linux-x64.tar.xz
+    node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
+    package: 'iconv-lite'
+  environment:
+    PATH: '{{ node_path }}:{{ ansible_facts.env.PATH }}'
+  block:
+    - shell: npm --version
+      register: npm_version
+
+    - debug:
+        var: npm_version.stdout
+
+    - name: 'Install simple package without dependency'
+      npm:
+        path: '{{ remote_dir }}'
+        state: present
+        name: '{{ package }}'
+      register: npm_install
+
+    - assert:
+        that:
+          - npm_install is success
+          - npm_install is changed
+
+    - name: 'Reinstall simple package without dependency'
+      npm:
+        path: '{{ remote_dir }}'
+        state: present
+        name: '{{ package }}'
+      register: npm_reinstall
+
+    - name: Check there is no change
+      assert:
+        that:
+          - npm_reinstall is success
+          - not (npm_reinstall is changed)
+
+    - name: 'Manually delete package'
+      file:
+        path: '{{ remote_dir }}/node_modules/{{ package }}'
+        state: absent
+
+    - name: 'reinstall simple package'
+      npm:
+        path: '{{ remote_dir }}'
+        state: present
+        name: '{{ package }}'
+      register: npm_fix_install
+
+    - name: Check result is changed and successful
+      assert:
+        that:
+          - npm_fix_install is success
+          - npm_fix_install is changed

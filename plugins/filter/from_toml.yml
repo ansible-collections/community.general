@@ -1,0 +1,37 @@
+---
+# Copyright (c) Contributors to the Ansible project
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: from_toml
+  author:
+    - Christian Schürmann (@spike77453)
+  version_added: 13.1.0
+  short_description: Convert TOML string into dictionary
+  description:
+    - Converts a string containing a TOML document into an Ansible variable
+  positional: _input
+  options:
+    _input:
+      description:
+        - A string that contains a TOML document.
+      type: str
+      required: true
+
+EXAMPLES: |
+  - name: Slurp TOML file
+    ansible.builtin.slurp:
+      src: config.toml
+    register: config
+
+  - name: Convert data into dictionary
+    ansible.builtin.set_fact:
+      my_config: "{{ config['content'] | b64decode | community.general.from_toml }}"
+
+
+RETURN:
+  _value:
+    description:
+      - Dictionary representing the data from the TOML string.
+    type: dict

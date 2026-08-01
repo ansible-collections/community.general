@@ -1,0 +1,96 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Tests for https://github.com/ansible-collections/community.general/issues/8730
+
+# --- create_if_missing=false: predicate no-match must be a silent no-op ---
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-items.xml
+    dest: /tmp/ansible-xml-items.xml
+
+- name: Update items via predicate (create_if_missing=false, first run - matches)
+  xml:
+    path: /tmp/ansible-xml-items.xml
+    xpath: /business/items/item[text()='value_a']
+    value: value_c
+    create_if_missing: false
+  register: set_predicate_first_run
+
+- name: Update items via predicate (create_if_missing=false, second run - predicate no longer matches)
+  xml:
+    path: /tmp/ansible-xml-items.xml
+    xpath: /business/items/item[text()='value_a']
+    value: value_c
+    create_if_missing: false
+  register: set_predicate_second_run
+
+- name: Add trailing newline
+  shell: echo "" >> /tmp/ansible-xml-items.xml
+
+- name: Compare to expected result
+  copy:
+    src: results/test-set-element-value-predicate.xml
+    dest: /tmp/ansible-xml-items.xml
+  check_mode: true
+  diff: true
+  register: comparison
+
+- name: Assert create_if_missing=false with predicate no-match is a no-op
+  assert:
+    that:
+      - set_predicate_first_run is changed
+      - set_predicate_second_run is not changed
+      - comparison is not changed  # no spurious elements created
+
+# --- create_if_missing=false: non-existent simple path must also be a no-op ---
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-items.xml
+    dest: /tmp/ansible-xml-items.xml
+
+- name: Set value on non-existent element (create_if_missing=false)
+  xml:
+    path: /tmp/ansible-xml-items.xml
+    xpath: /business/items/nonexistent
+    value: something
+    create_if_missing: false
+  register: set_nonexistent
+
+- name: Assert create_if_missing=false with missing simple path is a no-op
+  assert:
+    that:
+      - set_nonexistent is not changed
+
+# --- create_if_missing=true (default): no-match must create the node ---
+
+- name: Setup test fixture
+  copy:
+    src: fixtures/ansible-xml-items.xml
+    dest: /tmp/ansible-xml-items.xml
+
+- name: Set value on non-existent element (create_if_missing=true, should create)
+  xml:
+    path: /tmp/ansible-xml-items.xml
+    xpath: /business/items/item[text()='value_z']
+    value: value_z
+    create_if_missing: true
+  register: set_predicate_create
+
+- name: Set same value again (create_if_missing=true, should be idempotent)
+  xml:
+    path: /tmp/ansible-xml-items.xml
+    xpath: /business/items/item[text()='value_z']
+    value: value_z
+    create_if_missing: true
+  register: set_predicate_create_again
+
+- name: Assert create_if_missing=true creates the node and is then idempotent
+  assert:
+    that:
+      - set_predicate_create is changed
+      - set_predicate_create_again is not changed

@@ -1,0 +1,124 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+- name: Execute shutdown with custom message and delay
+  community.general.shutdown:
+    delay: 100
+    msg: "Custom Message"
+  register: shutdown_result
+  check_mode: true
+
+- name: Execute shutdown with minus delay
+  community.general.shutdown:
+    delay: -100
+  register: shutdown_result_minus
+  check_mode: true
+
+- name: Verify Custom Message except Alpine, AIX
+  assert:
+    that:
+      - '"Custom Message" in shutdown_result["shutdown_command"]'
+      - '"Shut down initiated by Ansible" in shutdown_result_minus["shutdown_command"]'
+      - '"Custom Message" not in shutdown_result_minus["shutdown_command"]'
+  when:
+    - 'ansible_facts.os_family not in ["Alpine", "AIX"]'
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
+    - '"systemctl" not in shutdown_result_minus["shutdown_command"]'
+
+- name: Verify shutdown command is present except Alpine or AIX or systemd
+  assert:
+    that: '"shutdown" in shutdown_result["shutdown_command"]'
+  when:
+    - "ansible_facts.os_family != 'Alpine'"
+    - "ansible_facts.system != 'VMKernel'"
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
+
+- name: Verify shutdown command is present in Alpine except systemd
+  assert:
+    that: '"poweroff" in shutdown_result["shutdown_command"]'
+  when:
+    - "ansible_facts.os_family == 'Alpine'"
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
+
+
+- name: Verify shutdown command is present in VMKernel except systemd
+  assert:
+    that: '"halt" in shutdown_result["shutdown_command"]'
+  when:
+    - "ansible_facts.system == 'VMKernel'"
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
+
+- name: Verify shutdown delay is present in minutes in Linux except systemd
+  assert:
+    that:
+      - '"-h 1" in shutdown_result["shutdown_command"]'
+      - '"-h 0" in shutdown_result_minus["shutdown_command"]'
+  when:
+    - "ansible_facts.system == 'Linux'"
+    - "ansible_facts.os_family != 'Alpine'"
+    - '"systemctl" not in shutdown_result["shutdown_command"]'
+    - '"systemctl" not in shutdown_result_minus["shutdown_command"]'
+
+- name: Verify shutdown delay is present in minutes in Void, MacOSX, OpenBSD
+  assert:
+    that:
+      - '"-h +1" in shutdown_result["shutdown_command"]'
+      - '"-h +0" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_facts.system in ['Void', 'Darwin', 'OpenBSD']
+
+- name: Verify shutdown delay is present in seconds in FreeBSD
+  assert:
+    that:
+      - '"-p +100s" in shutdown_result["shutdown_command"]'
+      - '"-p +0s" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_facts.system == 'FreeBSD'
+
+- name: Verify shutdown delay is present in seconds in Solaris, SunOS
+  assert:
+    that:
+      - '"-g 100" in shutdown_result["shutdown_command"]'
+      - '"-g 0" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_facts.system in ['Solaris', 'SunOS']
+
+- name: Verify shutdown delay is present in seconds, VMKernel
+  assert:
+    that:
+      - '"-d 100" in shutdown_result["shutdown_command"]'
+      - '"-d 0" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_facts.system == 'VMKernel'
+
+- name: Ensure that systemd-sysv is absent in Ubuntu and Debian
+  apt:
+    name: sytemd-sysv
+    state: absent
+  when: ansible_facts.distribution in ['Ubuntu', 'Debian']
+  register: systemd_sysv_install
+
+- name: Gather package facts
+  package_facts:
+    manager: apt
+  when: ansible_facts.distribution in ['Ubuntu', 'Debian']
+
+- name: Execute shutdown if no systemd-sysv
+  community.general.shutdown:
+  register: shutdown_result
+  check_mode: true
+  when:
+    - "ansible_facts.distribution in ['Ubuntu', 'Debian']"
+    - '"systemd-sysv" not in ansible_facts.packages'
+
+- name: Install systemd_sysv in case it has been removed in test
+  apt:
+    name: systemd-sysv
+    state: present
+  when:
+    - "ansible_facts.distribution in ['Ubuntu', 'Debian']"
+    - "systemd_sysv_install is changed"

@@ -1,0 +1,33 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# dnf -y install dnf-plugins-core
+# dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+# sudo dnf -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+- name: Install dnf-plugins-core
+  become: true
+  package:
+    name: dnf-plugins-core
+    state: present
+  notify: "D-Fedora : Remove dnf-plugins-core"
+
+- name: Add docker repo
+  become: true
+  ansible.builtin.command:
+    cmd: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+  notify: "D-Fedora : Remove repository"
+
+- name: Install docker
+  become: true
+  package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ docker_packages }}"
+  notify: Remove Docker packages
+
+- name: Inform that docker is installed
+  set_fact:
+    has_docker: true

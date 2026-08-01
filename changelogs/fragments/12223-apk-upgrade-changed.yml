@@ -1,0 +1,2 @@
+bugfixes:
+  - apk - the ``upgrade`` operation no longer reports ``changed=true`` when nothing was upgraded but an apk commit hook (for example ``mrtest``, or anything installed in ``/etc/apk/commit_hooks.d/``) printed output before the trailing ``OK:`` summary line; the change status is now derived from the packages apk actually reports upgrading (https://github.com/ansible-collections/community.general/issues/12223, https://github.com/ansible-collections/community.general/pull/12376).

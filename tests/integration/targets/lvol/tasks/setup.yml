@@ -1,0 +1,57 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Create files to use as a disk devices"
+  command: "dd if=/dev/zero of={{ remote_tmp_dir }}/img{{ item }} bs=1M count=36"
+  with_sequence: 'count=4'
+
+- name: "Show next free loop device"
+  command: "losetup -f"
+  register: loop_device1
+
+- name: "Create loop device for file"
+  command: "losetup -f {{ remote_tmp_dir }}/img1"
+
+- name: "Show next free loop device"
+  command: "losetup -f"
+  register: loop_device2
+
+- name: "Create loop device for file"
+  command: "losetup -f {{ remote_tmp_dir }}/img2"
+
+- name: "Show next free loop device"
+  command: "losetup -f"
+  register: loop_device3
+
+- name: "Create loop device for file"
+  command: "losetup -f {{ remote_tmp_dir }}/img3"
+
+- name: "Show next free loop device"
+  command: "losetup -f"
+  register: loop_device4
+
+- name: "Create loop device for file"
+  command: "losetup -f {{ remote_tmp_dir }}/img4"
+
+- name: "Set loop device names"
+  set_fact:
+    loop_device1: "{{ loop_device1.stdout }}"
+    loop_device2: "{{ loop_device2.stdout }}"
+    loop_device3: "{{ loop_device3.stdout }}"
+    loop_device4: "{{ loop_device4.stdout }}"
+
+- name: Create testvg1 volume group on disk devices
+  lvg:
+    vg: testvg1
+    pvs:
+      - "{{ loop_device1 }}"
+      - "{{ loop_device2 }}"
+
+- name: Create testvg2 volume group on disk devices
+  lvg:
+    vg: testvg2
+    pvs:
+      - "{{ loop_device3 }}"
+      - "{{ loop_device4 }}"

@@ -1,0 +1,353 @@
+#!/usr/bin/python
+
+# Copyright (c) 2020, Christian Wollinger <cwollinger@web.de>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: ipwcli_dns
+
+short_description: Manage DNS Records for Ericsson IPWorks using C(ipwcli)
+
+version_added: '0.2.0'
+
+description:
+  - Manage DNS records for the Ericsson IPWorks DNS server. The module uses the C(ipwcli) to deploy the DNS records.
+requirements:
+  - ipwcli (installed on Ericsson IPWorks)
+
+notes:
+  - To make the DNS record changes effective, you need to run C(update dnsserver) on the ipwcli.
+extends_documentation_fragment:
+  - community.general._attributes
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+
+options:
+  dnsname:
+    description:
+      - Name of the record.
+    required: true
+    type: str
+  type:
+    description:
+      - Type of the record.
+    required: true
+    type: str
+    choices: [NAPTR, SRV, A, AAAA]
+  container:
+    description:
+      - Sets the container zone for the record.
+    required: true
+    type: str
+  address:
+    description:
+      - The IP address for the A or AAAA record.
+      - Required for O(type=A) or O(type=AAAA).
+    type: str
+  ttl:
+    description:
+      - Sets the TTL of the record.
+    type: int
+    default: 3600
+  state:
+    description:
+      - Whether the record should exist or not.
+    type: str
+    choices: [absent, present]
+    default: present
+  priority:
+    description:
+      - Sets the priority of the SRV record.
+    type: int
+    default: 10
+  weight:
+    description:
+      - Sets the weight of the SRV record.
+    type: int
+    default: 10
+  port:
+    description:
+      - Sets the port of the SRV record.
+      - Required for O(type=SRV).
+    type: int
+  target:
+    description:
+      - Sets the target of the SRV record.
+      - Required for O(type=SRV).
+    type: str
+  order:
+    description:
+      - Sets the order of the NAPTR record.
+      - Required for O(type=NAPTR).
+    type: int
+  preference:
+    description:
+      - Sets the preference of the NAPTR record.
+      - Required for O(type=NAPTR).
+    type: int
+  flags:
+    description:
+      - Sets one of the possible flags of NAPTR record.
+      - Required for O(type=NAPTR).
+    type: str
+    choices: ['S', 'A', 'U', 'P']
+  service:
+    description:
+      - Sets the service of the NAPTR record.
+      - Required for O(type=NAPTR).
+    type: str
+  replacement:
+    description:
+      - Sets the replacement of the NAPTR record.
+      - Required for O(type=NAPTR).
+    type: str
+  username:
+    description:
+      - Username to login on ipwcli.
+    type: str
+    required: true
+  password:
+    description:
+      - Password to login on ipwcli.
+    type: str
+    required: true
+
+author:
+  - Christian Wollinger (@cwollinger)
+"""
+
+EXAMPLES = r"""
+- name: Create A record
+  community.general.ipwcli_dns:
+    dnsname: example.com
+    type: A
+    container: ZoneOne
+    address: 127.0.0.1
+
+- name: Remove SRV record if exists
+  community.general.ipwcli_dns:
+    dnsname: _sip._tcp.test.example.com
+    type: SRV
+    container: ZoneOne
+    ttl: 100
+    state: absent
+    target: example.com
+    port: 5060
+
+- name: Create NAPTR record
+  community.general.ipwcli_dns:
+    dnsname: test.example.com
+    type: NAPTR
+    preference: 10
+    container: ZoneOne
+    ttl: 100
+    order: 10
+    service: 'SIP+D2T'
+    replacement: '_sip._tcp.test.example.com.'
+    flags: S
+"""
+
+RETURN = r"""
+record:
+  description: The created record from the input params.
+  type: str
+  returned: always
+"""
+
+from ansible.module_utils.basic import AnsibleModule
+
+
+class ResourceRecord:
+    def __init__(self, module):
+        self.module = module
+        self.dnsname = module.params["dnsname"]
+        self.dnstype = module.params["type"]
+        self.container = module.params["container"]
+        self.address = module.params["address"]
+        self.ttl = module.params["ttl"]
+        self.state = module.params["state"]
+        self.priority = module.params["priority"]
+        self.weight = module.params["weight"]
+        self.port = module.params["port"]
+        self.target = module.params["target"]
+        self.order = module.params["order"]
+        self.preference = module.params["preference"]
+        self.flags = module.params["flags"]
+        self.service = module.params["service"]
+        self.replacement = module.params["replacement"]
+        self.user = module.params["username"]
+        self.password = module.params["password"]
+
+    def create_naptrrecord(self):
+        # create NAPTR record with the given params
+        record = (
+            f"naptrrecord {self.dnsname} -set ttl={self.ttl};container={self.container};order={self.order};"
+            f'preference={self.preference};flags="{self.flags}";service="{self.service}";replacement="{self.replacement}"'
+        )
+        return record
+
+    def create_srvrecord(self):
+        # create SRV record with the given params
+        record = (
+            f"srvrecord {self.dnsname} -set ttl={self.ttl};container={self.container};priority={self.priority};"
+            f"weight={self.weight};port={self.port};target={self.target}"
+        )
+        return record
+
+    def create_arecord(self):
+        # create A record with the given params
+        if self.dnstype == "AAAA":
+            record = f"aaaarecord {self.dnsname} {self.address} -set ttl={self.ttl};container={self.container}"
+        else:
+            record = f"arecord {self.dnsname} {self.address} -set ttl={self.ttl};container={self.container}"
+
+        return record
+
+    def list_record(self, record):
+        # check if the record exists via list on ipwcli
+        search = f"list {record.replace(';', '&&').replace('set', 'where')}"
+        cmd = [
+            self.module.get_bin_path("ipwcli", True),
+            f"-user={self.user}",
+            f"-password={self.password}",
+        ]
+        rc, out, err = self.module.run_command(cmd, data=search)
+
+        if "Invalid username or password" in out:
+            self.module.fail_json(msg="access denied at ipwcli login: Invalid username or password")
+
+        if (
+            (f"ARecord {self.dnsname}" in out and rc == 0)
+            or (f"SRVRecord {self.dnsname}" in out and rc == 0)
+            or (f"NAPTRRecord {self.dnsname}" in out and rc == 0)
+        ):
+            return True, rc, out, err
+
+        return False, rc, out, err
+
+    def deploy_record(self, record):
+        # check what happens if create fails on ipworks
+        stdin = f"create {record}"
+        cmd = [
+            self.module.get_bin_path("ipwcli", True),
+            f"-user={self.user}",
+            f"-password={self.password}",
+        ]
+        rc, out, err = self.module.run_command(cmd, data=stdin)
+
+        if "Invalid username or password" in out:
+            self.module.fail_json(msg="access denied at ipwcli login: Invalid username or password")
+
+        if "1 object(s) created." in out:
+            return rc, out, err
+        else:
+            self.module.fail_json(msg="record creation failed", stderr=out)
+
+    def delete_record(self, record):
+        # check what happens if create fails on ipworks
+        stdin = f"delete {record.replace(';', '&&').replace('set', 'where')}"
+        cmd = [
+            self.module.get_bin_path("ipwcli", True),
+            f"-user={self.user}",
+            f"-password={self.password}",
+        ]
+        rc, out, err = self.module.run_command(cmd, data=stdin)
+
+        if "Invalid username or password" in out:
+            self.module.fail_json(msg="access denied at ipwcli login: Invalid username or password")
+
+        if "1 object(s) were updated." in out:
+            return rc, out, err
+        else:
+            self.module.fail_json(msg="record deletion failed", stderr=out)
+
+
+def run_module():
+    # define available arguments/parameters a user can pass to the module
+    module_args = dict(
+        dnsname=dict(type="str", required=True),
+        type=dict(type="str", required=True, choices=["A", "AAAA", "SRV", "NAPTR"]),
+        container=dict(type="str", required=True),
+        address=dict(type="str"),
+        ttl=dict(type="int", default=3600),
+        state=dict(type="str", default="present", choices=["absent", "present"]),
+        priority=dict(type="int", default=10),
+        weight=dict(type="int", default=10),
+        port=dict(type="int"),
+        target=dict(type="str"),
+        order=dict(type="int"),
+        preference=dict(type="int"),
+        flags=dict(type="str", choices=["S", "A", "U", "P"]),
+        service=dict(type="str"),
+        replacement=dict(type="str"),
+        username=dict(type="str", required=True),
+        password=dict(type="str", required=True, no_log=True),
+    )
+
+    # define result
+    result = dict(changed=False, stdout="", stderr="", rc=0, record="")
+
+    # supports check mode
+    module = AnsibleModule(
+        argument_spec=module_args,
+        required_if=[
+            ["type", "A", ["address"]],
+            ["type", "AAAA", ["address"]],
+            ["type", "SRV", ["port", "target"]],
+            ["type", "NAPTR", ["preference", "order", "service", "replacement"]],
+        ],
+        supports_check_mode=True,
+    )
+
+    user = ResourceRecord(module)
+
+    if user.dnstype == "NAPTR":
+        record = user.create_naptrrecord()
+    elif user.dnstype == "SRV":
+        record = user.create_srvrecord()
+    elif user.dnstype == "A" or user.dnstype == "AAAA":
+        record = user.create_arecord()
+
+    found, rc, out, err = user.list_record(record)
+
+    if found and user.state == "absent":
+        if module.check_mode:
+            module.exit_json(changed=True)
+        rc, out, err = user.delete_record(record)
+        result["changed"] = True
+        result["record"] = record
+        result["rc"] = rc
+        result["stdout"] = out
+        result["stderr"] = err
+    elif not found and user.state == "present":
+        if module.check_mode:
+            module.exit_json(changed=True)
+        rc, out, err = user.deploy_record(record)
+        result["changed"] = True
+        result["record"] = record
+        result["rc"] = rc
+        result["stdout"] = out
+        result["stderr"] = err
+    else:
+        result["changed"] = False
+        result["record"] = record
+        result["rc"] = rc
+        result["stdout"] = out
+        result["stderr"] = err
+
+    module.exit_json(**result)
+
+
+def main():
+    run_module()
+
+
+if __name__ == "__main__":
+    main()

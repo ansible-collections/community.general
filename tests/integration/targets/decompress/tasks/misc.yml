@@ -1,0 +1,74 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Decompress with check mode enabled
+  decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
+    format: gz
+  check_mode: true
+  register: decompressed_check_mode
+
+- name: Decompress second time with check mode enabled
+  decompress:
+    src: "{{ remote_tmp_dir }}/file.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_from_gz.txt"
+    format: gz
+    remove: true
+  check_mode: true
+  register: decompressed_check_mode_2
+
+- name: Stat original compressed file
+  stat:
+    path: "{{ remote_tmp_dir }}/file.txt.gz"
+  register: original_file
+
+- name: Stat non-existing file
+  stat:
+    path: "{{ remote_tmp_dir }}/file_from_gz.txt"
+  register: nonexisting_stat
+
+- name: Check mode test
+  assert:
+    that:
+      - decompressed_check_mode.changed
+      - decompressed_check_mode_2.changed
+      - original_file.stat.exists
+      - not nonexisting_stat.stat.exists
+
+- name: Copy compressed file
+  copy:
+    src: "{{ remote_tmp_dir }}/file.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_copied.txt.gz"
+    remote_src: true
+
+- name: Decompress, deleting original file
+  decompress:
+    src: "{{ remote_tmp_dir }}/file_copied.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_copied.txt"
+    remove: true
+
+- name: Decompress non existing src
+  decompress:
+    src: "{{ remote_tmp_dir }}/file_copied.txt.gz"
+    dest: "{{ remote_tmp_dir }}/file_copied.txt"
+    remove: true
+  register: decompress_non_existing_src
+
+- name: Stat compressed file
+  stat:
+    path: "{{ remote_tmp_dir }}/file_copied.txt.gz"
+  register: compressed_stat
+
+- name: Run tests
+  assert:
+    that:
+      - not compressed_stat.stat.exists
+      - not decompress_non_existing_src.changed
+
+- name: Delete decompressed file
+  file:
+    path: "{{ remote_tmp_dir }}/file_copied.txt"
+    state: absent

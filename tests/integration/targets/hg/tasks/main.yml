@@ -1,0 +1,27 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# test code for the hg module
+# Copyright (c) 2014, James Tanner <tanner.jc@gmail.com>
+#
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: determine if mercurial is already installed
+  command: which hg
+  register: has_hg
+  ignore_errors: true
+
+- block:
+    - name: install mercurial
+      include_tasks: install.yml
+      when: has_hg is failed
+
+    - name: test mercurial
+      include_tasks: run-tests.yml
+
+    - name: uninstall mercurial
+      include_tasks: uninstall.yml
+      when: has_hg is failed

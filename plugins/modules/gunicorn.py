@@ -1,0 +1,225 @@
+#!/usr/bin/python
+
+# Copyright (c) 2017, Alejandro Gomez <alexgomez2202@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: gunicorn
+short_description: Run gunicorn with various settings
+description:
+  - Starts gunicorn with the parameters specified. Common settings for gunicorn configuration are supported. For additional
+    configuration use a config file See U(https://gunicorn-docs.readthedocs.io/en/latest/settings.html) for more options.
+    It's recommended to always use the chdir option to avoid problems with the location of the app.
+requirements: [gunicorn]
+author:
+  - "Alejandro Gomez (@agmezr)"
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+options:
+  app:
+    type: str
+    required: true
+    aliases: ['name']
+    description:
+      - The app module. A name refers to a WSGI callable that should be found in the specified module.
+  venv:
+    type: path
+    aliases: ['virtualenv']
+    description:
+      - Path to the virtualenv directory.
+  config:
+    type: path
+    description:
+      - Path to the gunicorn configuration file.
+    aliases: ['conf']
+  chdir:
+    type: path
+    description:
+      - Chdir to specified directory before apps loading.
+  pid:
+    type: path
+    description:
+      - A filename to use for the PID file. If not set and not found on the configuration file a tmp pid file is created to
+        check a successful run of gunicorn.
+  worker:
+    type: str
+    choices: ['sync', 'eventlet', 'gevent', 'tornado ', 'gthread', 'gaiohttp']
+    description:
+      - The type of workers to use. The default class (sync) should handle most "normal" types of workloads.
+  user:
+    type: str
+    description:
+      - Switch worker processes to run as this user.
+notes:
+  - If not specified on config file, a temporary error log is created on C(/tmp) directory. Please make sure you have write
+    access in C(/tmp) directory. Not needed but it is helpful to identify any problem with configuration.
+"""
+
+EXAMPLES = r"""
+- name: Simple gunicorn run example
+  community.general.gunicorn:
+    app: 'wsgi'
+    chdir: '/workspace/example'
+
+- name: Run gunicorn on a virtualenv
+  community.general.gunicorn:
+    app: 'wsgi'
+    chdir: '/workspace/example'
+    venv: '/workspace/example/venv'
+
+- name: Run gunicorn with a config file
+  community.general.gunicorn:
+    app: 'wsgi'
+    chdir: '/workspace/example'
+    conf: '/workspace/example/gunicorn.cfg'
+
+- name: Run gunicorn as ansible user with specified pid and config file
+  community.general.gunicorn:
+    app: 'wsgi'
+    chdir: '/workspace/example'
+    conf: '/workspace/example/gunicorn.cfg'
+    venv: '/workspace/example/venv'
+    pid: '/workspace/example/gunicorn.pid'
+    user: 'ansible'
+"""
+
+RETURN = r"""
+gunicorn:
+  description: Process ID of gunicorn.
+  returned: changed
+  type: str
+  sample: "1234"
+"""
+
+import os
+import time
+
+from ansible.module_utils.basic import AnsibleModule
+
+
+def search_existing_config(config, option):
+    """search in config file for specified option"""
+    if config and os.path.isfile(config):
+        with open(config) as f:
+            for line in f:
+                if option in line:
+                    return line
+    return None
+
+
+def remove_tmp_file(file_path):
+    """remove temporary files"""
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+
+
+def main():
+    # available gunicorn options on module
+    gunicorn_options = {
+        "config": "-c",
+        "chdir": "--chdir",
+        "worker": "-k",
+        "user": "-u",
+    }
+
+    module = AnsibleModule(
+        argument_spec=dict(
+            app=dict(required=True, type="str", aliases=["name"]),
+            venv=dict(type="path", aliases=["virtualenv"]),
+            config=dict(type="path", aliases=["conf"]),
+            chdir=dict(type="path"),
+            pid=dict(type="path"),
+            user=dict(type="str"),
+            worker=dict(type="str", choices=["sync", "eventlet", "gevent", "tornado ", "gthread", "gaiohttp"]),
+        )
+    )
+
+    # temporary files in case no option provided
+    tmp_error_log = os.path.join(module.tmpdir, "gunicorn.temp.error.log")
+    tmp_pid_file = os.path.join(module.tmpdir, "gunicorn.temp.pid")
+
+    # remove temp file if exists
+    remove_tmp_file(tmp_pid_file)
+    remove_tmp_file(tmp_error_log)
+
+    # obtain app name and venv
+    params = module.params
+    app = params["app"]
+    venv = params["venv"]
+    pid = params["pid"]
+
+    # use venv path if exists
+    if venv:
+        gunicorn_command = f"{venv}/bin/gunicorn"
+    else:
+        gunicorn_command = module.get_bin_path("gunicorn")
+
+    # to daemonize the process
+    options = ["-D"]
+
+    # fill options
+    for option in gunicorn_options:
+        param = params[option]
+        if param:
+            options.append(gunicorn_options[option])
+            options.append(param)
+
+    error_log = search_existing_config(params["config"], "errorlog")
+    if not error_log:
+        # place error log somewhere in case of fail
+        options.append("--error-logfile")
+        options.append(tmp_error_log)
+
+    pid_file = search_existing_config(params["config"], "pid")
+    if not params["pid"] and not pid_file:
+        pid = tmp_pid_file
+
+    # add option for pid file if not found on config file
+    if not pid_file:
+        options.append("--pid")
+        options.append(pid)
+
+    # put args together
+    args = [gunicorn_command] + options + [app]
+    rc, out, err = module.run_command(args, use_unsafe_shell=False, encoding=None)
+
+    if not err:
+        # wait for gunicorn to dump to log
+        time.sleep(0.5)
+        if os.path.isfile(pid):
+            with open(pid) as f:
+                result = f.readline().strip()
+
+            if not params["pid"]:
+                os.remove(pid)
+
+            module.exit_json(changed=True, pid=result, debug=" ".join(args))
+        else:
+            # if user defined own error log, check that
+            if error_log:
+                error = f"Please check your {error_log.strip()}"
+            else:
+                if os.path.isfile(tmp_error_log):
+                    with open(tmp_error_log) as f:
+                        error = f.read()
+                    # delete tmp log
+                    os.remove(tmp_error_log)
+                else:
+                    error = "Log not found"
+
+            module.fail_json(msg=f"Failed to start gunicorn. {error}", error=err)
+
+    else:
+        module.fail_json(msg=f"Failed to start gunicorn {err}", error=err)
+
+
+if __name__ == "__main__":
+    main()

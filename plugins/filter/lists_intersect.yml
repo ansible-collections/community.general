@@ -1,0 +1,48 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: lists_intersect
+  short_description: Intersection of lists with a predictive order
+  version_added: 8.4.0
+  description:
+    - Provide a unique list of all the common elements of two or more lists.
+    - The order of the items in the resulting list is preserved.
+  options:
+    _input:
+      description: A list.
+      type: list
+      elements: any
+      required: true
+    flatten:
+      description: Whether to remove one hierarchy level from the input list.
+      type: boolean
+      default: false
+  author:
+    - Christoph Fiehe (@cfiehe)
+
+EXAMPLES: |
+  - name: Return the intersection of list1 and list2.
+    ansible.builtin.debug:
+      msg: "{{ list1 | community.general.lists_intersect(list2) }}"
+    vars:
+      list1: [1, 2, 5, 3, 4, 10]
+      list2: [1, 2, 3, 4, 5, 11, 99]
+  # => [1, 2, 5, 3, 4]
+
+  - name: Return the intersection of list1, list2 and list3.
+    ansible.builtin.debug:
+      msg: "{{ [list1, list2, list3] | community.general.lists_intersect(flatten=true) }}"
+    vars:
+      list1: [1, 2, 5, 3, 4, 10]
+      list2: [1, 2, 3, 4, 5, 11, 99]
+      list3: [1, 2, 3, 4, 5, 10, 99, 101]
+  # => [1, 2, 5, 3, 4]
+
+RETURN:
+  _value:
+    description: A unique list of all the common elements from the provided lists.
+    type: list
+    elements: any

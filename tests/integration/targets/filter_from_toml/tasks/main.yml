@@ -1,0 +1,12 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Convert TOML string to dictionary
+  set_fact:
+    actual_dict: "{{ toml_document | community.general.from_toml }}"
+
+- assert:
+    that:
+      - expected_dict == actual_dict

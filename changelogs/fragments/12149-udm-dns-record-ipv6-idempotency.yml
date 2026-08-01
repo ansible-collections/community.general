@@ -1,0 +1,2 @@
+bugfixes:
+  - "udm_dns_record - normalize IPv6 addresses in ``data`` to expanded form to fix idempotency (https://github.com/ansible-collections/community.general/issues/317, https://github.com/ansible-collections/community.general/pull/12149)."

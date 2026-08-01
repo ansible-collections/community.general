@@ -1,0 +1,1006 @@
+#!/usr/bin/python
+
+# Copyright (c) 2014, Steve Smith <ssmith@atlassian.com>
+# Atlassian open-source approval reference OSR-76.
+#
+# Copyright (c) 2020, Per Abildgaard Toft <per@minfejl.dk> Search and update function
+# Copyright (c) 2021, Brandon McNama <brandonmcnama@outlook.com> Issue attachment functionality
+# Copyright (c) 2022, Hugo Prudente <hugo.kenshin+oss@gmail.com> Worklog functionality
+#
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: jira
+short_description: Create and modify issues in a JIRA instance
+description:
+  - Create and modify issues in a JIRA instance.
+extends_documentation_fragment:
+  - community.general._attributes
+
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
+
+options:
+  uri:
+    type: str
+    required: true
+    description:
+      - Base URI for the JIRA instance.
+  operation:
+    type: str
+    required: true
+    aliases: [command]
+    choices: [attach, comment, create, edit, fetch, link, search, transition, update, worklog]
+    description:
+      - The operation to perform.
+      - V(worklog) was added in community.general 6.5.0.
+  username:
+    type: str
+    description:
+      - The username to log-in with.
+      - Must be used with O(password). Mutually exclusive with O(token).
+  password:
+    type: str
+    description:
+      - The password to log-in with.
+      - Must be used with O(username). Mutually exclusive with O(token).
+  token:
+    type: str
+    description:
+      - The personal access token to log-in with.
+      - Mutually exclusive with O(username) and O(password).
+    version_added: 4.2.0
+  client_cert:
+    type: path
+    description:
+      - Client certificate if required.
+      - In addition to O(username) and O(password) or O(token). Not mutually exclusive.
+    version_added: 10.4.0
+  client_key:
+    type: path
+    description:
+      - Client certificate key if required.
+      - In addition to O(username) and O(password) or O(token). Not mutually exclusive.
+    version_added: 10.4.0
+
+  project:
+    type: str
+    description:
+      - The project for this operation. Required for issue creation.
+  summary:
+    type: str
+    description:
+      - The issue summary, where appropriate.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
+  description:
+    type: str
+    description:
+      - The issue description, where appropriate.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
+  issuetype:
+    type: str
+    description:
+      - The issue type, for issue creation.
+  issue:
+    type: str
+    description:
+      - An existing issue key to operate on.
+    aliases: ['ticket']
+
+  comment:
+    type: str
+    description:
+      - The comment text to add.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
+  comment_visibility:
+    type: dict
+    description:
+      - Used to specify comment comment visibility.
+      - See
+        U(https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/#api-rest-api-2-issue-issueidorkey-comment-post)
+        for details.
+    suboptions:
+      type:
+        description:
+          - Use O(comment_visibility.type) to specify which of the JIRA visibility restriction types is used.
+        type: str
+        required: true
+        choices: [group, role]
+      value:
+        description:
+          - Specify value corresponding to the type of visibility restriction. For example name of the group or role.
+        type: str
+        required: true
+    version_added: '3.2.0'
+
+  status:
+    type: str
+    description:
+      - Only used when O(operation) is V(transition), and a bit of a misnomer, it actually refers to the transition name.
+      - This is mutually exclusive with O(status_id).
+  status_id:
+    type: str
+    description:
+      - Only used when O(operation) is V(transition), and refers to the transition ID.
+      - This is mutually exclusive with O(status).
+    version_added: 10.3.0
+  assignee:
+    type: str
+    description:
+      - Sets the assignee when O(operation) is V(create), V(transition), or V(edit).
+      - Jira Cloud requires account IDs for all user-type fields. When O(cloud=true), a string value containing C(@) is
+        resolved as an email to an account ID automatically. A string without C(@) is assumed to be an account ID.
+        See also O(account_id) for a dedicated assignee account ID parameter.
+        Added in community.general 12.6.0.
+      - Jira Server and Jira Data Center may still accept O(assignee) as a username.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
+  account_id:
+    type: str
+    description:
+      - Sets the account identifier for the assignee when O(operation) is V(create), V(transition), or V(edit).
+      - Note that JIRA may not allow changing field values on specific transitions or states.
+    version_added: 2.5.0
+
+  linktype:
+    type: str
+    description:
+      - Set type of link, when action 'link' selected.
+  inwardissue:
+    type: str
+    description:
+      - Set issue from which link is created.
+  outwardissue:
+    type: str
+    description:
+      - Set issue to which link is created.
+  fields:
+    type: dict
+    description:
+      - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API (possibly
+        after merging with other required data, as when passed to create). See examples for more information, and the JIRA
+        REST API for the structure required for various fields.
+      - When O(cloud=true), user-type fields (V(assignee), V(reporter), and any fields listed in O(custom_user_fields)) that
+        contain a string value with C(@) are automatically resolved from email to account ID. String values without C(@) are
+        assumed to be account IDs. Added in community.general 12.6.0.
+      - When passed to comment, the data structure is merged at the first level since community.general 4.6.0. Useful to add
+        JIRA properties for example.
+      - Note that JIRA may not allow changing field values on specific transitions or states.
+    default: {}
+  jql:
+    description:
+      - Query JIRA in JQL Syntax, for example V("CMDB Hostname" = test.example.com).
+    type: str
+    version_added: '0.2.0'
+
+  maxresults:
+    description:
+      - Limit the result of O(operation=search). If no value is specified, the default JIRA limit is used.
+      - Used when O(operation=search) only, ignored otherwise.
+    type: int
+    version_added: '0.2.0'
+
+  timeout:
+    type: float
+    description:
+      - Set timeout, in seconds, on requests to JIRA API.
+    default: 10
+
+  validate_certs:
+    description:
+      - Require valid SSL certificates (set to V(false) if you would like to use self-signed certificates).
+    default: true
+    type: bool
+
+  cloud:
+    description:
+      - Enable when using Jira Cloud.
+      - When set to V(true), the module uses Jira Cloud compatible behavior.
+      - When set to V(false) (the default), the module uses Jira Server / Data Center compatible behavior.
+      - In the future, this option might affect additional operations for Jira Cloud compatibility.
+    type: bool
+    default: false
+    version_added: '12.6.0'
+
+  custom_user_fields:
+    description:
+      - A list of field names (for example V(customfield_10050)) that hold user values.
+      - When O(cloud=true) and a listed field is present in O(fields) as a string containing C(@), the module resolves the
+        email to a Jira Cloud account ID automatically.
+      - The built-in user fields O(assignee) and V(reporter) are always resolved when present; list here any further
+        user-typed fields (from other Jira products or extensions) that should receive the same resolution.
+    type: list
+    elements: str
+    default: []
+    version_added: '12.6.0'
+
+  attachment:
+    type: dict
+    version_added: 2.5.0
+    description:
+      - Information about the attachment being uploaded.
+    suboptions:
+      filename:
+        required: true
+        type: path
+        description:
+          - The path to the file to upload (from the remote node) or, if O(attachment.content) is specified, the filename
+            to use for the attachment.
+      content:
+        type: str
+        description:
+          - The Base64 encoded contents of the file to attach. If not specified, the contents of O(attachment.filename) is
+            used instead.
+      mimetype:
+        type: str
+        description:
+          - The MIME type to supply for the upload. If not specified, best-effort detection is performed.
+notes:
+  - Currently this only works with basic-auth, or tokens.
+  - To use with JIRA Cloud, pass the login e-mail as the O(username) and the API token as O(password).
+  - Jira Cloud has removed the legacy C(/rest/api/2/search) endpoint. Set O(cloud=true) when using
+    O(operation=search) against Jira Cloud so that the module uses the replacement C(/rest/api/2/search/jql) endpoint instead.
+author:
+  - "Steve Smith (@tarka)"
+  - "Per Abildgaard Toft (@pertoft)"
+  - "Brandon McNama (@DWSR)"
+"""
+
+EXAMPLES = r"""
+# Create a new issue and add a comment to it:
+- name: Create an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: create
+    summary: Example Issue
+    description: Created using Ansible
+    issuetype: Task
+  args:
+    fields:
+      customfield_13225: "test"
+      customfield_12931: {"value": "Test"}
+  register: issue
+
+- name: Comment on issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: comment
+    comment: A comment added by Ansible
+
+- name: Comment on issue with restricted visibility
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: comment
+    comment: A comment added by Ansible
+    comment_visibility:
+      type: role
+      value: Developers
+
+- name: Comment on issue with property to mark it internal
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: comment
+    comment: A comment added by Ansible
+    fields:
+      properties:
+        - key: 'sd.public.comment'
+          value:
+            internal: true
+
+# Add an workog to an existing issue
+- name: Worklog on issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: A worklog added by Ansible
+    fields:
+      timeSpentSeconds: 12000
+
+- name: Workflow on issue with comment restricted visibility
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: A worklog added by Ansible
+    comment_visibility:
+      type: role
+      value: Developers
+    fields:
+      timeSpentSeconds: 12000
+
+- name: Workflow on issue with comment property to mark it internal
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: worklog
+    comment: A worklog added by Ansible
+    fields:
+      properties:
+        - key: 'sd.public.comment'
+          value:
+            internal: true
+      timeSpentSeconds: 12000
+
+# Assign an existing issue using edit
+- name: Assign an issue using free-form fields
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key}}'
+    operation: edit
+    assignee: ssmith
+
+# Create an issue with an existing assignee
+- name: Create an assigned issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: create
+    summary: Assigned issue
+    description: Created and assigned using Ansible
+    issuetype: Task
+    assignee: ssmith
+
+# Assign an issue on Jira Cloud using an email address
+# (the module resolves the email to an account ID automatically)
+- name: Assign an issue on Jira Cloud using email
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: edit
+    cloud: true
+    assignee: user@example.com
+
+# Create an issue on Jira Cloud with reporter and a custom user field
+# resolved from email addresses to account IDs
+- name: Create an issue on Jira Cloud with user field resolution
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: create
+    summary: Example Issue
+    description: Created using Ansible
+    issuetype: Task
+    cloud: true
+    assignee: assignee@example.com
+    custom_user_fields:
+      - customfield_10050
+  args:
+    fields:
+      reporter: reporter@example.com
+      customfield_10050: approver@example.com
+
+# Edit an issue
+- name: Set the labels on an issue using free-form fields
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: edit
+  args:
+    fields:
+      labels:
+        - autocreated
+        - ansible
+
+# Updating a field using operations: add, set & remove
+- name: Change the value of a Select dropdown
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: update
+  args:
+    fields:
+      customfield_12931: ['set': {'value': 'Virtual'}]
+      customfield_13820: ['set': {'value': 'Manually'}]
+  register: cmdb_issue
+  delegate_to: localhost
+
+
+# Retrieve metadata for an issue and use it to create an account
+- name: Get an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: fetch
+    issue: ANS-63
+  register: issue
+
+# Search for an issue on Jira Data Center / Server
+# You can limit the search for specific fields by adding optional args. Note! It must be a dict, hence, lastViewed: null
+- name: Search for an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: search
+    maxresults: 10
+    jql: project=cmdb AND cf[13225]="test"
+  args:
+    fields:
+      lastViewed:
+  register: issue
+
+# Search for an issue on Jira Cloud (uses the /search/jql endpoint)
+- name: Search for an issue on Jira Cloud
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: search
+    cloud: true
+    maxresults: 10
+    jql: project=cmdb AND cf[13225]="test"
+  args:
+    fields:
+      lastViewed:
+  register: issue
+
+- name: Create a unix account for the reporter
+  become: true
+  user:
+    name: '{{ issue.meta.fields.creator.name }}'
+    comment: '{{ issue.meta.fields.creator.displayName }}'
+
+# You can get list of valid linktypes at /rest/api/2/issueLinkType
+# url of your jira installation.
+- name: Create link from HSP-1 to MKY-1
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    operation: link
+    linktype: Relates
+    inwardissue: HSP-1
+    outwardissue: MKY-1
+
+# Transition an issue
+- name: Resolve the issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: transition
+    status: Resolve Issue
+    account_id: 112233445566778899aabbcc
+    fields:
+      resolution:
+        name: Done
+      description: I am done! This is the last description I will ever give you.
+
+# Attach a file to an issue
+- name: Attach a file
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: HSP-1
+    operation: attach
+    attachment:
+      filename: topsecretreport.xlsx
+
+# Use username, password and client certificate authentification
+- name: Create an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    client_cert: '{{ path/to/client-cert }}'
+    client_key: '{{ path/to/client-key }}'
+
+# Use token and client certificate authentification
+- name: Create an issue
+  community.general.jira:
+    uri: '{{ server }}'
+    token: '{{ token }}'
+    client_cert: '{{ path/to/client-cert }}'
+    client_key: '{{ path/to/client-key }}'
+"""
+
+import base64
+import binascii
+import json
+import mimetypes
+import os
+import random
+import string
+import traceback
+from urllib.parse import quote
+from urllib.request import pathname2url
+
+from ansible.module_utils.common.text.converters import to_bytes, to_native, to_text
+from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper, cause_changes
+
+
+class JIRA(StateModuleHelper):
+    USER_FIELDS = ["assignee", "reporter"]
+
+    module = dict(
+        argument_spec=dict(
+            attachment=dict(
+                type="dict",
+                options=dict(
+                    content=dict(type="str"), filename=dict(type="path", required=True), mimetype=dict(type="str")
+                ),
+            ),
+            uri=dict(type="str", required=True),
+            operation=dict(
+                type="str",
+                choices=[
+                    "attach",
+                    "create",
+                    "comment",
+                    "edit",
+                    "update",
+                    "fetch",
+                    "transition",
+                    "link",
+                    "search",
+                    "worklog",
+                ],
+                aliases=["command"],
+                required=True,
+            ),
+            username=dict(type="str"),
+            password=dict(type="str", no_log=True),
+            token=dict(type="str", no_log=True),
+            client_cert=dict(type="path"),
+            client_key=dict(type="path"),
+            project=dict(
+                type="str",
+            ),
+            summary=dict(
+                type="str",
+            ),
+            description=dict(
+                type="str",
+            ),
+            issuetype=dict(
+                type="str",
+            ),
+            issue=dict(type="str", aliases=["ticket"]),
+            comment=dict(
+                type="str",
+            ),
+            comment_visibility=dict(
+                type="dict",
+                options=dict(
+                    type=dict(type="str", choices=["group", "role"], required=True),
+                    value=dict(type="str", required=True),
+                ),
+            ),
+            status=dict(
+                type="str",
+            ),
+            status_id=dict(
+                type="str",
+            ),
+            assignee=dict(
+                type="str",
+            ),
+            fields=dict(default={}, type="dict"),
+            linktype=dict(
+                type="str",
+            ),
+            inwardissue=dict(
+                type="str",
+            ),
+            outwardissue=dict(
+                type="str",
+            ),
+            jql=dict(
+                type="str",
+            ),
+            cloud=dict(type="bool", default=False),
+            custom_user_fields=dict(type="list", elements="str", default=[]),
+            maxresults=dict(type="int"),
+            timeout=dict(type="float", default=10),
+            validate_certs=dict(default=True, type="bool"),
+            account_id=dict(type="str"),
+        ),
+        mutually_exclusive=[
+            ["username", "token"],
+            ["password", "token"],
+            ["assignee", "account_id"],
+            ["status", "status_id"],
+        ],
+        required_together=[["username", "password"], ["client_cert", "client_key"]],
+        required_one_of=[
+            ["username", "token"],
+        ],
+        required_if=(
+            ("operation", "attach", ["issue", "attachment"]),
+            ("operation", "create", ["project", "issuetype", "summary"]),
+            ("operation", "comment", ["issue", "comment"]),
+            ("operation", "workflow", ["issue", "comment"]),
+            ("operation", "fetch", ["issue"]),
+            ("operation", "transition", ["issue"]),
+            ("operation", "transition", ["status", "status_id"], True),
+            ("operation", "link", ["linktype", "inwardissue", "outwardissue"]),
+            ("operation", "search", ["jql"]),
+        ),
+        supports_check_mode=False,
+    )
+    state_param = "operation"
+
+    def __init_module__(self):
+        self.vars.uri = self.vars.uri.strip("/")
+        self.vars.set("restbase", f"{self.vars.uri}/rest/api/2")
+        if self.vars.fields is None:
+            self.vars.fields = {}
+        if self.vars.assignee:
+            if self.vars.cloud:
+                self.vars.fields["assignee"] = self.vars.assignee
+            else:
+                self.vars.fields["assignee"] = {"name": self.vars.assignee}
+        if self.vars.account_id:
+            self.vars.fields["assignee"] = {"accountId": self.vars.account_id}
+        self.resolve_user_fields()
+
+    def resolve_user_fields(self):
+        if not self.vars.cloud or not self.vars.fields:
+            return
+        user_fields = self.USER_FIELDS + self.vars.custom_user_fields
+        for field_name in user_fields:
+            value = self.vars.fields.get(field_name)
+            if not isinstance(value, str):
+                continue
+            if "@" in value:
+                account_id = self.resolve_account_id(value, field_name)
+                self.vars.fields[field_name] = {"accountId": account_id}
+            else:
+                self.vars.fields[field_name] = {"accountId": value}
+
+    def resolve_account_id(self, email, field_name="assignee"):
+        url = f"{self.vars.restbase}/user/search?query={quote(email, safe='')}"
+        result = self.get(url)
+        if not isinstance(result, list) or len(result) != 1:
+            count = len(result) if isinstance(result, list) else 0
+            self.module.fail_json(
+                msg=(
+                    f'Failed to resolve field "{field_name}" email "{email}" to a unique '
+                    f'Jira Cloud account ID: found "{count}" result(s). '
+                    "Specify the account ID directly."
+                )
+            )
+        user = result[0]
+        user_email = user.get("emailAddress")
+        if (user_email or "").lower() != email.lower():
+            self.module.fail_json(
+                msg=(
+                    f'Failed to resolve field "{field_name}" email "{email}": '
+                    f'the email address on the matched account "{user_email}" does not match. '
+                    "Specify the account ID directly."
+                )
+            )
+        return user["accountId"]
+
+    @cause_changes(when="success")
+    def operation_create(self):
+        createfields = {
+            "project": {"key": self.vars.project},
+            "summary": self.vars.summary,
+            "issuetype": {"name": self.vars.issuetype},
+        }
+
+        if self.vars.description:
+            createfields["description"] = self.vars.description
+
+        # Merge in any additional or overridden fields
+        if self.vars.fields:
+            createfields.update(self.vars.fields)
+
+        data = {"fields": createfields}
+        url = f"{self.vars.restbase}/issue/"
+        self.vars.meta = self.post(url, data)
+
+    @cause_changes(when="success")
+    def operation_comment(self):
+        data = {"body": self.vars.comment}
+        # if comment_visibility is specified restrict visibility
+        if self.vars.comment_visibility is not None:
+            data["visibility"] = self.vars.comment_visibility
+
+        # Use 'fields' to merge in any additional data
+        if self.vars.fields:
+            data.update(self.vars.fields)
+
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}/comment"
+        self.vars.meta = self.post(url, data)
+
+    @cause_changes(when="success")
+    def operation_worklog(self):
+        data = {"comment": self.vars.comment}
+        # if comment_visibility is specified restrict visibility
+        if self.vars.comment_visibility is not None:
+            data["visibility"] = self.vars.comment_visibility
+
+        # Use 'fields' to merge in any additional data
+        if self.vars.fields:
+            data.update(self.vars.fields)
+
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}/worklog"
+        self.vars.meta = self.post(url, data)
+
+    @cause_changes(when="success")
+    def operation_edit(self):
+        data = {"fields": self.vars.fields}
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}"
+        self.vars.meta = self.put(url, data)
+
+    @cause_changes(when="success")
+    def operation_update(self):
+        data = {
+            "update": self.vars.fields,
+        }
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}"
+        self.vars.meta = self.put(url, data)
+
+    def operation_fetch(self):
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}"
+        self.vars.meta = self.get(url)
+
+    def operation_search(self):
+        if self.vars.cloud:
+            url = f"{self.vars.restbase}/search/jql?jql={pathname2url(self.vars.jql)}"
+        else:
+            url = f"{self.vars.restbase}/search?jql={pathname2url(self.vars.jql)}"
+
+        if self.vars.fields:
+            fields = self.vars.fields.keys()
+            url = f"{url}&fields={'&fields='.join([pathname2url(f) for f in fields])}"
+        elif self.vars.cloud:
+            url = f"{url}&fields=*navigable"
+
+        if self.vars.maxresults:
+            url = f"{url}&maxResults={self.vars.maxresults}"
+
+        self.vars.meta = self.get(url)
+
+    @cause_changes(when="success")
+    def operation_transition(self):
+        # Find the transition id
+        turl = f"{self.vars.restbase}/issue/{self.vars.issue}/transitions"
+        tmeta = self.get(turl)
+
+        tid = None
+        target = None
+
+        if self.vars.status is not None:
+            target = self.vars.status.strip()
+        elif self.vars.status_id is not None:
+            tid = self.vars.status_id.strip()
+
+        for t in tmeta["transitions"]:
+            if target is not None:
+                if t["name"] == target:
+                    tid = t["id"]
+                    break
+            else:
+                if tid == t["id"]:
+                    break
+        else:
+            if target is not None:
+                raise ValueError(f"Failed find valid transition for '{target}'")
+            else:
+                raise ValueError(f"Failed find valid transition for ID '{tid}'")
+
+        fields = dict(self.vars.fields)
+        if self.vars.summary is not None:
+            fields.update({"summary": self.vars.summary})
+        if self.vars.description is not None:
+            fields.update({"description": self.vars.description})
+
+        # Perform it
+        data = {"transition": {"id": tid}, "fields": fields}
+        if self.vars.comment is not None:
+            data.update(
+                {
+                    "update": {
+                        "comment": [{"add": {"body": self.vars.comment}}],
+                    }
+                }
+            )
+        url = f"{self.vars.restbase}/issue/{self.vars.issue}/transitions"
+        self.vars.meta = self.post(url, data)
+
+    @cause_changes(when="success")
+    def operation_link(self):
+        data = {
+            "type": {"name": self.vars.linktype},
+            "inwardIssue": {"key": self.vars.inwardissue},
+            "outwardIssue": {"key": self.vars.outwardissue},
+        }
+        url = f"{self.vars.restbase}/issueLink/"
+        self.vars.meta = self.post(url, data)
+
+    @cause_changes(when="success")
+    def operation_attach(self):
+        v = self.vars
+        filename = v.attachment.get("filename")
+        content = v.attachment.get("content")
+
+        if not any((filename, content)):
+            raise ValueError("at least one of filename or content must be provided")
+        mime = v.attachment.get("mimetype")
+
+        if not os.path.isfile(filename):
+            raise ValueError(f"The provided filename does not exist: {filename}")
+
+        content_type, data = self._prepare_attachment(filename, content, mime)
+
+        url = f"{v.restbase}/issue/{v.issue}/attachments"
+        return True, self.post(
+            url, data, content_type=content_type, additional_headers={"X-Atlassian-Token": "no-check"}
+        )
+
+    # Ideally we'd just use prepare_multipart from ansible.module_utils.urls, but
+    # unfortunately it does not support specifying the encoding and also defaults to
+    # base64. Jira doesn't support base64 encoded attachments (and is therefore not
+    # spec compliant. Go figure). I originally wrote this function as an almost
+    # exact copypasta of prepare_multipart, but ran into some encoding issues when
+    # using the noop encoder. Hand rolling the entire message body seemed to work
+    # out much better.
+    #
+    # https://community.atlassian.com/t5/Jira-questions/Jira-dosen-t-decode-base64-attachment-request-REST-API/qaq-p/916427
+    #
+    # content is expected to be a base64 encoded string since Ansible doesn't
+    # support passing raw bytes objects.
+    @staticmethod
+    def _prepare_attachment(filename, content=None, mime_type=None):
+        def escape_quotes(s):
+            return s.replace('"', '\\"')
+
+        boundary = "".join(random.choice(string.digits + string.ascii_letters) for dummy in range(30))
+        name = os.path.basename(filename)
+
+        if not mime_type:
+            try:
+                mime_type = mimetypes.guess_type(filename or "", strict=False)[0] or "application/octet-stream"
+            except Exception:
+                mime_type = "application/octet-stream"
+        main_type, sep, sub_type = mime_type.partition("/")
+
+        if not content and filename:
+            with open(to_bytes(filename, errors="surrogate_or_strict"), "rb") as f:
+                content = f.read()
+        else:
+            try:
+                content = base64.b64decode(content)
+            except binascii.Error as e:
+                raise Exception(f"Unable to base64 decode file content: {e}") from e
+
+        lines = [
+            f"--{boundary}",
+            f'Content-Disposition: form-data; name="file"; filename={escape_quotes(name)}',
+            f"Content-Type: {main_type}/{sub_type}",
+            "",
+            to_text(content),
+            f"--{boundary}--",
+            "",
+        ]
+
+        return (f"multipart/form-data; boundary={boundary}", "\r\n".join(lines))
+
+    def request(self, url, data=None, method=None, content_type="application/json", additional_headers=None):
+        if data and content_type == "application/json":
+            data = json.dumps(data)
+
+        headers = {}
+        if isinstance(additional_headers, dict):
+            headers = additional_headers.copy()
+
+        # NOTE: fetch_url uses a password manager, which follows the
+        # standard request-then-challenge basic-auth semantics. However as
+        # JIRA allows some unauthorised operations it doesn't necessarily
+        # send the challenge, so the request occurs as the anonymous user,
+        # resulting in unexpected results. To work around this we manually
+        # inject the auth header up-front to ensure that JIRA treats
+        # the requests as authorized for this user.
+
+        if self.vars.token is not None:
+            headers.update(
+                {
+                    "Content-Type": content_type,
+                    "Authorization": f"Bearer {self.vars.token}",
+                }
+            )
+        else:
+            auth = to_text(
+                base64.b64encode(to_bytes(f"{self.vars.username}:{self.vars.password}", errors="surrogate_or_strict"))
+            )
+            headers.update(
+                {
+                    "Content-Type": content_type,
+                    "Authorization": f"Basic {auth}",
+                }
+            )
+
+        response, info = fetch_url(
+            self.module, url, data=data, method=method, timeout=self.vars.timeout, headers=headers
+        )
+
+        if info["status"] not in (200, 201, 204):
+            error = None
+            try:
+                error = json.loads(info["body"])
+            except Exception:
+                msg = f'The request "{method} {url}" returned the unexpected status code {info["status"]} {info["msg"]}\n{info.get("body")}'
+                self.module.fail_json(msg=msg, exception=traceback.format_exc())
+            if error:
+                msg = []
+                for key in ("errorMessages", "errors"):
+                    if error.get(key):
+                        msg.append(str(error[key]))
+                if msg:
+                    self.module.fail_json(msg=", ".join(msg))
+                self.module.fail_json(msg=f"{error}")
+            # Fallback print body, if it can't be decoded
+            self.module.fail_json(msg=to_native(info["body"]))
+
+        body = response.read()
+
+        if body:
+            return json.loads(to_text(body, errors="surrogate_or_strict"))
+        return {}
+
+    def post(self, url, data, content_type="application/json", additional_headers=None):
+        return self.request(
+            url, data=data, method="POST", content_type=content_type, additional_headers=additional_headers
+        )
+
+    def put(self, url, data):
+        return self.request(url, data=data, method="PUT")
+
+    def get(self, url):
+        return self.request(url)
+
+
+def main():
+    jira = JIRA()
+    jira.run()
+
+
+if __name__ == "__main__":
+    main()

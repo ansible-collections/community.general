@@ -1,0 +1,84 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vaulted_vars.yml
+  vars:
+    timestamp: 2025-01-02T03:04:05Z
+    bar: "foobarbaz"
+  tasks:
+    - name: Convert more complex data structure (from vars file)
+      set_fact:
+        complex: "{{ foobar | community.general.to_toml }}"
+        complex_redact: "{{ foobar | community.general.to_toml(redact_sensitive_values=true) }}"
+
+    - assert:
+        that:
+          - complex == exp_complex
+          - complex_redact == exp_complex_redact
+      vars:
+        exp_complex: |
+          a_value = 123
+          a_list = ["bar", 2025-02-03T04:05:06, "Hello!", true, false]
+        exp_complex_redact: |
+          a_value = 123
+          a_list = ["<redacted>", 2025-02-03T04:05:06, "Hello!", true, false]
+
+    - name: Convert more complex data structure (from vars)
+      set_fact:
+        complex: "{{ data | community.general.to_toml }}"
+        complex_redact: "{{ data | community.general.to_toml(redact_sensitive_values=true) }}"
+      vars:
+        data:
+          foo: 123
+          bar: 1.23
+          baz: true
+          bam: foobar
+          bang:
+            - "{{ timestamp }}"
+            - "{{ bar }}"
+            - "{{ foo }}"
+
+    - when: ansible_version.full is version("2.19", "<")
+      assert:
+        that:
+          - complex == exp_complex
+          # With ansible-core 2.18 and before, the vaulted string is decrypted before it reaches the filter,
+          # so the redaction does not work there.
+          - complex_redact == exp_complex
+      vars:
+        exp_complex: |
+          foo = 123
+          bar = 1.23
+          baz = true
+          bam = "foobar"
+          bang = ["2025-01-02 03:04:05+00:00", "foobarbaz", "bar"]
+        exp_complex_redact: |
+          foo = 123
+          bar = 1.23
+          baz = true
+          bam = "foobar"
+          bang = ["2025-01-02 03:04:05+00:00", "foobarbaz", "bar"]
+
+    - when: ansible_version.full is version("2.19", ">=")
+      assert:
+        that:
+          - complex == exp_complex
+          - complex_redact == exp_complex_redact
+      vars:
+        exp_complex: |
+          foo = 123
+          bar = 1.23
+          baz = true
+          bam = "foobar"
+          bang = [2025-01-02T03:04:05Z, "foobarbaz", "bar"]
+        exp_complex_redact: |
+          foo = 123
+          bar = 1.23
+          baz = true
+          bam = "foobar"
+          bang = [2025-01-02T03:04:05Z, "foobarbaz", "<redacted>"]

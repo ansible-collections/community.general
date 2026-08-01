@@ -1,0 +1,2 @@
+bugfixes:
+  - "aix_devices - fix ``chdev`` command failures being incorrectly reported as successful results, now properly fails the task when device attribute changes cannot be applied (https://github.com/ansible-collections/community.general/pull/12185)."

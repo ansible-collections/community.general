@@ -1,0 +1,120 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the pids module
+# Copyright (c) 2019, Saranya Sridharan
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Attempt installation of latest 'psutil' version
+  pip:
+    name: psutil
+  ignore_errors: true
+  register: psutil_latest_install
+
+- name: Install greatest 'psutil' version which will work with all pip versions
+  pip:
+    name: psutil < 5.7.0
+  when: psutil_latest_install is failed
+
+- name: "Checking the empty result"
+  pids:
+    name: "blahblah"
+  register: emptypids
+
+- name: "Verify that the list of Process IDs (PIDs) returned is empty"
+  assert:
+    that:
+      - emptypids is not changed
+      - emptypids.pids == []
+
+- name: "Picking a random process name"
+  set_fact:
+    random_name: some-random-long-name-{{ 10000000000 + (9999999999 | random) }}
+
+- name: Copy the fake 'sleep' source code
+  copy:
+    src: sleeper.c
+    dest: "{{ remote_tmp_dir }}/sleeper.c"
+    mode: "0644"
+
+- name: Compile fake 'sleep' binary
+  command: cc {{ remote_tmp_dir }}/sleeper.c -o {{ remote_tmp_dir }}/{{ random_name }}
+
+- name: Copy templated helper script
+  template:
+    src: obtainpid.sh.j2
+    dest: "{{ remote_tmp_dir }}/obtainpid.sh"
+    mode: "0755"
+
+- name: "Run the fake 'sleep' binary"
+  command: sh {{ remote_tmp_dir }}/obtainpid.sh
+  async: 100
+  poll: 0
+
+- name: "Wait for one second to make sure that the fake 'sleep' binary has actually been started"
+  pause:
+    seconds: 1
+
+- name: "Checking the process IDs (PIDs) of fake 'sleep' binary"
+  pids:
+    name: "{{ random_name }}"
+  register: pids
+
+- name: "Checking that exact non-substring matches are required"
+  pids:
+    name: "{{ random_name[0:25] }}"
+  register: exactpidmatch
+
+- name: "Checking that patterns can be used with the pattern option"
+  pids:
+    pattern: "{{ random_name[0:25] }}"
+  register: pattern_pid_match
+
+- name: "Checking that case-insensitive patterns can be used with the pattern option"
+  pids:
+    pattern: "{{ random_name[0:25] | upper }}"
+    ignore_case: true
+  register: caseinsensitive_pattern_pid_match
+
+- name: "Checking that .* includes test pid"
+  pids:
+    pattern: .*
+  register: match_all
+
+- name: "Reading pid from the file"
+  slurp:
+    src: "{{ remote_tmp_dir }}/obtainpid.txt"
+  register: newpid
+
+- name: Gather all processes to make debugging easier
+  command: ps aux
+  register: result
+  no_log: true
+
+- name: List all processes to make debugging easier
+  debug:
+    var: result.stdout_lines
+
+- name: "Verify that the Process IDs (PIDs) returned is not empty and also equal to the PIDs obtained in console"
+  assert:
+    that:
+      - "pids.pids | join(' ')  == newpid.content | b64decode | trim"
+      - "pids.pids | length > 0"
+      - "exactpidmatch.pids == []"
+      - "pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
+      - "caseinsensitive_pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
+      - newpid.content | b64decode | trim | int in match_all.pids
+
+- name: "Register output of bad input pattern"
+  pids:
+    pattern: (unterminated
+  register: bad_pattern_result
+  ignore_errors: true
+
+- name: "Verify that bad input pattern result is failed"
+  assert:
+    that:
+      - bad_pattern_result is failed

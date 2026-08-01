@@ -1,0 +1,33 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Setup Test
+  ansible.builtin.include_tasks:
+    file: test_setup.yml
+
+- name: Create the new flow <Integration Test Flow>
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v1.yml
+
+- name: Assert the flow creation result
+  ansible.builtin.assert:
+    that:
+      - flow_v1_result is changed
+      - flow_v1_result.diff is defined
+    msg: "Expected changes and a diff but got: changed={{ flow_v1_result.changed }}, diff={{ flow_v1_result.get('diff') }}"
+
+- name: Assert the created flow <Integration Test Flow>
+  ansible.builtin.include_tasks:
+    file: ../assertions/assertion_flow_v1.yml
+
+# Check idempotency, by trying to create the existing flow again
+- name: Trying to create the <Integration Test Flow> again, although nothing changed
+  ansible.builtin.include_tasks:
+    file: ../actions/flow_v1.yml
+
+- name: Assert that the task didn't re-create the flow, because the flow didn't change
+  ansible.builtin.assert:
+    that:
+      - flow_v1_result is not changed
+      - flow_v1_result.diff is not defined
+    msg: "Expected no changes and no diff but got: changed={{ flow_v1_result.changed }}, diff={{ flow_v1_result.get('diff') }}"

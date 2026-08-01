@@ -1,0 +1,26 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- import_tasks: "setup_file.yml"
+
+- name: getting all system configs
+  git_config_info:
+    scope: system
+  register: get_result1
+
+- name: getting all system configs for a key
+  git_config_info:
+    name: user.name
+    scope: system
+  register: get_result2
+
+- name: assert value is correct
+  assert:
+    that:
+      - get_result1.config_value == ""
+      - 'get_result1.config_values == {}'
+      - get_result2.config_value == ""
+      - 'get_result2.config_values == {"user.name": []}'
+...

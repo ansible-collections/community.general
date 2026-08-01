@@ -1,0 +1,2 @@
+bugfixes:
+  - dnf_config_manager - fix incompatibility with DNF5. The module was crashing on systems with DNF5 due to CLI changes since DNF4 (https://github.com/ansible-collections/community.general/issues/9127, https://github.com/ansible-collections/community.general/pull/12206).

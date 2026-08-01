@@ -1,0 +1,35 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create terraform project directory (provider upgrade)
+  file:
+    path: "{{ terraform_project_dir }}/{{ item['name'] }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ terraform_provider_versions }}"
+  loop_control:
+    index_var: provider_index
+
+- name: Output terraform provider test project
+  ansible.builtin.template:
+    src: templates/provider_test/main.tf.j2
+    dest: "{{ terraform_project_dir }}/{{ tf_provider['name'] }}/main.tf"
+    force: true
+  register: terraform_provider_hcl
+
+# The purpose of this task is to init terraform multiple times with different provider module
+# versions, so that we can verify that provider upgrades during init work as intended.
+
+- name: Init Terraform configuration with pinned provider version
+  community.general.terraform:
+    project_path: "{{ terraform_provider_hcl.dest | dirname }}"
+    binary_path: "{{ terraform_binary_path }}"
+    force_init: true
+    provider_upgrade: "{{ terraform_provider_upgrade }}"
+    state: present
+  register: terraform_init_result
+
+- assert:
+    that: terraform_init_result is not failed

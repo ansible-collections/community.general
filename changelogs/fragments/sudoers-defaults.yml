@@ -1,0 +1,2 @@
+minor_changes:
+  - sudoers - add ``defaults`` parameter to allow specifying ``Defaults`` directives scoped to the user or group in the generated sudoers file (https://github.com/ansible-collections/community.general/pull/12186).

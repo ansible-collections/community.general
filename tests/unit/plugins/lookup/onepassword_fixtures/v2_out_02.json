@@ -1,0 +1,85 @@
+{
+    "id": "awk4s2u44fhnrgppszcsvc663i",
+    "title": "Dummy Login",
+    "version": 4,
+    "vault": {
+        "id": "stpebbaccrq72xulgouxsk4p7y",
+        "name": "Personal"
+    },
+    "category": "LOGIN",
+    "last_edited_by": "LSGPJERUYBH7BFPHMZ2KKGL6AU",
+    "created_at": "2018-04-25T21:55:19Z",
+    "updated_at": "2022-09-02T17:51:21Z",
+    "additional_information": "agent.smith",
+    "urls": [
+        {
+            "primary": true,
+            "href": "https://acme.com"
+        }
+    ],
+    "sections": [
+        {
+            "id": "add more"
+        },
+        {
+            "id": "gafaeg7vnqmgrklw5r6yrufyxy",
+            "label": "COMMANDS"
+        },
+        {
+            "id": "linked items",
+            "label": "Related Items"
+        }
+    ],
+    "fields": [
+        {
+            "id": "username",
+            "type": "STRING",
+            "purpose": "USERNAME",
+            "label": "username",
+            "value": "agent.smith",
+            "reference": "op://Personal/Dummy Login/username"
+        },
+        {
+            "id": "password",
+            "type": "CONCEALED",
+            "purpose": "PASSWORD",
+            "label": "password",
+            "value": "FootworkDegreeReverence",
+            "entropy": 159.60836791992188,
+            "reference": "op://Personal/Dummy Login/password",
+            "password_details": {
+                "entropy": 159,
+                "generated": true,
+                "strength": "FANTASTIC"
+            }
+        },
+        {
+            "id": "notesPlain",
+            "type": "STRING",
+            "purpose": "NOTES",
+            "label": "notesPlain",
+            "reference": "op://Personal/Dummy Login/notesPlain"
+        },
+        {
+            "id": "7gyjekelk24ghgd4rvafspjbli",
+            "section": {
+                "id": "add more"
+            },
+            "type": "STRING",
+            "label": "title",
+            "value": "value of the field",
+            "reference": "op://Personal/Dummy Login/add more/title"
+        },
+        {
+            "id": "fx4wpzokrxn7tlb3uwpdjfptgm",
+            "section": {
+                "id": "gafaeg7vnqmgrklw5r6yrufyxy",
+                "label": "COMMANDS"
+            },
+            "type": "CONCEALED",
+            "label": "password1",
+            "value": "data in custom field",
+            "reference": "op://Personal/Dummy Login/COMMANDS/password1"
+        }
+    ]
+}

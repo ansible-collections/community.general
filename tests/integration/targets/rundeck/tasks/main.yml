@@ -1,0 +1,195 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Generate a Rundeck API Token
+  ansible.builtin.command: java -jar {{ rdeck_base }}/rundeck-cli.jar tokens create -u admin -d 24h -r admin
+  environment:
+    RD_URL: "{{ rundeck_url }}"
+    RD_USER: admin
+    RD_PASSWORD: admin
+  register: rundeck_api_token
+  retries: 3
+  until: rundeck_api_token.rc == 0
+  changed_when: true
+
+- name: Create a Rundeck project
+  community.general.rundeck_project:
+    name: "test_project"
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: present
+
+- name: Create a system ACL
+  community.general.rundeck_acl_policy:
+    name: test_acl
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: present
+    policy: "{{ system_acl_policy }}"
+
+- name: Create a project ACL
+  community.general.rundeck_acl_policy:
+    name: test_acl
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: present
+    policy: "{{ project_acl_policy }}"
+    project: test_project
+
+- name: Retrieve ACLs
+  ansible.builtin.uri:
+    url: "{{ rundeck_url }}/api/{{ rundeck_api_version }}/{{ item }}"
+    headers:
+      accept: application/json
+      x-rundeck-auth-token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+  register: acl_policy_check
+  loop:
+    - system/acl/test_acl.aclpolicy
+    - project/test_project/acl/test_acl.aclpolicy
+
+- name: Assert ACL content is correct
+  ansible.builtin.assert:
+    that:
+      - acl_policy_check['results'][0]['json']['contents'] == system_acl_policy
+      - acl_policy_check['results'][1]['json']['contents'] == project_acl_policy
+
+- name: Remove system ACL
+  community.general.rundeck_acl_policy:
+    name: test_acl
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: absent
+
+- name: Remove project ACL
+  community.general.rundeck_acl_policy:
+    name: test_acl
+    api_version: "{{ rundeck_api_version }}"
+    url: "{{ rundeck_url }}"
+    token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    state: absent
+    project: test_project
+
+- name: Check that ACLs have been removed
+  ansible.builtin.uri:
+    url: "{{ rundeck_url }}/api/{{ rundeck_api_version }}/{{ item }}"
+    headers:
+      accept: application/json
+      x-rundeck-auth-token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    status_code:
+      - 404
+  loop:
+    - system/acl/test_acl.aclpolicy
+    - project/test_project/acl/test_acl.aclpolicy
+
+- name: Copy test_job definition to /tmp
+  copy:
+    src: test_job.yaml
+    dest: /tmp/test_job.yaml
+
+- name: Create Rundeck job Test
+  ansible.builtin.command: java -jar {{ rdeck_base }}/rundeck-cli.jar jobs load -f /tmp/test_job.yaml -F yaml -p test_project
+  environment:
+    RD_URL: "{{ rundeck_url }}"
+    RD_USER: admin
+    RD_PASSWORD: admin
+
+- name: Wrong Rundeck API Token
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: wrong_token
+    job_id: "{{ rundeck_job_id }}"
+  ignore_errors: true
+  register: rundeck_job_run_wrong_token
+
+- name: Assert that Rundeck authorization failed
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_wrong_token.msg == "Token authorization failed"
+
+- name: Success run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+  register: rundeck_job_run_success
+
+- name: Assert that Rundeck job test_job runs successfully
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_success.execution_info.status == "succeeded"
+
+- name: Fail run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      exit_code: "1"
+  ignore_errors: true
+  register: rundeck_job_run_fail
+
+- name: Assert that Rundeck job test_job failed
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_fail.execution_info.status == "failed"
+
+- name: Abort run Rundeck job test_job due timeout
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      sleep: "5"
+    wait_execution_timeout: 2
+    abort_on_timeout: true
+  ignore_errors: true
+  register: rundeck_job_run_aborted
+
+- name: Assert that Rundeck job test_job is aborted
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_aborted.execution_info.status == "aborted"
+
+- name: Fire-and-forget run Rundeck job test_job
+  community.general.rundeck_job_run:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+    job_options:
+      sleep: "5"
+    wait_execution: false
+  register: rundeck_job_run_forget
+
+- name: Assert that Rundeck job test_job is running
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_run_forget.execution_info.status == "running"
+
+- name: Get Rundeck job test_job executions info
+  community.general.rundeck_job_executions_info:
+    url: "{{ rundeck_url }}"
+    api_version: "{{ rundeck_api_version }}"
+    api_token: "{{ rundeck_api_token.stdout_lines[-1] }}"
+    job_id: "{{ rundeck_job_id }}"
+  register: rundeck_job_executions_info
+
+- name: Assert that Rundeck job executions info has 4 registers
+  ansible.builtin.assert:
+    that:
+      - rundeck_job_executions_info.paging.total | int == 4

@@ -1,0 +1,55 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Include OS-specific variables
+  include_vars: '{{ lookup("first_found", search) }}'
+  vars:
+    search:
+      files:
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml'
+        - '{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_version }}.yml'
+        - '{{ ansible_facts.distribution }}.yml'
+        - '{{ ansible_facts.os_family }}.yml'
+        - default.yml
+      paths:
+        - vars
+
+- name: Install OpenSSL
+  become: true
+  package:
+    name: '{{ openssl_package_name }}'
+  when: not ansible_facts.os_family == 'Darwin'
+
+- name: Install cryptography
+  become: true
+  package:
+    name: '{{ cryptography_package_name_python3 }}'
+  when: not cryptography_from_pip
+
+- name: Install cryptography (pip)
+  become: true
+  pip:
+    name: cryptography>=3.3
+    extra_args: "-c {{ remote_constraints }}"
+  when: cryptography_from_pip
+
+- name: Install pyOpenSSL
+  become: true
+  package:
+    name: '{{ pyopenssl_package_name_python3 }}'
+  when: pyopenssl_package_name_python3 is defined
+
+- name: register openssl version
+  shell: "openssl version | cut -d' ' -f2"
+  register: openssl_version
+
+- name: register cryptography version
+  command: "{{ ansible_facts.python.executable }} -c 'import cryptography; print(cryptography.__version__)'"
+  register: cryptography_version

@@ -1,0 +1,369 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2023, Salvatore Mesoraca <s.mesoraca16@gmail.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set paths
+  set_fact:
+    output_file: "{{ remote_tmp_dir }}/kdeconf"
+    kwriteconf_fake: "{{ remote_tmp_dir }}/kwriteconf"
+
+- name: Install fake kwriteconf
+  copy:
+    dest: "{{ kwriteconf_fake }}"
+    src: kwriteconf_fake
+    mode: "0755"
+
+- name: Simple test
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        value: test2
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_simple
+  ignore_errors: true
+
+- name: Simple test - checks
+  assert:
+    that:
+      - result_simple is changed
+      - result_simple is not failed
+
+- name: Simple test - idempotence
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        value: test2
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_simple_idem
+  ignore_errors: true
+
+- name: Simple test - idempotence - checks
+  assert:
+    that:
+      - result_simple_idem is not changed
+      - result_simple_idem is not failed
+
+- name: Reset
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: Group and groups are mutually exclusive
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        groups: [test2]
+        key: test1
+        value: test2
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_group_mutex
+  ignore_errors: true
+
+- name: Group and groups are mutually exclusive - checks
+  assert:
+    that:
+      - result_group_mutex is not changed
+      - result_group_mutex is failed
+      - "result_group_mutex.msg == 'parameters are mutually exclusive: group|groups found in values'"
+
+- name: value and bool_value are mutually exclusive
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        value: test2
+        bool_value: true
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_val_mutex
+  ignore_errors: true
+
+- name: value and bool_value are mutually exclusive - checks
+  assert:
+    that:
+      - result_val_mutex is not changed
+      - result_val_mutex is failed
+      - "result_val_mutex.msg == 'parameters are mutually exclusive: value|bool_value found in values'"
+
+- name: bool_value must be bool
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        bool_value: thisisastring
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_val_bool
+  ignore_errors: true
+
+- name: bool_value must be bool - checks
+  assert:
+    that:
+      - result_val_bool is not changed
+      - result_val_bool is failed
+      - "'is not a valid boolean' in result_val_bool.msg"
+
+- name: Multiple groups test
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - groups:
+          - test
+          - test1
+          - test2
+        key: test3
+        value: test4
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_groups
+  ignore_errors: true
+
+- name: Multiple groups test - checks
+  assert:
+    that:
+      - result_groups is changed
+      - result_groups is not failed
+
+- name: Multiple groups test - idempotence
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - groups:
+          - test
+          - test1
+          - test2
+        key: test3
+        value: test4
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_groups_idem
+  ignore_errors: true
+
+- name: Multiple groups test - idempotence - checks
+  assert:
+    that:
+      - result_groups_idem is not changed
+      - result_groups_idem is not failed
+
+- name: Reset
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: Bool test
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        bool_value: true
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_bool
+  ignore_errors: true
+
+- name: Simple test - checks
+  assert:
+    that:
+      - result_bool is changed
+      - result_bool is not failed
+
+- name: Bool test - idempotence
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        bool_value: true
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_bool_idem
+  ignore_errors: true
+
+- name: Bool test - idempotence - checks
+  assert:
+    that:
+      - result_bool_idem is not changed
+      - result_bool_idem is not failed
+
+- name: Reset
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: check_mode test
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        value: test2
+      - groups: [testx, testy]
+        key: testz
+        bool_value: true
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_checkmode
+  ignore_errors: true
+  check_mode: true
+  diff: true
+
+- name: check_mode test file contents
+  slurp:
+    src: "{{ output_file }}"
+  register: check_mode_contents
+  ignore_errors: true
+
+- name: check_mode test - checks
+  assert:
+    that:
+      - result_checkmode is changed
+      - result_checkmode is not failed
+      - check_mode_contents is failed
+
+- name: check_mode test - apply
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        value: test2
+      - groups: [testx, testy]
+        key: testz
+        bool_value: true
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_checkmode_apply
+  ignore_errors: true
+  check_mode: false
+  diff: true
+
+- name: check_mode test - apply - checks
+  assert:
+    that:
+      - result_checkmode_apply is changed
+      - result_checkmode_apply is not failed
+      - "result_checkmode_apply['diff']['after'] == result_checkmode['diff']['after']"
+      - "result_checkmode_apply['diff']['before'] == result_checkmode['diff']['before']"
+
+- name: check_mode test - idempotence
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test
+        key: test1
+        value: test2
+      - groups: [testx, testy]
+        key: testz
+        bool_value: true
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_checkmode2
+  ignore_errors: true
+  check_mode: true
+
+- name: check_mode test - idempotence - checks
+  assert:
+    that:
+      - result_checkmode2 is not changed
+      - result_checkmode2 is not failed
+
+- name: Reset
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: Unicode test
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: tesòt
+        key: testè1
+        value: testù2
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_unicode
+  ignore_errors: true
+
+- name: Unicode test - checks
+  assert:
+    that:
+      - result_unicode is changed
+      - result_unicode is not failed
+
+- name: Reset
+  file:
+    path: "{{ output_file }}"
+    state: absent
+
+- name: Missing groups
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - key: test1
+        value: test2
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_mgroup
+  ignore_errors: true
+
+- name: Missing groups - checks
+  assert:
+    that:
+      - result_mgroup is not changed
+      - result_mgroup is failed
+      - "result_mgroup.msg == 'one of the following is required: group, groups found in values'"
+
+- name: Missing key
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test1
+        value: test2
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_mkey
+  ignore_errors: true
+
+- name: Missing key - checks
+  assert:
+    that:
+      - result_mkey is not changed
+      - result_mkey is failed
+      - "result_mkey.msg == 'missing required arguments: key found in values'"
+
+- name: Missing value
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test1
+        key: test2
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_mvalue
+  ignore_errors: true
+
+- name: Missing value - checks
+  assert:
+    that:
+      - result_mvalue is not changed
+      - result_mvalue is failed
+      - "result_mvalue.msg == 'one of the following is required: value, bool_value found in values'"
+
+- name: Empty key
+  kdeconfig:
+    path: "{{ output_file }}"
+    values:
+      - group: test1
+        key: ''
+        value: test2
+    kwriteconfig_path: "{{ kwriteconf_fake }}"
+  register: result_ekey
+  ignore_errors: true
+
+- name: Empty key - checks
+  assert:
+    that:
+      - result_ekey is not changed
+      - result_ekey is failed
+      - "result_ekey.msg == \"'key' cannot be empty\""

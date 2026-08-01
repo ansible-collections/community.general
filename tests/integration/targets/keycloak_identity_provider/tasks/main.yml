@@ -1,0 +1,364 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Delete realm if exists
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    state: absent
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create new identity provider
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    display_name: OpenID Connect IdP
+    enabled: true
+    provider_id: oidc
+    config:
+      issuer: https://idp.example.com
+      authorizationUrl: https://idp.example.com/auth
+      tokenUrl: https://idp.example.com/token
+      userInfoUrl: https://idp.example.com/userinfo
+      clientAuthMethod: client_secret_post
+      clientId: clientid
+      clientSecret: clientsecret
+      syncMode: FORCE
+    mappers:
+      - name: "first_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "first_name"
+          user.attribute: "first_name"
+          syncMode: "INHERIT"
+      - name: "last_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "last_name"
+          user.attribute: "last_name"
+          syncMode: "INHERIT"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider created
+  assert:
+    that:
+      - result is changed
+      - result.existing == {}
+      - result.end_state.alias == "{{ idp }}"
+      - result.end_state.mappers != []
+      - result.end_state.config.clientSecret == "**********"
+
+- name: Update existing identity provider (no change)
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    enabled: true
+    provider_id: oidc
+    config:
+      issuer: https://idp.example.com
+      authorizationUrl: https://idp.example.com/auth
+      tokenUrl: https://idp.example.com/token
+      userInfoUrl: https://idp.example.com/userinfo
+      clientAuthMethod: client_secret_post
+      clientId: clientid
+      clientSecret: "**********"
+      syncMode: FORCE
+    mappers:
+      - name: "first_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "first_name"
+          user.attribute: "first_name"
+          syncMode: "INHERIT"
+      - name: "last_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "last_name"
+          user.attribute: "last_name"
+          syncMode: "INHERIT"
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider unchanged
+  assert:
+    that:
+      - result is not changed
+
+- name: Update existing identity provider (with change, no mapper change)
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    enabled: false
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider updated
+  assert:
+    that:
+      - result is changed
+      - result.existing.enabled == true
+      - result.end_state.enabled == false
+
+- name: Update existing identity provider (delete mapper)
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    state: present
+    mappers:
+      - name: "first_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "first_name"
+          user.attribute: "first_name"
+          syncMode: "INHERIT"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider updated
+  assert:
+    that:
+      - result is changed
+      - result.existing.mappers | length == 2
+      - result.end_state.mappers | length == 1
+      - result.end_state.mappers[0].name == "first_name"
+
+- name: Update existing identity provider (add mapper)
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    state: present
+    mappers:
+      - name: "last_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "last_name"
+          user.attribute: "last_name"
+          syncMode: "INHERIT"
+      - name: "first_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "first_name"
+          user.attribute: "first_name"
+          syncMode: "INHERIT"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider updated
+  assert:
+    that:
+      - result is changed
+      - result.existing.mappers | length == 1
+      - result.end_state.mappers | length == 2
+
+- name: Update existing identity provider (no change, test mapper idempotency)
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    state: present
+    mappers:
+      - name: "last_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "last_name"
+          user.attribute: "last_name"
+          syncMode: "INHERIT"
+      - name: "first_name"
+        identityProviderAlias: "{{ idp }}"
+        identityProviderMapper: "oidc-user-attribute-idp-mapper"
+        config:
+          claim: "first_name"
+          user.attribute: "first_name"
+          syncMode: "INHERIT"
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider updated
+  assert:
+    that:
+      - result is not changed
+
+- name: Delete existing identity provider
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider deleted
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Delete absent identity provider
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp }}"
+    state: absent
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider unchanged
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Create IDP realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ idp_realm }}"
+    realm: "{{ idp_realm }}"
+    state: present
+
+- name: Create new identity provider with fromUrl
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "{{ idp_fromurl }}"
+    display_name: OpenID Connect IdP from url
+    enabled: true
+    provider_id: oidc
+    config:
+      fromUrl: "{{ url }}/realms/{{ idp_realm }}/.well-known/openid-configuration"
+      clientAuthMethod: client_secret_post
+      clientId: clientid
+      clientSecret: clientsecret
+      syncMode: FORCE
+    state: present
+  register: result
+
+- name: Debug
+  debug:
+    var: result
+
+- name: Assert identity provider created with IDP endpoints
+  assert:
+    that:
+      - result is changed
+      - result.end_state.config.authorizationUrl == "{{ url }}/realms/{{ idp_realm }}/protocol/openid-connect/auth"
+      - result.end_state.config.issuer == "{{ url }}/realms/{{ idp_realm }}"
+      - result.end_state.config.jwksUrl == "{{ url }}/realms/{{ idp_realm }}/protocol/openid-connect/certs"
+      - result.end_state.config.logoutUrl ==  "{{ url }}/realms/{{ idp_realm }}/protocol/openid-connect/logout"
+      - result.end_state.config.tokenUrl == "{{ url }}/realms/{{ idp_realm }}/protocol/openid-connect/token"
+      - result.end_state.config.userInfoUrl == "{{ url }}/realms/{{ idp_realm }}/protocol/openid-connect/userinfo"
+
+- name: Create new identity provider with fromUrl and exclusion should fail
+  community.general.keycloak_identity_provider:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: "mustfail"
+    display_name: Failed OpenID Connect IdP from url
+    enabled: true
+    provider_id: oidc
+    config: "{{ config | combine(endpoint) }}"
+    state: present
+  vars:
+    config:
+      fromUrl: "{{ url }}/realms/{{ idp_realm }}/.well-known/openid-configuration"
+      clientAuthMethod: client_secret_post
+      clientId: clientid
+      clientSecret: clientsecret
+    endpoint: "{{ '{\"' + item + '\": \"' + url + '/realms/' + idp_realm + '/protocol/openid-connect/' + item + '\"}' }}"
+  with_items: ['userInfoUrl', 'authorizationUrl', 'tokenUrl', 'logoutUrl', 'issuer', 'jwksUrl']
+  register: result
+  ignore_errors: true
+
+- name: Check failure of identity provider creation with fromUrl and userInfoUrl
+  assert:
+    that:
+      - result is not changed
+      - result is failed
+      - result.results | selectattr('failed', 'equalto', false) | list | length == 0

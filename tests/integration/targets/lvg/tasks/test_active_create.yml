@@ -1,0 +1,71 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Collect vgcreate help
+  command: "vgcreate --help"
+  register: vgcreate_help_result
+
+- when: "'--setautoactivation' in vgcreate_help_result.stdout"
+  block:
+    - name: Create autoactivated volume group on disk device
+      lvg:
+        state: active
+        vg: vg_autoact_test
+        pvs: "{{ loop_device2 }}"
+
+    - name: Collect vg autoactivation status for vg_autoact_test
+      shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
+      register: active_vg_autoact_status_result
+
+    - name: Assert vg autoactivation is set for vg_autoact_test
+      assert:
+        that: "'enabled' == active_vg_autoact_status_result.stdout"
+
+    - name: Remove vg_autoact_test for the next test
+      lvg:
+        state: absent
+        vg: vg_autoact_test
+        force: true
+
+    - name: Create auttoactivation disabled volume group on disk device
+      lvg:
+        state: inactive
+        vg: vg_autoact_test
+        pvs: "{{ loop_device2 }}"
+
+    - name: Collect vg autoactivation status for vg_autoact_test
+      shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
+      register: inactive_vg_autoact_status_result
+
+    - name: Assert vg autoactivation disabled for vg_autoact_test
+      assert:
+        that: "inactive_vg_autoact_status_result.stdout | length == 0"
+
+    - name: Remove vg_autoact_test for the next test
+      lvg:
+        state: absent
+        vg: vg_autoact_test
+        force: true
+
+    - name: Create auttoactivation disabled by option volume group on disk device
+      lvg:
+        state: active
+        vg: vg_autoact_test
+        vg_options: "--setautoactivation n"
+        pvs: "{{ loop_device2 }}"
+
+    - name: Collect vg autoactivation status for vg_autoact_test
+      shell: vgs -oautoactivation --noheadings vg_autoact_test | xargs -n1
+      register: inactive_by_option_vg_autoact_status_result
+
+    - name: Assert vg autoactivation disabled by option for vg_autoact_test
+      assert:
+        that: "inactive_by_option_vg_autoact_status_result.stdout | length == 0"
+  always:
+    - name: Cleanup vg_autoact_test
+      lvg:
+        state: absent
+        vg: vg_autoact_test
+        force: true

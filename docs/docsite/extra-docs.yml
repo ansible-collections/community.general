@@ -1,0 +1,27 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+sections:
+  - title: Guides
+    toctree:
+      - filter_guide
+      - test_guide
+  - title: Deployment Guides
+    toctree:
+      - guide_ee
+  - title: Technology Guides
+    toctree:
+      - guide_alicloud
+      - guide_iocage
+      - guide_online
+      - guide_packet
+      - guide_scaleway
+  - title: Developer Guides
+    toctree:
+      - guide_deps
+      - guide_vardict
+      - guide_cmdrunner
+      - guide_modulehelper
+      - guide_uthelper

@@ -1,0 +1,23 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Removing xfs filesystem from LV lv_tmp_test
+  community.general.filesystem:
+    dev: /dev/vg_tmp_test/lv_tmp_test
+    state: absent
+    force: true
+
+- name: Deleting testlv logical volume
+  community.general.lvol:
+    vg: testvg
+    lv: testlv
+    force: true
+    state: absent
+
+- name: Deleting volume group testvg
+  community.general.lvg:
+    vg: testvg
+    force: true
+    state: absent

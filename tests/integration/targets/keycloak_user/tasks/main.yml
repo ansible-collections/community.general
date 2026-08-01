@@ -1,0 +1,322 @@
+# Copyright (c) 2022, Dušan Marković (@bratwurzt)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create realm
+  community.general.keycloak_realm:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    id: "{{ realm }}"
+    realm: "{{ realm }}"
+    state: present
+
+- name: Create new realm role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Create client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    service_accounts_enabled: true
+    state: present
+  register: client
+
+
+- name: Create new client role
+  community.general.keycloak_role:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    name: "{{ keycloak_client_role }}"
+    description: "{{ description_1 }}"
+    state: present
+
+- name: Create new groups
+  community.general.keycloak_group:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    name: "{{ item.name }}"
+    state: present
+  with_items: "{{ keycloak_user_groups }}"
+
+- name: Create user
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    attributes: "{{ keycloak_user_attributes }}"
+    state: present
+  register: create_result
+
+- name: debug
+  debug:
+    var: create_result
+
+- name: Assert user is created
+  ansible.builtin.assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.username == 'test'
+      - create_result.end_state.userProfileMetadata.attributes | length == 4
+      - create_result.end_state.groups | length == 2
+
+- name: Delete User
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    attributes: "{{ keycloak_user_attributes }}"
+    state: absent
+  register: delete_result
+
+- name: debug
+  debug:
+    var: delete_result
+
+- name: Assert user is deleted
+  ansible.builtin.assert:
+    that:
+      - delete_result.changed
+      - delete_result.end_state | length == 0
+
+- name: Create user with plus-addressed email
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "testuser+tag"
+    realm: "{{ realm }}"
+    first_name: Plus
+    last_name: User
+    email: "testuser+tag@example.org"
+    state: present
+  register: plus_create_result
+
+- name: Assert plus-addressed user is created
+  ansible.builtin.assert:
+    that:
+      - plus_create_result.changed
+      - plus_create_result.end_state.username == 'testuser+tag'
+      - plus_create_result.end_state.email == 'testuser+tag@example.org'
+
+- name: Re-run plus-addressed user creation (idempotency)
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "testuser+tag"
+    realm: "{{ realm }}"
+    first_name: Plus
+    last_name: User
+    email: "testuser+tag@example.org"
+    state: present
+  register: plus_idempotent_result
+
+- name: Assert plus-addressed user is idempotent
+  ansible.builtin.assert:
+    that:
+      - plus_idempotent_result is not changed
+
+- name: Delete plus-addressed user
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "testuser+tag"
+    realm: "{{ realm }}"
+    state: absent
+  register: plus_delete_result
+
+- name: Assert plus-addressed user is deleted
+  ansible.builtin.assert:
+    that:
+      - plus_delete_result.changed
+
+- name: Create user again
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+    email_verified_behavior: no_defaults
+  register: create_result
+
+- name: Assert user is created without email_verified
+  ansible.builtin.assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.username == 'test'
+      - create_result.end_state.emailVerified == false
+
+- name: Set email_verified
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    groups: "{{ keycloak_user_groups }}"
+    attributes: "{{ keycloak_user_attributes }}"
+    email_verified: true
+    state: present
+  register: create_result
+
+- name: Assert email_verified is set
+  ansible.builtin.assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.emailVerified == True
+
+- name: Leave email_verified as it is
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+    email_verified_behavior: no_defaults
+  register: create_result
+
+- name: Assert email_verified is still set
+  ansible.builtin.assert:
+    that:
+      - not create_result.changed
+      - create_result.end_state.emailVerified == True
+
+- name: Test old email_verified behavior
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+  register: create_result
+
+- name: Assert email_verified is reset
+  ansible.builtin.assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.emailVerified == False
+
+- name: Test setting required_actions
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    required_actions:
+      - UPDATE_PASSWORD
+      - VERIFY_EMAIL
+    state: present
+  register: create_result
+
+- name: Assert required_actions are set
+  ansible.builtin.assert:
+    that:
+      - create_result.changed
+      - "'UPDATE_PASSWORD' in create_result.end_state.requiredActions"
+      - "'VERIFY_EMAIL' in create_result.end_state.requiredActions"
+
+- name: Test required_actions unchanged
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+  register: create_result
+
+- name: Assert required_actions are still set
+  ansible.builtin.assert:
+    that:
+      - not create_result.changed
+      - "'UPDATE_PASSWORD' in create_result.end_state.requiredActions"
+      - "'VERIFY_EMAIL' in create_result.end_state.requiredActions"
+
+- name: Test required_actions reset
+  community.general.keycloak_user:
+    auth_keycloak_url: "{{ url }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    auth_realm: "{{ admin_realm }}"
+    username: "{{ keycloak_username }}"
+    realm: "{{ realm }}"
+    first_name: Ceciestes
+    last_name: Untestes
+    email: ceciestuntestes@test.com
+    state: present
+    required_actions: []
+  register: create_result
+
+- name: Assert required_actions are reset
+  ansible.builtin.assert:
+    that:
+      - create_result.changed
+      - create_result.end_state.requiredActions == []

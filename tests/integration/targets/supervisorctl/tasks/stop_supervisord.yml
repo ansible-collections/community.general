@@ -1,0 +1,14 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: stop supervisord
+  command: "supervisorctl -c {{ remote_dir }}/supervisord.conf {% if credentials.username %}-u {{ credentials.username }} -p {{ credentials.password }}{% endif %} shutdown"
+
+- name: wait_for supervisord to stop
+  ansible.builtin.wait_for:
+    port: 9001
+    host: 127.0.0.1
+    timeout: 15
+    state: stopped

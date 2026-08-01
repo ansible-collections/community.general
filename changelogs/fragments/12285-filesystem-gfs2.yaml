@@ -1,0 +1,2 @@
+minor_changes:
+  - filesystem - adds GFS2 support (https://github.com/ansible-collections/community.general/pull/12285).

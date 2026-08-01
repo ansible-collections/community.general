@@ -1,0 +1,37 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Get image information and register it in a variable
+  scaleway_image_info:
+    region: par1
+  register: images
+
+- name: Display images variable
+  debug:
+    var: images
+
+- name: Ensure retrieval of images info is success
+  assert:
+    that:
+      - images is success
+
+- name: Get image information from ams1 and register it in a variable
+  scaleway_image_info:
+    region: ams1
+  register: images_ams1
+
+- name: Display images variable from ams1
+  debug:
+    var: images_ams1
+
+- name: Ensure retrieval of images info is success
+  assert:
+    that:
+      - images_ams1 is success

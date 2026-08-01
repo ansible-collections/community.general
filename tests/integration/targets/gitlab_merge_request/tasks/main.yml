@@ -1,0 +1,129 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- block:
+    - name: Create {{ gitlab_project_name }}
+      gitlab_project:
+        api_url: "{{ gitlab_host }}"
+        validate_certs: true
+        api_token: "{{ gitlab_api_token }}"
+        name: "{{ gitlab_project_name }}"
+        group: "{{ gitlab_project_group }}"
+        default_branch: "{{ gitlab_target_branch }}"
+        initialize_with_readme: true
+        state: present
+
+    - name: Create branch {{ gitlab_source_branch }}
+      gitlab_branch:
+        api_url: "{{ gitlab_host }}"
+        api_token: "{{ gitlab_api_token }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        branch: "{{ gitlab_source_branch }}"
+        ref_branch: "{{ gitlab_target_branch }}"
+        state: present
+
+    - name: Create Merge Request
+      gitlab_merge_request:
+        api_url: "{{ gitlab_host }}"
+        api_token: "{{ gitlab_api_token }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        source_branch: "{{gitlab_source_branch}}"
+        target_branch: "{{gitlab_target_branch}}"
+        title: "Ansible test merge request"
+        description: "Test description"
+        labels: ""
+        state_filter: "opened"
+        assignee_ids: ""
+        reviewer_ids: ""
+        remove_source_branch: true
+        state: present
+      register: gitlab_merge_request_create
+
+    - name: Test Merge Request Created
+      assert:
+        that:
+          - gitlab_merge_request_create is changed
+
+    - name: Create Merge Request ( Idempotency test )
+      gitlab_merge_request:
+        api_url: "{{ gitlab_host }}"
+        api_token: "{{ gitlab_api_token }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        source_branch: "{{gitlab_source_branch}}"
+        target_branch: "{{gitlab_target_branch}}"
+        title: "Ansible test merge request"
+        description: "Test description"
+        labels: ""
+        state_filter: "opened"
+        assignee_ids: ""
+        reviewer_ids: ""
+        remove_source_branch: true
+        state: present
+      register: gitlab_merge_request_create_idempotence
+
+    - name: Test module is idempotent
+      assert:
+        that:
+          - gitlab_merge_request_create_idempotence is not changed
+
+    - name: Update Merge Request Test
+      gitlab_merge_request:
+        api_url: "{{ gitlab_host }}"
+        api_token: "{{ gitlab_api_token }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        source_branch: "{{gitlab_source_branch}}"
+        target_branch: "{{gitlab_target_branch}}"
+        title: "Ansible test merge request"
+        description_path: "{{gitlab_description_path}}"
+        labels: "{{ gitlab_labels }}"
+        state_filter: "opened"
+        assignee_ids: "{{ gitlab_assignee_ids }}"
+        reviewer_ids: ""
+        remove_source_branch: true
+        state: present
+      register: gitlab_merge_request_udpate
+
+    - name: Test merge request updated
+      assert:
+        that:
+          - gitlab_merge_request_udpate.mr.labels[0] == "{{ gitlab_labels }}"
+          - gitlab_merge_request_udpate.mr.assignees[0].username == "{{ gitlab_assignee_ids }}"
+          - "'### Description\n\nMerge Request test description' in gitlab_merge_request_udpate.mr.description"
+
+    - name: Delete Merge Request
+      gitlab_merge_request:
+        api_url: "{{ gitlab_host }}"
+        api_token: "{{ gitlab_api_token }}"
+        project: "{{ gitlab_project_group }}/{{ gitlab_project_name }}"
+        source_branch: "{{gitlab_source_branch}}"
+        target_branch: "{{gitlab_target_branch}}"
+        title: "Ansible test merge request"
+        state: absent
+      register: gitlab_merge_request_delete
+
+    - name: Test merge request is deleted
+      assert:
+        that:
+          - gitlab_merge_request_delete is changed
+
+  always:
+    - name: Clean up {{ gitlab_project_name }}
+      gitlab_project:
+        api_url: "{{ gitlab_host }}"
+        validate_certs: false
+        api_token: "{{ gitlab_api_token }}"
+        name: "{{ gitlab_project_name }}"
+        group: "{{ gitlab_project_group }}"
+        state: absent

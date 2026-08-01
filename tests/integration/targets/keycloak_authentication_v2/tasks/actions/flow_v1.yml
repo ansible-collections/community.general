@@ -1,0 +1,41 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Flow Creation/Update <Integration Test Flow> Version 1
+  community.general.keycloak_authentication_v2:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    alias: Integration Test Flow
+    state: present
+    authenticationExecutions:
+      - providerId: idp-review-profile
+        requirement: REQUIRED
+        authenticationConfig:
+          alias: Integration Test Flow - review profile config
+          config:
+            update.profile.on.first.login: "missing"
+      - subFlow: Integration Test Flow - User creation or linking
+        requirement: REQUIRED
+        authenticationExecutions:
+          - providerId: idp-create-user-if-unique
+            requirement: ALTERNATIVE
+            authenticationConfig:
+              alias: Integration Test Flow - create unique user config
+              config:
+                require.password.update.after.registration: "false"
+          - subFlow: Integration Test Flow - Handle Existing Account
+            requirement: ALTERNATIVE
+            authenticationExecutions:
+              - providerId: idp-confirm-link
+                requirement: REQUIRED
+      - providerId: auth-cookie
+        requirement: REQUIRED
+  register: flow_v1_result
+
+- name: Expose flow_v1_result to parent scope
+  ansible.builtin.set_fact:
+    flow_v1_result: "{{ flow_v1_result }}"
+  no_log: true

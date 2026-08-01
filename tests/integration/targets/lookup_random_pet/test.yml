@@ -1,0 +1,30 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Call plugin
+      set_fact:
+        result1: "{{ query('community.general.random_pet', words=3) }}"
+        result2: "{{ query('community.general.random_pet', length=3) }}"
+        result3: "{{ query('community.general.random_pet', prefix='kubernetes') }}"
+        result4: "{{ query('community.general.random_pet', separator='_') }}"
+        result5: "{{ query('community.general.random_pet', words=2, length=6, prefix='kubernetes', separator='_') }}"
+
+    - name: Check results
+      assert:
+        that:
+          - result1 | length == 1
+          - result1[0].split('-') | length == 3
+          - result2 | length == 1
+          - result2[0].split('-')[0] | length <= 3
+          - result3 | length == 1
+          - result3[0].split('-')[0] == 'kubernetes'
+          - result4 | length == 1
+          - result4[0].split('_') | length == 2
+          - result5 | length == 1
+          - result5[0].split('_') | length == 3
+          - result5[0].split('_')[0] == 'kubernetes'

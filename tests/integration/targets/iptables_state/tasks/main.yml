@@ -1,0 +1,53 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: ensure iptables package is installed (non-RHEL)
+  package:
+    name:
+      - iptables
+  become: true
+  when: not (ansible_facts.distribution == 'RedHat' and ansible_facts.distribution_major_version|int >= 10)
+
+- name: ensure iptables package is installed (RHEL 10+)
+  package:
+    name:
+      - "kernel-modules-extra-matched-{{ ansible_facts.kernel }}"
+      - "iptables-nft"
+      - "kernel-modules-extra-{{ ansible_facts.kernel }}"
+  become: true
+  when: ansible_facts.distribution == 'RedHat' and ansible_facts.distribution_major_version|int >= 10
+
+- name: include tasks
+  vars:
+    iptables_saved: "/tmp/test_iptables_state.saved"
+    iptables_tests: "/tmp/test_iptables_state.tests"
+
+  block:
+    - name: include tasks to perform basic tests (check_mode, async, idempotency)
+      include_tasks: tests/00-basic.yml
+
+    - name: include tasks to test tables handling
+      include_tasks: tests/01-tables.yml
+      when:
+        - xtables_lock is undefined
+
+    - name: include tasks to test partial restore files
+      include_tasks: tests/02-partial-restore.yml
+      when:
+        - xtables_lock is undefined
+
+
+    - name: include tasks to test rollbacks
+      include_tasks: tests/10-rollback.yml
+      when:
+        - xtables_lock is undefined
+        - ansible_connection in ['ssh', 'paramiko', 'smart']
+
+  become: true

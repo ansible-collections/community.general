@@ -1,0 +1,19 @@
+---
+# Derived from ../connection_proxmox_pct_remote/dependencies.yml Copyright (c) 2025 Nils Stein (@mietzen) <github.nstein@mailbox.org>
+# Copyright (c) 2025 Rui Lopes (@rgl) <ruilopes.com>
+# Copyright (c) 2025 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- hosts: localhost
+  gather_facts: true
+  serial: 1
+  tasks:
+    - name: Copy wsl.exe mock
+      copy:
+        src: files/wsl.exe
+        dest: /usr/local/bin/wsl.exe
+        mode: '0755'
+    - name: Install paramiko
+      pip:
+        name: "paramiko>=3.0.0"

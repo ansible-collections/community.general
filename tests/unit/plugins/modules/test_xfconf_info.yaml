@@ -1,0 +1,126 @@
+# Copyright (c) Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+  out: &version-output |
+    xfconf-query 4.18.1
+
+    Copyright (c) 2008-2023
+        The Xfce development team. All rights reserved.
+
+    Please report bugs to <https://gitlab.xfce.org/xfce/xfconf>.
+test_cases:
+  - id: test_simple_property_get
+    input:
+      channel: xfwm4
+      property: /general/inactive_opacity
+    output:
+      value: '100'
+      is_array: false
+      version: 4.18.1
+    mocks:
+      run_command:
+        - command: [/testbin/xfconf-query, --version]
+          environ: *env-def
+          rc: 0
+          out: *version-output
+          err: ''
+        - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/inactive_opacity]
+          environ: *env-def
+          rc: 0
+          out: "100\n"
+          err: ''
+  - id: test_simple_property_get_nonexistent
+    input:
+      channel: xfwm4
+      property: /general/i_dont_exist
+    output:
+      version: 4.18.1
+    mocks:
+      run_command:
+        - command: [/testbin/xfconf-query, --version]
+          environ: *env-def
+          rc: 0
+          out: *version-output
+          err: ''
+        - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/i_dont_exist]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: Property "/general/i_dont_exist" does not exist on channel "xfwm4".\n
+  - id: test_property_no_channel
+    input:
+      property: /general/i_dont_exist
+    output:
+      failed: true
+      msg: "missing parameter(s) required by 'property': channel"
+  - id: test_property_get_array
+    input:
+      channel: xfwm4
+      property: /general/workspace_names
+    output:
+      is_array: true
+      value_array: [Main, Work, Tmp]
+      version: 4.18.1
+    mocks:
+      run_command:
+        - command: [/testbin/xfconf-query, --version]
+          environ: *env-def
+          rc: 0
+          out: *version-output
+          err: ''
+        - command: [/testbin/xfconf-query, --channel, xfwm4, --property, /general/workspace_names]
+          environ: *env-def
+          rc: 0
+          out: "Value is an array with 3 items:\n\nMain\nWork\nTmp\n"
+          err: ''
+  - id: get_channels
+    input: {}
+    output:
+      channels: [a, b, c]
+      version: 4.18.1
+    mocks:
+      run_command:
+        - command: [/testbin/xfconf-query, --version]
+          environ: *env-def
+          rc: 0
+          out: *version-output
+          err: ''
+        - command: [/testbin/xfconf-query, --list]
+          environ: *env-def
+          rc: 0
+          out: "Channels:\n  a\n  b\n  c\n"
+          err: ''
+  - id: get_properties
+    input:
+      channel: xfwm4
+    output:
+      properties:
+        - /general/wrap_cycle
+        - /general/wrap_layout
+        - /general/wrap_resistance
+        - /general/wrap_windows
+        - /general/wrap_workspaces
+        - /general/zoom_desktop
+      version: 4.18.1
+    mocks:
+      run_command:
+        - command: [/testbin/xfconf-query, --version]
+          environ: *env-def
+          rc: 0
+          out: *version-output
+          err: ''
+        - command: [/testbin/xfconf-query, --list, --channel, xfwm4]
+          environ: *env-def
+          rc: 0
+          out: |
+            /general/wrap_cycle
+            /general/wrap_layout
+            /general/wrap_resistance
+            /general/wrap_windows
+            /general/wrap_workspaces
+            /general/zoom_desktop
+          err: ''

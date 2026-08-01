@@ -1,0 +1,16 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+keycloak_version: latest
+keycloak_port: 8080
+
+url: "http://localhost:{{ keycloak_port }}/auth"
+admin_realm: master
+admin_user: admin
+admin_password: password
+realm: myrealm
+
+
+keycloak_no_otp_required_pattern_orinale: "X-Forwarded-For: 10\\.[0-9\\.:]+"
+keycloak_no_otp_required_pattern_modifed: "X-Original-Forwarded-For: 10\\.[0-9\\.:]+"

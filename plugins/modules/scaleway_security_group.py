@@ -1,0 +1,285 @@
+#!/usr/bin/python
+#
+# Scaleway Security Group management module
+#
+# Copyright (C) 2018 Antoine Barbare (antoinebarbare@gmail.com).
+#
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from __future__ import annotations
+
+DOCUMENTATION = r"""
+module: scaleway_security_group
+short_description: Scaleway Security Group management module
+author: Antoine Barbare (@abarbare)
+description:
+  - This module manages Security Group on Scaleway account U(https://developer.scaleway.com).
+extends_documentation_fragment:
+  - community.general._scaleway
+  - community.general._attributes
+  - community.general._scaleway.actiongroup_scaleway
+
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  action_group:
+    version_added: 11.3.0
+
+options:
+  state:
+    description:
+      - Indicate desired state of the Security Group.
+    type: str
+    choices: [absent, present]
+    default: present
+
+  organization:
+    type: str
+    description:
+      - Organization identifier.
+      - Exactly one of O(project) and O(organization) must be specified.
+
+  region:
+    description:
+      - Scaleway region to use (for example V(par1)).
+    type: str
+    required: true
+    choices:
+      - ams1
+      - EMEA-NL-EVS
+      - ams2
+      - ams3
+      - par1
+      - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - par3
+      - waw1
+      - EMEA-PL-WAW1
+      - waw2
+      - waw3
+
+  name:
+    description:
+      - Name of the Security Group.
+    type: str
+    required: true
+
+  description:
+    description:
+      - Description of the Security Group.
+    type: str
+
+  stateful:
+    description:
+      - Create a stateful security group which allows established connections in and out.
+    type: bool
+    required: true
+
+  inbound_default_policy:
+    description:
+      - Default policy for incoming traffic.
+    type: str
+    choices: [accept, drop]
+
+  outbound_default_policy:
+    description:
+      - Default policy for outcoming traffic.
+    type: str
+    choices: [accept, drop]
+
+  organization_default:
+    description:
+      - Create security group to be the default one.
+    type: bool
+
+  project:
+    type: str
+    description:
+      - Project identifier.
+      - Exactly one of O(project) and O(organization) must be specified.
+    version_added: 12.3.0
+"""
+
+EXAMPLES = r"""
+- name: Create a Security Group using a project ID
+  community.general.scaleway_security_group:
+    state: present
+    region: par1
+    name: security_group
+    description: "my security group description"
+    stateful: false
+    inbound_default_policy: accept
+    outbound_default_policy: accept
+    organization_default: false
+    project: 951df375-e094-4d26-97c1-ba548eeb9c42
+  register: security_group_creation_task
+
+- name: Create a Security Group in the default project using an organization ID (deprecated)
+  community.general.scaleway_security_group:
+    state: present
+    region: par1
+    name: security_group
+    description: "my security group description"
+    organization: 43a3b6c8-916f-477b-b7ec-ff1898f5fdd9
+    stateful: false
+    inbound_default_policy: accept
+    outbound_default_policy: accept
+    organization_default: false
+  register: security_group_creation_task
+"""
+
+RETURN = r"""
+data:
+  description: This is only present when O(state=present).
+  returned: when O(state=present)
+  type: dict
+  sample:
+    {
+      "scaleway_security_group": {
+        "description": "my security group description",
+        "enable_default_security": true,
+        "id": "0168fb1f-cc46-4f69-b4be-c95d2a19bcae",
+        "inbound_default_policy": "accept",
+        "name": "security_group",
+        "organization": "43a3b6c8-916f-477b-b7ec-ff1898f5fdd9",
+        "organization_default": false,
+        "outbound_default_policy": "accept",
+        "servers": [],
+        "stateful": false
+      }
+    }
+"""
+
+from uuid import uuid4
+
+from ansible.module_utils.basic import AnsibleModule
+
+from ansible_collections.community.general.plugins.module_utils._scaleway import (
+    SCALEWAY_LOCATION,
+    Scaleway,
+    scaleway_argument_spec,
+)
+
+
+def payload_from_security_group(security_group):
+    return {k: v for k, v in security_group.items() if k != "id" and v is not None}
+
+
+def present_strategy(api, security_group):
+    ret = {"changed": False}
+
+    response = api.get("security_groups")
+    if not response.ok:
+        api.module.fail_json(
+            msg=f'Error getting security groups "{response.info["msg"]}": "{response.json["message"]}" ({response.json})'
+        )
+
+    security_group_lookup = {sg["name"]: sg for sg in response.json["security_groups"]}
+
+    if security_group["name"] not in security_group_lookup.keys():
+        ret["changed"] = True
+        if api.module.check_mode:
+            # Help user when check mode is enabled by defining id key
+            ret["scaleway_security_group"] = {"id": str(uuid4())}
+            return ret
+
+        # Create Security Group
+        response = api.post("/security_groups", data=payload_from_security_group(security_group))
+
+        if not response.ok:
+            msg = f'Error during security group creation: "{response.info["msg"]}": "{response.json["message"]}" ({response.json})'
+            api.module.fail_json(msg=msg)
+        ret["scaleway_security_group"] = response.json["security_group"]
+
+    else:
+        ret["scaleway_security_group"] = security_group_lookup[security_group["name"]]
+
+    return ret
+
+
+def absent_strategy(api, security_group):
+    response = api.get("security_groups")
+    ret = {"changed": False}
+
+    if not response.ok:
+        api.module.fail_json(
+            msg=f'Error getting security groups "{response.info["msg"]}": "{response.json["message"]}" ({response.json})'
+        )
+
+    security_group_lookup = {sg["name"]: sg for sg in response.json["security_groups"]}
+    if security_group["name"] not in security_group_lookup.keys():
+        return ret
+
+    ret["changed"] = True
+    if api.module.check_mode:
+        return ret
+
+    response = api.delete(f"/security_groups/{security_group_lookup[security_group['name']]['id']}")
+    if not response.ok:
+        api.module.fail_json(
+            msg=f'Error deleting security group "{response.info["msg"]}": "{response.json["message"]}" ({response.json})'
+        )
+
+    return ret
+
+
+def core(module):
+    security_group = {
+        "organization": module.params["organization"],
+        "name": module.params["name"],
+        "description": module.params["description"],
+        "stateful": module.params["stateful"],
+        "inbound_default_policy": module.params["inbound_default_policy"],
+        "outbound_default_policy": module.params["outbound_default_policy"],
+        "organization_default": module.params["organization_default"],
+        "project": module.params["project"],
+    }
+
+    region = module.params["region"]
+    module.params["api_url"] = SCALEWAY_LOCATION[region]["api_endpoint"]
+
+    api = Scaleway(module=module)
+    if module.params["state"] == "present":
+        summary = present_strategy(api=api, security_group=security_group)
+    else:
+        summary = absent_strategy(api=api, security_group=security_group)
+    module.exit_json(**summary)
+
+
+def main():
+    argument_spec = scaleway_argument_spec()
+    argument_spec.update(
+        dict(
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            organization=dict(type="str"),
+            name=dict(type="str", required=True),
+            description=dict(type="str"),
+            region=dict(type="str", required=True, choices=list(SCALEWAY_LOCATION.keys())),
+            stateful=dict(type="bool", required=True),
+            inbound_default_policy=dict(type="str", choices=["accept", "drop"]),
+            outbound_default_policy=dict(type="str", choices=["accept", "drop"]),
+            organization_default=dict(type="bool"),
+            project=dict(type="str"),
+        )
+    )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        required_if=[["stateful", True, ["inbound_default_policy", "outbound_default_policy"]]],
+        mutually_exclusive=[
+            ("organization", "project"),
+        ],
+        required_one_of=[
+            ("organization", "project"),
+        ],
+    )
+
+    core(module)
+
+
+if __name__ == "__main__":
+    main()

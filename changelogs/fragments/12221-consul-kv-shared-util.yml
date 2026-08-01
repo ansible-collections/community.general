@@ -1,0 +1,2 @@
+minor_changes:
+  - consul_kv - the module no longer requires the ``py-consul`` Python library, and is now part of the ``community.general.consul`` action group (https://github.com/ansible-collections/community.general/pull/12221).

@@ -1,0 +1,39 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the file_remove module
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Ensure the test directory is absent before starting
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: absent
+
+- name: Create the test directory
+  ansible.builtin.file:
+    path: "{{ file_remove_testdir }}"
+    state: directory
+    mode: '0755'
+
+- name: Include tasks to test error handling
+  ansible.builtin.include_tasks: test_errors.yml
+
+- name: Include tasks to test glob pattern matching
+  ansible.builtin.include_tasks: test_glob.yml
+
+- name: Include tasks to test regex pattern matching
+  ansible.builtin.include_tasks: test_regex.yml
+
+- name: Include tasks to test recursive removal
+  ansible.builtin.include_tasks: test_recursive.yml
+
+- name: Include tasks to test different file types
+  ansible.builtin.include_tasks: test_file_types.yml
+
+- name: Include tasks to test check mode and diff mode
+  ansible.builtin.include_tasks: test_check_diff.yml

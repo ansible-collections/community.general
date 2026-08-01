@@ -1,0 +1,78 @@
+---
+# Copyright (c) 2020 Gregory Thiemonge <gregory.thiemonge@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: test absent dns record
+  community.general.gandi_livedns:
+    api_key: "{{ gandi_api_key }}"
+    record: "{{ item.record }}"
+    domain: "{{ gandi_livedns_domain_name }}"
+    type: "{{ item.type }}"
+    ttl: "{{ item.ttl }}"
+    state: absent
+  register: result
+- name: verify test absent dns record
+  assert:
+    that:
+      - result is successful
+
+- name: test create a dns record in check mode
+  community.general.gandi_livedns:
+    api_key: "{{ gandi_api_key }}"
+    record: "{{ item.record }}"
+    domain: "{{ gandi_livedns_domain_name }}"
+    values: "{{ item['values'] }}"
+    ttl: "{{ item.ttl }}"
+    type: "{{ item.type }}"
+  check_mode: true
+  register: result
+- name: verify test create a dns record in check mode
+  assert:
+    that:
+      - result is changed
+
+- name: test create a dns record
+  community.general.gandi_livedns:
+    api_key: "{{ gandi_api_key }}"
+    record: "{{ item.record }}"
+    domain: "{{ gandi_livedns_domain_name }}"
+    values: "{{ item['values'] }}"
+    ttl: "{{ item.ttl }}"
+    type: "{{ item.type }}"
+  register: result
+- name: verify test create a dns record
+  assert:
+    that:
+      - result is changed
+      - result.record['values'] == item['values']
+      - result.record.record == item.record
+      - result.record.type == item.type
+      - result.record.ttl == item.ttl
+
+- name: test create a dns record idempotence
+  community.general.gandi_livedns:
+    api_key: "{{ gandi_api_key }}"
+    record: "{{ item.record }}"
+    domain: "{{ gandi_livedns_domain_name }}"
+    values: "{{ item['values'] }}"
+    ttl: "{{ item.ttl }}"
+    type: "{{ item.type }}"
+  register: result
+- name: verify test create a dns record idempotence
+  assert:
+    that:
+      - result is not changed
+      - result.record['values'] == item['values']
+      - result.record.record == item.record
+      - result.record.type == item.type
+      - result.record.ttl == item.ttl
+
+- name: test create a DNS record with personal access token
+  community.general.gandi_livedns:
+    personal_access_token: "{{ gandi_personal_access_token }}"
+    record: "{{ item.record }}"
+    domain: "{{ gandi_livedns_domain_name }}"
+    values: "{{ item['values'] }}"
+    ttl: "{{ item.ttl }}"
+    type: "{{ item.type }}"

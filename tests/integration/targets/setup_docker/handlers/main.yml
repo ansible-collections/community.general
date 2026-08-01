@@ -1,0 +1,31 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Remove python requests
+  ansible.builtin.pip:
+    name:
+      - requests
+    state: absent
+
+- name: Stop docker service
+  become: true
+  ansible.builtin.service:
+    name: docker
+    state: stopped
+
+- name: Remove Docker packages
+  ansible.builtin.package:
+    name: "{{ docker_packages }}"
+    state: absent
+
+- name: "D-Fedora : Remove repository"
+  ansible.builtin.file:
+    path: /etc/yum.repos.d/docker-ce.repo
+    state: absent
+
+- name: "D-Fedora : Remove dnf-plugins-core"
+  ansible.builtin.package:
+    name: dnf-plugins-core
+    state: absent

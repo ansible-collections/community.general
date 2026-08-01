@@ -1,0 +1,234 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Remove keycloak client to avoid failures from previous failed runs
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: absent
+
+- name: Create keycloak client with authorization services enabled
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: present
+    enabled: true
+    public_client: false
+    service_accounts_enabled: true
+    authorization_services_enabled: true
+
+- name: Create an authorization scope (check mode)
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "file:delete"
+    display_name: "File delete"
+    icon_uri: "http://localhost/icon.png"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  check_mode: true
+  diff: true
+  register: result
+
+- name: Assert that authorization scope was not created in check mode
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+      - result.msg == 'Authorization scope would be created'
+      - result.diff.before == {}
+      - result.diff.after.name == 'file:delete'
+      - result.diff.after.displayName == 'File delete'
+      - result.diff.after.iconUri == 'http://localhost/icon.png'
+
+- name: Create authorization scope
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "file:delete"
+    display_name: "File delete"
+    icon_uri: "http://localhost/icon.png"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that authorization scope was created
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "file:delete"
+      - result.end_state.iconUri == "http://localhost/icon.png"
+      - result.end_state.displayName == "File delete"
+
+- name: Create authorization scope (test for idempotency)
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "file:delete"
+    display_name: "File delete"
+    icon_uri: "http://localhost/icon.png"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "file:delete"
+      - result.end_state.iconUri == "http://localhost/icon.png"
+      - result.end_state.displayName == "File delete"
+
+- name: Authorization scope update (check mode)
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "file:delete"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  diff: true
+  check_mode: true
+  register: result
+
+- name: Assert that authorization scope was not updated in check mode
+  assert:
+    that:
+      - result is changed
+      - result.msg == 'Authorization scope would be updated'
+      - result.diff.before.displayName == 'File delete'
+      - result.diff.before.iconUri == 'http://localhost/icon.png'
+      - result.diff.after.displayName == ''
+      - result.diff.after.iconUri == ''
+
+- name: Authorization scope update (remove optional parameters)
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "file:delete"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that optional parameters have been removed
+  assert:
+    that:
+      - result is changed
+      - result.end_state != {}
+      - result.end_state.name == "file:delete"
+      - result.end_state.iconUri == ""
+      - result.end_state.displayName == ""
+
+- name: Authorization scope update (test for idempotency)
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: present
+    name: "file:delete"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state != {}
+      - result.end_state.name == "file:delete"
+      - result.end_state.iconUri == ""
+      - result.end_state.displayName == ""
+
+- name: Authorization scope remove (check mode)
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    name: "file:delete"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  diff: true
+  check_mode: true
+  register: result
+
+- name: Assert that authorization scope has not been removed in check mode
+  assert:
+    that:
+      - result is changed
+      - result.msg == 'Authorization scope would be removed'
+      - result.diff.before.name == 'file:delete'
+      - result.diff.after == {}
+
+- name: Authorization scope remove
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    name: "file:delete"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that authorization scope has been removed
+  assert:
+    that:
+      - result is changed
+      - result.end_state == {}
+
+- name: Authorization scope remove (test for idempotency)
+  community.general.keycloak_authz_authorization_scope:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    state: absent
+    name: "file:delete"
+    client_id: "{{ client_id }}"
+    realm: "{{ realm }}"
+  register: result
+
+- name: Assert that nothing has changed
+  assert:
+    that:
+      - result is not changed
+      - result.end_state == {}
+
+- name: Remove keycloak client
+  community.general.keycloak_client:
+    auth_keycloak_url: "{{ url }}"
+    auth_realm: "{{ admin_realm }}"
+    auth_username: "{{ admin_user }}"
+    auth_password: "{{ admin_password }}"
+    realm: "{{ realm }}"
+    client_id: "{{ client_id }}"
+    state: absent

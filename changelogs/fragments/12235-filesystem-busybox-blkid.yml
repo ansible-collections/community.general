@@ -1,0 +1,4 @@
+bugfixes:
+  - "filesystem - handle BusyBox ``blkid`` output to correctly detect existing filesystems on systems like Alpine Linux
+    (https://github.com/ansible-collections/community.general/issues/7283,
+    https://github.com/ansible-collections/community.general/pull/12235)."
