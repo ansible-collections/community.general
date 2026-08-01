@@ -1,2 +1,2 @@
 bugfixes:
-  - pkgng - fix failure to install packages with pkgng. The module was crashing due to a failure to find the requested package for installation when a pkg repository had never been updated before, caused by the unconditional addition of the -U flag for the pkg tool which prevents the updating of repositories. Now the flag is only added if "cached" is set to true.
+  - pkgng - fix failure to install packages when the package repository has never been updated (https://github.com/ansible-collections/community.general/pull/12507).
