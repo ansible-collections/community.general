@@ -130,6 +130,16 @@ EXAMPLES = r"""
     tag_push_events: true
     token: "my-super-secret-token-that-my-ci-server-will-check"
 
+- name: Add a project hook with a custom webhook template
+  community.general.gitlab_hook:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    project: "my_group/my_project"
+    hook_url: "https://my-ci-server.example.com/gitlab-hook"
+    state: present
+    push_events: true
+    custom_webhook_template: !unsafe '{"event": "{{object_kind}}", "project": "{{project.name}}"}'    
+
 - name: "Delete the previous hook"
   community.general.gitlab_hook:
     api_url: https://gitlab.example.com/
