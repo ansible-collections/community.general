@@ -138,7 +138,7 @@ EXAMPLES = r"""
     hook_url: "https://my-ci-server.example.com/gitlab-hook"
     state: present
     push_events: true
-    custom_webhook_template: !unsafe '{"event": "{{object_kind}}", "project": "{{project.name}}"}'    
+    custom_webhook_template: !unsafe '{"event": "{{object_kind}}", "project": "{{project.name}}"}'
 
 - name: "Delete the previous hook"
   community.general.gitlab_hook:
