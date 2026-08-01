@@ -50,8 +50,6 @@ redis_module: redis
 
 redis_password: PASS
 
-old_redis: false
-
 # Master
 master_port: 6379
 master_conf: /etc/redis-master.conf
