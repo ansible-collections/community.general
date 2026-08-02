@@ -207,6 +207,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
+zstandard = None
 with deps.declare(
     "zstandard",
     msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
