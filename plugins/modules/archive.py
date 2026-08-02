@@ -586,6 +586,9 @@ class TarArchive(Archive):
 
     def _get_checksums(self, path):
         LZMAError = lzma.LZMAError
+        compression_errors = (LZMAError, tarfile.ReadError, tarfile.CompressionError)
+        if not deps.failed("zstandard"):
+            compression_errors += (zstandard.ZstdError,)
 
         try:
             if self.format == "xz":
@@ -601,7 +604,7 @@ class TarArchive(Archive):
                 archive = tarfile.open(_to_native_ascii(path), f"r|{self.format}")
                 checksums = {(info.name, info.chksum) for info in archive.getmembers()}
                 archive.close()
-        except (LZMAError, tarfile.ReadError, tarfile.CompressionError):
+        except compression_errors:
             try:
                 # The python implementations of gzip, bz2, and lzma do not support restoring compressed files
                 # to their original names so only file checksum is returned
