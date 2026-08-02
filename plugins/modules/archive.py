@@ -205,15 +205,13 @@ from zlib import crc32
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
-ZSTANDARD_IMP_ERR = None
-try:
-    import zstandard
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
-    HAS_ZSTANDARD = True
-except ImportError:
-    HAS_ZSTANDARD = False
-    ZSTANDARD_IMP_ERR = format_exc()
-    zstandard = None
+with deps.declare(
+    "zstandard",
+    msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
+):
+    import zstandard
 
 STATE_ABSENT = "absent"
 STATE_ARCHIVED = "archive"
@@ -314,11 +312,8 @@ class Archive(metaclass=abc.ABCMeta):
                 msg='Error, must specify "dest" when archiving multiple files or trees',
             )
 
-        if self.format == "zstd" and not HAS_ZSTANDARD:
-            module.fail_json(
-                msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
-                exception=ZSTANDARD_IMP_ERR,
-            )
+        if self.format == "zstd":
+            deps.validate(module, "zstandard")
 
         if self.remove:
             self._check_removal_safety()

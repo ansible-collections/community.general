@@ -120,9 +120,9 @@ class TestOpenCompressedFileZstd(ModuleTestCase):
         self.os_path_islink.stop()
         super().tearDown()
 
-    @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", True)
+    @patch("ansible_collections.community.general.plugins.modules.archive.deps.validate")
     @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
-    def test_open_compressed_file_zstd(self, mock_zstandard):
+    def test_open_compressed_file_zstd(self, mock_zstandard, mock_deps_validate):
         mock_file = MagicMock()
         mock_zstandard.open.return_value = mock_file
 
@@ -134,9 +134,13 @@ class TestOpenCompressedFileZstd(ModuleTestCase):
             mock_zstandard.open.assert_called_once_with("/foo/bar.zst", "wb")
             assert result == mock_file
 
-    @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", False)
-    @patch("ansible_collections.community.general.plugins.modules.archive.ZSTANDARD_IMP_ERR", "ModuleNotFoundError")
-    def test_open_compressed_file_zstd_missing(self):
+    @patch("ansible_collections.community.general.plugins.modules.archive.deps.validate")
+    def test_open_compressed_file_zstd_missing(self, mock_deps_validate):
+        def fail_on_validate(module, spec=None):
+            module.fail_json(msg="The zstandard Python library is required for zstd compression")
+
+        mock_deps_validate.side_effect = fail_on_validate
+
         with set_module_args(dict(path=["/foo/bar"], dest="/foo/bar.zst", format="zstd")):
             module = create_module()
             module.fail_json = Mock()
@@ -168,9 +172,9 @@ class TestTarArchiveZstd(ModuleTestCase):
         self.os_path_islink.stop()
         super().tearDown()
 
-    @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", True)
+    @patch("ansible_collections.community.general.plugins.modules.archive.deps.validate")
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
-    def test_tar_archive_open_zstd(self, mock_tarfile):
+    def test_tar_archive_open_zstd(self, mock_tarfile, mock_deps_validate):
         with set_module_args(dict(path=["/foo/bar", "/foo/baz"], dest="/foo/out.tar.zst", format="zstd")):
             module = create_module()
             archive = get_archive(module)
@@ -184,10 +188,10 @@ class TestTarArchiveZstd(ModuleTestCase):
             assert isinstance(archive.fileIO, io.BytesIO)
             mock_tarfile.open.assert_called_once_with(fileobj=archive.fileIO, mode="w")
 
-    @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", True)
+    @patch("ansible_collections.community.general.plugins.modules.archive.deps.validate")
     @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
-    def test_tar_archive_close_zstd(self, mock_tarfile, mock_zstandard):
+    def test_tar_archive_close_zstd(self, mock_tarfile, mock_zstandard, mock_deps_validate):
         with set_module_args(dict(path=["/foo/bar", "/foo/baz"], dest="/foo/out.tar.zst", format="zstd")):
             module = create_module()
             archive = get_archive(module)
@@ -203,10 +207,10 @@ class TestTarArchiveZstd(ModuleTestCase):
             archive.file.close.assert_called_once()
             mock_zstandard.open.assert_called_once()
 
-    @patch("ansible_collections.community.general.plugins.modules.archive.HAS_ZSTANDARD", True)
+    @patch("ansible_collections.community.general.plugins.modules.archive.deps.validate")
     @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
-    def test_tar_archive_get_checksums_zstd(self, mock_tarfile, mock_zstandard):
+    def test_tar_archive_get_checksums_zstd(self, mock_tarfile, mock_zstandard, mock_deps_validate):
         with set_module_args(dict(path=["/foo/bar", "/foo/baz"], dest="/foo/out.tar.zst", format="zstd")):
             module = create_module()
             archive = get_archive(module)
