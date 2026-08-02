@@ -12,7 +12,7 @@ module: flatpak_mask
 short_description: Mask Flatpak applications
 description:
   - This module masks flatpak applications, preventing them from being installed or updated.
-  - It replicates the behavior of C(flatpak mask). 
+  - It replicates the behavior of C(flatpak mask).
 author:
   - Ilya Bogdanov (@zeerayne)
 version_added: 13.3.0
@@ -62,74 +62,74 @@ EXAMPLES = r"""
     state: absent
 """
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
 
-class FlatpakMaskModule(AnsibleModule):
-    def __init__(self):
-        super().__init__(
-            argument_spec=dict(
-                name=dict(type="str", required=True, aliases=["app"]),
-                state=dict(type="str", default="present", choices=["present", "absent"]),
-                method=dict(type="str", default="system", choices=["user", "system"]),
-            ),
-            supports_check_mode=True,
-        )
+class FlatpakMask(StateModuleHelper):
+    output_params = ("name", "state", "masked")
+    module = dict(
+        argument_spec=dict(
+            name=dict(type="str", required=True, aliases=["app"]),
+            state=dict(type="str", default="present", choices=["present", "absent"]),
+            method=dict(type="str", default="system", choices=["user", "system"]),
+        ),
+        supports_check_mode=True,
+    )
 
-        self.app_name = self.params["name"]
-        self.state = self.params["state"]
-        self.method = self.params["method"]
+    def __init_module__(self):
         self.flatpak_bin = self.get_bin_path("flatpak", required=True)
+        self.vars.set("masked", self._check_is_masked(), change=True, diff=True)
 
-    def check_is_masked(self):
+    def _check_is_masked(self):
         check_cmd = [self.flatpak_bin, "mask"]
-        check_cmd.insert(1, f"--{self.method}")
+        check_cmd.insert(1, f"--{self.vars.method}")
 
-        rc, out, err = self.run_command(check_cmd)
+        rc, out, err = self.module.run_command(check_cmd)
+        if rc != 0:
+            self.do_raise(msg=f"Failed to query flatpak mask state: {err}", rc=rc, out=out, err=err)
 
         masked_apps = [line.strip() for line in out.splitlines()]
-        return self.app_name in masked_apps
+        return self.vars.name in masked_apps
 
-    def apply_mask(self):
-        set_cmd = [self.flatpak_bin, "mask", self.app_name]
-        set_cmd.insert(1, f"--{self.method}")
+    def _apply_mask(self):
+        set_cmd = [self.flatpak_bin, "mask", self.vars.name]
+        set_cmd.insert(1, f"--{self.vars.method}")
 
-        rc, out, err = self.run_command(set_cmd)
+        rc, out, err = self.module.run_command(set_cmd)
         if rc != 0:
-            self.fail_json(msg=f"Failed to mask flatpak app: {err}", rc=rc, out=out, err=err)
+            self.do_raise(msg=f"Failed to mask flatpak app: {err}", rc=rc, out=out, err=err)
 
-    def apply_unmask(self):
-        set_cmd = [self.flatpak_bin, "mask", "--remove", self.app_name]
-        set_cmd.insert(1, f"--{self.method}")
+    def _apply_unmask(self):
+        set_cmd = [self.flatpak_bin, "mask", "--remove", self.vars.name]
+        set_cmd.insert(1, f"--{self.vars.method}")
 
-        rc, out, err = self.run_command(set_cmd)
+        rc, out, err = self.module.run_command(set_cmd)
         if rc != 0:
-            self.fail_json(msg=f"Failed to unmask flatpak app: {err}", rc=rc, out=out, err=err)
+            self.do_raise(msg=f"Failed to unmask flatpak app: {err}", rc=rc, out=out, err=err)
 
-    def run(self):
-        is_masked = self.check_is_masked()
-        changed = False
+    def state_present(self):
+        if self.vars.masked:
+            return
 
-        if self.state == "present" and not is_masked:
-            changed = True
-        elif self.state == "absent" and is_masked:
-            changed = True
-
+        self.changed = True
+        self.vars.masked = True
         if self.check_mode:
-            self.exit_json(changed=changed)
+            return
+        self._apply_mask()
 
-        if changed:
-            if self.state == "present":
-                self.apply_mask()
-            else:
-                self.apply_unmask()
+    def state_absent(self):
+        if not self.vars.masked:
+            return
 
-        self.exit_json(changed=changed, name=self.app_name, state=self.state, masked=(self.state == "present"))
+        self.changed = True
+        self.vars.masked = False
+        if self.check_mode:
+            return
+        self._apply_unmask()
 
 
 def main():
-    module = FlatpakMaskModule()
-    module.run()
+    FlatpakMask.execute()
 
 
 if __name__ == "__main__":
