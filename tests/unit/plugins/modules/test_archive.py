@@ -13,12 +13,20 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args,
 )
 
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 from ansible_collections.community.general.plugins.modules.archive import (
     common_path,
     create_module,
     get_archive,
     is_archive,
 )
+
+
+@pytest.fixture(autouse=True)
+def register_deps():
+    """Re-register the zstandard dep after deps_cleanup clears _deps before each test."""
+    with deps.declare("zstandard"):
+        pass
 
 
 class TestArchive(ModuleTestCase):
