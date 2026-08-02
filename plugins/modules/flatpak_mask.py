@@ -16,6 +16,7 @@ description:
   - It replicates the behavior of C(flatpak mask). 
 author:
   - Ilya Bogdanov (@zeerayne)
+version_added: 13.3.0
 requirements:
   - flatpak
 extends_documentation_fragment:
