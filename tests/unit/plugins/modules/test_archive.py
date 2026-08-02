@@ -220,7 +220,7 @@ class TestTarArchiveZstd(ModuleTestCase):
             mock_info.name = "file.txt"
             mock_info.chksum = 12345
             mock_tar.getmembers.return_value = [mock_info]
-            mock_tarfile.open.return_value = mock_tar
+            mock_tarfile.open.return_value.__enter__.return_value = mock_tar
 
             mock_zstd_file = MagicMock()
             mock_zstd_file.__enter__ = Mock(return_value=mock_zstd_file)
