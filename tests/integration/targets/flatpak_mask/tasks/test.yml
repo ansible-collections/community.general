@@ -9,7 +9,7 @@
 
 - name: Test masking - {{ method }}
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App2
     method: "{{ method }}"
     state: present
   register: mask_result
@@ -22,7 +22,7 @@
 
 - name: Test idempotency of masking - {{ method }}
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App2
     method: "{{ method }}"
     state: present
   register: double_mask_result
@@ -38,7 +38,7 @@
 
 - name: Test unmasking - {{ method }}
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App2
     method: "{{ method }}"
     state: absent
   register: unmask_result
@@ -51,7 +51,7 @@
 
 - name: Test idempotency of unmasking - {{ method }}
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App2
     method: "{{ method }}"
     state: absent
   register: double_unmask_result
@@ -67,7 +67,7 @@
 
 - name: Test re-masking after unmask - {{ method }}
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App2
     method: "{{ method }}"
     state: present
   register: remask_result
@@ -80,7 +80,7 @@
 
 - name: Test idempotency of re-masking - {{ method }}
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App2
     method: "{{ method }}"
     state: present
   register: double_remask_result

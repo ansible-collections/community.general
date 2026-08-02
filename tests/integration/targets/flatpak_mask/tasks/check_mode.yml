@@ -9,7 +9,7 @@
 
 - name: Test masking of not masked app (check mode)
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App3
     state: present
   register: mask_result
   check_mode: true
@@ -22,7 +22,7 @@
 
 - name: Test non-existent idempotency of masking of not masked app (check mode)
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App3
     state: present
   register: double_mask_result
   check_mode: true
@@ -37,7 +37,7 @@
 
 - name: Test unmasking of not masked app in check mode
   community.general.flatpak_mask:
-    name: io.github.shiftey.Desktop
+    name: com.dummy.App3
     state: absent
   register: unmask_result
   check_mode: true
@@ -55,7 +55,7 @@
 
 - name: Test masking of masked app in check mode
   community.general.flatpak_mask:
-    name: check-mode-masked-app
+    name: com.dummy.App1
     state: present
   register: mask_result
   check_mode: true
@@ -70,7 +70,7 @@
 
 - name: Test unmasking of masked app (check mode)
   community.general.flatpak_mask:
-    name: check-mode-masked-app
+    name: com.dummy.App1
     state: absent
   register: unmask_result
   check_mode: true
@@ -83,7 +83,7 @@
 
 - name: Test non-existent idempotency of unmasking of masked app (check mode)
   community.general.flatpak_mask:
-    name: check-mode-masked-app
+    name: com.dummy.App1
     state: absent
   register: double_unmask_result
   check_mode: true

@@ -15,7 +15,7 @@
 
     - name: Mask app for check_mode tests with masked app
       community.general.flatpak_mask:
-        name: check-mode-masked-app
+        name: com.dummy.App1
         state: present
       become: true
       ignore_errors: true
@@ -40,8 +40,8 @@
         name: "{{ item }}"
         state: absent
       loop:
-        - io.github.shiftey.Desktop
-        - check-mode-masked-app
+        - com.dummy.App1
+        - com.dummy.App2
       ignore_errors: true
       become: true
 
