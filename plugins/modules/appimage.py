@@ -11,7 +11,7 @@ short_description: Manage AppImage packages
 description:
   - Install, update, and remove applications distributed as AppImage files.
   - The module installs AppImage files into a user-controlled directory and can optionally create a desktop launcher.
-  - Sources can be direct AppImage URLs or GitHub release pages containing AppImage assets.
+  - Sources can be direct AppImage URLs, GitHub release pages containing AppImage assets, or appimage.github.io catalog entries.
 author:
   - Ansible Community (@ansible-collections)
 extends_documentation_fragment:
@@ -26,6 +26,7 @@ options:
     description:
       - Name of the managed AppImage.
       - This is used as the installed executable filename and as the desktop file basename.
+      - When O(url) is omitted, this is also used to look up the AppImage in the appimage.github.io catalog.
     type: str
     required: true
   url:
@@ -33,7 +34,7 @@ options:
       - URL used to install the AppImage.
       - This can point directly to an AppImage file, or to a GitHub releases page such as
         V(https://github.com/OWNER/REPO/releases) or V(https://github.com/OWNER/REPO/releases/tag/TAG).
-      - Required when O(state=present) or O(state=latest).
+      - When omitted with O(state=present) or O(state=latest), the module looks up O(name) in the appimage.github.io catalog.
     type: str
   state:
     description:
@@ -71,6 +72,11 @@ options:
       - GitHub token used when querying GitHub releases.
       - This can be useful for private repositories or higher API rate limits.
     type: str
+  catalog_url:
+    description:
+      - URL of the appimage.github.io-compatible JSON feed used when O(url) is omitted.
+    type: str
+    default: https://appimage.github.io/feed.json
   validate_certs:
     description:
       - If V(false), SSL certificates are not validated.
@@ -88,6 +94,10 @@ EXAMPLES = r"""
   community.general.appimage:
     name: example
     url: https://example.com/downloads/example-x86_64.AppImage
+
+- name: Install an AppImage from the appimage.github.io catalog
+  community.general.appimage:
+    name: appimagetool
 
 - name: Install the latest x86_64 AppImage from GitHub releases
   community.general.appimage:
@@ -135,6 +145,16 @@ version:
   returned: when installing from a GitHub release
   type: str
   sample: v1.2.3
+catalog_name:
+  description: AppImage catalog entry name used to resolve the source.
+  returned: when installing from the appimage.github.io catalog
+  type: str
+  sample: appimagetool
+catalog_url:
+  description: AppImage catalog page used to resolve the source.
+  returned: when installing from the appimage.github.io catalog
+  type: str
+  sample: https://appimage.github.io/appimagetool/
 """
 
 import fnmatch
@@ -145,6 +165,10 @@ from urllib.parse import urlparse
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
+
+
+def normalized_catalog_name(name):
+    return "".join(c for c in name.lower() if c.isalnum())
 
 
 def is_github_releases_url(url):
@@ -170,6 +194,10 @@ def github_api_url(owner, repo, tag):
     if tag:
         return f"https://api.github.com/repos/{owner}/{repo}/releases/tags/{tag}"
     return f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+
+
+def appimage_catalog_name_url(catalog_name):
+    return f"https://appimage.github.io/{catalog_name}/"
 
 
 def response_body(response):
@@ -212,8 +240,40 @@ def select_release_asset(module, release, asset_name):
     return matches[0]
 
 
-def resolve_source(module):
-    url = module.params["url"]
+def select_catalog_item(module, feed, name):
+    items = feed.get("items") or []
+    exact_matches = [item for item in items if item.get("name") == name]
+    if exact_matches:
+        return exact_matches[0]
+
+    normalized_name = normalized_catalog_name(name)
+    normalized_matches = [item for item in items if normalized_catalog_name(item.get("name", "")) == normalized_name]
+    if not normalized_matches:
+        module.fail_json(msg=f"No AppImage named {name!r} was found in the appimage.github.io catalog")
+    if len(normalized_matches) > 1:
+        names = [item["name"] for item in normalized_matches]
+        module.fail_json(msg=f"Multiple AppImage catalog entries match {name!r}; use the exact catalog name", catalog_names=names)
+
+    return normalized_matches[0]
+
+
+def select_catalog_download_url(module, item):
+    links = item.get("links") or []
+    download_links = [link for link in links if link.get("type") == "Download" and link.get("url")]
+    github_links = [link for link in links if link.get("type") == "GitHub" and link.get("url")]
+
+    if download_links:
+        return download_links[0]["url"]
+    if github_links:
+        github_url = github_links[0]["url"]
+        if github_url.startswith("http://") or github_url.startswith("https://"):
+            return github_url.rstrip("/") + "/releases"
+        return f"https://github.com/{github_url.strip('/')}/releases"
+
+    module.fail_json(msg=f"AppImage catalog entry {item.get('name')!r} does not contain a supported download link")
+
+
+def resolve_url_source(module, url, catalog_name=None):
     if is_github_releases_url(url):
         owner, repo, tag_from_url = parse_github_releases_url(url)
         tag = module.params["version"] or tag_from_url
@@ -222,13 +282,47 @@ def resolve_source(module):
             headers["Authorization"] = "Bearer %s" % module.params["github_token"]
         release = fetch_json(module, github_api_url(owner, repo, tag), headers)
         asset = select_release_asset(module, release, module.params["asset_name"])
-        return {
+        source = {
             "source_url": asset["browser_download_url"],
             "asset_name": asset.get("name"),
             "version": release.get("tag_name"),
         }
+        if catalog_name:
+            source["catalog_name"] = catalog_name
+        return source
 
-    return {"source_url": url, "asset_name": os.path.basename(urlparse(url).path), "version": None}
+    if not urlparse(url).path.lower().endswith(".appimage"):
+        module.fail_json(
+            msg=(
+                f"Resolved URL {url!r} is not a direct AppImage URL or GitHub releases page. "
+                "Use url to provide a supported AppImage source explicitly."
+            )
+        )
+
+    source = {
+        "source_url": url,
+        "asset_name": os.path.basename(urlparse(url).path),
+        "version": None,
+    }
+    if catalog_name:
+        source["catalog_name"] = catalog_name
+    return source
+
+
+def resolve_catalog_source(module):
+    feed = fetch_json(module, module.params["catalog_url"], {})
+    item = select_catalog_item(module, feed, module.params["name"])
+    download_url = select_catalog_download_url(module, item)
+    source = resolve_url_source(module, download_url, catalog_name=item.get("name"))
+    source["catalog_url"] = appimage_catalog_name_url(item.get("name"))
+    return source
+
+
+def resolve_source(module):
+    url = module.params["url"]
+    if url:
+        return resolve_url_source(module, url)
+    return resolve_catalog_source(module)
 
 
 def metadata_path(path):
@@ -334,10 +428,10 @@ def main():
             version=dict(type="str"),
             asset_name=dict(type="str", default="*.AppImage"),
             github_token=dict(type="str", no_log=True),
+            catalog_url=dict(type="str", default="https://appimage.github.io/feed.json"),
             validate_certs=dict(type="bool", default=True),
             timeout=dict(type="int", default=30),
         ),
-        required_if=[("state", "present", ["url"]), ("state", "latest", ["url"])],
         supports_check_mode=True,
     )
 

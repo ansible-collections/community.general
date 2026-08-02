@@ -64,6 +64,53 @@ def test_select_release_asset_fails_on_multiple_matches():
     assert module.fail["assets"] == ["tool-x86_64.AppImage", "tool-aarch64.AppImage"]
 
 
+def test_select_catalog_item_prefers_exact_match():
+    feed = {
+        "items": [
+            {"name": "Tool_App"},
+            {"name": "tool-app"},
+        ],
+    }
+
+    item = appimage.select_catalog_item(FakeModule(), feed, "Tool_App")
+
+    assert item["name"] == "Tool_App"
+
+
+def test_select_catalog_item_normalizes_name():
+    feed = {"items": [{"name": "AppImageUpdate"}]}
+
+    item = appimage.select_catalog_item(FakeModule(), feed, "appimage-update")
+
+    assert item["name"] == "AppImageUpdate"
+
+
+def test_select_catalog_download_url_prefers_download_link():
+    item = {
+        "name": "tool",
+        "links": [
+            {"type": "GitHub", "url": "example/tool"},
+            {"type": "Download", "url": "https://github.com/example/tool/releases"},
+        ],
+    }
+
+    assert appimage.select_catalog_download_url(FakeModule(), item) == "https://github.com/example/tool/releases"
+
+
+def test_select_catalog_download_url_uses_github_fallback():
+    item = {"name": "tool", "links": [{"type": "GitHub", "url": "example/tool"}]}
+
+    assert appimage.select_catalog_download_url(FakeModule(), item) == "https://github.com/example/tool/releases"
+
+
+def test_resolve_url_source_rejects_unsupported_catalog_url():
+    module = FakeModule()
+    module.params = {"version": None, "github_token": None, "asset_name": "*.AppImage"}
+
+    with pytest.raises(RuntimeError, match="not a direct AppImage URL or GitHub releases page"):
+        appimage.resolve_url_source(module, "https://example.com/download")
+
+
 def test_needs_install_uses_metadata_for_latest(tmp_path):
     path = tmp_path / "tool"
     path.write_text("appimage", encoding="utf-8")
