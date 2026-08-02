@@ -1,2 +1,0 @@
-minor_changes:
-  - flatpak_mask - add new module to mask/unmask flatpak applications (https://github.com/ansible-collections/community.general/pull/12491).

@@ -618,10 +618,10 @@ files:
     maintainers: shahargolshani
   $modules/flatpak.py:
     maintainers: $team_flatpak
-  $modules/flatpak_remote.py:
-    maintainers: $team_flatpak
   $modules/flatpak_mask.py:
     maintainers: zeerayne
+  $modules/flatpak_remote.py:
+    maintainers: $team_flatpak
   $modules/gandi_livedns.py:
     maintainers: gthiemonge
   $modules/gconftool2.py:
