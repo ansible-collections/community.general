@@ -32,7 +32,7 @@ attributes:
 options:
   name:
     description:
-      - The application ID or pattern to mask (e.g., org.gtk.Gtk3theme.Adwaita-dark).
+      - The application ID or pattern to mask (for example C(org.gtk.Gtk3theme.Adwaita-dark)).
     required: true
     type: str
     aliases: [app]
