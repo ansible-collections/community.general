@@ -121,7 +121,7 @@ class TestOpenCompressedFileZstd(ModuleTestCase):
         super().tearDown()
 
     @patch("ansible_collections.community.general.plugins.modules.archive.deps.validate")
-    @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
+    @patch("ansible_collections.community.general.plugins.modules.archive.zstandard", create=True)
     def test_open_compressed_file_zstd(self, mock_zstandard, mock_deps_validate):
         mock_file = MagicMock()
         mock_zstandard.open.return_value = mock_file
@@ -189,7 +189,7 @@ class TestTarArchiveZstd(ModuleTestCase):
             mock_tarfile.open.assert_called_once_with(fileobj=archive.fileIO, mode="w")
 
     @patch("ansible_collections.community.general.plugins.modules.archive.deps.validate")
-    @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
+    @patch("ansible_collections.community.general.plugins.modules.archive.zstandard", create=True)
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
     def test_tar_archive_close_zstd(self, mock_tarfile, mock_zstandard, mock_deps_validate):
         with set_module_args(dict(path=["/foo/bar", "/foo/baz"], dest="/foo/out.tar.zst", format="zstd")):
@@ -208,7 +208,7 @@ class TestTarArchiveZstd(ModuleTestCase):
             mock_zstandard.open.assert_called_once()
 
     @patch("ansible_collections.community.general.plugins.modules.archive.deps.validate")
-    @patch("ansible_collections.community.general.plugins.modules.archive.zstandard")
+    @patch("ansible_collections.community.general.plugins.modules.archive.zstandard", create=True)
     @patch("ansible_collections.community.general.plugins.modules.archive.tarfile")
     def test_tar_archive_get_checksums_zstd(self, mock_tarfile, mock_zstandard, mock_deps_validate):
         with set_module_args(dict(path=["/foo/bar", "/foo/baz"], dest="/foo/out.tar.zst", format="zstd")):
