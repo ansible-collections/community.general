@@ -212,7 +212,7 @@ with deps.declare(
     "zstandard",
     msg="The zstandard Python library is required for zstd compression. Install it with: pip install zstandard",
 ):
-    import zstandard  # type: ignore[no-redef]
+    import zstandard
 
 STATE_ABSENT = "absent"
 STATE_ARCHIVED = "archive"
