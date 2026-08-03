@@ -58,6 +58,93 @@ options:
     type: list
     elements: path
     version_added: 3.2.0
+  entry_owner:
+    description:
+      - When set, overrides the owner name (C(uname)) recorded on every entry inside the archive.
+      - Useful for byte-reproducible tarballs. Has no effect on the on-disk source files.
+      - Tar formats only (V(gz), V(bz2), V(xz), V(tar)).
+    type: str
+    version_added: 13.1.0
+  entry_group:
+    description:
+      - When set, overrides the group name (C(gname)) recorded on every entry inside the archive.
+      - Tar formats only.
+    type: str
+    version_added: 13.1.0
+  entry_uid:
+    description:
+      - When set, overrides the numeric UID recorded on every entry inside the archive.
+      - Tar formats only.
+    type: int
+    version_added: 13.1.0
+  entry_gid:
+    description:
+      - When set, overrides the numeric GID recorded on every entry inside the archive.
+      - Tar formats only.
+    type: int
+    version_added: 13.1.0
+  entry_mtime:
+    description:
+      - When set, overrides the modification time (epoch seconds) recorded on every entry inside the archive.
+      - Tar formats only.
+    type: int
+    version_added: 13.1.0
+  entry_file_mode:
+    description:
+      - When set, overrides the mode recorded on every regular non-executable file entry inside the archive.
+      - Accepts an octal string (for example V("0644")) or an integer.
+      - Tar formats only.
+    type: str
+    version_added: 13.1.0
+  entry_dir_mode:
+    description:
+      - When set, overrides the mode recorded on every directory entry inside the archive.
+      - Accepts an octal string (for example V("0755")) or an integer.
+      - Tar formats only.
+    type: str
+    version_added: 13.1.0
+  entry_executable_mode:
+    description:
+      - When set, overrides the mode recorded on every file entry whose source file has any executable bit set.
+      - Accepts an octal string (for example V("0755")) or an integer.
+      - Tar formats only.
+    type: str
+    version_added: 13.1.0
+  sort_entries:
+    description:
+      - When V(true), entries are added to the archive in lexical order by archive name rather than in filesystem walk order.
+      - Required for byte-reproducible archives across different hosts and filesystems.
+      - Tar formats only.
+    type: bool
+    default: false
+    version_added: 13.1.0
+  tar_format:
+    description:
+      - Override the tar header format. Defaults to the C(tarfile) module default (PAX).
+      - PAX headers embed live timestamps that defeat byte-reproducibility; use V(gnu) or V(ustar) for reproducible output.
+      - Tar formats only.
+    type: str
+    choices: [ustar, gnu, pax]
+    version_added: 13.1.0
+  gzip_mtime:
+    description:
+      - Override the modification time written into the gzip header (epoch seconds).
+      - The standard gzip layer embeds the current time by default; set this (commonly to V(0)) for byte-reproducible C(.tar.gz) output.
+      - Only meaningful when O(format=gz).
+    type: int
+    version_added: 13.1.0
+  gzip_filename:
+    description:
+      - Override the original filename embedded in the gzip header. Pass an empty string (V("")) to strip the field entirely.
+      - Only meaningful when O(format=gz).
+    type: str
+    version_added: 13.1.0
+  gzip_level:
+    description:
+      - Compression level passed to gzip when O(format=gz). Range 1-9.
+      - Only meaningful when O(format=gz) and one of the other C(gzip_*) options or any of the entry-normalization options is set, since these trigger the in-memory tar buffer path.
+    type: int
+    version_added: 13.1.0
   force_archive:
     description:
       - Allows you to force the module to treat this as an archive even if only a single file is specified.
@@ -245,6 +332,21 @@ def _to_native_ascii(s):
     return to_native(s, errors="surrogate_or_strict", encoding="ascii")
 
 
+def _parse_octal_mode(value):
+    """Accept an octal string ("0644", "644", "0o644") or int and return int.
+
+    Returns None if value is None so callers can treat "unset" as a no-op.
+    """
+    if value is None:
+        return None
+    if isinstance(value, int):
+        return value
+    s = str(value).strip()
+    if not s:
+        return None
+    return int(s, 8)
+
+
 class Archive(metaclass=abc.ABCMeta):
     def __init__(self, module):
         self.module = module
@@ -254,6 +356,22 @@ class Archive(metaclass=abc.ABCMeta):
         self.format = module.params["format"]
         self.must_archive = module.params["force_archive"]
         self.remove = module.params["remove"]
+
+        # Per-entry normalization + ordering + format overrides. Every
+        # one of these defaults to None ("do not change behavior").
+        self.entry_owner = module.params.get("entry_owner")
+        self.entry_group = module.params.get("entry_group")
+        self.entry_uid = module.params.get("entry_uid")
+        self.entry_gid = module.params.get("entry_gid")
+        self.entry_mtime = module.params.get("entry_mtime")
+        self.entry_file_mode = _parse_octal_mode(module.params.get("entry_file_mode"))
+        self.entry_dir_mode = _parse_octal_mode(module.params.get("entry_dir_mode"))
+        self.entry_executable_mode = _parse_octal_mode(module.params.get("entry_executable_mode"))
+        self.sort_entries = bool(module.params.get("sort_entries"))
+        self.tar_format = module.params.get("tar_format")
+        self.gzip_mtime = module.params.get("gzip_mtime")
+        self.gzip_filename = module.params.get("gzip_filename")
+        self.gzip_level = module.params.get("gzip_level")
 
         self.changed = False
         self.destination_state = STATE_ABSENT
@@ -331,9 +449,18 @@ class Archive(metaclass=abc.ABCMeta):
     def add_targets(self):
         self.open()
         try:
-            for target in self.targets:
+            # When sort_entries is set, iterate targets and walked entries in
+            # lex order so the archive layout is independent of filesystem
+            # walk order. Mutating directory_names in-place during a
+            # topdown=True walk is the documented way to control os.walk's
+            # descent order.
+            iter_targets = sorted(self.targets) if self.sort_entries else self.targets
+            for target in iter_targets:
                 if os.path.isdir(target):
                     for directory_path, directory_names, file_names in os.walk(target, topdown=True):
+                        if self.sort_entries:
+                            directory_names.sort()
+                            file_names.sort()
                         for directory_name in directory_names:
                             full_path = os.path.join(directory_path, directory_name)
                             self.add(full_path, strip_prefix(self.root, full_path))
@@ -512,16 +639,84 @@ class ZipArchive(Archive):
         return checksums
 
 
+_TAR_FORMAT_MAP = {
+    "ustar": tarfile.USTAR_FORMAT,
+    "gnu": tarfile.GNU_FORMAT,
+    "pax": tarfile.PAX_FORMAT,
+}
+
+
 class TarArchive(Archive):
     def __init__(self, module):
         super().__init__(module)
         self.fileIO = None
+        # _buffered_gz is True when any gzip_* / entry-normalization param is
+        # set with format=gz; in that case we buffer the tar in memory and
+        # write the gzip layer in close() with a controlled header. Existing
+        # callers (no new params set) keep the streaming `w|gz` path and see
+        # zero behavioral / performance change.
+        self._buffered_gz = (
+            self.format == "gz"
+            and any(
+                v is not None
+                for v in (
+                    self.gzip_mtime,
+                    self.gzip_filename,
+                    self.gzip_level,
+                    self.entry_owner,
+                    self.entry_group,
+                    self.entry_uid,
+                    self.entry_gid,
+                    self.entry_mtime,
+                    self.entry_file_mode,
+                    self.entry_dir_mode,
+                    self.entry_executable_mode,
+                )
+            )
+        )
+        if self._buffered_gz or self.sort_entries:
+            # sort_entries on its own also forces buffered mode for gz,
+            # otherwise streaming `w|gz` would interleave header writes
+            # before we know the final entry list.
+            if self.format == "gz":
+                self._buffered_gz = True
+
+    def _tar_open_kwargs(self):
+        """Build kwargs for tarfile.open() that include format= when requested."""
+        kwargs = {}
+        if self.tar_format is not None:
+            kwargs["format"] = _TAR_FORMAT_MAP[self.tar_format]
+        return kwargs
 
     def close(self):
         self.file.close()
         if self.format == "xz":
             with lzma.open(_to_native(self.destination), "wb") as f:
                 f.write(self.fileIO.getvalue())
+            self.fileIO.close()
+        elif self._buffered_gz:
+            # Write the gzip layer ourselves with a controlled header, then
+            # atomically replace the destination. Atomic rename guarantees
+            # readers never see a partial file mid-build.
+            dest_native = _to_native(self.destination)
+            tmp_dest = dest_native + ".tmp"
+            level = self.gzip_level if self.gzip_level is not None else 9
+            mtime = self.gzip_mtime if self.gzip_mtime is not None else None
+            if self.gzip_filename is not None:
+                filename = self.gzip_filename
+            else:
+                filename = os.path.basename(dest_native)
+            # GzipFile takes filename via the `filename=` constructor arg.
+            with open(tmp_dest, "wb") as raw_out:
+                with gzip.GzipFile(
+                    filename=filename,
+                    mode="wb",
+                    compresslevel=level,
+                    fileobj=raw_out,
+                    mtime=mtime,
+                ) as gz_out:
+                    gz_out.write(self.fileIO.getvalue())
+            os.replace(tmp_dest, dest_native)
             self.fileIO.close()
 
     def contains(self, name):
@@ -532,21 +727,58 @@ class TarArchive(Archive):
         return True
 
     def open(self):
-        if self.format in ("gz", "bz2"):
-            self.file = tarfile.open(_to_native_ascii(self.destination), f"w|{self.format}")
+        tar_kwargs = self._tar_open_kwargs()
+        if self._buffered_gz:
+            # Buffer tar in memory; close() writes the gzip layer with a
+            # controlled header. Asset tarballs in this repo are <5 MB so
+            # the memory cost is trivial.
+            self.fileIO = io.BytesIO()
+            self.file = tarfile.open(fileobj=self.fileIO, mode="w", **tar_kwargs)
+        elif self.format in ("gz", "bz2"):
+            self.file = tarfile.open(
+                _to_native_ascii(self.destination), f"w|{self.format}", **tar_kwargs
+            )
         # python3 tarfile module allows xz format but for python2 we have to create the tarfile
         # in memory and then compress it with lzma.
         elif self.format == "xz":
             self.fileIO = io.BytesIO()
-            self.file = tarfile.open(fileobj=self.fileIO, mode="w")
+            self.file = tarfile.open(fileobj=self.fileIO, mode="w", **tar_kwargs)
         elif self.format == "tar":
-            self.file = tarfile.open(_to_native_ascii(self.destination), "w")
+            self.file = tarfile.open(_to_native_ascii(self.destination), "w", **tar_kwargs)
         else:
             self.module.fail_json(msg=f"{self.format} is not a valid archive format")
 
+    def _normalize_tarinfo(self, tarinfo):
+        """Apply per-entry overrides in place. Each override is independent;
+        any param left as None leaves the corresponding field untouched."""
+        if self.entry_owner is not None:
+            tarinfo.uname = self.entry_owner
+        if self.entry_group is not None:
+            tarinfo.gname = self.entry_group
+        if self.entry_uid is not None:
+            tarinfo.uid = self.entry_uid
+        if self.entry_gid is not None:
+            tarinfo.gid = self.entry_gid
+        if self.entry_mtime is not None:
+            tarinfo.mtime = self.entry_mtime
+        # Mode handling is per-entry-type so callers can express
+        # "all dirs 0755, all regular files 0644, executables 0755" in
+        # three independent knobs.
+        if tarinfo.isdir():
+            if self.entry_dir_mode is not None:
+                tarinfo.mode = self.entry_dir_mode
+        else:
+            if (tarinfo.mode & 0o111) and self.entry_executable_mode is not None:
+                tarinfo.mode = self.entry_executable_mode
+            elif self.entry_file_mode is not None:
+                tarinfo.mode = self.entry_file_mode
+        return tarinfo
+
     def _add(self, path, archive_name):
         def filter(tarinfo):
-            return None if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns) else tarinfo
+            if matches_exclusion_patterns(tarinfo.name, self.exclusion_patterns):
+                return None
+            return self._normalize_tarinfo(tarinfo)
 
         self.file.add(path, archive_name, recursive=False, filter=filter)
 
@@ -598,6 +830,19 @@ def create_module() -> AnsibleModule:
             exclusion_patterns=dict(type="list", elements="path"),
             force_archive=dict(type="bool", default=False),
             remove=dict(type="bool", default=False),
+            entry_owner=dict(type="str"),
+            entry_group=dict(type="str"),
+            entry_uid=dict(type="int"),
+            entry_gid=dict(type="int"),
+            entry_mtime=dict(type="int"),
+            entry_file_mode=dict(type="str"),
+            entry_dir_mode=dict(type="str"),
+            entry_executable_mode=dict(type="str"),
+            sort_entries=dict(type="bool", default=False),
+            tar_format=dict(type="str", choices=["ustar", "gnu", "pax"]),
+            gzip_mtime=dict(type="int"),
+            gzip_filename=dict(type="str"),
+            gzip_level=dict(type="int"),
         ),
         add_file_common_args=True,
         supports_check_mode=True,
