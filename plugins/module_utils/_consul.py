@@ -7,13 +7,14 @@
 
 from __future__ import annotations
 
+import base64
 import copy
 import json
 import re
 import typing as t
 from http import HTTPStatus
 from urllib import error as urllib_error
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 
 from ansible.module_utils.urls import open_url
 
@@ -356,3 +357,43 @@ class _ConsulModule:
         and :meth:`delete`.
         """
         return self._request(method, url_parts, **kwargs)
+
+    @staticmethod
+    def _kv_decode_value(value):
+        return None if value is None else base64.b64decode(value)
+
+    @staticmethod
+    def _kv_quote_key(key):
+        return quote(key, safe="/")
+
+    def kv_get(self, key, recurse=False, dc=None):
+        params = {"dc": dc}
+        if recurse:
+            params["recurse"] = "true"
+        try:
+            body, headers = self.request("GET", ("kv", self._kv_quote_key(key)), params=params)
+        except RequestError as e:
+            if e.status == HTTPStatus.NOT_FOUND:
+                index = e.response_headers.get("X-Consul-Index") if e.response_headers else None
+                return index, None
+            raise
+        index = headers.get("X-Consul-Index") if headers is not None else None
+        if not body:
+            return index, None
+        for entry in body:
+            entry["Value"] = self._kv_decode_value(entry.get("Value"))
+        if recurse:
+            return index, body
+        return index, body[0]
+
+    def kv_put(self, key, value, cas=None, acquire=None, release=None, flags=None, dc=None):
+        params = {"cas": cas, "acquire": acquire, "release": release, "flags": flags, "dc": dc}
+        if value is not None:
+            value = value.encode("utf-8")
+        return self.put(("kv", self._kv_quote_key(key)), data=value, params=params) is True
+
+    def kv_delete(self, key, recurse=False, dc=None):
+        params = {"dc": dc}
+        if recurse:
+            params["recurse"] = "true"
+        return self.delete(("kv", self._kv_quote_key(key)), params=params) is True
