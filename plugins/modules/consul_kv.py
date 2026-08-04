@@ -114,10 +114,6 @@ EXAMPLES = r"""
     state: acquire
 """
 
-import base64
-from http import HTTPStatus
-from urllib.parse import quote
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_text
 
@@ -128,54 +124,8 @@ from ansible_collections.community.general.plugins.module_utils._consul import (
 )
 
 
-def _decode_value(entry):
-    if entry.get("Value") is not None:
-        entry["Value"] = base64.b64decode(entry["Value"])
-
-
-def _quote_key(key):
-    # KV keys may contain characters that are not valid in a URL path
-    # (spaces, non-ASCII, ...). Slashes are key separators and must stay raw.
-    return quote(key, safe="/")
-
-
-def _kv_get(consul_module, key, recurse=False, dc=None):
-    params = {"dc": dc}
-    if recurse:
-        params["recurse"] = "true"
-    try:
-        body, headers = consul_module.request("GET", ("kv", _quote_key(key)), params=params)
-    except RequestError as e:
-        if e.status == HTTPStatus.NOT_FOUND:
-            index = e.response_headers.get("X-Consul-Index") if e.response_headers else None
-            return index, None
-        raise
-    index = headers.get("X-Consul-Index") if headers is not None else None
-    if not body:
-        return index, None
-    for entry in body:
-        _decode_value(entry)
-    if recurse:
-        return index, body
-    return index, body[0]
-
-
-def _kv_put(consul_module, key, value, cas=None, acquire=None, release=None, flags=None, dc=None):
-    params = {"cas": cas, "acquire": acquire, "release": release, "flags": flags, "dc": dc}
-    if value is not None:
-        value = value.encode("utf-8")
-    return consul_module.put(("kv", _quote_key(key)), data=value, params=params) is True
-
-
-def _kv_delete(consul_module, key, recurse=False, dc=None):
-    params = {"dc": dc}
-    if recurse:
-        params["recurse"] = "true"
-    return consul_module.delete(("kv", _quote_key(key)), params=params) is True
-
-
 def _has_value_changed(consul_module, key, target_value):
-    index, existing = _kv_get(consul_module, key)
+    index, existing = consul_module.kv_get(key)
     if not existing:
         return index, True
     try:
@@ -223,15 +173,14 @@ def lock(module, consul_module, state):
             kwargs["acquire"] = session
         else:
             kwargs["release"] = session
-        changed = _kv_put(consul_module, key, value, **kwargs)
+        changed = consul_module.kv_put(key, value, **kwargs)
 
     module.exit_json(changed=changed, index=index, key=key)
 
 
 def get_value(module, consul_module):
     key = module.params["key"]
-    index, existing = _kv_get(
-        consul_module,
+    index, existing = consul_module.kv_get(
         key,
         recurse=module.params["recurse"],
         dc=module.params["datacenter"],
@@ -250,8 +199,7 @@ def set_value(module, consul_module):
     index, changed = _has_value_changed(consul_module, key, value)
 
     if changed and not module.check_mode:
-        changed = _kv_put(
-            consul_module,
+        changed = consul_module.kv_put(
             key,
             value,
             cas=module.params["cas"],
@@ -261,7 +209,7 @@ def set_value(module, consul_module):
 
     stored = None
     if module.params["retrieve"]:
-        index, stored = _kv_get(consul_module, key, dc=dc)
+        index, stored = consul_module.kv_get(key, dc=dc)
 
     module.exit_json(changed=changed, index=index, key=key, data=stored)
 
@@ -273,11 +221,11 @@ def remove_value(module, consul_module):
     dc = module.params["datacenter"]
     recurse = module.params["recurse"]
 
-    index, existing = _kv_get(consul_module, key, recurse=recurse, dc=dc)
+    index, existing = consul_module.kv_get(key, recurse=recurse, dc=dc)
 
     changed = existing is not None
     if changed and not module.check_mode:
-        _kv_delete(consul_module, key, recurse=recurse, dc=dc)
+        consul_module.kv_delete(key, recurse=recurse, dc=dc)
 
     module.exit_json(changed=changed, index=index, key=key, data=existing)
 
