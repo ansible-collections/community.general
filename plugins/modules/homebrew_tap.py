@@ -116,7 +116,8 @@ def a_valid_tap(tap):
 
 def normalized_tap(tap: str) -> str:
     """Returns the tap name in the form Homebrew itself reports it."""
-    return re.sub("homebrew-", "", tap.lower())
+    user, dummy, repo = tap.lower().partition("/")
+    return f"{user}/{repo.removeprefix('homebrew-')}"
 
 
 def already_tapped(module, brew_path, tap, taps=None):

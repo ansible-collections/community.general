@@ -26,6 +26,9 @@ def trust_output(*taps):
 def test_normalized_tap():
     assert normalized_tap("HasHicorp/TAp") == "hashicorp/tap"
     assert normalized_tap("telemachus/homebrew-brew") == "telemachus/brew"
+    # Only the repository is prefixed with `homebrew-`, so a repository merely
+    # containing that string keeps it.
+    assert normalized_tap("telemachus/my-homebrew-tools") == "telemachus/my-homebrew-tools"
 
 
 def test_trusted_taps(mocker):
