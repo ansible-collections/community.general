@@ -114,7 +114,7 @@ def a_valid_tap(tap):
     return regex.match(tap)
 
 
-def normalized_tap(tap):
+def normalized_tap(tap: str) -> str:
     """Returns the tap name in the form Homebrew itself reports it."""
     return re.sub("homebrew-", "", tap.lower())
 
@@ -236,7 +236,7 @@ def remove_taps(module, brew_path, taps):
     return (failed, changed, msg)
 
 
-def trusted_taps(module, brew_path):
+def trusted_taps(module: AnsibleModule, brew_path: str) -> set[str]:
     """Returns the set of currently trusted taps."""
     rc, out, err = module.run_command([brew_path, "trust", "--json", "v1"])
     if rc != 0:
@@ -252,13 +252,13 @@ def trusted_taps(module, brew_path):
     return {normalized_tap(tap) for tap in taps}
 
 
-def taps_to_change(module, brew_path, taps, trust):
+def taps_to_change(module: AnsibleModule, brew_path: str, taps: list[str], trust: bool) -> list[str]:
     """Returns the taps whose trust state does not match `trust` yet."""
     trusted = trusted_taps(module, brew_path)
     return [tap for tap in taps if (normalized_tap(tap) in trusted) != trust]
 
 
-def set_trust(module, brew_path, taps, trust):
+def set_trust(module: AnsibleModule, brew_path: str, taps: list[str], trust: bool) -> tuple[bool, bool, str]:
     """Trusts or untrusts one or more taps."""
     command = "trust" if trust else "untrust"
     outstanding = taps_to_change(module, brew_path, taps, trust)
