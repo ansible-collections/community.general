@@ -57,6 +57,11 @@
     state: latest
   when: ansible_facts.pkg_mgr == 'apt'
 
+- name: Ensure zstandard Python package is present for zstd tests
+  ansible.builtin.pip:
+    name: zstandard
+    state: latest
+
 - name: Define formats to test
   ansible.builtin.set_fact:
     formats:
@@ -65,6 +70,7 @@
       - gz
       - bz2
       - xz
+      - zstd
 
 # Run tests
 - name: Run core tests
