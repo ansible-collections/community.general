@@ -102,6 +102,7 @@
       gz: compress
       bz2: compress
       xz: compress
+      zstd: compress
 
 - block:
     - name: Retrieve contents of archive - single target ({{ format }})

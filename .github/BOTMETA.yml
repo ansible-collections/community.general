@@ -501,7 +501,7 @@ files:
   $modules/apt_rpm.py:
     maintainers: evgkrsk
   $modules/archive.py:
-    maintainers: bendoh
+    maintainers: bendoh aardbol
   $modules/awall.py:
     maintainers: tdtrask
   $modules/beadm.py:
