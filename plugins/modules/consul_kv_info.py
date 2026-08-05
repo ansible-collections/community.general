@@ -76,10 +76,6 @@ index:
   type: str
 """
 
-import base64
-from http import HTTPStatus
-from urllib.parse import quote
-
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils._consul import (
@@ -87,35 +83,6 @@ from ansible_collections.community.general.plugins.module_utils._consul import (
     RequestError,
     _ConsulModule,
 )
-
-
-def _decode_value(value):
-    return None if value is None else base64.b64decode(value)
-
-
-def _quote_key(key):
-    return quote(key, safe="/")
-
-
-def _kv_get(consul_module, key, recurse=False, dc=None):
-    params = {"dc": dc}
-    if recurse:
-        params["recurse"] = "true"
-    try:
-        body, headers = consul_module.request("GET", ("kv", _quote_key(key)), params=params)
-    except RequestError as e:
-        if e.status == HTTPStatus.NOT_FOUND:
-            index = e.response_headers.get("X-Consul-Index") if e.response_headers else None
-            return index, []
-        raise
-    index = headers.get("X-Consul-Index") if headers is not None else None
-    if not body:
-        return index, []
-    for entry in body:
-        entry["Value"] = _decode_value(entry.get("Value"))
-    if recurse:
-        return index, body
-    return index, [body[0]]
 
 
 def main():
@@ -131,12 +98,15 @@ def main():
     consul_module = _ConsulModule(module)
 
     try:
-        index, data = _kv_get(
-            consul_module,
+        index, data = consul_module.kv_get(
             module.params["key"],
             recurse=module.params["recurse"],
             dc=module.params["datacenter"],
         )
+        if data is None:
+            data = []
+        elif not isinstance(data, list):
+            data = [data]
         module.exit_json(changed=False, index=index, data=data)
     except RequestError as e:
         body = e.response_data
