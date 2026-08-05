@@ -9,7 +9,7 @@
 - name: Install pipx>=1.7.0
   ansible.builtin.pip:
     name: pipx>=1.7.0
-    extra_args: --user
+    extra_args: "--user -c {{ remote_constraints }}"
 
 ##############################################################################
 - name: Ensure applications are uninstalled
