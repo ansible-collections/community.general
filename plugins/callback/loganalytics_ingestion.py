@@ -149,7 +149,7 @@ import getpass
 import json
 import socket
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from os.path import basename
 from urllib.parse import urlencode
 
@@ -232,7 +232,7 @@ class AzureLogAnalyticsIngestionSource:
         open_url(ingestion_url, data=json.dumps(event_data), headers=headers, method="POST", timeout=self.timeout)
 
     def _rfc1123date(self):
-        return datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
+        return datetime.now(UTC).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     # This method wraps the private method with the appropriate error handling.
     def send_to_loganalytics(self, playbook_name, result, state):
