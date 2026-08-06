@@ -231,6 +231,7 @@ remote = [
     # "macos/26.3",
     "rhel/10.1",
     # "rhel/9.7",
+    "freebsd/15.0",
 ]
 
 # Ansible-core devel:
@@ -296,10 +297,8 @@ remote = [
     "macos/26.3",
     "rhel/10.2",
     "rhel/9.8",
-    # TODO: enable this ASAP!
-    # "freebsd/15.0",
-    # TODO: enable this ASAP!
-    # "freebsd/14.4",
+    "freebsd/15.1",
+    "freebsd/14.4",
 ]
 
 ##################################################################################################
