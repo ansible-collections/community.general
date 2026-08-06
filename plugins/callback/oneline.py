@@ -15,6 +15,14 @@ description:
     in ansible-core 2.19 and will be removed from ansible-core 2.23.
 """
 
+EXAMPLES = r"""
+---
+# Enable callback in ansible.cfg:
+ansible_config: |-
+  [defaults]
+  stdout_callback = community.general.oneline
+"""
+
 import typing as t
 
 from ansible import constants as C
