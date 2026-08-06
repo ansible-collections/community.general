@@ -21,9 +21,6 @@ extends_documentation_fragment:
   - community.general._consul.token
   - community.general._attributes
   - community.general._attributes.info_module
-attributes:
-  action_group:
-    version_added: 13.3.0
 options:
   key:
     description:
