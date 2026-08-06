@@ -710,7 +710,7 @@ def main():
                 msg="Aborting command because it would destroy some resources. "
                 "Consider switching the 'check_destroy' to false to suppress this error"
             )
-        command.append(plan_file)
+        command.append(plan_file) #added
 
     result_diff = dict()
     if module._diff or module.check_mode:
