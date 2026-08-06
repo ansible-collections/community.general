@@ -552,17 +552,16 @@ def main():
                             else:
                                 last_ipv4 = no
 
-                    match relative_to_cmd:
-                        case 'first-ipv4':
-                            relative_to = 1
-                        case 'last-ipv4':
-                            relative_to = last_ipv4 or 1
-                        case 'first-ipv6':
-                            relative_to = first_ipv6 or last_ipv4 + 1
-                        case 'last-ipv6':
-                            relative_to = last_ipv6 or last_number + 1
-                        case _:
-                            raise ValueError(f'Undefinded value for "insert_relative_to": {relative_to_cmd}')
+                    if relative_to_cmd == 'first-ipv4':
+                        relative_to = 1
+                    elif relative_to_cmd == 'last-ipv4':
+                        relative_to = last_ipv4 or 1
+                    elif relative_to_cmd == 'first-ipv6':
+                        relative_to = first_ipv6 or last_ipv4 + 1
+                    elif relative_to_cmd == 'last-ipv6':
+                        relative_to = last_ipv6 or last_number + 1
+                    else:
+                        raise ValueError(f'Undefinded value for "insert_relative_to": {relative_to_cmd}')
 
                     insert_to = params["insert"] + relative_to
                     if insert_to > last_number:
