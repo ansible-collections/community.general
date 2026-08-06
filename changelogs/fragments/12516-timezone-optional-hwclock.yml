@@ -1,0 +1,2 @@
+bugfixes:
+  - timezone - no longer requires the ``hwclock`` executable for name-only changes on non-systemd systems (https://github.com/ansible-collections/community.general/issues/12516, https://github.com/ansible-collections/community.general/pull/12526).
