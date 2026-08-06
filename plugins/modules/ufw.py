@@ -531,7 +531,7 @@ def main():
                 if relative_to_cmd == "zero":
                     insert_to = params["insert"]
                 else:
-                    _, numbered_state, _ = module.run_command([ufw_bin, "status", "numbered"])
+                    dummy, numbered_state, dummy = module.run_command([ufw_bin, "status", "numbered"])
                     # Format is: [no] To Action From # Comment
                     numbered_line_re = re.compile(r"^\[ *([0-9]+)] [^#\n]*(DENY|ALLOW|REJECT|LIMIT) (IN|OUT) +([^# \n][^#\n]+[^# \n])")
                     last_number = last_ipv4 = first_ipv6 = last_ipv6 = 0
@@ -588,7 +588,7 @@ def main():
                 value = params[key]
                 cmd.append([value, template % (value)])
 
-            ufw_major, ufw_minor, _ = ufw_version()
+            ufw_major, ufw_minor, dummy = ufw_version()
             # comment is supported only in ufw version after 0.35
             if (ufw_major == 0 and ufw_minor >= 35) or ufw_major > 0:
                 cmd.append([params["comment"], f"comment '{params['comment']}'"])
