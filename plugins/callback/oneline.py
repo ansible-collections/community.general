@@ -15,10 +15,15 @@ description:
     in ansible-core 2.19 and will be removed from ansible-core 2.23.
 """
 
+import typing as t
+
 from ansible import constants as C
 from ansible.executor.task_result import CallbackTaskResult
 from ansible.plugins.callback import CallbackBase
 from ansible.template import Templar
+
+if t.TYPE_CHECKING:
+    from collections.abc import Mapping
 
 COLOR_ERROR = C.COLOR_ERROR  # type: ignore[attr-defined]
 COLOR_CHANGED = C.COLOR_CHANGED  # type: ignore[attr-defined]
@@ -37,7 +42,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "stdout"
     CALLBACK_NAME = "oneline"
 
-    def _command_generic_msg(self, hostname, result, caption):
+    def _command_generic_msg(self, hostname: str, result: Mapping[str, t.Any], caption: str) -> str:
         stdout = result.get("stdout", "").replace("\n", "\\n").replace("\r", "\\r")
         rc = result.get("rc", -1)
         if "stderr" in result and result["stderr"]:
