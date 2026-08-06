@@ -287,7 +287,7 @@ EXAMPLES = r"""
 """
 
 import re
-from ipaddress import ip_address, IPv6Address
+from ipaddress import IPv6Address, ip_address
 from operator import itemgetter
 
 from ansible.module_utils.basic import AnsibleModule
@@ -533,7 +533,9 @@ def main():
                 else:
                     dummy, numbered_state, dummy = module.run_command([ufw_bin, "status", "numbered"])
                     # Format is: [no] To Action From # Comment
-                    numbered_line_re = re.compile(r"^\[ *([0-9]+)] [^#\n]*(DENY|ALLOW|REJECT|LIMIT) (IN|OUT) +([^# \n][^#\n]+[^# \n])")
+                    numbered_line_re = re.compile(
+                        r"^\[ *([0-9]+)] [^#\n]*(DENY|ALLOW|REJECT|LIMIT) (IN|OUT) +([^# \n][^#\n]+[^# \n])"
+                    )
                     last_number = last_ipv4 = first_ipv6 = last_ipv6 = 0
                     for line in numbered_state.splitlines():
                         if line_match := numbered_line_re.match(line):
@@ -548,17 +550,17 @@ def main():
                                 first_ipv6 = first_ipv6 or no
                                 last_ipv6 = no
                             elif first_ipv6:
-                                raise ValueError('ufw output could not be parsed correctly. ipv4 follows ipv6!')
+                                raise ValueError("ufw output could not be parsed correctly. ipv4 follows ipv6!")
                             else:
                                 last_ipv4 = no
 
-                    if relative_to_cmd == 'first-ipv4':
+                    if relative_to_cmd == "first-ipv4":
                         relative_to = 1
-                    elif relative_to_cmd == 'last-ipv4':
+                    elif relative_to_cmd == "last-ipv4":
                         relative_to = last_ipv4 or 1
-                    elif relative_to_cmd == 'first-ipv6':
+                    elif relative_to_cmd == "first-ipv6":
                         relative_to = first_ipv6 or last_ipv4 + 1
-                    elif relative_to_cmd == 'last-ipv6':
+                    elif relative_to_cmd == "last-ipv6":
                         relative_to = last_ipv6 or last_number + 1
                     else:
                         raise ValueError(f'Undefinded value for "insert_relative_to": {relative_to_cmd}')
