@@ -77,6 +77,8 @@ files:
   $callbacks/nrdp.py:
     maintainers: rverchere
   $callbacks/null.py: {}
+  $callbacks/oneline.py:
+    maintainers: felixfontein
   $callbacks/opentelemetry.py:
     keywords: opentelemetry observability
     maintainers: v1v
