@@ -345,7 +345,7 @@ class NosystemdTimezone(Timezone):
             self.update_timezone = [
                 [self.module.get_bin_path("cp", required=True), "--remove-destination", tzfile, "/etc/localtime"]
             ]
-        self.update_hwclock = self.module.get_bin_path("hwclock", required=True)
+        self.update_hwclock = self.module.get_bin_path("hwclock", required="hwclock" in self.value)
         distribution = get_distribution()
         self.conf_files["name"] = "/etc/timezone"
         self.regexps["name"] = re.compile(r"^([^\s]+)", re.MULTILINE)
