@@ -40,7 +40,7 @@ class CallbackModule(CallbackBase):
 
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "stdout"
-    CALLBACK_NAME = "oneline"
+    CALLBACK_NAME = "community.general.oneline"
 
     def _command_generic_msg(self, hostname: str, result: Mapping[str, t.Any], caption: str) -> str:
         stdout = result.get("stdout", "").replace("\n", "\\n").replace("\r", "\\r")
