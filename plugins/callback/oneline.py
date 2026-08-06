@@ -16,9 +16,15 @@ description:
 """
 
 from ansible import constants as C
+from ansible.executor.task_result import CallbackTaskResult
 from ansible.plugins.callback import CallbackBase
 from ansible.template import Templar
-from ansible.executor.task_result import CallbackTaskResult
+
+COLOR_ERROR = C.COLOR_ERROR  # type: ignore[attr-defined]
+COLOR_CHANGED = C.COLOR_CHANGED  # type: ignore[attr-defined]
+COLOR_OK = C.COLOR_OK  # type: ignore[attr-defined]
+COLOR_UNREACHABLE = C.COLOR_UNREACHABLE  # type: ignore[attr-defined]
+COLOR_SKIP = C.COLOR_SKIP  # type: ignore[attr-defined]
 
 
 class CallbackModule(CallbackBase):
@@ -28,52 +34,62 @@ class CallbackModule(CallbackBase):
     """
 
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'stdout'
-    CALLBACK_NAME = 'oneline'
+    CALLBACK_TYPE = "stdout"
+    CALLBACK_NAME = "oneline"
 
     def _command_generic_msg(self, hostname, result, caption):
-        stdout = result.get('stdout', '').replace('\n', '\\n').replace('\r', '\\r')
-        if 'stderr' in result and result['stderr']:
-            stderr = result.get('stderr', '').replace('\n', '\\n').replace('\r', '\\r')
-            return "%s | %s | rc=%s | (stdout) %s (stderr) %s" % (hostname, caption, result.get('rc', -1), stdout, stderr)
+        stdout = result.get("stdout", "").replace("\n", "\\n").replace("\r", "\\r")
+        rc = result.get("rc", -1)
+        if "stderr" in result and result["stderr"]:
+            stderr = result.get("stderr", "").replace("\n", "\\n").replace("\r", "\\r")
+            return f"{hostname} | {caption} | rc={rc} | (stdout) {stdout} (stderr) {stderr}"
         else:
-            return "%s | %s | rc=%s | (stdout) %s" % (hostname, caption, result.get('rc', -1), stdout)
+            return f"{hostname} | {caption} | rc={rc} | (stdout) {stdout}"
 
     def v2_runner_on_failed(self, result: CallbackTaskResult, ignore_errors: bool = False) -> None:
-        if 'exception' in result.result:
-            error_text = Templar().template(result.result['exception'])  # transform to a string
+        if "exception" in result.result:
+            error_text = Templar().template(result.result["exception"])  # transform to a string
             if self._display.verbosity < 3:
                 # extract just the actual error message from the exception text
-                error = error_text.strip().split('\n')[-1]
-                msg = "An exception occurred during task execution. To see the full traceback, use -vvv. The error was: %s" % error
+                error = error_text.strip().split("\n")[-1]
+                msg = f"An exception occurred during task execution. To see the full traceback, use -vvv. The error was: {error}"
             else:
-                msg = "An exception occurred during task execution. The full traceback is:\n" + error_text.replace('\n', '')
+                msg = "An exception occurred during task execution. The full traceback is:\n" + error_text.replace(
+                    "\n", ""
+                )
 
-            if result.task.action in C.MODULE_NO_JSON and 'module_stderr' not in result.result:
-                self._display.display(self._command_generic_msg(result.host.get_name(), result.result, 'FAILED'), color=C.COLOR_ERROR)
+            if result.task.action in C.MODULE_NO_JSON and "module_stderr" not in result.result:
+                self._display.display(
+                    self._command_generic_msg(result.host.get_name(), result.result, "FAILED"), color=COLOR_ERROR
+                )
             else:
-                self._display.display(msg, color=C.COLOR_ERROR)
+                self._display.display(msg, color=COLOR_ERROR)
 
-        self._display.display("%s | FAILED! => %s" % (result.host.get_name(), self._dump_results(result.result, indent=0).replace('\n', '')),
-                              color=C.COLOR_ERROR)
+        hostname = result.host.get_name()
+        msg = self._dump_results(result.result, indent=0).replace("\n", "")
+        self._display.display(f"{hostname} | FAILED! => {msg}", color=COLOR_ERROR)
 
     def v2_runner_on_ok(self, result: CallbackTaskResult) -> None:
 
-        if result.result.get('changed', False):
-            color = C.COLOR_CHANGED
-            state = 'CHANGED'
+        if result.result.get("changed", False):
+            color = COLOR_CHANGED
+            state = "CHANGED"
         else:
-            color = C.COLOR_OK
-            state = 'SUCCESS'
+            color = COLOR_OK
+            state = "SUCCESS"
 
-        if result.task.action in C.MODULE_NO_JSON and 'ansible_job_id' not in result.result:
-            self._display.display(self._command_generic_msg(result.host.get_name(), result.result, state), color=color)
+        hostname = result.host.get_name()
+        if result.task.action in C.MODULE_NO_JSON and "ansible_job_id" not in result.result:
+            self._display.display(self._command_generic_msg(hostname, result.result, state), color=color)
         else:
-            self._display.display("%s | %s => %s" % (result.host.get_name(), state, self._dump_results(result.result, indent=0).replace('\n', '')),
-                                  color=color)
+            msg = self._dump_results(result.result, indent=0).replace("\n", "")
+            self._display.display(f"{hostname} | {state} => {msg}", color=color)
 
     def v2_runner_on_unreachable(self, result: CallbackTaskResult) -> None:
-        self._display.display("%s | UNREACHABLE!: %s" % (result.host.get_name(), result.result.get('msg', '')), color=C.COLOR_UNREACHABLE)
+        hostname = result.host.get_name()
+        msg = result.result.get("msg", "")
+        self._display.display(f"{hostname} | UNREACHABLE!: {msg}", color=COLOR_UNREACHABLE)
 
     def v2_runner_on_skipped(self, result: CallbackTaskResult) -> None:
-        self._display.display("%s | SKIPPED" % (result.host.get_name()), color=C.COLOR_SKIP)
+        hostname = result.host.get_name()
+        self._display.display(f"{hostname} | SKIPPED", color=COLOR_SKIP)
