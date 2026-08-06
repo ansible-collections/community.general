@@ -305,17 +305,24 @@
 
 # Test install from homebrew tap
 - block:
-    - name: Tap hashicorp repository
+    - name: Tap and trust hashicorp repository
       community.general.homebrew_tap:
         name: hashicorp/tap
+        trust: true
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - name: "Trust tap (TODO: let homebrew_tap do this)"
-      ansible.builtin.command:
-        cmd: brew trust hashicorp/tap
+    - name: Tap and trust hashicorp repository again
+      community.general.homebrew_tap:
+        name: hashicorp/tap
+        trust: true
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
+      register: tap_idempotency_result
+
+    - ansible.builtin.assert:
+        that:
+          - tap_idempotency_result is not changed
 
     - name: Install terraform from tap
       community.general.homebrew:
@@ -358,17 +365,24 @@
 
 # Test tap with no public fallback
 - block:
-    - name: Tap ascii-image-converter homebrew repository
+    - name: Tap and trust ascii-image-converter homebrew repository
       community.general.homebrew_tap:
         name: TheZoraiz/ascii-image-converter
+        trust: true
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
 
-    - name: "Trust tap (TODO: let homebrew_tap do this)"
-      ansible.builtin.command:
-        cmd: brew trust thezoraiz/ascii-image-converter
+    - name: Tap and trust ascii-image-converter homebrew repository again
+      community.general.homebrew_tap:
+        name: TheZoraiz/ascii-image-converter
+        trust: true
       become: true
       become_user: "{{ brew_stat.stat.pw_name }}"
+      register: tap_idempotency_result
+
+    - ansible.builtin.assert:
+        that:
+          - tap_idempotency_result is not changed
 
     - name: Install ascii from full tap name
       community.general.homebrew:
