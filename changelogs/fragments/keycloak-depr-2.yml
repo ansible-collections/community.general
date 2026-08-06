@@ -1,0 +1,2 @@
+deprecated_features:
+  - "keycloak_realm_users_info - the module is moved to ``ansible_middleware.keycloak.keycloak_realm_users_info``. The module will be replaced by a deprecated redirect to that module in community.general 14.0.0, and the redirect will be removed in community.general 16.0.0. If you are using the module, please consider installing and using ``ansible_middleware.keycloak`` now (https://github.com/ansible-collections/community.general/pull/12525)."
