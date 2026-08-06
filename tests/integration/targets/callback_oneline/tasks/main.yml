@@ -51,8 +51,10 @@
         expected_output:
           - "testhost | SUCCESS => {\"ansible_facts\": {\"counter_test\": \"first\"},\"changed\": false}"
           - "testhost | SUCCESS => {\"ansible_facts\": {\"counter_test\": \"second\"},\"changed\": false}"
-          - "testhost | SUCCESS => {\"changed\": false,\"msg\": \"All items completed\",\"results\": [{\"ansible_facts\": {\"dummy_fact\": \"item_a\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"item\": \"item_a\"},{\"ansible_facts\": {\"dummy_fact\": \"item_b\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"item\": \"item_b\"},{\"ansible_facts\": {\"dummy_fact\": \"item_c\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"item\": \"item_c\"}]}"
+          - - "testhost | SUCCESS => {\"changed\": false,\"msg\": \"All items completed\",\"results\": [{\"ansible_facts\": {\"dummy_fact\": \"item_a\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"item\": \"item_a\"},{\"ansible_facts\": {\"dummy_fact\": \"item_b\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"item\": \"item_b\"},{\"ansible_facts\": {\"dummy_fact\": \"item_c\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"item\": \"item_c\"}]}"
+            - "testhost | SUCCESS => {\"changed\": false,\"msg\": \"All items completed\",\"results\": [{\"ansible_facts\": {\"dummy_fact\": \"item_a\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"failed\": false,\"item\": \"item_a\"},{\"ansible_facts\": {\"dummy_fact\": \"item_b\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"failed\": false,\"item\": \"item_b\"},{\"ansible_facts\": {\"dummy_fact\": \"item_c\"},\"ansible_loop_var\": \"item\",\"changed\": false,\"failed\": false,\"item\": \"item_c\"}]}"
           - "testhost | CHANGED | rc=0 | (stdout) Hello"
           - "testhost | CHANGED | rc=23 | (stdout)  (stderr) Hello"
-          - "An exception occurred during task execution. To see the full traceback, use -vvv. The error was: (traceback unavailable)"
+          - - "An exception occurred during task execution. To see the full traceback, use -vvv. The error was: (traceback unavailable)"
+            - "An exception occurred during task execution. To see the full traceback, use -vvv. The error was: ansible.errors.AnsibleTaskError: Task failed: Action failed: Boo!"
           - "testhost | FAILED! => {\"changed\": false,\"msg\": \"Boo!\"}"
