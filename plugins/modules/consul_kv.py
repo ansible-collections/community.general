@@ -36,7 +36,9 @@ options:
     description:
       - The action to take with the supplied key and value. If the state is V(present) and O(value) is set, the key contents
         is set to the value supplied and RV(ignore:changed) is set to V(true) only if the value was different to the current contents.
-        If the state is V(present) and O(value) is not set, the existing value associated to the key is returned. The state
+        If the state is V(present) and O(value) is not set, the existing value associated to the key is returned.
+        This behavior will be B(deprecated) in the future. Use
+        M(community.general.consul_kv_info) to read key/value entries instead. The state
         V(absent) is used to remove the key/value pair, again RV(ignore:changed) is set to V(true) only if the key actually existed
         prior to the removal. An attempt can be made to obtain or free the lock associated with a key/value pair with the
         states V(acquire) or V(release) respectively. A valid session must be supplied to make the attempt RV(ignore:changed) is V(true)
@@ -52,6 +54,8 @@ options:
   value:
     description:
       - The value should be associated with the given key, required if O(state) is V(present).
+      - Omitting O(value) with O(state=present) to read a key will be B(deprecated) in the future.
+        Use M(community.general.consul_kv_info) instead.
     type: str
   recurse:
     description:
@@ -80,17 +84,12 @@ options:
       - The name of the datacenter to query. If unspecified, the query defaults to the datacenter of the Consul agent on O(host).
     type: str
     version_added: 10.0.0
+seealso:
+  - module: community.general.consul_kv_info
 """
 
 
 EXAMPLES = r"""
-# If the key does not exist, the value associated to the "data" property in `retrieved_key` will be `None`
-# If the key value is empty string, `retrieved_key["data"]["Value"]` will be `None`
-- name: Retrieve a value from the key/value store
-  community.general.consul_kv:
-    key: somekey
-  register: retrieved_key
-
 - name: Add or update the value associated with a key in the key/value store
   community.general.consul_kv:
     key: somekey

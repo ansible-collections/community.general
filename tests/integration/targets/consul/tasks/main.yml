@@ -107,6 +107,7 @@
             - ansible.builtin.import_tasks: consul_binding_rule.yml
             - ansible.builtin.import_tasks: consul_agent_service.yml
             - ansible.builtin.import_tasks: consul_agent_check.yml
+            - ansible.builtin.import_tasks: consul_kv_info.yml
           module_defaults:
             group/community.general.consul:
               token: "{{ consul_management_token }}"

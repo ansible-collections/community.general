@@ -11,6 +11,7 @@ action_groups:
     - consul_auth_method
     - consul_binding_rule
     - consul_kv
+    - consul_kv_info
     - consul_policy
     - consul_role
     - consul_session
