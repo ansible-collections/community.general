@@ -1,0 +1,38 @@
+---
+# Copyright (c) 2026, Shreyash Bhosale (@Shreyashxredhat)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Read an existing key
+  consul_kv_info:
+    key: data/value1
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+      - result.data | length == 1
+      - result.data[0].Value == 'foo1'
+      - result.index is defined
+
+- name: Read a non-existent key
+  consul_kv_info:
+    key: does/not/exist
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+      - result.data | length == 0
+
+- name: Read all keys under a prefix
+  consul_kv_info:
+    key: data/
+    recurse: true
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+      - result.data | length == 3
+      - result.data | map(attribute='Key') | sort == ['data/value1', 'data/value2', 'data/value3']
