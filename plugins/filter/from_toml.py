@@ -4,10 +4,10 @@
 
 from __future__ import annotations
 
+import tomllib
 import typing as t
 from collections.abc import Mapping
 
-import tomllib
 from ansible.errors import AnsibleFilterError
 
 
