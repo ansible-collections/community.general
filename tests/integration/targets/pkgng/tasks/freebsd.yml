@@ -177,6 +177,42 @@
           - pkgng_example4_nopower_wildcard.failed
 
 ##
+## pkgng - example - install package from local file
+##
+- name: Install package from local package file
+  block:
+    - name: Remove test package
+      pkgng:
+        name: '{{ pkgng_test_pkg_name }}'
+        state: absent
+
+    - name: Create local test package
+      import_tasks: create-outofdate-pkg.yml
+
+    - name: Install package from local package file
+      pkgng:
+        name: '{{ pkgng_test_outofdate_pkg_path }}'
+      register: pkgng_file_install
+
+    - name: Install package from local package file (idempotent)
+      pkgng:
+        name: '{{ pkgng_test_outofdate_pkg_path }}'
+      register: pkgng_file_install_idempotent
+
+    - name: Remove test package installed from file
+      pkgng:
+        name: '{{ pkgng_test_pkg_name }}'
+        state: absent
+      register: pkgng_file_install_cleanup
+
+    - name: Ensure pkgng installs from a local package file correctly
+      assert:
+        that:
+          - pkgng_file_install is changed
+          - pkgng_file_install_idempotent is not changed
+          - pkgng_file_install_cleanup is changed
+
+##
 ## pkgng - example - Install multiple packages in one command
 ##
 - name: Remove test package (checkmode)
