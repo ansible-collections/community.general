@@ -13,7 +13,7 @@
   delay: 10
 
 - name: Delete realm if exists
-  community.general.keycloak_realm:
+  ansible_middleware.keycloak.keycloak_realm:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
     auth_username: "{{ admin_user }}"
@@ -22,7 +22,7 @@
     state: absent
 
 - name: Create realm
-  community.general.keycloak_realm:
+  ansible_middleware.keycloak.keycloak_realm:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
     auth_username: "{{ admin_user }}"
@@ -32,7 +32,7 @@
     state: present
 
 - name: Create new groups
-  community.general.keycloak_group:
+  ansible_middleware.keycloak.keycloak_group:
     auth_keycloak_url: "{{ url }}"
     auth_realm: "{{ admin_realm }}"
     auth_username: "{{ admin_user }}"
@@ -43,7 +43,7 @@
   with_items: "{{ keycloak_user_groups }}"
 
 - name: Create user
-  community.general.keycloak_user:
+  ansible_middleware.keycloak.keycloak_user:
     auth_keycloak_url: "{{ url }}"
     auth_username: "{{ admin_user }}"
     auth_password: "{{ admin_password }}"
@@ -65,7 +65,7 @@
       - create_result.end_state.groups | length == 2
 
 - name: Create another user
-  community.general.keycloak_user:
+  ansible_middleware.keycloak.keycloak_user:
     auth_keycloak_url: "{{ url }}"
     auth_username: "{{ admin_user }}"
     auth_password: "{{ admin_password }}"
