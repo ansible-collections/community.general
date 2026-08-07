@@ -3037,8 +3037,8 @@ class RedfishUtils:
                 return uri, data
             # WORKAROUND
             # Supermicro systems do not properly clear out ImageName when media is ejected
-            if vendor == 'Supermicro':
-                if data.get('ConnectedVia') == 'NotConnected':
+            if vendor == "Supermicro":
+                if data.get("ConnectedVia") == "NotConnected":
                     return uri, data
         return None, None
 
