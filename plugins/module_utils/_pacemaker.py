@@ -64,6 +64,7 @@ def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
 
 
 _DEFAULT_RESOURCE_READY_STATES = ("Started",)
+_STOPPED_READY_STATES = ("Stopped",)
 
 
 def wait_for_resource(
@@ -76,11 +77,17 @@ def wait_for_resource(
 ) -> None:
     """Poll ``pcs <cli_noun> status <name>`` until the resource reports a ready state or the wait budget expires.
 
-    A resource is considered ready when its status output contains any of the states in
-    *ready_states*. The default ``("Started",)`` matches non-promotable resources and stonith
-    fencing devices. Callers managing promotable resources should pass
-    ``("Started", "Promoted", "Unpromoted")`` because promotable resources never reach
-    ``Started``.
+    Used to assert *runtime* state after ``state=enabled`` or ``state=disabled`` in the
+    pacemaker modules — not for configuration changes such as ``state=present`` or
+    ``state=cloned``. A resource is considered ready when its status output contains any
+    of the states in *ready_states*.
+
+    Common ready-state tuples:
+
+    - ``("Started",)`` — non-promotable resources and stonith fencing devices when enabling.
+    - ``("Started", "Promoted", "Unpromoted")`` — promotable resources when enabling, because
+      promotable resources never reach ``Started``.
+    - ``("Stopped",)`` — any resource or stonith device when disabling.
 
     Raises an exception if the resource does not reach a ready state within *wait* seconds.
     """
@@ -91,7 +98,10 @@ def wait_for_resource(
         if out and any(state in out for state in ready_states):
             return
         if time.monotonic() >= deadline:
-            raise Exception(f"Timed out waiting {wait}s for {cli_noun} resource '{name}' to start")
+            raise Exception(
+                f"Timed out waiting {wait}s for {cli_noun} resource '{name}' to reach a ready state "
+                f"(expected one of {tuple(ready_states)})"
+            )
         time.sleep(sleep_interval)
 
 
