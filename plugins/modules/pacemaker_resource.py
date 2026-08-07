@@ -14,6 +14,12 @@ author:
 version_added: 10.5.0
 description:
   - This module can manage resources in a Pacemaker cluster using the pacemaker CLI.
+requirements:
+  - pcs
+notes:
+  - Clone-idempotency detection uses structured JSON output on C(pcs) >= 0.11.6 and falls back to
+    plaintext parsing of C(pcs resource config <name>) on older versions. Both paths preserve
+    idempotency of clone creation.
 extends_documentation_fragment:
   - community.general._attributes
 attributes:
@@ -148,6 +154,7 @@ cluster_resources:
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     get_pacemaker_maintenance_mode,
+    is_resource_cloned_any,
     pacemaker_runner,
     wait_for_resource,
 )
@@ -255,6 +262,8 @@ class PacemakerResource(StateModuleHelper):
             wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait, ready_states=_READY_STATES)
 
     def state_cloned(self):
+        if self._is_already_cloned():
+            return
         with self.runner(
             "cli_action state name resource_clone_ids resource_clone_meta",
             output_process=self._process_command_output(
@@ -268,6 +277,22 @@ class PacemakerResource(StateModuleHelper):
             )
         if not self.module.check_mode and self.vars.wait and not get_pacemaker_maintenance_mode(self.runner):
             wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait, ready_states=_READY_STATES)
+
+    def _is_already_cloned(self):
+        """Return True if the named resource (or group) is already part of a clone set.
+
+        On ``pcs`` >= 0.11.6 this queries ``pcs resource config <name> --output-format=json``
+        and checks whether any clone object's ``member_id`` matches the requested name.
+        On older ``pcs`` it falls back to matching a ``Clone:`` / ``Clone Set:`` header
+        line in plaintext ``pcs resource config <name>`` output. Both paths avoid the
+        previous fragile approach of inspecting pcs stderr for a hard-coded substring,
+        which only matched the "resource is already cloned" wording and not the
+        "cannot clone a group that has already been cloned" wording.
+        """
+        name = self.module.params["name"]
+        if not name:
+            return False
+        return is_resource_cloned_any(self.runner, name)
 
     def state_enabled(self):
         with self.runner(
