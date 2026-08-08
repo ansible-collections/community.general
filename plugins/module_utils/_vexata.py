@@ -43,9 +43,9 @@ def get_array(module: AnsibleModule):
     """Return storage array object or fail"""
     global VXOS_VERSION
     array = module.params["array"]
-    user = module.params.get("user", None)
-    password = module.params.get("password", None)
-    validate = module.params.get("validate_certs")
+    user = module.params["user"]
+    password = module.params["password"]
+    validate = module.params["validate_certs"]
 
     if not HAS_VEXATAPI:
         module.fail_json(msg="vexatapi library is required for this module. To install, use `pip install vexatapi`")

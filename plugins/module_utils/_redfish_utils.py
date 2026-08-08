@@ -76,10 +76,10 @@ class RedfishUtils:
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
-        self.ciphers = ciphers if ciphers is not None else module.params.get("ciphers")
+        self.ciphers = ciphers if ciphers is not None else module.params["ciphers"]
         self._vendor = None
-        self.validate_certs = module.params.get("validate_certs", False)
-        self.ca_path = module.params.get("ca_path")
+        self.validate_certs = module.params["validate_certs"]
+        self.ca_path = module.params["ca_path"]
 
     def _auth_params(self, headers: dict[str, str]) -> tuple[str | None, str | None, bool]:
         """
@@ -1933,11 +1933,15 @@ class RedfishUtils:
         return operation_results
 
     def simple_update(self, update_opts):
-        image_uri = update_opts.get("update_image_uri")
-        protocol = update_opts.get("update_protocol")
-        targets = update_opts.get("update_targets")
-        creds = update_opts.get("update_creds")
-        apply_time = update_opts.get("update_apply_time")
+        image_uri = update_opts.get(
+            "update_image_uri"
+        )  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        protocol = update_opts.get("update_protocol")  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        targets = update_opts.get("update_targets")  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        creds = update_opts.get("update_creds")  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        apply_time = update_opts.get(
+            "update_apply_time"
+        )  # UNCERTAIN: 'update_opts' might be a params dict — check callers
 
         if not image_uri:
             return {"ret": False, "msg": "Must specify update_image_uri for the SimpleUpdate command"}
@@ -2005,13 +2009,25 @@ class RedfishUtils:
         :param update_opts: The parameters for the update operation
         :return: dict containing the response of the update request
         """
-        image_file = update_opts.get("update_image_file")
-        targets = update_opts.get("update_targets")
-        apply_time = update_opts.get("update_apply_time")
-        oem_params = update_opts.get("update_oem_params")
-        custom_oem_header = update_opts.get("update_custom_oem_header")
-        custom_oem_mime_type = update_opts.get("update_custom_oem_mime_type")
-        custom_oem_params = update_opts.get("update_custom_oem_params")
+        image_file = update_opts.get(
+            "update_image_file"
+        )  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        targets = update_opts.get("update_targets")  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        apply_time = update_opts.get(
+            "update_apply_time"
+        )  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        oem_params = update_opts.get(
+            "update_oem_params"
+        )  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        custom_oem_header = update_opts.get(
+            "update_custom_oem_header"
+        )  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        custom_oem_mime_type = update_opts.get(
+            "update_custom_oem_mime_type"
+        )  # UNCERTAIN: 'update_opts' might be a params dict — check callers
+        custom_oem_params = update_opts.get(
+            "update_custom_oem_params"
+        )  # UNCERTAIN: 'update_opts' might be a params dict — check callers
 
         # Ensure the image file is provided
         if not image_file:
@@ -2206,7 +2222,9 @@ class RedfishUtils:
         # Build boot device list
         boot_device_list = []
         for ref in boot_order:
-            boot_device_list.append(boot_options_dict.get(ref, {"BootOptionReference": ref}))
+            boot_device_list.append(
+                boot_options_dict.get(ref, {"BootOptionReference": ref})
+            )  # UNCERTAIN: 'boot_options_dict' might be a params dict — check callers
 
         result["entries"] = boot_device_list
         return result
@@ -2279,11 +2297,15 @@ class RedfishUtils:
 
     def set_boot_override_with_settings_uri(self, boot_opts):
         # Extract the requested boot override options
-        bootdevice = boot_opts.get("bootdevice")
-        uefi_target = boot_opts.get("uefi_target")
-        boot_next = boot_opts.get("boot_next")
-        override_enabled = boot_opts.get("override_enabled")
-        boot_override_mode = boot_opts.get("boot_override_mode")
+        bootdevice = boot_opts.get("bootdevice")  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
+        uefi_target = boot_opts.get("uefi_target")  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
+        boot_next = boot_opts.get("boot_next")  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
+        override_enabled = boot_opts.get(
+            "override_enabled"
+        )  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
+        boot_override_mode = boot_opts.get(
+            "boot_override_mode"
+        )  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
         if not bootdevice and override_enabled != "Disabled":
             return {"ret": False, "msg": "bootdevice option required for temporary boot override"}
 
@@ -2367,11 +2389,15 @@ class RedfishUtils:
 
     def set_boot_override(self, boot_opts):
         # Extract the requested boot override options
-        bootdevice = boot_opts.get("bootdevice")
-        uefi_target = boot_opts.get("uefi_target")
-        boot_next = boot_opts.get("boot_next")
-        override_enabled = boot_opts.get("override_enabled")
-        boot_override_mode = boot_opts.get("boot_override_mode")
+        bootdevice = boot_opts.get("bootdevice")  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
+        uefi_target = boot_opts.get("uefi_target")  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
+        boot_next = boot_opts.get("boot_next")  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
+        override_enabled = boot_opts.get(
+            "override_enabled"
+        )  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
+        boot_override_mode = boot_opts.get(
+            "boot_override_mode"
+        )  # UNCERTAIN: 'boot_opts' might be a params dict — check callers
         if not bootdevice and override_enabled != "Disabled":
             return {"ret": False, "msg": "bootdevice option required for temporary boot override"}
 
@@ -3070,16 +3096,16 @@ class RedfishUtils:
 
     @staticmethod
     def _insert_virt_media_payload(options, param_map, data, ai):
-        payload = {"Image": options.get("image_url")}
+        payload = {"Image": options["image_url"]}
         for param, option in param_map.items():
-            if options.get(option) is not None and param in data:
+            if options[option] is not None and param in data:
                 allowable = ai.get(param, {}).get("AllowableValues", [])
-                if allowable and options.get(option) not in allowable:
+                if allowable and options[option] not in allowable:
                     return {
                         "ret": False,
-                        "msg": f"Value '{options.get(option)}' specified for option '{option}' not in list of AllowableValues {allowable}",
+                        "msg": f"Value '{options[option]}' specified for option '{option}' not in list of AllowableValues {allowable}",
                     }
-                payload[param] = options.get(option)
+                payload[param] = options[option]
         return payload
 
     def virtual_media_insert_via_patch(self, options, param_map, uri, data, image_only=False):
@@ -3115,10 +3141,10 @@ class RedfishUtils:
             "TransferProtocolType": "transfer_protocol_type",
             "TransferMethod": "transfer_method",
         }
-        image_url = options.get("image_url")
+        image_url = options["image_url"]
         if not image_url:
             return {"ret": False, "msg": "image_url option required for VirtualMediaInsert"}
-        media_types = options.get("media_types")
+        media_types = options["media_types"]
 
         # locate and read the VirtualMedia resources
         #  Given resource_type, use the proper URI
@@ -3220,7 +3246,7 @@ class RedfishUtils:
         return resp
 
     def virtual_media_eject(self, options, resource_type="Manager"):
-        image_url = options.get("image_url")
+        image_url = options["image_url"]
         if not image_url:
             return {"ret": False, "msg": "image_url option required for VirtualMediaEject"}
 
