@@ -232,10 +232,14 @@ def select_release_asset(module, release, asset_name):
             matches.append(asset)
 
     if not matches:
-        module.fail_json(msg=f"No AppImage asset matching {asset_name!r} was found in GitHub release {release.get('tag_name')}")
+        module.fail_json(
+            msg=f"No AppImage asset matching {asset_name!r} was found in GitHub release {release.get('tag_name')}"
+        )
     if len(matches) > 1:
         names = [asset["name"] for asset in matches]
-        module.fail_json(msg=f"Multiple AppImage assets match {asset_name!r}; make asset_name more specific", assets=names)
+        module.fail_json(
+            msg=f"Multiple AppImage assets match {asset_name!r}; make asset_name more specific", assets=names
+        )
 
     return matches[0]
 
@@ -252,7 +256,9 @@ def select_catalog_item(module, feed, name):
         module.fail_json(msg=f"No AppImage named {name!r} was found in the appimage.github.io catalog")
     if len(normalized_matches) > 1:
         names = [item["name"] for item in normalized_matches]
-        module.fail_json(msg=f"Multiple AppImage catalog entries match {name!r}; use the exact catalog name", catalog_names=names)
+        module.fail_json(
+            msg=f"Multiple AppImage catalog entries match {name!r}; use the exact catalog name", catalog_names=names
+        )
 
     return normalized_matches[0]
 
@@ -279,7 +285,7 @@ def resolve_url_source(module, url, catalog_name=None):
         tag = module.params["version"] or tag_from_url
         headers = {}
         if module.params["github_token"]:
-            headers["Authorization"] = "Bearer %s" % module.params["github_token"]
+            headers["Authorization"] = f"Bearer {module.params['github_token']}"
         release = fetch_json(module, github_api_url(owner, repo, tag), headers)
         asset = select_release_asset(module, release, module.params["asset_name"])
         source = {
@@ -387,14 +393,7 @@ def desktop_file_path(name):
 
 
 def desired_desktop_file(name, executable):
-    return (
-        "[Desktop Entry]\n"
-        "Type=Application\n"
-        f"Name={name}\n"
-        f"Exec={executable}\n"
-        "Terminal=false\n"
-        "Categories=Utility;\n"
-    )
+    return f"[Desktop Entry]\nType=Application\nName={name}\nExec={executable}\nTerminal=false\nCategories=Utility;\n"
 
 
 def ensure_desktop_file(path, content, check_mode):
