@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_hook - add ``custom_webhook_template`` option to configure a custom webhook payload template on project hooks (https://github.com/ansible-collections/community.general/issues/11233, https://github.com/ansible-collections/community.general/pull/12496).
