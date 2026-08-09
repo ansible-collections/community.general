@@ -721,6 +721,10 @@ def main():
     cmd = module.get_bin_path("blkid", required=True)
     rc, raw_fs, err = module.run_command([cmd, "-c", os.devnull, "-o", "value", "-s", "TYPE", str(dev)])
     fs = raw_fs.strip()
+    # blkid exit codes: 0 = filesystem found, 2 = nothing found (blank device).
+    # Any other code means probe failed.
+    if rc not in (0, 2):
+        module.warn(f"blkid failed probing {dev} (rc={rc}): {err.strip()}")
     # BusyBox blkid may ignore -o/-s flags and output the full device info line,
     # e.g. '/dev/sda2: UUID="..." TYPE="btrfs"' instead of just 'btrfs'
     if fs and " " in fs:
