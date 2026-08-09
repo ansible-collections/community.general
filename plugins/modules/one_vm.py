@@ -207,6 +207,32 @@ options:
       - B(VIDEO:) V(ATS), V(IOMMU), V(RESOLUTION), V(TYPE), V(VRAM).
     type: dict
     version_added: 6.3.0
+  update_attributes:
+    description:
+      - A dictionary of USER_TEMPLATE key/value pairs to merge onto existing VMs.
+      - Unlike O(attributes), which is applied only at VM creation, this parameter is
+        reconciled on every run by calling the C(one.vm.update) API with append/merge
+        semantics. It runs for VMs matched via O(instance_ids), O(attributes)/O(labels),
+        or O(exact_count) (including when O(template_name)/O(template_id) is set for
+        create/count matching).
+      - With O(count) alone (no O(exact_count)), only newly created VMs from that run are
+        reconciled; prefer O(exact_count) to keep a matched fleet in sync.
+      - On a brand-new instantiate, prefer also setting the same keys in O(attributes)
+        so they exist from first boot; O(update_attributes) then becomes a no-op once
+        values already match.
+      - Keys are automatically uppercased. Only string and integer values are accepted.
+        Scalar values are compared as strings so that for example V(8080) matches a stored
+        C("8080") without perpetual updates. Prefer string scalars; OpenNebula booleans are
+        typically stored as C(YES)/C(NO), not Python V(true)/V(false).
+      - Values of V(null) are not supported; append merge cannot remove USER_TEMPLATE keys.
+      - With O(exact_count), reconciled VMs are listed in R(tagged_instances), not
+        necessarily in the C(instances) return value, which tracks only creates/terminates
+        in that run.
+      - Cannot set keys restricted by OpenNebula (for example V(CPU), V(VCPU), V(MEMORY), V(DISK)).
+      - Mutually exclusive with O(state=absent).
+    type: dict
+    default: {}
+    version_added: 13.3.0
 author:
   - "Milan Ilic (@ilicmilan)"
   - "Jan Meerkamp (@meerkampdvv)"
@@ -439,6 +465,35 @@ EXAMPLES = r"""
         SSH_PUBLIC_KEY: |-
           ssh-rsa ...
           ssh-ed25519 ...
+
+- name: "Set USER_TEMPLATE attributes on a running VM (idempotent)"
+  community.general.one_vm:
+    instance_ids: 351
+    update_attributes:
+      PROJECT: myproject
+      ENVIRONMENT: prod
+      ROLE: web
+
+- name: "Ensure USER_TEMPLATE attributes are set on VMs matched by name attribute"
+  community.general.one_vm:
+    attributes:
+      name: my-vm-###
+    update_attributes:
+      SUBROLE: head
+
+- name: "Reconcile USER_TEMPLATE on exact_count VMs (works with template_name)"
+  community.general.one_vm:
+    template_name: my-base-template
+    exact_count: 1
+    count_attributes:
+      NAME: my-vm-00
+    attributes:
+      NAME: my-vm-00
+      ROLE: k8s
+      SUBROLE: head
+    update_attributes:
+      SUBROLE: head
+    state: present
 """
 
 RETURN = r"""
@@ -564,6 +619,8 @@ tagged_instances:
   description:
     - A list of instances info based on a specific attributes and/or labels that are specified with O(count_attributes) and
       O(count_labels) options.
+    - When using O(exact_count) with O(update_attributes), steady-state USER_TEMPLATE reconciliation populates this list
+      even when the C(instances) return value is empty.
   type: list
   elements: dict
   returned: success
@@ -1016,6 +1073,45 @@ def update_vms(module, client, vms, *args):
     changed = False
     for vm in vms:
         changed = update_vm(module, client, vm, *args) or changed
+    return changed
+
+
+def update_vm_user_template(module, client, vm, update_attributes_dict):
+    """Merge USER_TEMPLATE keys onto a VM via one.vm.update (append).
+
+    Skips the XML-RPC call when every requested key already matches, so
+    idempotent re-runs do not touch the API.
+    """
+    if not update_attributes_dict:
+        return False
+
+    before = client.vm.info(vm.ID).USER_TEMPLATE or {}
+    needs_update = any(not _user_template_values_equal(before.get(k), v) for k, v in update_attributes_dict.items())
+    if not needs_update:
+        return False
+
+    if module.check_mode:
+        return True
+
+    # 1: Merge new template with the existing one.
+    client.vm.update(vm.ID, render(update_attributes_dict), 1)
+    return True
+
+
+def _user_template_values_equal(current, desired):
+    """Compare USER_TEMPLATE values with OpenNebula string storage in mind."""
+    if current is None:
+        return False
+    if isinstance(desired, (dict, list)) or isinstance(current, (dict, list)):
+        return current == desired
+    # OpenNebula stores scalars as strings; normalise so PORT: 8080 matches "8080".
+    return str(current) == str(desired)
+
+
+def update_vms_user_template(module, client, vms, update_attributes_dict):
+    changed = False
+    for vm in vms:
+        changed = update_vm_user_template(module, client, vm, update_attributes_dict) or changed
     return changed
 
 
@@ -1584,12 +1680,24 @@ TEMPLATE_RESTRICTED_ATTRIBUTES = [
 ]
 
 
-def check_attributes(module, attributes):
+def check_attributes(module, attributes, purpose="filtering VMs"):
     for key in attributes.keys():
         if key in TEMPLATE_RESTRICTED_ATTRIBUTES:
-            module.fail_json(msg=f"Restricted attribute `{key}` cannot be used when filtering VMs.")
+            module.fail_json(msg=f"Restricted attribute `{key}` cannot be used when {purpose}.")
     # Check the format of the name attribute
     check_name_attribute(module, attributes)
+
+
+def check_update_attributes_values(module, update_attributes):
+    for key, value in update_attributes.items():
+        if value is None:
+            module.fail_json(
+                msg=(f"update_attributes key `{key}` cannot be null; append merge cannot remove USER_TEMPLATE keys.")
+            )
+        elif isinstance(value, bool) or not isinstance(value, (str, int)):
+            module.fail_json(
+                msg=f"update_attributes key `{key}` must be a string or integer, not {type(value).__name__}."
+            )
 
 
 def disk_save_as(module, client, vm, disk_saveas, wait_timeout):
@@ -1679,6 +1787,7 @@ def main():
         "disk_saveas": {"type": "dict"},
         "persistent": {"default": False, "type": "bool"},
         "updateconf": {"type": "dict"},
+        "update_attributes": {"default": {}, "type": "dict"},
     }
 
     module = AnsibleModule(
@@ -1737,6 +1846,7 @@ def main():
     disk_saveas = params.get("disk_saveas")
     persistent = params.get("persistent")
     updateconf = params.get("updateconf")
+    update_attributes = params.get("update_attributes")
 
     if not (auth.username and auth.password):
         module.warn("Credentials missing")
@@ -1758,6 +1868,13 @@ def main():
 
     if updateconf:
         check_updateconf(module, updateconf)
+
+    if update_attributes:
+        if state == "absent":
+            module.fail_json(msg="Option update_attributes cannot be used when state is 'absent'.")
+        check_update_attributes_values(module, update_attributes)
+        update_attributes = {k.upper(): v for k, v in update_attributes.items()}
+        check_attributes(module, update_attributes, purpose="setting update_attributes")
 
     if count_labels and not labels:
         module.warn(
@@ -1914,6 +2031,12 @@ def main():
 
     if template_id is None and updateconf is not None:
         changed = update_vms(module, one_client, vms, updateconf) or changed
+
+    # Reconcile USER_TEMPLATE on all resolved VMs. Do not gate on template_id:
+    # exact_count / template_name paths still need to update attributes on
+    # already-running matches (attributes alone only apply at instantiate).
+    if update_attributes:
+        changed = update_vms_user_template(module, one_client, vms, update_attributes) or changed
 
     if wait and not module.check_mode and state != "present":
         wait_for = {
