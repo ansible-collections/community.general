@@ -249,7 +249,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
             action_count[action] += len(package_list)
             continue
 
-        pkgng_args = [action, "-U", "-y"] + package_list
+        pkgng_args = [action] + (["-U"] if cached else []) + ["-y"] + package_list
         rc, out, err = run_pkgng(*pkgng_args)
         stdout += out
         stderr += err
