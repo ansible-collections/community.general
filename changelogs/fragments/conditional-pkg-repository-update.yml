@@ -1,2 +1,0 @@
-bugfixes:
-  - pkgng - fix failure to install packages when the package repository has never been updated (https://github.com/ansible-collections/community.general/pull/12507).

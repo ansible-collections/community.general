@@ -2,64 +2,68 @@
 
 **Topics**
 
-- <a href="#v12-6-3">v12\.6\.3</a>
+- <a href="#v12-6-4">v12\.6\.4</a>
     - <a href="#release-summary">Release Summary</a>
+    - <a href="#minor-changes">Minor Changes</a>
     - <a href="#bugfixes">Bugfixes</a>
-- <a href="#v12-6-2">v12\.6\.2</a>
+- <a href="#v12-6-3">v12\.6\.3</a>
     - <a href="#release-summary-1">Release Summary</a>
     - <a href="#bugfixes-1">Bugfixes</a>
-- <a href="#v12-6-1">v12\.6\.1</a>
+- <a href="#v12-6-2">v12\.6\.2</a>
     - <a href="#release-summary-2">Release Summary</a>
-    - <a href="#minor-changes">Minor Changes</a>
     - <a href="#bugfixes-2">Bugfixes</a>
-- <a href="#v12-6-0">v12\.6\.0</a>
+- <a href="#v12-6-1">v12\.6\.1</a>
     - <a href="#release-summary-3">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#bugfixes-3">Bugfixes</a>
-    - <a href="#new-modules">New Modules</a>
-- <a href="#v12-5-0">v12\.5\.0</a>
+- <a href="#v12-6-0">v12\.6\.0</a>
     - <a href="#release-summary-4">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
-    - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes-4">Bugfixes</a>
-    - <a href="#new-modules-1">New Modules</a>
-- <a href="#v12-4-0">v12\.4\.0</a>
+    - <a href="#new-modules">New Modules</a>
+- <a href="#v12-5-0">v12\.5\.0</a>
     - <a href="#release-summary-5">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
+    - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes-5">Bugfixes</a>
+    - <a href="#new-modules-1">New Modules</a>
+- <a href="#v12-4-0">v12\.4\.0</a>
+    - <a href="#release-summary-6">Release Summary</a>
+    - <a href="#minor-changes-4">Minor Changes</a>
+    - <a href="#bugfixes-6">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#callback">Callback</a>
     - <a href="#new-modules-2">New Modules</a>
 - <a href="#v12-3-0">v12\.3\.0</a>
-    - <a href="#release-summary-6">Release Summary</a>
-    - <a href="#minor-changes-4">Minor Changes</a>
-    - <a href="#bugfixes-6">Bugfixes</a>
+    - <a href="#release-summary-7">Release Summary</a>
+    - <a href="#minor-changes-5">Minor Changes</a>
+    - <a href="#bugfixes-7">Bugfixes</a>
     - <a href="#new-plugins-1">New Plugins</a>
         - <a href="#filter">Filter</a>
 - <a href="#v12-2-0">v12\.2\.0</a>
-    - <a href="#release-summary-7">Release Summary</a>
-    - <a href="#minor-changes-5">Minor Changes</a>
-    - <a href="#deprecated-features-1">Deprecated Features</a>
-    - <a href="#bugfixes-7">Bugfixes</a>
-    - <a href="#new-modules-3">New Modules</a>
-- <a href="#v12-1-0">v12\.1\.0</a>
     - <a href="#release-summary-8">Release Summary</a>
     - <a href="#minor-changes-6">Minor Changes</a>
-    - <a href="#deprecated-features-2">Deprecated Features</a>
+    - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#bugfixes-8">Bugfixes</a>
-    - <a href="#new-modules-4">New Modules</a>
-- <a href="#v12-0-1">v12\.0\.1</a>
+    - <a href="#new-modules-3">New Modules</a>
+- <a href="#v12-1-0">v12\.1\.0</a>
     - <a href="#release-summary-9">Release Summary</a>
     - <a href="#minor-changes-7">Minor Changes</a>
+    - <a href="#deprecated-features-2">Deprecated Features</a>
     - <a href="#bugfixes-9">Bugfixes</a>
-- <a href="#v12-0-0">v12\.0\.0</a>
+    - <a href="#new-modules-4">New Modules</a>
+- <a href="#v12-0-1">v12\.0\.1</a>
     - <a href="#release-summary-10">Release Summary</a>
     - <a href="#minor-changes-8">Minor Changes</a>
+    - <a href="#bugfixes-10">Bugfixes</a>
+- <a href="#v12-0-0">v12\.0\.0</a>
+    - <a href="#release-summary-11">Release Summary</a>
+    - <a href="#minor-changes-9">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features-3">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
     - <a href="#security-fixes">Security Fixes</a>
-    - <a href="#bugfixes-10">Bugfixes</a>
+    - <a href="#bugfixes-11">Bugfixes</a>
     - <a href="#new-plugins-2">New Plugins</a>
         - <a href="#callback-1">Callback</a>
         - <a href="#filter-1">Filter</a>
@@ -69,15 +73,38 @@
 
 This changelog describes changes after version 11\.0\.0\.
 
-<a id="v12-6-3"></a>
-## v12\.6\.3
+<a id="v12-6-4"></a>
+## v12\.6\.4
 
 <a id="release-summary"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
+<a id="minor-changes"></a>
+### Minor Changes
+
+* filesystem \- print a warning if <code>blkid \-c</code> probe fails and show the error message from <code>blkid</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12500](https\://github\.com/ansible\-collections/community\.general/pull/12500)\)\.
+
 <a id="bugfixes"></a>
+### Bugfixes
+
+* incus connection plugin \- detect failed <code>incus file push</code>/<code>incus file pull</code> transfers and raise a clear error naming the instance and the CLI stderr\, instead of silently reporting success and failing later with a misleading <code>chmod\: No such file or directory</code> error \([https\://github\.com/ansible\-collections/community\.general/pull/12464](https\://github\.com/ansible\-collections/community\.general/pull/12464)\)\.
+* lxd connection plugin \- detect failed <code>lxc file push</code>/<code>lxc file pull</code> transfers and raise a clear error naming the instance and the CLI stderr\, instead of silently reporting success and failing later with a misleading <code>chmod\: No such file or directory</code> error \([https\://github\.com/ansible\-collections/community\.general/pull/12464](https\://github\.com/ansible\-collections/community\.general/pull/12464)\)\.
+* opennebula inventory plugin \- coerce <code>SSH\_PORT</code> to an integer before setting <code>ansible\_port</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12437](https\://github\.com/ansible\-collections/community\.general/pull/12437)\)\.
+* pkgng \- fix failure to install packages when the package repository has never been updated \([https\://github\.com/ansible\-collections/community\.general/pull/12507](https\://github\.com/ansible\-collections/community\.general/pull/12507)\)\.
+* terraform \- fix return value <code>command</code>\, showing terraform plan name twice \([https\://github\.com/ansible\-collections/community\.general/issues/12530](https\://github\.com/ansible\-collections/community\.general/issues/12530)\, [https\://github\.com/ansible\-collections/community\.general/pull/12540](https\://github\.com/ansible\-collections/community\.general/pull/12540)\)\.
+* timezone \- no longer requires the <code>hwclock</code> executable for name\-only changes on non\-systemd systems \([https\://github\.com/ansible\-collections/community\.general/issues/12516](https\://github\.com/ansible\-collections/community\.general/issues/12516)\, [https\://github\.com/ansible\-collections/community\.general/pull/12526](https\://github\.com/ansible\-collections/community\.general/pull/12526)\)\.
+
+<a id="v12-6-3"></a>
+## v12\.6\.3
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Regular bugfix release\.
+
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * apk \- the <code>upgrade</code> operation no longer reports <code>changed\=true</code> when nothing was upgraded but an apk commit hook \(for example <code>mrtest</code>\, or anything installed in <code>/etc/apk/commit\_hooks\.d/</code>\) printed output before the trailing <code>OK\:</code> summary line\; the change status is now derived from the packages apk actually reports upgrading \([https\://github\.com/ansible\-collections/community\.general/issues/12223](https\://github\.com/ansible\-collections/community\.general/issues/12223)\, [https\://github\.com/ansible\-collections/community\.general/pull/12376](https\://github\.com/ansible\-collections/community\.general/pull/12376)\)\.
@@ -90,12 +117,12 @@ Regular bugfix release\.
 <a id="v12-6-2"></a>
 ## v12\.6\.2
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * aix\_devices \- fix <code>chdev</code> command failures being incorrectly reported as successful results\, now properly fails the task when device attribute changes cannot be applied \([https\://github\.com/ansible\-collections/community\.general/pull/12185](https\://github\.com/ansible\-collections/community\.general/pull/12185)\)\.
@@ -127,17 +154,17 @@ Regular bugfix release\.
 <a id="v12-6-1"></a>
 ## v12\.6\.1
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Regular bugfix release\.
 
-<a id="minor-changes"></a>
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * mattermost\, rocketchat\, slack \- update default <code>icon\_url</code> to ansible favicon \([https\://github\.com/ansible\-collections/community\.general/pull/11909](https\://github\.com/ansible\-collections/community\.general/pull/11909)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * apt\_rpm \- do not fail when <code>update\_kernel</code> finds no new kernel available \([https\://github\.com/ansible\-collections/community\.general/issues/10055](https\://github\.com/ansible\-collections/community\.general/issues/10055)\, [https\://github\.com/ansible\-collections/community\.general/pull/11949](https\://github\.com/ansible\-collections/community\.general/pull/11949)\)\.
@@ -167,12 +194,12 @@ Regular bugfix release\.
 <a id="v12-6-0"></a>
 ## v12\.6\.0
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-1"></a>
+<a id="minor-changes-2"></a>
 ### Minor Changes
 
 * cobbler\_sync \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
@@ -208,7 +235,7 @@ Regular bugfix and feature release\.
 * terraform \- minor code cleanup \([https\://github\.com/ansible\-collections/community\.general/pull/11879](https\://github\.com/ansible\-collections/community\.general/pull/11879)\)\.
 * xenserver\_guest \- use <code>enumerate\(\)</code> instead of manual index variable in <code>for</code> loop \([https\://github\.com/ansible\-collections/community\.general/pull/11721](https\://github\.com/ansible\-collections/community\.general/pull/11721)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * alternatives \- normalize locale environment for <code>run\_command\(\)</code> calls to <code>LANGUAGE\=C</code>\, <code>LC\_ALL\=C</code> \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11738](https\://github\.com/ansible\-collections/community\.general/pull/11738)\)\.
@@ -352,12 +379,12 @@ Regular bugfix and feature release\.
 <a id="v12-5-0"></a>
 ## v12\.5\.0
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 Bugfix and feature release\.
 
-<a id="minor-changes-2"></a>
+<a id="minor-changes-3"></a>
 ### Minor Changes
 
 * ansible\_galaxy\_install \- add parameter <code>executable</code> \([https\://github\.com/ansible\-collections/community\.general/issues/7261](https\://github\.com/ansible\-collections/community\.general/issues/7261)\, [https\://github\.com/ansible\-collections/community\.general/pull/11646](https\://github\.com/ansible\-collections/community\.general/pull/11646)\)\.
@@ -402,7 +429,7 @@ Bugfix and feature release\.
 * monit \- support for Monit version 5\.18 or older is deprecated and will be removed in community\.general 14\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11254](https\://github\.com/ansible\-collections/community\.general/pull/11254)\)\.
 * puppet \- the <code>timeout</code> parameter is deprecated and will be removed in community\.general 14\.0\.0\. \([https\://github\.com/ansible\-collections/community\.general/pull/11658](https\://github\.com/ansible\-collections/community\.general/pull/11658)\)\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * counter\_enabled callback plugin \- fix plugin not observing <code>display\_ok\_hosts</code> option \([https\://github\.com/ansible\-collections/community\.general/issues/3978](https\://github\.com/ansible\-collections/community\.general/issues/3978)\, [https\://github\.com/ansible\-collections/community\.general/pull/11656](https\://github\.com/ansible\-collections/community\.general/pull/11656)\)\.
@@ -424,12 +451,12 @@ Bugfix and feature release\.
 <a id="v12-4-0"></a>
 ## v12\.4\.0
 
-<a id="release-summary-5"></a>
+<a id="release-summary-6"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-3"></a>
+<a id="minor-changes-4"></a>
 ### Minor Changes
 
 * ModuleHelper module utils \- allow to ignore specific exceptions in <code>module\_fails\_on\_exception</code> decorator \([https\://github\.com/ansible\-collections/community\.general/pull/11488](https\://github\.com/ansible\-collections/community\.general/pull/11488)\)\.
@@ -441,7 +468,7 @@ Regular bugfix and feature release\.
 * redfish\_info \- add Redfish Root data to results of successful <code>CheckAvailability</code> command \([https\://github\.com/ansible\-collections/community\.general/pull/11504](https\://github\.com/ansible\-collections/community\.general/pull/11504)\)\.
 * seport \- adds support for DCCP and SCTP protocols \([https\://github\.com/ansible\-collections/community\.general/pull/11486](https\://github\.com/ansible\-collections/community\.general/pull/11486)\)\.
 
-<a id="bugfixes-5"></a>
+<a id="bugfixes-6"></a>
 ### Bugfixes
 
 * keycloak module utils \- fix <code>TypeError</code> crash when managing users whose username or email contains special characters such as <code>\+</code> \([https\://github\.com/ansible\-collections/community\.general/issues/10305](https\://github\.com/ansible\-collections/community\.general/issues/10305)\, [https\://github\.com/ansible\-collections/community\.general/pull/11472](https\://github\.com/ansible\-collections/community\.general/pull/11472)\)\.
@@ -473,12 +500,12 @@ Regular bugfix and feature release\.
 <a id="v12-3-0"></a>
 ## v12\.3\.0
 
-<a id="release-summary-6"></a>
+<a id="release-summary-7"></a>
 ### Release Summary
 
 Regular feature and bugfix release\.
 
-<a id="minor-changes-4"></a>
+<a id="minor-changes-5"></a>
 ### Minor Changes
 
 * alicloud\_ecs module utils \- update to Python 3\.7 idioms \([https\://github\.com/ansible\-collections/community\.general/pull/11341](https\://github\.com/ansible\-collections/community\.general/pull/11341)\)\.
@@ -578,7 +605,7 @@ Regular feature and bugfix release\.
 * zypper \- update to Python 3\.7 idioms \([https\://github\.com/ansible\-collections/community\.general/pull/11344](https\://github\.com/ansible\-collections/community\.general/pull/11344)\)\.
 * zypper\_repository \- update to Python 3\.7 idioms \([https\://github\.com/ansible\-collections/community\.general/pull/11344](https\://github\.com/ansible\-collections/community\.general/pull/11344)\)\.
 
-<a id="bugfixes-6"></a>
+<a id="bugfixes-7"></a>
 ### Bugfixes
 
 * cloudflare\_dns \- also allow <code>flag\=128</code> for CAA records \([https\://github\.com/ansible\-collections/community\.general/issues/11355](https\://github\.com/ansible\-collections/community\.general/issues/11355)\, [https\://github\.com/ansible\-collections/community\.general/pull/11377](https\://github\.com/ansible\-collections/community\.general/pull/11377)\)\.
@@ -599,12 +626,12 @@ Regular feature and bugfix release\.
 <a id="v12-2-0"></a>
 ## v12\.2\.0
 
-<a id="release-summary-7"></a>
+<a id="release-summary-8"></a>
 ### Release Summary
 
 Feature and bugfix release\.
 
-<a id="minor-changes-5"></a>
+<a id="minor-changes-6"></a>
 ### Minor Changes
 
 * btrfs module utils \- make execution of external commands safer by passing arguments as list \([https\://github\.com/ansible\-collections/community\.general/pull/11240](https\://github\.com/ansible\-collections/community\.general/pull/11240)\)\.
@@ -624,7 +651,7 @@ Feature and bugfix release\.
 
 * All module utils\, plugin utils\, and doc fragments will be made <strong>private</strong> in community\.general 13\.0\.0\. This means that they will no longer be part of the public API of the collection\, and can have breaking changes even in bugfix releases\. If you depend on importing code from the module or plugin utils\, or use one of the doc fragments\, please [comment in the issue to discuss this](https\://github\.com/ansible\-collections/community\.general/issues/11312)\. Note that this does not affect any use of community\.general in task files\, roles\, or playbooks \([https\://github\.com/ansible\-collections/community\.general/issues/11312](https\://github\.com/ansible\-collections/community\.general/issues/11312)\, [https\://github\.com/ansible\-collections/community\.general/pull/11320](https\://github\.com/ansible\-collections/community\.general/pull/11320)\)\.
 
-<a id="bugfixes-7"></a>
+<a id="bugfixes-8"></a>
 ### Bugfixes
 
 * apk \- fix <code>packages</code> return value for apk\-tools \>\= 3 \(Alpine 3\.23\) \([https\://github\.com/ansible\-collections/community\.general/issues/11264](https\://github\.com/ansible\-collections/community\.general/issues/11264)\)\.
@@ -644,12 +671,12 @@ Feature and bugfix release\.
 <a id="v12-1-0"></a>
 ## v12\.1\.0
 
-<a id="release-summary-8"></a>
+<a id="release-summary-9"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-6"></a>
+<a id="minor-changes-7"></a>
 ### Minor Changes
 
 * The last code included in the collection that was licensed under the PSF 2\.0 license was removed form the collection\. This means that now all code is either GPLv3\+ licensed\, MIT licensed\, or BSD\-2\-clause licensed \([https\://github\.com/ansible\-collections/community\.general/pull/11232](https\://github\.com/ansible\-collections/community\.general/pull/11232)\)\.
@@ -1000,7 +1027,7 @@ Regular bugfix and feature release\.
 * saslprep module utils \- this module utils is not used by community\.general and will thus be removed from community\.general 13\.0\.0\. If you are using it from another collection\, please copy it over \([https\://github\.com/ansible\-collections/community\.general/pull/11205](https\://github\.com/ansible\-collections/community\.general/pull/11205)\)\.
 * spotinst\_aws\_elastigroup \- module relies on Python package supporting Python 2\.7 only\; the module will be removed from community\.general 13\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/pull/11069](https\://github\.com/ansible\-collections/community\.general/pull/11069)\)\.
 
-<a id="bugfixes-8"></a>
+<a id="bugfixes-9"></a>
 ### Bugfixes
 
 * \_filelock module utils \- add type hints\. Fix bug if <code>set\_lock\(\)</code> is called with <code>lock\_timeout\=None</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11222](https\://github\.com/ansible\-collections/community\.general/pull/11222)\)\.
@@ -1028,12 +1055,12 @@ Regular bugfix and feature release\.
 <a id="v12-0-1"></a>
 ## v12\.0\.1
 
-<a id="release-summary-9"></a>
+<a id="release-summary-10"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
 
-<a id="minor-changes-7"></a>
+<a id="minor-changes-8"></a>
 ### Minor Changes
 
 * datetime module utils \- remove code for unsupported Python version \([https\://github\.com/ansible\-collections/community\.general/pull/11048](https\://github\.com/ansible\-collections/community\.general/pull/11048)\)\.
@@ -1048,7 +1075,7 @@ Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
 * tss lookup plugin \- fixed <code>AccessTokenAuthorizer</code> initialization to include <code>base\_url</code> parameter for proper token authentication \([https\://github\.com/ansible\-collections/community\.general/pull/11031](https\://github\.com/ansible\-collections/community\.general/pull/11031)\)\.
 * zfs\_facts \- use Ansible construct to check result of external command \([https\://github\.com/ansible\-collections/community\.general/pull/11054](https\://github\.com/ansible\-collections/community\.general/pull/11054)\)\.
 
-<a id="bugfixes-9"></a>
+<a id="bugfixes-10"></a>
 ### Bugfixes
 
 * \_filelock module utils \- improve Python code \([https\://github\.com/ansible\-collections/community\.general/pull/11043](https\://github\.com/ansible\-collections/community\.general/pull/11043)\)\.
@@ -1181,12 +1208,12 @@ Bugfix release for inclusion in Ansible 13\.0\.0rc1\.
 <a id="v12-0-0"></a>
 ## v12\.0\.0
 
-<a id="release-summary-10"></a>
+<a id="release-summary-11"></a>
 ### Release Summary
 
 This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-11\-03\.
 
-<a id="minor-changes-8"></a>
+<a id="minor-changes-9"></a>
 ### Minor Changes
 
 * Modernize code for Python 3\.7\+\. This includes code reformatting\, and adding new checks to CI\, including a type checker \(mypy\)\. Most of the code does not have type hints yet\, but now it is possible to add typing hints and have these validated \([https\://github\.com/ansible\-collections/community\.general/pull/10285](https\://github\.com/ansible\-collections/community\.general/pull/10285)\, [https\://github\.com/ansible\-collections/community\.general/pull/10886](https\://github\.com/ansible\-collections/community\.general/pull/10886)\, [https\://github\.com/ansible\-collections/community\.general/pull/10891](https\://github\.com/ansible\-collections/community\.general/pull/10891)\, [https\://github\.com/ansible\-collections/community\.general/pull/10892](https\://github\.com/ansible\-collections/community\.general/pull/10892)\, [https\://github\.com/ansible\-collections/community\.general/pull/10897](https\://github\.com/ansible\-collections/community\.general/pull/10897)\, [https\://github\.com/ansible\-collections/community\.general/pull/10899](https\://github\.com/ansible\-collections/community\.general/pull/10899)\, [https\://github\.com/ansible\-collections/community\.general/pull/10902](https\://github\.com/ansible\-collections/community\.general/pull/10902)\, [https\://github\.com/ansible\-collections/community\.general/pull/10903](https\://github\.com/ansible\-collections/community\.general/pull/10903)\, [https\://github\.com/ansible\-collections/community\.general/pull/10904](https\://github\.com/ansible\-collections/community\.general/pull/10904)\, [https\://github\.com/ansible\-collections/community\.general/pull/10907](https\://github\.com/ansible\-collections/community\.general/pull/10907)\, [https\://github\.com/ansible\-collections/community\.general/pull/10908](https\://github\.com/ansible\-collections/community\.general/pull/10908)\, [https\://github\.com/ansible\-collections/community\.general/pull/10909](https\://github\.com/ansible\-collections/community\.general/pull/10909)\, [https\://github\.com/ansible\-collections/community\.general/pull/10939](https\://github\.com/ansible\-collections/community\.general/pull/10939)\, [https\://github\.com/ansible\-collections/community\.general/pull/10940](https\://github\.com/ansible\-collections/community\.general/pull/10940)\, [https\://github\.com/ansible\-collections/community\.general/pull/10941](https\://github\.com/ansible\-collections/community\.general/pull/10941)\, [https\://github\.com/ansible\-collections/community\.general/pull/10942](https\://github\.com/ansible\-collections/community\.general/pull/10942)\, [https\://github\.com/ansible\-collections/community\.general/pull/10945](https\://github\.com/ansible\-collections/community\.general/pull/10945)\, [https\://github\.com/ansible\-collections/community\.general/pull/10947](https\://github\.com/ansible\-collections/community\.general/pull/10947)\, [https\://github\.com/ansible\-collections/community\.general/pull/10958](https\://github\.com/ansible\-collections/community\.general/pull/10958)\, [https\://github\.com/ansible\-collections/community\.general/pull/10959](https\://github\.com/ansible\-collections/community\.general/pull/10959)\, [https\://github\.com/ansible\-collections/community\.general/pull/10968](https\://github\.com/ansible\-collections/community\.general/pull/10968)\, [https\://github\.com/ansible\-collections/community\.general/pull/10969](https\://github\.com/ansible\-collections/community\.general/pull/10969)\, [https\://github\.com/ansible\-collections/community\.general/pull/10970](https\://github\.com/ansible\-collections/community\.general/pull/10970)\, [https\://github\.com/ansible\-collections/community\.general/pull/10971](https\://github\.com/ansible\-collections/community\.general/pull/10971)\, [https\://github\.com/ansible\-collections/community\.general/pull/10973](https\://github\.com/ansible\-collections/community\.general/pull/10973)\, [https\://github\.com/ansible\-collections/community\.general/pull/10974](https\://github\.com/ansible\-collections/community\.general/pull/10974)\, [https\://github\.com/ansible\-collections/community\.general/pull/10975](https\://github\.com/ansible\-collections/community\.general/pull/10975)\, [https\://github\.com/ansible\-collections/community\.general/pull/10976](https\://github\.com/ansible\-collections/community\.general/pull/10976)\, [https\://github\.com/ansible\-collections/community\.general/pull/10977](https\://github\.com/ansible\-collections/community\.general/pull/10977)\, [https\://github\.com/ansible\-collections/community\.general/pull/10978](https\://github\.com/ansible\-collections/community\.general/pull/10978)\, [https\://github\.com/ansible\-collections/community\.general/pull/10979](https\://github\.com/ansible\-collections/community\.general/pull/10979)\, [https\://github\.com/ansible\-collections/community\.general/pull/10980](https\://github\.com/ansible\-collections/community\.general/pull/10980)\, [https\://github\.com/ansible\-collections/community\.general/pull/10981](https\://github\.com/ansible\-collections/community\.general/pull/10981)\, [https\://github\.com/ansible\-collections/community\.general/pull/10992](https\://github\.com/ansible\-collections/community\.general/pull/10992)\, [https\://github\.com/ansible\-collections/community\.general/pull/10993](https\://github\.com/ansible\-collections/community\.general/pull/10993)\, [https\://github\.com/ansible\-collections/community\.general/pull/10997](https\://github\.com/ansible\-collections/community\.general/pull/10997)\, [https\://github\.com/ansible\-collections/community\.general/pull/10999](https\://github\.com/ansible\-collections/community\.general/pull/10999)\, [https\://github\.com/ansible\-collections/community\.general/pull/11015](https\://github\.com/ansible\-collections/community\.general/pull/11015)\, [https\://github\.com/ansible\-collections/community\.general/pull/11016](https\://github\.com/ansible\-collections/community\.general/pull/11016)\, [https\://github\.com/ansible\-collections/community\.general/pull/11017](https\://github\.com/ansible\-collections/community\.general/pull/11017)\)\.
@@ -1523,7 +1550,7 @@ This is release 12\.0\.0 of <code>community\.general</code>\, released on 2025\-
 
 * keycloak\_user \- the parameter <code>credentials\[\]\.value</code> is now marked as <code>no\_log\=true</code>\. Before it was logged by Ansible\, unless the task was marked as <code>no\_log\: true</code>\. Since this parameter can be used for passwords\, this resulted in credential leaking \([https\://github\.com/ansible\-collections/community\.general/issues/11000](https\://github\.com/ansible\-collections/community\.general/issues/11000)\, [https\://github\.com/ansible\-collections/community\.general/pull/11005](https\://github\.com/ansible\-collections/community\.general/pull/11005)\)\.
 
-<a id="bugfixes-10"></a>
+<a id="bugfixes-11"></a>
 ### Bugfixes
 
 * Avoid deprecated functionality in ansible\-core 2\.20 \([https\://github\.com/ansible\-collections/community\.general/pull/10687](https\://github\.com/ansible\-collections/community\.general/pull/10687)\)\.

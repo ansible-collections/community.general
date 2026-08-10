@@ -6,6 +6,29 @@ Community General Release Notes
 
 This changelog describes changes after version 11.0.0.
 
+v12.6.4
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Minor Changes
+-------------
+
+- filesystem - print a warning if ``blkid -c`` probe fails and show the error message from ``blkid`` (https://github.com/ansible-collections/community.general/pull/12500).
+
+Bugfixes
+--------
+
+- incus connection plugin - detect failed ``incus file push``/``incus file pull`` transfers and raise a clear error naming the instance and the CLI stderr, instead of silently reporting success and failing later with a misleading ``chmod: No such file or directory`` error (https://github.com/ansible-collections/community.general/pull/12464).
+- lxd connection plugin - detect failed ``lxc file push``/``lxc file pull`` transfers and raise a clear error naming the instance and the CLI stderr, instead of silently reporting success and failing later with a misleading ``chmod: No such file or directory`` error (https://github.com/ansible-collections/community.general/pull/12464).
+- opennebula inventory plugin - coerce ``SSH_PORT`` to an integer before setting ``ansible_port`` (https://github.com/ansible-collections/community.general/pull/12437).
+- pkgng - fix failure to install packages when the package repository has never been updated (https://github.com/ansible-collections/community.general/pull/12507).
+- terraform - fix return value ``command``, showing terraform plan name twice (https://github.com/ansible-collections/community.general/issues/12530, https://github.com/ansible-collections/community.general/pull/12540).
+- timezone - no longer requires the ``hwclock`` executable for name-only changes on non-systemd systems (https://github.com/ansible-collections/community.general/issues/12516, https://github.com/ansible-collections/community.general/pull/12526).
+
 v12.6.3
 =======
 
