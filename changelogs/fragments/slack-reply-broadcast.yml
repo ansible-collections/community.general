@@ -1,0 +1,2 @@
+minor_changes:
+  - slack - add ``reply_broadcast`` option to allow a threaded reply (``thread_id``) to also be broadcast to the main channel (https://github.com/ansible-collections/community.general/pull/12535).
