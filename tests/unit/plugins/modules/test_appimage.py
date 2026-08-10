@@ -136,3 +136,9 @@ def test_desktop_file_content():
 
     assert "Name=tool\n" in content
     assert "Exec=/home/user/.local/bin/tool\n" in content
+
+
+def test_desktop_file_path_uses_home(monkeypatch):
+    monkeypatch.setenv("HOME", "/home/user")
+
+    assert appimage.desktop_file_path("tool") == "/home/user/.local/share/applications/tool.desktop"

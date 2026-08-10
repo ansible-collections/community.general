@@ -388,7 +388,7 @@ def download_appimage(module, source_url, dest):
 
 
 def desktop_file_path(name):
-    base_dir = os.path.expanduser("~/.local/share/applications")
+    base_dir = os.path.join(os.environ["HOME"], ".local", "share", "applications")
     return os.path.join(base_dir, f"{name}.desktop")
 
 
@@ -436,7 +436,7 @@ def main():
 
     state = module.params["state"]
     name = module.params["name"]
-    install_dir = os.path.expanduser(module.params["install_dir"])
+    install_dir = module.params["install_dir"]
     path = os.path.join(install_dir, name)
     desktop_path = desktop_file_path(name)
     result = {"changed": False, "path": path}
