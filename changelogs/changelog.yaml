@@ -2247,3 +2247,268 @@ releases:
           name: proton_pass
           namespace: null
     release_date: '2026-07-13'
+  13.3.0:
+    changes:
+      bugfixes:
+        - apk - the ``upgrade`` operation no longer reports ``changed=true`` when
+          nothing was upgraded but an apk commit hook (for example ``mrtest``, or
+          anything installed in ``/etc/apk/commit_hooks.d/``) printed output before
+          the trailing ``OK:`` summary line; the change status is now derived from
+          the packages apk actually reports upgrading (https://github.com/ansible-collections/community.general/issues/12223,
+          https://github.com/ansible-collections/community.general/pull/12376).
+        - 'incus connection plugin - detect failed ``incus file push``/``incus file
+          pull`` transfers and raise a clear error naming the instance and the CLI
+          stderr, instead of silently reporting success and failing later with a misleading
+          ``chmod: No such file or directory`` error (https://github.com/ansible-collections/community.general/pull/12464).'
+        - ini_file - do not delete comment-only lines that contain the option name
+          (https://github.com/ansible-collections/community.general/issues/11919,
+          https://github.com/ansible-collections/community.general/pull/12083).
+        - 'lxd connection plugin - detect failed ``lxc file push``/``lxc file pull``
+          transfers and raise a clear error naming the instance and the CLI stderr,
+          instead of silently reporting success and failing later with a misleading
+          ``chmod: No such file or directory`` error (https://github.com/ansible-collections/community.general/pull/12464).'
+        - nmcli - add ``bond_mode_behavior`` to control whether omitted ``mode`` preserves
+          the existing bond mode or uses the legacy ``balance-rr`` default on existing
+          connections (https://github.com/ansible-collections/community.general/issues/9201,
+          https://github.com/ansible-collections/community.general/pull/12114).
+        - opennebula inventory plugin - coerce ``SSH_PORT`` to an integer before setting
+          ``ansible_port`` (https://github.com/ansible-collections/community.general/pull/12437).
+        - pacemaker_cluster - skip ``pcs cluster start`` in ``state=online`` when
+          the cluster is already running, improving idempotency and allowing maintenance
+          mode to be disabled without pcsd connectivity (https://github.com/ansible-collections/community.general/issues/12362,
+          https://github.com/ansible-collections/community.general/pull/12403).
+        - pkgng - fix failure to install packages when the package repository has
+          never been updated (https://github.com/ansible-collections/community.general/pull/12507).
+        - terraform - fix return value ``command``, showing terraform plan name twice
+          (https://github.com/ansible-collections/community.general/issues/12530,
+          https://github.com/ansible-collections/community.general/pull/12540).
+        - timezone - no longer requires the ``hwclock`` executable for name-only changes
+          on non-systemd systems (https://github.com/ansible-collections/community.general/issues/12516,
+          https://github.com/ansible-collections/community.general/pull/12526).
+      deprecated_features:
+        - keycloak_authentication - the module is moved to ``ansible_middleware.keycloak.keycloak_authentication``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_authentication_required_actions - the module is moved to ``ansible_middleware.keycloak.keycloak_authentication_required_actions``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_authentication_v2 - the module is moved to ``ansible_middleware.keycloak.keycloak_authentication_v2``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_authz_authorization_scope - the module is moved to ``ansible_middleware.keycloak.keycloak_authz_authorization_scope``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_authz_custom_policy - the module is moved to ``ansible_middleware.keycloak.keycloak_authz_custom_policy``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_authz_permission - the module is moved to ``ansible_middleware.keycloak.keycloak_authz_permission``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_authz_permission_info - the module is moved to ``ansible_middleware.keycloak.keycloak_authz_permission_info``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_client - the module is moved to ``ansible_middleware.keycloak.keycloak_client``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_client_rolemapping - the module is moved to ``ansible_middleware.keycloak.keycloak_client_rolemapping``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_client_rolescope - the module is moved to ``ansible_middleware.keycloak.keycloak_client_rolescope``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_clientscope - the module is moved to ``ansible_middleware.keycloak.keycloak_client_scope``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_clientscope_rolemappings - the module is moved to ``ansible_middleware.keycloak.keycloak_client_scope_rolemappings``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_clientscope_type - the module is moved to ``ansible_middleware.keycloak.keycloak_client_scope_type``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_clientsecret_info - the module is moved to ``ansible_middleware.keycloak.keycloak_clientsecret_info``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_clientsecret_regenerate - the module is moved to ``ansible_middleware.keycloak.keycloak_clientsecret_regenerate``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_clienttemplate - the module is moved to ``ansible_middleware.keycloak.keycloak_clienttemplate``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_component - the module is moved to ``ansible_middleware.keycloak.keycloak_component``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_component_info - the module is moved to ``ansible_middleware.keycloak.keycloak_component_info``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_group - the module is moved to ``ansible_middleware.keycloak.keycloak_group``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_identity_provider - the module is moved to ``ansible_middleware.keycloak.keycloak_identity_provider``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_realm - the module is moved to ``ansible_middleware.keycloak.keycloak_realm``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_realm_key - the module is moved to ``ansible_middleware.keycloak.keycloak_realm_key``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_realm_keys_metadata_info - the module is moved to ``ansible_middleware.keycloak.keycloak_realm_keys_metadata_info``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_realm_localization - the module is moved to ``ansible_middleware.keycloak.keycloak_realm_localization``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_realm_rolemapping - the module is moved to ``ansible_middleware.keycloak.keycloak_realm_rolemapping``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_role - the module is moved to ``ansible_middleware.keycloak.keycloak_role``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_user - the module is moved to ``ansible_middleware.keycloak.keycloak_user``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_user_execute_actions_email - the module is moved to ``ansible_middleware.keycloak.keycloak_user_execute_actions_email``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_user_federation - the module is moved to ``ansible_middleware.keycloak.keycloak_user_federation``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_user_rolemapping - the module is moved to ``ansible_middleware.keycloak.keycloak_user_rolemapping``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+        - keycloak_userprofile - the module is moved to ``ansible_middleware.keycloak.keycloak_userprofile``.
+          The module will be replaced by a deprecated redirect to that module in community.general
+          14.0.0, and the redirect will be removed in community.general 16.0.0. If
+          you are using the module, please consider installing and using ``ansible_middleware.keycloak``
+          now (https://github.com/ansible-collections/community.general/pull/12484).
+      minor_changes:
+        - archive - add ``zstd`` as a format choice (https://github.com/ansible-collections/community.general/issues/3455,
+          https://github.com/ansible-collections/community.general/pull/12497).
+        - consul_kv - refactored KV store helpers into shared ``_ConsulModule`` methods
+          to prepare for the ``consul_kv_info`` module (https://github.com/ansible-collections/community.general/pull/12515).
+        - filesystem - print a warning if ``blkid -c`` probe fails and show the error
+          message from ``blkid`` (https://github.com/ansible-collections/community.general/pull/12500).
+        - gitlab_hook - add ``custom_webhook_template`` option to configure a custom
+          webhook payload template on project hooks (https://github.com/ansible-collections/community.general/issues/11233,
+          https://github.com/ansible-collections/community.general/pull/12496).
+        - homebrew_tap - add ``trust`` option to control whether Homebrew trusts the
+          tapped repositories (https://github.com/ansible-collections/community.general/issues/12220,
+          https://github.com/ansible-collections/community.general/pull/12503).
+        - ini_file - use named groups in the internal option-matching regular expressions
+          (https://github.com/ansible-collections/community.general/pull/12493).
+        - kopia_repository, kopia_repository_info - normalize handling of CLI parameters
+          across all ``kopia_*`` modules (https://github.com/ansible-collections/community.general/pull/12360).
+        - mail - add the ``inline`` option to embed images in the message body via
+          ``Content-ID``, so an HTML body can reference them with ``cid:...`` instead
+          of an external URL (https://github.com/ansible-collections/community.general/pull/12480).
+        - maven_artifact - use Ansible construct to express the default value of parameter
+          (https://github.com/ansible-collections/community.general/pull/12411).
+        - one_vm - add ``update_attributes`` parameter to merge USER_TEMPLATE key/value
+          pairs onto existing VMs via the ``one.vm.update`` API with append/merge
+          semantics, enabling idempotent attribute updates on running VMs without
+          teardown (https://github.com/ansible-collections/community.general/issues/12498,
+          https://github.com/ansible-collections/community.general/pull/12536).
+        - opennebula inventory plugin - add ``prefer_existing_ansible_host`` option
+          to skip setting ``ansible_host`` when the host already has one from an earlier
+          inventory source (https://github.com/ansible-collections/community.general/pull/12417).
+        - opennebula inventory plugin - expose ``UNAME`` (VM owner) and ``GNAME``
+          (VM group) as host variables, enabling ``keyed_groups`` based on ownership
+          (https://github.com/ansible-collections/community.general/pull/12417).
+        - pacemaker_cluster - add support for unmaintenance state (https://github.com/ansible-collections/community.general/issues/12362,
+          https://github.com/ansible-collections/community.general/pull/12364).
+        - slack - add ``reply_broadcast`` option to allow a threaded reply (``thread_id``)
+          to also be broadcast to the main channel (https://github.com/ansible-collections/community.general/pull/12535).
+      release_summary: Regular bugfix and feature release.
+    fragments:
+      - 11233-gitlab_hook-custom-webhook-template.yml
+      - 11919-ini-file-do-not-delete-comment-only-lines.yml
+      - 12220-homebrew-tap-trust.yml
+      - 12223-apk-upgrade-changed.yml
+      - 12360-expand-kopia-utility.yml
+      - 12364-pacemaker-cluster-unmaintenance-state.yml
+      - 12403-pacemaker-cluster-online-skip-start.yml
+      - 12411-maven-artifact.yml
+      - 12417-opennebula-inventory-enhancements.yml
+      - 12437-opennebula-ssh-port-coercion.yml
+      - 12464-incus-lxd-file-transfer-errors.yml
+      - 12480-mail-inline-images.yml
+      - 12493-ini-file-regexp.yml
+      - 12498-one_vm-update-attributes.yml
+      - 12515-consul-kv-refactor-methods.yml
+      - 12516-timezone-optional-hwclock.yml
+      - 12530-terraform-retvalue-command.yml
+      - 13.3.0.yml
+      - 9201-nmcli-preserve-bond-mode.yml
+      - archive-zstd.yml
+      - conditional-pkg-repository-update.yml
+      - filesystem-fails-if-blkid-probe-fails.yml
+      - keycloak-depr.yml
+      - slack-reply-broadcast.yml
+    modules:
+      - description: Retrieve entries from the key/value store of a Consul cluster.
+        name: consul_kv_info
+        namespace: ''
+      - description: Write binary file from Base64 encoded input.
+        name: write_binary_file
+        namespace: ''
+    release_date: '2026-08-10'

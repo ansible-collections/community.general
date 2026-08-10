@@ -2,40 +2,46 @@
 
 **Topics**
 
-- <a href="#v13-2-0">v13\.2\.0</a>
+- <a href="#v13-3-0">v13\.3\.0</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
+    - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes">Bugfixes</a>
-    - <a href="#new-plugins">New Plugins</a>
-        - <a href="#lookup">Lookup</a>
     - <a href="#new-modules">New Modules</a>
-- <a href="#v13-1-0">v13\.1\.0</a>
+- <a href="#v13-2-0">v13\.2\.0</a>
     - <a href="#release-summary-1">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#bugfixes-1">Bugfixes</a>
-    - <a href="#new-plugins-1">New Plugins</a>
-        - <a href="#filter">Filter</a>
+    - <a href="#new-plugins">New Plugins</a>
+        - <a href="#lookup">Lookup</a>
     - <a href="#new-modules-1">New Modules</a>
-- <a href="#v13-0-1">v13\.0\.1</a>
+- <a href="#v13-1-0">v13\.1\.0</a>
     - <a href="#release-summary-2">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
     - <a href="#bugfixes-2">Bugfixes</a>
-- <a href="#v13-0-0">v13\.0\.0</a>
+    - <a href="#new-plugins-1">New Plugins</a>
+        - <a href="#filter">Filter</a>
+    - <a href="#new-modules-2">New Modules</a>
+- <a href="#v13-0-1">v13\.0\.1</a>
     - <a href="#release-summary-3">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
-    - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
-    - <a href="#deprecated-features">Deprecated Features</a>
-    - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
     - <a href="#bugfixes-3">Bugfixes</a>
+- <a href="#v13-0-0">v13\.0\.0</a>
+    - <a href="#release-summary-4">Release Summary</a>
+    - <a href="#minor-changes-4">Minor Changes</a>
+    - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
+    - <a href="#deprecated-features-1">Deprecated Features</a>
+    - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
+    - <a href="#bugfixes-4">Bugfixes</a>
     - <a href="#new-plugins-2">New Plugins</a>
         - <a href="#callback">Callback</a>
         - <a href="#filter-1">Filter</a>
-    - <a href="#new-modules-2">New Modules</a>
+    - <a href="#new-modules-3">New Modules</a>
 
 This changelog describes changes after version 12\.0\.0\.
 
-<a id="v13-2-0"></a>
-## v13\.2\.0
+<a id="v13-3-0"></a>
+## v13\.3\.0
 
 <a id="release-summary"></a>
 ### Release Summary
@@ -43,6 +49,87 @@ This changelog describes changes after version 12\.0\.0\.
 Regular bugfix and feature release\.
 
 <a id="minor-changes"></a>
+### Minor Changes
+
+* archive \- add <code>zstd</code> as a format choice \([https\://github\.com/ansible\-collections/community\.general/issues/3455](https\://github\.com/ansible\-collections/community\.general/issues/3455)\, [https\://github\.com/ansible\-collections/community\.general/pull/12497](https\://github\.com/ansible\-collections/community\.general/pull/12497)\)\.
+* consul\_kv \- refactored KV store helpers into shared <code>\_ConsulModule</code> methods to prepare for the <code>consul\_kv\_info</code> module \([https\://github\.com/ansible\-collections/community\.general/pull/12515](https\://github\.com/ansible\-collections/community\.general/pull/12515)\)\.
+* filesystem \- print a warning if <code>blkid \-c</code> probe fails and show the error message from <code>blkid</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12500](https\://github\.com/ansible\-collections/community\.general/pull/12500)\)\.
+* gitlab\_hook \- add <code>custom\_webhook\_template</code> option to configure a custom webhook payload template on project hooks \([https\://github\.com/ansible\-collections/community\.general/issues/11233](https\://github\.com/ansible\-collections/community\.general/issues/11233)\, [https\://github\.com/ansible\-collections/community\.general/pull/12496](https\://github\.com/ansible\-collections/community\.general/pull/12496)\)\.
+* homebrew\_tap \- add <code>trust</code> option to control whether Homebrew trusts the tapped repositories \([https\://github\.com/ansible\-collections/community\.general/issues/12220](https\://github\.com/ansible\-collections/community\.general/issues/12220)\, [https\://github\.com/ansible\-collections/community\.general/pull/12503](https\://github\.com/ansible\-collections/community\.general/pull/12503)\)\.
+* ini\_file \- use named groups in the internal option\-matching regular expressions \([https\://github\.com/ansible\-collections/community\.general/pull/12493](https\://github\.com/ansible\-collections/community\.general/pull/12493)\)\.
+* kopia\_repository\, kopia\_repository\_info \- normalize handling of CLI parameters across all <code>kopia\_\*</code> modules \([https\://github\.com/ansible\-collections/community\.general/pull/12360](https\://github\.com/ansible\-collections/community\.general/pull/12360)\)\.
+* mail \- add the <code>inline</code> option to embed images in the message body via <code>Content\-ID</code>\, so an HTML body can reference them with <code>cid\:\.\.\.</code> instead of an external URL \([https\://github\.com/ansible\-collections/community\.general/pull/12480](https\://github\.com/ansible\-collections/community\.general/pull/12480)\)\.
+* maven\_artifact \- use Ansible construct to express the default value of parameter \([https\://github\.com/ansible\-collections/community\.general/pull/12411](https\://github\.com/ansible\-collections/community\.general/pull/12411)\)\.
+* one\_vm \- add <code>update\_attributes</code> parameter to merge USER\_TEMPLATE key/value pairs onto existing VMs via the <code>one\.vm\.update</code> API with append/merge semantics\, enabling idempotent attribute updates on running VMs without teardown \([https\://github\.com/ansible\-collections/community\.general/issues/12498](https\://github\.com/ansible\-collections/community\.general/issues/12498)\, [https\://github\.com/ansible\-collections/community\.general/pull/12536](https\://github\.com/ansible\-collections/community\.general/pull/12536)\)\.
+* opennebula inventory plugin \- add <code>prefer\_existing\_ansible\_host</code> option to skip setting <code>ansible\_host</code> when the host already has one from an earlier inventory source \([https\://github\.com/ansible\-collections/community\.general/pull/12417](https\://github\.com/ansible\-collections/community\.general/pull/12417)\)\.
+* opennebula inventory plugin \- expose <code>UNAME</code> \(VM owner\) and <code>GNAME</code> \(VM group\) as host variables\, enabling <code>keyed\_groups</code> based on ownership \([https\://github\.com/ansible\-collections/community\.general/pull/12417](https\://github\.com/ansible\-collections/community\.general/pull/12417)\)\.
+* pacemaker\_cluster \- add support for unmaintenance state \([https\://github\.com/ansible\-collections/community\.general/issues/12362](https\://github\.com/ansible\-collections/community\.general/issues/12362)\, [https\://github\.com/ansible\-collections/community\.general/pull/12364](https\://github\.com/ansible\-collections/community\.general/pull/12364)\)\.
+* slack \- add <code>reply\_broadcast</code> option to allow a threaded reply \(<code>thread\_id</code>\) to also be broadcast to the main channel \([https\://github\.com/ansible\-collections/community\.general/pull/12535](https\://github\.com/ansible\-collections/community\.general/pull/12535)\)\.
+
+<a id="deprecated-features"></a>
+### Deprecated Features
+
+* keycloak\_authentication \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_authentication</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_authentication\_required\_actions \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_authentication\_required\_actions</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_authentication\_v2 \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_authentication\_v2</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_authz\_authorization\_scope \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_authz\_authorization\_scope</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_authz\_custom\_policy \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_authz\_custom\_policy</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_authz\_permission \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_authz\_permission</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_authz\_permission\_info \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_authz\_permission\_info</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_client \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_client</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_client\_rolemapping \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_client\_rolemapping</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_client\_rolescope \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_client\_rolescope</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_clientscope \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_client\_scope</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_clientscope\_rolemappings \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_client\_scope\_rolemappings</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_clientscope\_type \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_client\_scope\_type</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_clientsecret\_info \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_clientsecret\_info</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_clientsecret\_regenerate \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_clientsecret\_regenerate</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_clienttemplate \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_clienttemplate</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_component \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_component</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_component\_info \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_component\_info</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_group \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_group</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_identity\_provider \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_identity\_provider</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_realm \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_realm</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_realm\_key \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_realm\_key</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_realm\_keys\_metadata\_info \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_realm\_keys\_metadata\_info</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_realm\_localization \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_realm\_localization</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_realm\_rolemapping \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_realm\_rolemapping</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_role \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_role</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_user \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_user</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_user\_execute\_actions\_email \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_user\_execute\_actions\_email</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_user\_federation \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_user\_federation</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_user\_rolemapping \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_user\_rolemapping</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+* keycloak\_userprofile \- the module is moved to <code>ansible\_middleware\.keycloak\.keycloak\_userprofile</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* apk \- the <code>upgrade</code> operation no longer reports <code>changed\=true</code> when nothing was upgraded but an apk commit hook \(for example <code>mrtest</code>\, or anything installed in <code>/etc/apk/commit\_hooks\.d/</code>\) printed output before the trailing <code>OK\:</code> summary line\; the change status is now derived from the packages apk actually reports upgrading \([https\://github\.com/ansible\-collections/community\.general/issues/12223](https\://github\.com/ansible\-collections/community\.general/issues/12223)\, [https\://github\.com/ansible\-collections/community\.general/pull/12376](https\://github\.com/ansible\-collections/community\.general/pull/12376)\)\.
+* incus connection plugin \- detect failed <code>incus file push</code>/<code>incus file pull</code> transfers and raise a clear error naming the instance and the CLI stderr\, instead of silently reporting success and failing later with a misleading <code>chmod\: No such file or directory</code> error \([https\://github\.com/ansible\-collections/community\.general/pull/12464](https\://github\.com/ansible\-collections/community\.general/pull/12464)\)\.
+* ini\_file \- do not delete comment\-only lines that contain the option name \([https\://github\.com/ansible\-collections/community\.general/issues/11919](https\://github\.com/ansible\-collections/community\.general/issues/11919)\, [https\://github\.com/ansible\-collections/community\.general/pull/12083](https\://github\.com/ansible\-collections/community\.general/pull/12083)\)\.
+* lxd connection plugin \- detect failed <code>lxc file push</code>/<code>lxc file pull</code> transfers and raise a clear error naming the instance and the CLI stderr\, instead of silently reporting success and failing later with a misleading <code>chmod\: No such file or directory</code> error \([https\://github\.com/ansible\-collections/community\.general/pull/12464](https\://github\.com/ansible\-collections/community\.general/pull/12464)\)\.
+* nmcli \- add <code>bond\_mode\_behavior</code> to control whether omitted <code>mode</code> preserves the existing bond mode or uses the legacy <code>balance\-rr</code> default on existing connections \([https\://github\.com/ansible\-collections/community\.general/issues/9201](https\://github\.com/ansible\-collections/community\.general/issues/9201)\, [https\://github\.com/ansible\-collections/community\.general/pull/12114](https\://github\.com/ansible\-collections/community\.general/pull/12114)\)\.
+* opennebula inventory plugin \- coerce <code>SSH\_PORT</code> to an integer before setting <code>ansible\_port</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12437](https\://github\.com/ansible\-collections/community\.general/pull/12437)\)\.
+* pacemaker\_cluster \- skip <code>pcs cluster start</code> in <code>state\=online</code> when the cluster is already running\, improving idempotency and allowing maintenance mode to be disabled without pcsd connectivity \([https\://github\.com/ansible\-collections/community\.general/issues/12362](https\://github\.com/ansible\-collections/community\.general/issues/12362)\, [https\://github\.com/ansible\-collections/community\.general/pull/12403](https\://github\.com/ansible\-collections/community\.general/pull/12403)\)\.
+* pkgng \- fix failure to install packages when the package repository has never been updated \([https\://github\.com/ansible\-collections/community\.general/pull/12507](https\://github\.com/ansible\-collections/community\.general/pull/12507)\)\.
+* terraform \- fix return value <code>command</code>\, showing terraform plan name twice \([https\://github\.com/ansible\-collections/community\.general/issues/12530](https\://github\.com/ansible\-collections/community\.general/issues/12530)\, [https\://github\.com/ansible\-collections/community\.general/pull/12540](https\://github\.com/ansible\-collections/community\.general/pull/12540)\)\.
+* timezone \- no longer requires the <code>hwclock</code> executable for name\-only changes on non\-systemd systems \([https\://github\.com/ansible\-collections/community\.general/issues/12516](https\://github\.com/ansible\-collections/community\.general/issues/12516)\, [https\://github\.com/ansible\-collections/community\.general/pull/12526](https\://github\.com/ansible\-collections/community\.general/pull/12526)\)\.
+
+<a id="new-modules"></a>
+### New Modules
+
+* community\.general\.consul\_kv\_info \- Retrieve entries from the key/value store of a Consul cluster\.
+* community\.general\.write\_binary\_file \- Write binary file from Base64 encoded input\.
+
+<a id="v13-2-0"></a>
+## v13\.2\.0
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Regular bugfix and feature release\.
+
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * The collection now depends on community\.library\_inventory\_filtering\_v1\. This runtime dependency is used by inventory plugins only\, and will be automatically installed by <code>ansible\-galaxy collection install</code>\. If you install community\.general by cloning its repository or extracting its release tarball to a specific location\, you also need to make sure to install community\.library\_inventory\_filtering\_v1 manually if you use one of the affected inventory plugins \([https\://github\.com/ansible\-collections/community\.general/pull/12302](https\://github\.com/ansible\-collections/community\.general/pull/12302)\)\.
@@ -54,7 +141,7 @@ Regular bugfix and feature release\.
 * passwordstore lookup plugin \- make <code>directory</code> configurable through <code>ansible\.cfg</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12298](https\://github\.com/ansible\-collections/community\.general/pull/12298)\)\.
 * tss lookup plugin \- cache the <code>TSSClient</code> per process and credential identity so OAuth2 token grants are reused across lookups \(rebuilding the client and retrying the lookup once on a stale\-token 4xx\, while 5xx and other errors propagate unchanged\)\, and add a <code>token\_path\_source</code> option whose <code>auto</code> value lets <code>python\-tss\-sdk</code> auto\-detect the Secret Server or Delinea Platform token endpoint \([https\://github\.com/ansible\-collections/community\.general/pull/12328](https\://github\.com/ansible\-collections/community\.general/pull/12328)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * composer \- restore compatibility with older compose versions when using <code>working\_dir</code> \([https\://github\.com/ansible\-collections/community\.general/issues/12293](https\://github\.com/ansible\-collections/community\.general/issues/12293)\, [https\://github\.com/ansible\-collections/community\.general/pull/12339](https\://github\.com/ansible\-collections/community\.general/pull/12339)\)\.
@@ -72,7 +159,7 @@ Regular bugfix and feature release\.
 
 * community\.general\.proton\_pass \- Fetch secrets from Proton Pass via the <code>pass\-cli</code> command\-line tool\.
 
-<a id="new-modules"></a>
+<a id="new-modules-1"></a>
 ### New Modules
 
 * community\.general\.xml\_info \- Query XML files or strings\.
@@ -80,12 +167,12 @@ Regular bugfix and feature release\.
 <a id="v13-1-0"></a>
 ## v13\.1\.0
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-1"></a>
+<a id="minor-changes-2"></a>
 ### Minor Changes
 
 * consul\_kv lookup plugin \- add <code>empty\_value</code> option to control what is returned for null Consul values \([https\://github\.com/ansible\-collections/community\.general/issues/11039](https\://github\.com/ansible\-collections/community\.general/issues/11039)\, [https\://github\.com/ansible\-collections/community\.general/pull/12120](https\://github\.com/ansible\-collections/community\.general/pull/12120)\)\.
@@ -97,7 +184,7 @@ Regular bugfix and feature release\.
 * xbps \- include <code>stdout</code> and <code>stderr</code> from the last executed command in module output \([https\://github\.com/ansible\-collections/community\.general/issues/2478](https\://github\.com/ansible\-collections/community\.general/issues/2478)\, [https\://github\.com/ansible\-collections/community\.general/pull/12234](https\://github\.com/ansible\-collections/community\.general/pull/12234)\)\.
 * xenserver\_guest\_info \- add VDI <code>uuid</code> and <code>vdi\_type</code> \(VHD/QCOW2\) fields to disk info output \([https\://github\.com/ansible\-collections/community\.general/issues/11998](https\://github\.com/ansible\-collections/community\.general/issues/11998)\, [https\://github\.com/ansible\-collections/community\.general/pull/12119](https\://github\.com/ansible\-collections/community\.general/pull/12119)\)\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * aix\_devices \- fix <code>chdev</code> command failures being incorrectly reported as successful results\, now properly fails the task when device attribute changes cannot be applied \([https\://github\.com/ansible\-collections/community\.general/pull/12185](https\://github\.com/ansible\-collections/community\.general/pull/12185)\)\.
@@ -133,7 +220,7 @@ Regular bugfix and feature release\.
 
 * community\.general\.from\_toml \- Convert TOML string into dictionary\.
 
-<a id="new-modules-1"></a>
+<a id="new-modules-2"></a>
 ### New Modules
 
 * community\.general\.gitlab\_project\_approvals \- Manage project\-level merge request approvals settings on GitLab Server\.
@@ -147,12 +234,12 @@ Regular bugfix and feature release\.
 <a id="v13-0-1"></a>
 ## v13\.0\.1
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 14\.0\.0rc1\.
 
-<a id="minor-changes-2"></a>
+<a id="minor-changes-3"></a>
 ### Minor Changes
 
 * homebrew\_services \- replace <code>NamedTuple</code> with dataclass \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
@@ -161,7 +248,7 @@ Bugfix release for inclusion in Ansible 14\.0\.0rc1\.
 * opennebula inventory plugin \- replace function\-local <code>namedtuple</code> with module\-level dataclass \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
 * pacman \- replace <code>namedtuple</code> with dataclass for <code>VersionTuple</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * iptables\_state \- refactor code to avoid unnecessary unused variables and improve internal state handling \([https\://github\.com/ansible\-collections/community\.general/pull/12093](https\://github\.com/ansible\-collections/community\.general/pull/12093)\)\.
@@ -172,12 +259,12 @@ Bugfix release for inclusion in Ansible 14\.0\.0rc1\.
 <a id="v13-0-0"></a>
 ## v13\.0\.0
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-05\-18\.
 
-<a id="minor-changes-3"></a>
+<a id="minor-changes-4"></a>
 ### Minor Changes
 
 * ModuleHelper module utils \- allow to ignore specific exceptions in <code>module\_fails\_on\_exception</code> decorator \([https\://github\.com/ansible\-collections/community\.general/pull/11488](https\://github\.com/ansible\-collections/community\.general/pull/11488)\)\.
@@ -756,7 +843,7 @@ This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-
 * random\_words lookup plugin \- the plugin no longer accepts positional arguments\. They were never used anyway \([https\://github\.com/ansible\-collections/community\.general/pull/12060](https\://github\.com/ansible\-collections/community\.general/pull/12060)\)\.
 * rocketchat \- the default for the <code>is\_pre740</code> option changed from <code>true</code> to <code>false</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11834](https\://github\.com/ansible\-collections/community\.general/pull/11834)\)\.
 
-<a id="deprecated-features"></a>
+<a id="deprecated-features-1"></a>
 ### Deprecated Features
 
 * aix\_devices \- module is superseded by equivalent in <code>ibm\.power\_aix</code> collection\. It will be removed from community\.general 15\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/issues/11290](https\://github\.com/ansible\-collections/community\.general/issues/11290)\, [https\://github\.com/ansible\-collections/community\.general/pull/11540](https\://github\.com/ansible\-collections/community\.general/pull/11540)\)\.
@@ -820,7 +907,7 @@ This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-
 * spotinst\_aws\_elastigroup \- the module has been removed\. Use <code>spot\.cloud\_modules\.aws\_elastigroup</code> instead \([https\://github\.com/ansible\-collections/community\.general/pull/11834](https\://github\.com/ansible\-collections/community\.general/pull/11834)\)\.
 * typetalk \- the module has been removed \([https\://github\.com/ansible\-collections/community\.general/pull/11834](https\://github\.com/ansible\-collections/community\.general/pull/11834)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * \_filelock module utils \- add type hints\. Fix bug if <code>set\_lock\(\)</code> is called with <code>lock\_timeout\=None</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11222](https\://github\.com/ansible\-collections/community\.general/pull/11222)\)\.
@@ -1167,7 +1254,7 @@ This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-
 
 * community\.general\.to\_toml \- Convert variable to TOML string\.
 
-<a id="new-modules-2"></a>
+<a id="new-modules-3"></a>
 ### New Modules
 
 * community\.general\.file\_remove \- Remove files matching a pattern from a directory\.

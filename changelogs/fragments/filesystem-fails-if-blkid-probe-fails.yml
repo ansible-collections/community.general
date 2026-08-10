@@ -1,2 +1,0 @@
-minor_changes:
-  - filesystem - print a warning if ``blkid -c`` probe fails and show the error message from ``blkid`` (https://github.com/ansible-collections/community.general/pull/12500).

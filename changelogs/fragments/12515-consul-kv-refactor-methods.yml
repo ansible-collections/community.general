@@ -1,2 +1,0 @@
-minor_changes:
-  - consul_kv - refactored KV store helpers into shared ``_ConsulModule`` methods to prepare for the ``consul_kv_info`` module (https://github.com/ansible-collections/community.general/pull/12515).
