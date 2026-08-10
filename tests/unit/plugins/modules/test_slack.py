@@ -84,6 +84,47 @@ class TestSlackModule(ModuleTestCase):
         assert call_data["thread_ts"] == "100.00"
         assert fetch_url_mock.call_args[1]["url"] == "https://hooks.slack.com/services/TXX/BYY/ZZZ"
 
+    def test_message_with_thread_and_reply_broadcast(self):
+        """tests sending a threaded message that is also broadcast to the channel"""
+        with set_module_args(
+            {
+                "token": "TXX/BYY/ZZZ",
+                "msg": "test",
+                "thread_id": "100.00",
+                "reply_broadcast": True,
+            }
+        ):
+            with patch.object(slack, "fetch_url") as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 200})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
+
+        self.assertTrue(fetch_url_mock.call_count, 1)
+        call_data = json.loads(fetch_url_mock.call_args[1]["data"])
+        assert call_data["thread_ts"] == "100.00"
+        assert call_data["reply_broadcast"] is True
+        assert fetch_url_mock.call_args[1]["url"] == "https://hooks.slack.com/services/TXX/BYY/ZZZ"
+
+    def test_message_with_thread_and_reply_broadcast_false(self):
+        """tests that reply_broadcast is omitted from the payload when false"""
+        with set_module_args(
+            {
+                "token": "TXX/BYY/ZZZ",
+                "msg": "test",
+                "thread_id": "100.00",
+                "reply_broadcast": False,
+            }
+        ):
+            with patch.object(slack, "fetch_url") as fetch_url_mock:
+                fetch_url_mock.return_value = (None, {"status": 200})
+                with self.assertRaises(AnsibleExitJson):
+                    self.module.main()
+
+        self.assertTrue(fetch_url_mock.call_count, 1)
+        call_data = json.loads(fetch_url_mock.call_args[1]["data"])
+        assert call_data["thread_ts"] == "100.00"
+        assert "reply_broadcast" not in call_data
+
     # https://github.com/ansible-collections/community.general/issues/1097
     def test_ts_in_message_does_not_cause_edit(self):
         with set_module_args({"token": "xoxa-123456789abcdef", "msg": "test with ts"}):
