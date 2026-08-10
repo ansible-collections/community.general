@@ -13,7 +13,7 @@ description:
   - The module installs AppImage files into a user-controlled directory and can optionally create a desktop launcher.
   - Sources can be direct AppImage URLs, GitHub release pages containing AppImage assets, or appimage.github.io catalog entries.
 author:
-  - Ansible Community (@ansible-collections)
+  - Travis Beale (@travisbeale)
 extends_documentation_fragment:
   - community.general._attributes
 attributes:

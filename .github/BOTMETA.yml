@@ -492,6 +492,8 @@ files:
   $modules/apache2_module.py:
     ignore: robinro
     maintainers: berendt n0trax
+  $modules/appimage.py:
+    maintainers: travisbeale
   $modules/apk.py:
     ignore: kbrebanov
     labels: apk
