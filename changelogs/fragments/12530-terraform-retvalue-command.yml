@@ -1,2 +1,2 @@
 bugfixes:
-  - terraform - fix return value ```command```, showing terraform plan name twice (https://github.com/ansible-collections/community.general/issues/12530, https://github.com/ansible-collections/community.general/pull/12540).
+  - terraform - fix return value ``command``, showing terraform plan name twice (https://github.com/ansible-collections/community.general/issues/12530, https://github.com/ansible-collections/community.general/pull/12540).
