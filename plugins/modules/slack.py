@@ -67,6 +67,15 @@ options:
     description:
       - Optional. Timestamp of parent message to thread this message, see U(https://api.slack.com/docs/message-threading).
     type: str
+  reply_broadcast:
+    description:
+      - Used in conjunction with O(thread_id).
+      - If V(true), a threaded reply is broadcast to the whole channel, in addition to the thread it was posted in.
+      - See U(https://api.slack.com/events/message/reply_broadcast) for more information.
+      - Only has an effect when a WebAPI token is used, since incoming webhooks do not support this parameter.
+    type: bool
+    default: false
+    version_added: 13.3.0
   message_id:
     description:
       - Optional. Message ID to edit, instead of posting a new message.
@@ -281,6 +290,14 @@ EXAMPLES = r"""
     color: good
     msg: 'And this is my threaded response!'
 
+- name: Add a threaded response and also broadcast it to the channel
+  community.general.slack:
+    channel: '#ansible'
+    token: xoxb-1234-56789abcdefghijklmnopqrstuvwxyz
+    thread_id: "{{ slack_response['ts'] }}"
+    reply_broadcast: true
+    msg: 'This threaded response is also shown in the channel!'
+
 - name: Send a message to be edited later on
   community.general.slack:
     token: thetoken/generatedby/slack
@@ -365,6 +382,7 @@ def build_payload_for_slack(
     text,
     channel,
     thread_id,
+    reply_broadcast,
     username,
     icon_url,
     icon_emoji,
@@ -394,6 +412,8 @@ def build_payload_for_slack(
             payload["channel"] = channel
     if thread_id is not None:
         payload["thread_ts"] = thread_id
+        if reply_broadcast:
+            payload["reply_broadcast"] = True
     if username is not None:
         payload["username"] = username
     if icon_emoji is not None:
@@ -605,6 +625,7 @@ def main():
             msg=dict(type="str"),
             channel=dict(type="str"),
             thread_id=dict(type="str"),
+            reply_broadcast=dict(type="bool", default=False),
             username=dict(type="str", default="Ansible"),
             icon_url=dict(type="str", default="https://docs.ansible.com/favicon/favicon.ico"),
             icon_emoji=dict(type="str"),
@@ -634,6 +655,7 @@ def main():
     text = module.params["msg"]
     channel = module.params["channel"]
     thread_id = module.params["thread_id"]
+    reply_broadcast = module.params["reply_broadcast"]
     username = module.params["username"]
     icon_url = module.params["icon_url"]
     icon_emoji = module.params["icon_emoji"]
@@ -681,6 +703,7 @@ def main():
         text,
         channel,
         thread_id,
+        reply_broadcast,
         username,
         icon_url,
         icon_emoji,
