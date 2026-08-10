@@ -9,7 +9,7 @@ DOCUMENTATION = """
 name: oneline
 type: stdout
 short_description: One-line Ansible screen output
-version_added: 13.3.0
+version_added: 13.4.0
 description:
   - This is a copy of ansible-core's P(ansible.builtin.oneline#callback) callback plugin, which has been deprecated
     in ansible-core 2.19 and will be removed from ansible-core 2.23.
