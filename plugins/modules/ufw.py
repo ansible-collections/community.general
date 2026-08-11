@@ -533,7 +533,7 @@ def main():
                     (dummy, numbered_state, dummy) = module.run_command([ufw_bin, "status", "numbered"])
                     numbered_line_re = re.compile(R"^\[ *([0-9]+)\] ")
                     lines = [
-                        (numbered_line_re.match(line), bool(ipv6_regexp.search(line)))
+                        (numbered_line_re.match(line), bool("(v6)" in line or ipv6_regexp.search(line)))
                         for line in numbered_state.splitlines()
                     ]
                     lines = [(int(matcher.group(1)), ipv6) for (matcher, ipv6) in lines if matcher]
