@@ -293,4 +293,3 @@ test_cases:
           out: ''
           err: ''
         - *list-empty
-
