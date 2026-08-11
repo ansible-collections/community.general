@@ -16,12 +16,6 @@ description:
   - Gather information about a Pacemaker cluster.
 requirements:
   - pcs
-notes:
-  - On C(pcs) >= 0.11.6, the module invokes C(pcs <subcommand> config --output-format=json) and
-    returns parsed dictionaries under each C(*_info) key. On older C(pcs) versions that do not
-    support JSON output, the raw plaintext C(pcs) output is returned as a string under each
-    C(*_info) key instead. Consumers can distinguish shapes at run time with a
-    C({{ cluster_info is mapping }}) guard.
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.info_module
@@ -45,33 +39,28 @@ version:
 cluster_info:
   description:
     - Cluster information such as the name, UUID, and nodes.
-    - Structured dictionary on C(pcs) >= 0.11.6; raw C(pcs) stdout string on older versions.
   returned: always
-  type: raw
+  type: dict
 resource_info:
   description:
     - All resources available on the cluster and their status.
-    - Structured dictionary on C(pcs) >= 0.11.6; raw C(pcs) stdout string on older versions.
   returned: success
-  type: raw
+  type: dict
 stonith_info:
   description:
     - All STONITH information on the cluster.
-    - Structured dictionary on C(pcs) >= 0.11.6; raw C(pcs) stdout string on older versions.
   returned: success
-  type: raw
+  type: dict
 constraint_info:
   description:
     - All cluster resource constraints on the cluster.
-    - Structured dictionary on C(pcs) >= 0.11.6; raw C(pcs) stdout string on older versions.
   returned: success
-  type: raw
+  type: dict
 property_info:
   description:
     - All properties present on the cluster.
-    - Structured dictionary on C(pcs) >= 0.11.6; raw C(pcs) stdout string on older versions.
   returned: success
-  type: raw
+  type: dict
 """
 
 import json
@@ -99,23 +88,20 @@ class PacemakerInfo(ModuleHelper):
         self.vars.version = self.runner.raw_version
 
     def _process_command_output(self, cli_action=""):
-        supports_json = self.runner.supports_json
 
         def process(rc, out, err):
             if rc != 0:
                 self.do_raise(f"pcs {cli_action} config failed with error (rc={rc}): {err}")
-            if supports_json:
-                parsed = json.loads(out) if out else None
-                return parsed if parsed else None
-            stripped = out.strip() if out else ""
-            return stripped or None
+            parsed = json.loads(out) if out else None
+            return parsed if parsed else None
 
         return process
 
     def _get_info(self, cli_action):
-        spec = "cli_action config output_format" if self.runner.supports_json else "cli_action config"
-        with self.runner(spec, output_process=self._process_command_output(cli_action)) as ctx:
-            return ctx.run(cli_action=cli_action)
+        with self.runner(
+            "cli_action config output_format", output_process=self._process_command_output(cli_action)
+        ) as ctx:
+            return ctx.run(cli_action=cli_action, output_format="json")
 
     def __run__(self):
         for key, cli_action in sorted(self.info_vars.items()):
