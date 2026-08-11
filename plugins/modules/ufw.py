@@ -531,35 +531,27 @@ def main():
                 if relative_to_cmd == "zero":
                     insert_to = params["insert"]
                 else:
-                    dummy, numbered_state, dummy = module.run_command([ufw_bin, "status", "numbered"])
-                    # Format is: [no] To Action From # Comment
-                    numbered_line_re = re.compile(
-                        r"^\[ *([0-9]+)] [^#\n]*(DENY|ALLOW|REJECT|LIMIT) (IN|OUT) +([^# \n][^#\n]+[^# \n])"
-                    )
-                    last_number = last_ipv4 = first_ipv6 = last_ipv6 = 0
-                    for line in numbered_state.splitlines():
-                        if line_match := numbered_line_re.match(line):
-                            no = int(line_match.group(1))
-                            last_number = no
-                            try:
-                                ip = ip_address(line_match.group(4).strip())
-                                ipv6 = isinstance(ip, IPv6Address)
-                            except ValueError:
-                                ipv6 = "(v6)" in line
-                            if ipv6:
-                                first_ipv6 = first_ipv6 or no
-                                last_ipv6 = no
-                            elif first_ipv6:
-                                raise ValueError("ufw output could not be parsed correctly. ipv4 follows ipv6!")
-                            else:
-                                last_ipv4 = no
+                    (dummy, numbered_state, dummy) = module.run_command([ufw_bin, "status", "numbered"])
+                    numbered_line_re = re.compile(R"^\[ *([0-9]+)\] ")
+                    lines = [(numbered_line_re.match(line), bool(ipv6_regexp.search(line))) for line in numbered_state.splitlines()]
+                    lines = [(int(matcher.group(1)), ipv6) for (matcher, ipv6) in lines if matcher]
+                    last_number = max([no for (no, ipv6) in lines]) if lines else 0
+                    has_ipv4 = any(not ipv6 for (no, ipv6) in lines)
+                    has_ipv6 = any(ipv6 for (no, ipv6) in lines)
+
+                    last_ipv4 = max([no for (no, ipv6) in lines if not ipv6]) if has_ipv4 else None
+                    first_ipv6 = min([no for (no, ipv6) in lines if ipv6]) if has_ipv6 else None
+                    last_ipv6 = max([no for (no, ipv6) in lines if ipv6]) if has_ipv6 else None
+
+                    if last_ipv4 and first_ipv6 and last_ipv4 > first_ipv6:
+                        raise ValueError("ufw output could not be parsed correctly. ipv4 follows ipv6!")
 
                     if relative_to_cmd == "first-ipv4":
                         relative_to = 1
                     elif relative_to_cmd == "last-ipv4":
                         relative_to = last_ipv4 or 1
                     elif relative_to_cmd == "first-ipv6":
-                        relative_to = first_ipv6 or last_ipv4 + 1
+                        relative_to = first_ipv6 or last_ipv4 + 1 if last_ipv4 else 1
                     elif relative_to_cmd == "last-ipv6":
                         relative_to = last_ipv6 or last_number + 1
                     else:
