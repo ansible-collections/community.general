@@ -287,7 +287,6 @@ EXAMPLES = r"""
 """
 
 import re
-from ipaddress import IPv6Address, ip_address
 from operator import itemgetter
 
 from ansible.module_utils.basic import AnsibleModule
