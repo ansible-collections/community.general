@@ -15,7 +15,7 @@ version_added: 11.2.0
 description:
   - Gather information about a Pacemaker cluster.
 requirements:
-  - pcs
+  - pcs >= 0.11.6
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.info_module
@@ -37,28 +37,23 @@ version:
   returned: always
   type: str
 cluster_info:
-  description:
-    - Cluster information such as the name, UUID, and nodes.
+  description: Cluster information such as the name, UUID, and nodes.
   returned: always
   type: dict
 resource_info:
-  description:
-    - All resources available on the cluster and their status.
+  description: All resources available on the cluster and their status.
   returned: success
   type: dict
 stonith_info:
-  description:
-    - All STONITH information on the cluster.
+  description: All STONITH information on the cluster.
   returned: success
   type: dict
 constraint_info:
-  description:
-    - All cluster resource constraints on the cluster.
+  description: All cluster resource constraints on the cluster.
   returned: success
   type: dict
 property_info:
-  description:
-    - All properties present on the cluster.
+  description: All properties present on the cluster.
   returned: success
   type: dict
 """
@@ -88,7 +83,6 @@ class PacemakerInfo(ModuleHelper):
         self.vars.version = self.runner.raw_version
 
     def _process_command_output(self, cli_action=""):
-
         def process(rc, out, err):
             if rc != 0:
                 self.do_raise(f"pcs {cli_action} config failed with error (rc={rc}): {err}")
