@@ -1,4 +1,4 @@
 bugfixes:
   - pacemaker_resource - fix non-idempotent behaviour when ``state=cloned`` is applied to a resource or group that is already part of a clone set (https://github.com/ansible-collections/community.general/issues/12217, https://github.com/ansible-collections/community.general/pull/12288).
 minor_changes:
-  - pacemaker_cluster, pacemaker_info, pacemaker_resource - added compatibility with older ``pcs`` versions that lack ``--output-format=json`` by probing ``pcs --version`` at runtime and dispatching to plaintext parsing on ``pcs`` < 0.11.6. On older ``pcs``, ``pacemaker_info`` returns raw ``pcs`` stdout strings under each ``*_info`` key instead of structured dictionaries; ``pacemaker_cluster`` and ``pacemaker_resource`` retain full functional and idempotency guarantees.
+  - pacemaker_cluster, pacemaker_resource - added json compatibility with ``--output-format=json`` by probing ``pcs --version`` at runtime and dispatching to plaintext parsing on ``pcs`` < 0.11.6. ``pacemaker_cluster`` and ``pacemaker_resource`` retain full functional and idempotency guarantees.
