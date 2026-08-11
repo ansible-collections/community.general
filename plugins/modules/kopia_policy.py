@@ -11,11 +11,11 @@ module: kopia_policy
 short_description: Manage Kopia snapshot policies
 author:
   - Dexter Le (@munchtoast)
-version_added: "13.1.0"
+version_added: "13.4.0"
 description:
   - Manage Kopia snapshot policies using the Kopia CLI.
   - Supports setting, deleting, showing, and listing policies.
-  - Policies control retention, scheduling, file exclusions, and compression for snapshots.
+    Policies control retention, scheduling, file exclusions, and compression for snapshots.
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._kopia
@@ -32,8 +32,6 @@ options:
     choices:
       set: Creates or updates a policy. At least one policy option must be provided.
       deleted: Removes the policy for O(target) or the global policy when O(global_policy=true).
-      listed: Lists all defined policies.
-      shown: Displays the effective policy for O(target), including inherited values.
     default: set
   target:
     description:
@@ -41,7 +39,7 @@ options:
       - A per-path policy C(user@host:/path).
       - A per-host policy C(@host).
       - A per-user policy C(user@host).
-      - Required if O(state=set), O(state=deleted), or O(state=shown), unless O(global_policy=true).
+      - Required if O(state=set) or O(state=deleted), unless O(global_policy=true).
     type: str
   global_policy:
     description:
@@ -188,17 +186,6 @@ EXAMPLES = r"""
       keep_daily: inherit
     config: /etc/kopia/root.config
 
-- name: Show the effective policy for a target
-  community.general.kopia_policy:
-    state: shown
-    target: "user@hostname:/home/user"
-    config: /etc/kopia/root.config
-
-- name: List all defined policies
-  community.general.kopia_policy:
-    state: listed
-    config: /etc/kopia/root.config
-
 - name: Delete a policy for a specific target
   community.general.kopia_policy:
     state: deleted
@@ -283,7 +270,7 @@ class KopiaPolicy(StateModuleHelper):
             state=dict(
                 type="str",
                 default="set",
-                choices=["set", "deleted", "listed", "shown"],
+                choices=["set", "deleted"],
             ),
             target=dict(type="str"),
             global_policy=dict(type="bool", default=False),
@@ -322,7 +309,6 @@ class KopiaPolicy(StateModuleHelper):
         required_if=[
             ("state", "set", ["target", "global_policy"], True),
             ("state", "deleted", ["target", "global_policy"], True),
-            ("state", "shown", ["target", "global_policy"], True),
         ],
     )
 
@@ -376,20 +362,6 @@ class KopiaPolicy(StateModuleHelper):
             "cli_action state target global_policy config",
             output_process=self._process_command_output(True, "no such policy"),
             check_mode_skip=True,
-        ) as ctx:
-            ctx.run(cli_action="policy")
-
-    def state_listed(self):
-        with self.runner(
-            "cli_action state config",
-            output_process=self._process_command_output(True),
-        ) as ctx:
-            ctx.run(cli_action="policy")
-
-    def state_shown(self):
-        with self.runner(
-            "cli_action state target global_policy config",
-            output_process=self._process_command_output(True),
         ) as ctx:
             ctx.run(cli_action="policy")
 

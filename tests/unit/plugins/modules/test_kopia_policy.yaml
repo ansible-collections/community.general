@@ -115,48 +115,6 @@ test_cases:
           err: ''
         - *list-ok
 
-  - id: show_policy
-    input:
-      state: shown
-      target: "user@hostname:/home/user"
-      config: /etc/kopia/root.config
-    output:
-      changed: false
-    mocks:
-      run_command:
-        - *list-ok
-        - command:
-            - /testbin/kopia
-            - policy
-            - show
-            - user@hostname:/home/user
-            - --config-file=/etc/kopia/root.config
-          environ: *env-def
-          rc: 0
-          out: "Policy for user@hostname:/home/user"
-          err: ''
-        - *list-ok
-
-  - id: list_policies
-    input:
-      state: listed
-      config: /etc/kopia/root.config
-    output:
-      changed: false
-    mocks:
-      run_command:
-        - *list-ok
-        - command:
-            - /testbin/kopia
-            - policy
-            - list
-            - --config-file=/etc/kopia/root.config
-          environ: *env-def
-          rc: 0
-          out: "user@host:/home/user"
-          err: ''
-        - *list-ok
-
   - id: delete_policy
     input:
       state: deleted
@@ -336,24 +294,3 @@ test_cases:
           err: ''
         - *list-empty
 
-  - id: show_global_policy
-    input:
-      state: shown
-      global_policy: true
-      config: /etc/kopia/root.config
-    output:
-      changed: false
-    mocks:
-      run_command:
-        - *list-ok
-        - command:
-            - /testbin/kopia
-            - policy
-            - show
-            - --global
-            - --config-file=/etc/kopia/root.config
-          environ: *env-def
-          rc: 0
-          out: "Global policy settings"
-          err: ''
-        - *list-ok
