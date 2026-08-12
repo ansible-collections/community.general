@@ -54,7 +54,19 @@ options:
       - Defaults to V(false) if O(force_defaults=true), which is the default in this module.
       - Defaults to V(false) if O(force_defaults=false) when creating a new repository.
       - This is only used when O(state=present).
+      - Mutually exclusive with O(visibility).
     type: bool
+  visibility:
+    description:
+      - The visibility of the repository.
+      - V(internal) is only available for organization repositories on GitHub Enterprise
+        and requires O(organization) to be specified.
+      - V(public) and V(private) can be used for both personal and organization repositories.
+      - This is only used when O(state=present).
+      - Mutually exclusive with O(private).
+    type: str
+    choices: [public, private, internal]
+    version_added: "13.5.0"
   state:
     description:
       - Whether the repository should exist or not.
@@ -74,7 +86,7 @@ options:
     version_added: "3.5.0"
   force_defaults:
     description:
-      - If V(true), overwrite current O(description) and O(private) attributes with defaults.
+      - If V(true), overwrite current O(description), O(private), and O(visibility) attributes with defaults.
       - The default value changed from V(true) to V(false) in community.general 13.0.0.
     type: bool
     default: false
@@ -83,6 +95,11 @@ requirements:
   - PyGithub>=1.54
 notes:
   - For Python 3, PyGithub>=1.54 should be used.
+  - The O(visibility) option requires PyGithub>=1.58 which added support for the C(visibility) parameter
+    in C(Organization.create_repo()) and C(Repository.edit()).
+  - For personal repositories (without O(organization)), O(visibility=public) and O(visibility=private) are
+    converted to the equivalent O(private) value, since the underlying PyGithub C(AuthenticatedUser.create_repo())
+    does not support the C(visibility) parameter directly.
 author:
   - Álvaro Torres Cogollo (@atorrescogollo)
 """
@@ -97,6 +114,25 @@ EXAMPLES = r"""
     private: true
     state: present
     force_defaults: false
+  register: result
+
+- name: Create an internal Github repository (GitHub Enterprise)
+  community.general.github_repo:
+    access_token: mytoken
+    organization: MyOrganization
+    name: myrepo
+    description: "Internal repository"
+    visibility: internal
+    state: present
+  register: result
+
+- name: Create a public personal repository using visibility
+  community.general.github_repo:
+    access_token: mytoken
+    name: myrepo
+    description: "My public project"
+    visibility: public
+    state: present
   register: result
 
 - name: Delete the repository
@@ -122,6 +158,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 GITHUB_IMP_ERR = None
 try:
+    import github as _github_module
     from github import Github, GithubException, GithubObject
     from github.GithubException import UnknownObjectException
 
@@ -129,6 +166,9 @@ try:
 except Exception:
     GITHUB_IMP_ERR = traceback.format_exc()
     HAS_GITHUB_PACKAGE = False
+
+
+PYGITHUB_MIN_VERSION_VISIBILITY = (1, 58)
 
 
 def authenticate(username=None, password=None, access_token=None, api_url=None):
@@ -141,7 +181,11 @@ def authenticate(username=None, password=None, access_token=None, api_url=None):
         return Github(base_url=api_url, login_or_token=username, password=password)
 
 
-def create_repo(gh, name, organization=None, private=None, description=None, check_mode=False):
+def _effective_private(visibility):
+    return visibility in ("private", "internal")
+
+
+def create_repo(gh, name, organization=None, private=None, visibility=None, description=None, check_mode=False):
     result = dict(changed=False, repo=dict())
     if organization:
         target = gh.get_organization(organization)
@@ -154,17 +198,27 @@ def create_repo(gh, name, organization=None, private=None, description=None, che
         result["repo"] = repo.raw_data
     except UnknownObjectException:
         if not check_mode:
-            repo = target.create_repo(
+            create_kwargs = dict(
                 name=name,
-                private=GithubObject.NotSet if private is None else private,
                 description=GithubObject.NotSet if description is None else description,
             )
+            if visibility is not None and organization:
+                create_kwargs["visibility"] = visibility
+            elif visibility is not None:
+                create_kwargs["private"] = _effective_private(visibility)
+            else:
+                create_kwargs["private"] = GithubObject.NotSet if private is None else private
+            repo = target.create_repo(**create_kwargs)
             result["repo"] = repo.raw_data
 
         result["changed"] = True
 
     changes = {}
-    if private is not None:
+    if visibility is not None:
+        current_visibility = repo.raw_data.get("visibility") if repo is not None else None
+        if repo is None or current_visibility != visibility:
+            changes["visibility"] = visibility
+    elif private is not None:
         if repo is None or repo.raw_data["private"] != private:
             changes["private"] = private
     if description is not None:
@@ -175,12 +229,15 @@ def create_repo(gh, name, organization=None, private=None, description=None, che
         if not check_mode:
             repo.edit(**changes)
 
-        result["repo"].update(
-            {
-                "private": repo._private.value if not check_mode else private,
-                "description": repo._description.value if not check_mode else description,
-            }
-        )
+        update = {}
+        if "visibility" in changes:
+            update["visibility"] = repo._visibility.value if not check_mode else visibility
+            update["private"] = repo._private.value if not check_mode else _effective_private(visibility)
+        elif "private" in changes:
+            update["private"] = repo._private.value if not check_mode else private
+        if "description" in changes:
+            update["description"] = repo._description.value if not check_mode else description
+        result["repo"].update(update)
         result["changed"] = True
 
     return result
@@ -206,7 +263,8 @@ def delete_repo(gh, name, organization=None, check_mode=False):
 def run_module(params, check_mode=False):
     if params["force_defaults"]:
         params["description"] = params["description"] or ""
-        params["private"] = params["private"] or False
+        if params["visibility"] is None:
+            params["private"] = params["private"] or False
 
     gh = authenticate(
         username=params["username"],
@@ -222,6 +280,7 @@ def run_module(params, check_mode=False):
             name=params["name"],
             organization=params["organization"],
             private=params["private"],
+            visibility=params["visibility"],
             description=params["description"],
             check_mode=check_mode,
         )
@@ -238,6 +297,7 @@ def main():
             type="str",
         ),
         private=dict(type="bool"),
+        visibility=dict(type="str", choices=["public", "private", "internal"]),
         description=dict(type="str"),
         api_url=dict(type="str", default="https://api.github.com"),
         force_defaults=dict(type="bool", default=False),
@@ -247,11 +307,19 @@ def main():
         supports_check_mode=True,
         required_together=[("username", "password")],
         required_one_of=[("username", "access_token")],
-        mutually_exclusive=[("username", "access_token")],
+        mutually_exclusive=[("username", "access_token"), ("private", "visibility")],
+        required_if=[("visibility", "internal", ("organization",))],
     )
 
     if not HAS_GITHUB_PACKAGE:
         module.fail_json(msg=missing_required_lib("PyGithub"), exception=GITHUB_IMP_ERR)
+
+    if module.params["visibility"] is not None:
+        pygithub_version = tuple(int(x) for x in _github_module.__version__.split(".")[:2])
+        if pygithub_version < PYGITHUB_MIN_VERSION_VISIBILITY:
+            module.fail_json(
+                msg="The 'visibility' option requires PyGithub >= 1.58. Found version %s." % _github_module.__version__
+            )
 
     try:
         result = run_module(module.params, module.check_mode)
