@@ -442,13 +442,17 @@ class HomebrewCask:
         cmd = [self.brew_path, "--version"]
         dummy, out, dummy = self.module.run_command(cmd, check_rc=True)
 
-        pattern = r"Homebrew (.*)(\d+\.\d+\.\d+)(-dirty)?"
+        # Anchored immediately after "Homebrew " so the version group can't drift onto a
+        # later substring of the output; ``\d+(?:\.\d+)+`` accepts any number of dot-separated
+        # segments rather than assuming exactly three (some Homebrew builds report more, e.g.
+        # "Homebrew 4.6.13.1-custom-...").
+        pattern = r"Homebrew\s+(>=)?\s*(\d+(?:\.\d+)+)"
         rematch = re.search(pattern, out)
         if not rematch:
             self.module.fail_json(msg="Failed to match regex to get brew version", stdout=out)
 
-        prefix, version, dummy = rematch.groups()
-        if ">=" in prefix:
+        placeholder, version = rematch.groups()
+        if placeholder:
             version = "99.0.0"
 
         self.brew_version = version
