@@ -19,10 +19,11 @@ def test_valid_cask_names():
 
 
 def test_homebrew_version(mocker):
-    # NB: HomebrewCask._get_brew_version() caches its result on the instance, so each case
-    # below needs its own instance -- otherwise every iteration after the first would just
-    # return the first case's cached value without actually exercising the regex (as the
-    # previous version of this test did: it only ever verified the first case below).
+    # NB: HomebrewCask._get_brew_version() caches its result on the instance, so
+    # brew_version is reset before each case below -- otherwise every iteration after
+    # the first would just return the first case's cached value without actually
+    # exercising the regex (as the previous version of this test did: it only ever
+    # verified the first case below).
     brew_versions = {
         "Homebrew 4.1.0": "4.1.0",
         # A placeholder version (e.g. a shallow git clone) is deliberately treated as
@@ -38,7 +39,8 @@ def test_homebrew_version(mocker):
     mocker.patch.object(HomebrewValidate, "valid_path", return_value=True)
     mocker.patch.object(HomebrewValidate, "valid_brew_path", return_value=True)
 
+    homebrewcask = HomebrewCask(module=module)
     for version, expected in brew_versions.items():
-        homebrewcask = HomebrewCask(module=module)
+        homebrewcask.brew_version = None
         module.run_command.return_value = (0, version, "")
         assert homebrewcask._get_brew_version() == expected

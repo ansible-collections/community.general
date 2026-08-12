@@ -446,7 +446,7 @@ class HomebrewCask:
         # later substring of the output; ``\d+(?:\.\d+)+`` accepts any number of dot-separated
         # segments rather than assuming exactly three (some Homebrew builds report more, e.g.
         # "Homebrew 4.6.13.1-custom-...").
-        pattern = r"Homebrew\s+(>=)?\s*(\d+(?:\.\d+)+)"
+        pattern = r"Homebrew\s+(>=)?(\d+(?:\.\d+)+)"
         rematch = re.search(pattern, out)
         if not rematch:
             self.module.fail_json(msg="Failed to match regex to get brew version", stdout=out)
