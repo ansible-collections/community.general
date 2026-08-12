@@ -57,4 +57,6 @@
           - "testhost | CHANGED | rc=23 | (stdout)  (stderr) Hello"
           - - "An exception occurred during task execution. To see the full traceback, use -vvv. The error was: (traceback unavailable)"
             - "An exception occurred during task execution. To see the full traceback, use -vvv. The error was: ansible.errors.AnsibleTaskError: Task failed: Action failed: Boo!"
-          - "testhost | FAILED! => {\"changed\": false,\"msg\": \"Boo!\"}"
+            - "testhost | FAILED! => {\"changed\": false,\"msg\": \"Boo!\"}"
+          - - "testhost | FAILED! => {\"changed\": false,\"msg\": \"Boo!\"}"
+            - null
