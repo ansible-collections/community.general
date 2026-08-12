@@ -318,7 +318,7 @@ def main():
         pygithub_version = tuple(int(x) for x in _github_module.__version__.split(".")[:2])
         if pygithub_version < PYGITHUB_MIN_VERSION_VISIBILITY:
             module.fail_json(
-                msg="The 'visibility' option requires PyGithub >= 1.58. Found version %s." % _github_module.__version__
+                msg=f"The 'visibility' option requires PyGithub >= 1.58. Found version {_github_module.__version__}."
             )
 
     try:
