@@ -546,18 +546,16 @@ def main():
                     last_ipv6 = max([no for (no, ipv6) in lines if ipv6]) if has_ipv6 else None
 
                     if last_ipv4 and first_ipv6 and last_ipv4 > first_ipv6:
-                        raise ValueError("ufw output could not be parsed correctly. ipv4 follows ipv6!")
+                        module.warn("ufw output could not be parsed correctly. ipv4 follows ipv6!")
 
                     if relative_to_cmd == "first-ipv4":
                         relative_to = 1
                     elif relative_to_cmd == "last-ipv4":
                         relative_to = last_ipv4 or 1
                     elif relative_to_cmd == "first-ipv6":
-                        relative_to = first_ipv6 or last_ipv4 + 1 if last_ipv4 else 1
+                        relative_to = first_ipv6 or (last_ipv4 + 1 if last_ipv4 else 1)
                     elif relative_to_cmd == "last-ipv6":
-                        relative_to = last_ipv6 or last_number + 1
-                    else:
-                        raise ValueError(f'Undefinded value for "insert_relative_to": {relative_to_cmd}')
+                        relative_to = last_ipv6 or (last_number + 1)
 
                     insert_to = params["insert"] + relative_to
                     if insert_to > last_number:
