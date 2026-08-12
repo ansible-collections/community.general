@@ -26,12 +26,13 @@ ansible_config: |-
 import typing as t
 
 from ansible import constants as C
-from ansible.executor.task_result import CallbackTaskResult
 from ansible.plugins.callback import CallbackBase
 from ansible.template import Templar
 
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
+
+    from ansible.executor.task_result import CallbackTaskResult
 
 COLOR_ERROR = C.COLOR_ERROR  # type: ignore[attr-defined]
 COLOR_CHANGED = C.COLOR_CHANGED  # type: ignore[attr-defined]
