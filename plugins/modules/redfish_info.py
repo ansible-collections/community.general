@@ -27,11 +27,56 @@ options:
     default: ['Systems']
     type: list
     elements: str
+    choises:
+      - Systems
+      - Chassis
+      - Accounts
+      - Update
+      - Sessions
+      - Manager
+      - Service
   command:
     description:
       - List of commands to execute on OOB controller.
+      - Commands must match the category above. The applicable categories are listed after each command.
     type: list
     elements: str
+    choises:
+      - GetSystemInventory (Systems)
+      - GetPsuInventory (Systems, Chassis)
+      - GetCpuInventory (Systems)
+      - GetMemoryInventory (Systems)
+      - GetNicInventory (Systems)
+      - GetHealthReport (Systems, Chassis, Manager)
+      - GetStorageControllerInventory (Systems)
+      - GetDiskInventory (Systems)
+      - GetVolumeInventory (Systems)
+      - GetBiosAttributes (Systems)
+      - GetBootOrder (Systems)
+      - GetBootOverride (Systems)
+      - GetVirtualMedia (Systems, Manager)
+      - GetBiosRegistries (Systems)
+      - GetPowerRestorePolicy (Systems)
+      - GetFanInventory (Chassis)
+      - GetChassisPower (Chassis)
+      - GetChassisThermals (Chassis)
+      - GetChassisInventory (Chassis)
+      - GetHPEThermalConfig (Chassis)
+      - GetHPEFanPercentMin (Chassis)
+      - ListUsers (Accounts)
+      - GetAccountServiceConfig (Accounts)
+      - GetSessions (Sessions)
+      - GetFirmwareInventory (Update)
+      - GetFirmwareUpdateCapabilities (Update)
+      - GetSoftwareInventory (Update)
+      - GetUpdateStatus (Update)
+      - GetManagerNicInventory (Manager)
+      - GetLogs (Manager)
+      - GetNetworkProtocols (Manager)
+      - GetHostInterfaces (Manager)
+      - GetManagerInventory (Manager)
+      - GetServiceIdentification (Manager)
+      - CheckAvailability (Service)
   baseuri:
     required: true
     description:
