@@ -137,7 +137,11 @@ def create_new_org_repo_mock(url, request):
 def create_new_user_repo_mock(url, request):
     repo = json.loads(request.body)
 
-    private = repo.get("private", False)
+    visibility = repo.get("visibility")
+    if visibility is not None:
+        private = visibility in ("private", "internal")
+    else:
+        private = repo.get("private", False)
 
     headers = {"content-type": "application/json"}
     # https://docs.github.com/en/rest/reference/repos#create-a-repository-for-the-authenticated-user
@@ -145,7 +149,7 @@ def create_new_user_repo_mock(url, request):
         "name": repo["name"],
         "full_name": f"octocat/{repo['name']}",
         "private": private,
-        "visibility": "private" if private else "public",
+        "visibility": visibility if visibility is not None else ("private" if private else "public"),
         "description": repo.get("description"),
     }
     content = json.dumps(content).encode("utf-8")
@@ -456,52 +460,6 @@ class TestGithubRepo(unittest.TestCase):
         self.assertEqual(result["changed"], False)
         self.assertEqual(result["repo"]["visibility"], "internal")
 
-    @with_httmock(get_user_mock)
-    @with_httmock(get_repo_notfound_mock)
-    @with_httmock(create_new_user_repo_mock)
-    def test_create_new_user_repo_with_visibility_public(self):
-        result = github_repo.run_module(
-            {
-                "username": None,
-                "password": None,
-                "access_token": "mytoken",
-                "organization": None,
-                "name": "myrepo",
-                "description": "My public project",
-                "private": None,
-                "visibility": "public",
-                "state": "present",
-                "api_url": "https://api.github.com",
-                "force_defaults": False,
-            }
-        )
-
-        self.assertEqual(result["changed"], True)
-        self.assertEqual(result["repo"]["private"], False)
-
-    @with_httmock(get_user_mock)
-    @with_httmock(get_repo_notfound_mock)
-    @with_httmock(create_new_user_repo_mock)
-    def test_create_new_user_repo_with_visibility_private(self):
-        result = github_repo.run_module(
-            {
-                "username": None,
-                "password": None,
-                "access_token": "mytoken",
-                "organization": None,
-                "name": "myrepo",
-                "description": "My private project",
-                "private": None,
-                "visibility": "private",
-                "state": "present",
-                "api_url": "https://api.github.com",
-                "force_defaults": False,
-            }
-        )
-
-        self.assertEqual(result["changed"], True)
-        self.assertEqual(result["repo"]["private"], True)
-
     @with_httmock(get_orgs_mock)
     @with_httmock(get_repo_notfound_mock)
     @with_httmock(create_new_org_repo_mock)
@@ -524,7 +482,6 @@ class TestGithubRepo(unittest.TestCase):
         )
 
         self.assertEqual(result["changed"], True)
-        self.assertEqual(result["repo"]["private"], True)
         self.assertEqual(result["repo"]["visibility"], "internal")
 
     @with_httmock(get_orgs_mock)

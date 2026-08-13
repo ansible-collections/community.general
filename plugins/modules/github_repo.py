@@ -59,9 +59,8 @@ options:
   visibility:
     description:
       - The visibility of the repository.
-      - V(internal) is only available for organization repositories on GitHub Enterprise
-        and requires O(organization) to be specified.
-      - V(public) and V(private) can be used for both personal and organization repositories.
+      - Only available for organization repositories and requires O(organization) to be specified.
+      - V(internal) is only available on GitHub Enterprise.
       - This is only used when O(state=present).
       - Mutually exclusive with O(private).
     type: str
@@ -86,7 +85,7 @@ options:
     version_added: "3.5.0"
   force_defaults:
     description:
-      - If V(true), overwrite current O(description), O(private), and O(visibility) attributes with defaults.
+      - If V(true), overwrite current O(description) and O(private) attributes with defaults.
       - The default value changed from V(true) to V(false) in community.general 13.0.0.
     type: bool
     default: false
@@ -96,10 +95,7 @@ requirements:
 notes:
   - For Python 3, PyGithub>=1.54 should be used.
   - The O(visibility) option requires PyGithub>=1.58 which added support for the C(visibility) parameter
-    in C(Organization.create_repo()) and C(Repository.edit()).
-  - For personal repositories (without O(organization)), O(visibility=public) and O(visibility=private) are
-    converted to the equivalent O(private) value, since the underlying PyGithub C(AuthenticatedUser.create_repo())
-    does not support the C(visibility) parameter directly.
+    in V(Organization.create_repo(\)) and V(Repository.edit(\)).
 author:
   - Álvaro Torres Cogollo (@atorrescogollo)
 """
@@ -123,15 +119,6 @@ EXAMPLES = r"""
     name: myrepo
     description: "Internal repository"
     visibility: internal
-    state: present
-  register: result
-
-- name: Create a public personal repository using visibility
-  community.general.github_repo:
-    access_token: mytoken
-    name: myrepo
-    description: "My public project"
-    visibility: public
     state: present
   register: result
 
@@ -181,10 +168,6 @@ def authenticate(username=None, password=None, access_token=None, api_url=None):
         return Github(base_url=api_url, login_or_token=username, password=password)
 
 
-def _effective_private(visibility):
-    return visibility in ("private", "internal")
-
-
 def create_repo(gh, name, organization=None, private=None, visibility=None, description=None, check_mode=False):
     result = dict(changed=False, repo=dict())
     if organization:
@@ -202,10 +185,8 @@ def create_repo(gh, name, organization=None, private=None, visibility=None, desc
                 name=name,
                 description=GithubObject.NotSet if description is None else description,
             )
-            if visibility is not None and organization:
+            if visibility is not None:
                 create_kwargs["visibility"] = visibility
-            elif visibility is not None:
-                create_kwargs["private"] = _effective_private(visibility)
             else:
                 create_kwargs["private"] = GithubObject.NotSet if private is None else private
             repo = target.create_repo(**create_kwargs)
@@ -232,7 +213,6 @@ def create_repo(gh, name, organization=None, private=None, visibility=None, desc
         update = {}
         if "visibility" in changes:
             update["visibility"] = repo._visibility.value if not check_mode else visibility
-            update["private"] = repo._private.value if not check_mode else _effective_private(visibility)
         elif "private" in changes:
             update["private"] = repo._private.value if not check_mode else private
         if "description" in changes:
@@ -308,7 +288,11 @@ def main():
         required_together=[("username", "password")],
         required_one_of=[("username", "access_token")],
         mutually_exclusive=[("username", "access_token"), ("private", "visibility")],
-        required_if=[("visibility", "internal", ("organization",))],
+        required_if=[
+            ("visibility", "public", ("organization",)),
+            ("visibility", "private", ("organization",)),
+            ("visibility", "internal", ("organization",)),
+        ],
     )
 
     if not HAS_GITHUB_PACKAGE:
