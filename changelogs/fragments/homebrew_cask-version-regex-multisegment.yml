@@ -3,4 +3,4 @@ bugfixes:
     three dot-separated segments (for example, some vendor Homebrew builds report a fourth
     segment). The previous regex could silently drop the leading segment, misjudging whether
     the deprecated ``brew cask`` command syntax is still required and causing installs to fail
-    with an unknown-command error."
+    with an unknown-command error (https://github.com/ansible-collections/community.general/pull/12559)."
