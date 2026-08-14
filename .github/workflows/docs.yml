@@ -21,6 +21,9 @@ name: nox
     - cron: '0 8 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   nox:
     uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-run.yml@main

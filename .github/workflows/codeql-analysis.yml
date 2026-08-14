@@ -13,6 +13,9 @@ name: "Code scanning - action"
 permissions:
   contents: read
 
+permissions:
+  contents: read
+
 jobs:
   CodeQL-Build:
 
