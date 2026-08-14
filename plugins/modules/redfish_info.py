@@ -27,7 +27,7 @@ options:
     default: ['Systems']
     type: list
     elements: str
-    choises:
+    choices:
       - Systems
       - Chassis
       - Accounts
@@ -41,7 +41,7 @@ options:
       - Commands must match the category above. The applicable categories are listed after each command.
     type: list
     elements: str
-    choises:
+    choices:
       - GetSystemInventory (Systems)
       - GetPsuInventory (Systems, Chassis)
       - GetCpuInventory (Systems)
