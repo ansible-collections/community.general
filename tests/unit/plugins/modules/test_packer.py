@@ -361,4 +361,3 @@ class TestPackerModule(unittest.TestCase):
                 packer.main()
             self.assertIn("fail_json called", str(context.exception))
             mock_module_for_test.fail_json.assert_called_once()
-

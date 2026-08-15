@@ -7,7 +7,7 @@ from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: packer
-version_added: 1.0.0
+version_added: 13.4.0
 short_description: Manage HashiCorp Packer builds
 description:
   - Manage Packer builds and templates.
