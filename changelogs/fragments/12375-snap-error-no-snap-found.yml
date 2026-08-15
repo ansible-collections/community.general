@@ -1,0 +1,2 @@
+bugfixes:
+  - snap - fix ``IndexError`` when a snap does not exist. ``snap info`` reports a missing snap as ``error: no snap found`` on stderr when a single snap is queried, but the module only matched the ``warning: no snap found`` that is emitted on stdout for several snaps, so the single-snap case fell through and crashed instead of reporting the missing snap (https://github.com/ansible-collections/community.general/issues/12375).

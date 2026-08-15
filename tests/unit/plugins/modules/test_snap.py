@@ -585,4 +585,34 @@ TEST_SPEC = dict(
     ]
 )
 
+TEST_SPEC["test_cases"].append(
+    dict(
+        # https://github.com/ansible-collections/community.general/issues/12375
+        # snapd emits "error: no snap found" on stderr with rc=1 when a single
+        # snap is queried, not the "warning:" on stdout it uses for several.
+        id="issue_12375_single_snap_not_found",
+        input={"name": ["hello-world"]},
+        output=dict(failed=True, msg="Snaps not found: ['hello-world']."),
+        flags={},
+        mocks=dict(
+            run_command=[
+                dict(
+                    command=["/testbin/snap", "version"],
+                    environ=default_env,
+                    rc=0,
+                    out=default_version_out,
+                    err="",
+                ),
+                dict(
+                    command=["/testbin/snap", "info", "hello-world"],
+                    environ=default_env,
+                    rc=1,
+                    out="",
+                    err='error: no snap found for "hello-world"\n',
+                ),
+            ],
+        ),
+    )
+)
+
 UTHelper.from_spec(snap, sys.modules[__name__], TEST_SPEC, mocks=[RunCommandMock])

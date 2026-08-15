@@ -372,6 +372,8 @@ class Snap(StateModuleHelper):
 
         def process_one(rc, out, err):
             res = [line for line in out.split("\n") if line.startswith("name:")]
+            if not res:
+                self.do_raise(msg=f"Unable to determine snap name from 'snap info' output:\n{out}")
             name = res[0].split()[1]
             return [name]
 
@@ -393,8 +395,18 @@ class Snap(StateModuleHelper):
                 check_error = out
                 process_ = process_many
 
-            if "warning: no snap found" in check_error:
-                snaps_not_found = [x.split()[-1] for x in out.split("\n") if x.startswith("warning: no snap found")]
+            # snapd reports a missing snap as a warning on stdout when several
+            # snaps are queried at once, but as an error on stderr when only one
+            # is, so both prefixes and both streams have to be handled. Matching
+            # only the warning let the single-snap case fall through to
+            # process_one, which then raised IndexError because there is no
+            # "name:" line to read.
+            snaps_not_found = [
+                x.split()[-1].strip('"')
+                for x in check_error.split("\n")
+                if x.startswith(("warning: no snap found", "error: no snap found"))
+            ]
+            if snaps_not_found:
                 self.do_raise(f"Snaps not found: {snaps_not_found}.")
             return process_(rc, out, err)
 
