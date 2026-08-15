@@ -212,6 +212,17 @@ def test_op_get_field(mocker, op_fixture, output, expected, request):
 # This test sometimes fails on older Python versions because the gathered tests mismatch.
 # Sort the fixture data to make this reliable
 # https://github.com/pytest-dev/pytest-xdist/issues/432
+@pytest.mark.parametrize("op_fixture", OP_VERSION_FIXTURES)
+def test_op_get_secret_reference_decodes_bytes(mocker, op_fixture, request):
+    op = request.getfixturevalue(op_fixture)
+    mocker.patch.object(op._cli, "get_secret_reference", return_value=(0, b"hunter2\n", ""))
+
+    result = op.get_secret_reference("op://vault/item/field")
+
+    assert result == "hunter2"
+    assert isinstance(result, str)
+
+
 @pytest.mark.parametrize(
     ("cli_class", "vault", "queries", "kwargs", "output", "expected"),
     (
