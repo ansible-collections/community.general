@@ -579,7 +579,7 @@ class OnePass:
             raise AnsibleLookupError("Not a valid secret reference")
 
         rc, out, err = self._cli.get_secret_reference(reference, self.token)
-        return out.strip()
+        return to_text(out).strip()
 
 
 class LookupModule(LookupBase):
