@@ -593,17 +593,15 @@ class TarArchive(Archive):
         try:
             if self.format == "xz":
                 with lzma.open(_to_native_ascii(path), "r") as f:
-                    archive = tarfile.open(fileobj=f)
-                    checksums = {(info.name, info.chksum) for info in archive.getmembers()}
-                    archive.close()
+                    with tarfile.open(fileobj=f) as archive:
+                        checksums = {(info.name, info.chksum) for info in archive.getmembers()}
             elif self.format == "zstd":
                 with zstandard.open(_to_native_ascii(path), "rb") as f:
                     with tarfile.open(fileobj=f, mode="r|") as archive:
                         checksums = {(info.name, info.chksum) for info in archive.getmembers()}
             else:
-                archive = tarfile.open(_to_native_ascii(path), f"r|{self.format}")
-                checksums = {(info.name, info.chksum) for info in archive.getmembers()}
-                archive.close()
+                with tarfile.open(_to_native_ascii(path), f"r|{self.format}") as archive:
+                    checksums = {(info.name, info.chksum) for info in archive.getmembers()}
         except compression_errors:
             try:
                 # The python implementations of gzip, bz2, and lzma do not support restoring compressed files

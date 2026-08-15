@@ -1,0 +1,2 @@
+minor_changes:
+  - archive - use context managers when reading tar checksums (https://github.com/ansible-collections/community.general/pull/12569).
