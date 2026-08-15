@@ -10,8 +10,14 @@ from ansible_collections.community.general.plugins.modules import appimage
 
 
 class FakeModule:
-    def __init__(self):
+    def __init__(self, params=None):
         self.fail = None
+        self.params = params or {
+            "state": "present",
+            "version": None,
+            "github_token": None,
+            "asset_name": "*.AppImage",
+        }
 
     def fail_json(self, **kwargs):
         self.fail = kwargs
@@ -105,10 +111,79 @@ def test_select_catalog_download_url_uses_github_fallback():
 
 def test_resolve_url_source_rejects_unsupported_catalog_url():
     module = FakeModule()
-    module.params = {"version": None, "github_token": None, "asset_name": "*.AppImage"}
 
     with pytest.raises(RuntimeError, match="not a direct AppImage URL or GitHub releases page"):
         appimage.resolve_url_source(module, "https://example.com/download")
+
+
+def test_resolve_url_source_accepts_local_path(tmp_path):
+    path = tmp_path / "tool.AppImage"
+    path.write_bytes(b"appimage")
+
+    source = appimage.resolve_url_source(FakeModule(), str(path))
+
+    assert source["source_path"] == str(path)
+    assert source["asset_name"] == "tool.AppImage"
+
+
+def test_resolve_url_source_accepts_file_url(tmp_path):
+    path = tmp_path / "tool.AppImage"
+    path.write_bytes(b"appimage")
+
+    source = appimage.resolve_url_source(FakeModule(), path.as_uri())
+
+    assert source["source_path"] == str(path)
+    assert source["asset_name"] == "tool.AppImage"
+
+
+def test_resolve_url_source_rejects_latest_for_local_path(tmp_path):
+    path = tmp_path / "tool.AppImage"
+    path.write_bytes(b"appimage")
+
+    with pytest.raises(RuntimeError, match="state=latest is only supported"):
+        appimage.resolve_url_source(FakeModule({"state": "latest"}), str(path))
+
+
+def test_resolve_url_source_rejects_latest_for_direct_url():
+    module = FakeModule({"state": "latest"})
+
+    with pytest.raises(RuntimeError, match="state=latest is only supported"):
+        appimage.resolve_url_source(module, "https://example.com/tool.AppImage")
+
+
+def test_resolve_url_source_rejects_latest_with_version():
+    module = FakeModule(
+        {
+            "state": "latest",
+            "version": "v1.2.3",
+            "github_token": None,
+            "asset_name": "*.AppImage",
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="state=latest cannot be combined with version"):
+        appimage.resolve_url_source(module, "https://github.com/example/project/releases")
+
+
+def test_resolve_url_source_uses_latest_github_release_for_state_latest(monkeypatch):
+    fetched_urls = []
+
+    def fake_fetch_json(module, url, headers):
+        fetched_urls.append(url)
+        return {
+            "tag_name": "v2.0.0",
+            "assets": [{"name": "tool.AppImage", "browser_download_url": "https://example.com/tool.AppImage"}],
+        }
+
+    monkeypatch.setattr(appimage, "fetch_json", fake_fetch_json)
+
+    source = appimage.resolve_url_source(
+        FakeModule({"state": "latest", "version": None, "github_token": None, "asset_name": "*.AppImage"}),
+        "https://github.com/example/project/releases/tag/v1.0.0",
+    )
+
+    assert fetched_urls == ["https://api.github.com/repos/example/project/releases/latest"]
+    assert source["version"] == "v2.0.0"
 
 
 def test_needs_install_uses_metadata_for_latest(tmp_path):
@@ -131,14 +206,41 @@ def test_needs_install_uses_metadata_for_latest(tmp_path):
     )
 
 
-def test_desktop_file_content():
-    content = appimage.desired_desktop_file("tool", "/home/user/.local/bin/tool")
+def test_needs_install_uses_source_path_metadata_for_latest(tmp_path):
+    path = tmp_path / "tool"
+    path.write_text("appimage", encoding="utf-8")
+    appimage.write_metadata(str(path), {"source_path": "/tmp/tool-v1.AppImage", "version": None})
 
-    assert "Name=tool\n" in content
-    assert "Exec=/home/user/.local/bin/tool\n" in content
+    assert not appimage.needs_install(str(path), "latest", {"source_path": "/tmp/tool-v1.AppImage", "version": None})
+    assert appimage.needs_install(str(path), "latest", {"source_path": "/tmp/tool-v2.AppImage", "version": None})
 
 
-def test_desktop_file_path_uses_home(monkeypatch):
-    monkeypatch.setenv("HOME", "/home/user")
+def test_response_text_decodes_body():
+    class Response:
+        def read(self):
+            return b'{"ok": true}'
 
-    assert appimage.desktop_file_path("tool") == "/home/user/.local/share/applications/tool.desktop"
+    assert appimage.response_text(Response()) == '{"ok": true}'
+
+
+def test_apply_file_attributes_defaults_to_executable_mode(tmp_path):
+    class AttrModule(FakeModule):
+        def __init__(self):
+            super().__init__({"mode": None})
+            self.loaded = None
+
+        def load_file_common_arguments(self, params, path=None):
+            self.loaded = (params, path)
+            return {"mode": params["mode"], "path": path}
+
+        def set_fs_attributes_if_different(self, file_args, changed):
+            return changed
+
+    path = tmp_path / "tool"
+    path.write_text("appimage", encoding="utf-8")
+    module = AttrModule()
+
+    appimage.apply_file_attributes(module, str(path), False)
+
+    assert module.loaded[0]["mode"] == "0755"
+    assert module.loaded[1] == str(path)

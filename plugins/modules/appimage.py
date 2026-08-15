@@ -10,12 +10,14 @@ module: appimage
 short_description: Manage AppImage packages
 description:
   - Install, update, and remove applications distributed as AppImage files.
-  - The module installs AppImage files into a user-controlled directory and can optionally create a desktop launcher.
-  - Sources can be direct AppImage URLs, GitHub release pages containing AppImage assets, or appimage.github.io catalog entries.
+  - The module installs AppImage files into a user-controlled directory.
+  - Sources can be local AppImage files, direct AppImage URLs, GitHub release pages containing AppImage assets,
+    or U(https://appimage.github.io) catalog entries.
 author:
   - Travis Beale (@travisbeale)
 extends_documentation_fragment:
   - community.general._attributes
+  - ansible.builtin.files
 attributes:
   check_mode:
     support: full
@@ -25,23 +27,26 @@ options:
   name:
     description:
       - Name of the managed AppImage.
-      - This is used as the installed executable filename and as the desktop file basename.
-      - When O(url) is omitted, this is also used to look up the AppImage in the appimage.github.io catalog.
+      - This is used as the installed executable filename.
+      - When O(url) is omitted, this is also used to look up the AppImage in the U(https://appimage.github.io) catalog.
     type: str
     required: true
   url:
     description:
-      - URL used to install the AppImage.
-      - This can point directly to an AppImage file, or to a GitHub releases page such as
-        V(https://github.com/OWNER/REPO/releases) or V(https://github.com/OWNER/REPO/releases/tag/TAG).
-      - When omitted with O(state=present) or O(state=latest), the module looks up O(name) in the appimage.github.io catalog.
+      - Source used to install the AppImage.
+      - This can point directly to an AppImage URL, a local AppImage file path, a V(file://) AppImage URL,
+        or to a GitHub releases page such as V(https://github.com/OWNER/REPO/releases)
+        or V(https://github.com/OWNER/REPO/releases/tag/TAG).
+      - When omitted with O(state=present) or O(state=latest), the module looks up O(name) in the U(https://appimage.github.io) catalog.
     type: str
   state:
     description:
       - Desired state of the AppImage.
       - When O(state=present), the AppImage is installed if missing.
-      - When O(state=latest), GitHub releases pages are resolved to the latest release unless O(version) is set.
-        Direct AppImage URLs are installed when missing or when the recorded source URL differs.
+      - When O(state=latest), sources that support multiple versions, such as GitHub releases pages,
+        are resolved to the latest release and updated when the recorded version differs.
+      - O(state=latest) cannot be combined with O(version), and is not supported for fixed sources such
+        as direct AppImage URLs or local files.
     type: str
     choices: [absent, present, latest]
     default: present
@@ -50,12 +55,6 @@ options:
       - Directory where the AppImage executable is installed.
     type: path
     default: "~/.local/bin"
-  desktop_integration:
-    description:
-      - Whether to create a desktop launcher for the installed AppImage.
-      - The launcher is written to C($HOME/.local/share/applications/).
-    type: bool
-    default: false
   version:
     description:
       - GitHub release tag to install when O(url) points to a GitHub releases page.
@@ -74,7 +73,7 @@ options:
     type: str
   catalog_url:
     description:
-      - URL of the appimage.github.io-compatible JSON feed used when O(url) is omitted.
+      - URL of the U(https://appimage.github.io)-compatible JSON feed used when O(url) is omitted.
     type: str
     default: https://appimage.github.io/feed.json
   validate_certs:
@@ -95,6 +94,11 @@ EXAMPLES = r"""
     name: example
     url: https://example.com/downloads/example-x86_64.AppImage
 
+- name: Install an AppImage from a local file
+  community.general.appimage:
+    name: example
+    url: /tmp/example-x86_64.AppImage
+
 - name: Install an AppImage from the appimage.github.io catalog
   community.general.appimage:
     name: appimagetool
@@ -111,12 +115,6 @@ EXAMPLES = r"""
     name: example
     url: https://github.com/example/example/releases
     version: v1.2.3
-
-- name: Install an AppImage and create a desktop launcher
-  community.general.appimage:
-    name: example
-    url: https://example.com/downloads/example.AppImage
-    desktop_integration: true
 
 - name: Remove an AppImage
   community.general.appimage:
@@ -135,11 +133,11 @@ source_url:
   returned: when O(state) is V(present) or V(latest)
   type: str
   sample: https://github.com/example/example/releases/download/v1.2.3/example-x86_64.AppImage
-desktop_file:
-  description: Path to the managed desktop launcher.
-  returned: when O(desktop_integration=true) or O(state=absent)
+source_path:
+  description: Local AppImage source path.
+  returned: when installing from a local path or V(file://) source
   type: str
-  sample: /home/user/.local/share/applications/example.desktop
+  sample: /tmp/example-x86_64.AppImage
 version:
   description: GitHub release tag that was installed.
   returned: when installing from a GitHub release
@@ -160,8 +158,9 @@ catalog_url:
 import fnmatch
 import json
 import os
+import shutil
 import tempfile
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
@@ -196,14 +195,20 @@ def github_api_url(owner, repo, tag):
     return f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
 
 
+def github_api_url_from_releases_url(url, state, version):
+    owner, repo, tag_from_url = parse_github_releases_url(url)
+    tag = None if state == "latest" else version or tag_from_url
+    return github_api_url(owner, repo, tag)
+
+
 def appimage_catalog_name_url(catalog_name):
     return f"https://appimage.github.io/{catalog_name}/"
 
 
-def response_body(response):
+def response_text(response):
     if response is None:
-        return b""
-    return response.read()
+        return ""
+    return response.read().decode("utf-8")
 
 
 def fetch_json(module, url, headers):
@@ -218,7 +223,7 @@ def fetch_json(module, url, headers):
     if status != 200:
         module.fail_json(msg=f"Failed to fetch {url}", status=status, details=info.get("msg"))
     try:
-        return json.loads(response_body(response).decode("utf-8"))
+        return json.loads(response_text(response))
     except (TypeError, ValueError) as e:
         module.fail_json(msg=f"Failed to parse JSON from {url}: {e}")
 
@@ -279,14 +284,59 @@ def select_catalog_download_url(module, item):
     module.fail_json(msg=f"AppImage catalog entry {item.get('name')!r} does not contain a supported download link")
 
 
+def local_appimage_path(source):
+    parsed = urlparse(source)
+    if parsed.scheme == "file":
+        if parsed.netloc not in ("", "localhost"):
+            return None
+        return unquote(parsed.path)
+    if parsed.scheme == "":
+        return os.path.expanduser(source)
+    return None
+
+
+def resolve_local_source(module, source, catalog_name=None):
+    path = local_appimage_path(source)
+    if path is None:
+        return None
+    if module.params["state"] == "latest":
+        module.fail_json(msg="state=latest is only supported for sources that provide release versions, such as GitHub releases pages")
+    if not path.lower().endswith(".appimage"):
+        module.fail_json(
+            msg=(
+                f"Local source {source!r} is not an AppImage file. "
+                "Use `url` to provide a supported AppImage source explicitly."
+            )
+        )
+    if not os.path.isfile(path):
+        module.fail_json(msg=f"Local AppImage source {path!r} does not exist or is not a file")
+    resolved_path = os.path.abspath(path)
+    result = {
+        "source_path": resolved_path,
+        "asset_name": os.path.basename(resolved_path),
+        "version": None,
+    }
+    if catalog_name:
+        result["catalog_name"] = catalog_name
+    return result
+
+
 def resolve_url_source(module, url, catalog_name=None):
+    local_source = resolve_local_source(module, url, catalog_name=catalog_name)
+    if local_source is not None:
+        return local_source
+
     if is_github_releases_url(url):
-        owner, repo, tag_from_url = parse_github_releases_url(url)
-        tag = module.params["version"] or tag_from_url
+        if module.params["state"] == "latest" and module.params["version"]:
+            module.fail_json(msg="state=latest cannot be combined with version")
         headers = {}
         if module.params["github_token"]:
             headers["Authorization"] = f"Bearer {module.params['github_token']}"
-        release = fetch_json(module, github_api_url(owner, repo, tag), headers)
+        release = fetch_json(
+            module,
+            github_api_url_from_releases_url(url, module.params["state"], module.params["version"]),
+            headers,
+        )
         asset = select_release_asset(module, release, module.params["asset_name"])
         source = {
             "source_url": asset["browser_download_url"],
@@ -301,9 +351,11 @@ def resolve_url_source(module, url, catalog_name=None):
         module.fail_json(
             msg=(
                 f"Resolved URL {url!r} is not a direct AppImage URL or GitHub releases page. "
-                "Use url to provide a supported AppImage source explicitly."
+                "Use `url` to provide a supported AppImage source explicitly."
             )
         )
+    if module.params["state"] == "latest":
+        module.fail_json(msg="state=latest is only supported for sources that provide release versions, such as GitHub releases pages")
 
     source = {
         "source_url": url,
@@ -340,7 +392,7 @@ def load_metadata(path):
     if not os.path.exists(meta_path):
         return {}
     try:
-        with open(meta_path, "r", encoding="utf-8") as f:
+        with open(meta_path, "r") as f:
             return json.load(f)
     except (OSError, ValueError):
         return {}
@@ -358,7 +410,18 @@ def needs_install(path, state, source):
     if state != "latest":
         return False
     metadata = load_metadata(path)
-    return metadata.get("source_url") != source.get("source_url") or metadata.get("version") != source.get("version")
+    return (
+        metadata.get("source_url") != source.get("source_url")
+        or metadata.get("source_path") != source.get("source_path")
+        or metadata.get("version") != source.get("version")
+    )
+
+
+def atomic_install(module, write_source, dest):
+    fd, tmp_path = tempfile.mkstemp(prefix=".ansible-appimage-", dir=module.tmpdir)
+    with os.fdopen(fd, "wb") as tmp_file:
+        write_source(tmp_file)
+    module.atomic_move(tmp_path, dest, unsafe_writes=module.params["unsafe_writes"])
 
 
 def download_appimage(module, source_url, dest):
@@ -372,40 +435,30 @@ def download_appimage(module, source_url, dest):
     if status != 200:
         module.fail_json(msg=f"Failed to download AppImage from {source_url}", status=status, details=info.get("msg"))
 
-    install_dir = os.path.dirname(dest)
-    fd, tmp_path = tempfile.mkstemp(prefix=".ansible-appimage-", dir=install_dir)
-    try:
-        with os.fdopen(fd, "wb") as tmp_file:
-            tmp_file.write(response_body(response))
-        os.chmod(tmp_path, 0o755)
-        module.atomic_move(tmp_path, dest)
-    except Exception:
-        try:
-            os.unlink(tmp_path)
-        except OSError:
-            pass
-        raise
+    atomic_install(module, lambda tmp_file: shutil.copyfileobj(response, tmp_file), dest)
 
 
-def desktop_file_path(name):
-    base_dir = os.path.join(os.environ["HOME"], ".local", "share", "applications")
-    return os.path.join(base_dir, f"{name}.desktop")
+def copy_appimage(module, source_path, dest):
+    def write_source(tmp_file):
+        with open(source_path, "rb") as source_file:
+            shutil.copyfileobj(source_file, tmp_file)
+
+    atomic_install(module, write_source, dest)
 
 
-def desired_desktop_file(name, executable):
-    return f"[Desktop Entry]\nType=Application\nName={name}\nExec={executable}\nTerminal=false\nCategories=Utility;\n"
+def install_appimage(module, source, dest):
+    if source.get("source_path"):
+        copy_appimage(module, source["source_path"], dest)
+    else:
+        download_appimage(module, source["source_url"], dest)
 
 
-def ensure_desktop_file(path, content, check_mode):
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            if f.read() == content:
-                return False
-    if not check_mode:
-        os.makedirs(os.path.dirname(path), mode=0o755, exist_ok=True)
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(content)
-    return True
+def apply_file_attributes(module, path, changed):
+    file_params = module.params.copy()
+    if file_params.get("mode") is None:
+        file_params["mode"] = "0755"
+    file_args = module.load_file_common_arguments(file_params, path=path)
+    return module.set_fs_attributes_if_different(file_args, changed)
 
 
 def remove_file(path, check_mode):
@@ -423,7 +476,6 @@ def main():
             url=dict(type="str"),
             state=dict(type="str", default="present", choices=["absent", "present", "latest"]),
             install_dir=dict(type="path", default="~/.local/bin"),
-            desktop_integration=dict(type="bool", default=False),
             version=dict(type="str"),
             asset_name=dict(type="str", default="*.AppImage"),
             github_token=dict(type="str", no_log=True),
@@ -431,6 +483,7 @@ def main():
             validate_certs=dict(type="bool", default=True),
             timeout=dict(type="int", default=30),
         ),
+        add_file_common_args=True,
         supports_check_mode=True,
     )
 
@@ -438,14 +491,12 @@ def main():
     name = module.params["name"]
     install_dir = module.params["install_dir"]
     path = os.path.join(install_dir, name)
-    desktop_path = desktop_file_path(name)
     result = {"changed": False, "path": path}
 
     if state == "absent":
-        result["changed"] = remove_file(path, module.check_mode)
-        result["changed"] = remove_file(metadata_path(path), module.check_mode) or result["changed"]
-        result["changed"] = remove_file(desktop_path, module.check_mode) or result["changed"]
-        result["desktop_file"] = desktop_path
+        removed_appimage = remove_file(path, module.check_mode)
+        removed_metadata = remove_file(metadata_path(path), module.check_mode)
+        result["changed"] = removed_appimage or removed_metadata
         module.exit_json(**result)
 
     source = resolve_source(module)
@@ -454,14 +505,12 @@ def main():
     if needs_install(path, state, source):
         result["changed"] = True
         if not module.check_mode:
-            os.makedirs(install_dir, mode=0o755, exist_ok=True)
-            download_appimage(module, source["source_url"], path)
+            os.makedirs(install_dir, exist_ok=True)
+            install_appimage(module, source, path)
             write_metadata(path, source)
 
-    if module.params["desktop_integration"]:
-        result["desktop_file"] = desktop_path
-        content = desired_desktop_file(name, path)
-        result["changed"] = ensure_desktop_file(desktop_path, content, module.check_mode) or result["changed"]
+    if os.path.exists(path):
+        result["changed"] = apply_file_attributes(module, path, result["changed"])
 
     module.exit_json(**result)
 
