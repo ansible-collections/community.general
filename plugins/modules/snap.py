@@ -234,6 +234,7 @@ class Snap(StateModuleHelper):
     __disable_re = re.compile(r"(?:\S+\s+){5}(?P<notes>\S+)")
     __set_param_re = re.compile(r"(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)")
     __list_re = re.compile(r"^(?P<name>\S+)\s+\S+\s+(?P<rev>\S+)\s+(?P<channel>\S+)\s+\S+\s+(?P<notes>\S+)")
+    __no_snap_re = re.compile(r"^(?:warning|error): no snap found for \"(?P<name>[^\"]+)\"")
     module = dict(
         argument_spec={
             "name": dict(type="list", elements="str", required=True),
@@ -372,8 +373,6 @@ class Snap(StateModuleHelper):
 
         def process_one(rc, out, err):
             res = [line for line in out.split("\n") if line.startswith("name:")]
-            if not res:
-                self.do_raise(msg=f"Unable to determine snap name from 'snap info' output:\n{out}")
             name = res[0].split()[1]
             return [name]
 
@@ -395,16 +394,9 @@ class Snap(StateModuleHelper):
                 check_error = out
                 process_ = process_many
 
-            # snapd reports a missing snap as a warning on stdout when several
-            # snaps are queried at once, but as an error on stderr when only one
-            # is, so both prefixes and both streams have to be handled. Matching
-            # only the warning let the single-snap case fall through to
-            # process_one, which then raised IndexError because there is no
-            # "name:" line to read.
+            # snapd warns on stdout for many snaps, but errors on stderr for one.
             snaps_not_found = [
-                x.split()[-1].strip('"')
-                for x in check_error.split("\n")
-                if x.startswith(("warning: no snap found", "error: no snap found"))
+                m.group("name") for m in (self.__no_snap_re.match(x) for x in check_error.split("\n")) if m
             ]
             if snaps_not_found:
                 self.do_raise(f"Snaps not found: {snaps_not_found}.")
