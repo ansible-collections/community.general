@@ -87,16 +87,14 @@ class FlatpakMask(StateModuleHelper):
         return self.vars.name in masked_apps
 
     def _apply_mask(self):
-        set_cmd = [self.flatpak_bin, "mask", self.vars.name]
-        set_cmd.insert(1, f"--{self.vars.method}")
+        set_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask", self.vars.name]
 
         rc, out, err = self.module.run_command(set_cmd)
         if rc != 0:
             self.do_raise(msg=f"Failed to mask flatpak app: {err}", rc=rc, out=out, err=err)
 
     def _apply_unmask(self):
-        set_cmd = [self.flatpak_bin, "mask", "--remove", self.vars.name]
-        set_cmd.insert(1, f"--{self.vars.method}")
+        set_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask", "--remove", self.vars.name]
 
         rc, out, err = self.module.run_command(set_cmd)
         if rc != 0:
