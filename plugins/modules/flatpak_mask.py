@@ -62,7 +62,7 @@ from ansible_collections.community.general.plugins.module_utils._module_helper i
 
 
 class FlatpakMask(StateModuleHelper):
-    output_params = ("name", "state", "masked")
+    output_params = ("name", "state", "method")
     module = dict(
         argument_spec=dict(
             name=dict(type="str", required=True, aliases=["app"]),
