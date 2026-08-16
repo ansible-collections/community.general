@@ -12,7 +12,7 @@ module: flatpak_mask
 short_description: Mask Flatpak applications
 description:
   - This module masks flatpak applications, preventing them from being installed or updated.
-  - It replicates the behavior of C(flatpak mask).
+  - It encapsulates the behavior of C(flatpak mask).
 author:
   - Ilya Bogdanov (@zeerayne)
 version_added: 13.3.0
