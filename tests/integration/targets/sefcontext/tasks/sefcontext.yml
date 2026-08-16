@@ -231,3 +231,97 @@
 - ansible.builtin.assert:
     that:
       - subst_tenth is not changed
+
+- name: Ensure we start with a clean state for "<<none>>"
+  community.general.sefcontext:
+    path: '/tmp/foo/none(/.*)?'
+    state: absent
+    reload: false
+
+- name: Set SELinux file context of foo/none to "<<none>>"
+  community.general.sefcontext:
+    path: '/tmp/foo/none(/.*)?'
+    setype: '<<none>>'
+    state: present
+    reload: false
+  register: none_first
+
+- ansible.builtin.assert:
+    that:
+      - none_first is changed
+      - none_first.setype == '<<none>>'
+
+- name: Set SELinux file context of foo/none to "<<none>>" (again)
+  community.general.sefcontext:
+    path: '/tmp/foo/none(/.*)?'
+    setype: '<<none>>'
+    state: present
+    reload: false
+  register: none_second
+
+- ansible.builtin.assert:
+    that:
+      - none_second is not changed
+      - none_second.setype == '<<none>>'
+
+- name: Set SELinux file context of foo/none to "<<None>>" (semanage spelling is case-insensitive)
+  community.general.sefcontext:
+    path: '/tmp/foo/none(/.*)?'
+    setype: '<<None>>'
+    state: present
+    reload: false
+  register: none_third
+
+- ansible.builtin.assert:
+    that:
+      - none_third is not changed
+
+- name: Change SELinux file context of foo/none to a real type
+  community.general.sefcontext:
+    path: '/tmp/foo/none(/.*)?'
+    setype: httpd_sys_content_t
+    state: present
+    reload: false
+  register: none_fourth
+
+- ansible.builtin.assert:
+    that:
+      - none_fourth is changed
+      - none_fourth.setype == 'httpd_sys_content_t'
+
+- name: Change SELinux file context of foo/none back to "<<none>>"
+  community.general.sefcontext:
+    path: '/tmp/foo/none(/.*)?'
+    setype: '<<none>>'
+    state: present
+    reload: false
+  register: none_fifth
+
+- ansible.builtin.assert:
+    that:
+      - none_fifth is changed
+      - none_fifth.setype == '<<none>>'
+
+- name: Delete SELinux file context of foo/none
+  community.general.sefcontext:
+    path: '/tmp/foo/none(/.*)?'
+    setype: '<<none>>'
+    state: absent
+    reload: false
+  register: none_sixth
+
+- ansible.builtin.assert:
+    that:
+      - none_sixth is changed
+
+- name: Delete SELinux file context of foo/none (again)
+  community.general.sefcontext:
+    path: '/tmp/foo/none(/.*)?'
+    setype: '<<none>>'
+    state: absent
+    reload: false
+  register: none_seventh
+
+- ansible.builtin.assert:
+    that:
+      - none_seventh is not changed
