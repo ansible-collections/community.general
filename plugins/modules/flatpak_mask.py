@@ -25,8 +25,6 @@ attributes:
     support: full
   diff_mode:
     support: none
-    details:
-      - This module does not support diff mode.
 options:
   name:
     description:
