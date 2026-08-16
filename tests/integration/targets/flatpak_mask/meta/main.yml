@@ -5,3 +5,4 @@
 
 dependencies:
   - setup_flatpak_remote
+  - setup_flatpak

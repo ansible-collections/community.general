@@ -10,9 +10,6 @@
 
 - block:
 
-    - ansible.builtin.import_tasks: setup.yml
-      become: true
-
     - name: Mask app for check_mode tests with masked app
       community.general.flatpak_mask:
         name: com.dummy.App1
