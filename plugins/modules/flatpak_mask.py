@@ -77,8 +77,7 @@ class FlatpakMask(StateModuleHelper):
         self.vars.set("masked", self._check_is_masked(), change=True, diff=True)
 
     def _check_is_masked(self):
-        check_cmd = [self.flatpak_bin, "mask"]
-        check_cmd.insert(1, f"--{self.vars.method}")
+        check_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask"]
 
         rc, out, err = self.module.run_command(check_cmd)
         if rc != 0:
