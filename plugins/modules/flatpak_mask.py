@@ -55,6 +55,15 @@ EXAMPLES = r"""
   flatpak_mask:
     name: "org.gtk.Gtk3theme.Adwaita-dark"
     state: absent
+
+- name: Mask flatpak applications matching a pattern
+  flatpak_mask:
+    name: "org.gtk.*"
+
+- name: Mask a flatpak application for the current user only
+  flatpak_mask:
+    name: "org.gtk.Gtk3theme.Adwaita-dark"
+    method: user
 """
 
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
