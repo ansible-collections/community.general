@@ -47,6 +47,8 @@ options:
   setype:
     description:
       - SELinux type for the specified O(target).
+      - V(<<none>>) maps the O(target) to no context at all, marking paths that should not be relabeled.
+        Such a mapping stores no SELinux user or range, so O(seuser) and O(selevel) are reported as V(none) for it.
     type: str
   substitute:
     description:
@@ -170,6 +172,9 @@ if HAVE_SEOBJECT:
         s=seobject.SEMANAGE_FCONTEXT_SOCK,
     )
 
+# semanage spelling for "map this target to no context at all"
+SETYPE_NONE = "<<none>>"
+
 # Make backward compatible
 option_to_file_type_str = dict(
     a="all files",
@@ -187,16 +192,23 @@ def get_runtime_status(ignore_selinux_state=False):
     return True if ignore_selinux_state is True else selinux.is_selinux_enabled()
 
 
+def is_setype_none(setype):
+    """Whether setype is the special "no context at all" mapping, which semanage spells case-insensitively."""
+
+    return setype is not None and setype.lower() == SETYPE_NONE
+
+
 def semanage_fcontext_exists(sefcontext, target, ftype):
     """Get the SELinux file context mapping definition from policy. Return None if it does not exist."""
 
     # Beware that records comprise of a string representation of the file_type
     record = (target, option_to_file_type_str[ftype])
     records = sefcontext.get_all()
-    try:
-        return records[record]
-    except KeyError:
+    if record not in records:
         return None
+    # A "<<none>>" mapping carries no context, and seobject represents it as a None value.
+    # Return a synthetic record instead so callers can tell it apart from a missing one.
+    return records[record] or (None, None, SETYPE_NONE, None)
 
 
 def semanage_fcontext_substitute_exists(sefcontext, target):
@@ -216,7 +228,7 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, substitute, 
         sefcontext.set_reload(do_reload)
         if substitute is None:
             exists = semanage_fcontext_exists(sefcontext, target, ftype)
-            if exists:
+            if exists is not None:
                 # Modify existing entry
                 orig_seuser, orig_serole, orig_setype, orig_serange = exists
 
@@ -225,9 +237,21 @@ def semanage_fcontext_modify(module, result, target, ftype, setype, substitute, 
                 if serange is None:
                     serange = orig_serange
 
-                if setype != orig_setype or seuser != orig_seuser or serange != orig_serange:
+                # A "<<none>>" mapping stores no user or range, so only the type can differ
+                setype_differs = (
+                    not is_setype_none(setype) or not is_setype_none(orig_setype)
+                ) and setype != orig_setype
+
+                if setype_differs or seuser != orig_seuser or serange != orig_serange:
                     if not module.check_mode:
-                        sefcontext.modify(target, setype, ftype, serange, seuser)
+                        # serange/seuser are None if the existing mapping was "<<none>>"
+                        sefcontext.modify(
+                            target,
+                            setype,
+                            ftype,
+                            "s0" if serange is None else serange,
+                            "system_u" if seuser is None else seuser,
+                        )
                     changed = True
 
                     if module._diff:
@@ -298,7 +322,7 @@ def semanage_fcontext_delete(module, result, target, ftype, setype, substitute, 
         sefcontext.set_reload(do_reload)
         exists = semanage_fcontext_exists(sefcontext, target, ftype)
         substitute_exists = semanage_fcontext_substitute_exists(sefcontext, target)
-        if exists and substitute is None:
+        if exists is not None and substitute is None:
             # Remove existing entry
             orig_seuser, orig_serole, orig_setype, orig_serange = exists
 
