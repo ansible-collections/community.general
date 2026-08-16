@@ -1,0 +1,2 @@
+bugfixes:
+  - sefcontext - fix idempotence of ``<<none>>`` file contexts (https://github.com/ansible-collections/community.general/pull/12561)
