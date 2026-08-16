@@ -291,7 +291,7 @@ def local_appimage_path(source):
             return None
         return unquote(parsed.path)
     if parsed.scheme == "":
-        return os.path.expanduser(source)
+        return source
     return None
 
 
