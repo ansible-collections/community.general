@@ -40,8 +40,7 @@ options:
     default: present
   method:
     description:
-      - The installation method to use.
-      - Defines if the C(flatpak) is supposed to be installed globally for the whole V(system) or only for the current V(user).
+      - Defines whether the mask or unmask operation applies system-wide (V(system)) or only to the current user (V(user)).
     type: str
     choices: [system, user]
     default: system
