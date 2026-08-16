@@ -49,7 +49,7 @@ options:
     default: false
   retention:
     description:
-      - Snapshot retention settings. All sub-options accept an integer or the string C(inherit)
+      - Snapshot retention settings. All sub-options accept an integer or the string V(inherit)
         to remove an override and fall back to the parent policy.
     type: dict
     suboptions:
@@ -95,12 +95,12 @@ options:
     suboptions:
       interval:
         description:
-          - Time between automatic snapshots, for example C(1h), C(30m), or C(24h).
+          - Time between automatic snapshots, for example V(1h), V(30m), or V(24h).
         type: str
       times:
         description:
           - List of times of day at which to take snapshots, in C(HH:mm) format.
-          - Pass C(inherit) as the only list entry to remove this override.
+          - Pass V(inherit) as the only list entry to remove this override.
         type: list
         elements: str
       manual:
