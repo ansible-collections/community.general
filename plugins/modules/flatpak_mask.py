@@ -38,7 +38,7 @@ options:
     aliases: [app]
   state:
     description:
-      - Whether the application should be masked V(present) or unmasked V(absent).
+      - Whether the application should be masked (V(present)) or unmasked (V(absent)).
     type: str
     choices: [present, absent]
     default: present
