@@ -55,8 +55,12 @@ def handle_consul_response_error(response):
 
 
 def nonempty_env_fallback(*names: str) -> str:
-    # Like env_fallback, but a variable that is set to an empty string counts
-    # as unset, matching how the consul CLI reads its environment.
+    # Like env_fallback, but a variable that is set to an empty string counts as
+    # unset, matching how the consul CLI reads its environment. env_fallback
+    # hands the empty string on instead: an exported but empty
+    # CONSUL_HTTP_SSL_VERIFY then fails the boolean conversion with an error the
+    # playbook cannot avoid, and an empty CONSUL_HTTP_TOKEN sends an empty
+    # X-Consul-Token header rather than none at all.
     for name in names:
         value = os.environ.get(name)
         if value:
@@ -67,15 +71,21 @@ def nonempty_env_fallback(*names: str) -> str:
 CONNECTION_DEFAULTS: dict[str, t.Any] = {"host": "localhost", "port": 8500, "scheme": "http"}
 
 
-def addr_password(addr: str) -> str | None:
-    """Return the password embedded in an address, if it carries one."""
-    try:
-        return urlparse(addr if "://" in addr else "//" + addr).password
-    except ValueError:
+def url_password(url: str) -> str | None:
+    """Return the password embedded in an address, if it carries one.
+
+    Deliberately string based rather than another urlparse call: urlparse
+    raises for exactly the malformed addresses whose password still has to be
+    kept out of the module output.
+    """
+    netloc = url.split("://", 1)[-1].split("/", 1)[0]
+    userinfo, separator = netloc.rpartition("@")[:2]
+    if not separator or ":" not in userinfo:
         return None
+    return userinfo.split(":", 1)[1] or None
 
 
-def parse_addr(addr: str) -> dict[str, t.Any]:
+def parse_url(url: str) -> dict[str, t.Any]:
     """Split an address into the connection components it specifies.
 
     Accepts the ``host:port`` and ``scheme://host:port`` forms, where the
@@ -86,12 +96,14 @@ def parse_addr(addr: str) -> dict[str, t.Any]:
     try:
         # urlparse only reads a netloc after a scheme, so a bare host:port
         # needs the leading slashes.
-        parsed = urlparse(addr if "://" in addr else "//" + addr)
+        parsed = urlparse(url if "://" in url else "//" + url)
         scheme, hostname, port = parsed.scheme, parsed.hostname, parsed.port
     except ValueError as exc:
         # urlparse itself rejects a mangled netloc, an unbracketed IPv6
-        # address for instance, and .port rejects a non-numeric port.
-        raise ValueError("cannot be parsed") from exc
+        # address for instance, and .port rejects a non-numeric port. Their
+        # messages are not reused: the one for a netloc that fails NFKC
+        # normalization quotes the netloc, credentials included.
+        raise ValueError("cannot be parsed as host:port or scheme://host:port") from exc
     if scheme and scheme not in ("http", "https"):
         # unix:// sockets in particular: the modules speak HTTP over TCP only.
         raise ValueError(f"uses the unsupported scheme {scheme}, only http and https work")
@@ -122,33 +134,35 @@ def parse_addr(addr: str) -> dict[str, t.Any]:
 def resolve_connection_params(module: AnsibleModule) -> None:
     """Fill in host, port and scheme, in place.
 
-    An explicitly set option wins over the matching component of ``addr``,
-    which wins over the default. Options left unset are still ``None`` at this
-    point, since these three carry no default in the argument spec: ansible-core
+    An explicitly set option wins over the matching component of ``url``, which
+    wins over the default. Options left unset are still ``None`` at this point,
+    since these three carry no default in the argument spec: ansible-core
     applies spec defaults before a module runs, which would make an explicit
     value indistinguishable from a default.
     """
     params = module.params
+    # CONSUL_HTTP_ADDR is read here rather than through a fallback on the
+    # option, so that an address exported for the consul CLI is never copied
+    # into the module arguments, which ansible-core echoes back with the
+    # result before a module can mask anything.
+    url = (params["url"] or os.environ.get("CONSUL_HTTP_ADDR") or "").strip()
+    if params["url"]:
+        password = url_password(url)
+        if password:
+            module.no_log_values.add(password)
     if all(params[name] is not None for name in CONNECTION_DEFAULTS):
-        # Everything is set explicitly, so neither addr nor the environment can
-        # contribute anything. Do not even look at them: a task that spells out
-        # its connection must not be broken by an address exported for the
-        # consul CLI that these modules happen not to support.
+        # Everything is set explicitly, so neither the address nor the
+        # environment can contribute anything. Do not even look at them: a task
+        # that spells out its connection must not be broken by an address
+        # exported for the consul CLI that these modules cannot use.
         return
     components: dict[str, t.Any] = {}
-    addr = params["addr"]
-    if addr and addr.strip():
-        addr = addr.strip()
-        password = addr_password(addr)
-        if password:
-            # ansible-core echoes the module arguments back with the result, so
-            # an embedded password has to be registered to be masked there.
-            module.no_log_values.add(password)
+    if url:
         try:
-            components = parse_addr(addr)
+            components = parse_url(url)
         except ValueError as exc:
             module.fail_json(
-                msg=f"The Consul address given in the addr option or the CONSUL_HTTP_ADDR environment variable {exc}."
+                msg=f"The Consul address given in the url option or the CONSUL_HTTP_ADDR environment variable {exc}."
             )
     if params["scheme"] is None:
         tls = os.environ.get("CONSUL_HTTP_SSL")
@@ -169,7 +183,7 @@ def resolve_connection_params(module: AnsibleModule) -> None:
 
 
 AUTH_ARGUMENTS_SPEC = dict(
-    addr=dict(fallback=(nonempty_env_fallback, ["CONSUL_HTTP_ADDR"])),
+    url=dict(),
     host=dict(),
     port=dict(type="int"),
     scheme=dict(),
