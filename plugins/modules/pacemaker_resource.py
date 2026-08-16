@@ -289,7 +289,7 @@ class PacemakerResource(StateModuleHelper):
         which only matched the "resource is already cloned" wording and not the
         "cannot clone a group that has already been cloned" wording.
         """
-        name = self.module.params["name"]
+        name = self.vars.name
         if not name:
             return False
         return is_resource_cloned_any(self.runner, name)
