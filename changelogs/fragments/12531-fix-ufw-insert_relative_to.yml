@@ -1,2 +1,2 @@
 bugfixes:
-  - ufw - fix IPv6 rule determination and insert_relative_to (https://github.com/ansible-collections/community.general/pull/12531).
+  - ufw - fix IPv6 rule determination and ``insert_relative_to`` (https://github.com/ansible-collections/community.general/pull/12531).
