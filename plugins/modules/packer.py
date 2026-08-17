@@ -29,11 +29,11 @@ options:
   state:
     description:
       - Desired operation to perform.
-      - "build: builds the image from template (or validates in check_mode)."
-      - "init: initializes the template (installs required plugins)."
     type: str
     required: true
-    choices: [build, init]
+    choices:
+      build: builds the image from template (or validates in check_mode).
+      init: initializes the template (installs required plugins).
   template:
     description:
       - Path to the Packer template file or directory.
@@ -160,18 +160,18 @@ EXAMPLES = r"""
 
 RETURN = r"""
 cmd:
-  description: Full command line executed
+  description: Full command line executed.
   returned: always
   type: str
   sample: "packer build -force template.pkr.hcl"
 packer_version:
-  description: Packer version used
+  description: Packer version used.
   returned: always
   type: str
   sample: "1.9.4"
 artifacts:
-  description: List of created artifacts
-  returned: when state is build and build successful (not in check_mode)
+  description: List of created artifacts.
+  returned: when O(state=build) and build successful (not in check_mode)
   type: list
   elements: dict
   sample:
@@ -179,13 +179,13 @@ artifacts:
       name: ami-12345678
       build_index: 0
 artifacts_count:
-  description: Number of artifacts created
-  returned: when state is build and build successful
+  description: Number of artifacts created.
+  returned: when O(state=build) and build successful
   type: int
   sample: 1
-started:
-  description: Timestamp when the build started (UTC)
-  returned: when state is build
+build_start_timestamp:
+  description: Timestamp when the build started (UTC).
+  returned: when O(state=build)
   type: str
   sample: "2024-01-15T10:30:00Z"
 """
@@ -403,7 +403,7 @@ class PackerModule:
             }
 
             if command == "build":
-                result_dict["started"] = start_time
+                result_dict["build_start_timestamp"] = start_time
                 result_dict["artifacts"] = artifacts
                 result_dict["artifacts_count"] = artifacts_count
 
