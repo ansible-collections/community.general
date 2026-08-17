@@ -438,6 +438,7 @@ class TestGithubRepo(unittest.TestCase):
         )
         self.assertEqual(result["changed"], True)
         self.assertEqual(result["repo"]["visibility"], "internal")
+        self.assertEqual(result["repo"]["private"], True)
 
     @with_httmock(get_orgs_mock)
     @with_httmock(get_internal_repo_mock)
@@ -483,6 +484,7 @@ class TestGithubRepo(unittest.TestCase):
 
         self.assertEqual(result["changed"], True)
         self.assertEqual(result["repo"]["visibility"], "internal")
+        self.assertEqual(result["repo"]["private"], True)
 
     @with_httmock(get_orgs_mock)
     @with_httmock(get_repo_notfound_mock)

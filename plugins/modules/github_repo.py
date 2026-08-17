@@ -213,6 +213,7 @@ def create_repo(gh, name, organization=None, private=None, visibility=None, desc
         update = {}
         if "visibility" in changes:
             update["visibility"] = repo._visibility.value if not check_mode else visibility
+            update["private"] = repo._private.value if not check_mode else (visibility in ("private", "internal"))
         elif "private" in changes:
             update["private"] = repo._private.value if not check_mode else private
         if "description" in changes:
