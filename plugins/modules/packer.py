@@ -39,7 +39,7 @@ options:
       - Path to the Packer template file or directory.
       - Required for all states.
     type: path
-    required: false
+    required: true
   variables:
     description:
       - Dictionary of variables to pass to Packer (C(-var)).
@@ -107,6 +107,12 @@ EXAMPLES = r"""
     state: init
     template: aws-ubuntu.pkr.hcl
 
+- name: Initialize Packer template from directory
+  community.general.packer:
+    name: init-template-dir
+    state: init
+    template: ./packer-templates/
+
 - name: Build AWS AMI with Packer (or validate in check_mode)
   community.general.packer:
     name: my-ami
@@ -115,6 +121,13 @@ EXAMPLES = r"""
     variables:
       aws_region: us-west-2
       instance_type: t2.micro
+    force: false
+
+- name: Build from directory containing multiple templates
+  community.general.packer:
+    name: multi-template-build
+    state: build
+    template: ./packer-templates/
     force: false
 
 - name: Validate template using check_mode
@@ -209,17 +222,17 @@ class PackerModule:
         }
 
         self.state = self.params["state"]
-        self.template = self.params.get("template")
-        self.variables = self.params.get("variables") or {}
-        self.var_files = self.params.get("var_files") or []
-        self.only = self.params.get("only")
-        self.except_builders = self.params.get("except_builders")
-        self.force = self.params.get("force")
-        self.parallel = self.params.get("parallel")
-        self.color = self.params.get("color")
-        self.machine_readable = self.params.get("machine_readable")
-        self.cleanup = self.params.get("cleanup")
-        self.log_level = self.params.get("log_level", "info")
+        self.template = self.params["template"]
+        self.variables = self.params["variables"]
+        self.var_files = self.params["var_files"]
+        self.only = self.params["only"]
+        self.except_builders = self.params["except_builders"]
+        self.force = self.params["force"]
+        self.parallel = self.params["parallel"]
+        self.color = self.params["color"]
+        self.machine_readable = self.params["machine_readable"]
+        self.cleanup = self.params["cleanup"]
+        self.log_level = self.params["log_level"]
 
     def _check_packer_version(self) -> str:
         """Get Packer version using module.run_command."""
@@ -241,15 +254,11 @@ class PackerModule:
     def _validate_parameters(self) -> None:
         """Validate module parameters."""
         if self.template and not os.path.exists(self.template):
-            self.module.fail_json(
-                msg=f"Template file/directory does not exist: {self.template}"
-            )
+            self.module.fail_json(msg=f"Template file/directory does not exist: {self.template}")
 
         for var_file in self.var_files:
             if not os.path.exists(var_file):
-                self.module.fail_json(
-                    msg=f"Variable file does not exist: {var_file}"
-                )
+                self.module.fail_json(msg=f"Variable file does not exist: {var_file}")
 
     def _build_command(self, command: str) -> list[str]:
         """Build the Packer command line."""
@@ -323,7 +332,7 @@ class PackerModule:
         if self.machine_readable:
             return self._parse_machine_readable_output(output)
 
-        pattern = re.compile(r"^-->\s+(.+?):\s+(.+)$")
+        pattern = re.compile(r"^-->\s+(\S+):\s+(.+)$")
         lines = output.splitlines()
         for line in lines:
             match = pattern.match(line.strip())
@@ -337,7 +346,7 @@ class PackerModule:
                     }
                 )
             elif "ami-" in line and ("created" in line or "AMIs" in line):
-                ami_match = re.search(r"(ami-[a-zA-Z0-9]+)", line)
+                ami_match = re.search(r"(ami-\S+)", line)
                 if ami_match:
                     artifacts.append(
                         {

@@ -289,9 +289,7 @@ class TestPackerModule(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             packer_module.apply()
         self.assertIn("fail_json called", str(context.exception))
-        self.mock_module.fail_json.assert_called_with(
-            msg="Variable file does not exist: /nonexistent/file.pkrvars.hcl"
-        )
+        self.mock_module.fail_json.assert_called_with(msg="Variable file does not exist: /nonexistent/file.pkrvars.hcl")
 
     @patch("os.getcwd")
     def test_packer_not_installed(self, mock_getcwd):
