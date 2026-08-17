@@ -234,7 +234,7 @@ class Snap(StateModuleHelper):
     __disable_re = re.compile(r"(?:\S+\s+){5}(?P<notes>\S+)")
     __set_param_re = re.compile(r"(?P<snap_prefix>\S+:)?(?P<key>\S+)\s*=\s*(?P<value>.+)")
     __list_re = re.compile(r"^(?P<name>\S+)\s+\S+\s+(?P<rev>\S+)\s+(?P<channel>\S+)\s+\S+\s+(?P<notes>\S+)")
-    __no_snap_re = re.compile(r"^(?:warning|error): no snap found for \"(?P<name>[^\"]+)\"")
+    __no_snap_re = re.compile(r'''^(?:warning|error): no snap found for "(?P<name>[^"]+)"''')
     module = dict(
         argument_spec={
             "name": dict(type="list", elements="str", required=True),

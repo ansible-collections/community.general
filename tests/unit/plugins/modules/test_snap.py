@@ -583,7 +583,6 @@ TEST_SPEC = dict(
             ),
         ),
         dict(
-            # https://github.com/ansible-collections/community.general/issues/12375
             id="issue_12375_single_snap_not_found",
             input={"name": ["this-snap-does-not-exist"]},
             output=dict(failed=True, msg="Snaps not found: ['this-snap-does-not-exist']."),
@@ -608,7 +607,6 @@ TEST_SPEC = dict(
             ),
         ),
         dict(
-            # https://github.com/ansible-collections/community.general/issues/12375
             id="issue_12375_multiple_snaps_not_found",
             input={"name": ["this-snap-does-not-exist", "nor-does-this-one"]},
             output=dict(failed=True, msg="Snaps not found: ['this-snap-does-not-exist', 'nor-does-this-one']."),
