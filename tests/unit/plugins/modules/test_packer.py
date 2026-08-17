@@ -73,7 +73,6 @@ class TestPackerModule(unittest.TestCase):
             "parallel": True,
             "color": True,
             "machine_readable": False,
-            "chdir": None,
             "cleanup": False,
             "log_level": "info",
         }
@@ -277,7 +276,7 @@ class TestPackerModule(unittest.TestCase):
             packer_module.apply()
         self.assertIn("fail_json called", str(context.exception))
         self.mock_module.fail_json.assert_called_with(
-            msg="Template file/directory does not exist: /nonexistent/template.pkr.hcl (relative to chdir: .)"
+            msg="Template file/directory does not exist: /nonexistent/template.pkr.hcl"
         )
 
     def test_var_file_not_exists(self):
@@ -291,31 +290,8 @@ class TestPackerModule(unittest.TestCase):
             packer_module.apply()
         self.assertIn("fail_json called", str(context.exception))
         self.mock_module.fail_json.assert_called_with(
-            msg="Variable file does not exist: /nonexistent/file.pkrvars.hcl (relative to chdir: .)"
+            msg="Variable file does not exist: /nonexistent/file.pkrvars.hcl"
         )
-
-    def test_chdir_with_relative_paths(self):
-        from ansible_collections.community.general.plugins.modules import packer
-
-        subdir = os.path.join(self.test_dir, "subdir")
-        os.makedirs(subdir)
-        template_in_subdir = os.path.join(subdir, "test.pkr.hcl")
-        shutil.copy(self.template_path, template_in_subdir)
-        var_file = os.path.join(subdir, "vars.pkrvars.hcl")
-        with open(var_file, "w") as f:
-            f.write('aws_region = "us-west-2"\n')
-
-        self._setup_module_params(state="build", chdir=subdir, template="test.pkr.hcl", var_files=["vars.pkrvars.hcl"])
-        self.mock_module.run_command.return_value = (0, "Build finished", "")
-
-        packer_bin = self.mock_module.get_bin_path.return_value
-        packer_module = packer.PackerModule(self.mock_module, packer_bin)
-        result = packer_module.apply()
-
-        self.assertTrue(result["changed"])
-        cmd = result["cmd"]
-        self.assertIn("test.pkr.hcl", cmd)
-        self.assertIn("vars.pkrvars.hcl", cmd)
 
     @patch("os.getcwd")
     def test_packer_not_installed(self, mock_getcwd):
@@ -336,7 +312,6 @@ class TestPackerModule(unittest.TestCase):
             "parallel": True,
             "color": True,
             "machine_readable": False,
-            "chdir": None,
             "cleanup": False,
             "log_level": "info",
         }

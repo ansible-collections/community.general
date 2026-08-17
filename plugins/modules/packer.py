@@ -87,11 +87,6 @@ options:
       - Recommended for parsing artifacts reliably.
     type: bool
     default: false
-  chdir:
-    description:
-      - Change to this directory before running Packer.
-    type: path
-    required: false
   cleanup:
     description:
       - Clean up temporary files after build (C(-cleanup)).
@@ -223,7 +218,6 @@ class PackerModule:
         self.parallel = self.params.get("parallel")
         self.color = self.params.get("color")
         self.machine_readable = self.params.get("machine_readable")
-        self.chdir = self.params.get("chdir")
         self.cleanup = self.params.get("cleanup")
         self.log_level = self.params.get("log_level", "info")
 
@@ -246,26 +240,15 @@ class PackerModule:
 
     def _validate_parameters(self) -> None:
         """Validate module parameters."""
-        if self.chdir and not os.path.exists(self.chdir):
-            self.module.fail_json(msg=f"Working directory does not exist: {self.chdir}")
-
-        def path_exists(path):
-            if self.chdir:
-                full_path = os.path.join(self.chdir, path)
-                return os.path.exists(full_path)
-            return os.path.exists(path)
-
-        if self.template and not path_exists(self.template):
+        if self.template and not os.path.exists(self.template):
             self.module.fail_json(
-                msg=f"Template file/directory does not exist: {self.template} "
-                f"(relative to chdir: {self.chdir if self.chdir else '.'})"
+                msg=f"Template file/directory does not exist: {self.template}"
             )
 
         for var_file in self.var_files:
-            if not path_exists(var_file):
+            if not os.path.exists(var_file):
                 self.module.fail_json(
-                    msg=f"Variable file does not exist: {var_file} "
-                    f"(relative to chdir: {self.chdir if self.chdir else '.'})"
+                    msg=f"Variable file does not exist: {var_file}"
                 )
 
     def _build_command(self, command: str) -> list[str]:
@@ -370,14 +353,11 @@ class PackerModule:
         cmd = self._build_command(command)
         self.result["cmd"] = " ".join(cmd)
 
-        cwd = self.chdir or os.getcwd()
-
         try:
             start_time = datetime.now(timezone.utc).isoformat() + "Z"
 
             rc, stdout, stderr = self.module.run_command(
                 cmd,
-                cwd=cwd,
                 check_rc=False,
             )
 
@@ -464,7 +444,6 @@ def main() -> None:
             parallel=dict(type="bool", required=False, default=True),
             color=dict(type="bool", required=False, default=True),
             machine_readable=dict(type="bool", required=False, default=False),
-            chdir=dict(type="path", required=False),
             cleanup=dict(type="bool", required=False, default=False),
             log_level=dict(
                 type="str",
