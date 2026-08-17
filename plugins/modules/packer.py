@@ -439,7 +439,7 @@ def main() -> None:
                 required=True,
                 choices=["build", "init"],
             ),
-            template=dict(type="path", required=False),
+            template=dict(type="path", required=True),
             variables=dict(type="dict", required=False, default={}),
             var_files=dict(type="list", elements="path", required=False, default=[]),
             only=dict(type="list", elements="str", required=False),
