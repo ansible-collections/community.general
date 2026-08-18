@@ -1,0 +1,2 @@
+bugfixes:
+  - "snap - fix ``IndexError`` when a single snap does not exist (https://github.com/ansible-collections/community.general/issues/12375, https://github.com/ansible-collections/community.general/pull/12570)."
