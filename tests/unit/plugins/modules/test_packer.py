@@ -248,7 +248,6 @@ class TestPackerModule(unittest.TestCase):
 
         self.assertFalse(result["changed"])
         self.assertEqual(result["rc"], 0)
-        self.assertIn("Check mode", result["msg"])
         self.assertIn("validate", result["cmd"])
         self.assertNotIn("build", result["cmd"])
 
