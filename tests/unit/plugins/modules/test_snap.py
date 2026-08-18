@@ -582,6 +582,57 @@ TEST_SPEC = dict(
                 ],
             ),
         ),
+        dict(
+            id="issue_12375_single_snap_not_found",
+            input={"name": ["this-snap-does-not-exist"]},
+            output=dict(failed=True, msg="Snaps not found: ['this-snap-does-not-exist']."),
+            flags={},
+            mocks=dict(
+                run_command=[
+                    dict(
+                        command=["/testbin/snap", "version"],
+                        environ=default_env,
+                        rc=0,
+                        out=default_version_out,
+                        err="",
+                    ),
+                    dict(
+                        command=["/testbin/snap", "info", "this-snap-does-not-exist"],
+                        environ=default_env,
+                        rc=1,
+                        out="",
+                        err='error: no snap found for "this-snap-does-not-exist"\n',
+                    ),
+                ],
+            ),
+        ),
+        dict(
+            id="issue_12375_multiple_snaps_not_found",
+            input={"name": ["this-snap-does-not-exist", "nor-does-this-one"]},
+            output=dict(failed=True, msg="Snaps not found: ['this-snap-does-not-exist', 'nor-does-this-one']."),
+            flags={},
+            mocks=dict(
+                run_command=[
+                    dict(
+                        command=["/testbin/snap", "version"],
+                        environ=default_env,
+                        rc=0,
+                        out=default_version_out,
+                        err="",
+                    ),
+                    dict(
+                        command=["/testbin/snap", "info", "this-snap-does-not-exist", "nor-does-this-one"],
+                        environ=default_env,
+                        rc=0,
+                        out=(
+                            'warning: no snap found for "this-snap-does-not-exist"\n'
+                            'warning: no snap found for "nor-does-this-one"\n'
+                        ),
+                        err="",
+                    ),
+                ],
+            ),
+        ),
     ]
 )
 
