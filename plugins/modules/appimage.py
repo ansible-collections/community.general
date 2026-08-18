@@ -170,16 +170,18 @@ def normalized_catalog_name(name):
     return "".join(c for c in name.lower() if c.isalnum())
 
 
-def is_github_releases_url(url):
-    parsed = urlparse(url)
+def is_github_releases_url(url, parsed=None):
+    if parsed is None:
+        parsed = urlparse(url)
     path_parts = [part for part in parsed.path.split("/") if part]
     return parsed.netloc.lower() == "github.com" and len(path_parts) >= 3 and path_parts[2] == "releases"
 
 
-def parse_github_releases_url(url):
-    parsed = urlparse(url)
+def parse_github_releases_url(url, parsed=None):
+    if parsed is None:
+        parsed = urlparse(url)
     path_parts = [part for part in parsed.path.split("/") if part]
-    if not is_github_releases_url(url):
+    if not is_github_releases_url(url, parsed):
         raise ValueError("URL is not a GitHub releases page")
     owner = path_parts[0]
     repo = path_parts[1]
@@ -195,8 +197,8 @@ def github_api_url(owner, repo, tag):
     return f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
 
 
-def github_api_url_from_releases_url(url, state, version):
-    owner, repo, tag_from_url = parse_github_releases_url(url)
+def github_api_url_from_releases_url(url, state, version, parsed=None):
+    owner, repo, tag_from_url = parse_github_releases_url(url, parsed)
     tag = None if state == "latest" else version or tag_from_url
     return github_api_url(owner, repo, tag)
 
@@ -284,8 +286,9 @@ def select_catalog_download_url(module, item):
     module.fail_json(msg=f"AppImage catalog entry {item.get('name')!r} does not contain a supported download link")
 
 
-def local_appimage_path(source):
-    parsed = urlparse(source)
+def local_appimage_path(source, parsed=None):
+    if parsed is None:
+        parsed = urlparse(source)
     if parsed.scheme == "file":
         if parsed.netloc not in ("", "localhost"):
             return None
@@ -295,8 +298,8 @@ def local_appimage_path(source):
     return None
 
 
-def resolve_local_source(module, source, catalog_name=None):
-    path = local_appimage_path(source)
+def resolve_local_source(module, source, parsed=None, catalog_name=None):
+    path = local_appimage_path(source, parsed)
     if path is None:
         return None
     if module.params["state"] == "latest":
@@ -322,11 +325,12 @@ def resolve_local_source(module, source, catalog_name=None):
 
 
 def resolve_url_source(module, url, catalog_name=None):
-    local_source = resolve_local_source(module, url, catalog_name=catalog_name)
+    parsed = urlparse(url)
+    local_source = resolve_local_source(module, url, parsed=parsed, catalog_name=catalog_name)
     if local_source is not None:
         return local_source
 
-    if is_github_releases_url(url):
+    if is_github_releases_url(url, parsed):
         if module.params["state"] == "latest" and module.params["version"]:
             module.fail_json(msg="state=latest cannot be combined with version")
         headers = {}
@@ -334,7 +338,7 @@ def resolve_url_source(module, url, catalog_name=None):
             headers["Authorization"] = f"Bearer {module.params['github_token']}"
         release = fetch_json(
             module,
-            github_api_url_from_releases_url(url, module.params["state"], module.params["version"]),
+            github_api_url_from_releases_url(url, module.params["state"], module.params["version"], parsed),
             headers,
         )
         asset = select_release_asset(module, release, module.params["asset_name"])
@@ -347,7 +351,7 @@ def resolve_url_source(module, url, catalog_name=None):
             source["catalog_name"] = catalog_name
         return source
 
-    if not urlparse(url).path.lower().endswith(".appimage"):
+    if not parsed.path.lower().endswith(".appimage"):
         module.fail_json(
             msg=(
                 f"Resolved URL {url!r} is not a direct AppImage URL or GitHub releases page. "
@@ -359,7 +363,7 @@ def resolve_url_source(module, url, catalog_name=None):
 
     source = {
         "source_url": url,
-        "asset_name": os.path.basename(urlparse(url).path),
+        "asset_name": os.path.basename(parsed.path),
         "version": None,
     }
     if catalog_name:
@@ -417,10 +421,10 @@ def needs_install(path, state, source):
     )
 
 
-def atomic_install(module, write_source, dest):
+def atomic_install(module, source_file, dest):
     fd, tmp_path = tempfile.mkstemp(prefix=".ansible-appimage-", dir=module.tmpdir)
     with os.fdopen(fd, "wb") as tmp_file:
-        write_source(tmp_file)
+        shutil.copyfileobj(source_file, tmp_file)
     module.atomic_move(tmp_path, dest, unsafe_writes=module.params["unsafe_writes"])
 
 
@@ -435,15 +439,12 @@ def download_appimage(module, source_url, dest):
     if status != 200:
         module.fail_json(msg=f"Failed to download AppImage from {source_url}", status=status, details=info.get("msg"))
 
-    atomic_install(module, lambda tmp_file: shutil.copyfileobj(response, tmp_file), dest)
+    atomic_install(module, response, dest)
 
 
 def copy_appimage(module, source_path, dest):
-    def write_source(tmp_file):
-        with open(source_path, "rb") as source_file:
-            shutil.copyfileobj(source_file, tmp_file)
-
-    atomic_install(module, write_source, dest)
+    with open(source_path, "rb") as source_file:
+        atomic_install(module, source_file, dest)
 
 
 def install_appimage(module, source, dest):

@@ -4,6 +4,9 @@
 
 from __future__ import annotations
 
+import io
+import os
+
 import pytest
 
 from ansible_collections.community.general.plugins.modules import appimage
@@ -221,6 +224,64 @@ def test_response_text_decodes_body():
             return b'{"ok": true}'
 
     assert appimage.response_text(Response()) == '{"ok": true}'
+
+
+def test_atomic_install_copies_source_file(tmp_path):
+    class InstallModule(FakeModule):
+        def __init__(self):
+            super().__init__({"unsafe_writes": False})
+            self.tmpdir = str(tmp_path)
+            self.atomic_move_args = None
+
+        def atomic_move(self, tmp_path, dest, unsafe_writes=False):
+            self.atomic_move_args = (tmp_path, dest, unsafe_writes)
+            os.replace(tmp_path, dest)
+
+    module = InstallModule()
+    dest = tmp_path / "tool"
+
+    appimage.atomic_install(module, io.BytesIO(b"appimage"), str(dest))
+
+    assert dest.read_bytes() == b"appimage"
+    assert module.atomic_move_args[1:] == (str(dest), False)
+
+
+def test_copy_appimage_installs_local_file(tmp_path):
+    class InstallModule(FakeModule):
+        def __init__(self):
+            super().__init__({"unsafe_writes": False})
+            self.tmpdir = str(tmp_path)
+
+        def atomic_move(self, tmp_path, dest, unsafe_writes=False):
+            os.replace(tmp_path, dest)
+
+    source = tmp_path / "source.AppImage"
+    dest = tmp_path / "tool"
+    source.write_bytes(b"local appimage")
+
+    appimage.copy_appimage(InstallModule(), str(source), str(dest))
+
+    assert dest.read_bytes() == b"local appimage"
+
+
+def test_download_appimage_installs_response_body(monkeypatch, tmp_path):
+    class InstallModule(FakeModule):
+        def __init__(self):
+            super().__init__({"timeout": 30, "unsafe_writes": False})
+            self.tmpdir = str(tmp_path)
+
+        def atomic_move(self, tmp_path, dest, unsafe_writes=False):
+            os.replace(tmp_path, dest)
+
+    def fake_fetch_url(module, source_url, method=None, timeout=None):
+        return io.BytesIO(b"downloaded appimage"), {"status": 200}
+
+    monkeypatch.setattr(appimage, "fetch_url", fake_fetch_url)
+    dest = tmp_path / "tool"
+
+    appimage.download_appimage(InstallModule(), "https://example.com/tool.AppImage", str(dest))
+
+    assert dest.read_bytes() == b"downloaded appimage"
 
 
 def test_apply_file_attributes_defaults_to_executable_mode(tmp_path):
