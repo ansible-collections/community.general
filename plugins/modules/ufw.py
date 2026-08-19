@@ -532,19 +532,31 @@ def main():
                 else:
                     (dummy, numbered_state, dummy) = module.run_command([ufw_bin, "status", "numbered"])
                     numbered_line_re = re.compile(R"^\[ *([0-9]+)\] ")
-                    lines = [(numbered_line_re.match(line), "(v6)" in line) for line in numbered_state.splitlines()]
+                    lines = [
+                        (numbered_line_re.match(line), bool("(v6)" in line or ipv6_regexp.search(line)))
+                        for line in numbered_state.splitlines()
+                    ]
                     lines = [(int(matcher.group(1)), ipv6) for (matcher, ipv6) in lines if matcher]
                     last_number = max([no for (no, ipv6) in lines]) if lines else 0
                     has_ipv4 = any(not ipv6 for (no, ipv6) in lines)
                     has_ipv6 = any(ipv6 for (no, ipv6) in lines)
+
+                    last_ipv4 = max([no for (no, ipv6) in lines if not ipv6]) if has_ipv4 else None
+                    first_ipv6 = min([no for (no, ipv6) in lines if ipv6]) if has_ipv6 else None
+                    last_ipv6 = max([no for (no, ipv6) in lines if ipv6]) if has_ipv6 else None
+
+                    if last_ipv4 and first_ipv6 and last_ipv4 > first_ipv6:
+                        module.warn("ufw output could not be parsed correctly. ipv4 follows ipv6!")
+
                     if relative_to_cmd == "first-ipv4":
                         relative_to = 1
                     elif relative_to_cmd == "last-ipv4":
-                        relative_to = max([no for (no, ipv6) in lines if not ipv6]) if has_ipv4 else 1
+                        relative_to = last_ipv4 or 1
                     elif relative_to_cmd == "first-ipv6":
-                        relative_to = max([no for (no, ipv6) in lines if not ipv6]) + 1 if has_ipv4 else 1
+                        relative_to = first_ipv6 or (last_ipv4 + 1 if last_ipv4 else 1)
                     elif relative_to_cmd == "last-ipv6":
-                        relative_to = last_number if has_ipv6 else last_number + 1
+                        relative_to = last_ipv6 or (last_number + 1)
+
                     insert_to = params["insert"] + relative_to
                     if insert_to > last_number:
                         # ufw does not like it when the insert number is larger than the
