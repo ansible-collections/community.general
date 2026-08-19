@@ -118,7 +118,7 @@ def create_new_org_repo_mock(url, request):
     org = match.group("org")
     repo = json.loads(request.body)
 
-    visibility = repo.get("visibility", "private" if repo.get("private", False) else "public")
+    visibility = repo.get("visibility", "private" if repo.get("private") else "public")
 
     headers = {"content-type": "application/json"}
     # https://docs.github.com/en/rest/reference/repos#create-an-organization-repository
@@ -137,19 +137,15 @@ def create_new_org_repo_mock(url, request):
 def create_new_user_repo_mock(url, request):
     repo = json.loads(request.body)
 
-    visibility = repo.get("visibility")
-    if visibility is not None:
-        private = visibility in ("private", "internal")
-    else:
-        private = repo.get("private", False)
+    visibility = repo.get("visibility", "private" if repo.get("private") else "public")
 
     headers = {"content-type": "application/json"}
     # https://docs.github.com/en/rest/reference/repos#create-a-repository-for-the-authenticated-user
     content = {
         "name": repo["name"],
         "full_name": f"octocat/{repo['name']}",
-        "private": private,
-        "visibility": visibility if visibility is not None else ("private" if private else "public"),
+        "private": visibility in ("private", "internal"),
+        "visibility": visibility,
         "description": repo.get("description"),
     }
     content = json.dumps(content).encode("utf-8")

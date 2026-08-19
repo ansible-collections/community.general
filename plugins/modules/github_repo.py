@@ -65,7 +65,7 @@ options:
       - Mutually exclusive with O(private).
     type: str
     choices: [public, private, internal]
-    version_added: "13.5.0"
+    version_added: "13.4.0"
   state:
     description:
       - Whether the repository should exist or not.

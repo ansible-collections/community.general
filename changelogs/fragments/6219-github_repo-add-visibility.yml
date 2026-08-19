@@ -1,2 +1,2 @@
 minor_changes:
-  - github_repo - added ``visibility`` option to set repository visibility to ``public``, ``private``, or ``internal`` (https://github.com/ansible-collections/community.general/issues/6219).
+  - github_repo - added ``visibility`` option to set repository visibility to ``public``, ``private``, or ``internal`` (https://github.com/ansible-collections/community.general/issues/6219, https://github.com/ansible-collections/community.general/pull/12557).
