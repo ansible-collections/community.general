@@ -11,13 +11,6 @@
     state: latest
     force: true
 
-- name: Install apt_key dependencies
-  ansible.builtin.pip:
-    name:
-      - pyOpenSSL
-      - ndg-httpsclient
-      - pyasn1
-
 - name: Make sure python3-debian is installed
   ansible.builtin.apt:
     name: python3-debian
