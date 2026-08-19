@@ -25,16 +25,15 @@
 
 - name: Add InfluxDB repository
   ansible.builtin.deb822_repository:
-    update_cache: true
     name: influxdb
     types: deb
-    signed_by: https://repos.influxdata.com/influxdb.key
+    signed_by: https://repos.influxdata.com/influxdata-archive.key
     uris:
-      - https://repos.influxdata.com/ubuntu
+      - https://repos.influxdata.com/debian
     suites:
-      - trusty
-    components:
       - stable
+    components:
+      - main
     state: present
   register: apt_repo
 
