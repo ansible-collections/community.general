@@ -303,7 +303,9 @@ def resolve_local_source(module, source, parsed=None, catalog_name=None):
     if path is None:
         return None
     if module.params["state"] == "latest":
-        module.fail_json(msg="state=latest is only supported for sources that provide release versions, such as GitHub releases pages")
+        module.fail_json(
+            msg="state=latest is only supported for sources that provide release versions, such as GitHub releases pages"
+        )
     if not path.lower().endswith(".appimage"):
         module.fail_json(
             msg=(
@@ -359,7 +361,9 @@ def resolve_url_source(module, url, catalog_name=None):
             )
         )
     if module.params["state"] == "latest":
-        module.fail_json(msg="state=latest is only supported for sources that provide release versions, such as GitHub releases pages")
+        module.fail_json(
+            msg="state=latest is only supported for sources that provide release versions, such as GitHub releases pages"
+        )
 
     source = {
         "source_url": url,
