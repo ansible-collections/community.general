@@ -107,6 +107,7 @@ Changelog Fragments:
     Description must start with lower-case - do not capitalize it.
   - The URLs - the URL of the current PR and, if the PR fixes one or more issues, the URLs of those issues as well.
     Preferably the issues before the PR. The URLs must be separated with `, `.
+    Do not create an issue for the PR after creating the PR.
 - SHOULD NOT mix `bugfixes` with other changes: fixes are backported and no new features should come along
 - SHOULD NOT mix `deprecated_features` with other changes
 
