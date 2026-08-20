@@ -79,4 +79,7 @@ options:
       - HTTP(S) proxy to use for Requests to connect to InfluxDB server.
     type: dict
     default: {}
+notes:
+  - Please note that this module relies on the C(influxdb) Python package, which is no longer active.
+    Moreover, it is only compatible with InfluxDB 1.x, meaning this module will not work with InfluxDB 2.x or 3.x.
 """
