@@ -68,6 +68,7 @@ Instead:
   )
   ```
   Depending on the option, only call `module.deprecate()` if the changing default has an effect on the task.
+  Depending on the option, only call `module.deprecate()` if the changing default has an effect on the task.
 
 ### Removal target versions
 
