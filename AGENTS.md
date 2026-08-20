@@ -203,6 +203,8 @@ approval before committing or pushing it.
   (omit the path to test everything)
 - Run integration tests with: `ansible-test integration --docker default --python 3.14 <target name>`
   (omit target to test everything, but that is discouraged as it takes a long while)
+  - Some integration tests require a proper OS container (`ubuntu`, `fedora`, `alpine`) instead of the default container (`default`).
+    For OS containers, do not specify `--python <version>`.
   - Some integration tests must run on a full VM, not in a container (e.g. `snap`)
 - PRs are only merged into `main` if they pass the tests
 - Do not re-run a test suite that already passed in the current session unless new code changes have been made since the last run.
