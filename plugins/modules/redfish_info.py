@@ -38,45 +38,44 @@ options:
   command:
     description:
       - List of commands to execute on OOB controller.
-      - Commands must match the category above. The applicable categories are listed after each command.
     type: list
     elements: str
     choices:
-      GetSystemInventory: Can be used with O(category=Systems)
-      GetPsuInventory: Can be used with O(category=Systems) and O(category=Chassis)
-      GetCpuInventory: Can be used with O(category=Systems)
-      GetMemoryInventory: Can be used with O(category=Systems)
-      GetNicInventory: Can be used with O(category=Systems)
-      GetHealthReport: Can be used with O(category=Systems), O(category=Chassis) and O(category=Manager)
-      GetStorageControllerInventory: Can be used with O(category=Systems)
-      GetDiskInventory: Can be used with O(category=Systems)
-      GetVolumeInventory: Can be used with O(category=Systems)
-      GetBiosAttributes: Can be used with O(category=Systems)
-      GetBootOrder: Can be used with O(category=Systems)
-      GetBootOverride: Can be used with O(category=Systems)
-      GetVirtualMedia: Can be used with O(category=Systems) and O(category=Manager)
-      GetBiosRegistries: Can be used with O(category=Systems)
-      GetPowerRestorePolicy: Can be used with O(category=Systems)
-      GetFanInventory: Can be used with O(category=Chassis)
-      GetChassisPower: Can be used with O(category=Chassis)
-      GetChassisThermals: Can be used with O(category=Chassis)
-      GetChassisInventory: Can be used with O(category=Chassis)
-      GetHPEThermalConfig: Can be used with O(category=Chassis)
-      GetHPEFanPercentMin: Can be used with O(category=Chassis)
-      ListUsers: Can be used with O(category=Accounts)
-      GetAccountServiceConfig: Can be used with O(category=Accounts)
-      GetSessions: Can be used with O(category=Sessions)
-      GetFirmwareInventory: Can be used with O(category=Update)
-      GetFirmwareUpdateCapabilities: Can be used with O(category=Update)
-      GetSoftwareInventory: Can be used with O(category=Update)
-      GetUpdateStatus: Can be used with O(category=Update)
-      GetManagerNicInventory: Can be used with O(category=Manager)
-      GetLogs: Can be used with O(category=Manager)
-      GetNetworkProtocols: Can be used with O(category=Manager)
-      GetHostInterfaces: Can be used with O(category=Manager)
-      GetManagerInventory: Can be used with O(category=Manager)
-      GetServiceIdentification: Can be used with O(category=Manager)
-      CheckAvailability: Can be used with O(category=Service)
+      GetSystemInventory: Must be used with O(category=Systems).
+      GetPsuInventory: Must be used with O(category=Systems) and O(category=Chassis).
+      GetCpuInventory: Must be used with O(category=Systems).
+      GetMemoryInventory: Must be used with O(category=Systems).
+      GetNicInventory: Must be used with O(category=Systems).
+      GetHealthReport: Must be used with O(category=Systems), O(category=Chassis) and O(category=Manager).
+      GetStorageControllerInventory: Must be used with O(category=Systems).
+      GetDiskInventory: Must be used with O(category=Systems).
+      GetVolumeInventory: Must be used with O(category=Systems).
+      GetBiosAttributes: Must be used with O(category=Systems).
+      GetBootOrder: Must be used with O(category=Systems).
+      GetBootOverride: Must be used with O(category=Systems).
+      GetVirtualMedia: Must be used with O(category=Systems) and O(category=Manager).
+      GetBiosRegistries: Must be used with O(category=Systems).
+      GetPowerRestorePolicy: Must be used with O(category=Systems).
+      GetFanInventory: Must be used with O(category=Chassis).
+      GetChassisPower: Must be used with O(category=Chassis).
+      GetChassisThermals: Must be used with O(category=Chassis).
+      GetChassisInventory: Must be used with O(category=Chassis).
+      GetHPEThermalConfig: Must be used with O(category=Chassis).
+      GetHPEFanPercentMin: Must be used with O(category=Chassis).
+      ListUsers: Must be used with O(category=Accounts).
+      GetAccountServiceConfig: Must be used with O(category=Accounts).
+      GetSessions: Must be used with O(category=Sessions).
+      GetFirmwareInventory: Must be used with O(category=Update).
+      GetFirmwareUpdateCapabilities: Must be used with O(category=Update).
+      GetSoftwareInventory: Must be used with O(category=Update).
+      GetUpdateStatus: Must be used with O(category=Update).
+      GetManagerNicInventory: Must be used with O(category=Manager).
+      GetLogs: Must be used with O(category=Manager).
+      GetNetworkProtocols: Must be used with O(category=Manager).
+      GetHostInterfaces: Must be used with O(category=Manager).
+      GetManagerInventory: Must be used with O(category=Manager).
+      GetServiceIdentification: Must be used with O(category=Manager).
+      CheckAvailability: Must be used with O(category=Service).
   baseuri:
     required: true
     description:
