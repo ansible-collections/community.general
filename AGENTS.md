@@ -120,7 +120,9 @@ approval before committing or pushing it.
 
 ## BOTMETA Rules
 
-- Every time a new file is added within the specified paths, an entry must be created in the `.github/BOTMETA.yml` file.
+- Add an entry to the `.github/BOTMETA.yml` file every time a new file is added within the  paths:
+  - docs/docsite/rst/**
+  - plugins/**
 - The entry should be placed within the existing section where it belongs,
   and within that section, files should be listed on alphabetical order.
 - User handles are never removed, unless explicitly requested.
