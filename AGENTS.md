@@ -4,7 +4,7 @@
 
 - This collection follows Semantic Versioning.
 - Being an Ansible collection, its version number is specificied in the `galaxy.yml`.
-- The version set there, for the `main` branch is the next version to be released.
+- The version set there, for the `main` branch is the next version to be released that accepts new features.
 - For this collection, you will want to read the description
   of the issue: https://github.com/ansible-collections/community.general/issues/11482
 - The guidelines for contributors are found in the `CONTRIBUTING.md`.
@@ -14,9 +14,9 @@
 - Deprecations usually plan for the removal of the deprecated code in two major versions (X+2).0.0 from
   the current version. Depending on the situation, this target may be pushed for the (X+3).0.0 version.
 - If a deprecation is needed, ingest https://github.com/russoz-ansible/ansible-contrib-unofficial/blob/main/deprecations.md for more information on how to implement the deprecations.
-- Always refer to modules and plugins by their FQCN
+- Always refer to modules and plugins by their FQCN.
 - When setting `version_added` on a new parameter or plugin, always read `galaxy.yml` and use
-  that version string directly — it holds the next version to be released on `main`
+  that version string directly — it holds the next version for a feature release.
 
 ## Licensing and Copyright
 
@@ -42,6 +42,7 @@ can be used to perform that check, but only when a marker is added, changed or r
   ```
   There might be multiple Copyright lines, for different authors.
 - Whenever you create a new copyright marker, check the current date and use the current year.
+- Do not update dates in existing copyright markers.
 
 ## Deprecation Rules
 
@@ -146,7 +147,7 @@ approval before committing or pushing it.
 
 - MUST use one of the templates in `.github/ISSUE_TEMPLATE`
   - Component name: one per line, use the relative path in the repo, one per line
-  - Community.general version: if bug exists in `main` branch, report the version from galaxy.yml
+  - Community.general version: if bug exists in `main` branch, simply state so.
   - Do generate the Code of Conduct checkbox - I am responsible for what you do, my child
 - When the issue is about code:
 
@@ -169,7 +170,7 @@ approval before committing or pushing it.
 
   | Case | Format | Example |
   | --- | --- | --- |
-  | Non-plugin (CI, docs, infra) | `docs:`, `ci:`, `testing:`, `build:`, `meta:` prefix | `docs: update contribution guidelines` |
+  | Non-plugin (CI, docs, infra) | `docs:`, `CI:`, `testing:`, `build:`, `meta:` prefix | `docs: update contribution guidelines` |
 
 
 ## Github Pull Request Rules
@@ -195,11 +196,11 @@ approval before committing or pushing it.
 
 ### Running Tests
 
-- Run sanity tests with: `ansible-test sanity --docker default --python 3.13 <files>`
+- Run sanity tests with: `ansible-test sanity --docker default --python 3.14 <files>`
   (omit files to test everything)
-- Run unit tests with: `ansible-test units --docker default --python 3.13 tests/unit/plugins/<plugin_type>/<test_file.py>`
+- Run unit tests with: `ansible-test units --docker default --python 3.14 tests/unit/plugins/<plugin_type>/<test_file.py>`
   (omit the path to test everything)
-- Run integration tests with: `ansible-test integration --docker default --python 3.13 <target name>`
+- Run integration tests with: `ansible-test integration --docker default --python 3.14 <target name>`
   (omit target to test everything, but that is discouraged as it takes a long while)
   - Some integration tests must run on a full VM, not in a container (e.g. `snap`)
 - PRs are only merged into `main` if they pass the tests
@@ -210,6 +211,7 @@ approval before committing or pushing it.
 - Prefer `pytest` idioms to write tests
   - Prefer plain functions instead of Test classes
   - Use pytest fixtures when applicable
+  - Avoid unittest class-based tests
 - Use `mocker` to mock patch symbols
 - Use the common tools from `community.internal_test_tools` when applicable, instead of reinventing the wheel.
   - E.g. `ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils.set_module_args`
@@ -221,7 +223,8 @@ approval before committing or pushing it.
   - Mock all interaction with external services, APIs, commands
   - NEVER mock the entire module - it defeats the purpose of the testing. Instead, run the module
     and capture the `SystemExit` exception from it.
-  - Assert the "happy-path" for the module execution
+  - Assert the "happy-path" for the module execution.
+    There might be multiple ones (changes, no changes, partial changes).
   - Assert some exception paths (when things go wrong) are handled as gracefully as possible
   - NOT assert Ansible features, e.g. if two parameters are marked in the argument spec as
     mutually exclusive, there is no need to write a test to verify that they cannot be used together.
