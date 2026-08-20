@@ -223,7 +223,6 @@ approval before committing or pushing it.
 - When testing modules that call CLI commands, prefer `uthelper`. Other tests can be mixed with the `UTHelper` call.
 - Try and avoid adding new entries to the `tests/unit/requirements.txt` file, as it is installed every time,
   for every unit testing, no matter how small or unrelated to the requirements it might be.
-- Do not use typing/type hints in the test code, unless requested.
 - Tests should:
   - Mock all interaction with external services, APIs, commands
   - NEVER mock the entire module - it defeats the purpose of the testing. Instead, run the module
