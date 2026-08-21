@@ -26,7 +26,7 @@ can be used to perform that check, but only when a marker is added, changed or r
 
 ### Licensing and Copyright Rules
 
-- All new content added to this collection must fall under the GPL-3 license. 
+- All new content added to this collection must fall under the GPL-3 license.
 - Every file should have a license and copyright markers.
 - These markers should be placed as comments by the beginning of the file.
   If the file has a "shebang", then it should start in line 2, otherwise, in line 1.
