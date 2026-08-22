@@ -157,17 +157,17 @@ from ansible_collections.community.general.plugins.module_utils._pritunl_api imp
 def add_or_update_pritunl_user(module):
     result = {}
 
-    org_name = module.params.get("organization")
-    user_name = module.params.get("user_name")
+    org_name = module.params["organization"]
+    user_name = module.params["user_name"]
 
     user_params = {
         "name": user_name,
-        "email": module.params.get("user_email"),
-        "groups": module.params.get("user_groups"),
-        "disabled": module.params.get("user_disabled"),
-        "gravatar": module.params.get("user_gravatar"),
-        "mac_addresses": module.params.get("user_mac_addresses"),
-        "type": module.params.get("user_type"),
+        "email": module.params["user_email"],
+        "groups": module.params["user_groups"],
+        "disabled": module.params["user_disabled"],
+        "gravatar": module.params["user_gravatar"],
+        "mac_addresses": module.params["user_mac_addresses"],
+        "type": module.params["user_type"],
     }
 
     org_obj_list = list_pritunl_organizations(
@@ -251,8 +251,8 @@ def add_or_update_pritunl_user(module):
 def remove_pritunl_user(module):
     result = {}
 
-    org_name = module.params.get("organization")
-    user_name = module.params.get("user_name")
+    org_name = module.params["organization"]
+    user_name = module.params["user_name"]
 
     org_obj_list = []
 
@@ -322,7 +322,7 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec)
 
-    state = module.params.get("state")
+    state = module.params["state"]
 
     try:
         if state == "present":

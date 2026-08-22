@@ -217,14 +217,14 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
         self._check_hpe_oneview_sdk()
         self._create_oneview_client()
 
-        self.state = self.module.params.get("state")
-        self.data = self.module.params.get("data")
+        self.state = self.module.params["state"]
+        self.data = self.module.params["data"]
 
         # Preload params for get_all - used by facts
-        self.facts_params = self.module.params.get("params") or {}
+        self.facts_params = self.module.params["params"] or {}
 
         # Preload options as dict - used by facts
-        self.options = transform_list_to_dict(self.module.params.get("options"))
+        self.options = transform_list_to_dict(self.module.params["options"])
 
         self.validate_etag_support = validate_etag_support
 
@@ -245,7 +245,7 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
             self.module.fail_json(msg=missing_required_lib("hpOneView"), exception=HPE_ONEVIEW_IMP_ERR)
 
     def _create_oneview_client(self):
-        if self.module.params.get("hostname"):
+        if self.module.params["hostname"]:
             config = dict(
                 ip=self.module.params["hostname"],
                 credentials=dict(userName=self.module.params["username"], password=self.module.params["password"]),
@@ -281,7 +281,7 @@ class OneViewModuleBase(metaclass=abc.ABCMeta):
         """
         try:
             if self.validate_etag_support:
-                if not self.module.params.get("validate_etag"):
+                if not self.module.params["validate_etag"]:
                     self.oneview_client.connection.disable_etag_validation()
 
             result = self.execute_module()

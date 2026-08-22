@@ -1,0 +1,6 @@
+minor_changes:
+  - "pritunl_org - replace ``module.params.get()`` with subscript access (https://github.com/ansible-collections/community.general/pull/12104)."
+  - "pritunl_org_info - replace ``module.params.get()`` with subscript access (https://github.com/ansible-collections/community.general/pull/12104)."
+  - "pritunl_user - replace ``module.params.get()`` with subscript access (https://github.com/ansible-collections/community.general/pull/12104)."
+  - "pritunl_user_info - replace ``module.params.get()`` with subscript access (https://github.com/ansible-collections/community.general/pull/12104)."
+  - "vexata_volume - replace ``module.params.get()`` with subscript access (https://github.com/ansible-collections/community.general/pull/12104)."
