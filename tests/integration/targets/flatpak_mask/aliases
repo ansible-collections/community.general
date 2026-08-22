@@ -7,3 +7,4 @@ skip/freebsd
 skip/macos
 skip/rhel
 needs/root
+destructive
