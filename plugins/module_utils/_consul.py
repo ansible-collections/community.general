@@ -55,12 +55,8 @@ def handle_consul_response_error(response):
 
 
 def nonempty_env_fallback(*names: str) -> str:
-    # Like env_fallback, but a variable that is set to an empty string counts as
-    # unset, matching how the consul CLI reads its environment. env_fallback
-    # hands the empty string on instead: an exported but empty
-    # CONSUL_HTTP_SSL_VERIFY then fails the boolean conversion with an error the
-    # playbook cannot avoid, and an empty CONSUL_HTTP_TOKEN sends an empty
-    # X-Consul-Token header rather than none at all.
+    # Unlike env_fallback, a variable set to an empty string counts as unset,
+    # the way the consul CLI reads its environment.
     for name in names:
         value = os.environ.get(name)
         if value:
@@ -74,9 +70,8 @@ CONNECTION_DEFAULTS: dict[str, t.Any] = {"host": "localhost", "port": 8500, "sch
 def url_password(url: str) -> str | None:
     """Return the password embedded in an address, if it carries one.
 
-    Deliberately string based rather than another urlparse call: urlparse
-    raises for exactly the malformed addresses whose password still has to be
-    kept out of the module output.
+    String based on purpose: urlparse raises for some of the malformed
+    addresses whose password still has to be kept out of the output.
     """
     netloc = url.split("://", 1)[-1].split("/", 1)[0]
     userinfo, separator = netloc.rpartition("@")[:2]
@@ -88,28 +83,18 @@ def url_password(url: str) -> str | None:
 def parse_url(url: str) -> dict[str, t.Any]:
     """Split an address into the connection components it specifies.
 
-    Accepts the ``host:port`` and ``scheme://host:port`` forms, where the
-    scheme and the port are optional. Raises :class:`ValueError` with a reason
-    for addresses these modules cannot use. The reason never repeats the
-    address itself, which may embed credentials.
+    Accepts ``host:port`` and ``scheme://host:port``, where the scheme and the
+    port are optional. Raises :class:`ValueError` with a reason that never
+    repeats the address, which may embed credentials.
     """
     try:
-        # urlparse only reads a netloc after a scheme, so a bare host:port
-        # needs the leading slashes.
         parsed = urlparse(url if "://" in url else "//" + url)
         scheme, hostname, port = parsed.scheme, parsed.hostname, parsed.port
     except ValueError as exc:
-        # urlparse itself rejects a mangled netloc, an unbracketed IPv6
-        # address for instance, and .port rejects a non-numeric port. Their
-        # messages are not reused: the one for a netloc that fails NFKC
-        # normalization quotes the netloc, credentials included.
         raise ValueError("cannot be parsed as host:port or scheme://host:port") from exc
     if scheme and scheme not in ("http", "https"):
-        # unix:// sockets in particular: the modules speak HTTP over TCP only.
         raise ValueError(f"uses the unsupported scheme {scheme}, only http and https work")
     if parsed.path not in ("", "/") or parsed.params:
-        # urlparse splits a trailing ;suffix of the path off into params, so
-        # both have to be checked to reject an address that carries a path.
         raise ValueError("must not contain a path")
     if parsed.query or parsed.fragment:
         raise ValueError("must not contain a query or a fragment")
@@ -118,11 +103,9 @@ def parse_url(url: str) -> dict[str, t.Any]:
     if not hostname:
         raise ValueError("does not contain a host")
     if any(char.isspace() or not char.isprintable() for char in hostname):
-        # urlparse keeps these in the host, where they would only surface much
-        # later as an unrelated error from the HTTP layer.
         raise ValueError("contains a host with whitespace or control characters")
     components: dict[str, t.Any] = {}
-    # Re-bracket IPv6 addresses so the composed URL stays valid.
+    # Keep IPv6 addresses bracketed so the composed URL stays valid.
     components["host"] = f"[{hostname}]" if ":" in hostname else hostname
     if port is not None:
         components["port"] = port
@@ -135,26 +118,20 @@ def resolve_connection_params(module: AnsibleModule) -> None:
     """Fill in host, port and scheme, in place.
 
     An explicitly set option wins over the matching component of ``url``, which
-    wins over the default. Options left unset are still ``None`` at this point,
-    since these three carry no default in the argument spec: ansible-core
-    applies spec defaults before a module runs, which would make an explicit
-    value indistinguishable from a default.
+    wins over the default. The three carry no default in the argument spec, so
+    that an unset one is still ``None`` here and can be told apart from one the
+    playbook set to the same value as the default.
     """
     params = module.params
-    # CONSUL_HTTP_ADDR is read here rather than through a fallback on the
-    # option, so that an address exported for the consul CLI is never copied
-    # into the module arguments, which ansible-core echoes back with the
-    # result before a module can mask anything.
+    # Read from the environment here rather than through a fallback on the
+    # option, which would copy the value into the module arguments.
     url = (params["url"] or os.environ.get("CONSUL_HTTP_ADDR") or "").strip()
     if params["url"]:
         password = url_password(url)
         if password:
             module.no_log_values.add(password)
     if all(params[name] is not None for name in CONNECTION_DEFAULTS):
-        # Everything is set explicitly, so neither the address nor the
-        # environment can contribute anything. Do not even look at them: a task
-        # that spells out its connection must not be broken by an address
-        # exported for the consul CLI that these modules cannot use.
+        # Nothing left for the address or the environment to contribute.
         return
     components: dict[str, t.Any] = {}
     if url:
@@ -171,10 +148,7 @@ def resolve_connection_params(module: AnsibleModule) -> None:
                 use_tls = boolean(tls, strict=True)
             except (TypeError, ValueError):
                 module.fail_json(msg="The CONSUL_HTTP_SSL environment variable is not a valid boolean.")
-            # A true CONSUL_HTTP_SSL selects https even when the address says
-            # http. A false one does not downgrade an https address, matching
-            # the consul CLI, which never reverts to http once TLS was asked
-            # for.
+            # A false value never downgrades an https address, as in the CLI.
             if use_tls:
                 components["scheme"] = "https"
     for name, default in CONNECTION_DEFAULTS.items():
