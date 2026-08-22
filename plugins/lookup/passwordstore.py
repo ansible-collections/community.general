@@ -53,6 +53,13 @@ options:
     description: Return all the content of the password, not only the first line.
     type: bool
     default: false
+  keep_trailing_newline:
+    description:
+      - Keep the trailing newline in the password file content when O(returnall=true).
+      - Only used when O(returnall=true), ignored otherwise.
+    type: bool
+    default: false
+    version_added: 13.4.0
   subkey:
     description:
       - By default return a specific subkey of the password. When set to V(password), always returns the first line.
@@ -233,6 +240,10 @@ tasks.yml: |-
   - name: Return the entire password file content
     ansible.builtin.set_fact:
       passfilecontent: "{{ lookup('community.general.passwordstore', 'example/test', returnall=true)}}"
+
+  - name: Return the entire password file content, keeping its trailing newline
+    ansible.builtin.set_fact:
+      passfilecontent: "{{ lookup('community.general.passwordstore', 'example/test', returnall=true, keep_trailing_newline=true)}}"
 """
 
 RETURN = r"""
@@ -319,7 +330,7 @@ class LookupModule(LookupBase):
                 raise AnsibleError(e) from e
             # check and convert values
             try:
-                for key in ["create", "returnall", "overwrite", "backup", "nosymbols"]:
+                for key in ["create", "returnall", "keep_trailing_newline", "overwrite", "backup", "nosymbols"]:
                     if not isinstance(self.paramvals[key], bool):
                         self.paramvals[key] = boolean(self.paramvals[key])
             except (ValueError, AssertionError) as e:
@@ -358,9 +369,11 @@ class LookupModule(LookupBase):
 
     def check_pass(self):
         try:
-            self.passoutput = to_text(
+            raw_output = to_text(
                 run_backend_cmd([self.pass_cmd, "show"] + [self.passname], env=self.env), errors="surrogate_or_strict"
-            ).splitlines()
+            )
+            self.passoutput_had_trailing_newline = raw_output.endswith("\n")
+            self.passoutput = raw_output.splitlines()
             self.password = self.passoutput[0]
             self.passdict = {}
             try:
@@ -473,7 +486,10 @@ class LookupModule(LookupBase):
 
     def get_passresult(self):
         if self.paramvals["returnall"]:
-            return os.linesep.join(self.passoutput)
+            result = os.linesep.join(self.passoutput)
+            if self.paramvals["keep_trailing_newline"] and self.passoutput_had_trailing_newline:
+                result += os.linesep
+            return result
         if self.paramvals["subkey"] == "password":
             return self.password
         else:
@@ -531,6 +547,7 @@ class LookupModule(LookupBase):
             "directory": directory,
             "create": self.get_option("create"),
             "returnall": self.get_option("returnall"),
+            "keep_trailing_newline": self.get_option("keep_trailing_newline"),
             "overwrite": self.get_option("overwrite"),
             "nosymbols": self.get_option("nosymbols"),
             "userpass": self.get_option("userpass") or "",
