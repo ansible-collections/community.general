@@ -498,6 +498,8 @@ files:
     ignore: kbrebanov
     labels: apk
     maintainers: tdtrask
+  $modules/appimage.py:
+    maintainers: travisbeale
   $modules/apt_repo.py:
     maintainers: obirvalger
   $modules/apt_rpm.py:
