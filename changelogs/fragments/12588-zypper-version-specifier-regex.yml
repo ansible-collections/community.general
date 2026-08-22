@@ -1,0 +1,3 @@
+bugfixes:
+  - zypper - fix version specifier parsing when the version contains non-numeric characters, which caused packages to
+    not be removed or installed (https://github.com/ansible-collections/community.general/pull/12588, https://github.com/ansible-collections/community.general/issues/6564).
