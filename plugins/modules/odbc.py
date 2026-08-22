@@ -44,6 +44,15 @@ options:
     type: bool
     default: true
     version_added: 1.3.0
+  autocommit:
+    description:
+      - Enable autocommit on the connection.
+      - Some databases and drivers execute an implicit transaction as soon as a statement runs unless autocommit
+        is enabled, which some statements (for example, C(ALTER SERVER AUDIT) on SQL Server) do not allow.
+      - This is independent of O(commit), which only controls whether an explicit commit is issued after the query.
+    type: bool
+    default: false
+    version_added: 13.4.0
 requirements:
   - "pyodbc"
 
@@ -60,6 +69,14 @@ EXAMPLES = r"""
     query: "Select * from table_a where column1 = ?"
     params:
       - "value1"
+    commit: false
+  changed_when: false
+
+- name: Run a statement that cannot execute inside a transaction
+  community.general.odbc:
+    dsn: "DRIVER={ODBC Driver 17 for SQL Server};Server=db.ansible.com;Database=master;UID=admin;PWD=password;"
+    query: "ALTER SERVER AUDIT my_audit WITH (STATE=ON)"
+    autocommit: true
     commit: false
   changed_when: false
 """
@@ -100,6 +117,7 @@ def main():
             query=dict(type="str", required=True),
             params=dict(type="list", elements="str"),
             commit=dict(type="bool", default=True),
+            autocommit=dict(type="bool", default=False),
         ),
     )
 
@@ -107,6 +125,7 @@ def main():
     query = module.params.get("query")
     params = module.params.get("params")
     commit = module.params.get("commit")
+    autocommit = module.params.get("autocommit")
 
     if not HAS_PYODBC:
         module.fail_json(msg=missing_required_lib("pyodbc"))
@@ -114,7 +133,7 @@ def main():
     # Try to make a connection with the DSN
     connection = None
     try:
-        connection = pyodbc.connect(dsn)
+        connection = pyodbc.connect(dsn, autocommit=autocommit)
     except Exception as e:
         module.fail_json(msg=f"Failed to connect to DSN: {e}")
 
