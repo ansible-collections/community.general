@@ -18,7 +18,6 @@
   ansible.builtin.assert:
     that:
       - mask_result is changed
-    msg: "state=present shall mask flatpak app when not masked"
 
 - name: Test idempotency of masking - {{ method }}
   community.general.flatpak_mask:
@@ -31,7 +30,6 @@
   ansible.builtin.assert:
     that:
       - double_mask_result is not changed
-    msg: "state=present shall not do anything when flatpak app is already masked"
 
 
 # state=absent (unmask) - app is masked
@@ -47,7 +45,6 @@
   ansible.builtin.assert:
     that:
       - unmask_result is changed
-    msg: "state=absent shall unmask flatpak app when masked"
 
 - name: Test idempotency of unmasking - {{ method }}
   community.general.flatpak_mask:
@@ -60,7 +57,6 @@
   ansible.builtin.assert:
     that:
       - double_unmask_result is not changed
-    msg: "state=absent shall not do anything when flatpak app is not masked"
 
 
 # state=present (mask) - app already masked after unmask
@@ -76,7 +72,6 @@
   ansible.builtin.assert:
     that:
       - remask_result is changed
-    msg: "state=present shall mask flatpak app after it was unmasked"
 
 - name: Test idempotency of re-masking - {{ method }}
   community.general.flatpak_mask:
@@ -89,4 +84,3 @@
   ansible.builtin.assert:
     that:
       - double_remask_result is not changed
-    msg: "state=present shall not do anything when flatpak app is already masked"
