@@ -119,6 +119,29 @@ def test_resolve_url_source_rejects_unsupported_catalog_url():
         appimage.resolve_url_source(module, "https://example.com/download")
 
 
+def test_local_appimage_path_rejects_non_local_sources():
+    with pytest.raises(appimage.NoLocalImagePath):
+        appimage.local_appimage_path("https://example.com/tool.AppImage")
+
+
+def test_resolve_url_source_continues_after_non_local_source(monkeypatch):
+    fetched_urls = []
+
+    def fake_fetch_json(module, url, headers):
+        fetched_urls.append(url)
+        return {
+            "tag_name": "v1.2.3",
+            "assets": [{"name": "tool.AppImage", "browser_download_url": "https://example.com/tool.AppImage"}],
+        }
+
+    monkeypatch.setattr(appimage, "fetch_json", fake_fetch_json)
+
+    source = appimage.resolve_url_source(FakeModule(), "https://github.com/example/project/releases")
+
+    assert fetched_urls == ["https://api.github.com/repos/example/project/releases/latest"]
+    assert source["source_url"] == "https://example.com/tool.AppImage"
+
+
 def test_resolve_url_source_accepts_local_path(tmp_path):
     path = tmp_path / "tool.AppImage"
     path.write_bytes(b"appimage")

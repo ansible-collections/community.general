@@ -33,7 +33,7 @@ options:
     required: true
   url:
     description:
-      - Source used to install the AppImage.
+      - Source used to obtain the AppImage.
       - This can point directly to an AppImage URL, a local AppImage file path, a V(file://) AppImage URL,
         or to a GitHub releases page such as V(https://github.com/OWNER/REPO/releases)
         or V(https://github.com/OWNER/REPO/releases/tag/TAG).
@@ -58,6 +58,7 @@ options:
   version:
     description:
       - GitHub release tag to install when O(url) points to a GitHub releases page.
+      - This can only be used with sources that provide release versions, such as GitHub releases pages.
       - By default, GitHub release pages use the latest release.
     type: str
   asset_name:
@@ -164,6 +165,10 @@ from urllib.parse import unquote, urlparse
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
+
+
+class NoLocalImagePath(Exception):
+    pass
 
 
 def normalized_catalog_name(name):
@@ -289,22 +294,20 @@ def select_catalog_download_url(module, item):
 def local_appimage_path(source, parsed=None):
     if parsed is None:
         parsed = urlparse(source)
+    if parsed.scheme == "file" and parsed.netloc not in ("", "localhost"):
+        raise NoLocalImagePath
     if parsed.scheme == "file":
-        if parsed.netloc not in ("", "localhost"):
-            return None
         return unquote(parsed.path)
     if parsed.scheme == "":
         return source
-    return None
+    raise NoLocalImagePath
 
 
 def resolve_local_source(module, source, parsed=None, catalog_name=None):
     path = local_appimage_path(source, parsed)
-    if path is None:
-        return None
     if module.params["state"] == "latest":
         module.fail_json(
-            msg="state=latest is only supported for sources that provide release versions, such as GitHub releases pages"
+            msg="`state=latest` is only supported for sources that provide release versions, such as GitHub releases pages"
         )
     if not path.lower().endswith(".appimage"):
         module.fail_json(
@@ -328,9 +331,10 @@ def resolve_local_source(module, source, parsed=None, catalog_name=None):
 
 def resolve_url_source(module, url, catalog_name=None):
     parsed = urlparse(url)
-    local_source = resolve_local_source(module, url, parsed=parsed, catalog_name=catalog_name)
-    if local_source is not None:
-        return local_source
+    try:
+        return resolve_local_source(module, url, parsed=parsed, catalog_name=catalog_name)
+    except NoLocalImagePath:
+        pass
 
     if is_github_releases_url(url, parsed):
         if module.params["state"] == "latest" and module.params["version"]:
@@ -362,7 +366,7 @@ def resolve_url_source(module, url, catalog_name=None):
         )
     if module.params["state"] == "latest":
         module.fail_json(
-            msg="state=latest is only supported for sources that provide release versions, such as GitHub releases pages"
+            msg="`state=latest` is only supported for sources that provide release versions, such as GitHub releases pages"
         )
 
     source = {
