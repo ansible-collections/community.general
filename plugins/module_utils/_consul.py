@@ -10,12 +10,15 @@ from __future__ import annotations
 import base64
 import copy
 import json
+import os
 import re
 import typing as t
 from http import HTTPStatus
 from urllib import error as urllib_error
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode, urlparse
 
+from ansible.module_utils.basic import AnsibleFallbackNotFound
+from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.module_utils.urls import open_url
 
 if t.TYPE_CHECKING:
@@ -51,13 +54,116 @@ def handle_consul_response_error(response):
         raise RequestError(f"{response.status_code} {response.content}")
 
 
+def nonempty_env_fallback(*names: str) -> str:
+    # Unlike env_fallback, a variable set to an empty string counts as unset,
+    # the way the consul CLI reads its environment.
+    for name in names:
+        value = os.environ.get(name)
+        if value:
+            return value
+    raise AnsibleFallbackNotFound
+
+
+CONNECTION_DEFAULTS: dict[str, t.Any] = {"host": "localhost", "port": 8500, "scheme": "http"}
+
+
+def url_password(url: str) -> str | None:
+    """Return the password embedded in an address, if it carries one.
+
+    String based on purpose: urlparse raises for some of the malformed
+    addresses whose password still has to be kept out of the output.
+    """
+    netloc = url.split("://", 1)[-1].split("/", 1)[0]
+    userinfo, separator = netloc.rpartition("@")[:2]
+    if not separator or ":" not in userinfo:
+        return None
+    return userinfo.split(":", 1)[1] or None
+
+
+def parse_url(url: str) -> dict[str, t.Any]:
+    """Split an address into the connection components it specifies.
+
+    Accepts ``host:port`` and ``scheme://host:port``, where the scheme and the
+    port are optional. Raises :class:`ValueError` with a reason that never
+    repeats the address, which may embed credentials.
+    """
+    try:
+        parsed = urlparse(url if "://" in url else "//" + url)
+        scheme, hostname, port = parsed.scheme, parsed.hostname, parsed.port
+    except ValueError as exc:
+        raise ValueError("cannot be parsed as host:port or scheme://host:port") from exc
+    if scheme and scheme not in ("http", "https"):
+        raise ValueError(f"uses the unsupported scheme {scheme}, only http and https work")
+    if parsed.path not in ("", "/") or parsed.params:
+        raise ValueError("must not contain a path")
+    if parsed.query or parsed.fragment:
+        raise ValueError("must not contain a query or a fragment")
+    if parsed.username is not None or parsed.password is not None:
+        raise ValueError("must not contain credentials")
+    if not hostname:
+        raise ValueError("does not contain a host")
+    if any(char.isspace() or not char.isprintable() for char in hostname):
+        raise ValueError("contains a host with whitespace or control characters")
+    components: dict[str, t.Any] = {}
+    # Keep IPv6 addresses bracketed so the composed URL stays valid.
+    components["host"] = f"[{hostname}]" if ":" in hostname else hostname
+    if port is not None:
+        components["port"] = port
+    if scheme:
+        components["scheme"] = scheme
+    return components
+
+
+def resolve_connection_params(module: AnsibleModule) -> None:
+    """Fill in host, port and scheme, in place.
+
+    An explicitly set option wins over the matching component of ``url``, which
+    wins over the default. The three carry no default in the argument spec, so
+    that an unset one is still ``None`` here and can be told apart from one the
+    playbook set to the same value as the default.
+    """
+    params = module.params
+    # Read from the environment here rather than through a fallback on the
+    # option, which would copy the value into the module arguments.
+    url = (params["url"] or os.environ.get("CONSUL_HTTP_ADDR") or "").strip()
+    if params["url"]:
+        password = url_password(url)
+        if password:
+            module.no_log_values.add(password)
+    if all(params[name] is not None for name in CONNECTION_DEFAULTS):
+        # Nothing left for the address or the environment to contribute.
+        return
+    components: dict[str, t.Any] = {}
+    if url:
+        try:
+            components = parse_url(url)
+        except ValueError as exc:
+            module.fail_json(
+                msg=f"The Consul address given in the url option or the CONSUL_HTTP_ADDR environment variable {exc}."
+            )
+    if params["scheme"] is None:
+        tls = os.environ.get("CONSUL_HTTP_SSL")
+        if tls:
+            try:
+                use_tls = boolean(tls, strict=True)
+            except (TypeError, ValueError):
+                module.fail_json(msg="The CONSUL_HTTP_SSL environment variable is not a valid boolean.")
+            # A false value never downgrades an https address, as in the CLI.
+            if use_tls:
+                components["scheme"] = "https"
+    for name, default in CONNECTION_DEFAULTS.items():
+        if params[name] is None:
+            params[name] = components.get(name, default)
+
+
 AUTH_ARGUMENTS_SPEC = dict(
-    host=dict(default="localhost"),
-    port=dict(type="int", default=8500),
-    scheme=dict(default="http"),
-    validate_certs=dict(type="bool", default=True),
-    token=dict(no_log=True),
-    ca_path=dict(),
+    url=dict(),
+    host=dict(),
+    port=dict(type="int"),
+    scheme=dict(),
+    validate_certs=dict(type="bool", default=True, fallback=(nonempty_env_fallback, ["CONSUL_HTTP_SSL_VERIFY"])),
+    token=dict(no_log=True, fallback=(nonempty_env_fallback, ["CONSUL_HTTP_TOKEN"])),
+    ca_path=dict(fallback=(nonempty_env_fallback, ["CONSUL_CACERT"])),
 )
 
 
@@ -130,6 +236,7 @@ class _ConsulModule:
 
     def __init__(self, module: AnsibleModule) -> None:
         self._module = module
+        resolve_connection_params(module)
         self.params = _normalize_params(module.params, module.argument_spec)
         self.api_params = {
             k: camel_case_key(k) for k in self.params if k not in STATE_PARAMETER and k not in AUTH_ARGUMENTS_SPEC
