@@ -15,7 +15,7 @@ description:
   - It encapsulates the behavior of C(flatpak mask).
 author:
   - Ilya Bogdanov (@zeerayne)
-version_added: 13.3.0
+version_added: 13.4.0
 requirements:
   - flatpak
 extends_documentation_fragment:
