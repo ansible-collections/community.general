@@ -30,16 +30,4 @@
       vars:
         method: system
 
-  always:
-
-    - name: Cleanup masked apps
-      community.general.flatpak_mask:
-        name: "{{ item }}"
-        state: absent
-      loop:
-        - com.dummy.App1
-        - com.dummy.App2
-      ignore_errors: true
-      become: true
-
   when: ansible_facts.distribution in ['Fedora', 'Ubuntu']
