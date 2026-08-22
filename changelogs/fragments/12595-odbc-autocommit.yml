@@ -1,0 +1,2 @@
+minor_changes:
+  - odbc - add ``autocommit`` option to support statements that must run outside of a transaction (https://github.com/ansible-collections/community.general/issues/4173, https://github.com/ansible-collections/community.general/issues/8577, https://github.com/ansible-collections/community.general/pull/12595).
