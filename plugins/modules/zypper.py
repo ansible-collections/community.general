@@ -277,9 +277,10 @@ def split_name_version(name):
     example formats:
         - docker>=1.10
         - apache=2.4
+        - crash-kmp-default<7.2.1_k4.12.14_122.127
 
     Allowed version specifiers: <, >, <=, >=, =
-    Allowed version format: [0-9.-]*
+    Allowed version format: [\\w.:+~-]*
 
     Also allows a prefix indicating remove "-", "~" or install "+"
     """
@@ -291,7 +292,7 @@ def split_name_version(name):
     if prefix == "~":
         prefix = "-"
 
-    version_check = re.compile("^(.*?)((?:<|>|<=|>=|=)[0-9.-]*)?$")
+    version_check = re.compile(r"^(.*?)((?:<=|>=|<|>|=)[\w.:+~-]*)?$")
     try:
         reres = version_check.match(name)
         name, version = reres.groups()
