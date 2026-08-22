@@ -166,14 +166,14 @@ def test_resolve_url_source_rejects_latest_for_local_path(tmp_path):
     path = tmp_path / "tool.AppImage"
     path.write_bytes(b"appimage")
 
-    with pytest.raises(RuntimeError, match="state=latest is only supported"):
+    with pytest.raises(RuntimeError, match=r"`state=latest` is only supported"):
         appimage.resolve_url_source(FakeModule({"state": "latest"}), str(path))
 
 
 def test_resolve_url_source_rejects_latest_for_direct_url():
     module = FakeModule({"state": "latest"})
 
-    with pytest.raises(RuntimeError, match="state=latest is only supported"):
+    with pytest.raises(RuntimeError, match=r"`state=latest` is only supported"):
         appimage.resolve_url_source(module, "https://example.com/tool.AppImage")
 
 
