@@ -42,18 +42,18 @@ options:
     elements: str
     choices:
       GetSystemInventory: Must be used with O(category=Systems).
-      GetPsuInventory: Must be used with O(category=Systems) and O(category=Chassis).
+      GetPsuInventory: Must be used with O(category=Systems) or O(category=Chassis).
       GetCpuInventory: Must be used with O(category=Systems).
       GetMemoryInventory: Must be used with O(category=Systems).
       GetNicInventory: Must be used with O(category=Systems).
-      GetHealthReport: Must be used with O(category=Systems), O(category=Chassis) and O(category=Manager).
+      GetHealthReport: Must be used with O(category=Systems), O(category=Chassis), or O(category=Manager).
       GetStorageControllerInventory: Must be used with O(category=Systems).
       GetDiskInventory: Must be used with O(category=Systems).
       GetVolumeInventory: Must be used with O(category=Systems).
       GetBiosAttributes: Must be used with O(category=Systems).
       GetBootOrder: Must be used with O(category=Systems).
       GetBootOverride: Must be used with O(category=Systems).
-      GetVirtualMedia: Must be used with O(category=Systems) and O(category=Manager).
+      GetVirtualMedia: Must be used with O(category=Systems) or O(category=Manager).
       GetBiosRegistries: Must be used with O(category=Systems).
       GetPowerRestorePolicy: Must be used with O(category=Systems).
       GetFanInventory: Must be used with O(category=Chassis).
