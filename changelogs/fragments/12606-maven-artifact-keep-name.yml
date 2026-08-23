@@ -1,0 +1,2 @@
+deprecated_features:
+  - maven_artifact - when ``dest`` is a directory and a fixed ``version`` is given, ``keep_name`` currently also controls whether the version is part of the destination filename, contradicting its documentation; set the new ``keep_name_only_when_resolved=true`` to opt in to the documented behavior now, this becomes the default in community.general 15.0.0 (https://github.com/ansible-collections/community.general/pull/12606, https://github.com/ansible-collections/community.general/issues/4796).
