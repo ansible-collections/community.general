@@ -27,11 +27,55 @@ options:
     default: ['Systems']
     type: list
     elements: str
+    choices:
+      - Systems
+      - Chassis
+      - Accounts
+      - Update
+      - Sessions
+      - Manager
+      - Service
   command:
     description:
       - List of commands to execute on OOB controller.
     type: list
     elements: str
+    choices:
+      GetSystemInventory: Must be used with O(category=Systems).
+      GetPsuInventory: Must be used with O(category=Systems) or O(category=Chassis).
+      GetCpuInventory: Must be used with O(category=Systems).
+      GetMemoryInventory: Must be used with O(category=Systems).
+      GetNicInventory: Must be used with O(category=Systems).
+      GetHealthReport: Must be used with O(category=Systems), O(category=Chassis), or O(category=Manager).
+      GetStorageControllerInventory: Must be used with O(category=Systems).
+      GetDiskInventory: Must be used with O(category=Systems).
+      GetVolumeInventory: Must be used with O(category=Systems).
+      GetBiosAttributes: Must be used with O(category=Systems).
+      GetBootOrder: Must be used with O(category=Systems).
+      GetBootOverride: Must be used with O(category=Systems).
+      GetVirtualMedia: Must be used with O(category=Systems) or O(category=Manager).
+      GetBiosRegistries: Must be used with O(category=Systems).
+      GetPowerRestorePolicy: Must be used with O(category=Systems).
+      GetFanInventory: Must be used with O(category=Chassis).
+      GetChassisPower: Must be used with O(category=Chassis).
+      GetChassisThermals: Must be used with O(category=Chassis).
+      GetChassisInventory: Must be used with O(category=Chassis).
+      GetHPEThermalConfig: Must be used with O(category=Chassis).
+      GetHPEFanPercentMin: Must be used with O(category=Chassis).
+      ListUsers: Must be used with O(category=Accounts).
+      GetAccountServiceConfig: Must be used with O(category=Accounts).
+      GetSessions: Must be used with O(category=Sessions).
+      GetFirmwareInventory: Must be used with O(category=Update).
+      GetFirmwareUpdateCapabilities: Must be used with O(category=Update).
+      GetSoftwareInventory: Must be used with O(category=Update).
+      GetUpdateStatus: Must be used with O(category=Update).
+      GetManagerNicInventory: Must be used with O(category=Manager).
+      GetLogs: Must be used with O(category=Manager).
+      GetNetworkProtocols: Must be used with O(category=Manager).
+      GetHostInterfaces: Must be used with O(category=Manager).
+      GetManagerInventory: Must be used with O(category=Manager).
+      GetServiceIdentification: Must be used with O(category=Manager).
+      CheckAvailability: Must be used with O(category=Service).
   baseuri:
     required: true
     description:
@@ -460,8 +504,61 @@ def main():
     result = {}
     category_list = []
     argument_spec = dict(
-        category=dict(type="list", elements="str", default=["Systems"]),
-        command=dict(type="list", elements="str"),
+        category=dict(
+            type="list",
+            elements="str",
+            default=["Systems"],
+            choices=[
+                "Systems",
+                "Chassis",
+                "Accounts",
+                "Update",
+                "Sessions",
+                "Manager",
+                "Service",
+            ],
+        ),
+        command=dict(
+            type="list",
+            elements="str",
+            choices=[
+                "GetSystemInventory",
+                "GetPsuInventory",
+                "GetCpuInventory",
+                "GetMemoryInventory",
+                "GetNicInventory",
+                "GetHealthReport",
+                "GetStorageControllerInventory",
+                "GetDiskInventory",
+                "GetVolumeInventory",
+                "GetBiosAttributes",
+                "GetBootOrder",
+                "GetBootOverride",
+                "GetVirtualMedia",
+                "GetBiosRegistries",
+                "GetPowerRestorePolicy",
+                "GetFanInventory",
+                "GetChassisPower",
+                "GetChassisThermals",
+                "GetChassisInventory",
+                "GetHPEThermalConfig",
+                "GetHPEFanPercentMin",
+                "ListUsers",
+                "GetAccountServiceConfig",
+                "GetSessions",
+                "GetFirmwareInventory",
+                "GetFirmwareUpdateCapabilities",
+                "GetSoftwareInventory",
+                "GetUpdateStatus",
+                "GetManagerNicInventory",
+                "GetLogs",
+                "GetNetworkProtocols",
+                "GetHostInterfaces",
+                "GetManagerInventory",
+                "GetServiceIdentification",
+                "CheckAvailability",
+            ],
+        ),
         baseuri=dict(required=True),
         username=dict(),
         password=dict(no_log=True),
