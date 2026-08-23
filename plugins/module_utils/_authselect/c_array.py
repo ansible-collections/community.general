@@ -1,10 +1,13 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import ctypes
 from typing import Callable
 
 
-class CStringArray(ctypes.POINTER(ctypes.c_char_p)):
+class CStringArray(ctypes.POINTER(ctypes.c_char_p)):  # type: ignore[misc]
     """
     Converts list[str] in Python to 'char **' in C
     """
@@ -26,7 +29,7 @@ class CStringArray(ctypes.POINTER(ctypes.c_char_p)):
         return pointer
 
 
-class NullTerminatedStringArray(ctypes.POINTER(ctypes.c_char_p)):
+class NullTerminatedStringArray(ctypes.POINTER(ctypes.c_char_p)):  # type: ignore[misc]
     """
     Converts 'char **' from C to list[str] in Python
     """
@@ -62,12 +65,12 @@ class NullTerminatedStringArray(ctypes.POINTER(ctypes.c_char_p)):
         if getattr(self, "_closed", False):
             return
 
-        if type(self)._free is None:
-            raise RuntimeError(
-                "No free function configured for NullTerminatedStringArray"
-            )
+        free = type(self)._free
 
-        type(self)._free(self)
+        if free is None:
+            raise RuntimeError("No free function configured for NullTerminatedStringArray")
+
+        free(self)
         self._closed = True
 
     def __iter__(self):

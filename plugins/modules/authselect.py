@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright: Contributors to the Ansible project
+# Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -177,9 +177,11 @@ features:
 """
 
 import time
-from typing import NoReturn, Callable
 from enum import Enum, auto
+from typing import Callable, NoReturn, cast
+
 from ansible.module_utils.basic import AnsibleModule
+
 from ansible_collections.community.general.plugins.module_utils._authselect.authselect import (
     Authselect,
     AuthselectValidationStatus,
@@ -187,8 +189,8 @@ from ansible_collections.community.general.plugins.module_utils._authselect.auth
 
 
 class AuthselectProfileState(Enum):
-    PRESENT = 'present'
-    ABSENT = 'absent'
+    PRESENT = "present"
+    ABSENT = "absent"
 
 
 class IncorrectAuthselectStateError(Exception):
@@ -235,7 +237,6 @@ class AuthselectState(Enum):
 
 
 class AuthselectModule:
-
     TEMP_BACKUP_NAME: str = "ansible-tmp-backup-{0}"
 
     def __init__(self, module: AnsibleModule):
@@ -264,7 +265,7 @@ class AuthselectModule:
         self.backup_created: bool = False
         self.rollback_required: bool = False
 
-        self.final_profile: str = ''
+        self.final_profile: str = ""
         self.final_features: set[str] = set()
 
     def __iter__(self):
@@ -325,11 +326,10 @@ class AuthselectModule:
 
         return
 
-    def __call__(self):
+    def __call__(self) -> None:
         state_to_function: dict[AuthselectState, Callable] = self._get_state_to_function_mapping()
 
         for state in self:
-
             # SuccessExit is the normal end of module execution.
             # Keep it outside the failure handler so a successful exit is not treated like an error.
             if state is AuthselectState.SuccessExit:
@@ -385,48 +385,39 @@ class AuthselectModule:
         return {
             AuthselectState.ValidateProfile: self.validate_requested_authselect_profile,
             AuthselectState.ValidateFeatures: self.validate_requested_authselect_features,
-
             AuthselectState.DetermineFinalProfile: self.determine_final_authselect_profile,
             AuthselectState.DetermineFinalFeatures: self.determine_final_authselect_features,
-
             AuthselectState.DetermineIfChangesAreNeeded: self.determine_if_changes_are_needed,
-
             AuthselectState.MakeChanges: self.make_changes,
             AuthselectState.ValidateChanges: self.validate_changes,
-
             AuthselectState.SuccessExit: self.success_exit,
             AuthselectState.FailExit: self.fail_exit,
-
             AuthselectState.ValidateConfig: self.validate_config,
-
             AuthselectState.CreateBackup: self.create_backup,
             AuthselectState.RevertFromBackup: self.revert_from_backup,
             AuthselectState.RemoveBackup: self.remove_backup,
         }
 
     def is_authselect_profile_requested(self) -> bool:
-        return bool(self.ansible_module.params.get('profile', False))
+        return bool(self.ansible_module.params.get("profile", False))
 
     def _get_requested_authselect_profile(self) -> str:
         if self.is_authselect_profile_requested():
-            return self.ansible_module.params['profile']
+            return self.ansible_module.params["profile"]
         else:
-            return ''
+            return ""
 
     def is_current_authselect_profile_set(self) -> bool:
-        if self.authselect.get_current_profile_id() is not None:
-            return True
-        else:
-            return False
+        return self.authselect.get_current_profile_id() is not None
 
     def _get_current_authselect_profile(self):
         if self.is_current_authselect_profile_set():
             return self.authselect.get_current_profile_id()
         else:
-            return ''
+            return ""
 
     def is_authselect_features_requested(self) -> bool:
-        return bool(self.ansible_module.params.get('features', False))
+        return bool(self.ansible_module.params.get("features", False))
 
     def _get_requested_authselect_features(self) -> set[str]:
         if self.is_authselect_features_requested():
@@ -435,37 +426,34 @@ class AuthselectModule:
             return set()
 
     def is_current_authselect_features_set(self) -> bool:
-        if self.authselect.get_current_features() is not None:
-            return True
-        else:
-            return False
+        return self.authselect.get_current_features() is not None
 
     def _get_current_authselect_features(self) -> set[str]:
         if self.is_current_authselect_features_set():
-            return set(self.authselect.get_current_features())
+            return set(cast(list[str], self.authselect.get_current_features()))
         else:
             return set()
 
     def _get_authselect_state_requested(self) -> AuthselectProfileState:
         try:
-            return AuthselectProfileState(self.ansible_module.params['state'])
+            return AuthselectProfileState(self.ansible_module.params["state"])
         except ValueError:
-            raise IncorrectAuthselectStateError("State must be \"present\" or \"absent\".")
+            raise IncorrectAuthselectStateError('State must be "present" or "absent".') from None
 
     def _is_authselect_validate_requested(self) -> bool:
-        return self.ansible_module.params['validate']
+        return self.ansible_module.params["validate"]
 
     def _is_authselect_force_requested(self) -> bool:
-        return self.ansible_module.params['force']
+        return self.ansible_module.params["force"]
 
     def _is_authselect_backup_requested(self) -> bool:
-        return self.ansible_module.params['rollback_on_failure']
+        return self.ansible_module.params["rollback_on_failure"]
 
     def _get_authselect_backup_name(self) -> str:
         if self._is_authselect_backup_requested():
             return self.TEMP_BACKUP_NAME.format(time.time_ns())
         else:
-            return ''
+            return ""
 
     #################
     # State methods #
@@ -488,14 +476,12 @@ class AuthselectModule:
 
         if not current_profile_set and not profile_requested:
             raise AuthselectProfileNotValidError(
-                "There are no currently configured authselect profiles. "
-                "Please specify one."
+                "There are no currently configured authselect profiles. Please specify one."
             )
 
         if module_state is AuthselectProfileState.ABSENT and profile_requested and not current_profile_set:
             raise AuthselectProfileNotValidError(
-                "There are no currently configured authselect profiles. "
-                "Activate a profile first to use `absent`."
+                "There are no currently configured authselect profiles. Activate a profile first to use `absent`."
             )
 
         if module_state is AuthselectProfileState.ABSENT:
@@ -545,10 +531,7 @@ class AuthselectModule:
         return
 
     def determine_if_changes_are_needed(self) -> None:
-        self.changes_needed = (
-            self.final_profile != self.current_profile
-            or self.final_features != self.current_features
-        )
+        self.changes_needed = self.final_profile != self.current_profile or self.final_features != self.current_features
         return
 
     def make_changes(self) -> None:
@@ -561,7 +544,7 @@ class AuthselectModule:
         return
 
     def validate_changes(self) -> None:
-        new_profile: str = self.authselect.get_current_profile_id() or ''
+        new_profile: str = self.authselect.get_current_profile_id() or ""
         new_features: set[str] = set(self.authselect.get_current_features() or set())
 
         profiles_match: bool = new_profile == self.final_profile
@@ -570,8 +553,8 @@ class AuthselectModule:
         if not profiles_match or not features_match:
             raise AuthselectError(
                 "Authselect configuration does not match what was declared! "
-                f"Profile requested: \"{self.final_profile}\". "
-                f"Profile currently set: \"{new_profile}\". "
+                f'Profile requested: "{self.final_profile}". '
+                f'Profile currently set: "{new_profile}". '
                 f"Features requested: {', '.join(sorted(self.final_features))}. "
                 f"Features currently configured: {', '.join(sorted(new_features))}."
             )
@@ -582,7 +565,7 @@ class AuthselectModule:
             features = self.final_features
             changed = True
         else:
-            profile = self.authselect.get_current_profile_id() or ''
+            profile = self.authselect.get_current_profile_id() or ""
             features = set(self.authselect.get_current_features() or set())
             changed = self.changes_made
 
@@ -594,9 +577,7 @@ class AuthselectModule:
 
     def fail_exit(self) -> NoReturn:
         if self.failure is None:
-            raise RuntimeError(
-                "FailExit was reached without a recorded failure."
-            )
+            raise RuntimeError("FailExit was reached without a recorded failure.")
 
         self.ansible_module.fail_json(
             changed=self.changes_made,
@@ -622,7 +603,7 @@ class AuthselectModule:
             return
 
         if not is_valid:
-            current_profile = self.authselect.get_current_profile_id() or ''
+            current_profile = self.authselect.get_current_profile_id() or ""
             current_features = set(self.authselect.get_current_features() or set())
 
             raise AuthselectConfigurationNotValidError(

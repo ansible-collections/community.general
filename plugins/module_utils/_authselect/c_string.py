@@ -1,10 +1,13 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import ctypes
 from typing import Callable
 
 
-class AllocatedCString(ctypes.POINTER(ctypes.c_char)):
+class AllocatedCString(ctypes.POINTER(ctypes.c_char)):  # type: ignore[misc]
     """
     C-allocated 'char *' that must be manually freed.
     """
@@ -37,10 +40,12 @@ class AllocatedCString(ctypes.POINTER(ctypes.c_char)):
         if getattr(self, "_closed", False):
             return
 
-        if type(self)._free is None:
+        free = type(self)._free
+
+        if free is None:
             raise RuntimeError("No free function configured for AllocatedCString")
 
-        type(self)._free(self)
+        free(self)
         self._closed = True
 
     def decode(self, encoding: str = "utf-8") -> str:

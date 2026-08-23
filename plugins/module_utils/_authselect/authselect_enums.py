@@ -1,7 +1,11 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import errno
 from enum import IntEnum, IntFlag
+from typing import cast
 
 
 class AuthselectValidationStatus(IntEnum):
@@ -24,7 +28,7 @@ class AuthselectProfileType(IntEnum):
         try:
             return cls[value.upper()]
         except KeyError:
-            raise ValueError(f"Invalid authselect profile type: {value}")
+            raise ValueError(f"Invalid authselect profile type: {value}") from None
 
 
 class AuthselectSymlinkFlag(IntFlag):
@@ -39,7 +43,7 @@ class AuthselectSymlinkFlag(IntFlag):
 
     def to_strings(self) -> list[str]:
         return [
-            flag.name.lower()
+            cast(str, flag.name).lower()
             for flag in AuthselectSymlinkFlag
             if (flag is not AuthselectSymlinkFlag.NONE and flag in self)
         ]

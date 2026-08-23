@@ -1,4 +1,4 @@
-# Copyright: Contributors to the Ansible project
+# Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -100,11 +100,11 @@ class TestAuthselectProfile(unittest.TestCase):
         profile = self.make_profile()
         AuthselectProfile._get_id = Mock(return_value=None)
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             r"authselect_profile_id\(\) returned NULL",
-        ):
-            discard = profile.id
+            lambda: profile.id,
+        )
 
     def test_name_decodes_utf8_string(self):
         profile = self.make_profile()
@@ -118,11 +118,11 @@ class TestAuthselectProfile(unittest.TestCase):
         profile = self.make_profile()
         AuthselectProfile._get_name = Mock(return_value=None)
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             r"authselect_profile_name\(\) returned NULL",
-        ):
-            discard = profile.name
+            lambda: profile.name,
+        )
 
     def test_path_decodes_utf8_string(self):
         profile = self.make_profile()
@@ -139,11 +139,11 @@ class TestAuthselectProfile(unittest.TestCase):
         profile = self.make_profile()
         AuthselectProfile._get_path = Mock(return_value=None)
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             r"authselect_profile_path\(\) returned NULL",
-        ):
-            discard = profile.path
+            lambda: profile.path,
+        )
 
     def test_description_decodes_utf8_string(self):
         profile = self.make_profile()
@@ -194,11 +194,11 @@ class TestAuthselectProfile(unittest.TestCase):
         profile = self.make_profile()
         AuthselectProfile._get_features = Mock(return_value=None)
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             r"authselect_profile_features\(\) returned NULL",
-        ):
-            discard = profile.features
+            lambda: profile.features,
+        )
 
     def test_nsswitch_maps_passes_requested_features_and_closes_returned_array(self):
         profile = self.make_profile()
@@ -319,11 +319,11 @@ class TestAuthselectProfile(unittest.TestCase):
     def test_null_pointer_cannot_access_properties(self):
         profile = AuthselectProfile()
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             "Authselect profile pointer is NULL",
-        ):
-            discard = profile.id
+            lambda: profile.id,
+        )
 
     def test_close_on_null_pointer_is_noop(self):
         profile = AuthselectProfile()
@@ -366,11 +366,11 @@ class TestAuthselectProfile(unittest.TestCase):
         AuthselectProfile._get_id = Mock(return_value=b"sssd")
         profile.close()
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             "Authselect profile has already been freed",
-        ):
-            discard = profile.id
+            lambda: profile.id,
+        )
 
     def test_context_manager_returns_same_profile_and_frees_on_exit(self):
         profile = self.make_profile()

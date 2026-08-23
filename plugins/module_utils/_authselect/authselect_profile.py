@@ -1,8 +1,13 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import ctypes
+from typing import Callable
 
-from .c_array import CStringArray
+from .c_array import CStringArray, NullTerminatedStringArray
+from .c_string import AllocatedCString
 
 
 class _AuthselectProfileStruct(ctypes.Structure):
@@ -14,20 +19,20 @@ class _AuthselectProfileStruct(ctypes.Structure):
     pass
 
 
-class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):
+class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):  # type: ignore[misc]
     _type_ = _AuthselectProfileStruct
 
     #
     # Populated by authselect_lib.py.
     #
-    _free = None
-    _get_id = None
-    _get_name = None
-    _get_path = None
-    _get_description = None
-    _get_features = None
-    _get_nsswitch_maps = None
-    _get_requirements = None
+    _free: Callable[[AuthselectProfile], None] | None = None
+    _get_id: Callable[[AuthselectProfile], bytes | None] | None = None
+    _get_name: Callable[[AuthselectProfile], bytes | None] | None = None
+    _get_path: Callable[[AuthselectProfile], bytes | None] | None = None
+    _get_description: Callable[[AuthselectProfile], bytes | None] | None = None
+    _get_features: Callable[[AuthselectProfile], NullTerminatedStringArray | None] | None = None
+    _get_nsswitch_maps: Callable[[AuthselectProfile, CStringArray], NullTerminatedStringArray | None] | None = None
+    _get_requirements: Callable[[AuthselectProfile, CStringArray], AllocatedCString | None] | None = None
 
     def __enter__(self):
         self._assert_valid()
@@ -50,17 +55,24 @@ class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):
         if getattr(self, "_closed", False):
             return
 
-        if type(self)._free is None:
+        free = type(self)._free
+
+        if free is None:
             raise RuntimeError("AuthselectProfile free function has not been configured")
 
-        type(self)._free(self)
+        free(self)
         self._closed = True
 
     @property
     def id(self) -> str:
         self._assert_valid()
 
-        value = type(self)._get_id(self)
+        get_id = type(self)._get_id
+
+        if get_id is None:
+            raise RuntimeError("AuthselectProfile id function has not been configured")
+
+        value = get_id(self)
 
         if value is None:
             raise RuntimeError("authselect_profile_id() returned NULL")
@@ -71,7 +83,12 @@ class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):
     def name(self) -> str:
         self._assert_valid()
 
-        value = type(self)._get_name(self)
+        name = type(self)._get_name
+
+        if name is None:
+            raise RuntimeError("AuthselectProfile name function has not been configured")
+
+        value = name(self)
 
         if value is None:
             raise RuntimeError("authselect_profile_name() returned NULL")
@@ -82,7 +99,12 @@ class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):
     def path(self) -> str:
         self._assert_valid()
 
-        value = type(self)._get_path(self)
+        path = type(self)._get_path
+
+        if path is None:
+            raise RuntimeError("AuthselectProfile path function has not been configured")
+
+        value = path(self)
 
         if value is None:
             raise RuntimeError("authselect_profile_path() returned NULL")
@@ -93,7 +115,12 @@ class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):
     def description(self) -> str | None:
         self._assert_valid()
 
-        value = type(self)._get_description(self)
+        description = type(self)._get_description
+
+        if description is None:
+            raise RuntimeError("AuthselectProfile description function has not been configured")
+
+        value = description(self)
 
         return None if value is None else value.decode("utf-8")
 
@@ -101,7 +128,12 @@ class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):
     def features(self) -> list[str]:
         self._assert_valid()
 
-        values = type(self)._get_features(self)
+        features = type(self)._get_features
+
+        if features is None:
+            raise RuntimeError("AuthselectProfile features function has not been configured")
+
+        values = features(self)
 
         if not values:
             raise RuntimeError("authselect_profile_features() returned NULL")
@@ -112,7 +144,12 @@ class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):
     def nsswitch_maps(self, features: list[str] | None = None) -> list[str]:
         self._assert_valid()
         c_features = CStringArray.from_strings(features or [])
-        values = type(self)._get_nsswitch_maps(self, c_features)
+        nsswitch_maps = type(self)._get_nsswitch_maps
+
+        if nsswitch_maps is None:
+            raise RuntimeError("AuthselectProfile nsswitch_maps function has not been configured")
+
+        values = nsswitch_maps(self, c_features)
 
         if not values:
             raise RuntimeError("authselect_profile_nsswitch_maps() returned NULL")
@@ -124,8 +161,12 @@ class AuthselectProfile(ctypes.POINTER(_AuthselectProfileStruct)):
         self._assert_valid()
 
         c_features = CStringArray.from_strings(features or [])
+        get_requirements = type(self)._get_requirements
 
-        value = type(self)._get_requirements(self, c_features)
+        if get_requirements is None:
+            raise RuntimeError("AuthselectProfile requirements function has not been configured")
+
+        value = get_requirements(self, c_features)
 
         if not value:
             raise RuntimeError("authselect_profile_requirements() returned NULL")

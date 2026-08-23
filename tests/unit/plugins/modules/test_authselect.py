@@ -1,4 +1,4 @@
-# Copyright: Contributors to the Ansible project
+# Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -14,7 +14,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
 )
 
 from ansible_collections.community.general.plugins.modules import authselect
-
 
 PROFILE_FEATURES = {
     "sssd": {
@@ -70,8 +69,7 @@ class FakeAuthselect:
             self.current_features = set(current_features)
 
         self.profile_features = {
-            profile: set(features)
-            for profile, features in (profile_features or PROFILE_FEATURES).items()
+            profile: set(features) for profile, features in (profile_features or PROFILE_FEATURES).items()
         }
 
         self.validation_results = list(validation_results or [(None, True)])

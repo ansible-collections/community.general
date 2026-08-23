@@ -1,3 +1,6 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import ctypes
@@ -34,9 +37,7 @@ class Authselect:
 
     def get_switchableauth_path(self) -> str:
         if not hasattr(self._lib, "authselect_path_switchableauth"):
-            raise RuntimeError(
-                "The installed libauthselect does not support switchable-auth"
-            )
+            raise RuntimeError("The installed libauthselect does not support switchable-auth")
 
         return self._lib.authselect_path_switchableauth().decode("utf-8")
 
@@ -106,7 +107,9 @@ class Authselect:
         with profile_id:
             return profile_id.decode()
 
-    def activate_profile(self, profile_id: str, features: list[str] | None = None, force_overwrite: bool = False) -> None:
+    def activate_profile(
+        self, profile_id: str, features: list[str] | None = None, force_overwrite: bool = False
+    ) -> None:
 
         c_features = CStringArray.from_strings(features or [])
 
@@ -158,7 +161,9 @@ class Authselect:
         try:
             status = AuthselectValidationStatus(result)
         except ValueError:
-            raise RuntimeError(f"authselect_validate_configuration() failed: [{result}] {os.strerror(result)}")
+            raise RuntimeError(
+                f"authselect_validate_configuration() failed: [{result}] {os.strerror(result)}"
+            ) from None
 
         return status, is_valid.value
 

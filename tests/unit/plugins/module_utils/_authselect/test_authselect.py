@@ -1,4 +1,4 @@
-# Copyright: Contributors to the Ansible project
+# Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -147,9 +147,8 @@ class TestAuthselect(unittest.TestCase):
         profile = FakePointer(valid=True)
         self.lib.authselect_profile.return_value = 0
 
-        with (
-            patch.object(authselect, "AuthselectProfile", return_value=profile),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AuthselectProfile", return_value=profile), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             result = self.wrapper.get_profile("sssd-ü")
 
@@ -163,9 +162,8 @@ class TestAuthselect(unittest.TestCase):
         profile = FakePointer(valid=True)
         self.lib.authselect_profile.return_value = errno.EINVAL
 
-        with (
-            patch.object(authselect, "AuthselectProfile", return_value=profile),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AuthselectProfile", return_value=profile), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(RuntimeError, r"authselect_profile\(\) failed"):
                 self.wrapper.get_profile("sssd")
@@ -174,9 +172,8 @@ class TestAuthselect(unittest.TestCase):
         profile = FakePointer(valid=False)
         self.lib.authselect_profile.return_value = 0
 
-        with (
-            patch.object(authselect, "AuthselectProfile", return_value=profile),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AuthselectProfile", return_value=profile), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(RuntimeError, r"authselect_profile\(\) returned a NULL profile"):
                 self.wrapper.get_profile("sssd")
@@ -190,20 +187,16 @@ class TestAuthselect(unittest.TestCase):
         c_features = object()
         self.lib.authselect_files.return_value = 0
 
-        with (
-            patch.object(authselect, "AuthselectFiles", return_value=files),
-            patch.object(authselect.CStringArray, "from_strings", return_value=c_features) as from_strings,
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
-        ):
+        with patch.object(authselect, "AuthselectFiles", return_value=files), patch.object(
+            authselect.CStringArray, "from_strings", return_value=c_features
+        ) as from_strings, patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
             result = self.wrapper.get_files(
                 "sssd-ü",
                 ["with-faillock", "with-mkhomedir"],
             )
 
         self.assertIs(result, files)
-        from_strings.assert_called_once_with(
-            ["with-faillock", "with-mkhomedir"]
-        )
+        from_strings.assert_called_once_with(["with-faillock", "with-mkhomedir"])
         self.lib.authselect_files.assert_called_once_with(
             "sssd-ü".encode("utf-8"),
             c_features,
@@ -215,11 +208,9 @@ class TestAuthselect(unittest.TestCase):
         c_features = object()
         self.lib.authselect_files.return_value = 0
 
-        with (
-            patch.object(authselect, "AuthselectFiles", return_value=files),
-            patch.object(authselect.CStringArray, "from_strings", return_value=c_features) as from_strings,
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
-        ):
+        with patch.object(authselect, "AuthselectFiles", return_value=files), patch.object(
+            authselect.CStringArray, "from_strings", return_value=c_features
+        ) as from_strings, patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
             self.wrapper.get_files("sssd")
 
         from_strings.assert_called_once_with([])
@@ -228,9 +219,8 @@ class TestAuthselect(unittest.TestCase):
         files = FakePointer(valid=True)
         self.lib.authselect_files.return_value = errno.ENOENT
 
-        with (
-            patch.object(authselect, "AuthselectFiles", return_value=files),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AuthselectFiles", return_value=files), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -242,9 +232,8 @@ class TestAuthselect(unittest.TestCase):
         files = FakePointer(valid=True)
         self.lib.authselect_files.return_value = errno.EACCES
 
-        with (
-            patch.object(authselect, "AuthselectFiles", return_value=files),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AuthselectFiles", return_value=files), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -256,9 +245,8 @@ class TestAuthselect(unittest.TestCase):
         files = FakePointer(valid=False)
         self.lib.authselect_files.return_value = 0
 
-        with (
-            patch.object(authselect, "AuthselectFiles", return_value=files),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AuthselectFiles", return_value=files), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -274,9 +262,8 @@ class TestAuthselect(unittest.TestCase):
         profile_id = FakeAllocatedCString("sssd-ü")
         self.lib.authselect_current_configuration.return_value = 0
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=profile_id),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=profile_id), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             result = self.wrapper.get_current_profile_id()
 
@@ -292,9 +279,8 @@ class TestAuthselect(unittest.TestCase):
         profile_id = FakeAllocatedCString()
         self.lib.authselect_current_configuration.return_value = errno.ENOENT
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=profile_id),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=profile_id), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             result = self.wrapper.get_current_profile_id()
 
@@ -304,9 +290,8 @@ class TestAuthselect(unittest.TestCase):
         profile_id = FakeAllocatedCString()
         self.lib.authselect_current_configuration.return_value = errno.EACCES
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=profile_id),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=profile_id), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -318,9 +303,8 @@ class TestAuthselect(unittest.TestCase):
         profile_id = FakeAllocatedCString()
         self.lib.authselect_current_configuration.return_value = 0
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=profile_id),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=profile_id), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -333,11 +317,9 @@ class TestAuthselect(unittest.TestCase):
         profile_id = FakeAllocatedCString("sssd")
         self.lib.authselect_current_configuration.return_value = 0
 
-        with (
-            patch.object(authselect, "NullTerminatedStringArray", return_value=features),
-            patch.object(authselect, "AllocatedCString", return_value=profile_id),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
-        ):
+        with patch.object(authselect, "NullTerminatedStringArray", return_value=features), patch.object(
+            authselect, "AllocatedCString", return_value=profile_id
+        ), patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
             result = self.wrapper.get_current_features()
 
         self.assertEqual(
@@ -357,11 +339,9 @@ class TestAuthselect(unittest.TestCase):
         profile_id = FakeAllocatedCString()
         self.lib.authselect_current_configuration.return_value = errno.ENOENT
 
-        with (
-            patch.object(authselect, "NullTerminatedStringArray", return_value=features),
-            patch.object(authselect, "AllocatedCString", return_value=profile_id),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
-        ):
+        with patch.object(authselect, "NullTerminatedStringArray", return_value=features), patch.object(
+            authselect, "AllocatedCString", return_value=profile_id
+        ), patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
             result = self.wrapper.get_current_features()
 
         self.assertIsNone(result)
@@ -371,11 +351,9 @@ class TestAuthselect(unittest.TestCase):
         profile_id = FakeAllocatedCString()
         self.lib.authselect_current_configuration.return_value = errno.EACCES
 
-        with (
-            patch.object(authselect, "NullTerminatedStringArray", return_value=features),
-            patch.object(authselect, "AllocatedCString", return_value=profile_id),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
-        ):
+        with patch.object(authselect, "NullTerminatedStringArray", return_value=features), patch.object(
+            authselect, "AllocatedCString", return_value=profile_id
+        ), patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
             with self.assertRaisesRegex(
                 RuntimeError,
                 r"authselect_current_configuration\(\) failed",
@@ -387,11 +365,9 @@ class TestAuthselect(unittest.TestCase):
         profile_id = FakeAllocatedCString("sssd")
         self.lib.authselect_current_configuration.return_value = 0
 
-        with (
-            patch.object(authselect, "NullTerminatedStringArray", return_value=features),
-            patch.object(authselect, "AllocatedCString", return_value=profile_id),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
-        ):
+        with patch.object(authselect, "NullTerminatedStringArray", return_value=features), patch.object(
+            authselect, "AllocatedCString", return_value=profile_id
+        ), patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
             with self.assertRaisesRegex(
                 RuntimeError,
                 "succeeded but returned NULL features",
@@ -490,9 +466,7 @@ class TestAuthselect(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_validate_configuration_returns_complete_status_and_valid_flag(self):
-        self.lib.authselect_validate_configuration.side_effect = (
-            lambda is_valid: setattr(is_valid, "value", True) or 0
-        )
+        self.lib.authselect_validate_configuration.side_effect = lambda is_valid: setattr(is_valid, "value", True) or 0
 
         with patch.object(
             authselect.ctypes,
@@ -540,9 +514,7 @@ class TestAuthselect(unittest.TestCase):
         self.lib.authselect_feature_enabled.return_value = 0
 
         self.assertTrue(self.wrapper.is_feature_enabled("with-faillock"))
-        self.lib.authselect_feature_enabled.assert_called_once_with(
-            b"with-faillock"
-        )
+        self.lib.authselect_feature_enabled.assert_called_once_with(b"with-faillock")
 
     def test_is_feature_enabled_returns_false_when_feature_is_not_enabled(self):
         self.lib.authselect_feature_enabled.return_value = errno.ENOENT
@@ -568,9 +540,7 @@ class TestAuthselect(unittest.TestCase):
         result = self.wrapper.enable_feature("with-faillock")
 
         self.assertIsNone(result)
-        self.lib.authselect_feature_enable.assert_called_once_with(
-            b"with-faillock"
-        )
+        self.lib.authselect_feature_enable.assert_called_once_with(b"with-faillock")
 
     def test_enable_feature_fails_without_existing_configuration(self):
         self.lib.authselect_feature_enable.return_value = errno.ENOENT
@@ -597,9 +567,7 @@ class TestAuthselect(unittest.TestCase):
         result = self.wrapper.disable_feature("with-faillock")
 
         self.assertIsNone(result)
-        self.lib.authselect_feature_disable.assert_called_once_with(
-            b"with-faillock"
-        )
+        self.lib.authselect_feature_disable.assert_called_once_with(b"with-faillock")
 
     def test_disable_feature_fails_without_existing_configuration(self):
         self.lib.authselect_feature_disable.return_value = errno.ENOENT
@@ -673,9 +641,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString("/var/lib/authselect/backups/test")
         self.lib.authselect_backup.return_value = 0
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             result = self.wrapper.create_profile_backup("test-ü")
 
@@ -691,9 +658,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString("/var/lib/authselect/backups/generated")
         self.lib.authselect_backup.return_value = 0
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             self.wrapper.create_profile_backup()
 
@@ -706,9 +672,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString()
         self.lib.authselect_backup.return_value = errno.EIO
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -720,9 +685,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString()
         self.lib.authselect_backup.return_value = 0
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -736,9 +700,7 @@ class TestAuthselect(unittest.TestCase):
         result = self.wrapper.remove_profile_backup("backup-ü")
 
         self.assertIsNone(result)
-        self.lib.authselect_backup_remove.assert_called_once_with(
-            "backup-ü".encode("utf-8")
-        )
+        self.lib.authselect_backup_remove.assert_called_once_with("backup-ü".encode("utf-8"))
 
     def test_remove_profile_backup_reports_library_error(self):
         self.lib.authselect_backup_remove.return_value = errno.EIO
@@ -755,9 +717,7 @@ class TestAuthselect(unittest.TestCase):
         result = self.wrapper.restore_profile_backup("backup-ü")
 
         self.assertIsNone(result)
-        self.lib.authselect_backup_restore.assert_called_once_with(
-            "backup-ü".encode("utf-8")
-        )
+        self.lib.authselect_backup_restore.assert_called_once_with("backup-ü".encode("utf-8"))
 
     def test_restore_profile_backup_reports_library_error(self):
         self.lib.authselect_backup_restore.return_value = errno.EIO
@@ -777,27 +737,20 @@ class TestAuthselect(unittest.TestCase):
         c_symlinks = object()
         self.lib.authselect_profile_create.return_value = 0
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.CStringArray, "from_strings", return_value=c_symlinks) as from_strings,
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
-        ):
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.CStringArray, "from_strings", return_value=c_symlinks
+        ) as from_strings, patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
             result = self.wrapper.create_profile(
                 name="test-ü",
                 profile_type=AuthselectProfileType.CUSTOM,
                 base_id="sssd-ü",
                 base_type=AuthselectProfileType.DEFAULT,
-                symlink_flags=(
-                    AuthselectSymlinkFlag.PAM
-                    | AuthselectSymlinkFlag.NSSWITCH
-                ),
+                symlink_flags=(AuthselectSymlinkFlag.PAM | AuthselectSymlinkFlag.NSSWITCH),
                 symlinks=["system-auth", "password-auth"],
             )
 
         self.assertEqual(result, "/etc/authselect/custom/test")
-        from_strings.assert_called_once_with(
-            ["system-auth", "password-auth"]
-        )
+        from_strings.assert_called_once_with(["system-auth", "password-auth"])
         self.lib.authselect_profile_create.assert_called_once_with(
             "test-ü".encode("utf-8"),
             int(AuthselectProfileType.CUSTOM),
@@ -815,11 +768,9 @@ class TestAuthselect(unittest.TestCase):
         c_symlinks = object()
         self.lib.authselect_profile_create.return_value = 0
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.CStringArray, "from_strings", return_value=c_symlinks) as from_strings,
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
-        ):
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.CStringArray, "from_strings", return_value=c_symlinks
+        ) as from_strings, patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
             self.wrapper.create_profile(
                 name="test",
                 profile_type=AuthselectProfileType.CUSTOM,
@@ -840,9 +791,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString()
         self.lib.authselect_profile_create.return_value = errno.EEXIST
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -857,9 +807,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString()
         self.lib.authselect_profile_create.return_value = errno.ENOENT
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -875,9 +824,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString()
         self.lib.authselect_profile_create.return_value = errno.EINVAL
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -892,9 +840,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString()
         self.lib.authselect_profile_create.return_value = errno.EIO
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -909,9 +856,8 @@ class TestAuthselect(unittest.TestCase):
         path = FakeAllocatedCString()
         self.lib.authselect_profile_create.return_value = 0
 
-        with (
-            patch.object(authselect, "AllocatedCString", return_value=path),
-            patch.object(authselect.ctypes, "byref", side_effect=lambda value: value),
+        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
+            authselect.ctypes, "byref", side_effect=lambda value: value
         ):
             with self.assertRaisesRegex(
                 RuntimeError,

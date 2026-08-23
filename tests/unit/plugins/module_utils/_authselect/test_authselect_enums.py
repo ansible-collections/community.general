@@ -1,4 +1,4 @@
-# Copyright: Contributors to the Ansible project
+# Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -94,11 +94,7 @@ class TestAuthselectSymlinkFlag(unittest.TestCase):
         )
 
     def test_combined_flags_to_strings_returns_each_flag(self):
-        flags = (
-            AuthselectSymlinkFlag.META
-            | AuthselectSymlinkFlag.PAM
-            | AuthselectSymlinkFlag.DCONF
-        )
+        flags = AuthselectSymlinkFlag.META | AuthselectSymlinkFlag.PAM | AuthselectSymlinkFlag.DCONF
 
         self.assertEqual(
             flags.to_strings(),
@@ -118,10 +114,7 @@ class TestAuthselectSymlinkFlag(unittest.TestCase):
         )
 
     def test_str_combined_flags_joins_names_with_pipe(self):
-        flags = (
-            AuthselectSymlinkFlag.NSSWITCH
-            | AuthselectSymlinkFlag.PAM
-        )
+        flags = AuthselectSymlinkFlag.NSSWITCH | AuthselectSymlinkFlag.PAM
 
         self.assertEqual(
             str(flags),
@@ -170,11 +163,7 @@ class TestAuthselectSymlinkFlag(unittest.TestCase):
 
         self.assertEqual(
             flags,
-            (
-                AuthselectSymlinkFlag.META
-                | AuthselectSymlinkFlag.PAM
-                | AuthselectSymlinkFlag.DCONF
-            ),
+            (AuthselectSymlinkFlag.META | AuthselectSymlinkFlag.PAM | AuthselectSymlinkFlag.DCONF),
         )
 
     def test_from_strings_is_case_insensitive(self):

@@ -1,4 +1,4 @@
-# Copyright: Contributors to the Ansible project
+# Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -170,11 +170,11 @@ class TestAuthselectFiles(unittest.TestCase):
         files = self.make_files()
         AuthselectFiles._get_dconf_db = Mock(return_value=None)
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             r"authselect_files_dconf_db\(\) returned NULL",
-        ):
-            discard = files.dconf_db
+            lambda: files.dconf_db,
+        )
 
     def test_dconf_lock_decodes_utf8_string(self):
         files = self.make_files()
@@ -191,11 +191,11 @@ class TestAuthselectFiles(unittest.TestCase):
         files = self.make_files()
         AuthselectFiles._get_dconf_lock = Mock(return_value=None)
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             r"authselect_files_dconf_lock\(\) returned NULL",
-        ):
-            discard = files.dconf_lock
+            lambda: files.dconf_lock,
+        )
 
     # ------------------------------------------------------------------
     # Pointer lifetime
@@ -214,11 +214,11 @@ class TestAuthselectFiles(unittest.TestCase):
     def test_null_pointer_cannot_access_properties(self):
         files = AuthselectFiles()
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             "AuthselectFiles pointer is NULL",
-        ):
-            discard = files.nsswitch
+            lambda: files.nsswitch,
+        )
 
     def test_close_on_null_pointer_is_noop(self):
         files = AuthselectFiles()
@@ -261,11 +261,11 @@ class TestAuthselectFiles(unittest.TestCase):
         AuthselectFiles._get_nsswitch = Mock(return_value=b"passwd: files sss")
         files.close()
 
-        with self.assertRaisesRegex(
+        self.assertRaisesRegex(
             RuntimeError,
             "AuthselectFiles has already been freed",
-        ):
-            discard = files.nsswitch
+            lambda: files.nsswitch,
+        )
 
     def test_context_manager_returns_same_files_and_frees_on_exit(self):
         files = self.make_files()

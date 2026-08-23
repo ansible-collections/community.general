@@ -1,4 +1,4 @@
-# Copyright: Contributors to the Ansible project
+# Copyright (c) Ansible Project
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -24,7 +24,6 @@ from ansible_collections.community.general.plugins.module_utils._authselect.c_ar
 from ansible_collections.community.general.plugins.module_utils._authselect.c_string import (
     AllocatedCString,
 )
-
 
 AUTHSELECT_FUNCTION_NAMES = (
     "authselect_set_debug_fn",
@@ -158,10 +157,9 @@ class TestAuthselectLib(unittest.TestCase):
         cached_libc = object()
         authselect_lib._LIBC = cached_libc
 
-        with (
-            patch.object(authselect_lib, "find_library") as find_library,
-            patch.object(authselect_lib.cdll, "LoadLibrary") as load_library,
-        ):
+        with patch.object(authselect_lib, "find_library") as find_library, patch.object(
+            authselect_lib.cdll, "LoadLibrary"
+        ) as load_library:
             result = authselect_lib.get_libc_lib()
 
         self.assertIs(result, cached_libc)
@@ -185,22 +183,18 @@ class TestAuthselectLib(unittest.TestCase):
     def test_get_libc_lib_loads_configures_and_caches_library(self):
         libc = Mock()
 
-        with (
-            patch.object(
-                authselect_lib,
-                "find_library",
-                return_value="libc.so.6",
-            ) as find_library,
-            patch.object(
-                authselect_lib.cdll,
-                "LoadLibrary",
-                return_value=libc,
-            ) as load_library,
-            patch.object(
-                authselect_lib,
-                "_configure_libc_lib",
-            ) as configure_libc,
-        ):
+        with patch.object(
+            authselect_lib,
+            "find_library",
+            return_value="libc.so.6",
+        ) as find_library, patch.object(
+            authselect_lib.cdll,
+            "LoadLibrary",
+            return_value=libc,
+        ) as load_library, patch.object(
+            authselect_lib,
+            "_configure_libc_lib",
+        ) as configure_libc:
             result = authselect_lib.get_libc_lib()
 
         self.assertIs(result, libc)
@@ -212,22 +206,18 @@ class TestAuthselectLib(unittest.TestCase):
     def test_get_libc_lib_does_not_cache_library_when_configuration_fails(self):
         libc = Mock()
 
-        with (
-            patch.object(
-                authselect_lib,
-                "find_library",
-                return_value="libc.so.6",
-            ),
-            patch.object(
-                authselect_lib.cdll,
-                "LoadLibrary",
-                return_value=libc,
-            ),
-            patch.object(
-                authselect_lib,
-                "_configure_libc_lib",
-                side_effect=RuntimeError("configuration failed"),
-            ),
+        with patch.object(
+            authselect_lib,
+            "find_library",
+            return_value="libc.so.6",
+        ), patch.object(
+            authselect_lib.cdll,
+            "LoadLibrary",
+            return_value=libc,
+        ), patch.object(
+            authselect_lib,
+            "_configure_libc_lib",
+            side_effect=RuntimeError("configuration failed"),
         ):
             with self.assertRaisesRegex(
                 RuntimeError,
@@ -540,12 +530,11 @@ class TestAuthselectLib(unittest.TestCase):
         cached_lib = object()
         authselect_lib._LIB = cached_lib
 
-        with (
-            patch.object(authselect_lib, "find_library") as find_library,
-            patch.object(authselect_lib.cdll, "LoadLibrary") as load_library,
-            patch.object(authselect_lib, "get_libc_lib") as get_libc,
-            patch.object(authselect_lib, "_configure_authselect_lib") as configure_authselect,
-        ):
+        with patch.object(authselect_lib, "find_library") as find_library, patch.object(
+            authselect_lib.cdll, "LoadLibrary"
+        ) as load_library, patch.object(authselect_lib, "get_libc_lib") as get_libc, patch.object(
+            authselect_lib, "_configure_authselect_lib"
+        ) as configure_authselect:
             result = authselect_lib.get_authselect_lib()
 
         self.assertIs(result, cached_lib)
@@ -572,27 +561,22 @@ class TestAuthselectLib(unittest.TestCase):
         lib = Mock()
         libc = Mock()
 
-        with (
-            patch.object(
-                authselect_lib,
-                "find_library",
-                return_value="libauthselect.so.1",
-            ) as find_library,
-            patch.object(
-                authselect_lib.cdll,
-                "LoadLibrary",
-                return_value=lib,
-            ) as load_library,
-            patch.object(
-                authselect_lib,
-                "get_libc_lib",
-                return_value=libc,
-            ) as get_libc,
-            patch.object(
-                authselect_lib,
-                "_configure_authselect_lib",
-            ) as configure_authselect,
-        ):
+        with patch.object(
+            authselect_lib,
+            "find_library",
+            return_value="libauthselect.so.1",
+        ) as find_library, patch.object(
+            authselect_lib.cdll,
+            "LoadLibrary",
+            return_value=lib,
+        ) as load_library, patch.object(
+            authselect_lib,
+            "get_libc_lib",
+            return_value=libc,
+        ) as get_libc, patch.object(
+            authselect_lib,
+            "_configure_authselect_lib",
+        ) as configure_authselect:
             result = authselect_lib.get_authselect_lib()
 
         self.assertIs(result, lib)
@@ -609,23 +593,18 @@ class TestAuthselectLib(unittest.TestCase):
             self.assertIs(candidate, lib)
             self.assertIsNone(authselect_lib._LIB)
 
-        with (
-            patch.object(
-                authselect_lib,
-                "find_library",
-                return_value="libauthselect.so.1",
-            ),
-            patch.object(
-                authselect_lib.cdll,
-                "LoadLibrary",
-                return_value=lib,
-            ),
-            patch.object(authselect_lib, "get_libc_lib"),
-            patch.object(
-                authselect_lib,
-                "_configure_authselect_lib",
-                side_effect=configure,
-            ),
+        with patch.object(
+            authselect_lib,
+            "find_library",
+            return_value="libauthselect.so.1",
+        ), patch.object(
+            authselect_lib.cdll,
+            "LoadLibrary",
+            return_value=lib,
+        ), patch.object(authselect_lib, "get_libc_lib"), patch.object(
+            authselect_lib,
+            "_configure_authselect_lib",
+            side_effect=configure,
         ):
             result = authselect_lib.get_authselect_lib()
 
@@ -635,27 +614,22 @@ class TestAuthselectLib(unittest.TestCase):
     def test_get_authselect_lib_does_not_cache_library_when_libc_loading_fails(self):
         lib = Mock()
 
-        with (
-            patch.object(
-                authselect_lib,
-                "find_library",
-                return_value="libauthselect.so.1",
-            ),
-            patch.object(
-                authselect_lib.cdll,
-                "LoadLibrary",
-                return_value=lib,
-            ),
-            patch.object(
-                authselect_lib,
-                "get_libc_lib",
-                side_effect=RuntimeError("libc failed"),
-            ),
-            patch.object(
-                authselect_lib,
-                "_configure_authselect_lib",
-            ) as configure_authselect,
-        ):
+        with patch.object(
+            authselect_lib,
+            "find_library",
+            return_value="libauthselect.so.1",
+        ), patch.object(
+            authselect_lib.cdll,
+            "LoadLibrary",
+            return_value=lib,
+        ), patch.object(
+            authselect_lib,
+            "get_libc_lib",
+            side_effect=RuntimeError("libc failed"),
+        ), patch.object(
+            authselect_lib,
+            "_configure_authselect_lib",
+        ) as configure_authselect:
             with self.assertRaisesRegex(
                 RuntimeError,
                 "libc failed",
@@ -668,23 +642,18 @@ class TestAuthselectLib(unittest.TestCase):
     def test_get_authselect_lib_does_not_cache_library_when_configuration_fails(self):
         lib = Mock()
 
-        with (
-            patch.object(
-                authselect_lib,
-                "find_library",
-                return_value="libauthselect.so.1",
-            ),
-            patch.object(
-                authselect_lib.cdll,
-                "LoadLibrary",
-                return_value=lib,
-            ),
-            patch.object(authselect_lib, "get_libc_lib"),
-            patch.object(
-                authselect_lib,
-                "_configure_authselect_lib",
-                side_effect=RuntimeError("configuration failed"),
-            ),
+        with patch.object(
+            authselect_lib,
+            "find_library",
+            return_value="libauthselect.so.1",
+        ), patch.object(
+            authselect_lib.cdll,
+            "LoadLibrary",
+            return_value=lib,
+        ), patch.object(authselect_lib, "get_libc_lib"), patch.object(
+            authselect_lib,
+            "_configure_authselect_lib",
+            side_effect=RuntimeError("configuration failed"),
         ):
             with self.assertRaisesRegex(
                 RuntimeError,

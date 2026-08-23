@@ -1,6 +1,10 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import ctypes
+from typing import Callable
 
 
 class _AuthselectFilesStruct(ctypes.Structure):
@@ -12,22 +16,22 @@ class _AuthselectFilesStruct(ctypes.Structure):
     pass
 
 
-class AuthselectFiles(ctypes.POINTER(_AuthselectFilesStruct)):
+class AuthselectFiles(ctypes.POINTER(_AuthselectFilesStruct)):  # type: ignore[misc]
     _type_ = _AuthselectFilesStruct
 
     #
     # Populated by authselect_lib.py
     #
-    _free = None
-    _get_nsswitch = None
-    _get_systemauth = None
-    _get_passwordauth = None
-    _get_smartcardauth = None
-    _get_fingerprintauth = None
-    _get_switchableauth = None
-    _get_postlogin = None
-    _get_dconf_db = None
-    _get_dconf_lock = None
+    _free: Callable[[AuthselectFiles], None] | None = None
+    _get_nsswitch: Callable[[AuthselectFiles], bytes | None] | None = None
+    _get_systemauth: Callable[[AuthselectFiles], bytes | None] | None = None
+    _get_passwordauth: Callable[[AuthselectFiles], bytes | None] | None = None
+    _get_smartcardauth: Callable[[AuthselectFiles], bytes | None] | None = None
+    _get_fingerprintauth: Callable[[AuthselectFiles], bytes | None] | None = None
+    _get_switchableauth: Callable[[AuthselectFiles], bytes | None] | None = None
+    _get_postlogin: Callable[[AuthselectFiles], bytes | None] | None = None
+    _get_dconf_db: Callable[[AuthselectFiles], bytes | None] | None = None
+    _get_dconf_lock: Callable[[AuthselectFiles], bytes | None] | None = None
 
     def __enter__(self):
         self._assert_valid()
@@ -50,64 +54,113 @@ class AuthselectFiles(ctypes.POINTER(_AuthselectFilesStruct)):
         if getattr(self, "_closed", False):
             return
 
-        if type(self)._free is None:
+        free = type(self)._free
+
+        if free is None:
             raise RuntimeError("AuthselectFiles free function has not been configured")
 
-        type(self)._free(self)
+        free(self)
         self._closed = True
 
     @property
     def nsswitch(self) -> str | None:
         self._assert_valid()
-        value = type(self)._get_nsswitch(self)
+
+        nsswitch = type(self)._get_nsswitch
+
+        if nsswitch is None:
+            raise RuntimeError("AuthselectFiles nsswitch function has not been configured")
+
+        value = nsswitch(self)
         return None if value is None else value.decode("utf-8")
 
     @property
     def systemauth(self) -> str | None:
         self._assert_valid()
-        value = type(self)._get_systemauth(self)
+
+        systemauth = type(self)._get_systemauth
+
+        if systemauth is None:
+            raise RuntimeError("The installed libauthselect does not support system-auth")
+
+        value = systemauth(self)
+
         return None if value is None else value.decode("utf-8")
 
     @property
     def passwordauth(self) -> str | None:
         self._assert_valid()
-        value = type(self)._get_passwordauth(self)
+
+        passwordauth = type(self)._get_passwordauth
+
+        if passwordauth is None:
+            raise RuntimeError("The installed libauthselect does not support password-auth")
+
+        value = passwordauth(self)
+
         return None if value is None else value.decode("utf-8")
 
     @property
     def smartcardauth(self) -> str | None:
         self._assert_valid()
-        value = type(self)._get_smartcardauth(self)
+
+        smartcardauth = type(self)._get_smartcardauth
+
+        if smartcardauth is None:
+            raise RuntimeError("The installed libauthselect does not support smartcard-auth")
+
+        value = smartcardauth(self)
+
         return None if value is None else value.decode("utf-8")
 
     @property
     def fingerprintauth(self) -> str | None:
         self._assert_valid()
-        value = type(self)._get_fingerprintauth(self)
+
+        fingerprintauth = type(self)._get_fingerprintauth
+
+        if fingerprintauth is None:
+            raise RuntimeError("The installed libauthselect does not support fingerprint-auth")
+
+        value = fingerprintauth(self)
+
         return None if value is None else value.decode("utf-8")
 
     @property
     def switchableauth(self) -> str | None:
         self._assert_valid()
 
-        if type(self)._get_switchableauth is None:
-            raise RuntimeError(
-                "The installed libauthselect does not support switchable-auth"
-            )
+        switchableauth = type(self)._get_switchableauth
 
-        value = type(self)._get_switchableauth(self)
+        if switchableauth is None:
+            raise RuntimeError("The installed libauthselect does not support switchable-auth")
+
+        value = switchableauth(self)
         return None if value is None else value.decode("utf-8")
 
     @property
     def postlogin(self) -> str | None:
         self._assert_valid()
-        value = type(self)._get_postlogin(self)
+
+        postlogin = type(self)._get_postlogin
+
+        if postlogin is None:
+            raise RuntimeError("AuthselectFiles postlogin function has not been configured")
+
+        value = postlogin(self)
+
         return None if value is None else value.decode("utf-8")
 
     @property
     def dconf_db(self) -> str:
         self._assert_valid()
-        value = type(self)._get_dconf_db(self)
+
+        dconf_db = type(self)._get_dconf_db
+
+        if dconf_db is None:
+            raise RuntimeError("AuthselectFiles dconf_db function has not been configured")
+
+        value = dconf_db(self)
 
         if value is None:
             raise RuntimeError("authselect_files_dconf_db() returned NULL")
@@ -117,7 +170,13 @@ class AuthselectFiles(ctypes.POINTER(_AuthselectFilesStruct)):
     @property
     def dconf_lock(self) -> str:
         self._assert_valid()
-        value = type(self)._get_dconf_lock(self)
+
+        dconf_lock = type(self)._get_dconf_lock
+
+        if dconf_lock is None:
+            raise RuntimeError("AuthselectFiles dconf_lock function has not been configured")
+
+        value = dconf_lock(self)
 
         if value is None:
             raise RuntimeError("authselect_files_dconf_lock() returned NULL")
