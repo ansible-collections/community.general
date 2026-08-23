@@ -6,6 +6,7 @@ from __future__ import annotations
 import unittest
 from unittest.mock import patch
 
+import pytest
 from ansible.module_utils import basic
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
@@ -49,6 +50,14 @@ ufw_status_verbose_with_ipv6 = (
 )
 
 ufw_status_verbose_nothing = ufw_verbose_header
+
+ufw_status_verbose_default_allow_incoming = """Status: active
+Logging: on (low)
+Default: allow (incoming), allow (outgoing), deny (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----"""
 
 skippg_adding_existing_rules = "Skipping adding existing rule\nSkipping adding existing rule (v6)\n"
 
@@ -113,6 +122,31 @@ def do_nothing_func_port_7000(*args, **kwarg):
 def get_bin_path(self, arg, required=False):
     """Mock AnsibleModule.get_bin_path"""
     return arg
+
+
+def default_command_run_command(post_status_verbose):
+    """Build a run_command side_effect for real-mode "default" command tests.
+
+    The first "ufw status verbose" call reports the pre-change state (deny incoming,
+    allow outgoing); later calls report post_status_verbose, simulating the effect
+    (or lack thereof) of running "ufw default ...".
+    """
+    calls = {"status_verbose": 0}
+
+    def _run_command(*args, **kwarg):
+        cmd = args[0]
+        if cmd == "ufw status verbose":
+            calls["status_verbose"] += 1
+            if calls["status_verbose"] == 1:
+                return 0, ufw_verbose_header, ""
+            return 0, post_status_verbose, ""
+        if cmd == grep_config_cli:
+            return 0, "", ""
+        if cmd.startswith("ufw default "):
+            return 0, "Default incoming policy changed to 'allow'\n", ""
+        raise AssertionError(f"unexpected command: {cmd}")
+
+    return _run_command
 
 
 class TestUFW(unittest.TestCase):
@@ -430,3 +464,35 @@ class TestUFW(unittest.TestCase):
             with self.assertRaises(AnsibleExitJson) as result:
                 module.main()
         return result
+
+
+@pytest.fixture
+def patch_ansible_module():
+    with patch.multiple(basic.AnsibleModule, exit_json=exit_json, fail_json=fail_json, get_bin_path=get_bin_path):
+        yield
+
+
+def test_default_real_mode_not_changed(patch_ansible_module):
+    # policy already matches the desired value: "ufw default ..." must not run
+    with set_module_args({"default": "deny", "direction": "incoming"}):
+        with patch.object(basic.AnsibleModule, "run_command") as mock_run_command:
+            mock_run_command.side_effect = default_command_run_command(ufw_verbose_header)
+            with pytest.raises(AnsibleExitJson) as exc:
+                module.main()
+
+    payload = exc.value.args[0]
+    assert payload["changed"] is False
+    assert "ufw default deny incoming" not in payload["commands"]
+
+
+def test_default_real_mode_changed(patch_ansible_module):
+    # policy differs from the desired value: "ufw default ..." must run
+    with set_module_args({"default": "allow", "direction": "incoming"}):
+        with patch.object(basic.AnsibleModule, "run_command") as mock_run_command:
+            mock_run_command.side_effect = default_command_run_command(ufw_status_verbose_default_allow_incoming)
+            with pytest.raises(AnsibleExitJson) as exc:
+                module.main()
+
+    payload = exc.value.args[0]
+    assert payload["changed"] is True
+    assert "ufw default allow incoming" in payload["commands"]
