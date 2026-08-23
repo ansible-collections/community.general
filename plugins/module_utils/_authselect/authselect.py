@@ -168,6 +168,8 @@ class Authselect:
         return status, is_valid.value
 
     def is_feature_enabled(self, feature: str) -> bool:
+        if not hasattr(self._lib, "authselect_feature_enabled"):
+            raise RuntimeError("The installed libauthselect does not support authselect_feature_enabled()")
         result = self._lib.authselect_feature_enabled(feature.encode("utf-8"))
 
         if result == 0:

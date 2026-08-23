@@ -530,6 +530,15 @@ class TestAuthselect(unittest.TestCase):
         ):
             self.wrapper.is_feature_enabled("with-faillock")
 
+    def test_is_feature_enabled_fails_when_library_does_not_support_it(self):
+        del self.lib.authselect_feature_enabled
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            r"The installed libauthselect does not support authselect_feature_enabled\(\)",
+        ):
+            self.wrapper.is_feature_enabled("with-faillock")
+
     # ------------------------------------------------------------------
     # Feature mutation
     # ------------------------------------------------------------------

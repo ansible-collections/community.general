@@ -425,6 +425,12 @@ class TestAuthselectLib(unittest.TestCase):
                     expected_restype,
                 )
 
+    def test_configure_authselect_does_not_require_feature_enabled(self):
+        lib = make_authselect_library()
+        del lib.authselect_feature_enabled
+
+        authselect_lib._configure_authselect_lib(lib)
+
     def test_configure_authselect_configures_debug_callback_signature_and_registers_callback(self):
         lib = make_authselect_library()
 

@@ -406,10 +406,11 @@ def _configure_authselect_lib(lib):
     #     const char *feature
     # );
     #
-    lib.authselect_feature_enabled.argtypes = [
-        ctypes.c_char_p,
-    ]
-    lib.authselect_feature_enabled.restype = ctypes.c_int
+    if hasattr(lib, "authselect_feature_enabled"):
+        lib.authselect_feature_enabled.argtypes = [
+            ctypes.c_char_p,
+        ]
+        lib.authselect_feature_enabled.restype = ctypes.c_int
 
     #
     # int authselect_apply_changes(
