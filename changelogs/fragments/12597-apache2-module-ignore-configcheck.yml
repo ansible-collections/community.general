@@ -1,0 +1,2 @@
+bugfixes:
+  - apache2_module - fix false failures when ``ignore_configcheck`` is set and the configuration is broken for a reason unrelated to the module being changed (https://github.com/ansible-collections/community.general/issues/4592, https://github.com/ansible-collections/community.general/pull/12597).
