@@ -1,0 +1,2 @@
+bugfixes:
+  - ufw - do not reload the default policy when it is already set to the requested value (https://github.com/ansible-collections/community.general/issues/1843, https://github.com/ansible-collections/community.general/pull/12590).
