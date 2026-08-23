@@ -178,7 +178,7 @@ features:
 
 import time
 from enum import Enum, auto
-from typing import Callable, NoReturn, cast
+from typing import Callable, List, NoReturn, cast
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -430,7 +430,7 @@ class AuthselectModule:
 
     def _get_current_authselect_features(self) -> set[str]:
         if self.is_current_authselect_features_set():
-            return set(cast(list[str], self.authselect.get_current_features()))
+            return set(cast(List[str], self.authselect.get_current_features()))
         else:
             return set()
 
