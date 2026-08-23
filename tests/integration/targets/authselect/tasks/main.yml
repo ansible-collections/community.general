@@ -130,28 +130,28 @@
           - authselect_check_no_change.profile == "sssd"
           - authselect_check_no_change.features == []
 
-    - name: Switch to local profile
+    - name: Switch to winbind profile
       community.general.authselect:
-        profile: local
+        profile: winbind
       register: authselect_switch_profile
 
-    - name: Verify profile switched to local
+    - name: Verify profile switched to winbind
       ansible.builtin.assert:
         that:
           - authselect_switch_profile.changed
-          - authselect_switch_profile.profile == "local"
+          - authselect_switch_profile.profile == "winbind"
           - authselect_switch_profile.features == []
 
-    - name: Ensure local profile again
+    - name: Ensure winbind profile again
       community.general.authselect:
-        profile: local
+        profile: winbind
       register: authselect_switch_profile_again
 
-    - name: Verify local profile selection is idempotent
+    - name: Verify winbind profile selection is idempotent
       ansible.builtin.assert:
         that:
           - not authselect_switch_profile_again.changed
-          - authselect_switch_profile_again.profile == "local"
+          - authselect_switch_profile_again.profile == "winbind"
           - authselect_switch_profile_again.features == []
 
     - name: Switch back to sssd with with-mkhomedir enabled
@@ -168,21 +168,21 @@
           - authselect_sssd_with_feature.profile == "sssd"
           - "'with-mkhomedir' in authselect_sssd_with_feature.features"
 
-    - name: Switch to local without requesting features
+    - name: Switch to winbind without requesting features
       community.general.authselect:
-        profile: local
+        profile: winbind
       register: authselect_switch_without_features
 
     - name: Verify features from previous profile were not carried over
       ansible.builtin.assert:
         that:
           - authselect_switch_without_features.changed
-          - authselect_switch_without_features.profile == "local"
+          - authselect_switch_without_features.profile == "winbind"
           - authselect_switch_without_features.features == []
 
-    - name: Validate current local configuration
+    - name: Validate current winbind configuration
       community.general.authselect:
-        profile: local
+        profile: winbind
         validate: true
       register: authselect_validate
 
@@ -190,7 +190,7 @@
       ansible.builtin.assert:
         that:
           - not authselect_validate.changed
-          - authselect_validate.profile == "local"
+          - authselect_validate.profile == "winbind"
           - authselect_validate.features == []
 
     - name: Switch to sssd with validation
@@ -216,9 +216,9 @@
       register: authselect_backups_before
       changed_when: false
 
-    - name: Switch to local with rollback protection
+    - name: Switch to winbind with rollback protection
       community.general.authselect:
-        profile: local
+        profile: winbind
         validate: true
         rollback_on_failure: true
       register: authselect_rollback_success
@@ -235,7 +235,7 @@
       ansible.builtin.assert:
         that:
           - authselect_rollback_success.changed
-          - authselect_rollback_success.profile == "local"
+          - authselect_rollback_success.profile == "winbind"
           - authselect_rollback_success.features == []
           - authselect_backups_after.stdout_lines | sort == authselect_backups_before.stdout_lines | sort
 
@@ -261,20 +261,20 @@
           - authselect_before_restore.profile == "sssd"
           - "'with-mkhomedir' in authselect_before_restore.features"
 
-    - name: Restore saved local configuration through libauthselect
+    - name: Restore saved winbind configuration through libauthselect
       authselect_restore_test:
         name: ansible-test-authselect-restore
 
     - name: Verify restored configuration through the module
       community.general.authselect:
-        profile: local
+        profile: winbind
       register: authselect_after_restore
 
-    - name: Verify backup restore returned to local
+    - name: Verify backup restore returned to winbind
       ansible.builtin.assert:
         that:
           - not authselect_after_restore.changed
-          - authselect_after_restore.profile == "local"
+          - authselect_after_restore.profile == "winbind"
           - authselect_after_restore.features == []
 
     - name: Remove restore test backup
