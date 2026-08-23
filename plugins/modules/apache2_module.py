@@ -135,6 +135,13 @@ def _get_ctl_binary(module):
 
 
 def _module_is_enabled(module):
+    """
+    Returns a tuple (enabled, configcheck_failed).
+
+    configcheck_failed is True when `apache2ctl -M` itself failed and
+    ignore_configcheck absorbed the error, meaning enabled could not
+    actually be confirmed one way or another.
+    """
     control_binary = _get_ctl_binary(module)
     result, stdout, stderr = module.run_command([control_binary, "-M"])
 
@@ -149,12 +156,12 @@ def _module_is_enabled(module):
                     )
             else:
                 module.warn(error_msg)
-            return False
+            return False, True
         else:
             module.fail_json(msg=error_msg)
 
     searchstring = f" {module.params['identifier']}"
-    return searchstring in stdout
+    return searchstring in stdout, False
 
 
 def create_apache_identifier(name):
@@ -201,7 +208,8 @@ def _set_state(module, state):
     a2mod_binary = {"present": "a2enmod", "absent": "a2dismod"}[state]
     success_msg = f"Module {name} {state_string}"
 
-    if _module_is_enabled(module) != want_enabled:
+    currently_enabled, _configcheck_failed = _module_is_enabled(module)
+    if currently_enabled != want_enabled:
         if module.check_mode:
             module.exit_json(changed=True, result=success_msg)
 
@@ -219,8 +227,24 @@ def _set_state(module, state):
 
         result, stdout, stderr = module.run_command(a2mod_binary_cmd + [name])
 
-        if _module_is_enabled(module) == want_enabled:
+        if result != 0:
+            module.fail_json(
+                msg=f"Failed to run {a2mod_binary} for module {name}:\n{stdout}\n{stderr}",
+                rc=result,
+                stdout=stdout,
+                stderr=stderr,
+            )
+
+        now_enabled, configcheck_failed = _module_is_enabled(module)
+        if now_enabled == want_enabled:
             module.exit_json(changed=True, result=success_msg)
+        elif configcheck_failed:
+            # apache2ctl -M could not confirm the new state because the configuration
+            # is broken for a reason unrelated to this module. Since a2mod_binary
+            # itself succeeded above, fall back to its own wording to tell whether
+            # this was a real change.
+            changed = f"already {state_string}" not in stdout
+            module.exit_json(changed=changed, result=success_msg)
         else:
             msg = (
                 f"Failed to set module {name} to {state_string}:\n"
