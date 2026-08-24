@@ -79,7 +79,7 @@ options:
     default: https://appimage.github.io/feed.json
   validate_certs:
     description:
-      - If V(false), SSL certificates are not validated.
+      - If V(false), TLS certificates are not validated.
     type: bool
     default: true
   timeout:
