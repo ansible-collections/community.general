@@ -140,7 +140,7 @@
     api_username: "{{ opennebula_username }}"
     api_password: "{{ opennebula_password }}"
     validate_certs: false
-    ansible.builtin.template:
+    template:
       LABELS:
         - test
         - custom
