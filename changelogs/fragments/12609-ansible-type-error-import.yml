@@ -1,0 +1,3 @@
+bugfixes:
+  - unicode_normalize filter - fix spurious deprecation warnings by importing ``AnsibleTypeError`` directly instead of falling back to the deprecated ``AnsibleFilterTypeError`` (https://github.com/ansible-collections/community.general/issues/12609).
+  - hashids filter - fix spurious deprecation warnings by importing ``AnsibleTypeError`` directly instead of falling back to the deprecated ``AnsibleFilterTypeError`` (https://github.com/ansible-collections/community.general/issues/12609).

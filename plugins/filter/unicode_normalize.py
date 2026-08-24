@@ -47,11 +47,7 @@ _value:
 from unicodedata import normalize
 
 from ansible.errors import AnsibleFilterError
-
-try:
-    from ansible.errors import AnsibleTypeError
-except ImportError:
-    from ansible.errors import AnsibleFilterTypeError as AnsibleTypeError  # type: ignore
+from ansible.errors import AnsibleTypeError
 
 
 def unicode_normalize(data, form="NFC"):

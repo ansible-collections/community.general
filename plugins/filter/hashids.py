@@ -9,11 +9,7 @@ from ansible.errors import (
     AnsibleFilterError,
 )
 from ansible.module_utils.common.collections import is_sequence
-
-try:
-    from ansible.errors import AnsibleTypeError
-except ImportError:
-    from ansible.errors import AnsibleFilterTypeError as AnsibleTypeError  # type: ignore
+from ansible.errors import AnsibleTypeError
 
 try:
     from hashids import Hashids
