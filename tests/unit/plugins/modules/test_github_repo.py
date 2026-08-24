@@ -159,7 +159,7 @@ def patch_repo_mock(url, request):
     repo = match.group("repo")
 
     body = json.loads(request.body)
-    visibility = body.get("visibility", "private" if body.get("private", False) else "public")
+    visibility = body.get("visibility", "private" if body.get("private") else "public")
     headers = {"content-type": "application/json"}
     # https://docs.github.com/en/rest/reference/repos#update-a-repository
     content = {

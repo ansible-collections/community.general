@@ -289,11 +289,9 @@ def main():
         required_together=[("username", "password")],
         required_one_of=[("username", "access_token")],
         mutually_exclusive=[("username", "access_token"), ("private", "visibility")],
-        required_if=[
-            ("visibility", "public", ("organization",)),
-            ("visibility", "private", ("organization",)),
-            ("visibility", "internal", ("organization",)),
-        ],
+        required_by={
+            "visibility": ["organization"],
+        },
     )
 
     if not HAS_GITHUB_PACKAGE:
@@ -302,8 +300,9 @@ def main():
     if module.params["visibility"] is not None:
         pygithub_version = tuple(int(x) for x in _github_module.__version__.split(".")[:2])
         if pygithub_version < PYGITHUB_MIN_VERSION_VISIBILITY:
+            ver = ".".join(str(p) for p in PYGITHUB_MIN_VERSION_VISIBILITY)
             module.fail_json(
-                msg=f"The 'visibility' option requires PyGithub >= 1.58. Found version {_github_module.__version__}."
+                msg=f"The 'visibility' option requires PyGithub >= {ver}. Found version {_github_module.__version__}."
             )
 
     try:
