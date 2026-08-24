@@ -6,10 +6,11 @@ from __future__ import annotations
 
 import os
 import shutil
-import sys
 import tempfile
 import unittest
 from unittest.mock import Mock, patch
+
+from ansible_collections.community.general.plugins.modules import packer
 
 
 class TestPackerModule(unittest.TestCase):
@@ -53,10 +54,6 @@ class TestPackerModule(unittest.TestCase):
         with open(self.template_path, "w") as f:
             f.write('source "null" "test" {\n  communicator = "none"\n}\n\nbuild {\n  sources = ["null.test"]\n}\n')
 
-        for module_name in list(sys.modules.keys()):
-            if "packer" in module_name and "ansible_collections" in module_name:
-                del sys.modules[module_name]
-
     def tearDown(self):
         pass
 
@@ -80,7 +77,6 @@ class TestPackerModule(unittest.TestCase):
         self.mock_module.params = default_params
 
     def test_init_successful(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="init")
         self.mock_module.run_command.return_value = (0, "Plugins installed successfully", "")
@@ -89,13 +85,12 @@ class TestPackerModule(unittest.TestCase):
         packer_module = packer.PackerModule(self.mock_module, packer_bin)
         result = packer_module.apply()
 
-        self.assertFalse(result["changed"])
+        self.assertTrue(result["changed"])
         self.assertEqual(result["rc"], 0)
         self.assertIn("Plugins installed", result["stdout"])
         self.assertIn("init", result["cmd"])
 
     def test_build_successful(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build")
         self.mock_module.run_command.return_value = (
@@ -129,7 +124,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("-force", cmd)
 
     def test_build_with_only(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", only=["null.test"])
         self.mock_module.run_command.return_value = (0, "Build finished", "")
@@ -143,7 +137,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("-only null.test", cmd)
 
     def test_build_with_variables(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", variables={"aws_region": "us-west-2", "instance_type": "t2.micro"})
         self.mock_module.run_command.return_value = (0, "Build finished", "")
@@ -158,7 +151,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("-var instance_type=t2.micro", cmd)
 
     def test_build_with_var_files(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         var_file = os.path.join(self.test_dir, "vars.pkrvars.hcl")
         with open(var_file, "w") as f:
@@ -176,7 +168,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn(f"-var-file {var_file}", cmd)
 
     def test_build_with_parallel_disabled(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", parallel=False)
         self.mock_module.run_command.return_value = (0, "Build finished", "")
@@ -189,7 +180,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("-parallel=false", cmd)
 
     def test_build_with_color_disabled(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", color=False)
         self.mock_module.run_command.return_value = (0, "Build finished", "")
@@ -202,7 +192,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("-no-color", cmd)
 
     def test_build_with_machine_readable(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", machine_readable=True)
         mock_output = "artifact,0,amazon-ebs,ami-12345678\nartifact,1,docker,my-image:latest\n"
@@ -223,7 +212,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(artifacts[1]["name"], "my-image:latest")
 
     def test_build_with_log_level(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", log_level="debug")
         self.mock_module.run_command.return_value = (0, "Build finished", "")
@@ -236,7 +224,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("--log-level debug", cmd)
 
     def test_build_in_check_mode(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build")
         self.mock_module.check_mode = True
@@ -252,7 +239,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertNotIn("build", result["cmd"])
 
     def test_build_failure(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build")
         self.mock_module.run_command.return_value = (1, "", "Error: missing required variable")
@@ -265,7 +251,6 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("fail_json called", str(context.exception))
 
     def test_template_missing(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", template="/nonexistent/template.pkr.hcl")
         packer_bin = self.mock_module.get_bin_path.return_value
@@ -279,7 +264,6 @@ class TestPackerModule(unittest.TestCase):
         )
 
     def test_var_file_not_exists(self):
-        from ansible_collections.community.general.plugins.modules import packer
 
         self._setup_module_params(state="build", var_files=["/nonexistent/file.pkrvars.hcl"])
         packer_bin = self.mock_module.get_bin_path.return_value
@@ -292,7 +276,6 @@ class TestPackerModule(unittest.TestCase):
 
     @patch("os.getcwd")
     def test_packer_not_installed(self, mock_getcwd):
-        from ansible_collections.community.general.plugins.modules import packer
 
         mock_getcwd.return_value = self.test_dir
 

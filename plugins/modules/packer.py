@@ -32,7 +32,7 @@ options:
     type: str
     required: true
     choices:
-      build: builds the image from template (or validates in check_mode).
+      build: builds the image from template (or validates in check mode).
       init: initializes the template (installs required plugins).
   template:
     description:
@@ -44,27 +44,23 @@ options:
     description:
       - Dictionary of variables to pass to Packer (C(-var)).
     type: dict
-    required: false
     default: {}
   var_files:
     description:
       - List of variable files to load (C(-var-file)).
     type: list
     elements: path
-    required: false
     default: []
   only:
     description:
       - Build only the specified builders (C(-only)).
     type: list
     elements: str
-    required: false
   except_builders:
     description:
       - Build all builders except the specified ones (C(-except)).
     type: list
     elements: str
-    required: false
     aliases: [except]
   force:
     description:
@@ -383,7 +379,9 @@ class PackerModule:
             changed = False
             if command == "build":
                 changed = True
-            elif command in ["init", "validate"]:
+            elif command == "init" and rc == 0:
+                changed = True
+            elif command == "validate":
                 changed = False
 
             result_dict = {
@@ -422,9 +420,7 @@ class PackerModule:
             if self.module.check_mode:
                 return self.execute_packer("validate")
             else:
-                result = self.execute_packer("build")
-                self.result.update(result)
-                return self.result
+                return self.execute_packer("build")
 
         self.module.fail_json(msg=f"Unsupported state: {self.state}")
 
@@ -439,23 +435,21 @@ def main() -> None:
                 choices=["build", "init"],
             ),
             template=dict(type="path", required=True),
-            variables=dict(type="dict", required=False, default={}),
-            var_files=dict(type="list", elements="path", required=False, default=[]),
-            only=dict(type="list", elements="str", required=False),
+            variables=dict(type="dict", default={}),
+            var_files=dict(type="list", elements="path", default=[]),
+            only=dict(type="list", elements="str"),
             except_builders=dict(
                 type="list",
                 elements="str",
-                required=False,
                 aliases=["except"],
             ),
-            force=dict(type="bool", required=False, default=False),
-            parallel=dict(type="bool", required=False, default=True),
-            color=dict(type="bool", required=False, default=True),
-            machine_readable=dict(type="bool", required=False, default=False),
-            cleanup=dict(type="bool", required=False, default=False),
+            force=dict(type="bool", default=False),
+            parallel=dict(type="bool", default=True),
+            color=dict(type="bool", default=True),
+            machine_readable=dict(type="bool", default=False),
+            cleanup=dict(type="bool", default=False),
             log_level=dict(
                 type="str",
-                required=False,
                 choices=["trace", "debug", "info", "warn", "error"],
                 default="info",
             ),
