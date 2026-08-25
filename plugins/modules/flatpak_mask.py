@@ -114,7 +114,6 @@ class FlatpakMask(StateModuleHelper):
             self.apply_mask()
 
     def state_absent(self):
-        self.vars.masked = False
         if not self.vars.has_changed:
             return
         if not self.check_mode:
