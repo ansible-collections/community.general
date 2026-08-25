@@ -85,7 +85,7 @@ class FlatpakMask(StateModuleHelper):
         self.vars.set("masked", self._check_is_masked(), change=True)
         self.vars.masked = self.vars.state == "present"
 
-    def _check_is_masked(self):
+    def check_is_masked(self):
         check_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask"]
 
         rc, out, err = self.module.run_command(check_cmd)
@@ -95,14 +95,14 @@ class FlatpakMask(StateModuleHelper):
         masked_apps = [line.strip() for line in out.splitlines()]
         return self.vars.name in masked_apps
 
-    def _apply_mask(self):
+    def apply_mask(self):
         set_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask", self.vars.name]
 
         rc, out, err = self.module.run_command(set_cmd)
         if rc != 0:
             self.do_raise(msg="Failed to mask flatpak app", rc=rc, stdout=out, stderr=err)
 
-    def _apply_unmask(self):
+    def apply_unmask(self):
         set_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask", "--remove", self.vars.name]
 
         rc, out, err = self.module.run_command(set_cmd)
@@ -110,16 +110,15 @@ class FlatpakMask(StateModuleHelper):
             self.do_raise(msg="Failed to unmask flatpak app", rc=rc, stdout=out, stderr=err)
 
     def state_present(self):
-        self.vars.masked = True
         if self.vars.has_changed and not self.check_mode:
-            self._apply_mask()
+            self.apply_mask()
 
     def state_absent(self):
         self.vars.masked = False
         if not self.vars.has_changed:
             return
         if not self.check_mode:
-            self._apply_unmask()
+            self.apply_unmask()
 
 
 def main():
