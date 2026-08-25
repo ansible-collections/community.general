@@ -82,7 +82,7 @@ class FlatpakMask(StateModuleHelper):
 
     def __init_module__(self):
         self.flatpak_bin = self.get_bin_path("flatpak", required=True)
-        self.vars.set("masked", self._check_is_masked(), change=True)
+        self.vars.set("masked", self.check_is_masked(), change=True)
         self.vars.masked = self.vars.state == "present"
 
     def check_is_masked(self):
