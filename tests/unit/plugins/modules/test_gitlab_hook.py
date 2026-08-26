@@ -92,6 +92,28 @@ class TestGitlabHook(GitlabModuleTestCase):
 
     @with_httmock(resp_get_project)
     @with_httmock(resp_find_project_hook)
+    def test_update_hook_branch_filter_strategy(self):
+        project = self.gitlab_instance.projects.get(1)
+        hook = self.moduleUtil.find_hook(project, "http://example.com/hook")
+
+        self.assertEqual(hook.branch_filter_strategy, "wildcard")
+
+        changed, newHook = self.moduleUtil.update_hook(
+            hook, {"push_events_branch_filter": "^(main|release/.*)$", "branch_filter_strategy": "regex"}
+        )
+
+        self.assertEqual(changed, True)
+        self.assertEqual(newHook.push_events_branch_filter, "^(main|release/.*)$")
+        self.assertEqual(newHook.branch_filter_strategy, "regex")
+
+        # Not specifying the strategy must leave the one configured on the hook alone
+        changed, newHook = self.moduleUtil.update_hook(hook, {"branch_filter_strategy": None})
+
+        self.assertEqual(changed, False)
+        self.assertEqual(newHook.branch_filter_strategy, "regex")
+
+    @with_httmock(resp_get_project)
+    @with_httmock(resp_find_project_hook)
     @with_httmock(resp_delete_project_hook)
     def test_delete_hook(self):
         project = self.gitlab_instance.projects.get(1)
