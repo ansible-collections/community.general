@@ -8,6 +8,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: appimage
 short_description: Manage AppImage packages
+version_added: 13.4.0
 description:
   - Install, update, and remove applications distributed as AppImage files.
   - The module installs AppImage files into a user-controlled directory.
