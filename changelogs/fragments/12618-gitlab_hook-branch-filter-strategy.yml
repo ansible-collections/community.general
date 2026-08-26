@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_hook - add ``branch_filter_strategy`` option to control how ``push_events_branch_filter`` filters push events, which allows filtering branches by a regular expression (https://github.com/ansible-collections/community.general/pull/12618).
