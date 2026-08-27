@@ -32,12 +32,19 @@ options:
     choices: [joyent, joyent-minimal, lx, kvm, bhyve]
     default: joyent
     description:
-      - Type of virtual machine. The V(bhyve) option was added in community.general 0.2.0.
+      - Type of virtual machine.
+      - The V(bhyve) option was added in community.general 0.2.0.
     type: str
   boot:
     description:
       - Set the boot order for KVM VMs.
     type: str
+  bootrom:
+    description:
+      - Sets the boot ROM used for a bhyve VM. Valid values are V(bios), V(uefi), or a path to a custom bootrom binary relative
+        to the guest zone root.
+    type: str
+    version_added: 13.4.0
   cpu_cap:
     description:
       - Sets a limit on the amount of CPU time that can be used by a VM. Use V(0) for no cap.
@@ -577,6 +584,7 @@ def main():
     properties = {
         "str": [
             "boot",
+            "bootrom",
             "disk_driver",
             "dns_domain",
             "fs_allowed",
