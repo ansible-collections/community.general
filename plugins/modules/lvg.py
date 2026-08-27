@@ -132,7 +132,7 @@ EXAMPLES = r"""
     vg: vg.services
     state: absent
 
-- name: Create a volume group on top of /dev/sda3 and resize the volume group /dev/sda3 to the maximum possible
+- name: Create a volume group on top of /dev/sda3 and resize the physical volume /dev/sda3 to the maximum possible
   community.general.lvg:
     vg: resizableVG
     pvs: /dev/sda3
