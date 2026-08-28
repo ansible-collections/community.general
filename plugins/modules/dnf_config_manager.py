@@ -23,6 +23,16 @@ attributes:
   diff_mode:
     support: none
 options:
+  allowmissingmetadata:
+    description:
+      - Allow missing metadata and skip errors
+    default: false
+    type: bool
+  usecache:
+    description:
+      - Use cached repository metadata only
+    default: false
+    type: bool
   name:
     description:
       - Repository ID, for example V(crb).
@@ -133,12 +143,18 @@ def get_dnf_version(module, dnf) -> t.Literal[4, 5]:
     return 5 if re.match(r"^dnf5\s*", line) else 4
 
 
-def get_repo_states(module, dnf, dnf_v):
+def get_repo_states(module, dnf, dnf_v, use_cache, allow_missing_metadata):
     command = [dnf]
     if dnf_v == 4:
         command.extend(["repolist", "--all", "--verbose"])
+        if allow_missing_metadata:
+            command.append('--setopt=skip_if_unavailable=true')
     else:
         command.extend(["repo", "info", "--all"])
+        if allow_missing_metadata:
+            command.append('--skip-unavailable')
+    if use_cache:
+        command.append('-C')
 
     rc, out, err = module.run_command(command, check_rc=True)
 
@@ -200,7 +216,10 @@ def main():
 
     dnf_v = get_dnf_version(module, dnf)
 
-    repo_states = get_repo_states(module, dnf, dnf_v)
+    use_cache = module.params["usecache"]
+    allow_missing_metadata = module.params["allowmissingmetadata"]
+
+    repo_states = get_repo_states(module, dnf, dnf_v, use_cache, allow_missing_metadata)
     result["repo_states_pre"] = pack_repo_states_for_return(repo_states)
 
     desired_repo_state = module.params["state"]
@@ -221,7 +240,7 @@ def main():
     if len(to_change) > 0:
         set_repo_states(module, dnf, dnf_v, to_change, desired_repo_state)
 
-    repo_states_post = get_repo_states(module, dnf, dnf_v)
+    repo_states_post = get_repo_states(module, dnf, dnf_v, use_cache, allow_missing_metadata)
     result["repo_states_post"] = pack_repo_states_for_return(repo_states_post)
 
     for repo_id in to_change:
