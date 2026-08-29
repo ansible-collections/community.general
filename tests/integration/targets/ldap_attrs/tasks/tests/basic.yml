@@ -1,0 +1,70 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- ansible.builtin.debug:
+    msg: Running tests/basic.yml
+
+####################################################################
+## INAPPROPRIATE_MATCHING fallback (https://github.com/ansible-collections/community.general/issues/3559)
+##
+## olcTLSCACertificateFile on cn=config lacks an EQUALITY matching rule
+## on older OpenLDAP versions (~2.5.x), so server-side equality search
+## raises INAPPROPRIATE_MATCHING.  The module must fall back to Python-
+## side comparison.
+##
+## On newer OpenLDAP (2.6+), EQUALITY was added, so the fallback is not
+## exercised, but the test still validates correct behavior.
+##
+## Access to cn=config requires SASL EXTERNAL over ldapi:// (as root).
+####################################################################
+
+- name: Test state=present is idempotent when value already exists
+  community.general.ldap_attrs:
+    dn: cn=config
+    attributes:
+      olcTLSCACertificateFile: /usr/local/share/ca-certificates/ca.crt
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+      - result is not failed
+
+- name: Test state=absent removes the value
+  community.general.ldap_attrs:
+    dn: cn=config
+    attributes:
+      olcTLSCACertificateFile: /usr/local/share/ca-certificates/ca.crt
+    state: absent
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is changed
+
+- name: Test state=absent is idempotent when value is already absent
+  community.general.ldap_attrs:
+    dn: cn=config
+    attributes:
+      olcTLSCACertificateFile: /usr/local/share/ca-certificates/ca.crt
+    state: absent
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+
+- name: Restore olcTLSCACertificateFile
+  community.general.ldap_attrs:
+    dn: cn=config
+    attributes:
+      olcTLSCACertificateFile: /usr/local/share/ca-certificates/ca.crt
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is changed

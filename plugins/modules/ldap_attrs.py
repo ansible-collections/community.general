@@ -21,7 +21,9 @@ notes:
     specified as Base64 and sent to the LDAP after decoding. If an attribute must be handled as binary without including
     the C(binary) option, it can be listed in O(binary_attributes).
   - For O(state=present) and O(state=absent), when handling text attributes, all value comparisons are performed on the
-    server for maximum accuracy. For O(state=exact) or binary attributes, values have to be compared in Python, which
+    server for maximum accuracy. If the server raises V(INAPPROPRIATE_MATCHING) because the attribute has no EQUALITY
+    matching rule (for example, certain C(olcTLS*) attributes on older OpenLDAP versions), the module falls back to
+    Python-side comparison. For O(state=exact) or binary attributes, values are always compared in Python, which
     obviously ignores LDAP matching rules. This should work out in most cases, but it is theoretically possible to see
     spurious changes when target and actual values are semantically identical but lexically distinct.
   - Support for binary values was added in community.general 12.5.0.
@@ -336,6 +338,8 @@ class LdapAttrs(LdapGeneric):
             is_present = len(dns) == 1
         except ldap.NO_SUCH_OBJECT:
             is_present = False
+        except ldap.INAPPROPRIATE_MATCHING:
+            is_present = value in self._get_all_values_of(name)
 
         return is_present
 
