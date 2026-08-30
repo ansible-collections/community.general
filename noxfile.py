@@ -39,15 +39,17 @@ def botmeta(session: nox.Session) -> None:
 
 
 @nox.session(name="ansible-output", default=False)
-@install_packages(packages=[
-    "ansible-core",
-    "antsibull-docs",
-    # Needed libs for some code blocks:
-    "jc",
-    "hashids",
-    # Tools for post-processing
-    "ruamel.yaml",  # used by docs/docsite/reformat-yaml.py
-])
+@install_packages(
+    packages=[
+        "ansible-core",
+        "antsibull-docs",
+        # Needed libs for some code blocks:
+        "jc",
+        "hashids",
+        # Tools for post-processing
+        "ruamel.yaml",  # used by docs/docsite/reformat-yaml.py
+    ]
+)
 def ansible_output(session: nox.Session) -> None:
     args = []
     if IN_CI:
