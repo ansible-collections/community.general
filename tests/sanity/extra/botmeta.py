@@ -9,11 +9,10 @@ from __future__ import annotations
 import os
 import re
 import sys
+import typing as t
 
+import pydantic
 import yaml
-
-from voluptuous import Any, MultipleInvalid, PREVENT_EXTRA, Schema
-from voluptuous.humanize import humanize_error
 
 
 IGNORE_NO_MAINTAINERS = [
@@ -53,6 +52,27 @@ IGNORE_NO_MAINTAINERS = [
     'plugins/filter/json_query.py',
     'plugins/filter/random_mac.py',
 ]
+
+
+class _BaseModel(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(frozen=True, extra="forbid", validate_default=True)
+
+
+class File(_BaseModel):
+    supershipit: t.Optional[str] = None
+    support: t.Optional[t.Literal["community"]] = None
+    maintainers: t.Optional[str] = None
+    labels: t.Optional[str] = None
+    keywords: t.Optional[str] = None
+    notify: t.Optional[str] = None
+    ignore: t.Optional[str] = None
+
+
+class BotMeta(_BaseModel):
+    notifications: t.Optional[bool] = None
+    automerge: t.Optional[bool] = None
+    macros: dict[str, t.Optional[str]] = {}
+    files: dict[str, File] = {}
 
 
 class BotmetaCheck:
@@ -140,36 +160,15 @@ class BotmetaCheck:
             return
 
         # Validate schema
-
-        MacroSchema = Schema({
-            (str): Any(str, None),
-        }, extra=PREVENT_EXTRA)
-
-        FilesSchema = Schema({
-            (str): {
-                ('supershipit'): str,
-                ('support'): Any('community'),
-                ('maintainers'): str,
-                ('labels'): str,
-                ('keywords'): str,
-                ('notify'): str,
-                ('ignore'): str,
-            },
-        }, extra=PREVENT_EXTRA)
-
-        schema = Schema({
-            ('notifications'): bool,
-            ('automerge'): bool,
-            ('macros'): MacroSchema,
-            ('files'): FilesSchema,
-        }, extra=PREVENT_EXTRA)
-
         try:
-            schema(botmeta)
-        except MultipleInvalid as ex:
-            for error in ex.errors:
+            BotMeta.model_validate(botmeta)
+        except pydantic.ValidationError as ex:
+            for error in ex.errors():
+                location = " -> ".join(str(loc) for loc in error["loc"])
+                message = f"{location}: {error['msg']}"
+
                 # No way to get line/column numbers
-                self.report_error(f'{self.botmeta_filename}:0:0: {humanize_error(botmeta, error)}')
+                self.report_error(f"{self.botmeta_filename}:0:0: {message}")
             return
 
         # Preprocess (substitute macros, convert to lists)

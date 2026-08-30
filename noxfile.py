@@ -14,6 +14,7 @@ import nox
 try:
     import antsibull_nox
     from antsibull_nox.cli import run as run_antsibull_nox
+    from antsibull_nox.sessions import install_packages
 except ImportError:
     print("You need to install antsibull-nox in the same Python environment as nox.")
     sys.exit(1)
@@ -28,8 +29,8 @@ def aliases(session: nox.Session) -> None:
 
 
 @nox.session(name="botmeta", default=True)
+@install_packages(packages=["PyYAML", "pydantic"])
 def botmeta(session: nox.Session) -> None:
-    session.install("PyYAML", "voluptuous")
     session.run("python", "tests/sanity/extra/botmeta.py")
 
 
