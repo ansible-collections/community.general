@@ -33,7 +33,7 @@ def aliases(session: nox.Session) -> None:
 
 
 @nox.session(name="botmeta", default=True)
-@install_packages(packages=["PyYAML", "voluptuous"])
+@install_packages(packages=["PyYAML", "pydantic"])
 def botmeta(session: nox.Session) -> None:
     session.run("python", "tests/sanity/extra/botmeta.py")
 
