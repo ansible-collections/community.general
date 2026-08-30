@@ -157,6 +157,32 @@
           - results is successful
           - results.row_count == 2
 
+    - name: Insert a record with autocommit enabled
+      community.general.odbc:
+        dsn: "{{ dsn }}"
+        query: "INSERT INTO films (code, title, did, date_prod, kind, len) VALUES ('zxcvb', 'My Third Movie', 3, '2019-01-12', 'Drama', '01:45')"
+        autocommit: true
+        commit: false
+      become_user: "{{ pg_user }}"
+      become: true
+      register: results
+
+    - ansible.builtin.assert:
+        that:
+          - results is changed
+
+    - name: Perform select to confirm autocommit record was persisted
+      community.general.odbc:
+        dsn: "{{ dsn }}"
+        query: "SELECT * FROM films WHERE code='zxcvb'"
+      register: results
+      changed_when: false
+
+    - ansible.builtin.assert:
+        that:
+          - results is successful
+          - results.row_count == 1
+
     - name: Drop the table
       community.general.odbc:
         dsn: "{{ dsn }}"
