@@ -18,6 +18,7 @@ IN_CI = os.environ.get("CI") == "true"
 try:
     import antsibull_nox  # type: ignore[import-not-found]
     from antsibull_nox.cli import run as run_antsibull_nox  # type: ignore[import-not-found]
+    from antsibull_nox.sessions import install_packages
 except ImportError:
     print("You need to install antsibull-nox in the same Python environment as nox.")
     sys.exit(1)
@@ -32,22 +33,22 @@ def aliases(session: nox.Session) -> None:
 
 
 @nox.session(name="botmeta", default=True)
+@install_packages(packages=["PyYAML", "voluptuous"])
 def botmeta(session: nox.Session) -> None:
-    session.install("PyYAML", "voluptuous")
     session.run("python", "tests/sanity/extra/botmeta.py")
 
 
 @nox.session(name="ansible-output", default=False)
+@install_packages(packages=[
+    "ansible-core",
+    "antsibull-docs",
+    # Needed libs for some code blocks:
+    "jc",
+    "hashids",
+    # Tools for post-processing
+    "ruamel.yaml",  # used by docs/docsite/reformat-yaml.py
+])
 def ansible_output(session: nox.Session) -> None:
-    session.install(
-        "ansible-core",
-        "antsibull-docs",
-        # Needed libs for some code blocks:
-        "jc",
-        "hashids",
-        # Tools for post-processing
-        "ruamel.yaml",  # used by docs/docsite/reformat-yaml.py
-    )
     args = []
     if IN_CI:
         args.append("--check")
