@@ -21,7 +21,7 @@ notes:
     specified as Base64 and sent to the LDAP after decoding. If an attribute must be handled as binary without including
     the C(binary) option, it can be listed in O(binary_attributes).
   - For O(state=present) and O(state=absent), when handling text attributes, all value comparisons are performed on the
-    server for maximum accuracy. If the server raises V(INAPPROPRIATE_MATCHING) because the attribute has no EQUALITY
+    server for maximum accuracy. If the server cannot evaluate the equality filter because the attribute has no EQUALITY
     matching rule (for example, certain C(olcTLS*) attributes on older OpenLDAP versions), the module falls back to
     Python-side comparison. For O(state=exact) or binary attributes, values are always compared in Python, which
     obviously ignores LDAP matching rules. This should work out in most cases, but it is theoretically possible to see
@@ -335,13 +335,14 @@ class LdapAttrs(LdapGeneric):
             escaped_value = ldap.filter.escape_filter_chars(to_text(value))
             filterstr = f"({name}={escaped_value})"
             dns = self.connection.search_s(self.dn, ldap.SCOPE_BASE, filterstr)
-            is_present = len(dns) == 1
+            if len(dns) == 1:
+                return True
         except ldap.NO_SUCH_OBJECT:
-            is_present = False
+            return False
         except ldap.INAPPROPRIATE_MATCHING:
-            is_present = value in self._get_all_values_of(name)
+            pass
 
-        return is_present
+        return value in self._get_all_values_of(name)
 
     def _get_all_values_of(self, name):
         """Return all values of an attribute."""
