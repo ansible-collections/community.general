@@ -654,6 +654,11 @@ plugin_routing:
       deprecation:
         removal_version: 16.0.0
         warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_info:
+      redirect: middleware_automation.keycloak.keycloak_realm_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     keycloak_realm_key:
       redirect: middleware_automation.keycloak.keycloak_realm_key
       deprecation:
