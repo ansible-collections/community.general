@@ -95,7 +95,7 @@ def get_volume(module, array):
 
 
 def validate_size(module, err_msg):
-    size = module.params.get("size", False)
+    size = module.params["size"]
     if not size:
         module.fail_json(msg=err_msg)
     size = size_to_MiB(size)

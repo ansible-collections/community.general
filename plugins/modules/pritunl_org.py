@@ -91,7 +91,7 @@ from ansible_collections.community.general.plugins.module_utils._pritunl_api imp
 def add_pritunl_organization(module):
     result = {}
 
-    org_name = module.params.get("name")
+    org_name = module.params["name"]
 
     org_obj_list = list_pritunl_organizations(
         **dict_merge(
@@ -121,8 +121,8 @@ def add_pritunl_organization(module):
 def remove_pritunl_organization(module):
     result = {}
 
-    org_name = module.params.get("name")
-    force = module.params.get("force")
+    org_name = module.params["name"]
+    force = module.params["force"]
 
     org_obj_list = []
 
@@ -179,7 +179,7 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec)
 
-    state = module.params.get("state")
+    state = module.params["state"]
 
     try:
         if state == "present":

@@ -129,24 +129,24 @@ class OpenNebulaModule:
         if not HAS_PYONE:
             self.fail("pyone is required for this module")
 
-        if self.module.params.get("api_url"):
-            url = self.module.params.get("api_url")
+        if self.module.params["api_url"]:
+            url = self.module.params["api_url"]
         else:
             self.fail("Either api_url or the environment variable ONE_URL must be provided")
 
-        if self.module.params.get("api_username"):
-            username = self.module.params.get("api_username")
+        if self.module.params["api_username"]:
+            username = self.module.params["api_username"]
         else:
             self.fail("Either api_username or the environment variable ONE_USERNAME must be provided")
 
-        if self.module.params.get("api_password"):
-            password = self.module.params.get("api_password")
+        if self.module.params["api_password"]:
+            password = self.module.params["api_password"]
         else:
             self.fail("Either api_password or the environment variable ONE_PASSWORD must be provided")
 
         session = f"{username}:{password}"
 
-        if not self.module.params.get("validate_certs") and "PYTHONHTTPSVERIFY" not in environ:
+        if not self.module.params["validate_certs"] and "PYTHONHTTPSVERIFY" not in environ:
             return OneServer(url, session=session, context=no_ssl_validation_context)
         else:
             return OneServer(url, session)
@@ -191,7 +191,7 @@ class OpenNebulaModule:
         if "cluster_name" in self.module.params:
             clusters = self.one.clusterpool.info()
             for cluster in clusters.CLUSTER:
-                if self.module.params.get("cluster_name") == cluster.NAME:
+                if self.module.params["cluster_name"] == cluster.NAME:
                     resolved_params["cluster_id"] = cluster.ID
 
         return resolved_params
@@ -331,7 +331,7 @@ class OpenNebulaModule:
         """
 
         if not wait_timeout:
-            wait_timeout = self.module.params.get("wait_timeout")
+            wait_timeout = self.module.params["wait_timeout"]
 
         start_time = time.time()
 

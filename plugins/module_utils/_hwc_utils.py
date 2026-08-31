@@ -398,7 +398,7 @@ def build_path(module: AnsibleModule, path, kv=None):
 
         else:
             if n in module.params:
-                v[n] = str(module.params.get(n))
+                v[n] = str(module.params[n])
             else:
                 v[n] = ""
 
