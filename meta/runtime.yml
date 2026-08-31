@@ -21,38 +21,9 @@ action_groups:
         extend_group:
           - community.proxmox.proxmox
   keycloak:
-    - keycloak_authentication
-    - keycloak_authentication_required_actions
-    - keycloak_authentication_v2
-    - keycloak_authz_authorization_scope
-    - keycloak_authz_custom_policy
-    - keycloak_authz_permission
-    - keycloak_authz_permission_info
-    - keycloak_client
-    - keycloak_client_rolemapping
-    - keycloak_client_rolescope
-    - keycloak_clientscope
-    - keycloak_clientscope_type
-    - keycloak_clientscope_rolemappings
-    - keycloak_clientsecret_info
-    - keycloak_clientsecret_regenerate
-    - keycloak_clienttemplate
-    - keycloak_component
-    - keycloak_component_info
-    - keycloak_group
-    - keycloak_identity_provider
-    - keycloak_realm
-    - keycloak_realm_key
-    - keycloak_realm_keys_metadata_info
-    - keycloak_realm_localization
-    - keycloak_realm_rolemapping
-    - keycloak_realm_users_info
-    - keycloak_role
-    - keycloak_user
-    - keycloak_user_federation
-    - keycloak_user_rolemapping
-    - keycloak_userprofile
-    - keycloak_user_execute_actions_email
+    - metadata:
+        extend_group:
+          - middleware_automation.keycloak.keycloak
   scaleway:
     - scaleway_compute
     - scaleway_compute_private_network
@@ -578,6 +549,171 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use the modules from the theforeman.foreman collection instead.
+    keycloak_authentication:
+      redirect: middleware_automation.keycloak.keycloak_authentication
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authentication_required_actions:
+      redirect: middleware_automation.keycloak.keycloak_authentication_required_actions
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authentication_v2:
+      redirect: middleware_automation.keycloak.keycloak_authentication_v2
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authz_authorization_scope:
+      redirect: middleware_automation.keycloak.keycloak_authz_authorization_scope
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authz_custom_policy:
+      redirect: middleware_automation.keycloak.keycloak_authz_custom_policy
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authz_permission:
+      redirect: middleware_automation.keycloak.keycloak_authz_permission
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_authz_permission_info:
+      redirect: middleware_automation.keycloak.keycloak_authz_permission_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_client:
+      redirect: middleware_automation.keycloak.keycloak_client
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_client_rolemapping:
+      redirect: middleware_automation.keycloak.keycloak_client_rolemapping
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_client_rolescope:
+      redirect: middleware_automation.keycloak.keycloak_client_rolescope
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientscope:
+      redirect: middleware_automation.keycloak.keycloak_client_scope
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientscope_type:
+      redirect: middleware_automation.keycloak.keycloak_client_scope_type
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientscope_rolemappings:
+      redirect: middleware_automation.keycloak.keycloak_client_scope_rolemappings
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientsecret_info:
+      redirect: middleware_automation.keycloak.keycloak_clientsecret_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clientsecret_regenerate:
+      redirect: middleware_automation.keycloak.keycloak_clientsecret_regenerate
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_clienttemplate:
+      redirect: middleware_automation.keycloak.keycloak_clienttemplate
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_component:
+      redirect: middleware_automation.keycloak.keycloak_component
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_component_info:
+      redirect: middleware_automation.keycloak.keycloak_component_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_group:
+      redirect: middleware_automation.keycloak.keycloak_group
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_identity_provider:
+      redirect: middleware_automation.keycloak.keycloak_identity_provider
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm:
+      redirect: middleware_automation.keycloak.keycloak_realm
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_info:
+      redirect: middleware_automation.keycloak.keycloak_realm_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_key:
+      redirect: middleware_automation.keycloak.keycloak_realm_key
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_keys_metadata_info:
+      redirect: middleware_automation.keycloak.keycloak_realm_keys_metadata_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_localization:
+      redirect: middleware_automation.keycloak.keycloak_realm_localization
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_rolemapping:
+      redirect: middleware_automation.keycloak.keycloak_realm_rolemapping
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_realm_users_info:
+      redirect: middleware_automation.keycloak.keycloak_realm_users_info
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_role:
+      redirect: middleware_automation.keycloak.keycloak_role
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_user:
+      redirect: middleware_automation.keycloak.keycloak_user
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_user_federation:
+      redirect: middleware_automation.keycloak.keycloak_user_federation
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_user_rolemapping:
+      redirect: middleware_automation.keycloak.keycloak_user_rolemapping
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_userprofile:
+      redirect: middleware_automation.keycloak.keycloak_userprofile
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
+    keycloak_user_execute_actions_email:
+      redirect: middleware_automation.keycloak.keycloak_user_execute_actions_email
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: The Keycloak content has been moved to middleware_automation.keycloak.
     kubevirt_cdi_upload:
       redirect: community.kubevirt.kubevirt_cdi_upload
       deprecation:

@@ -390,12 +390,6 @@ files:
   $module_utils/_jenkins.py:
     labels: jenkins
     maintainers: russoz
-  $module_utils/_keycloak_clientsecret.py:
-    maintainers: $team_keycloak fynncfchen johncant
-  $module_utils/_keycloak_utils.py:
-    maintainers: $team_keycloak
-  $module_utils/_keycloak.py:
-    maintainers: $team_keycloak
   $module_utils/_kopia.py:
     maintainers: munchtoast
   $module_utils/_lxc.py:
@@ -855,70 +849,6 @@ files:
     maintainers: mirabilos
   $modules/kernel_blacklist.py:
     maintainers: matze
-  $modules/keycloak_:
-    maintainers: $team_keycloak
-  $modules/keycloak_authentication.py:
-    maintainers: elfelip Gaetan2907
-  $modules/keycloak_authentication_required_actions.py:
-    maintainers: Skrekulko
-  $modules/keycloak_authentication_v2.py:
-    maintainers: thomasbargetz
-  $modules/keycloak_authz_authorization_scope.py:
-    maintainers: mattock
-  $modules/keycloak_authz_custom_policy.py:
-    maintainers: mattock
-  $modules/keycloak_authz_permission.py:
-    maintainers: mattock
-  $modules/keycloak_authz_permission_info.py:
-    maintainers: mattock
-  $modules/keycloak_client.py:
-    maintainers: koke1997
-  $modules/keycloak_client_rolemapping.py:
-    maintainers: Gaetan2907
-  $modules/keycloak_client_rolescope.py:
-    maintainers: desand01
-  $modules/keycloak_clientscope_rolemappings.py:
-    maintainers: felix-grzelka
-  $modules/keycloak_clientscope.py:
-    maintainers: Gaetan2907
-  $modules/keycloak_clientscope_type.py:
-    maintainers: simonpahl
-  $modules/keycloak_clientsecret_info.py:
-    maintainers: fynncfchen johncant
-  $modules/keycloak_clientsecret_regenerate.py:
-    maintainers: fynncfchen johncant
-  $modules/keycloak_component.py:
-    maintainers: fivetide
-  $modules/keycloak_component_info.py:
-    maintainers: desand01
-  $modules/keycloak_group.py:
-    maintainers: adamgoossens
-  $modules/keycloak_identity_provider.py:
-    maintainers: laurpaum
-  $modules/keycloak_realm.py:
-    maintainers: kris2kris
-  $modules/keycloak_realm_info.py:
-    maintainers: fynncfchen
-  $modules/keycloak_realm_key.py:
-    maintainers: mattock koke1997
-  $modules/keycloak_realm_localization.py:
-    maintainers: danekja
-  $modules/keycloak_realm_rolemapping.py:
-    maintainers: agross mhuysamen Gaetan2907
-  $modules/keycloak_realm_users_info.py:
-    maintainers: felix-grzelka
-  $modules/keycloak_role.py:
-    maintainers: laurpaum
-  $modules/keycloak_user.py:
-    maintainers: elfelip
-  $modules/keycloak_user_execute_actions_email.py:
-    maintainers: mariusbertram
-  $modules/keycloak_user_federation.py:
-    maintainers: laurpaum
-  $modules/keycloak_user_rolemapping.py:
-    maintainers: bratwurzt koke1997
-  $modules/keycloak_userprofile.py:
-    maintainers: yeoldegrove
   $modules/keyring.py:
     maintainers: ahussey-redhat
   $modules/keyring_info.py:
@@ -1666,7 +1596,6 @@ macros:
   team_huawei: QijunPan TommyLike edisonxiang freesky-edward hwDCN niuzhenguo xuxiaowei0512 yanzhangi zengchen1024 zhongjun2
   team_ipa: Akasurde Nosmoht justchris1
   team_jboss: Wolfant jairojunior wbrefvem
-  team_keycloak: eikef ndclt mattock thomasbach-dev
   team_linode: InTheCloudDan decentral1se displague rmcintosh Charliekenney23 LBGarber
   team_macos: Akasurde kyleabenson martinm82 danieljaouen indrajitr
   team_manageiq: abellotti cben gtanzillo yaacov zgalor dkorn evertmulder
