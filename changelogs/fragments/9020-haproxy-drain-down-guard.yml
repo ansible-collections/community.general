@@ -1,0 +1,2 @@
+bugfixes:
+  - haproxy - fix ``state=disabled`` with ``drain=true`` timing out instead of putting a server that is already down into maintenance mode (https://github.com/ansible-collections/community.general/issues/9020, https://github.com/ansible-collections/community.general/pull/12640).
