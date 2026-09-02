@@ -293,11 +293,12 @@ class TestRaiseItemError(unittest.TestCase):
         with self.assertRaises(AnsibleLookupError) as ctx:
             _raise_item_error("vm", "vault", None, "Error: unauthorized access")
         self.assertIn("authentication", str(ctx.exception).lower())
+        self.assertIn("Error: unauthorized access", str(ctx.exception))
 
     def test_generic_error(self):
         with self.assertRaises(AnsibleLookupError) as ctx:
-            _raise_item_error("vm", "vault", "api_key", "unexpected failure")
-        self.assertIn("unexpected failure", str(ctx.exception))
+            _raise_item_error("vm", "vault", "api_key", "Unexpected Failure")
+        self.assertIn("Unexpected Failure", str(ctx.exception))
         self.assertIn("api_key", str(ctx.exception))
 
 
@@ -370,6 +371,7 @@ class TestProtonPassClientAuth(unittest.TestCase):
         mock_popen.return_value = _make_popen_mock(0, b"", b"")
         client = ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="")
         self.assertTrue(client.test_session())
+        self.assertEqual(mock_popen.call_args.args[0], ["pass-cli", "info"])
 
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
     def test_test_session_returns_false_on_nonzero(self, mock_popen):
