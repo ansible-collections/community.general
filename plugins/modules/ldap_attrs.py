@@ -20,12 +20,6 @@ notes:
     L(RFC 4522, https://www.rfc-editor.org/rfc/rfc4522.html#section-3) will be considered as binary.  Its contents must be
     specified as Base64 and sent to the LDAP after decoding. If an attribute must be handled as binary without including
     the C(binary) option, it can be listed in O(binary_attributes).
-  - For O(state=present) and O(state=absent), when handling text attributes, all value comparisons are performed on the
-    server for maximum accuracy. If the server cannot evaluate the equality filter because the attribute has no EQUALITY
-    matching rule (for example, certain C(olcTLS*) attributes on older OpenLDAP versions), the module falls back to
-    Python-side comparison. For O(state=exact) or binary attributes, values are always compared in Python, which
-    obviously ignores LDAP matching rules. This should work out in most cases, but it is theoretically possible to see
-    spurious changes when target and actual values are semantically identical but lexically distinct.
   - Support for binary values was added in community.general 12.5.0.
 version_added: '0.2.0'
 author:
@@ -49,6 +43,12 @@ options:
       - The state of the attribute values. If V(present), all given attribute values are added if they are missing. If V(absent),
         all given attribute values are removed if present. If V(exact), the set of attribute values is forced to exactly those
         provided and no others. If O(state=exact) and the attribute value is empty, all values for this attribute are removed.
+      - For V(present) and V(absent), when handling text attributes, all value comparisons are performed on the
+        server for maximum accuracy. If the server cannot evaluate the equality filter because the attribute has no EQUALITY
+        matching rule (for example, certain C(olcTLS*) attributes on older OpenLDAP versions), the module falls back to
+        Python-side comparison. For V(exact) or binary attributes, values are always compared in Python, which
+        obviously ignores LDAP matching rules. This should work out in most cases, but it is theoretically possible to see
+        spurious changes when target and actual values are semantically identical but lexically distinct.
   binary_attributes:
     description:
       - If O(state=present), attributes whose values must be handled as raw sequences of bytes must be listed here.
