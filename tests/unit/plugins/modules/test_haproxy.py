@@ -6,13 +6,14 @@ from __future__ import annotations
 
 from unittest import mock
 
-from ansible_collections.community.general.plugins.modules import haproxy
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
     ModuleTestCase,
     set_module_args,
 )
+
+from ansible_collections.community.general.plugins.modules import haproxy
 
 STAT_HEADER = (
     "# pxname,svname,qcur,qmax,scur,smax,slim,stot,bin,bout,dreq,dresp,ereq,econ,"
