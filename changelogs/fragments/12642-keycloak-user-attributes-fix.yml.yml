@@ -1,0 +1,2 @@
+bugfixes:
+  - keycloak_user - fix attributes always reporting changed=True due to a type mismatch between the raw Keycloak representation and the module's list representation (https://github.com/ansible-collections/community.general/pull/12642).
