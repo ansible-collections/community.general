@@ -55,10 +55,20 @@ options:
     default: true
   push_events_branch_filter:
     description:
-      - Branch name of wildcard to trigger hook on push events.
+      - Branch name, wildcard, or regular expression to trigger hook on push events.
+      - O(branch_filter_strategy) controls whether this is interpreted as a wildcard or as a regular expression.
     type: str
     version_added: '0.2.0'
     default: ''
+  branch_filter_strategy:
+    description:
+      - How O(push_events_branch_filter) is used to filter push events by branch.
+      - With V(wildcard) the filter is matched as a wildcard expression, with V(regex) as a regular expression.
+      - With V(all_branches) push events are not filtered by branch and O(push_events_branch_filter) is ignored.
+      - If not specified, GitLab uses V(wildcard) for new hooks, and the strategy of an existing hook is left unchanged.
+    type: str
+    choices: ["wildcard", "regex", "all_branches"]
+    version_added: 13.4.0
   issues_events:
     description:
       - Trigger hook on issues events.
@@ -139,6 +149,17 @@ EXAMPLES = r"""
     state: present
     push_events: true
     custom_webhook_template: !unsafe '{"event": "{{object_kind}}", "project": "{{project.name}}"}'
+
+- name: Add a project hook triggered by push events on branches matching a regular expression
+  community.general.gitlab_hook:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    project: "my_group/my_project"
+    hook_url: "https://my-ci-server.example.com/gitlab-hook"
+    state: present
+    push_events: true
+    push_events_branch_filter: '^(main|release/.*)$'
+    branch_filter_strategy: regex
 
 - name: "Delete the previous hook"
   community.general.gitlab_hook:
@@ -228,11 +249,14 @@ class GitLabHook:
         if self.hook_object is None:
             if options["releases_events"] is not None:
                 hook_arguments["releases_events"] = options["releases_events"]
+            if options["branch_filter_strategy"] is not None:
+                hook_arguments["branch_filter_strategy"] = options["branch_filter_strategy"]
             hook = self.create_hook(project, hook_arguments)
             changed = True
         else:
             update_arguments = hook_arguments.copy()
             update_arguments["releases_events"] = options["releases_events"]
+            update_arguments["branch_filter_strategy"] = options["branch_filter_strategy"]
             changed, hook = self.update_hook(self.hook_object, update_arguments)
 
         self.hook_object = hook
@@ -314,6 +338,7 @@ def main():
             hook_url=dict(type="str", required=True),
             push_events=dict(type="bool", default=True),
             push_events_branch_filter=dict(type="str", default=""),
+            branch_filter_strategy=dict(type="str", choices=["wildcard", "regex", "all_branches"]),
             issues_events=dict(type="bool", default=False),
             merge_requests_events=dict(type="bool", default=False),
             tag_push_events=dict(type="bool", default=False),
@@ -350,6 +375,7 @@ def main():
     hook_url = module.params["hook_url"]
     push_events = module.params["push_events"]
     push_events_branch_filter = module.params["push_events_branch_filter"]
+    branch_filter_strategy = module.params["branch_filter_strategy"]
     issues_events = module.params["issues_events"]
     merge_requests_events = module.params["merge_requests_events"]
     tag_push_events = module.params["tag_push_events"]
@@ -385,6 +411,7 @@ def main():
             {
                 "push_events": push_events,
                 "push_events_branch_filter": push_events_branch_filter,
+                "branch_filter_strategy": branch_filter_strategy,
                 "issues_events": issues_events,
                 "merge_requests_events": merge_requests_events,
                 "tag_push_events": tag_push_events,
