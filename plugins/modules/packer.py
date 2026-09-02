@@ -76,7 +76,7 @@ options:
     description:
       - Disable colored output (C(-no-color) if V(false)).
     type: bool
-    default: true
+    default: false
   machine_readable:
     description:
       - Output in machine-readable format (C(-machine-readable) if V(true)).
@@ -95,7 +95,6 @@ options:
     choices: [trace, debug, info, warn, error]
     default: info
 """
-
 EXAMPLES = r"""
 - name: Initialize Packer template (install plugins)
   community.general.packer:
@@ -161,13 +160,7 @@ EXAMPLES = r"""
     template: virtualbox.pkr.hcl
     force: true
 """
-
 RETURN = r"""
-cmd:
-  description: Full command line executed.
-  returned: always
-  type: str
-  sample: "packer build -force template.pkr.hcl"
 packer_version:
   description: Packer version used.
   returned: always
@@ -196,10 +189,13 @@ build_start_timestamp:
 
 import os
 import re
-import shlex
 from datetime import datetime, timezone
 
 from ansible.module_utils.basic import AnsibleModule
+
+VERSION_RE = re.compile(r"(\d+\.\d+\.\d+)")
+BUILD_ARTIFACT_RE = re.compile(r"^-->\s+(\S+):\s+(.+)$")
+AMI_ARTIFACT_RE = re.compile(r"(ami-\S+)")
 
 
 class PackerModule:
@@ -209,15 +205,6 @@ class PackerModule:
         self.module = module
         self.params = module.params
         self.packer_bin = packer_bin
-        self.result: dict[str, object] = {
-            "changed": False,
-            "stdout": "",
-            "stderr": "",
-            "rc": 0,
-            "cmd": "",
-            "packer_version": "",
-        }
-
         self.state = self.params["state"]
         self.template = self.params["template"]
         self.variables = self.params["variables"]
@@ -233,23 +220,19 @@ class PackerModule:
 
     def get_packer_version(self) -> str:
         """Get Packer version using module.run_command."""
-        try:
-            rc, stdout, _stderr = self.module.run_command(
-                [self.packer_bin, "version"],
-                check_rc=False,
-            )
-            if rc == 0 and stdout:
-                version_line = stdout.splitlines()[0]
-                match = re.search(r"(\d+\.\d+\.\d+)", version_line)
-                if match:
-                    return match.group(1)
-            return "unknown"
-        except Exception:
-            return "unknown"
+        rc, stdout, _stderr = self.module.run_command(
+            [self.packer_bin, "version"],
+            check_rc=False,
+        )
+        if rc == 0 and stdout:
+            match = VERSION_RE.search(stdout.splitlines()[0])
+            if match:
+                return match.group(1)
+        return "unknown"
 
     def validate_parameters(self) -> None:
         """Validate module parameters."""
-        if self.template and not os.path.exists(self.template):
+        if not os.path.exists(self.template):
             self.module.fail_json(msg=f"Template file/directory does not exist: {self.template}")
 
         for var_file in self.var_files:
@@ -258,13 +241,12 @@ class PackerModule:
 
     def build_command(self, command: str) -> list[str]:
         cmd = [self.packer_bin]
-
         if self.log_level != "info":
             cmd.extend(["--log-level", self.log_level])
 
         cmd.append(command)
 
-        if command in ["build", "init"] and self.template:
+        if command in ["build", "init"]:
             cmd.append(self.template)
 
         if command == "build":
@@ -286,8 +268,7 @@ class PackerModule:
                 cmd.append("-machine-readable")
 
             for key, value in self.variables.items():
-                quoted_value = shlex.quote(str(value))
-                cmd.extend(["-var", f"{key}={quoted_value}"])
+                cmd.extend(["-var", f"{key}={value}"])
 
             for var_file in self.var_files:
                 cmd.extend(["-var-file", var_file])
@@ -295,57 +276,36 @@ class PackerModule:
         return cmd
 
     def parse_machine_readable_output(self, output: str) -> list[dict[str, str]]:
-        """
-        Parse machine-readable output for artifacts.
-        Real format: artifact,<build_index>,<artifact_type>,<artifact_id>
-        Example: artifact,0,amazon-ebs,ami-12345678
-        """
+        """Parse machine-readable output for artifacts."""
         artifacts = []
         for line in output.splitlines():
             if not line.startswith("artifact,"):
                 continue
-
             parts = line.split(",")
-            if len(parts) >= 4:
-                artifact = {
-                    "type": parts[2],
-                    "name": parts[3],
-                    "build_index": parts[1],
-                }
-                if artifact["name"]:
-                    artifacts.append(artifact)
+            if len(parts) >= 4 and parts[3]:
+                artifacts.append(
+                    {
+                        "type": parts[2],
+                        "name": parts[3],
+                        "build_index": parts[1],
+                    }
+                )
         return artifacts
 
     def parse_build_output(self, output: str) -> list[dict[str, str]]:
-        """Parse build output to extract artifacts.
-        Expected output formats from Packer:
-        1. Regular build output:
-          "--> builder_name: artifact_description"
-          Example: "--> amazon-ebs: AMI ami-12345678"
-          Example: "--> virtualbox-iso: VirtualBox VM"
-
-        2. AWS AMI fallback (when the regular format is not present):
-          Lines containing "ami-" with "created" or "AMIs"
-          Example: "us-west-2: AMI ami-12345678 created"
-
-        For reliable parsing, use machine_readable: true in the module options."""
+        """Parse build output to extract artifacts."""
         artifacts = []
-
-        pattern = re.compile(r"^-->\s+(\S+):\s+(.+)$")
-        lines = output.splitlines()
-        for line in lines:
-            match = pattern.match(line.strip())
+        for line in output.splitlines():
+            match = BUILD_ARTIFACT_RE.match(line.strip())
             if match:
-                builder = match.group(1)
-                artifact_desc = match.group(2)
                 artifacts.append(
                     {
-                        "type": builder,
-                        "name": artifact_desc,
+                        "type": match.group(1),
+                        "name": match.group(2),
                     }
                 )
             elif "ami-" in line and ("created" in line or "AMIs" in line):
-                ami_match = re.search(r"(ami-\S+)", line)
+                ami_match = AMI_ARTIFACT_RE.search(line)
                 if ami_match:
                     artifacts.append(
                         {
@@ -353,76 +313,47 @@ class PackerModule:
                             "name": ami_match.group(1),
                         }
                     )
-
         return artifacts
 
     def execute_packer(self, command: str) -> dict[str, object]:
         cmd = self.build_command(command)
-        self.result["cmd"] = " ".join(cmd)
+        start_time = datetime.now(timezone.utc).isoformat() + "Z"
+        rc, stdout, stderr = self.module.run_command(cmd, check_rc=True)
 
-        try:
-            start_time = datetime.now(timezone.utc).isoformat() + "Z"
+        artifacts = []
+        if command == "build":
+            if self.machine_readable:
+                artifacts = self.parse_machine_readable_output(stdout)
+            else:
+                artifacts = self.parse_build_output(stdout)
 
-            rc, stdout, stderr = self.module.run_command(
-                cmd,
-                check_rc=False,
+        result_dict = {
+            "changed": command == "build" or command == "init",
+            "stdout": stdout,
+            "stderr": stderr,
+            "rc": rc,
+            "packer_version": self.get_packer_version(),
+        }
+
+        if command == "build":
+            result_dict.update(
+                {
+                    "build_start_timestamp": start_time,
+                    "artifacts": artifacts,
+                    "artifacts_count": len(artifacts),
+                }
             )
 
-            artifacts = []
-            if command == "build" and rc == 0:
-                if self.machine_readable:
-                    artifacts = self.parse_machine_readable_output(stdout)
-                else:
-                    artifacts = self.parse_build_output(stdout)
-            artifacts_count = len(artifacts)
-
-            changed = False
-            if command == "build":
-                changed = True
-            elif command == "init" and rc == 0:
-                changed = True
-            elif command == "validate":
-                changed = False
-
-            result_dict = {
-                "changed": changed,
-                "stdout": stdout,
-                "stderr": stderr,
-                "rc": rc,
-                "cmd": " ".join(cmd),
-                "packer_version": self.get_packer_version(),
-            }
-
-            if command == "build":
-                result_dict["build_start_timestamp"] = start_time
-                result_dict["artifacts"] = artifacts
-                result_dict["artifacts_count"] = artifacts_count
-
-            if rc != 0:
-                result_dict["failed"] = True
-                self.module.fail_json(msg="Packer command failed", **result_dict)
-
-            return result_dict
-
-        except Exception as e:
-            self.module.fail_json(
-                msg=f"Error executing Packer: {e}",
-                cmd=" ".join(cmd),
-            )
+        return result_dict
 
     def apply(self) -> dict[str, object]:
         self.validate_parameters()
 
         if self.state == "init":
             return self.execute_packer("init")
-
-        if self.state == "build":
-            if self.module.check_mode:
-                return self.execute_packer("validate")
-            else:
-                return self.execute_packer("build")
-
-        self.module.fail_json(msg=f"Unsupported state: {self.state}")
+        if self.module.check_mode:
+            return self.execute_packer("validate")
+        return self.execute_packer("build")
 
 
 def main() -> None:
@@ -445,7 +376,7 @@ def main() -> None:
             ),
             force=dict(type="bool", default=False),
             parallel=dict(type="bool", default=True),
-            color=dict(type="bool", default=True),
+            color=dict(type="bool", default=False),
             machine_readable=dict(type="bool", default=False),
             cleanup=dict(type="bool", default=False),
             log_level=dict(
@@ -459,7 +390,6 @@ def main() -> None:
         ],
         supports_check_mode=True,
     )
-
     packer_bin = module.get_bin_path("packer", required=True)
 
     packer_module = PackerModule(module, packer_bin)
