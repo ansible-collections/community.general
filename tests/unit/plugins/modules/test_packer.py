@@ -257,7 +257,7 @@ class TestPackerModule(unittest.TestCase):
     def test_template_missing(self):
         self._setup_module_params(state="build", template="/nonexistent/template.pkr.hcl")
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa: B017
             self._module().apply()
         self.mock_module.fail_json.assert_called_with(
             msg="Template file/directory does not exist: /nonexistent/template.pkr.hcl"
@@ -266,7 +266,7 @@ class TestPackerModule(unittest.TestCase):
     def test_var_file_not_exists(self):
         self._setup_module_params(state="build", var_files=["/nonexistent/file.pkrvars.hcl"])
 
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception):  # noqa: B017
             self._module().apply()
         self.mock_module.fail_json.assert_called_with(msg="Variable file does not exist: /nonexistent/file.pkrvars.hcl")
 
