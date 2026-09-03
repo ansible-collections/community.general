@@ -11,9 +11,6 @@ from unittest.mock import Mock, patch
 from ansible_collections.community.general.plugins.module_utils._authselect import (
     authselect_lib,
 )
-from ansible_collections.community.general.plugins.module_utils._authselect.authselect_files import (
-    AuthselectFiles,
-)
 from ansible_collections.community.general.plugins.module_utils._authselect.authselect_profile import (
     AuthselectProfile,
 )
@@ -28,49 +25,16 @@ from ansible_collections.community.general.plugins.module_utils._authselect.c_st
 AUTHSELECT_FUNCTION_NAMES = (
     "authselect_set_debug_fn",
     "authselect_array_free",
-    "authselect_path_systemauth",
-    "authselect_path_nsswitch",
-    "authselect_path_passwordauth",
-    "authselect_path_smartcardauth",
-    "authselect_path_fingerprintauth",
-    "authselect_path_switchableauth",
-    "authselect_path_postlogin",
-    "authselect_path_dconf_db",
-    "authselect_path_dconf_lock",
     "authselect_list",
-    "authselect_backup_list",
     "authselect_profile",
-    "authselect_profile_id",
-    "authselect_profile_name",
-    "authselect_profile_path",
-    "authselect_profile_description",
     "authselect_profile_features",
-    "authselect_profile_nsswitch_maps",
-    "authselect_profile_requirements",
     "authselect_profile_free",
     "authselect_current_configuration",
     "authselect_activate",
     "authselect_validate_configuration",
-    "authselect_files",
-    "authselect_files_nsswitch",
-    "authselect_files_systemauth",
-    "authselect_files_passwordauth",
-    "authselect_files_smartcardauth",
-    "authselect_files_fingerprintauth",
-    "authselect_files_switchableauth",
-    "authselect_files_postlogin",
-    "authselect_files_dconf_db",
-    "authselect_files_dconf_lock",
-    "authselect_files_free",
-    "authselect_feature_enabled",
-    "authselect_apply_changes",
     "authselect_backup",
     "authselect_backup_remove",
     "authselect_backup_restore",
-    "authselect_feature_enable",
-    "authselect_feature_disable",
-    "authselect_profile_create",
-    "authselect_uninstall",
 )
 
 
@@ -119,9 +83,6 @@ class TestAuthselectLib(unittest.TestCase):
         for attribute in self.PROFILE_CALLBACK_ATTRIBUTES:
             setattr(AuthselectProfile, attribute, None)
 
-        for attribute in self.FILES_CALLBACK_ATTRIBUTES:
-            setattr(AuthselectFiles, attribute, None)
-
     def tearDown(self):
         authselect_lib._LIB = None
         authselect_lib._LIBC = None
@@ -132,9 +93,6 @@ class TestAuthselectLib(unittest.TestCase):
 
         for attribute in self.PROFILE_CALLBACK_ATTRIBUTES:
             setattr(AuthselectProfile, attribute, None)
-
-        for attribute in self.FILES_CALLBACK_ATTRIBUTES:
-            setattr(AuthselectFiles, attribute, None)
 
     # ------------------------------------------------------------------
     # libc configuration and loading
@@ -241,17 +199,7 @@ class TestAuthselectLib(unittest.TestCase):
                 [ctypes.POINTER(ctypes.c_char_p)],
                 None,
             ),
-            "authselect_path_systemauth": ([], ctypes.c_char_p),
-            "authselect_path_nsswitch": ([], ctypes.c_char_p),
-            "authselect_path_passwordauth": ([], ctypes.c_char_p),
-            "authselect_path_smartcardauth": ([], ctypes.c_char_p),
-            "authselect_path_fingerprintauth": ([], ctypes.c_char_p),
-            "authselect_path_switchableauth": ([], ctypes.c_char_p),
-            "authselect_path_postlogin": ([], ctypes.c_char_p),
-            "authselect_path_dconf_db": ([], ctypes.c_char_p),
-            "authselect_path_dconf_lock": ([], ctypes.c_char_p),
             "authselect_list": ([], NullTerminatedStringArray),
-            "authselect_backup_list": ([], NullTerminatedStringArray),
             "authselect_profile": (
                 [
                     ctypes.c_char_p,
@@ -259,39 +207,9 @@ class TestAuthselectLib(unittest.TestCase):
                 ],
                 ctypes.c_int,
             ),
-            "authselect_profile_id": (
-                [AuthselectProfile],
-                ctypes.c_char_p,
-            ),
-            "authselect_profile_name": (
-                [AuthselectProfile],
-                ctypes.c_char_p,
-            ),
-            "authselect_profile_path": (
-                [AuthselectProfile],
-                ctypes.c_char_p,
-            ),
-            "authselect_profile_description": (
-                [AuthselectProfile],
-                ctypes.c_char_p,
-            ),
             "authselect_profile_features": (
                 [AuthselectProfile],
                 NullTerminatedStringArray,
-            ),
-            "authselect_profile_nsswitch_maps": (
-                [
-                    AuthselectProfile,
-                    CStringArray,
-                ],
-                NullTerminatedStringArray,
-            ),
-            "authselect_profile_requirements": (
-                [
-                    AuthselectProfile,
-                    CStringArray,
-                ],
-                AllocatedCString,
             ),
             "authselect_profile_free": (
                 [AuthselectProfile],
@@ -316,62 +234,6 @@ class TestAuthselectLib(unittest.TestCase):
                 [ctypes.POINTER(ctypes.c_bool)],
                 ctypes.c_int,
             ),
-            "authselect_files": (
-                [
-                    ctypes.c_char_p,
-                    CStringArray,
-                    ctypes.POINTER(AuthselectFiles),
-                ],
-                ctypes.c_int,
-            ),
-            "authselect_files_nsswitch": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_systemauth": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_passwordauth": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_smartcardauth": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_fingerprintauth": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_switchableauth": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_postlogin": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_dconf_db": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_dconf_lock": (
-                [AuthselectFiles],
-                ctypes.c_char_p,
-            ),
-            "authselect_files_free": (
-                [AuthselectFiles],
-                None,
-            ),
-            "authselect_feature_enabled": (
-                [ctypes.c_char_p],
-                ctypes.c_int,
-            ),
-            "authselect_apply_changes": (
-                [ctypes.c_bool],
-                ctypes.c_int,
-            ),
             "authselect_backup": (
                 [
                     ctypes.c_char_p,
@@ -385,30 +247,6 @@ class TestAuthselectLib(unittest.TestCase):
             ),
             "authselect_backup_restore": (
                 [ctypes.c_char_p],
-                ctypes.c_int,
-            ),
-            "authselect_feature_enable": (
-                [ctypes.c_char_p],
-                ctypes.c_int,
-            ),
-            "authselect_feature_disable": (
-                [ctypes.c_char_p],
-                ctypes.c_int,
-            ),
-            "authselect_profile_create": (
-                [
-                    ctypes.c_char_p,
-                    ctypes.c_int,
-                    ctypes.c_char_p,
-                    ctypes.c_int,
-                    ctypes.c_uint32,
-                    CStringArray,
-                    ctypes.POINTER(AllocatedCString),
-                ],
-                ctypes.c_int,
-            ),
-            "authselect_uninstall": (
-                [],
                 ctypes.c_int,
             ),
         }
@@ -469,54 +307,6 @@ class TestAuthselectLib(unittest.TestCase):
     # ------------------------------------------------------------------
     # Wrapper callback wiring
     # ------------------------------------------------------------------
-
-    def test_configure_authselect_wires_profile_callbacks(self):
-        lib = make_authselect_library()
-
-        authselect_lib._configure_authselect_lib(lib)
-
-        expected_callbacks = {
-            "_free": lib.authselect_profile_free,
-            "_get_id": lib.authselect_profile_id,
-            "_get_name": lib.authselect_profile_name,
-            "_get_path": lib.authselect_profile_path,
-            "_get_description": lib.authselect_profile_description,
-            "_get_features": lib.authselect_profile_features,
-            "_get_nsswitch_maps": lib.authselect_profile_nsswitch_maps,
-            "_get_requirements": lib.authselect_profile_requirements,
-        }
-
-        for attribute, expected in expected_callbacks.items():
-            with self.subTest(attribute=attribute):
-                self.assertIs(
-                    getattr(AuthselectProfile, attribute),
-                    expected,
-                )
-
-    def test_configure_authselect_wires_files_callbacks(self):
-        lib = make_authselect_library()
-
-        authselect_lib._configure_authselect_lib(lib)
-
-        expected_callbacks = {
-            "_free": lib.authselect_files_free,
-            "_get_nsswitch": lib.authselect_files_nsswitch,
-            "_get_systemauth": lib.authselect_files_systemauth,
-            "_get_passwordauth": lib.authselect_files_passwordauth,
-            "_get_smartcardauth": lib.authselect_files_smartcardauth,
-            "_get_fingerprintauth": lib.authselect_files_fingerprintauth,
-            "_get_switchableauth": lib.authselect_files_switchableauth,
-            "_get_postlogin": lib.authselect_files_postlogin,
-            "_get_dconf_db": lib.authselect_files_dconf_db,
-            "_get_dconf_lock": lib.authselect_files_dconf_lock,
-        }
-
-        for attribute, expected in expected_callbacks.items():
-            with self.subTest(attribute=attribute):
-                self.assertIs(
-                    getattr(AuthselectFiles, attribute),
-                    expected,
-                )
 
     def test_configure_authselect_wires_array_free_function(self):
         lib = make_authselect_library()
