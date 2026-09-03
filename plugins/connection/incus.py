@@ -67,6 +67,18 @@ options:
     keyword:
       - name: remote_user
     version_added: 10.4.0
+  remote_user_id_command:
+    description:
+      - Command used to retrieve the remote UID and GID of O(remote_user).
+      - Is used to set the ownership of files copied with C(put_file) when O(remote_user) is not V(root).
+      - The command is run inside the instance twice, once with the argument C(-u) to retrieve the UID and once with C(-g) to retrieve
+        the GID.
+      - In both cases the command must write the numeric ID, and nothing else, to standard output.
+    type: str
+    default: /bin/id
+    vars:
+      - name: ansible_incus_user_id_command
+    version_added: 13.4.0
   project:
     description:
       - The name of the Incus project to use (per C(incus project list)).
@@ -253,12 +265,14 @@ class Connection(ConnectionBase):
     def _get_remote_uid_gid(self) -> tuple[int, int]:
         """Get the user and group ID of 'remote_user' from the instance."""
 
-        rc, uid_out, err = self.exec_command("/bin/id -u")
+        id_cmd = self.get_option("remote_user_id_command")
+
+        rc, uid_out, err = self.exec_command(f"{id_cmd} -u")
         if rc != 0:
             raise AnsibleError(f"Failed to get remote uid for user {self.get_option('remote_user')}: {err}")
         uid = uid_out.strip()
 
-        rc, gid_out, err = self.exec_command("/bin/id -g")
+        rc, gid_out, err = self.exec_command(f"{id_cmd} -g")
         if rc != 0:
             raise AnsibleError(f"Failed to get remote gid for user {self.get_option('remote_user')}: {err}")
         gid = gid_out.strip()
