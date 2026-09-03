@@ -725,7 +725,8 @@ def resp_find_project_hook(url, request):
     headers = {"content-type": "application/json"}
     content = (
         '[{"id": 1,"url": "http://example.com/hook","project_id": 3,'
-        '"push_events": true,"push_events_branch_filter": "","issues_events": true,'
+        '"push_events": true,"push_events_branch_filter": "",'
+        '"branch_filter_strategy": "wildcard","issues_events": true,'
         '"confidential_issues_events": true,"merge_requests_events": true,'
         '"tag_push_events": true,"note_events": true,"job_events": true,'
         '"pipeline_events": true,"wiki_page_events": true,"enable_ssl_verification": true,'
@@ -740,7 +741,8 @@ def resp_get_project_hook(url, request):
     headers = {"content-type": "application/json"}
     content = (
         '{"id": 1,"url": "http://example.com/hook","project_id": 3,'
-        '"push_events": true,"push_events_branch_filter": "","issues_events": true,'
+        '"push_events": true,"push_events_branch_filter": "",'
+        '"branch_filter_strategy": "wildcard","issues_events": true,'
         '"confidential_issues_events": true,"merge_requests_events": true,'
         '"tag_push_events": true,"note_events": true,"job_events": true,'
         '"pipeline_events": true,"wiki_page_events": true,"enable_ssl_verification": true,'
@@ -755,7 +757,8 @@ def resp_create_project_hook(url, request):
     headers = {"content-type": "application/json"}
     content = (
         '{"id": 1,"url": "http://example.com/hook","project_id": 3,'
-        '"push_events": true,"push_events_branch_filter": "","issues_events": true,'
+        '"push_events": true,"push_events_branch_filter": "",'
+        '"branch_filter_strategy": "wildcard","issues_events": true,'
         '"confidential_issues_events": true,"merge_requests_events": true,'
         '"tag_push_events": true,"note_events": true,"job_events": true,'
         '"pipeline_events": true,"wiki_page_events": true,"enable_ssl_verification": true,'
