@@ -1,0 +1,504 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env {check_rc: false}
+
+  # ----- reused command lines -----
+  search_nmap: &search_nmap
+    [/testbin/zypper, --non-interactive, --xmlout, --quiet, --disable-repositories, search,
+     --type, package, --match-exact, --details, --installed-only, nmap]
+  install_nmap: &install_nmap
+    [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+     --auto-agree-with-licenses, --no-recommends, '--', +nmap]
+  update_all: &update_all
+    [/testbin/zypper, --non-interactive, --xmlout, --quiet, update, --type, package,
+     --auto-agree-with-licenses, --no-recommends]
+
+  # ----- reused zypper --xmlout payloads -----
+  xml_search_not_installed: &xml_search_not_installed |
+    <?xml version='1.0'?>
+    <stream>
+    <search-result version="0.0"><solvable-list/></search-result>
+    </stream>
+  xml_search_nmap_installed: &xml_search_nmap_installed |
+    <?xml version='1.0'?>
+    <stream>
+    <search-result version="0.0">
+    <solvable-list>
+    <solvable status="installed" name="nmap" kind="package" edition="7.92-1.1" arch="x86_64" repository="(System Packages)"/>
+    </solvable-list>
+    </search-result>
+    </stream>
+  xml_install_nmap: &xml_install_nmap |
+    <?xml version='1.0'?>
+    <stream>
+    <install-summary download-size="1500000" space-usage-diff="4000000">
+    <to-install>
+    <solvable type="package" name="nmap" edition="7.92-1.1" arch="x86_64"/>
+    </to-install>
+    </install-summary>
+    <message type="info">Installation completed.</message>
+    </stream>
+  xml_upgrade_vim: &xml_upgrade_vim |
+    <?xml version='1.0'?>
+    <stream>
+    <install-summary>
+    <to-upgrade>
+    <solvable type="package" name="vim" edition="9.0-1.1" edition-old="8.2-1.1"/>
+    </to-upgrade>
+    </install-summary>
+    </stream>
+  xml_remove_nmap: &xml_remove_nmap |
+    <?xml version='1.0'?>
+    <stream>
+    <install-summary>
+    <to-remove>
+    <solvable type="package" name="nmap" edition="7.92-1.1"/>
+    </to-remove>
+    </install-summary>
+    </stream>
+  xml_nothing_to_do: &xml_nothing_to_do |
+    <?xml version='1.0'?>
+    <stream>
+    <message type="info">Nothing to do.</message>
+    </stream>
+  xml_refreshed: &xml_refreshed |
+    <?xml version='1.0'?>
+    <stream>
+    <message type="info">All repositories have been refreshed.</message>
+    </stream>
+  xml_not_found_error: &xml_not_found_error |
+    <?xml version='1.0'?>
+    <stream>
+    <message type="error">Package 'nonexistent-pkg' not found.</message>
+    </stream>
+  xml_generic_error: &xml_generic_error |
+    <?xml version='1.0'?>
+    <stream>
+    <message type="error">Some zypper problem.</message>
+    </stream>
+  xml_locked_error: &xml_locked_error |
+    <?xml version='1.0'?>
+    <stream>
+    <message type="error">System management is locked by the application with pid 1234.</message>
+    </stream>
+
+test_cases:
+  # ---------------------------------------------------------------- install
+  - id: install_package_not_present
+    input:
+      name: nmap
+      state: present
+    output:
+      changed: true
+      rc: 0
+      name: [nmap]
+      state: present
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command: *install_nmap
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
+  - id: install_package_already_present
+    input:
+      name: nmap
+      state: present
+    output:
+      changed: false
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 0
+          out: *xml_search_nmap_installed
+          err: ''
+
+  - id: install_package_with_version
+    input:
+      name: docker>=1.10
+      state: present
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        # a version specifier implies --oldpackage and skips the "already installed" search
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+             --auto-agree-with-licenses, --no-recommends, --oldpackage, '--', +docker>=1.10]
+          environ: *env
+          rc: 0
+          out: |
+            <?xml version='1.0'?>
+            <stream>
+            <install-summary>
+            <to-install>
+            <solvable type="package" name="docker" edition="1.13.1-1.1"/>
+            </to-install>
+            </install-summary>
+            </stream>
+          err: ''
+
+  - id: install_patch_type
+    input:
+      name: openSUSE-2016-128
+      state: present
+      type: patch
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, --disable-repositories, search,
+             --type, patch, --match-exact, --details, --installed-only, openSUSE-2016-128]
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, patch,
+             --auto-agree-with-licenses, --no-recommends, '--', +openSUSE-2016-128]
+          environ: *env
+          rc: 0
+          out: |
+            <?xml version='1.0'?>
+            <stream>
+            <install-summary>
+            <to-install>
+            <solvable type="patch" name="openSUSE-2016-128" edition="1"/>
+            </to-install>
+            </install-summary>
+            </stream>
+          err: ''
+
+  - id: install_check_mode
+    flags:
+      check: true
+    input:
+      name: nmap
+      state: present
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        # search is not run with --dry-run
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+             --dry-run, --auto-agree-with-licenses, --no-recommends, '--', +nmap]
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
+  - id: install_diff_mode
+    flags:
+      diff: true
+    input:
+      name: nmap
+      state: present
+    output:
+      changed: true
+      diff:
+        prepared: "installed: nmap\n"
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command: *install_nmap
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
+  - id: install_with_options
+    input:
+      name: nmap
+      state: present
+      disable_recommends: false
+      disable_gpg_check: true
+      force: true
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, --no-gpg-checks, install,
+             --type, package, --auto-agree-with-licenses, --force, '--', +nmap]
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
+  - id: install_quiet_false
+    input:
+      name: '*'
+      state: latest
+      quiet: false
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, update, --type, package,
+             --auto-agree-with-licenses, --no-recommends]
+          environ: *env
+          rc: 0
+          out: *xml_upgrade_vim
+          err: ''
+
+  # ---------------------------------------------------------------- remove
+  - id: remove_package_present
+    input:
+      name: nmap
+      state: absent
+    output:
+      changed: true
+      rc: 0
+      state: absent
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 0
+          out: *xml_search_nmap_installed
+          err: ''
+        - command: [/testbin/zypper, --non-interactive, --xmlout, --quiet, remove, --type, package, nmap]
+          environ: *env
+          rc: 0
+          out: *xml_remove_nmap
+          err: ''
+
+  - id: remove_package_already_absent
+    input:
+      name: nmap
+      state: absent
+    output:
+      changed: false
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+
+  # ---------------------------------------------------------------- update / dist-upgrade
+  - id: update_all_packages
+    input:
+      name: '*'
+      state: latest
+    output:
+      changed: true
+      rc: 0
+      name: ['*']
+      state: latest
+    mocks:
+      run_command:
+        - command: *update_all
+          environ: *env
+          rc: 0
+          out: *xml_upgrade_vim
+          err: ''
+
+  - id: update_all_no_changes
+    input:
+      name: '*'
+      state: latest
+    output:
+      changed: false
+      rc: 0
+    mocks:
+      run_command:
+        - command: *update_all
+          environ: *env
+          rc: 0
+          out: *xml_nothing_to_do
+          err: ''
+
+  - id: dist_upgrade
+    input:
+      name: '*'
+      state: dist-upgrade
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, dist-upgrade,
+             --auto-agree-with-licenses, --no-recommends]
+          environ: *env
+          rc: 0
+          out: *xml_upgrade_vim
+          err: ''
+
+  - id: reboot_needed_rc_102_still_changed
+    input:
+      name: '*'
+      state: latest
+    output:
+      changed: true
+      rc: 102
+    mocks:
+      run_command:
+        - command: *update_all
+          environ: *env
+          rc: 102
+          out: *xml_upgrade_vim
+          err: ''
+
+  # ---------------------------------------------------------------- update_cache / refresh
+  - id: refresh_then_install
+    input:
+      name: nmap
+      state: present
+      update_cache: true
+    output:
+      changed: true
+      rc: 0
+      update_cache: true
+    mocks:
+      run_command:
+        - command: [/testbin/zypper, --non-interactive, --xmlout, --quiet, refresh]
+          environ: *env
+          rc: 0
+          out: *xml_refreshed
+          err: ''
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command: *install_nmap
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
+  # ---------------------------------------------------------------- error paths
+  - id: fail_generic_return_code
+    input:
+      name: '*'
+      state: latest
+    output:
+      failed: true
+      rc: 1
+      msg: Zypper run command failed with return code 1.
+    mocks:
+      run_command:
+        - command: *update_all
+          environ: *env
+          rc: 1
+          out: *xml_generic_error
+          err: ''
+
+  - id: fail_package_not_found
+    input:
+      name: nonexistent-pkg
+      state: present
+    output:
+      failed: true
+      rc: 104
+      msg: "Package 'nonexistent-pkg' not found."
+    mocks:
+      run_command:
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, --disable-repositories, search,
+             --type, package, --match-exact, --details, --installed-only, nonexistent-pkg]
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+             --auto-agree-with-licenses, --no-recommends, '--', +nonexistent-pkg]
+          environ: *env
+          rc: 104
+          out: *xml_not_found_error
+          err: ''
+
+  - id: fail_rpm_post_script_rc_107
+    input:
+      name: '*'
+      state: latest
+    output:
+      failed: true
+      rc: 107
+      msg: Zypper run failed.
+    mocks:
+      run_command:
+        - command: *update_all
+          environ: *env
+          rc: 107
+          out: *xml_upgrade_vim
+          err: ''
+
+  - id: skip_post_errors_reruns_on_rc_107
+    input:
+      name: '*'
+      state: latest
+      skip_post_errors: true
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command: *update_all
+          environ: *env
+          rc: 107
+          out: *xml_upgrade_vim
+          err: ''
+        # skip_post_errors makes the module run the very same command again
+        - command: *update_all
+          environ: *env
+          rc: 0
+          out: *xml_upgrade_vim
+          err: ''
+
+  - id: simple_errors_simplifies_stdout
+    input:
+      name: '*'
+      state: latest
+      simple_errors: true
+    output:
+      failed: true
+      rc: 8
+      msg: Zypper run command failed with return code 8.
+      stdout: System management is locked by the application with pid 1234.
+    mocks:
+      run_command:
+        - command: *update_all
+          environ: *env
+          rc: 8
+          out: *xml_locked_error
+          err: ''

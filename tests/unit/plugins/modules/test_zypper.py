@@ -6,7 +6,10 @@ from __future__ import annotations
 
 import pytest
 
+from ansible_collections.community.general.plugins.modules import zypper
 from ansible_collections.community.general.plugins.modules.zypper import split_name_version
+
+from .uthelper import RunCommandMock, UTHelper
 
 NAME_VERSION = [
     ("nmap", ("nmap", "")),
@@ -37,3 +40,12 @@ PREFIXED_NAME_VERSION = [
 @pytest.mark.parametrize("name, expected", PREFIXED_NAME_VERSION, ids=lambda x: x if isinstance(x, str) else "")
 def test_split_name_version_with_prefix(name, expected):
     assert split_name_version(name) == expected
+
+
+@pytest.fixture(autouse=True)
+def no_transactional_updates(mocker):
+    # keep the command line deterministic regardless of the host filesystem
+    mocker.patch.object(zypper, "transactional_updates", return_value=False)
+
+
+UTHelper.from_module(zypper, __name__, mocks=[RunCommandMock])
