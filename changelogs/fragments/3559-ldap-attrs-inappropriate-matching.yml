@@ -1,0 +1,7 @@
+bugfixes:
+  - ldap_attrs - when the server raises ``INAPPROPRIATE_MATCHING`` because an attribute has no EQUALITY
+    matching rule (for example, certain ``olcTLS*`` attributes on older OpenLDAP versions), the module
+    now falls back to Python-side value comparison instead of crashing
+    (https://github.com/ansible-collections/community.general/issues/3559,
+    https://github.com/ansible-collections/community.general/issues/12596,
+    https://github.com/ansible-collections/community.general/pull/12628).
