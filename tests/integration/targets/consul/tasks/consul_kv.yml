@@ -15,6 +15,9 @@
       - result is changed
       - result.data.Value == 'somevalue'
 
+# The lookup plugin always runs on the controller, but the dev-mode Consul
+# agent used by this integration test target is only reachable from the
+# target host, so this can't be exercised here.
 # - name: Test the lookup
 #   ansible.builtin.assert:
 #     that:
