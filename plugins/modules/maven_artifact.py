@@ -127,8 +127,21 @@ options:
       - If V(true), the downloaded artifact's name is preserved, in other words the version number remains part of it.
       - This option only has effect when O(dest) is a directory and O(version) is set to V(latest) or O(version_by_spec) is
         defined.
+      - See O(keep_name_only_when_resolved) about this option's scope when a fixed O(version) is given.
     type: bool
     default: false
+  keep_name_only_when_resolved:
+    description:
+      - If V(false) (default), O(keep_name) also controls whether O(version) is part of the destination filename when
+        a fixed O(version) is given (that is, not V(latest) and O(version_by_spec) is not used). This does not match
+        the documented scope of O(keep_name).
+      - If V(true), O(keep_name) only affects the filename when O(version=latest) or O(version_by_spec) is used, matching
+        the documented behavior of O(keep_name); a fixed O(version) is then always kept in the destination filename.
+      - A future community.general release will deprecate the V(false) behavior and eventually change the default to
+        V(true).
+    type: bool
+    default: false
+    version_added: '13.4.0'
   verify_checksum:
     type: str
     description:
@@ -641,6 +654,14 @@ class MavenDownloader:
         return hash.hexdigest()
 
 
+def _should_keep_version_in_filename(keep_name, keep_name_only_when_resolved, version_resolved_dynamically):
+    if version_resolved_dynamically:
+        return keep_name
+    if keep_name_only_when_resolved:
+        return True
+    return keep_name
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -662,6 +683,7 @@ def main():
             client_cert=dict(type="path"),
             client_key=dict(type="path"),
             keep_name=dict(default=False, type="bool"),
+            keep_name_only_when_resolved=dict(default=False, type="bool"),
             verify_checksum=dict(default="download", choices=["never", "download", "change", "always"]),
             checksum_alg=dict(default="md5", choices=["md5", "sha1"]),
             unredirected_headers=dict(type="list", elements="str", default=["Authorization", "Cookie"]),
@@ -703,6 +725,7 @@ def main():
     dest = module.params["dest"]
     b_dest = to_bytes(dest, errors="surrogate_or_strict")
     keep_name = module.params["keep_name"]
+    keep_name_only_when_resolved = module.params["keep_name_only_when_resolved"]
     verify_checksum = module.params["verify_checksum"]
     verify_download = verify_checksum in ["download", "always"]
     verify_change = verify_checksum in ["change", "always"]
@@ -738,12 +761,16 @@ def main():
 
     if os.path.isdir(b_dest):
         version_part = version
+        version_resolved_dynamically = version == "latest" or bool(version_by_spec)
         if version == "latest":
             version_part = downloader.find_latest_version_available(artifact)
         elif version_by_spec:
             version_part = downloader.find_version_by_spec(artifact)
 
-        filename = f"{artifact_id}{(f'-{version_part}' if keep_name else '')}{(f'-{classifier}' if classifier else '')}.{extension}"
+        keep_version = _should_keep_version_in_filename(
+            keep_name, keep_name_only_when_resolved, version_resolved_dynamically
+        )
+        filename = f"{artifact_id}{(f'-{version_part}' if keep_version else '')}{(f'-{classifier}' if classifier else '')}.{extension}"
         dest = posixpath.join(dest, filename)
 
         b_dest = to_bytes(dest, errors="surrogate_or_strict")

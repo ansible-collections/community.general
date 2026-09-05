@@ -235,3 +235,30 @@ def test_find_uri_for_release_version_unaffected(mocker):
 
     uri = mvn_downloader.find_uri_for_artifact(artifact)
     assert uri == "https://repo.example.com/com/example/my-lib/2.1.0/my-lib-2.1.0.jar"
+
+
+@pytest.mark.parametrize(
+    "patch_ansible_module, keep_name, keep_name_only_when_resolved, version_resolved_dynamically, expected",
+    [
+        # version resolved dynamically (latest / version_by_spec): keep_name always decides
+        (None, True, True, True, True),
+        (None, True, False, True, True),
+        (None, False, True, True, False),
+        (None, False, False, True, False),
+        # fixed version, new/documented scope (keep_name_only_when_resolved=True): version always kept
+        (None, True, True, False, True),
+        (None, False, True, False, True),
+        # fixed version, legacy scope (keep_name_only_when_resolved=False, deprecated): keep_name decides
+        (None, True, False, False, True),
+        (None, False, False, False, False),  # regression case reported in issue 4796
+    ],
+)
+def test_should_keep_version_in_filename(
+    keep_name, keep_name_only_when_resolved, version_resolved_dynamically, expected
+):
+    assert (
+        maven_artifact._should_keep_version_in_filename(
+            keep_name, keep_name_only_when_resolved, version_resolved_dynamically
+        )
+        == expected
+    )
