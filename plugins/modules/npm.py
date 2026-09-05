@@ -231,14 +231,13 @@ class Npm:
         data = {}
         out = self._exec(cmd, True, False, False) or "{}"
         # npm may print warnings/notices to stdout ahead of (or after) the JSON
-        # payload, which breaks strict JSON parsing. Extract the outermost
-        # object so such noise does not cause a spurious failure.
-        start = out.find("{")
-        end = out.rfind("}")
-        if start != -1 and end != -1 and end > start:
-            out = out[start : end + 1]
+        # payload, which breaks strict JSON parsing. Skip to the first '{'
+        # that starts a line (ignoring leading whitespace), then decode only
+        # the JSON value found there, ignoring any trailing noise npm appends.
+        start_match = re.search(r"^[ \t]*(\{)", out, re.MULTILINE)
+        start = start_match.start(1) if start_match else 0
         try:
-            data = json.loads(out)
+            data, _end = json.JSONDecoder().raw_decode(out, start)
         except getattr(json, "JSONDecodeError", ValueError) as e:
             self.module.fail_json(msg=f"Failed to parse NPM output with error {e}")
         if "dependencies" in data:
