@@ -97,6 +97,7 @@ options:
       - If not set, neither option is passed to I(zypper) and its configured default applies (option C(solver.onlyRequires)
         in C(zypp.conf)).
       - Mutually exclusive with O(disable_recommends).
+      - This option is only used during installation and not for idempotency checks.
     type: bool
     version_added: 13.4.0
   force:
