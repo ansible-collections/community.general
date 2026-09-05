@@ -1,0 +1,41 @@
+---
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+DOCUMENTATION:
+  name: version_sort_natural
+  short_description: Sort a list of strings by natural version order
+  version_added: 13.4.0
+  author: Alexei Znamensky (@russoz)
+  description:
+    - Sort a list of strings by natural version order, comparing runs of digits numerically and everything else as text.
+    - Unlike P(community.general.version_sort#filter), this does not require the compared versions to have the same
+      number of components, so for example C(1.1-SNAPSHOT) and C(1.1.0-SNAPSHOT) can be compared without errors.
+  options:
+    _input:
+      description: A list of strings to sort.
+      type: list
+      elements: string
+      required: true
+    reverse:
+      description: Set to V(true) to sort in descending order instead of the default ascending order.
+      type: boolean
+      default: false
+
+EXAMPLES: |
+  - name: Sort a list of strings by natural version order
+    ansible.builtin.set_fact:
+      sorted_list: "{{ ['1.1.0-SNAPSHOT', '1.1-SNAPSHOT'] | community.general.version_sort_natural }}"
+      # Result is ['1.1-SNAPSHOT', '1.1.0-SNAPSHOT']
+
+  - name: Sort a list of strings by natural version order, descending
+    ansible.builtin.set_fact:
+      sorted_list: "{{ ['2.1', '2.10', '2.9'] | community.general.version_sort_natural(reverse=true) }}"
+      # Result is ['2.10', '2.9', '2.1']
+
+RETURN:
+  _value:
+    description: The list of strings sorted by natural version order.
+    type: list
+    elements: string
