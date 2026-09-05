@@ -281,9 +281,12 @@ def alter_retention_policy(module, client, retention_policy):
     ):
         if not module.check_mode:
             try:
-                client.alter_retention_policy(
-                    policy_name, database_name, duration, replication, default, shard_group_duration
-                )
+                if shard_group_duration:
+                    client.alter_retention_policy(
+                        policy_name, database_name, duration, replication, default, shard_group_duration
+                    )
+                else:
+                    client.alter_retention_policy(policy_name, database_name, duration, replication, default)
             except exceptions.InfluxDBClientError as e:
                 module.fail_json(msg=e.content)
         changed = True
