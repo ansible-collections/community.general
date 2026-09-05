@@ -4,3 +4,4 @@
 
 azp/generic/1
 cloud/opennebula
+disabled  # FIXME - no recorded fixtures for this target, cannot run without live OpenNebula
