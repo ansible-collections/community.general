@@ -370,6 +370,7 @@ class TestProtonPassClientAuth(unittest.TestCase):
         mock_popen.return_value = _make_popen_mock(0, b"", b"")
         client = ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="")
         self.assertTrue(client.test_session())
+        self.assertEqual(mock_popen.call_args.args[0], ["pass-cli", "info"])
 
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
     def test_test_session_returns_false_on_nonzero(self, mock_popen):

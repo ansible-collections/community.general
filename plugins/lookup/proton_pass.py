@@ -360,7 +360,7 @@ class ProtonPassClient:
 
     def test_session(self) -> bool:
         """Return True when an active pass-cli session exists."""
-        rc, *_ignored = self._run(["test"])
+        rc, *_ignored = self._run(["info"])
         return rc == 0
 
     def login_with_pat(self, pat: str) -> None:
@@ -441,18 +441,19 @@ class ProtonPassClient:
 
 def _raise_item_error(title: str, vault: str, field: str | None, stderr: str) -> None:
     """Translate pass-cli stderr into a descriptive AnsibleLookupError."""
-    msg = stderr.strip()
+    msg = stderr.strip().lower()
     vault_hint = f" in vault '{vault}'" if vault else ""
     field_hint = f", field '{field}'" if field else ""
 
-    lower = msg.lower()
-    if "not found" in lower or "no items found" in lower:
-        raise AnsibleLookupError(
+    if "not found" in msg or "no items found" in msg:
+        error_msg = (
             f"Item '{title}'{vault_hint} not found in Proton Pass{field_hint}. Verify the item title and vault name."
         )
-    if "unauthorized" in lower or "unauthenticated" in lower:
-        raise AnsibleLookupError(f"pass-cli authentication error: {msg}. Re-run 'pass-cli login' or refresh your PAT.")
-    raise AnsibleLookupError(f"pass-cli failed for item '{title}'{vault_hint}{field_hint}: {msg}")
+    elif "unauthorized" in msg or "unauthenticated" in msg:
+        error_msg = f"pass-cli authentication error: {msg}. Re-run 'pass-cli login' or refresh your PAT."
+    else:
+        error_msg = f"pass-cli failed for item '{title}'{vault_hint}{field_hint}: {msg}"
+    raise AnsibleLookupError(error_msg)
 
 
 # ---------------------------------------------------------------------------
