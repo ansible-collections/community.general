@@ -1,0 +1,2 @@
+bugfixes:
+  - influxdb_retention_policy - fix ``TypeError`` when altering a retention policy without ``shard_group_duration`` set (https://github.com/ansible-collections/community.general/issues/3897, https://github.com/ansible-collections/community.general/pull/12652).
