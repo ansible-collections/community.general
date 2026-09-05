@@ -14,14 +14,6 @@
     consul_uri: https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_{{ ansible_facts.system | lower }}_{{ consul_arch }}.zip
     consul_cmd: '{{ remote_tmp_dir }}/consul'
   block:
-    - name: Install py-consul
-      ansible.builtin.pip:
-        name: py-consul
-        extra_args: "-c {{ remote_constraints }}"
-      register: result
-      retries: 3
-      delay: 5
-      until: result is success
     - name: Generate privatekey
       community.crypto.openssl_privatekey:
         path: '{{ remote_tmp_dir }}/privatekey.pem'
