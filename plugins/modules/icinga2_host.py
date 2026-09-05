@@ -136,6 +136,7 @@ data:
 import json
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 
 
@@ -162,11 +163,22 @@ class icinga2_api:
             method=method,
             use_proxy=self.module.params["use_proxy"],
         )
-        body = ""
-        if rsp:
-            body = json.loads(rsp.read())
+        # On HTTP errors (status >= 400), fetch_url() already reads and closes the
+        # response body, storing it in info["body"]. Calling rsp.read() again in
+        # that case returns an empty string, so the status must be checked first.
         if info["status"] >= 400:
-            body = info["body"]
+            body = info.get("body", "")
+        elif rsp is not None:
+            body = rsp.read()
+        else:
+            body = ""
+        if not body:
+            body = {}
+        else:
+            try:
+                body = json.loads(body)
+            except ValueError:
+                body = {"error": to_text(body)}
         return {"code": info["status"], "data": body}
 
     def check_connection(self):
