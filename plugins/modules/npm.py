@@ -229,8 +229,16 @@ class Npm:
         installed = list()
         missing = list()
         data = {}
+        out = self._exec(cmd, True, False, False) or "{}"
+        # npm may print warnings/notices to stdout ahead of (or after) the JSON
+        # payload, which breaks strict JSON parsing. Extract the outermost
+        # object so such noise does not cause a spurious failure.
+        start = out.find("{")
+        end = out.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            out = out[start : end + 1]
         try:
-            data = json.loads(self._exec(cmd, True, False, False) or "{}")
+            data = json.loads(out)
         except getattr(json, "JSONDecodeError", ValueError) as e:
             self.module.fail_json(msg=f"Failed to parse NPM output with error {e}")
         if "dependencies" in data:
