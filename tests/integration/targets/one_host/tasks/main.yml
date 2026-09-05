@@ -18,8 +18,8 @@
     src: testhost/tmp/opennebula-fixtures.json.gz
     dest: /tmp
   when:
-    - opennebula_test_fixture
-    - opennebula_test_fixture_replay
+    - opennebula_test_fixture | bool
+    - opennebula_test_fixture_replay | bool
 
 
 # SETUP INITIAL TESTING CONDITION
@@ -239,5 +239,5 @@
     src: /tmp/opennebula-fixtures.json.gz
     dest: targets/one_host/files
   when:
-    - opennebula_test_fixture
-    - not opennebula_test_fixture_replay
+    - opennebula_test_fixture | bool
+    - not (opennebula_test_fixture_replay | bool)
