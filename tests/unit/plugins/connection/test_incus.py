@@ -357,3 +357,36 @@ def test_fetch_file_transfer_success(mocker):
     mocker.patch("ansible_collections.community.general.plugins.connection.incus.Popen", return_value=process)
 
     conn.fetch_file("/tmp/src", "/tmp/dest")
+
+
+def test_get_remote_uid_gid_default_command(mocker):
+    """By default ``/bin/id`` is used to resolve the remote UID and GID."""
+    conn = _make_conn(mocker)
+
+    exec_command = mocker.patch.object(conn, "exec_command", side_effect=[(0, "1001\n", ""), (0, "2002\n", "")])
+
+    assert conn._get_remote_uid_gid() == (1001, 2002)
+    assert [call.args[0] for call in exec_command.call_args_list] == ["/bin/id -u", "/bin/id -g"]
+
+
+def test_get_remote_uid_gid_custom_command(mocker):
+    """``remote_user_id_command`` overrides the command used to resolve the remote UID and GID."""
+    conn = _make_conn(mocker)
+    conn.set_option("remote_user_id_command", "/usr/bin/id")
+
+    exec_command = mocker.patch.object(conn, "exec_command", side_effect=[(0, "1001\n", ""), (0, "2002\n", "")])
+
+    assert conn._get_remote_uid_gid() == (1001, 2002)
+    assert [call.args[0] for call in exec_command.call_args_list] == ["/usr/bin/id -u", "/usr/bin/id -g"]
+
+
+def test_get_remote_uid_gid_failure(mocker):
+    """A failing ``id`` command must raise instead of returning bogus IDs."""
+    conn = _make_conn(mocker)
+
+    mocker.patch.object(conn, "exec_command", return_value=(1, "", "id: command not found"))
+
+    with pytest.raises(AnsibleError) as exc:
+        conn._get_remote_uid_gid()
+
+    assert "Failed to get remote uid for user root" in str(exc.value)

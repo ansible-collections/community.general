@@ -1,0 +1,2 @@
+minor_changes:
+  - incus connection plugin - add ``remote_user_id_command`` option to configure the command used to retrieve the UID and GID of the remote user (https://github.com/ansible-collections/community.general/pull/12646).
