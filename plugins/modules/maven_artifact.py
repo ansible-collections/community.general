@@ -127,17 +127,18 @@ options:
       - If V(true), the downloaded artifact's name is preserved, in other words the version number remains part of it.
       - This option only has effect when O(dest) is a directory and O(version) is set to V(latest) or O(version_by_spec) is
         defined.
-      - See O(keep_name_only_when_resolved) for a deprecation affecting this option's scope.
+      - See O(keep_name_only_when_resolved) about this option's scope when a fixed O(version) is given.
     type: bool
     default: false
   keep_name_only_when_resolved:
     description:
       - If V(false) (default), O(keep_name) also controls whether O(version) is part of the destination filename when
         a fixed O(version) is given (that is, not V(latest) and O(version_by_spec) is not used). This does not match
-        the documented scope of O(keep_name) and is deprecated.
+        the documented scope of O(keep_name).
       - If V(true), O(keep_name) only affects the filename when O(version=latest) or O(version_by_spec) is used, matching
         the documented behavior of O(keep_name); a fixed O(version) is then always kept in the destination filename.
-      - The default value for this option will change to V(true) in community.general 15.0.0.
+      - A future community.general release will deprecate the V(false) behavior and eventually change the default to
+        V(true).
     type: bool
     default: false
     version_added: '13.4.0'
@@ -765,14 +766,6 @@ def main():
             version_part = downloader.find_latest_version_available(artifact)
         elif version_by_spec:
             version_part = downloader.find_version_by_spec(artifact)
-
-        if not keep_name_only_when_resolved and not version_resolved_dynamically and not keep_name:
-            module.deprecate(
-                "Omitting the version from the filename here is deprecated, set "
-                "'keep_name_only_when_resolved=true' to opt in to the new behavior now.",
-                version="15.0.0",
-                collection_name="community.general",
-            )
 
         keep_version = _should_keep_version_in_filename(
             keep_name, keep_name_only_when_resolved, version_resolved_dynamically
