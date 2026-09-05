@@ -4,36 +4,11 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = r"""
-name: version_sort
-short_description: Sort a list according to version order instead of pure alphabetical one
-version_added: 2.2.0
-author: Eric L. (@ericzolf)
-description:
-  - Sort a list according to version order instead of pure alphabetical one.
-options:
-  _input:
-    description: A list of strings to sort.
-    type: list
-    elements: string
-    required: true
-"""
-
-EXAMPLES = r"""
-- name: Sort a list of strings by version
-  ansible.builtin.set_fact:
-    sorted_list: "{{ ['2.1', '2.10', '2.9'] | community.general.version_sort }}"
-    # Result is ['2.1', '2.9', '2.10']
-"""
-
-RETURN = r"""
-_value:
-  description: The list of strings sorted by version.
-  type: list
-  elements: string
-"""
+import re
 
 from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
+
+_NATURAL_SORT_RE = re.compile(r"(\d+)")
 
 
 def version_sort(value, reverse=False):
@@ -41,8 +16,20 @@ def version_sort(value, reverse=False):
     return sorted(value, key=LooseVersion, reverse=reverse)
 
 
+def _natural_sort_key(value: str) -> list[int | str]:
+    return [int(chunk) if chunk.isdigit() else chunk for chunk in _NATURAL_SORT_RE.split(value)]
+
+
+def version_sort_natural(value: list[str], reverse: bool = False) -> list[str]:
+    """Sort a list of strings by natural version order, tolerating differing numbers of version components."""
+    return sorted(value, key=_natural_sort_key, reverse=reverse)
+
+
 class FilterModule:
     """Version sort filter"""
 
     def filters(self):
-        return {"version_sort": version_sort}
+        return {
+            "version_sort": version_sort,
+            "version_sort_natural": version_sort_natural,
+        }
