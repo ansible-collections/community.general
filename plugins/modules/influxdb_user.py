@@ -30,6 +30,18 @@ options:
     description:
       - Password to be set for the user.
     type: str
+  force_password_update:
+    description:
+      - Force the password to be updated, without checking whether it actually needs to change.
+      - By default, the module tries to detect a password change by logging in with O(user_password) and only calls the
+        password-update API when that login fails. This detection is inconclusive when the InfluxDB server does not enforce
+        authentication (for example, when C(auth-enabled) is not set), in which case the login always succeeds and the
+        password is never reported as needing an update.
+      - Set this to V(true) to always update the password when O(user_password) is provided, regardless of the detection
+        result.
+    default: false
+    type: bool
+    version_added: 13.4.0
   admin:
     description:
       - Whether the user should be in the admin role or not.
@@ -88,6 +100,14 @@ EXAMPLES = r"""
         privilege: 'WRITE'
       - database: 'graphite'
         privilege: 'READ'
+
+- name: Force a user's password to be updated, even without authentication enabled on the server
+  community.general.influxdb_user:
+    user_name: john
+    user_password: s3cr3t
+    force_password_update: true
+    login_username: "{{ influxdb_username }}"
+    login_password: "{{ influxdb_password }}"
 
 - name: Destroy a user using custom login credentials
   community.general.influxdb_user:
@@ -210,6 +230,7 @@ def main():
         state=dict(default="present", type="str", choices=["present", "absent"]),
         user_name=dict(required=True, type="str"),
         user_password=dict(type="str", no_log=True),
+        force_password_update=dict(default=False, type="bool"),
         admin=dict(default="False", type="bool"),
         grants=dict(type="list", elements="dict"),
     )
@@ -218,6 +239,7 @@ def main():
     state = module.params["state"]
     user_name = module.params["user_name"]
     user_password = module.params["user_password"]
+    force_password_update = module.params["force_password_update"]
     admin = module.params["admin"]
     grants = module.params["grants"]
     influxdb = influx.InfluxDb(module)
@@ -244,7 +266,9 @@ def main():
 
     if state == "present":
         if user:
-            if not check_user_password(module, client, user_name, user_password) and user_password is not None:
+            if user_password is not None and (
+                force_password_update or not check_user_password(module, client, user_name, user_password)
+            ):
                 set_user_password(module, client, user_name, user_password)
                 changed = True
 
