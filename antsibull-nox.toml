@@ -167,6 +167,12 @@ docker = [ "fedora40", "ubuntu2404", "alpine320" ]
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "2.18"
+target = [ "azp/generic/1/" ]
+python_version = [ "3.8", "3.13" ]
+docker = "default"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.18"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 remote = [
     # "macos/14.3",
@@ -183,6 +189,12 @@ description = "Meta session for running all ansible-test-integration-2.19-* sess
 ansible_core = "2.19"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 docker = [ "fedora41", "alpine321" ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.19"
+target = [ "azp/generic/1/" ]
+python_version = [ "3.9", "3.13" ]
+docker = "default"
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "2.19"
@@ -205,6 +217,12 @@ docker = [ "fedora42", "alpine322" ]
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "2.20"
+target = [ "azp/generic/1/" ]
+python_version = [ "3.10", "3.14" ]
+docker = "default"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.20"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 remote = [ "macos/15.3", "rhel/10.1", "freebsd/14.3" ]
 
@@ -223,6 +241,12 @@ docker = [
     "ubuntu2204",
     "ubuntu2404",
 ]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.21"
+target = [ "azp/generic/1/" ]
+python_version = [ "3.9", "3.12", "3.14" ]
+docker = "default"
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "2.21"
@@ -278,6 +302,12 @@ ansible_core = "devel"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 python_version = "3.14"
 docker = "quay.io/ansible-community/test-image:archlinux"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/generic/1/" ]
+python_version = [ "3.9", "3.13", "3.15" ]
+docker = "default"
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "devel"
