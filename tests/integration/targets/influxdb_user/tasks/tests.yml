@@ -50,6 +50,48 @@
         that:
           - add_admin_user is not changed
 
+- name: Test change admin password without authentication enabled
+  block:
+    - name: Change admin password without forcing the update
+      community.general.influxdb_user:
+        user_name: admin
+        user_password: admin2
+        admin: true
+      register: change_password_no_force
+
+    - name: Check that the password change is not detected without authentication enabled
+      ansible.builtin.assert:
+        that:
+          - change_password_no_force is not changed
+
+- name: Test force_password_update without authentication enabled
+  block:
+    - name: Change admin password with force_password_update
+      community.general.influxdb_user:
+        user_name: admin
+        user_password: admin2
+        admin: true
+        force_password_update: true
+      register: change_password_force
+
+    - name: Check that forcing the update reports a change
+      ansible.builtin.assert:
+        that:
+          - change_password_force is changed
+
+    - name: Restore original admin password with force_password_update
+      community.general.influxdb_user:
+        user_name: admin
+        user_password: admin
+        admin: true
+        force_password_update: true
+      register: restore_password_force
+
+    - name: Check that restoring the password reports a change
+      ansible.builtin.assert:
+        that:
+          - restore_password_force is changed
+
 - name: Enable authentication and restart service
   block:
     - name: Enable authentication
