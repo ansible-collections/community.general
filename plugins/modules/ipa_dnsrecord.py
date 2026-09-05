@@ -50,7 +50,7 @@ options:
       - In the case of V(CNAME) record type, this is the hostname.
       - In the case of V(DNAME) record type, this is the DNAME target.
       - In the case of V(NS) record type, this is the name server hostname. Hostname must already have a valid A or AAAA record.
-      - In the case of V(PTR) record type, this is the hostname.
+      - In the case of V(PTR) record type, this is the hostname. It must be a fully qualified domain name ending with a dot.
       - In the case of V(TXT) record type, this is a text.
       - In the case of V(SRV) record type, this is a service record.
       - In the case of V(MX) record type, this is a mail exchanger record.
@@ -65,7 +65,7 @@ options:
       - In the case of V(CNAME) record type, this is the hostname.
       - In the case of V(DNAME) record type, this is the DNAME target.
       - In the case of V(NS) record type, this is the name server hostname. Hostname must already have a valid A or AAAA record.
-      - In the case of V(PTR) record type, this is the hostname.
+      - In the case of V(PTR) record type, this is the hostname. It must be a fully qualified domain name ending with a dot.
       - In the case of V(TXT) record type, this is a text.
       - In the case of V(SRV) record type, this is a service record.
       - In the case of V(MX) record type, this is a mail exchanger record.
@@ -120,7 +120,7 @@ EXAMPLES = r"""
     zone_name: 2.168.192.in-addr.arpa
     record_name: 5
     record_type: 'PTR'
-    record_value: 'internal.ipa.example.com'
+    record_value: 'internal.ipa.example.com.'
 
 - name: Ensure a TXT record is present
   community.general.ipa_dnsrecord:
