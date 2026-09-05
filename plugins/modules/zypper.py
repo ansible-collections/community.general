@@ -85,8 +85,21 @@ options:
     description:
       - Corresponds to the C(--no-recommends) option for I(zypper). Default behavior (V(true)) modifies zypper's default behavior;
         V(false) does install recommended packages.
+      - Mutually exclusive with O(install_recommends).
+      - This option will be deprecated in the future in favor of O(install_recommends).
     default: true
     type: bool
+  install_recommends:
+    description:
+      - Corresponds to the C(--recommends) and C(--no-recommends) options for I(zypper).
+      - If set to V(true), recommended packages are installed (C(--recommends) is passed to I(zypper)).
+      - If set to V(false), recommended packages are not installed (C(--no-recommends) is passed to I(zypper)).
+      - If not set, neither option is passed to I(zypper) and its configured default applies (option C(solver.onlyRequires)
+        in C(zypp.conf)).
+      - Mutually exclusive with O(disable_recommends).
+      - This option is only used during installation and not for idempotency checks.
+    type: bool
+    version_added: 13.4.0
   force:
     description:
       - Adds C(--force) option to I(zypper). Allows to downgrade packages and change vendor or architecture.
@@ -171,7 +184,7 @@ EXAMPLES = r"""
   community.general.zypper:
     name: apache2
     state: present
-    disable_recommends: false
+    install_recommends: true
 
 - name: Apply a given patch
   community.general.zypper:
@@ -432,7 +445,9 @@ def get_cmd(m, subcommand):
         cmd.append("--dry-run")
     if is_install:
         cmd.append("--auto-agree-with-licenses")
-        if m.params["disable_recommends"]:
+        if m.params["install_recommends"] is not None:
+            cmd.append("--recommends" if m.params["install_recommends"] else "--no-recommends")
+        elif m.params["disable_recommends"]:
             cmd.append("--no-recommends")
         if m.params["force"]:
             cmd.append("--force")
@@ -609,6 +624,7 @@ def main():
             disable_gpg_check=dict(default=False, type="bool"),
             auto_import_keys=dict(default=False, type="bool"),
             disable_recommends=dict(default=True, type="bool"),
+            install_recommends=dict(type="bool"),
             force=dict(default=False, type="bool"),
             force_resolution=dict(default=False, type="bool"),
             update_cache=dict(aliases=["refresh"], default=False, type="bool"),
@@ -621,6 +637,7 @@ def main():
             quiet=dict(default=True, type="bool"),
             skip_post_errors=dict(default=False, type="bool"),
         ),
+        mutually_exclusive=[["disable_recommends", "install_recommends"]],
         supports_check_mode=True,
     )
 
