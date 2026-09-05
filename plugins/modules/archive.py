@@ -75,6 +75,10 @@ notes:
   - Can produce C(gzip), C(bzip2), C(lzma), C(zstd), and C(zip) compressed files or archives.
   - This module uses C(tarfile), C(zipfile), C(gzip), C(bz2), and C(lzma) packages on the target host to create archives. These are
     part of the Python standard library.
+  - Tar and gzip based archives embed per-entry metadata, such as modification time, ownership, and permissions, and this module
+    does not guarantee a stable order in which files are added to an archive. As a result, running this module against the
+    same source content more than once, or on different hosts, is not guaranteed to produce a byte-for-byte identical archive,
+    even when the file contents themselves are unchanged.
 requirements:
   - zstandard for O(format=zstd)
 seealso:
