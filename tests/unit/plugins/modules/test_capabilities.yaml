@@ -1,0 +1,283 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+test_cases:
+  - id: present_set_on_file_without_caps
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot+ep
+      state: present
+    output:
+      changed: true
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo\n"
+          err: ''
+        - command: [/testbin/setcap, -v, cap_sys_chroot+ep, /tmp/foo]
+          rc: 1
+          out: "/tmp/foo differs in [ep]\n"
+          err: ''
+        - command: [/testbin/setcap, cap_sys_chroot+ep, /tmp/foo]
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_sys_chroot=ep\n"
+          err: ''
+
+  # Second run of the task above: newer libcap prints the capability with '='
+  # even though it was set with '+'. Must be reported as not changed.
+  - id: present_idempotent_new_libcap
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot+ep
+      state: present
+    output:
+      changed: false
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_sys_chroot=ep\n"
+          err: ''
+        - command: [/testbin/setcap, -v, cap_sys_chroot+ep, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo: OK\n"
+          err: ''
+
+  # Same, but with the output format of an older libcap ('/foo = cap...+ep').
+  - id: present_idempotent_old_libcap
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot+ep
+      state: present
+    output:
+      changed: false
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo = cap_sys_chroot+ep\n"
+          err: ''
+        - command: [/testbin/setcap, -v, cap_sys_chroot+ep, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo: OK\n"
+          err: ''
+
+  # Several capabilities set at once, passed in a different order than getcap
+  # reports them back. Must still be idempotent.
+  - id: present_idempotent_multiple_caps
+    input:
+      path: /tmp/foo
+      capability: "cap_chown,cap_fowner,cap_dac_override=ip"
+      state: present
+    output:
+      changed: false
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_chown,cap_dac_override,cap_fowner=ip\n"
+          err: ''
+        - command: [/testbin/setcap, -v, "cap_chown,cap_fowner,cap_dac_override=ip", /tmp/foo]
+          rc: 0
+          out: "/tmp/foo: OK\n"
+          err: ''
+
+  - id: present_preserves_other_capabilities
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot+ep
+      state: present
+    output:
+      changed: true
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_net_raw=ep\n"
+          err: ''
+        - command: [/testbin/setcap, -v, "cap_net_raw=ep cap_sys_chroot+ep", /tmp/foo]
+          rc: 1
+          out: "/tmp/foo differs in [ep]\n"
+          err: ''
+        - command: [/testbin/setcap, "cap_net_raw=ep cap_sys_chroot+ep", /tmp/foo]
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_net_raw,cap_sys_chroot=ep\n"
+          err: ''
+
+  # setcap --verify claims a difference, but setcap does not actually change
+  # anything (effective flag without permitted flag). Re-reading the caps shows
+  # no change, so the task must be reported as not changed.
+  - id: present_setcap_verify_false_positive
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot+ep
+      state: present
+    output:
+      changed: false
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_sys_chroot=ep\n"
+          err: ''
+        - command: [/testbin/setcap, -v, cap_sys_chroot+ep, /tmp/foo]
+          rc: 1
+          out: "/tmp/foo differs in [e]\n"
+          err: ''
+        - command: [/testbin/setcap, cap_sys_chroot+ep, /tmp/foo]
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_sys_chroot=ep\n"
+          err: ''
+
+  - id: present_check_mode_reports_change
+    flags:
+      check: true
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot+ep
+      state: present
+    output:
+      changed: true
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo\n"
+          err: ''
+        - command: [/testbin/setcap, -v, cap_sys_chroot+ep, /tmp/foo]
+          rc: 1
+          out: "/tmp/foo differs in [ep]\n"
+          err: ''
+
+  - id: present_check_mode_idempotent
+    flags:
+      check: true
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot+ep
+      state: present
+    output:
+      changed: false
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_sys_chroot=ep\n"
+          err: ''
+        - command: [/testbin/setcap, -v, cap_sys_chroot+ep, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo: OK\n"
+          err: ''
+
+  - id: absent_removes_capability
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot
+      state: absent
+    output:
+      changed: true
+      state: absent
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_sys_chroot=ep\n"
+          err: ''
+        - command: [/testbin/setcap, '', /tmp/foo]
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo\n"
+          err: ''
+
+  - id: absent_keeps_other_capabilities
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot
+      state: absent
+    output:
+      changed: true
+      state: absent
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_net_raw,cap_sys_chroot=ep\n"
+          err: ''
+        - command: [/testbin/setcap, -v, "cap_net_raw=ep", /tmp/foo]
+          rc: 1
+          out: "/tmp/foo differs in [ep]\n"
+          err: ''
+        - command: [/testbin/setcap, "cap_net_raw=ep", /tmp/foo]
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_net_raw=ep\n"
+          err: ''
+
+  - id: absent_noop_when_capability_missing
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot
+      state: absent
+    output:
+      changed: false
+      state: absent
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_net_raw=ep\n"
+          err: ''
+
+  - id: fail_when_file_missing
+    input:
+      path: /tmp/does-not-exist
+      capability: cap_sys_chroot+ep
+      state: present
+    output:
+      failed: true
+      msg: Unable to get capabilities of /tmp/does-not-exist
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/does-not-exist]
+          rc: 0
+          out: "/tmp/does-not-exist (No such file or directory)\n"
+          err: ''
+
+  - id: fail_present_without_operator
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot
+      state: present
+    output:
+      failed: true
+    mocks:
+      run_command: []
