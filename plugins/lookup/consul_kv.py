@@ -12,8 +12,6 @@ description:
   - Lookup metadata for a playbook from the key value store in a Consul cluster. Values can be easily set in the kv store
     with simple rest commands.
   - C(curl -X PUT -d 'some-value' http://localhost:8500/v1/kv/ansible/somedata).
-requirements:
-  - 'py-consul python library U(https://github.com/criteo/py-consul?tab=readme-ov-file#installation)'
 options:
   _terms:
     description: List of key(s) to retrieve.
@@ -130,21 +128,17 @@ _raw:
   type: dict
 """
 
-from urllib.parse import urlparse
+import base64
+import json
+from urllib.error import HTTPError
+from urllib.parse import quote, urlencode, urlparse
 
 from ansible.errors import AnsibleAssertionError, AnsibleError
 from ansible.module_utils.common.text.converters import to_text
+from ansible.module_utils.urls import open_url
 from ansible.plugins.lookup import LookupBase
 
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
-
-try:
-    import consul
-
-    HAS_CONSUL = True
-except ImportError:
-    HAS_CONSUL = False
-
 
 _EMPTY_VALUE_MAP = {
     "textual_none": "None",
@@ -155,11 +149,6 @@ _EMPTY_VALUE_MAP = {
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
-        if not HAS_CONSUL:
-            raise AnsibleError(
-                "py-consul is required for consul_kv lookup. see https://github.com/criteo/py-consul?tab=readme-ov-file#installation"
-            )
-
         # get options
         self.set_options(direct=kwargs)
         check_for_wrong_terms(self, direct=kwargs)
@@ -180,35 +169,70 @@ class LookupModule(LookupBase):
         ca_path = self.get_option("ca_path")
         client_cert = self.get_option("client_cert")
 
-        verify = (ca_path or validate_certs) if validate_certs else False
-
         empty_value = _EMPTY_VALUE_MAP[self.get_option("empty_value")]
         values = []
         try:
             for term in terms:
                 params = self.parse_params(term)
-                consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=verify, cert=client_cert)
-
-                results = consul_api.kv.get(
-                    params["key"],
+                entries = self._kv_get(
+                    scheme=scheme,
+                    host=host,
+                    port=port,
+                    key=params["key"],
                     token=params["token"],
                     index=params["index"],
                     recurse=params["recurse"],
-                    dc=params["datacenter"],
+                    datacenter=params["datacenter"],
+                    validate_certs=validate_certs,
+                    ca_path=ca_path,
+                    client_cert=client_cert,
                 )
-                if results[1]:
-                    # responds with a single or list of result maps
-                    if isinstance(results[1], list):
-                        for r in results[1]:
-                            v = r["Value"]
-                            values.append(to_text(v) if v is not None else empty_value)
-                    else:
-                        v = results[1]["Value"]
-                        values.append(to_text(v) if v is not None else empty_value)
+                for entry in entries or []:
+                    v = entry["Value"]
+                    values.append(to_text(v) if v is not None else empty_value)
         except Exception as e:
             raise AnsibleError(f"Error locating '{term}' in kv store. Error was {e}") from e
 
         return values
+
+    @staticmethod
+    def _kv_get(scheme, host, port, key, token, index, recurse, datacenter, validate_certs, ca_path, client_cert):
+        query = {}
+        if recurse:
+            query["recurse"] = "true"
+        if datacenter:
+            query["dc"] = datacenter
+        if index is not None:
+            query["index"] = index
+
+        url = f"{scheme}://{host}:{port}/v1/kv/{quote(key, safe='/')}"
+        if query:
+            url = f"{url}?{urlencode(query)}"
+
+        headers = {"X-Consul-Token": token} if token else {}
+
+        try:
+            response = open_url(
+                url,
+                headers=headers,
+                validate_certs=validate_certs,
+                ca_path=ca_path,
+                client_cert=client_cert,
+            )
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            raise
+
+        body = response.read()
+        if not body:
+            return None
+
+        entries = json.loads(body)
+        for entry in entries:
+            if entry.get("Value") is not None:
+                entry["Value"] = base64.b64decode(entry["Value"])
+        return entries
 
     def parse_params(self, term):
         params = term.split(" ")
