@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper - add ``install_recommends`` option to explicitly control installation of recommended packages (https://github.com/ansible-collections/community.general/issues/3497, https://github.com/ansible-collections/community.general/pull/12648).

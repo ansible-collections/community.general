@@ -257,6 +257,52 @@ test_cases:
           out: *xml_install_nmap
           err: ''
 
+  - id: install_recommends_true
+    input:
+      name: nmap
+      state: present
+      install_recommends: true
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+             --auto-agree-with-licenses, --recommends, '--', +nmap]
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
+  - id: install_recommends_false
+    input:
+      name: nmap
+      state: present
+      install_recommends: false
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+             --auto-agree-with-licenses, --no-recommends, '--', +nmap]
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
   - id: install_quiet_false
     input:
       name: '*'
