@@ -169,6 +169,55 @@ test_cases:
           out: '{}'
           err: ''
 
+  - id: present_missing_with_stdout_noise
+    input:
+      name: coffee-script
+      global: true
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: "npm warn config global \n{\"dependencies\": {\"coffee-script\": {\"missing\": true}}}\n"
+          err: ''
+        - command: [/testbin/npm, install, --global, coffee-script]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
+  - id: present_missing_with_brace_in_warning
+    input:
+      name: coffee-script
+      global: true
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/npm, list, --json, --long, --global]
+          environ: *env-list
+          rc: 0
+          out: |
+            npm warn using {legacy} config
+            {
+              "dependencies": {
+                "coffee-script": {
+                  "missing": true
+                }
+              }
+            }
+            npm notice new version available {details here}
+          err: ''
+        - command: [/testbin/npm, install, --global, coffee-script]
+          environ: *env-exec
+          rc: 0
+          out: '{}'
+          err: ''
+
   - id: present_package_json
     input:
       global: true
