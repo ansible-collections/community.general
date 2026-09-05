@@ -1,0 +1,155 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+####################################################################
+## Attribute modification ##########################################
+####################################################################
+
+- name: Add description in check mode
+  community.general.ldap_attrs:
+    dn: uid=ldaptest,ou=users,dc=example,dc=com
+    attributes:
+      description: Test description
+    state: present
+    bind_dn: cn=admin,dc=example,dc=com
+    bind_pw: Test1234!
+  check_mode: true
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is changed
+
+- name: Add description
+  community.general.ldap_attrs:
+    dn: uid=ldaptest,ou=users,dc=example,dc=com
+    attributes:
+      description: Test description
+    state: present
+    bind_dn: cn=admin,dc=example,dc=com
+    bind_pw: Test1234!
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is changed
+
+- name: Add description again (idempotent)
+  community.general.ldap_attrs:
+    dn: uid=ldaptest,ou=users,dc=example,dc=com
+    attributes:
+      description: Test description
+    state: present
+    bind_dn: cn=admin,dc=example,dc=com
+    bind_pw: Test1234!
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+
+- name: Remove description in check mode
+  community.general.ldap_attrs:
+    dn: uid=ldaptest,ou=users,dc=example,dc=com
+    attributes:
+      description: Test description
+    state: absent
+    bind_dn: cn=admin,dc=example,dc=com
+    bind_pw: Test1234!
+  check_mode: true
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is changed
+
+- name: Verify value still present after check mode remove
+  community.general.ldap_attrs:
+    dn: uid=ldaptest,ou=users,dc=example,dc=com
+    attributes:
+      description: Test description
+    state: present
+    bind_dn: cn=admin,dc=example,dc=com
+    bind_pw: Test1234!
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+
+- name: Remove description
+  community.general.ldap_attrs:
+    dn: uid=ldaptest,ou=users,dc=example,dc=com
+    attributes:
+      description: Test description
+    state: absent
+    bind_dn: cn=admin,dc=example,dc=com
+    bind_pw: Test1234!
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is changed
+
+- name: Remove description again (idempotent)
+  community.general.ldap_attrs:
+    dn: uid=ldaptest,ou=users,dc=example,dc=com
+    attributes:
+      description: Test description
+    state: absent
+    bind_dn: cn=admin,dc=example,dc=com
+    bind_pw: Test1234!
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+
+####################################################################
+## INAPPROPRIATE_MATCHING fallback #################################
+## (https://github.com/ansible-collections/community.general/issues/3559)
+##
+## olcTLSCACertificateFile lacks an EQUALITY matching rule on older
+## OpenLDAP (~2.4.x / ~2.5.x).  Modifications use check_mode because
+## modify operations also fail without EQUALITY.
+####################################################################
+
+- name: Verify existing TLS attribute is detected
+  community.general.ldap_attrs:
+    dn: cn=config
+    attributes:
+      olcTLSCACertificateFile: /usr/local/share/ca-certificates/ca.crt
+    state: present
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is not changed
+
+- name: Detect removal of TLS attribute in check mode
+  community.general.ldap_attrs:
+    dn: cn=config
+    attributes:
+      olcTLSCACertificateFile: /usr/local/share/ca-certificates/ca.crt
+    state: absent
+  check_mode: true
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is changed
+
+- name: Detect addition of non-matching TLS value in check mode
+  community.general.ldap_attrs:
+    dn: cn=config
+    attributes:
+      olcTLSCACertificateFile: /tmp/nonexistent.crt
+    state: present
+  check_mode: true
+  register: result
+
+- ansible.builtin.assert:
+    that:
+      - result is changed
