@@ -334,7 +334,7 @@ class HAProxy:
 
             if state is not None:
                 self.execute(Template(cmd).substitute(pxname=backend, svname=svname))
-                if self.wait and not (wait_for_status == "DRAIN" and state == "DOWN"):
+                if self.wait and not (wait_for_status == "DRAIN" and "DOWN" in state[0]["status"]):
                     self.wait_until_status(backend, svname, wait_for_status)
 
     def get_state_for(self, pxname, svname):
