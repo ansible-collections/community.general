@@ -1,0 +1,11 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+consul_version: "1.22.6"
+consul_download_location: /tmp/consul-download-test
+consul_download_url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_{{ ansible_facts.system | lower }}_{{ consul_arch }}.zip"
+consul_cmd: "{{ consul_download_location }}/consul"
+
+consul_kv_prefix: "lookup_consul_kv_test/"

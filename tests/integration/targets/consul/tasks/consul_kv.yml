@@ -15,10 +15,9 @@
       - result is changed
       - result.data.Value == 'somevalue'
 
-# - name: Test the lookup
-#   ansible.builtin.assert:
-#     that:
-#       - lookup('community.general.consul_kv', 'somekey', token=consul_management_token) == 'somevalue'
+# The consul_kv lookup always runs on the controller, so it can't be tested
+# against the Consul agent started on the target host above; it has its own
+# dedicated integration test target instead: lookup_consul_kv.
 
 - name: Update a key with the same data
   community.general.consul_kv:
