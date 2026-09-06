@@ -1,0 +1,2 @@
+bugfixes:
+  - supervisorctl - treat the ``BACKOFF`` process state as active so that ``state=started`` does not fail on a program still being retried by ``supervisord`` (https://github.com/ansible-collections/community.general/issues/5599, https://github.com/ansible-collections/community.general/pull/12688).

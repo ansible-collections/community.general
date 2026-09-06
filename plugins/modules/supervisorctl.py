@@ -118,7 +118,7 @@ from ansible.module_utils.basic import AnsibleModule, is_executable
 
 
 def _is_active(status):
-    return status in ("RUNNING", "STARTING")
+    return status in ("RUNNING", "STARTING", "BACKOFF")
 
 
 def _is_not_active(status):
