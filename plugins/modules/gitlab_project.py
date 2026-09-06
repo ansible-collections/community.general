@@ -478,7 +478,8 @@ class GitLabProject:
             project_options["topics"] = options["topics"]
 
         # Because we have already call userExists in main()
-        if self.project_object is None:
+        is_new_project = self.project_object is None
+        if is_new_project:
             if options["default_branch"] and not options["initialize_with_readme"]:
                 module.fail_json(msg="Param default_branch needs param initialize_with_readme set to true")
             project_options.update(
@@ -511,7 +512,11 @@ class GitLabProject:
         self.project_object = project
         if changed:
             if self._module.check_mode:
-                self._module.exit_json(changed=True, msg=f"Successfully created or updated the project {project_name}")
+                if is_new_project:
+                    self._module.exit_json(
+                        changed=True, msg=f"Successfully created or updated the project {project_name}"
+                    )
+                return True
 
             try:
                 project.save()
@@ -812,12 +817,12 @@ def main():
             module.exit_json(
                 changed=True,
                 msg=f"Successfully created or updated the project {project_name}",
-                project=gitlab_project.project_object._attrs,
+                project=gitlab_project.project_object.attributes,
             )
         module.exit_json(
             changed=False,
             msg=f"No need to update the project {project_name}",
-            project=gitlab_project.project_object._attrs,
+            project=gitlab_project.project_object.attributes,
         )
 
 
