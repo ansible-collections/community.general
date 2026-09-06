@@ -165,9 +165,9 @@ stages:
               test: ansible-test-integration-2.19-alpine321-azp-posix-2
             - name: Alpine 3.21 + group 3
               test: ansible-test-integration-2.19-alpine321-azp-posix-3
-            - name: Generic + py3.13 + azp/generic/1/
+            - name: Generic + py3.13 + generic group 1
               test: ansible-test-integration-2.19-default-3.13-azp-generic-1
-            - name: Generic + py3.9 + azp/generic/1/
+            - name: Generic + py3.9 + generic group 1
               test: ansible-test-integration-2.19-default-3.9-azp-generic-1
             - name: Fedora 41 + group 1
               test: ansible-test-integration-2.19-fedora41-azp-posix-1
@@ -191,9 +191,9 @@ stages:
               test: ansible-test-integration-2.20-alpine322-azp-posix-2
             - name: Alpine 3.22 + group 3
               test: ansible-test-integration-2.20-alpine322-azp-posix-3
-            - name: Generic + py3.10 + azp/generic/1/
+            - name: Generic + py3.10 + generic group 1
               test: ansible-test-integration-2.20-default-3.10-azp-generic-1
-            - name: Generic + py3.14 + azp/generic/1/
+            - name: Generic + py3.14 + generic group 1
               test: ansible-test-integration-2.20-default-3.14-azp-generic-1
             - name: Fedora 42 + group 1
               test: ansible-test-integration-2.20-fedora42-azp-posix-1
@@ -217,11 +217,11 @@ stages:
               test: ansible-test-integration-2.21-alpine323-azp-posix-2
             - name: Alpine 3.23 + group 3
               test: ansible-test-integration-2.21-alpine323-azp-posix-3
-            - name: Generic + py3.12 + azp/generic/1/
+            - name: Generic + py3.12 + generic group 1
               test: ansible-test-integration-2.21-default-3.12-azp-generic-1
-            - name: Generic + py3.14 + azp/generic/1/
+            - name: Generic + py3.14 + generic group 1
               test: ansible-test-integration-2.21-default-3.14-azp-generic-1
-            - name: Generic + py3.9 + azp/generic/1/
+            - name: Generic + py3.9 + generic group 1
               test: ansible-test-integration-2.21-default-3.9-azp-generic-1
             - name: Fedora 43 + group 1
               test: ansible-test-integration-2.21-fedora43-azp-posix-1
@@ -281,11 +281,11 @@ stages:
               test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-2
             - name: Debian 11 + py3.9 + group 3
               test: ansible-test-integration-devel-debian-bullseye-3.9-azp-posix-3
-            - name: Generic + py3.13 + azp/generic/1/
+            - name: Generic + py3.13 + generic group 1
               test: ansible-test-integration-devel-default-3.13-azp-generic-1
-            - name: Generic + py3.15 + azp/generic/1/
+            - name: Generic + py3.15 + generic group 1
               test: ansible-test-integration-devel-default-3.15-azp-generic-1
-            - name: Generic + py3.9 + azp/generic/1/
+            - name: Generic + py3.9 + generic group 1
               test: ansible-test-integration-devel-default-3.9-azp-generic-1
             - name: Fedora 44 + group 1
               test: ansible-test-integration-devel-fedora44-azp-posix-1
