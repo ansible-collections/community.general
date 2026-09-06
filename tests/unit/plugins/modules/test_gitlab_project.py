@@ -82,6 +82,65 @@ class TestGitlabProject(GitlabModuleTestCase):
         self.assertEqual(type(project), Project)
         self.assertEqual(project.name, "Diaspora Client")
 
+    @with_httmock(resp_get_group)
+    @with_httmock(resp_get_gitlab_version)
+    def test_create_project_check_mode(self):
+        group = self.gitlab_instance.groups.get(1)
+
+        self.mock_module.check_mode = True
+        options = {
+            "allow_merge_on_skipped_pipeline": None,
+            "avatar_path": None,
+            "builds_access_level": None,
+            "build_timeout": None,
+            "ci_config_path": None,
+            "container_expiration_policy": None,
+            "container_registry_access_level": None,
+            "default_branch": None,
+            "description": None,
+            "environments_access_level": None,
+            "feature_flags_access_level": None,
+            "forking_access_level": None,
+            "import_url": None,
+            "infrastructure_access_level": None,
+            "initialize_with_readme": False,
+            "issues_access_level": None,
+            "issues_enabled": None,
+            "lfs_enabled": None,
+            "merge_method": None,
+            "merge_requests_enabled": None,
+            "model_registry_access_level": None,
+            "monitor_access_level": None,
+            "only_allow_merge_if_all_discussions_are_resolved": None,
+            "only_allow_merge_if_pipeline_succeeds": None,
+            "packages_enabled": None,
+            "pages_access_level": None,
+            "path": "diaspora-client",
+            "releases_access_level": None,
+            "remove_source_branch_after_merge": None,
+            "repository_access_level": None,
+            "security_and_compliance_access_level": None,
+            "service_desk_enabled": None,
+            "shared_runners_enabled": None,
+            "snippets_enabled": None,
+            "squash_option": None,
+            "topics": None,
+            "visibility": None,
+            "wiki_enabled": None,
+        }
+
+        # No POST response is mocked: if the module tried to create the project
+        # while in check mode, this call would fail with a connection error.
+        changed = self.moduleUtil.create_or_update_project(self.mock_module, "Diaspora Client", group, options)
+
+        self.assertEqual(changed, True)
+        self.assertEqual(type(self.moduleUtil.project_object), dict)
+
+        attrs = self.moduleUtil.project_attributes()
+        self.assertEqual(attrs["name"], "Diaspora Client")
+        self.assertEqual(attrs["path"], "diaspora-client")
+        self.assertEqual(attrs["namespace_id"], group.id)
+
     @with_httmock(resp_get_project)
     def test_update_project(self):
         project = self.gitlab_instance.projects.get(1)

@@ -399,7 +399,11 @@ error:
   sample: "400: path is already in use"
 
 project:
-  description: API object.
+  description:
+    - API object.
+    - When a new project is created while O(state=present) runs in check mode, no API call is made,
+      so this is a synthesized representation built from the module options instead of the object
+      GitLab would actually return. Treat it as an approximation in that case.
   returned: always
   type: dict
 """
@@ -496,8 +500,9 @@ class GitLabProject:
             project_options = self.get_options_with_value(project_options)
             project = self.create_project(namespace, project_options)
 
-            # add avatar to project
-            if options["avatar_path"]:
+            # add avatar to project. Nothing is created in check mode, so there is no
+            # real project to attach the avatar to.
+            if options["avatar_path"] and not self._module.check_mode:
                 try:
                     project.avatar = open(options["avatar_path"], "rb")
                 except OSError as e:
@@ -511,19 +516,25 @@ class GitLabProject:
 
         self.project_object = project
         if changed:
-            if self._module.check_mode:
-                if is_new_project:
-                    self._module.exit_json(
-                        changed=True, msg=f"Successfully created or updated the project {project_name}"
-                    )
-                return True
-
-            try:
-                project.save()
-            except Exception as e:
-                self._module.fail_json(msg=f"Failed to update project: {e} ")
+            if not self._module.check_mode:
+                try:
+                    project.save()
+                except Exception as e:
+                    self._module.fail_json(msg=f"Failed to update project: {e} ")
             return True
         return False
+
+    """
+    Returns the tracked project's attributes. For a project created while running in
+    check mode, no API call was made, so this is a synthesized dict built from the
+    module options rather than the project's real attributes - see the module's
+    RETURN documentation for `project`.
+    """
+
+    def project_attributes(self):
+        if isinstance(self.project_object, dict):
+            return self.project_object
+        return self.project_object.attributes
 
     """
     @param namespace Namespace Object (User or Group)
@@ -532,7 +543,10 @@ class GitLabProject:
 
     def create_project(self, namespace, arguments):
         if self._module.check_mode:
-            return True
+            # No API call is made in check mode, so there is no real project to
+            # report back. Synthesize one from the arguments that would have
+            # been sent, so the caller still gets a value for `project`.
+            return {"namespace_id": namespace.id, **arguments}
 
         arguments["namespace_id"] = namespace.id
         if "container_expiration_policy" in arguments:
@@ -817,12 +831,12 @@ def main():
             module.exit_json(
                 changed=True,
                 msg=f"Successfully created or updated the project {project_name}",
-                project=gitlab_project.project_object.attributes,
+                project=gitlab_project.project_attributes(),
             )
         module.exit_json(
             changed=False,
             msg=f"No need to update the project {project_name}",
-            project=gitlab_project.project_object.attributes,
+            project=gitlab_project.project_attributes(),
         )
 
 
