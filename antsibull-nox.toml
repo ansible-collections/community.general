@@ -144,6 +144,7 @@ retry_on_error = "in-ci"
 "azp/posix/2/" = "group 2"
 "azp/posix/3/" = "group 3"
 "azp/posix/vm/" = "extra VMs"
+"azp/generic/1/" = "generic group 1"
 
 [sessions.ansible_test_integration.nice_docker_names]
 "quay.io/ansible-community/test-image:debian-bullseye" = "Debian 11"
