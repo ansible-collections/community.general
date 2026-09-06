@@ -36,7 +36,8 @@
 
 - name: Test the lookup with recurse
   ansible.builtin.set_fact:
-    consul_kv_recurse_result: "{{ lookup('community.general.consul_kv', consul_kv_prefix, recurse=true) }}"
+    # query() (unlike lookup()) always returns a list, even with 2+ string results.
+    consul_kv_recurse_result: "{{ query('community.general.consul_kv', consul_kv_prefix, recurse=true) }}"
 
 - ansible.builtin.assert:
     that:
