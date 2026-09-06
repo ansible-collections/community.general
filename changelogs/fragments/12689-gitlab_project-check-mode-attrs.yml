@@ -1,2 +1,2 @@
 bugfixes:
-  - gitlab_project - return ``project`` in the result when updating an existing project in check mode (https://github.com/ansible-collections/community.general/pull/12689, https://github.com/ansible-collections/community.general/issues/5689).
+  - gitlab_project - return ``project`` in the result when running in check mode (https://github.com/ansible-collections/community.general/pull/12689, https://github.com/ansible-collections/community.general/issues/5689).
