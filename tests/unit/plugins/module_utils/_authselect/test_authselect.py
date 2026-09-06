@@ -10,9 +10,6 @@ import unittest
 from unittest.mock import Mock, patch
 
 from ansible_collections.community.general.plugins.module_utils._authselect import authselect
-from ansible_collections.community.general.plugins.module_utils._authselect.authselect_enums import (
-    AuthselectValidationStatus,
-)
 
 
 class FakeAllocatedCString:
@@ -68,6 +65,26 @@ class FakePointer:
 
     def __bool__(self):
         return self.valid
+
+
+class TestAuthselectValidationStatus(unittest.TestCase):
+    def test_validation_complete_value(self):
+        self.assertEqual(
+            authselect.AuthselectValidationStatus.VALIDATION_COMPLETE,
+            0,
+        )
+
+    def test_no_configuration_uses_enoent(self):
+        self.assertEqual(
+            authselect.AuthselectValidationStatus.NO_CONFIGURATION,
+            errno.ENOENT,
+        )
+
+    def test_not_managed_uses_eexist(self):
+        self.assertEqual(
+            authselect.AuthselectValidationStatus.NOT_MANAGED,
+            errno.EEXIST,
+        )
 
 
 class TestAuthselect(unittest.TestCase):
@@ -361,7 +378,7 @@ class TestAuthselect(unittest.TestCase):
 
         self.assertEqual(
             result,
-            (AuthselectValidationStatus.VALIDATION_COMPLETE, True),
+            (authselect.AuthselectValidationStatus.VALIDATION_COMPLETE, True),
         )
 
     def test_validate_configuration_returns_no_configuration_status(self):
@@ -371,7 +388,7 @@ class TestAuthselect(unittest.TestCase):
 
         self.assertEqual(
             result,
-            (AuthselectValidationStatus.NO_CONFIGURATION, False),
+            (authselect.AuthselectValidationStatus.NO_CONFIGURATION, False),
         )
 
     def test_validate_configuration_returns_not_managed_status(self):
@@ -381,7 +398,7 @@ class TestAuthselect(unittest.TestCase):
 
         self.assertEqual(
             result,
-            (AuthselectValidationStatus.NOT_MANAGED, False),
+            (authselect.AuthselectValidationStatus.NOT_MANAGED, False),
         )
 
     def test_validate_configuration_rejects_unknown_status(self):

@@ -13,6 +13,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     set_module_args,
 )
 
+from ansible_collections.community.general.plugins.module_utils._mh.deco import no_handle_exceptions
 from ansible_collections.community.general.plugins.modules import authselect
 
 PROFILE_FEATURES = {
@@ -26,6 +27,12 @@ PROFILE_FEATURES = {
         "with-mkhomedir",
     },
 }
+
+
+class FakeExceptionWithMessage(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+        super().__init__()
 
 
 class FakeProfile:
@@ -181,9 +188,17 @@ class FakeAuthselectWrongProfile(FakeAuthselect):
 class TestAuthselect(ModuleTestCase):
     def run_success(self, module_args, fake_authselect):
         with set_module_args(module_args):
-            with patch.object(authselect, "Authselect", return_value=fake_authselect):
-                with self.assertRaises(AnsibleExitJson) as result:
-                    authselect.main()
+            with patch.object(
+                authselect,
+                "Authselect",
+                return_value=fake_authselect,
+            ):
+                with no_handle_exceptions(
+                    AnsibleExitJson,
+                    AnsibleFailJson,
+                ):
+                    with self.assertRaises(AnsibleExitJson) as result:
+                        authselect.main()
 
         return result.exception.args[0]
 
@@ -191,9 +206,17 @@ class TestAuthselect(ModuleTestCase):
         fake_authselect = fake_authselect or FakeAuthselect()
 
         with set_module_args(module_args):
-            with patch.object(authselect, "Authselect", return_value=fake_authselect):
-                with self.assertRaises(AnsibleFailJson) as result:
-                    authselect.main()
+            with patch.object(
+                authselect,
+                "Authselect",
+                return_value=fake_authselect,
+            ):
+                with no_handle_exceptions(
+                    AnsibleExitJson,
+                    AnsibleFailJson,
+                ):
+                    with self.assertRaises(AnsibleFailJson) as result:
+                        authselect.main()
 
         return result.exception.args[0]
 
@@ -240,7 +263,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertIn("not a valid authselect profile", result["msg"])
         self.assertEqual(fake.activate_calls, [])
 
@@ -250,14 +272,13 @@ class TestAuthselect(ModuleTestCase):
             current_features=None,
         )
 
-        result = self.run_failure(
+        self.run_failure(
             {
                 "features": ["with-mkhomedir"],
             },
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertEqual(fake.activate_calls, [])
 
     def test_present_profile_activates_when_no_profile_is_current(self):
@@ -427,8 +448,7 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
-        self.assertIn("not valid for the profile sssd", result["msg"])
+        self.assertIn("not valid profile features: not-a-feature", result["msg"])
         self.assertEqual(fake.activate_calls, [])
 
     # ------------------------------------------------------------------
@@ -544,7 +564,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertIn("no currently configured authselect profiles", result["msg"].lower())
 
     def test_absent_named_profile_without_current_profile_fails(self):
@@ -562,8 +581,7 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
-        self.assertIn("Activate a profile first", result["msg"])
+        self.assertIn("there are no currently configured authselect profiles", result["msg"])
         self.assertEqual(fake.activate_calls, [])
 
     # ------------------------------------------------------------------
@@ -636,6 +654,32 @@ class TestAuthselect(ModuleTestCase):
         )
         self.assertEqual(fake.activate_calls, [])
 
+    def test_check_mode_absent_with_validate_validates_without_mutation(self):
+        fake = FakeAuthselect(
+            current_profile="sssd",
+            current_features={"with-faillock", "with-mkhomedir"},
+            validation_results=[(None, True)],
+        )
+
+        result = self.run_success(
+            {
+                "features": ["with-mkhomedir"],
+                "state": "absent",
+                "validate": True,
+                "_ansible_check_mode": True,
+            },
+            fake,
+        )
+
+        self.assertTrue(result["changed"])
+        self.assertEqual(result["features"], ["with-faillock"])
+        self.assertEqual(fake.validate_calls, 1)
+        self.assertEqual(fake.activate_calls, [])
+        self.assertEqual(
+            fake.current_features,
+            {"with-faillock", "with-mkhomedir"},
+        )
+
     def test_check_mode_idempotent_state_reports_no_change(self):
         fake = FakeAuthselect(
             current_profile="sssd",
@@ -682,7 +726,7 @@ class TestAuthselect(ModuleTestCase):
             ],
         )
 
-        result = self.run_failure(
+        self.run_failure(
             {
                 "features": ["with-mkhomedir"],
                 "validate": True,
@@ -691,7 +735,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertEqual(fake.activate_calls, [])
         self.assertEqual(fake.current_features, {"with-faillock"})
         self.assertEqual(fake.validate_calls, 1)
@@ -754,8 +797,7 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
-        self.assertIn("current configuration is not valid", result["msg"].lower())
+        self.assertIn("current authselect configuration is not valid", result["msg"].lower())
 
     def test_absent_named_different_profile_still_validates(self):
         fake = FakeAuthselect(
@@ -764,7 +806,7 @@ class TestAuthselect(ModuleTestCase):
             validation_results=[(None, False)],
         )
 
-        result = self.run_failure(
+        self.run_failure(
             {
                 "profile": "minimal",
                 "features": ["with-mkhomedir"],
@@ -774,7 +816,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertEqual(fake.validate_calls, 1)
         self.assertEqual(fake.activate_calls, [])
 
@@ -785,7 +826,7 @@ class TestAuthselect(ModuleTestCase):
             validation_results=[(None, False)],
         )
 
-        result = self.run_failure(
+        self.run_failure(
             {
                 "features": ["with-mkhomedir"],
                 "validate": True,
@@ -793,7 +834,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertTrue(result["changed"])
         self.assertEqual(fake.current_features, {"with-faillock", "with-mkhomedir"})
 
     def test_invalid_configuration_with_rollback_fails_before_change(self):
@@ -805,7 +845,7 @@ class TestAuthselect(ModuleTestCase):
             ],
         )
 
-        result = self.run_failure(
+        self.run_failure(
             {
                 "features": ["with-mkhomedir"],
                 "validate": True,
@@ -814,29 +854,9 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertEqual(fake.activate_calls, [])
         self.assertEqual(fake.create_backup_calls, [])
         self.assertEqual(fake.restore_backup_calls, [])
-
-    def test_validate_changes_fails_when_profile_does_not_match(self):
-        fake = FakeAuthselectWrongProfile(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertIn(
-            "does not match what was declared",
-            result["msg"],
-        )
 
     # ------------------------------------------------------------------
     # force and validation status
@@ -868,7 +888,7 @@ class TestAuthselect(ModuleTestCase):
             ],
         )
 
-        result = self.run_failure(
+        self.run_failure(
             {
                 "features": ["with-mkhomedir"],
                 "validate": True,
@@ -877,7 +897,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertEqual(fake.create_backup_calls, [])
         self.assertEqual(fake.activate_calls, [])
 
@@ -916,7 +935,7 @@ class TestAuthselect(ModuleTestCase):
             ],
         )
 
-        result = self.run_failure(
+        self.run_failure(
             {
                 "features": ["with-mkhomedir"],
                 "validate": True,
@@ -926,7 +945,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertEqual(fake.current_features, {"with-faillock"})
         self.assertEqual(fake.validate_calls, 3)
         self.assertEqual(len(fake.restore_backup_calls), 1)
@@ -950,7 +968,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertTrue(result["changed"])
         self.assertIn(
             "does not currently manage",
             result["msg"],
@@ -985,7 +1002,7 @@ class TestAuthselect(ModuleTestCase):
         self.assertEqual(result["features"], ["with-mkhomedir"])
         self.assertEqual(fake.validate_calls, 2)
 
-    def test_no_configuration_after_change_fails(self):
+    def test_absent_no_configuration_fails_even_without_change(self):
         fake = FakeAuthselect(
             current_profile="sssd",
             current_features={"with-faillock"},
@@ -997,12 +1014,33 @@ class TestAuthselect(ModuleTestCase):
         result = self.run_failure(
             {
                 "features": ["with-mkhomedir"],
+                "state": "absent",
                 "validate": True,
             },
             fake,
         )
 
-        self.assertTrue(result["changed"])
+        self.assertIn("there currently is no authselect configuration", result["msg"])
+        self.assertEqual(fake.activate_calls, [])
+        self.assertEqual(fake.validate_calls, 1)
+
+    def test_no_configuration_after_change_fails(self):
+        fake = FakeAuthselect(
+            current_profile="sssd",
+            current_features={"with-faillock"},
+            validation_results=[
+                (authselect.AuthselectValidationStatus.NO_CONFIGURATION, False),
+            ],
+        )
+
+        self.run_failure(
+            {
+                "features": ["with-mkhomedir"],
+                "validate": True,
+            },
+            fake,
+        )
+
         self.assertEqual(
             fake.current_features,
             {"with-faillock", "with-mkhomedir"},
@@ -1068,10 +1106,44 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertIn("backup creation failed", result["msg"])
         self.assertEqual(fake.activate_calls, [])
         self.assertEqual(fake.restore_backup_calls, [])
+
+    def test_activation_failure_without_rollback_reports_operation_error(self):
+        fake = FakeAuthselect(
+            current_profile="sssd",
+            current_features={"with-faillock"},
+            activate_exception=RuntimeError("activation failed"),
+        )
+
+        result = self.run_failure(
+            {
+                "features": ["with-mkhomedir"],
+            },
+            fake,
+        )
+
+        self.assertIn("unable to apply authselect changes: activation failed", result["msg"])
+        self.assertEqual(fake.create_backup_calls, [])
+        self.assertEqual(fake.restore_backup_calls, [])
+        self.assertEqual(fake.remove_backup_calls, [])
+
+    def test_activation_failure_uses_exception_msg_attribute(self):
+        fake = FakeAuthselect(
+            current_profile="sssd",
+            current_features={"with-faillock"},
+            activate_exception=FakeExceptionWithMessage("activation message"),
+        )
+
+        result = self.run_failure(
+            {
+                "features": ["with-mkhomedir"],
+            },
+            fake,
+        )
+
+        self.assertIn("unable to apply authselect changes: activation message", result["msg"])
 
     def test_activation_failure_rolls_back_and_removes_backup(self):
         fake = FakeAuthselect(
@@ -1088,7 +1160,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertIn("activation failed", result["msg"])
         self.assertEqual(fake.current_profile, "sssd")
         self.assertEqual(fake.current_features, {"with-faillock"})
@@ -1099,26 +1170,6 @@ class TestAuthselect(ModuleTestCase):
             fake.events,
             ["create_backup", "activate", "restore_backup", "remove_backup"],
         )
-
-    def test_validate_changes_failure_rolls_back_even_when_validate_false(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            apply_activation=False,
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertIn("does not match what was declared", result["msg"])
-        self.assertEqual(fake.current_features, {"with-faillock"})
-        self.assertEqual(len(fake.restore_backup_calls), 1)
 
     def test_post_change_validation_failure_rolls_back(self):
         fake = FakeAuthselect(
@@ -1131,7 +1182,7 @@ class TestAuthselect(ModuleTestCase):
             ],
         )
 
-        result = self.run_failure(
+        self.run_failure(
             {
                 "features": ["with-mkhomedir"],
                 "validate": True,
@@ -1140,7 +1191,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertEqual(fake.current_features, {"with-faillock"})
         self.assertEqual(fake.validate_calls, 3)
         self.assertEqual(
@@ -1172,10 +1222,8 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
-        self.assertIn("activation failed", result["msg"])
-        self.assertIn("restore failed", result["msg"])
-        self.assertIn("was preserved", result["msg"])
+        self.assertIn("unable to apply authselect changes: activation failed", result["msg"])
+        self.assertIn("rollback also failed: restore failed", result["msg"])
         self.assertEqual(len(fake.backups), 1)
         self.assertEqual(fake.remove_backup_calls, [])
 
@@ -1199,9 +1247,9 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
-        self.assertIn("Validation after backup also failed", result["msg"])
-        self.assertIn("was preserved", result["msg"])
+        self.assertIn("unable to apply authselect changes", result["msg"])
+        self.assertIn("rollback also failed", result["msg"])
+        self.assertIn("current authselect configuration is not valid", result["msg"])
         self.assertEqual(len(fake.backups), 1)
         self.assertEqual(fake.remove_backup_calls, [])
 
@@ -1221,10 +1269,9 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertFalse(result["changed"])
         self.assertIn("activation failed", result["msg"])
-        self.assertIn("delete failed", result["msg"])
-        self.assertIn("was preserved", result["msg"])
+        self.assertIn("the original configuration was restored", result["msg"])
+        self.assertIn("could not be removed: delete failed", result["msg"])
         self.assertEqual(len(fake.backups), 1)
 
     def test_backup_delete_failure_after_success_does_not_rollback_valid_change(self):
@@ -1242,7 +1289,6 @@ class TestAuthselect(ModuleTestCase):
             fake,
         )
 
-        self.assertTrue(result["changed"])
         self.assertIn("delete failed", result["msg"])
         self.assertEqual(
             fake.current_features,

@@ -6,13 +6,19 @@ from __future__ import annotations
 import ctypes
 import errno
 import os
+from enum import IntEnum
 from typing import Optional
 
-from .authselect_enums import AuthselectValidationStatus
 from .authselect_lib import get_authselect_lib
 from .authselect_profile import AuthselectProfile
 from .c_array import CStringArray, NullTerminatedStringArray
 from .c_string import AllocatedCString
+
+
+class AuthselectValidationStatus(IntEnum):
+    VALIDATION_COMPLETE = 0
+    NO_CONFIGURATION = errno.ENOENT
+    NOT_MANAGED = errno.EEXIST
 
 
 class Authselect:
