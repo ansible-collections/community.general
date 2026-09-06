@@ -383,7 +383,11 @@ class AuthselectModule(StateModuleHelper):
             try:
                 self.authselect.remove_profile_backup(backup_name)
             except Exception as exception:
-                self.do_raise(f"unable to remove backup: {backup_name}")
+                self.do_raise(
+                    f"authselect changes were applied, but unable to remove "
+                    f"temporary backup {backup_name}: "
+                    f"{self._get_error_message(exception)}"
+                )
         return
 
     def state_absent(self):
