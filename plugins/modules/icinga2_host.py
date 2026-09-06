@@ -163,15 +163,13 @@ class icinga2_api:
             method=method,
             use_proxy=self.module.params["use_proxy"],
         )
-        # On HTTP errors (status >= 400), fetch_url() already reads and closes the
-        # response body, storing it in info["body"]. Calling rsp.read() again in
-        # that case returns an empty string, so the status must be checked first.
-        if info["status"] >= 400:
+        # fetch_url() already reads and closes the response body when it catches an
+        # HTTPError, so a second rsp.read() would return an empty string; the raw
+        # body is available via info["body"] in that case.
+        if rsp is None or rsp.closed:
             body = info.get("body", "")
-        elif rsp is not None:
-            body = rsp.read()
         else:
-            body = ""
+            body = rsp.read()
         if not body:
             body = {}
         else:

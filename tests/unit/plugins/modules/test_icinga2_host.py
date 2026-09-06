@@ -30,6 +30,7 @@ def closed_response():
     # Simulates the response object fetch_url() returns for HTTP errors: it has
     # already been read and closed internally, so a second .read() yields "".
     rsp = MagicMock()
+    rsp.closed = True
     rsp.read.return_value = ""
     return rsp
 
