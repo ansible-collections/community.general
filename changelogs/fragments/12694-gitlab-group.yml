@@ -1,0 +1,2 @@
+bugfixes:
+  - Deprecate default value for visibility in gitlab_group module - (https://github.com/ansible-collections/community.general/pull/12694)
