@@ -6,6 +6,69 @@ Community General Release Notes
 
 This changelog describes changes after version 12.0.0.
 
+v13.4.0
+=======
+
+Release Summary
+---------------
+
+Regular bugfix and feature release.
+
+Minor Changes
+-------------
+
+- archive - use context managers when reading tar checksums (https://github.com/ansible-collections/community.general/pull/12569).
+- consul modules - add a ``url`` option taking the address of the Consul agent as a whole; the existing ``host``, ``port`` and ``scheme`` options each override the matching component of it. This does not cover ``community.general.consul`` (https://github.com/ansible-collections/community.general/pull/12216).
+- consul modules - connection options now fall back to the ``CONSUL_HTTP_ADDR``, ``CONSUL_HTTP_SSL``, ``CONSUL_HTTP_SSL_VERIFY``, ``CONSUL_HTTP_TOKEN`` and ``CONSUL_CACERT`` environment variables when not specified. This applies to all consul modules except ``community.general.consul``, which does not use the shared connection option handling yet (https://github.com/ansible-collections/community.general/pull/12216).
+- github_repo - added ``visibility`` option to set repository visibility to ``public``, ``private``, or ``internal`` (https://github.com/ansible-collections/community.general/issues/6219, https://github.com/ansible-collections/community.general/pull/12557).
+- gitlab_hook - add ``branch_filter_strategy`` option to control how ``push_events_branch_filter`` filters push events, which allows filtering branches by a regular expression (https://github.com/ansible-collections/community.general/pull/12618).
+- incus connection plugin - add ``remote_user_id_command`` option to configure the command used to retrieve the UID and GID of the remote user (https://github.com/ansible-collections/community.general/pull/12646).
+- influxdb_user - add ``force_password_update`` option to always update the password when ``user_password`` is set, working around InfluxDB installations that do not enforce authentication (https://github.com/ansible-collections/community.general/issues/3824, https://github.com/ansible-collections/community.general/pull/12654).
+- maven_artifact - add ``keep_name_only_when_resolved`` option to opt in to the documented scope of ``keep_name``, where it only controls the destination filename when ``version`` is resolved dynamically (``latest`` or ``version_by_spec``); previously ``keep_name`` also affected the filename with a fixed ``version``, contradicting its documentation (https://github.com/ansible-collections/community.general/pull/12606, https://github.com/ansible-collections/community.general/issues/4796).
+- odbc - add ``autocommit`` option to support statements that must run outside of a transaction (https://github.com/ansible-collections/community.general/issues/4173, https://github.com/ansible-collections/community.general/issues/8577, https://github.com/ansible-collections/community.general/pull/12595).
+- passwordstore lookup plugin - add ``keep_trailing_newline`` option to preserve the trailing newline when ``returnall=true`` (https://github.com/ansible-collections/community.general/pull/12589, https://github.com/ansible-collections/community.general/issues/3616).
+- vmadm - add ``bootrom`` option to support UEFI boot for ``bhyve`` VMs (https://github.com/ansible-collections/community.general/pull/12601, https://github.com/ansible-collections/community.general/issues/4282).
+- zypper - add ``install_recommends`` option to explicitly control installation of recommended packages (https://github.com/ansible-collections/community.general/issues/3497, https://github.com/ansible-collections/community.general/pull/12648).
+
+Deprecated Features
+-------------------
+
+- keycloak_realm_users_info - the module is moved to ``middleware_automation.keycloak.keycloak_realm_users_info``. The module will be replaced by a deprecated redirect to that module in community.general 14.0.0, and the redirect will be removed in community.general 16.0.0. If you are using the module, please consider installing and using ``ansible_middleware.keycloak`` now (https://github.com/ansible-collections/community.general/pull/12525).
+
+Bugfixes
+--------
+
+- apache2_module - fix false failures when ``ignore_configcheck`` is set and the configuration is broken for a reason unrelated to the module being changed (https://github.com/ansible-collections/community.general/issues/4592, https://github.com/ansible-collections/community.general/pull/12597).
+- haproxy - fix ``state=disabled`` with ``drain=true`` timing out instead of putting a server that is already down into maintenance mode (https://github.com/ansible-collections/community.general/issues/9020, https://github.com/ansible-collections/community.general/pull/12640).
+- homebrew_cask - fix ``brew --version`` parsing to handle version strings with more than three dot-separated segments (for example, some vendor Homebrew builds report a fourth segment). The previous regex could silently drop the leading segment, misjudging whether the deprecated ``brew cask`` command syntax is still required and causing installs to fail with an unknown-command error (https://github.com/ansible-collections/community.general/pull/12559).
+- icinga2_host - fix ``JSONDecodeError`` raised when the Icinga2 API returns an HTTP error response (https://github.com/ansible-collections/community.general/pull/12687, https://github.com/ansible-collections/community.general/issues/4948).
+- influxdb_retention_policy - fix ``TypeError`` when altering a retention policy without ``shard_group_duration`` set (https://github.com/ansible-collections/community.general/issues/3897, https://github.com/ansible-collections/community.general/pull/12652).
+- jabber - do not send an unnecessary ``muc#user`` tag on groupchat messages (https://github.com/ansible-collections/community.general/pull/12658, https://github.com/ansible-collections/community.general/issues/5343).
+- keycloak_user - fix attributes always reporting ``changed=true`` due to a type mismatch between the raw Keycloak representation and the module's list representation (https://github.com/ansible-collections/community.general/pull/12642).
+- ldap_attrs - when the server raises ``INAPPROPRIATE_MATCHING`` because an attribute has no EQUALITY matching rule (for example, certain ``olcTLS*`` attributes on older OpenLDAP versions), the module now falls back to Python-side value comparison instead of crashing (https://github.com/ansible-collections/community.general/issues/3559, https://github.com/ansible-collections/community.general/issues/12596, https://github.com/ansible-collections/community.general/pull/12628).
+- npm - fix ``JSONDecodeError`` when npm's stdout output contains warnings or notices alongside the JSON payload (https://github.com/ansible-collections/community.general/pull/12665, https://github.com/ansible-collections/community.general/issues/4960).
+- onepassword lookup plugin - the ``op://`` secret reference lookup returned raw bytes instead of a string, which broke passing the value into other modules (https://github.com/ansible-collections/community.general/pull/11958).
+- redfish_command - add workaround in ``VirtualMediaInsert`` for Supermicro systems to treat slots marked as ``NotConnected`` as empty (https://github.com/ansible-collections/community.general/issues/6969, https://github.com/ansible-collections/community.general/pull/12537).
+- sefcontext - fix idempotence of ``<<none>>`` file contexts (https://github.com/ansible-collections/community.general/pull/12561)
+- snap - fix ``IndexError`` when a single snap does not exist (https://github.com/ansible-collections/community.general/issues/12375, https://github.com/ansible-collections/community.general/pull/12570).
+- supervisorctl - treat the ``BACKOFF`` process state as active so that ``state=started`` does not fail on a program still being retried by ``supervisord`` (https://github.com/ansible-collections/community.general/issues/5599, https://github.com/ansible-collections/community.general/pull/12688).
+- ufw - do not reload the default policy when it is already set to the requested value (https://github.com/ansible-collections/community.general/issues/1843, https://github.com/ansible-collections/community.general/pull/12590).
+- ufw - fix IPv6 rule determination and ``insert_relative_to`` (https://github.com/ansible-collections/community.general/pull/12531).
+- zypper - fix version specifier parsing when the version contains non-numeric characters, which caused packages to not be removed or installed (https://github.com/ansible-collections/community.general/pull/12588, https://github.com/ansible-collections/community.general/issues/6564).
+
+New Plugins
+-----------
+
+Callback
+~~~~~~~~
+
+- community.general.oneline - One\-line Ansible screen output.
+
+New Modules
+-----------
+
+- community.general.appimage - Manage AppImage packages.
+
 v13.3.0
 =======
 

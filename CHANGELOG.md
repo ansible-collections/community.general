@@ -2,46 +2,54 @@
 
 **Topics**
 
-- <a href="#v13-3-0">v13\.3\.0</a>
+- <a href="#v13-4-0">v13\.4\.0</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
     - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#new-plugins">New Plugins</a>
+        - <a href="#callback">Callback</a>
     - <a href="#new-modules">New Modules</a>
-- <a href="#v13-2-0">v13\.2\.0</a>
+- <a href="#v13-3-0">v13\.3\.0</a>
     - <a href="#release-summary-1">Release Summary</a>
     - <a href="#minor-changes-1">Minor Changes</a>
+    - <a href="#deprecated-features-1">Deprecated Features</a>
     - <a href="#bugfixes-1">Bugfixes</a>
-    - <a href="#new-plugins">New Plugins</a>
-        - <a href="#lookup">Lookup</a>
     - <a href="#new-modules-1">New Modules</a>
-- <a href="#v13-1-0">v13\.1\.0</a>
+- <a href="#v13-2-0">v13\.2\.0</a>
     - <a href="#release-summary-2">Release Summary</a>
     - <a href="#minor-changes-2">Minor Changes</a>
     - <a href="#bugfixes-2">Bugfixes</a>
     - <a href="#new-plugins-1">New Plugins</a>
-        - <a href="#filter">Filter</a>
+        - <a href="#lookup">Lookup</a>
     - <a href="#new-modules-2">New Modules</a>
-- <a href="#v13-0-1">v13\.0\.1</a>
+- <a href="#v13-1-0">v13\.1\.0</a>
     - <a href="#release-summary-3">Release Summary</a>
     - <a href="#minor-changes-3">Minor Changes</a>
     - <a href="#bugfixes-3">Bugfixes</a>
-- <a href="#v13-0-0">v13\.0\.0</a>
+    - <a href="#new-plugins-2">New Plugins</a>
+        - <a href="#filter">Filter</a>
+    - <a href="#new-modules-3">New Modules</a>
+- <a href="#v13-0-1">v13\.0\.1</a>
     - <a href="#release-summary-4">Release Summary</a>
     - <a href="#minor-changes-4">Minor Changes</a>
-    - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
-    - <a href="#deprecated-features-1">Deprecated Features</a>
-    - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
     - <a href="#bugfixes-4">Bugfixes</a>
-    - <a href="#new-plugins-2">New Plugins</a>
-        - <a href="#callback">Callback</a>
+- <a href="#v13-0-0">v13\.0\.0</a>
+    - <a href="#release-summary-5">Release Summary</a>
+    - <a href="#minor-changes-5">Minor Changes</a>
+    - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
+    - <a href="#deprecated-features-2">Deprecated Features</a>
+    - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
+    - <a href="#bugfixes-5">Bugfixes</a>
+    - <a href="#new-plugins-3">New Plugins</a>
+        - <a href="#callback-1">Callback</a>
         - <a href="#filter-1">Filter</a>
-    - <a href="#new-modules-3">New Modules</a>
+    - <a href="#new-modules-4">New Modules</a>
 
 This changelog describes changes after version 12\.0\.0\.
 
-<a id="v13-3-0"></a>
-## v13\.3\.0
+<a id="v13-4-0"></a>
+## v13\.4\.0
 
 <a id="release-summary"></a>
 ### Release Summary
@@ -49,6 +57,69 @@ This changelog describes changes after version 12\.0\.0\.
 Regular bugfix and feature release\.
 
 <a id="minor-changes"></a>
+### Minor Changes
+
+* archive \- use context managers when reading tar checksums \([https\://github\.com/ansible\-collections/community\.general/pull/12569](https\://github\.com/ansible\-collections/community\.general/pull/12569)\)\.
+* consul modules \- add a <code>url</code> option taking the address of the Consul agent as a whole\; the existing <code>host</code>\, <code>port</code> and <code>scheme</code> options each override the matching component of it\. This does not cover <code>community\.general\.consul</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12216](https\://github\.com/ansible\-collections/community\.general/pull/12216)\)\.
+* consul modules \- connection options now fall back to the <code>CONSUL\_HTTP\_ADDR</code>\, <code>CONSUL\_HTTP\_SSL</code>\, <code>CONSUL\_HTTP\_SSL\_VERIFY</code>\, <code>CONSUL\_HTTP\_TOKEN</code> and <code>CONSUL\_CACERT</code> environment variables when not specified\. This applies to all consul modules except <code>community\.general\.consul</code>\, which does not use the shared connection option handling yet \([https\://github\.com/ansible\-collections/community\.general/pull/12216](https\://github\.com/ansible\-collections/community\.general/pull/12216)\)\.
+* github\_repo \- added <code>visibility</code> option to set repository visibility to <code>public</code>\, <code>private</code>\, or <code>internal</code> \([https\://github\.com/ansible\-collections/community\.general/issues/6219](https\://github\.com/ansible\-collections/community\.general/issues/6219)\, [https\://github\.com/ansible\-collections/community\.general/pull/12557](https\://github\.com/ansible\-collections/community\.general/pull/12557)\)\.
+* gitlab\_hook \- add <code>branch\_filter\_strategy</code> option to control how <code>push\_events\_branch\_filter</code> filters push events\, which allows filtering branches by a regular expression \([https\://github\.com/ansible\-collections/community\.general/pull/12618](https\://github\.com/ansible\-collections/community\.general/pull/12618)\)\.
+* incus connection plugin \- add <code>remote\_user\_id\_command</code> option to configure the command used to retrieve the UID and GID of the remote user \([https\://github\.com/ansible\-collections/community\.general/pull/12646](https\://github\.com/ansible\-collections/community\.general/pull/12646)\)\.
+* influxdb\_user \- add <code>force\_password\_update</code> option to always update the password when <code>user\_password</code> is set\, working around InfluxDB installations that do not enforce authentication \([https\://github\.com/ansible\-collections/community\.general/issues/3824](https\://github\.com/ansible\-collections/community\.general/issues/3824)\, [https\://github\.com/ansible\-collections/community\.general/pull/12654](https\://github\.com/ansible\-collections/community\.general/pull/12654)\)\.
+* maven\_artifact \- add <code>keep\_name\_only\_when\_resolved</code> option to opt in to the documented scope of <code>keep\_name</code>\, where it only controls the destination filename when <code>version</code> is resolved dynamically \(<code>latest</code> or <code>version\_by\_spec</code>\)\; previously <code>keep\_name</code> also affected the filename with a fixed <code>version</code>\, contradicting its documentation \([https\://github\.com/ansible\-collections/community\.general/pull/12606](https\://github\.com/ansible\-collections/community\.general/pull/12606)\, [https\://github\.com/ansible\-collections/community\.general/issues/4796](https\://github\.com/ansible\-collections/community\.general/issues/4796)\)\.
+* odbc \- add <code>autocommit</code> option to support statements that must run outside of a transaction \([https\://github\.com/ansible\-collections/community\.general/issues/4173](https\://github\.com/ansible\-collections/community\.general/issues/4173)\, [https\://github\.com/ansible\-collections/community\.general/issues/8577](https\://github\.com/ansible\-collections/community\.general/issues/8577)\, [https\://github\.com/ansible\-collections/community\.general/pull/12595](https\://github\.com/ansible\-collections/community\.general/pull/12595)\)\.
+* passwordstore lookup plugin \- add <code>keep\_trailing\_newline</code> option to preserve the trailing newline when <code>returnall\=true</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12589](https\://github\.com/ansible\-collections/community\.general/pull/12589)\, [https\://github\.com/ansible\-collections/community\.general/issues/3616](https\://github\.com/ansible\-collections/community\.general/issues/3616)\)\.
+* vmadm \- add <code>bootrom</code> option to support UEFI boot for <code>bhyve</code> VMs \([https\://github\.com/ansible\-collections/community\.general/pull/12601](https\://github\.com/ansible\-collections/community\.general/pull/12601)\, [https\://github\.com/ansible\-collections/community\.general/issues/4282](https\://github\.com/ansible\-collections/community\.general/issues/4282)\)\.
+* zypper \- add <code>install\_recommends</code> option to explicitly control installation of recommended packages \([https\://github\.com/ansible\-collections/community\.general/issues/3497](https\://github\.com/ansible\-collections/community\.general/issues/3497)\, [https\://github\.com/ansible\-collections/community\.general/pull/12648](https\://github\.com/ansible\-collections/community\.general/pull/12648)\)\.
+
+<a id="deprecated-features"></a>
+### Deprecated Features
+
+* keycloak\_realm\_users\_info \- the module is moved to <code>middleware\_automation\.keycloak\.keycloak\_realm\_users\_info</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>ansible\_middleware\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12525](https\://github\.com/ansible\-collections/community\.general/pull/12525)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* apache2\_module \- fix false failures when <code>ignore\_configcheck</code> is set and the configuration is broken for a reason unrelated to the module being changed \([https\://github\.com/ansible\-collections/community\.general/issues/4592](https\://github\.com/ansible\-collections/community\.general/issues/4592)\, [https\://github\.com/ansible\-collections/community\.general/pull/12597](https\://github\.com/ansible\-collections/community\.general/pull/12597)\)\.
+* haproxy \- fix <code>state\=disabled</code> with <code>drain\=true</code> timing out instead of putting a server that is already down into maintenance mode \([https\://github\.com/ansible\-collections/community\.general/issues/9020](https\://github\.com/ansible\-collections/community\.general/issues/9020)\, [https\://github\.com/ansible\-collections/community\.general/pull/12640](https\://github\.com/ansible\-collections/community\.general/pull/12640)\)\.
+* homebrew\_cask \- fix <code>brew \-\-version</code> parsing to handle version strings with more than three dot\-separated segments \(for example\, some vendor Homebrew builds report a fourth segment\)\. The previous regex could silently drop the leading segment\, misjudging whether the deprecated <code>brew cask</code> command syntax is still required and causing installs to fail with an unknown\-command error \([https\://github\.com/ansible\-collections/community\.general/pull/12559](https\://github\.com/ansible\-collections/community\.general/pull/12559)\)\.
+* icinga2\_host \- fix <code>JSONDecodeError</code> raised when the Icinga2 API returns an HTTP error response \([https\://github\.com/ansible\-collections/community\.general/pull/12687](https\://github\.com/ansible\-collections/community\.general/pull/12687)\, [https\://github\.com/ansible\-collections/community\.general/issues/4948](https\://github\.com/ansible\-collections/community\.general/issues/4948)\)\.
+* influxdb\_retention\_policy \- fix <code>TypeError</code> when altering a retention policy without <code>shard\_group\_duration</code> set \([https\://github\.com/ansible\-collections/community\.general/issues/3897](https\://github\.com/ansible\-collections/community\.general/issues/3897)\, [https\://github\.com/ansible\-collections/community\.general/pull/12652](https\://github\.com/ansible\-collections/community\.general/pull/12652)\)\.
+* jabber \- do not send an unnecessary <code>muc\#user</code> tag on groupchat messages \([https\://github\.com/ansible\-collections/community\.general/pull/12658](https\://github\.com/ansible\-collections/community\.general/pull/12658)\, [https\://github\.com/ansible\-collections/community\.general/issues/5343](https\://github\.com/ansible\-collections/community\.general/issues/5343)\)\.
+* keycloak\_user \- fix attributes always reporting <code>changed\=true</code> due to a type mismatch between the raw Keycloak representation and the module\'s list representation \([https\://github\.com/ansible\-collections/community\.general/pull/12642](https\://github\.com/ansible\-collections/community\.general/pull/12642)\)\.
+* ldap\_attrs \- when the server raises <code>INAPPROPRIATE\_MATCHING</code> because an attribute has no EQUALITY matching rule \(for example\, certain <code>olcTLS\*</code> attributes on older OpenLDAP versions\)\, the module now falls back to Python\-side value comparison instead of crashing \([https\://github\.com/ansible\-collections/community\.general/issues/3559](https\://github\.com/ansible\-collections/community\.general/issues/3559)\, [https\://github\.com/ansible\-collections/community\.general/issues/12596](https\://github\.com/ansible\-collections/community\.general/issues/12596)\, [https\://github\.com/ansible\-collections/community\.general/pull/12628](https\://github\.com/ansible\-collections/community\.general/pull/12628)\)\.
+* npm \- fix <code>JSONDecodeError</code> when npm\'s stdout output contains warnings or notices alongside the JSON payload \([https\://github\.com/ansible\-collections/community\.general/pull/12665](https\://github\.com/ansible\-collections/community\.general/pull/12665)\, [https\://github\.com/ansible\-collections/community\.general/issues/4960](https\://github\.com/ansible\-collections/community\.general/issues/4960)\)\.
+* onepassword lookup plugin \- the <code>op\://</code> secret reference lookup returned raw bytes instead of a string\, which broke passing the value into other modules \([https\://github\.com/ansible\-collections/community\.general/pull/11958](https\://github\.com/ansible\-collections/community\.general/pull/11958)\)\.
+* redfish\_command \- add workaround in <code>VirtualMediaInsert</code> for Supermicro systems to treat slots marked as <code>NotConnected</code> as empty \([https\://github\.com/ansible\-collections/community\.general/issues/6969](https\://github\.com/ansible\-collections/community\.general/issues/6969)\, [https\://github\.com/ansible\-collections/community\.general/pull/12537](https\://github\.com/ansible\-collections/community\.general/pull/12537)\)\.
+* sefcontext \- fix idempotence of <code>\<\<none\>\></code> file contexts \([https\://github\.com/ansible\-collections/community\.general/pull/12561](https\://github\.com/ansible\-collections/community\.general/pull/12561)\)
+* snap \- fix <code>IndexError</code> when a single snap does not exist \([https\://github\.com/ansible\-collections/community\.general/issues/12375](https\://github\.com/ansible\-collections/community\.general/issues/12375)\, [https\://github\.com/ansible\-collections/community\.general/pull/12570](https\://github\.com/ansible\-collections/community\.general/pull/12570)\)\.
+* supervisorctl \- treat the <code>BACKOFF</code> process state as active so that <code>state\=started</code> does not fail on a program still being retried by <code>supervisord</code> \([https\://github\.com/ansible\-collections/community\.general/issues/5599](https\://github\.com/ansible\-collections/community\.general/issues/5599)\, [https\://github\.com/ansible\-collections/community\.general/pull/12688](https\://github\.com/ansible\-collections/community\.general/pull/12688)\)\.
+* ufw \- do not reload the default policy when it is already set to the requested value \([https\://github\.com/ansible\-collections/community\.general/issues/1843](https\://github\.com/ansible\-collections/community\.general/issues/1843)\, [https\://github\.com/ansible\-collections/community\.general/pull/12590](https\://github\.com/ansible\-collections/community\.general/pull/12590)\)\.
+* ufw \- fix IPv6 rule determination and <code>insert\_relative\_to</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12531](https\://github\.com/ansible\-collections/community\.general/pull/12531)\)\.
+* zypper \- fix version specifier parsing when the version contains non\-numeric characters\, which caused packages to not be removed or installed \([https\://github\.com/ansible\-collections/community\.general/pull/12588](https\://github\.com/ansible\-collections/community\.general/pull/12588)\, [https\://github\.com/ansible\-collections/community\.general/issues/6564](https\://github\.com/ansible\-collections/community\.general/issues/6564)\)\.
+
+<a id="new-plugins"></a>
+### New Plugins
+
+<a id="callback"></a>
+#### Callback
+
+* community\.general\.oneline \- One\-line Ansible screen output\.
+
+<a id="new-modules"></a>
+### New Modules
+
+* community\.general\.appimage \- Manage AppImage packages\.
+
+<a id="v13-3-0"></a>
+## v13\.3\.0
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+Regular bugfix and feature release\.
+
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * archive \- add <code>zstd</code> as a format choice \([https\://github\.com/ansible\-collections/community\.general/issues/3455](https\://github\.com/ansible\-collections/community\.general/issues/3455)\, [https\://github\.com/ansible\-collections/community\.general/pull/12497](https\://github\.com/ansible\-collections/community\.general/pull/12497)\)\.
@@ -66,7 +137,7 @@ Regular bugfix and feature release\.
 * pacemaker\_cluster \- add support for unmaintenance state \([https\://github\.com/ansible\-collections/community\.general/issues/12362](https\://github\.com/ansible\-collections/community\.general/issues/12362)\, [https\://github\.com/ansible\-collections/community\.general/pull/12364](https\://github\.com/ansible\-collections/community\.general/pull/12364)\)\.
 * slack \- add <code>reply\_broadcast</code> option to allow a threaded reply \(<code>thread\_id</code>\) to also be broadcast to the main channel \([https\://github\.com/ansible\-collections/community\.general/pull/12535](https\://github\.com/ansible\-collections/community\.general/pull/12535)\)\.
 
-<a id="deprecated-features"></a>
+<a id="deprecated-features-1"></a>
 ### Deprecated Features
 
 * keycloak\_authentication \- the module is moved to <code>middleware\_automation\.keycloak\.keycloak\_authentication</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>middleware\_automation\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
@@ -101,7 +172,7 @@ Regular bugfix and feature release\.
 * keycloak\_user\_rolemapping \- the module is moved to <code>middleware\_automation\.keycloak\.keycloak\_user\_rolemapping</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>middleware\_automation\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
 * keycloak\_userprofile \- the module is moved to <code>middleware\_automation\.keycloak\.keycloak\_userprofile</code>\. The module will be replaced by a deprecated redirect to that module in community\.general 14\.0\.0\, and the redirect will be removed in community\.general 16\.0\.0\. If you are using the module\, please consider installing and using <code>middleware\_automation\.keycloak</code> now \([https\://github\.com/ansible\-collections/community\.general/pull/12484](https\://github\.com/ansible\-collections/community\.general/pull/12484)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * apk \- the <code>upgrade</code> operation no longer reports <code>changed\=true</code> when nothing was upgraded but an apk commit hook \(for example <code>mrtest</code>\, or anything installed in <code>/etc/apk/commit\_hooks\.d/</code>\) printed output before the trailing <code>OK\:</code> summary line\; the change status is now derived from the packages apk actually reports upgrading \([https\://github\.com/ansible\-collections/community\.general/issues/12223](https\://github\.com/ansible\-collections/community\.general/issues/12223)\, [https\://github\.com/ansible\-collections/community\.general/pull/12376](https\://github\.com/ansible\-collections/community\.general/pull/12376)\)\.
@@ -115,7 +186,7 @@ Regular bugfix and feature release\.
 * terraform \- fix return value <code>command</code>\, showing terraform plan name twice \([https\://github\.com/ansible\-collections/community\.general/issues/12530](https\://github\.com/ansible\-collections/community\.general/issues/12530)\, [https\://github\.com/ansible\-collections/community\.general/pull/12540](https\://github\.com/ansible\-collections/community\.general/pull/12540)\)\.
 * timezone \- no longer requires the <code>hwclock</code> executable for name\-only changes on non\-systemd systems \([https\://github\.com/ansible\-collections/community\.general/issues/12516](https\://github\.com/ansible\-collections/community\.general/issues/12516)\, [https\://github\.com/ansible\-collections/community\.general/pull/12526](https\://github\.com/ansible\-collections/community\.general/pull/12526)\)\.
 
-<a id="new-modules"></a>
+<a id="new-modules-1"></a>
 ### New Modules
 
 * community\.general\.consul\_kv\_info \- Retrieve entries from the key/value store of a Consul cluster\.
@@ -124,12 +195,12 @@ Regular bugfix and feature release\.
 <a id="v13-2-0"></a>
 ## v13\.2\.0
 
-<a id="release-summary-1"></a>
+<a id="release-summary-2"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-1"></a>
+<a id="minor-changes-2"></a>
 ### Minor Changes
 
 * The collection now depends on community\.library\_inventory\_filtering\_v1\. This runtime dependency is used by inventory plugins only\, and will be automatically installed by <code>ansible\-galaxy collection install</code>\. If you install community\.general by cloning its repository or extracting its release tarball to a specific location\, you also need to make sure to install community\.library\_inventory\_filtering\_v1 manually if you use one of the affected inventory plugins \([https\://github\.com/ansible\-collections/community\.general/pull/12302](https\://github\.com/ansible\-collections/community\.general/pull/12302)\)\.
@@ -141,7 +212,7 @@ Regular bugfix and feature release\.
 * passwordstore lookup plugin \- make <code>directory</code> configurable through <code>ansible\.cfg</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12298](https\://github\.com/ansible\-collections/community\.general/pull/12298)\)\.
 * tss lookup plugin \- cache the <code>TSSClient</code> per process and credential identity so OAuth2 token grants are reused across lookups \(rebuilding the client and retrying the lookup once on a stale\-token 4xx\, while 5xx and other errors propagate unchanged\)\, and add a <code>token\_path\_source</code> option whose <code>auto</code> value lets <code>python\-tss\-sdk</code> auto\-detect the Secret Server or Delinea Platform token endpoint \([https\://github\.com/ansible\-collections/community\.general/pull/12328](https\://github\.com/ansible\-collections/community\.general/pull/12328)\)\.
 
-<a id="bugfixes-1"></a>
+<a id="bugfixes-2"></a>
 ### Bugfixes
 
 * composer \- restore compatibility with older compose versions when using <code>working\_dir</code> \([https\://github\.com/ansible\-collections/community\.general/issues/12293](https\://github\.com/ansible\-collections/community\.general/issues/12293)\, [https\://github\.com/ansible\-collections/community\.general/pull/12339](https\://github\.com/ansible\-collections/community\.general/pull/12339)\)\.
@@ -151,7 +222,7 @@ Regular bugfix and feature release\.
 * opennebula inventory plugin \- fix crash when retrieving VM without NIC \([https\://github\.com/ansible\-collections/community\.general/pull/12361](https\://github\.com/ansible\-collections/community\.general/pull/12361)\)\.
 * pacemaker\_resource \- fix bug where the resource\-ready state check did not recognize all valid ready states\, causing the module to time out on resources that never reach the <code>Started</code> state \([https\://github\.com/ansible\-collections/community\.general/issues/12351](https\://github\.com/ansible\-collections/community\.general/issues/12351)\, [https\://github\.com/ansible\-collections/community\.general/pull/12355](https\://github\.com/ansible\-collections/community\.general/pull/12355)\)\.
 
-<a id="new-plugins"></a>
+<a id="new-plugins-1"></a>
 ### New Plugins
 
 <a id="lookup"></a>
@@ -159,7 +230,7 @@ Regular bugfix and feature release\.
 
 * community\.general\.proton\_pass \- Fetch secrets from Proton Pass via the <code>pass\-cli</code> command\-line tool\.
 
-<a id="new-modules-1"></a>
+<a id="new-modules-2"></a>
 ### New Modules
 
 * community\.general\.xml\_info \- Query XML files or strings\.
@@ -167,12 +238,12 @@ Regular bugfix and feature release\.
 <a id="v13-1-0"></a>
 ## v13\.1\.0
 
-<a id="release-summary-2"></a>
+<a id="release-summary-3"></a>
 ### Release Summary
 
 Regular bugfix and feature release\.
 
-<a id="minor-changes-2"></a>
+<a id="minor-changes-3"></a>
 ### Minor Changes
 
 * consul\_kv lookup plugin \- add <code>empty\_value</code> option to control what is returned for null Consul values \([https\://github\.com/ansible\-collections/community\.general/issues/11039](https\://github\.com/ansible\-collections/community\.general/issues/11039)\, [https\://github\.com/ansible\-collections/community\.general/pull/12120](https\://github\.com/ansible\-collections/community\.general/pull/12120)\)\.
@@ -184,7 +255,7 @@ Regular bugfix and feature release\.
 * xbps \- include <code>stdout</code> and <code>stderr</code> from the last executed command in module output \([https\://github\.com/ansible\-collections/community\.general/issues/2478](https\://github\.com/ansible\-collections/community\.general/issues/2478)\, [https\://github\.com/ansible\-collections/community\.general/pull/12234](https\://github\.com/ansible\-collections/community\.general/pull/12234)\)\.
 * xenserver\_guest\_info \- add VDI <code>uuid</code> and <code>vdi\_type</code> \(VHD/QCOW2\) fields to disk info output \([https\://github\.com/ansible\-collections/community\.general/issues/11998](https\://github\.com/ansible\-collections/community\.general/issues/11998)\, [https\://github\.com/ansible\-collections/community\.general/pull/12119](https\://github\.com/ansible\-collections/community\.general/pull/12119)\)\.
 
-<a id="bugfixes-2"></a>
+<a id="bugfixes-3"></a>
 ### Bugfixes
 
 * aix\_devices \- fix <code>chdev</code> command failures being incorrectly reported as successful results\, now properly fails the task when device attribute changes cannot be applied \([https\://github\.com/ansible\-collections/community\.general/pull/12185](https\://github\.com/ansible\-collections/community\.general/pull/12185)\)\.
@@ -212,7 +283,7 @@ Regular bugfix and feature release\.
 * xml \- preserve DOCTYPE declaration when writing modified XML files \([https\://github\.com/ansible\-collections/community\.general/issues/2762](https\://github\.com/ansible\-collections/community\.general/issues/2762)\, [https\://github\.com/ansible\-collections/community\.general/pull/12148](https\://github\.com/ansible\-collections/community\.general/pull/12148)\)\.
 * zypper\_repository \- fix <code>enabled</code>\, <code>autorefresh</code>\, and <code>gpgcheck</code> module parameters being overridden by values read from a <code>\.repo</code> file \([https\://github\.com/ansible\-collections/community\.general/issues/8783](https\://github\.com/ansible\-collections/community\.general/issues/8783)\, [https\://github\.com/ansible\-collections/community\.general/pull/12022](https\://github\.com/ansible\-collections/community\.general/pull/12022)\)\.
 
-<a id="new-plugins-1"></a>
+<a id="new-plugins-2"></a>
 ### New Plugins
 
 <a id="filter"></a>
@@ -220,7 +291,7 @@ Regular bugfix and feature release\.
 
 * community\.general\.from\_toml \- Convert TOML string into dictionary\.
 
-<a id="new-modules-2"></a>
+<a id="new-modules-3"></a>
 ### New Modules
 
 * community\.general\.gitlab\_project\_approvals \- Manage project\-level merge request approvals settings on GitLab Server\.
@@ -234,12 +305,12 @@ Regular bugfix and feature release\.
 <a id="v13-0-1"></a>
 ## v13\.0\.1
 
-<a id="release-summary-3"></a>
+<a id="release-summary-4"></a>
 ### Release Summary
 
 Bugfix release for inclusion in Ansible 14\.0\.0rc1\.
 
-<a id="minor-changes-3"></a>
+<a id="minor-changes-4"></a>
 ### Minor Changes
 
 * homebrew\_services \- replace <code>NamedTuple</code> with dataclass \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
@@ -248,7 +319,7 @@ Bugfix release for inclusion in Ansible 14\.0\.0rc1\.
 * opennebula inventory plugin \- replace function\-local <code>namedtuple</code> with module\-level dataclass \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
 * pacman \- replace <code>namedtuple</code> with dataclass for <code>VersionTuple</code> \([https\://github\.com/ansible\-collections/community\.general/pull/12094](https\://github\.com/ansible\-collections/community\.general/pull/12094)\)\.
 
-<a id="bugfixes-3"></a>
+<a id="bugfixes-4"></a>
 ### Bugfixes
 
 * iptables\_state \- refactor code to avoid unnecessary unused variables and improve internal state handling \([https\://github\.com/ansible\-collections/community\.general/pull/12093](https\://github\.com/ansible\-collections/community\.general/pull/12093)\)\.
@@ -259,12 +330,12 @@ Bugfix release for inclusion in Ansible 14\.0\.0rc1\.
 <a id="v13-0-0"></a>
 ## v13\.0\.0
 
-<a id="release-summary-4"></a>
+<a id="release-summary-5"></a>
 ### Release Summary
 
 This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-05\-18\.
 
-<a id="minor-changes-4"></a>
+<a id="minor-changes-5"></a>
 ### Minor Changes
 
 * ModuleHelper module utils \- allow to ignore specific exceptions in <code>module\_fails\_on\_exception</code> decorator \([https\://github\.com/ansible\-collections/community\.general/pull/11488](https\://github\.com/ansible\-collections/community\.general/pull/11488)\)\.
@@ -843,7 +914,7 @@ This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-
 * random\_words lookup plugin \- the plugin no longer accepts positional arguments\. They were never used anyway \([https\://github\.com/ansible\-collections/community\.general/pull/12060](https\://github\.com/ansible\-collections/community\.general/pull/12060)\)\.
 * rocketchat \- the default for the <code>is\_pre740</code> option changed from <code>true</code> to <code>false</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11834](https\://github\.com/ansible\-collections/community\.general/pull/11834)\)\.
 
-<a id="deprecated-features-1"></a>
+<a id="deprecated-features-2"></a>
 ### Deprecated Features
 
 * aix\_devices \- module is superseded by equivalent in <code>ibm\.power\_aix</code> collection\. It will be removed from community\.general 15\.0\.0 \([https\://github\.com/ansible\-collections/community\.general/issues/11290](https\://github\.com/ansible\-collections/community\.general/issues/11290)\, [https\://github\.com/ansible\-collections/community\.general/pull/11540](https\://github\.com/ansible\-collections/community\.general/pull/11540)\)\.
@@ -907,7 +978,7 @@ This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-
 * spotinst\_aws\_elastigroup \- the module has been removed\. Use <code>spot\.cloud\_modules\.aws\_elastigroup</code> instead \([https\://github\.com/ansible\-collections/community\.general/pull/11834](https\://github\.com/ansible\-collections/community\.general/pull/11834)\)\.
 * typetalk \- the module has been removed \([https\://github\.com/ansible\-collections/community\.general/pull/11834](https\://github\.com/ansible\-collections/community\.general/pull/11834)\)\.
 
-<a id="bugfixes-4"></a>
+<a id="bugfixes-5"></a>
 ### Bugfixes
 
 * \_filelock module utils \- add type hints\. Fix bug if <code>set\_lock\(\)</code> is called with <code>lock\_timeout\=None</code> \([https\://github\.com/ansible\-collections/community\.general/pull/11222](https\://github\.com/ansible\-collections/community\.general/pull/11222)\)\.
@@ -1241,10 +1312,10 @@ This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-
 * zypper\_repository \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11777](https\://github\.com/ansible\-collections/community\.general/pull/11777)\)\.
 * zypper\_repository\_info \- set <code>LANGUAGE</code> and <code>LC\_ALL</code> to <code>C</code> in <code>run\_command\(\)</code> calls to ensure locale\-independent output parsing \([https\://github\.com/ansible\-collections/community\.general/issues/11737](https\://github\.com/ansible\-collections/community\.general/issues/11737)\, [https\://github\.com/ansible\-collections/community\.general/pull/11782](https\://github\.com/ansible\-collections/community\.general/pull/11782)\)\.
 
-<a id="new-plugins-2"></a>
+<a id="new-plugins-3"></a>
 ### New Plugins
 
-<a id="callback"></a>
+<a id="callback-1"></a>
 #### Callback
 
 * community\.general\.loganalytics\_ingestion \- Posts task results to an Azure Log Analytics workspace using the new Logs Ingestion API\.
@@ -1254,7 +1325,7 @@ This is release 13\.0\.0 of <code>community\.general</code>\, released on 2026\-
 
 * community\.general\.to\_toml \- Convert variable to TOML string\.
 
-<a id="new-modules-3"></a>
+<a id="new-modules-4"></a>
 ### New Modules
 
 * community\.general\.file\_remove \- Remove files matching a pattern from a directory\.
