@@ -6,6 +6,29 @@ Community General Release Notes
 
 This changelog describes changes after version 11.0.0.
 
+v12.6.5
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- haproxy - fix ``state=disabled`` with ``drain=true`` timing out instead of putting a server that is already down into maintenance mode (https://github.com/ansible-collections/community.general/issues/9020, https://github.com/ansible-collections/community.general/pull/12640).
+- homebrew_cask - fix ``brew --version`` parsing to handle version strings with more than three dot-separated segments (for example, some vendor Homebrew builds report a fourth segment). The previous regex could silently drop the leading segment, misjudging whether the deprecated ``brew cask`` command syntax is still required and causing installs to fail with an unknown-command error (https://github.com/ansible-collections/community.general/pull/12559).
+- icinga2_host - fix ``JSONDecodeError`` raised when the Icinga2 API returns an HTTP error response (https://github.com/ansible-collections/community.general/pull/12687, https://github.com/ansible-collections/community.general/issues/4948).
+- influxdb_retention_policy - fix ``TypeError`` when altering a retention policy without ``shard_group_duration`` set (https://github.com/ansible-collections/community.general/issues/3897, https://github.com/ansible-collections/community.general/pull/12652).
+- jabber - do not send an unnecessary ``muc#user`` tag on groupchat messages (https://github.com/ansible-collections/community.general/pull/12658, https://github.com/ansible-collections/community.general/issues/5343).
+- ldap_attrs - when the server raises ``INAPPROPRIATE_MATCHING`` because an attribute has no EQUALITY matching rule (for example, certain ``olcTLS*`` attributes on older OpenLDAP versions), the module now falls back to Python-side value comparison instead of crashing (https://github.com/ansible-collections/community.general/issues/3559, https://github.com/ansible-collections/community.general/issues/12596, https://github.com/ansible-collections/community.general/pull/12628).
+- npm - fix ``JSONDecodeError`` when npm's stdout output contains warnings or notices alongside the JSON payload (https://github.com/ansible-collections/community.general/pull/12665, https://github.com/ansible-collections/community.general/issues/4960).
+- redfish_command - add workaround in ``VirtualMediaInsert`` for Supermicro systems to treat slots marked as ``NotConnected`` as empty (https://github.com/ansible-collections/community.general/issues/6969, https://github.com/ansible-collections/community.general/pull/12537).
+- ufw - do not reload the default policy when it is already set to the requested value (https://github.com/ansible-collections/community.general/issues/1843, https://github.com/ansible-collections/community.general/pull/12590).
+- ufw - fix IPv6 rule determination and ``insert_relative_to`` (https://github.com/ansible-collections/community.general/pull/12531).
+- zypper - fix version specifier parsing when the version contains non-numeric characters, which caused packages to not be removed or installed (https://github.com/ansible-collections/community.general/pull/12588, https://github.com/ansible-collections/community.general/issues/6564).
+
 v12.6.4
 =======
 
