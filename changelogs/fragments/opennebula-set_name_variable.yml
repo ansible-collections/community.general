@@ -1,0 +1,5 @@
+minor_changes:
+  - "opennebula inventory plugin - add ``set_name_variable`` option to allow disabling
+     the ``name`` host variable, avoiding the ``Found variable using reserved name 'name'``
+     warning. ``inventory_hostname`` is unaffected
+     (https://github.com/ansible-collections/community.general/pull/12695)."

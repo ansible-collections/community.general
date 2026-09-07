@@ -79,6 +79,15 @@ options:
     type: bool
     default: false
     version_added: 13.3.0
+  set_name_variable:
+    description:
+      - Set the C(name) variable for each host, taken from the VM's OpenNebula name.
+      - When V(true), sets the C(name) variable which may trigger a warning about using a reserved name.
+      - Set to V(false) to avoid the warning when C(name) is not needed as a variable. The value is always available
+        as C(inventory_hostname).
+    type: bool
+    default: true
+    version_added: 13.4.0
   filters:
     # This option is provided by the community.library_inventory_filtering_v1.inventory_filter doc fragment
     version_added: 13.2.0
@@ -120,6 +129,15 @@ group_by_labels: false
 plugin: community.general.opennebula
 api_url: https://opennebula:2633/RPC2
 prefer_existing_ansible_host: true
+
+---
+# Connect by VM name without setting the 'name' host variable, to avoid the
+# "Found variable using reserved name 'name'" warning. inventory_hostname
+# is unaffected and still equals the VM's OpenNebula name.
+plugin: community.general.opennebula
+api_url: https://opennebula:2633/RPC2
+hostname: name
+set_name_variable: false
 
 ---
 # Group VMs by their OpenNebula owner and group (UNAME/GNAME).
@@ -305,6 +323,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         hostname_preference = self.get_option("hostname")
         prefer_existing_ansible_host = self.get_option("prefer_existing_ansible_host")
         group_by_labels = self.get_option("group_by_labels")
+        set_name_variable = self.get_option("set_name_variable")
         strict = self.get_option("strict")
         filters = parse_filters(self.get_option("filters"))
 
@@ -329,6 +348,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             self.inventory.add_host(host=hostname, group="all")
 
             for attribute, value in server.items():
+                if attribute == "name" and not set_name_variable:
+                    continue
                 self.inventory.set_variable(hostname, attribute, value)
 
             if hostname_preference != "name":

@@ -300,6 +300,7 @@ options_base_test = {
     "api_authfile": "~/.one/one_auth",
     "hostname": "v4_first_ip",
     "prefer_existing_ansible_host": False,
+    "set_name_variable": True,
     "group_by_labels": True,
     "filter_by_label": None,
     "filters": None,
@@ -432,6 +433,9 @@ def test_populate(inventory, mocker):
     # check for custom ssh port
     assert host_gitlab.get_vars()["ansible_port"] == 8822
 
+    # check that the 'name' variable is set by default
+    assert host_sam.get_vars()["name"] == "sam-691-sam"
+
 
 def test_coerce_ssh_port():
     coerce = InventoryModule._coerce_ssh_port
@@ -471,6 +475,19 @@ def test_populate_hostname_name(inventory, mocker):
 
     host_sam = inventory.inventory.get_host("sam-691-sam")
     assert "ansible_host" not in host_sam.get_vars()
+
+
+def test_populate_set_name_variable_false(inventory, mocker):
+    opts = options_base_test.copy()
+    opts["set_name_variable"] = False
+    inventory._get_vm_pool = mocker.MagicMock(side_effect=get_vm_pool)
+    inventory.get_option = mocker.MagicMock(side_effect=mk_get_options(opts))
+    inventory._populate()
+
+    host_sam = inventory.inventory.get_host("sam-691-sam")
+    assert "name" not in host_sam.get_vars()
+    # inventory_hostname is unaffected by set_name_variable
+    assert host_sam.name == "sam-691-sam"
 
 
 def test_populate_respects_existing_ansible_host(inventory, mocker):
