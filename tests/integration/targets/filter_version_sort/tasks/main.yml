@@ -12,3 +12,19 @@
   ansible.builtin.assert:
     that:
       - "['a-1.9.rpm', 'a-1.10-1.rpm', 'a-1.09.rpm', 'b-1.01.rpm', 'a-2.1-0.rpm', 'a-1.10-0.rpm'] | community.general.version_sort == ['a-1.9.rpm', 'a-1.09.rpm', 'a-1.10-0.rpm', 'a-1.10-1.rpm', 'a-2.1-0.rpm', 'b-1.01.rpm']"
+
+- name: validate that version_sort_natural sorts the same stable-sort case as version_sort
+  ansible.builtin.assert:
+    that:
+      - "['a-1.9.rpm', 'a-1.10-1.rpm', 'a-1.09.rpm', 'b-1.01.rpm', 'a-2.1-0.rpm', 'a-1.10-0.rpm'] | community.general.version_sort_natural == ['a-1.9.rpm', 'a-1.09.rpm', 'a-1.10-0.rpm', 'a-1.10-1.rpm', 'a-2.1-0.rpm', 'b-1.01.rpm']"
+
+- name: validate that version_sort_natural handles versions with differing numbers of components
+  ansible.builtin.assert:
+    that:
+      - "['1.1.0-SNAPSHOT', '1.1-SNAPSHOT'] | community.general.version_sort_natural == ['1.1-SNAPSHOT', '1.1.0-SNAPSHOT']"
+      - "['1.1.0', '1.1'] | community.general.version_sort_natural == ['1.1', '1.1.0']"
+
+- name: validate that version_sort_natural supports reverse sorting
+  ansible.builtin.assert:
+    that:
+      - "['2.1', '2.10', '2.9'] | community.general.version_sort_natural(reverse=true) == ['2.10', '2.9', '2.1']"
