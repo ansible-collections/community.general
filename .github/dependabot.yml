@@ -13,3 +13,9 @@ updates:
       ci:
         patterns:
           - "*"
+
+  - package-ecosystem: "devcontainers"
+    directory: ".devcontainer"
+    schedule:
+      interval: "weekly"
+    rebase-strategy: auto
