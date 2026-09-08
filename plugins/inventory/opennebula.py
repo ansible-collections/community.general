@@ -87,7 +87,7 @@ options:
         as C(inventory_hostname).
     type: bool
     default: true
-    version_added: 13.4.0
+    version_added: 13.5.0
   filters:
     # This option is provided by the community.library_inventory_filtering_v1.inventory_filter doc fragment
     version_added: 13.2.0
