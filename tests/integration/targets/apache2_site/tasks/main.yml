@@ -1,0 +1,39 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: test apache2_site
+
+  when: ansible_facts.os_family == 'Debian'
+
+  block:
+    - name: get list of enabled sites before tests
+      ansible.builtin.command: ls /etc/apache2/sites-enabled/
+      register: sites_before
+      changed_when: false
+
+    - name: include actual tests
+      ansible.builtin.include_tasks: actualtest.yml
+
+    - name: get list of enabled sites after tests
+      ansible.builtin.command: ls /etc/apache2/sites-enabled/
+      register: sites_after
+      changed_when: false
+
+    - name: sites before tests
+      ansible.builtin.debug:
+        var: sites_before.stdout_lines
+
+    - name: sites after tests
+      ansible.builtin.debug:
+        var: sites_after.stdout_lines
+
+    - name: ensure that all test sites are disabled again
+      ansible.builtin.assert:
+        that: sites_before.stdout == sites_after.stdout
