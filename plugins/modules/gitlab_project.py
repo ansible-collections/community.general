@@ -36,6 +36,11 @@ options:
       - Allow merge when skipped pipelines exist.
     type: bool
     version_added: "3.4.0"
+  archive:
+    description:
+      - Archive the project.
+      - This option is only used on project updates.
+    type: bool
   avatar_path:
     description:
       - Absolute path image to configure avatar. File size should not exceed 200 kb.
@@ -378,6 +383,15 @@ EXAMPLES = r"""
     api_password: "{{ initial_root_password }}"
     name: my_second_project
     group: "10481470"
+
+- name: Archive a GitLab Project
+  community.general.gitlab_project:
+    api_url: https://gitlab.example.com/
+    api_username: root
+    api_password: "{{ initial_root_password }}"
+    name: my_second_project
+    group: "10481470"
+    archive: true
 """
 
 RETURN = r"""
@@ -506,6 +520,11 @@ class GitLabProject:
         else:
             if options["default_branch"]:
                 project_options["default_branch"] = options["default_branch"]
+            if options["archive"] is not None:
+                if options["archive"]:
+                    project.archive()
+                else:
+                    project.unarchive()
             changed, project = self.update_project(self.project_object, project_options)
 
         self.project_object = project
@@ -604,6 +623,7 @@ def main():
     argument_spec.update(
         dict(
             allow_merge_on_skipped_pipeline=dict(type="bool"),
+            archive=dict(type="bool"),
             avatar_path=dict(type="path"),
             builds_access_level=dict(type="str", choices=["private", "disabled", "enabled"]),
             build_timeout=dict(type="int"),
@@ -682,6 +702,7 @@ def main():
     gitlab_instance = gitlab_authentication(module)
 
     allow_merge_on_skipped_pipeline = module.params["allow_merge_on_skipped_pipeline"]
+    archive = module.params["archive"]
     avatar_path = module.params["avatar_path"]
     builds_access_level = module.params["builds_access_level"]
     build_timeout = module.params["build_timeout"]
@@ -770,6 +791,7 @@ def main():
             namespace,
             {
                 "allow_merge_on_skipped_pipeline": allow_merge_on_skipped_pipeline,
+                "archive": archive,
                 "avatar_path": avatar_path,
                 "builds_access_level": builds_access_level,
                 "build_timeout": build_timeout,
