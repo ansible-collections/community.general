@@ -30,6 +30,8 @@ options:
     required: true
     description:
       - List of commands to execute on iDRAC.
+      - V(CreateBiosConfigJob) is not idempotent and creates a new configuration job on every execution. The user is
+        responsible for ensuring that no other equivalent job is already running before invoking this command.
     type: list
     elements: str
   baseuri:
