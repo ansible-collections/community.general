@@ -303,7 +303,7 @@ options:
       - Possible values are present and absent.
     default: present
     type: str
-    choices: ["present", "absent"]
+    choices: ["present", "absent", "archived", "unarchived"]
   topics:
     description:
       - A topic or list of topics to be assigned to a project.
@@ -378,6 +378,24 @@ EXAMPLES = r"""
     api_password: "{{ initial_root_password }}"
     name: my_second_project
     group: "10481470"
+
+- name: Archive a GitLab Project
+  community.general.gitlab_project:
+    api_url: https://gitlab.example.com/
+    api_username: root
+    api_password: "{{ initial_root_password }}"
+    name: my_second_project
+    group: "10481470"
+    state: archived
+
+- name: Unarchive a GitLab Project
+  community.general.gitlab_project:
+    api_url: https://gitlab.example.com/
+    api_username: root
+    api_password: "{{ initial_root_password }}"
+    name: my_second_project
+    group: "10481470"
+    state: unarchived
 """
 
 RETURN = r"""
@@ -762,6 +780,18 @@ def main():
             gitlab_project.delete_project()
             module.exit_json(changed=True, msg=f"Successfully deleted project {project_name}")
         module.exit_json(changed=False, msg="Project deleted or does not exist")
+
+    if state == "archived":
+        if project_exists:
+            gitlab_project.archive()
+            module.exit_json(changed=True, msg=f"Successfully archived project {project_name}")
+        module.exit_json(changed=False, msg=f"Project deleted or does not exist")
+
+    if state == "unarchived":
+        if project_exists:
+            gitlab_project.unarchive()
+            module.exit_json(changed=True, msg=f"Successfully unarchived project {project_name}")
+        module.exit_json(changed=False, msg=f"Project deleted or does not exist")
 
     if state == "present":
         if gitlab_project.create_or_update_project(
