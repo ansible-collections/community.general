@@ -1,0 +1,2 @@
+minor_changes:
+  - xen_orchestra inventory plugin - add ``XO_HOST``, ``XO_USER``, and ``XO_PASSWORD`` as alternative environment variables for the ``api_host``, ``user``, and ``password`` options, respectively (https://github.com/ansible-collections/community.general/issues/4501, https://github.com/ansible-collections/community.general/pull/12656).
