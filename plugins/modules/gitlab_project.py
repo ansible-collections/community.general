@@ -41,7 +41,6 @@ options:
       - Archive the project.
       - This option is only used on project updates.
     type: bool
-    version_added: 13.5.0
   avatar_path:
     description:
       - Absolute path image to configure avatar. File size should not exceed 200 kb.
