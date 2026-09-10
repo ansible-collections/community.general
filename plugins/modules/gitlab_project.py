@@ -668,7 +668,7 @@ def main():
             shared_runners_enabled=dict(type="bool"),
             snippets_enabled=dict(default=True, type="bool"),
             squash_option=dict(type="str", choices=["never", "always", "default_off", "default_on"]),
-            state=dict(type="str", default="present", choices=["absent", "present"]),
+            state=dict(type="str", default="present", choices=["absent", "present", "archived", "unarchived"]),
             topics=dict(type="list", elements="str"),
             username=dict(type="str"),
             visibility=dict(
