@@ -125,7 +125,6 @@ retry_on_error = "in-ci"
 "azp/posix/vm/" = "extra VMs"
 
 [sessions.ansible_test_integration.nice_docker_names]
-"quay.io/ansible-community/test-image:debian-bullseye" = "Debian 11"
 "quay.io/ansible-community/test-image:debian-bookworm" = "Debian 12"
 "quay.io/ansible-community/test-image:debian-13-trixie" = "Debian 13"
 "quay.io/ansible-community/test-image:archlinux" = "Arch Linux"
@@ -220,12 +219,6 @@ description = "Meta session for running all ansible-test-integration-2.21-* sess
 ansible_core = "2.21"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 docker = [ "fedora43", "alpine323", "ubuntu2204", "ubuntu2404" ]
-
-[[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "2.21"
-target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
-python_version = "3.9"
-docker = "quay.io/ansible-community/test-image:debian-bullseye"
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "2.21"
