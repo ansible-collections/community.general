@@ -207,12 +207,6 @@ stages:
               test: ansible-test-integration-2.21-debian-bookworm-3.11-azp-posix-2
             - name: Debian 12 + py3.11 + group 3
               test: ansible-test-integration-2.21-debian-bookworm-3.11-azp-posix-3
-            - name: Debian 11 + py3.9 + group 1
-              test: ansible-test-integration-2.21-debian-bullseye-3.9-azp-posix-1
-            - name: Debian 11 + py3.9 + group 2
-              test: ansible-test-integration-2.21-debian-bullseye-3.9-azp-posix-2
-            - name: Debian 11 + py3.9 + group 3
-              test: ansible-test-integration-2.21-debian-bullseye-3.9-azp-posix-3
             - name: Fedora 43 + group 1
               test: ansible-test-integration-2.21-fedora43-azp-posix-1
             - name: Fedora 43 + group 2
