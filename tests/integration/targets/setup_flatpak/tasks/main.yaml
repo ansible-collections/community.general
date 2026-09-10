@@ -1,0 +1,41 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install flatpak and set up remotes for testing check mode
+  block:
+    - name: Install flatpak on Fedora
+      ansible.builtin.dnf:
+        name: flatpak
+        state: present
+      when: ansible_facts.distribution == 'Fedora'
+
+    - name: Install flatpak package on Ubuntu
+      ansible.builtin.apt:
+        name: flatpak
+        state: present
+      when: ansible_facts.distribution == 'Ubuntu'
+
+    - name: Install flatpak remote for testing check mode
+      community.general.flatpak_remote:
+        name: check-mode-test-remote
+        flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+        state: present
+        enabled: true
+
+    - name: Install disabled flatpak remote for testing check mode
+      community.general.flatpak_remote:
+        name: check-mode-disabled-test-remote
+        flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+        state: present
+        enabled: false
+
+    - name: Install enabled flatpak remote for testing check mode
+      community.general.flatpak_remote:
+        name: check-mode-enabled-test-remote
+        flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+        state: present
+        enabled: true
+  become: true
+  when: ansible_facts.distribution in ['Fedora', 'Ubuntu']
