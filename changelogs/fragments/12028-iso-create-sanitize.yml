@@ -1,0 +1,4 @@
+bugfixes:
+  - iso_create - fix failure with non-conforming ISO9660 path characters
+    (https://github.com/ansible-collections/community.general/issues/5103,
+    https://github.com/ansible-collections/community.general/pull/12028).
