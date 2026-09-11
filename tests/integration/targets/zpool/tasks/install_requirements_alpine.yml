@@ -7,7 +7,7 @@
   community.general.apk:
     name:
       - zfs
-      - zfs-lts
+      - "zfs-{{ ansible_kernel.split('-')[-1] }}"
 
 - name: Load zfs module
   community.general.modprobe:
