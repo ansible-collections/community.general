@@ -204,10 +204,6 @@ def main():
     device = module.params["device"]
     state = module.params["state"]
     resize = module.params["resize"]
-    zero = module.params["zero"]
-    metadatasize = module.params["metadatasize"]
-    dataalignment = module.params["dataalignment"]
-    pvmetadatacopies = module.params["pvmetadatacopies"]
     metadataignore = module.params["metadataignore"]
     allocatable = module.params["allocatable"]
     tags = module.params["tags"]
@@ -256,19 +252,9 @@ def main():
                 actions.append("would be created")
                 just_created = True
             else:
-                create_args = ["force"]
-                if zero is not None:
-                    create_args.append("zero")
-                if metadatasize:
-                    create_args.append("metadatasize")
-                if dataalignment:
-                    create_args.append("dataalignment")
-                if pvmetadatacopies is not None:
-                    create_args.append("pvmetadatacopies")
-                if metadataignore is not None:
-                    create_args.append("metadataignore")
-                create_args.append("device")
-                pvcreate(" ".join(create_args), check_rc=True).run()
+                pvcreate(
+                    "force zero metadatasize dataalignment pvmetadatacopies metadataignore device", check_rc=True
+                ).run()
                 changed = True
                 actions.append("created")
             is_pv = True
