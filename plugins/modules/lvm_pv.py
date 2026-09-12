@@ -235,8 +235,8 @@ def main():
 
     def get_pv_attrs():
         fields = "pv_attr,pv_tags,pv_mda_count,pv_mda_used_count"
-        with pvs("noheadings nosuffix readonly units fields separator devices") as ctx:
-            dummy, out, dummy = ctx.run(units="b", fields=fields, separator="|", devices=[device])
+        with pvs("noheadings readonly fields separator devices") as ctx:
+            dummy, out, dummy = ctx.run(fields=fields, separator="|", devices=[device])
         attr, tags_str, mda_count, mda_used_count = (p.strip() for p in out.strip().split("|"))
         return dict(
             allocatable=attr[:1] == "a",
@@ -303,8 +303,8 @@ def main():
                 if tags is not None:
                     current_tags = set(current["tags"])
                     desired_tags = set(tags)
-                    to_add = sorted(desired_tags - current_tags) or None
-                    to_del = sorted(current_tags - desired_tags) or None
+                    to_add = sorted(desired_tags - current_tags)
+                    to_del = sorted(current_tags - desired_tags)
 
                 if change_allocatable is not None or change_metadataignore is not None or to_add or to_del:
                     if module.check_mode:
