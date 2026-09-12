@@ -54,9 +54,12 @@ def pvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     Runner for C(pvcreate). Used by: community.general.lvg, community.general.lvm_pv,
     community.general.filesystem.
 
-    Suggested arg_formats keys: pv_options force yes device
+    Suggested arg_formats keys: pv_options force yes zero metadatasize dataalignment
+    pvmetadatacopies metadataignore device
 
     Note: C(pv_options) accepts a pre-split list (e.g. from C(shlex.split())).
+    C(zero) and C(metadataignore) are passed as booleans and map to C(-Z y/n)
+    and C(--metadataignore y/n) respectively.
     """
     return CmdRunner(
         module,
@@ -65,6 +68,13 @@ def pvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             pv_options=cmd_runner_fmt.as_list(),
             force=cmd_runner_fmt.as_bool("-f"),
             yes=cmd_runner_fmt.as_bool("--yes"),
+            zero=cmd_runner_fmt.as_bool(["-Z", "y"], ["-Z", "n"], ignore_none=True),
+            metadatasize=cmd_runner_fmt.as_opt_val("--metadatasize"),
+            dataalignment=cmd_runner_fmt.as_opt_val("--dataalignment"),
+            pvmetadatacopies=cmd_runner_fmt.as_opt_val("--pvmetadatacopies"),
+            metadataignore=cmd_runner_fmt.as_bool(
+                ["--metadataignore", "y"], ["--metadataignore", "n"], ignore_none=True
+            ),
             device=cmd_runner_fmt.as_list(),
         ),
         **kwargs,
@@ -73,9 +83,14 @@ def pvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
 
 def pvchange_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     """
-    Runner for C(pvchange). Used by: community.general.lvg, community.general.filesystem.
+    Runner for C(pvchange). Used by: community.general.lvg, community.general.filesystem,
+    community.general.lvm_pv.
 
-    Suggested arg_formats keys: uuid yes device
+    Suggested arg_formats keys: uuid yes allocatable metadataignore addtag deltag device
+
+    Note: C(allocatable) and C(metadataignore) are passed as booleans and map to
+    C(-x y/n) and C(--metadataignore y/n) respectively. C(addtag) and C(deltag)
+    each accept a list of tag strings.
     """
     return CmdRunner(
         module,
@@ -83,6 +98,12 @@ def pvchange_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
         arg_formats=dict(
             uuid=cmd_runner_fmt.as_bool("-u"),
             yes=cmd_runner_fmt.as_bool("--yes"),
+            allocatable=cmd_runner_fmt.as_bool(["-x", "y"], ["-x", "n"], ignore_none=True),
+            metadataignore=cmd_runner_fmt.as_bool(
+                ["--metadataignore", "y"], ["--metadataignore", "n"], ignore_none=True
+            ),
+            addtag=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--addtag"),
+            deltag=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--deltag"),
             device=cmd_runner_fmt.as_list(),
         ),
         **kwargs,
