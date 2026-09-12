@@ -14,6 +14,13 @@ description:
   - Creates, resizes or removes LVM Physical Volumes.
 author:
   - Klention Mali (@klention)
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   device:
     description:
