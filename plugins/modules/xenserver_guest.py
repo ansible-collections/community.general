@@ -707,8 +707,11 @@ class XenServerVM(XenServerObject):
 
                 self.xapi_session.xenapi.VM.set_other_config(self.vm_ref, vm_other_config)
 
-            # At this point we have VM ready for provisioning.
-            self.xapi_session.xenapi.VM.provision(self.vm_ref)
+            # At this point we have a template clone or copy that is ready
+            # for provisioning. Provisioning is done for real templates and
+            # snapshots and skipped for existing VMs used as templates.
+            if self.xapi_session.xenapi.VM.get_is_a_template(templ_ref):
+                self.xapi_session.xenapi.VM.provision(self.vm_ref)
 
             # After provisioning we can prepare vm_params for reconfigure().
             self.gather_params()
