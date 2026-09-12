@@ -437,7 +437,7 @@
       - gitlab_instance_variable_state.instance_variable.untouched|length == 0
       - gitlab_instance_variable_state.instance_variable.removed|length == 0
       - gitlab_instance_variable_state.instance_variable.updated|length == 0
-      # VALUE_SPECIFIED_IN_NO_LOG_PARAMETER
+      # VALUE_SPECIFIED_IN_NO_LOG_PARAMETER - this is only a problem for ansible-core < 2.22
       # - gitlab_instance_variable_state.instance_variable.added[0] == "my_test_var"
 
 - name: change variable_type attribute
