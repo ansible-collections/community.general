@@ -16,7 +16,7 @@ short_description: Bootc Switch and Upgrade
 description:
   - This module manages the switching and upgrading of C(bootc).
 extends_documentation_fragment:
-  - community.general._attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: none
