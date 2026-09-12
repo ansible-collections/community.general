@@ -73,6 +73,7 @@ options:
     ini:
       - section: tss_lookup
         key: password
+    secret: true
   domain:
     default: ""
     description:
@@ -99,6 +100,7 @@ options:
       - section: tss_lookup
         key: token
     version_added: 3.7.0
+    secret: true
   api_path_uri:
     default: /api/v1
     description: The path to append to the base URL to form a valid REST API request.

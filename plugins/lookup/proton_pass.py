@@ -100,6 +100,7 @@ options:
       - name: ANSIBLE_PROTON_PASS_PAT
     vars:
       - name: ansible_proton_pass_pat
+    secret: true
   agent_reason:
     description:
       - Human-readable reason string required by Proton Pass when authenticating

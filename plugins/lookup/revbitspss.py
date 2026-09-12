@@ -30,6 +30,7 @@ options:
       - This is the API key for authentication. You can get it from the RevBits PAM secret manager module.
     required: true
     type: string
+    secret: true
 """
 
 RETURN = r"""

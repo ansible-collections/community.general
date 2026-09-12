@@ -90,6 +90,7 @@ options:
     env:
       - name: ETCDCTL_PASSWORD
     type: str
+    secret: true
 
 notes:
   - O(host) and O(port) options take precedence over O(endpoints) option.

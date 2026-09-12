@@ -57,6 +57,7 @@ options:
     ini:
       - section: sudo_become_plugin
         key: password
+    secret: true
   alt_method:
     description:
       - Whether to use an alternative method to call C(su). Instead of running C(su -l user /path/to/shell -c command), it
