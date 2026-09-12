@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2026, Lorenzo Tanganelli <lorenzo.tanganelli@hotmail.it>
 # Copyright (c) 2024 Vladimir Botka <vbotka@gmail.com>
 # Copyright (c) 2024 Felix Fontein <felix@fontein.de>
@@ -167,8 +166,8 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
     if matching_parameter == "regex":
         try:
             regex_patterns = [re.compile(v) for v in values]
-        except re.error as e:
-            raise AnsibleFilterError(f"Invalid regex pattern: {e}")
+        except re.error as error:
+            raise AnsibleFilterError(f"Invalid regex pattern: {error}") from error
 
     def should_remove(val):
         if matching_parameter == "equal":
@@ -191,7 +190,7 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
     return clean(data)
 
 
-class FilterModule(object):
+class FilterModule:
     def filters(self):
         return {
             "remove_keys_from_values": remove_keys_from_values,
