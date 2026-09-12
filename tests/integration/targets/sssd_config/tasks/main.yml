@@ -1,0 +1,30 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+- name: Skip Alpine because SSSDConfig is unavailable
+  ansible.builtin.meta: end_host
+  when: ansible_facts.os_family == "Alpine"
+
+- name: Run sssd_config integration tests
+  block:
+    - name: Prepare the target
+      ansible.builtin.import_tasks: setup.yml
+
+    - name: Test sssd configuration options
+      ansible.builtin.import_tasks: test_sssd.yml
+
+    - name: Test validation and failure paths
+      ansible.builtin.import_tasks: test_validation.yml
+
+  always:
+    - name: Remove the temporary test directory
+      ansible.builtin.file:
+        path: "{{ sssd_config_test_temp.path }}"
+        state: absent
+      when: sssd_config_test_temp is defined

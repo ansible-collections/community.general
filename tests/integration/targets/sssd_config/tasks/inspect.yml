@@ -1,0 +1,17 @@
+---
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Inspect the temporary SSSD configuration independently
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts.python.executable }}"
+      - "{{ sssd_config_test_inspector }}"
+      - "{{ sssd_config_test_inspect_path }}"
+  register: sssd_config_test_inspect_command
+  changed_when: false
+
+- name: Store the independent configuration view
+  ansible.builtin.set_fact:
+    sssd_config_test_config: "{{ sssd_config_test_inspect_command.stdout | from_json }}"

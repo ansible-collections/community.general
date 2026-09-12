@@ -1,0 +1,180 @@
+---
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Seed the sssd-section test configuration
+  ansible.builtin.copy:
+    content: "{{ sssd_config_test_baseline }}"
+    dest: "{{ sssd_config_test_sssd_path }}"
+    mode: "0600"
+
+- name: Inspect the initial sssd-section configuration
+  ansible.builtin.include_tasks: inspect.yml
+  vars:
+    sssd_config_test_inspect_path: "{{ sssd_config_test_sssd_path }}"
+
+- name: Save the pre-check-mode hash
+  ansible.builtin.set_fact:
+    sssd_config_test_hash_before: "{{ sssd_config_test_config.sha256 }}"
+
+- name: Predict scalar and list changes to the sssd section
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    options:
+      debug_level: 31
+      services:
+        - nss
+        - pam
+  check_mode: true
+  diff: true
+  register: sssd_config_test_sssd_check
+
+- name: Inspect the sssd-section configuration after check mode
+  ansible.builtin.include_tasks: inspect.yml
+  vars:
+    sssd_config_test_inspect_path: "{{ sssd_config_test_sssd_path }}"
+
+- name: Verify sssd check mode predicts without writing
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_sssd_check is changed
+      - sssd_config_test_config.sha256 == sssd_config_test_hash_before
+      - sssd_config_test_sssd_check.diff.before.section_name == 'sssd'
+      - sssd_config_test_sssd_check.diff.before.exists
+      - sssd_config_test_sssd_check.diff.before.changed_option_names == []
+      - sssd_config_test_sssd_check.diff.after.changed_option_names == ['debug_level', 'services']
+      - sssd_config_test_sssd_check.diff.after.option_names == ['config_file_version', 'debug_level', 'domains', 'services']
+      - sssd_config_test_sssd_check.path == sssd_config_test_sssd_path
+      - sssd_config_test_sssd_check.section_name == 'sssd'
+      - sssd_config_test_sssd_check.exists
+      - sssd_config_test_sssd_check.option_names == ['config_file_version', 'debug_level', 'domains', 'services']
+
+- name: Set scalar and list options in the sssd section
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    options:
+      debug_level: 31
+      services:
+        - nss
+        - pam
+  register: sssd_config_test_sssd_create
+
+- name: Inspect the updated sssd-section configuration
+  ansible.builtin.include_tasks: inspect.yml
+  vars:
+    sssd_config_test_inspect_path: "{{ sssd_config_test_sssd_path }}"
+
+- name: Verify list and hexadecimal serialization
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_sssd_create is changed
+      - sssd_config_test_config.mode == '0600'
+      - sssd_config_test_config.sections.sssd.debug_level == '0x1f'
+      - sssd_config_test_config.sections.sssd.services == 'nss, pam'
+
+- name: Repeat the same sssd options
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    options:
+      debug_level: 31
+      services:
+        - nss
+        - pam
+  register: sssd_config_test_sssd_idempotent
+
+- name: Verify sssd option idempotence
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_sssd_idempotent is not changed
+
+- name: Update explicit sssd options with must_exist
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    must_exist: true
+    options:
+      debug_level: 32
+      services:
+        - nss
+        - pam
+  register: sssd_config_test_sssd_must_exist_update
+
+- name: Verify must_exist permits updates to explicit options
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_sssd_must_exist_update is changed
+
+- name: Reject a non-explicit sssd option with must_exist
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    must_exist: true
+    options:
+      re_expression: "(?P<name>[^@]+)"
+  register: sssd_config_test_sssd_missing_option
+  ignore_errors: true
+
+- name: Verify the missing sssd option failure
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_sssd_missing_option is failed
+      - "'must already exist' in sssd_config_test_sssd_missing_option.msg"
+
+- name: Selectively remove an existing and a missing sssd option
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    state: absent
+    options:
+      debug_level: ignored
+      re_expression: ignored
+  register: sssd_config_test_sssd_remove_options
+
+- name: Inspect the sssd section after selective removal
+  ansible.builtin.include_tasks: inspect.yml
+  vars:
+    sssd_config_test_inspect_path: "{{ sssd_config_test_sssd_path }}"
+
+- name: Verify selective sssd option removal
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_sssd_remove_options is changed
+      - "'debug_level' not in sssd_config_test_config.sections.sssd"
+      - sssd_config_test_config.sections.sssd.services == 'nss, pam'
+
+- name: Repeat selective removal of missing sssd options
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    state: absent
+    options:
+      debug_level: ignored
+      re_expression: ignored
+  register: sssd_config_test_sssd_remove_idempotent
+
+- name: Verify repeated sssd option absence is idempotent
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_sssd_remove_idempotent is not changed
+
+- name: Request selective removal of no sssd options
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    state: absent
+    options: {}
+  register: sssd_config_test_sssd_empty_absent
+
+- name: Verify options={} is a no-op for state=absent
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_sssd_empty_absent is not changed
+
+- name: Reject an absent request without option names
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_sssd_path }}"
+    state: absent
+  register: sssd_config_test_absent_without_options
+  ignore_errors: true
+
+- name: Verify options are required
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_absent_without_options is failed
+      - "'options' in sssd_config_test_absent_without_options.msg"

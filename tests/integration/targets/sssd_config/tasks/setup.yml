@@ -1,0 +1,104 @@
+---
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Gather target distribution and Python facts
+  ansible.builtin.setup:
+    gather_subset:
+      - "!all"
+      - min
+
+- name: Select the native SSSDConfig packages
+  ansible.builtin.set_fact:
+    sssd_config_test_packages: >-
+      {{
+        sssd_config_test_package_map.get(ansible_facts.os_family, [])
+        if sssd_config_test_packages_override is none
+        else sssd_config_test_packages_override
+      }}
+
+- name: Require a known package mapping
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.system == 'Linux'
+      - sssd_config_test_packages | length > 0
+    fail_msg: >-
+      No SSSDConfig package mapping is defined for os_family={{ ansible_facts.os_family }}.
+      Add it to defaults/main.yml or set sssd_config_test_packages_override.
+
+- name: Install the native SSSDConfig library and schemas
+  ansible.builtin.package:
+    name: "{{ sssd_config_test_packages }}"
+    state: present
+
+- name: Verify that Ansible's module interpreter can import SSSDConfig
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts.python.executable }}"
+      - -c
+      - "import SSSDConfig; print(SSSDConfig.__file__)"
+  register: sssd_config_test_import
+  changed_when: false
+
+- name: Create a private temporary directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: ansible-sssd-config-
+  register: sssd_config_test_temp
+
+- name: Define temporary test paths
+  ansible.builtin.set_fact:
+    sssd_config_test_inspector: "{{ sssd_config_test_temp.path }}/inspect_ini.py"
+    sssd_config_test_probe: "{{ sssd_config_test_temp.path }}/probe_sssdconfig.py"
+    sssd_config_test_probe_path: "{{ sssd_config_test_temp.path }}/probe.conf"
+    sssd_config_test_sssd_path: "{{ sssd_config_test_temp.path }}/sssd-section.conf"
+    sssd_config_test_validation_path: "{{ sssd_config_test_temp.path }}/validation.conf"
+
+- name: Install independent test helpers
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "0700"
+  loop:
+    - src: inspect_ini.py
+      dest: "{{ sssd_config_test_inspector }}"
+    - src: probe_sssdconfig.py
+      dest: "{{ sssd_config_test_probe }}"
+
+- name: Seed the capability-probe configuration
+  ansible.builtin.copy:
+    content: "{{ sssd_config_test_baseline }}"
+    dest: "{{ sssd_config_test_probe_path }}"
+    mode: "0600"
+
+- name: Probe the installed SSSDConfig schema
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts.python.executable }}"
+      - "{{ sssd_config_test_probe }}"
+      - "{{ sssd_config_test_probe_path }}"
+  register: sssd_config_test_probe_result
+  changed_when: false
+
+- name: Store runtime SSSDConfig capabilities
+  ansible.builtin.set_fact:
+    sssd_config_test_capabilities: "{{ sssd_config_test_probe_result.stdout | from_json }}"
+
+- name: Require the schema capabilities used by the core suite
+  ansible.builtin.assert:
+    that:
+      - "'services' in sssd_config_test_capabilities.sssd_options"
+      - "'domains' in sssd_config_test_capabilities.sssd_options"
+      - "'debug_level' in sssd_config_test_capabilities.sssd_options"
+    fail_msg: >-
+      The installed SSSDConfig schema lacks a baseline capability required to
+      exercise this module. Probe result: {{ sssd_config_test_capabilities }}
+
+- name: Report the tested runtime
+  ansible.builtin.debug:
+    msg:
+      distribution: "{{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
+      packages: "{{ sssd_config_test_packages }}"
+      python: "{{ sssd_config_test_capabilities.python }}"
+      sssdconfig_module: "{{ sssd_config_test_capabilities.module_file }}"
