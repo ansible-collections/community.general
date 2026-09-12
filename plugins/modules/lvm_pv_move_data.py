@@ -14,7 +14,7 @@ description:
 author:
   - Klention Mali (@klention)
 extends_documentation_fragment:
-  - community.general._attributes
+  - community.general.attributes
 attributes:
   check_mode:
     support: full
