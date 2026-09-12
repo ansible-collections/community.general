@@ -15,6 +15,8 @@ try:
 except ImportError:
     HAS_SECRETS_API = False
 
+_T = t.TypeVar("_T")
+
 
 def _collect_recursively(value: t.Any, collected_values: list[str], *, int_to_string: bool = False) -> None:
     if isinstance(value, Mapping):
@@ -29,7 +31,7 @@ def _collect_recursively(value: t.Any, collected_values: list[str], *, int_to_st
         collected_values.append(str(value))
 
 
-def mark_values_as_secrets(value: t.Any, *, int_to_string: bool = False) -> t.Any:
+def mark_values_as_secrets(value: _T, *, int_to_string: bool = False) -> _T:
     """Register all strings appearing in the (potentially nested) data structure ``value`` as secrets."""
     if HAS_SECRETS_API:
         collected_values: list[str] = []
@@ -61,6 +63,18 @@ def _mask_recursively(value: t.Any, *, mask_placeholder: str) -> t.Any:
     if isinstance(value, Sequence):
         return [_mask_recursively(v, mask_placeholder=mask_placeholder) for v in value]
     return value
+
+
+@t.overload
+def mask_secret_values(value: dict[str, t.Any], *, mask_placeholder="$REDACTED$") -> dict[str, t.Any]: ...
+
+
+@t.overload
+def mask_secret_values(value: list[t.Any], *, mask_placeholder="$REDACTED$") -> list[t.Any]: ...
+
+
+@t.overload
+def mask_secret_values(value: t.Any, *, mask_placeholder="$REDACTED$") -> t.Any: ...
 
 
 def mask_secret_values(value: t.Any, *, mask_placeholder="$REDACTED$") -> t.Any:
