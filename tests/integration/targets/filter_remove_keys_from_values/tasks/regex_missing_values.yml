@@ -1,0 +1,46 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create a playbook that applies regex mode without values
+  ansible.builtin.tempfile:
+    state: file
+    suffix: .yml
+  register: regex_missing_values_playbook
+
+- name: Write the regex-mode failure playbook
+  ansible.builtin.copy:
+    dest: "{{ regex_missing_values_playbook.path }}"
+    content: |
+      {% raw %}
+      ---
+      - name: Apply regex mode without values
+        hosts: localhost
+        connection: local
+        gather_facts: false
+        tasks:
+          - name: Apply regex mode without values
+            ansible.builtin.set_fact:
+              regex_missing_values_result: "{{ {'key': 'value'} | community.general.remove_keys_from_values(matching_parameter='regex') }}"
+      {% endraw %}
+
+- name: Run the regex-mode failure playbook
+  ansible.builtin.command:
+    cmd: "ansible-playbook -i localhost, {{ regex_missing_values_playbook.path }}"
+  register: regex_missing_values_result
+  changed_when: false
+  failed_when: false
+
+- name: Assert the expected error message
+  ansible.builtin.assert:
+    that:
+      - regex_missing_values_result.rc != 0
+      - >-
+        "values must be provided when matching_parameter='regex'" in
+        (regex_missing_values_result.stdout + regex_missing_values_result.stderr)
+
+- name: Remove the regex-mode failure playbook
+  ansible.builtin.file:
+    path: "{{ regex_missing_values_playbook.path }}"
+    state: absent
