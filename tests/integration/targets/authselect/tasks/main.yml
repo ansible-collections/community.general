@@ -1,0 +1,309 @@
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+- name: Run authselect integration tests
+  when: ansible_facts.os_family == "RedHat"
+  block:
+    - name: Ensure authselect is installed
+      ansible.builtin.package:
+        name: authselect
+        state: present
+
+    - name: Create backup and establish known authselect configuration
+      ansible.builtin.command:
+        argv:
+          - authselect
+          - select
+          - sssd
+          - --force
+          - --backup=ansible-test-authselect-original
+      register: authselect_initial_setup
+      changed_when: true
+
+    - name: Ensure current sssd profile is unchanged
+      community.general.authselect:
+        profile: sssd
+      register: authselect_result
+
+    - name: Verify current sssd profile is idempotent
+      ansible.builtin.assert:
+        that:
+          - not authselect_result.changed
+          - authselect_result.profile == "sssd"
+          - authselect_result.features == []
+
+    - name: Enable with-mkhomedir
+      community.general.authselect:
+        profile: sssd
+        features:
+          - with-mkhomedir
+      register: authselect_enable_feature
+
+    - name: Verify with-mkhomedir was enabled
+      ansible.builtin.assert:
+        that:
+          - authselect_enable_feature.changed
+          - authselect_enable_feature.profile == "sssd"
+          - "'with-mkhomedir' in authselect_enable_feature.features"
+
+    - name: Enable with-mkhomedir again
+      community.general.authselect:
+        profile: sssd
+        features:
+          - with-mkhomedir
+      register: authselect_enable_feature_again
+
+    - name: Verify enabling with-mkhomedir is idempotent
+      ansible.builtin.assert:
+        that:
+          - not authselect_enable_feature_again.changed
+          - authselect_enable_feature_again.profile == "sssd"
+          - "'with-mkhomedir' in authselect_enable_feature_again.features"
+
+    - name: Disable with-mkhomedir
+      community.general.authselect:
+        features:
+          - with-mkhomedir
+        state: absent
+      register: authselect_disable_feature
+
+    - name: Verify with-mkhomedir was disabled
+      ansible.builtin.assert:
+        that:
+          - authselect_disable_feature.changed
+          - authselect_disable_feature.profile == "sssd"
+          - "'with-mkhomedir' not in authselect_disable_feature.features"
+
+    - name: Disable with-mkhomedir again
+      community.general.authselect:
+        features:
+          - with-mkhomedir
+        state: absent
+      register: authselect_disable_feature_again
+
+    - name: Verify disabling with-mkhomedir is idempotent
+      ansible.builtin.assert:
+        that:
+          - not authselect_disable_feature_again.changed
+          - authselect_disable_feature_again.profile == "sssd"
+          - "'with-mkhomedir' not in authselect_disable_feature_again.features"
+
+    - name: Check enabling with-mkhomedir
+      community.general.authselect:
+        profile: sssd
+        features:
+          - with-mkhomedir
+      check_mode: true
+      register: authselect_check_enable
+
+    - name: Verify check mode predicts enabling with-mkhomedir
+      ansible.builtin.assert:
+        that:
+          - authselect_check_enable.changed
+          - authselect_check_enable.profile == "sssd"
+          - "'with-mkhomedir' in authselect_check_enable.features"
+
+    - name: Verify check mode did not actually enable with-mkhomedir
+      community.general.authselect:
+        profile: sssd
+      register: authselect_after_check
+
+    - name: Verify real configuration was unchanged by check mode
+      ansible.builtin.assert:
+        that:
+          - not authselect_after_check.changed
+          - authselect_after_check.profile == "sssd"
+          - "'with-mkhomedir' not in authselect_after_check.features"
+
+    - name: Check current sssd configuration
+      community.general.authselect:
+        profile: sssd
+      check_mode: true
+      register: authselect_check_no_change
+
+    - name: Verify check mode reports no change when configuration already matches
+      ansible.builtin.assert:
+        that:
+          - not authselect_check_no_change.changed
+          - authselect_check_no_change.profile == "sssd"
+          - authselect_check_no_change.features == []
+
+    - name: Switch to winbind profile
+      community.general.authselect:
+        profile: winbind
+      register: authselect_switch_profile
+
+    - name: Verify profile switched to winbind
+      ansible.builtin.assert:
+        that:
+          - authselect_switch_profile.changed
+          - authselect_switch_profile.profile == "winbind"
+          - authselect_switch_profile.features == []
+
+    - name: Ensure winbind profile again
+      community.general.authselect:
+        profile: winbind
+      register: authselect_switch_profile_again
+
+    - name: Verify winbind profile selection is idempotent
+      ansible.builtin.assert:
+        that:
+          - not authselect_switch_profile_again.changed
+          - authselect_switch_profile_again.profile == "winbind"
+          - authselect_switch_profile_again.features == []
+
+    - name: Switch back to sssd with with-mkhomedir enabled
+      community.general.authselect:
+        profile: sssd
+        features:
+          - with-mkhomedir
+      register: authselect_sssd_with_feature
+
+    - name: Verify sssd has with-mkhomedir enabled
+      ansible.builtin.assert:
+        that:
+          - authselect_sssd_with_feature.changed
+          - authselect_sssd_with_feature.profile == "sssd"
+          - "'with-mkhomedir' in authselect_sssd_with_feature.features"
+
+    - name: Switch to winbind without requesting features
+      community.general.authselect:
+        profile: winbind
+      register: authselect_switch_without_features
+
+    - name: Verify features from previous profile were not carried over
+      ansible.builtin.assert:
+        that:
+          - authselect_switch_without_features.changed
+          - authselect_switch_without_features.profile == "winbind"
+          - authselect_switch_without_features.features == []
+
+    - name: Validate current winbind configuration
+      community.general.authselect:
+        profile: winbind
+        validate: true
+      register: authselect_validate
+
+    - name: Verify valid configuration passes validation without changes
+      ansible.builtin.assert:
+        that:
+          - not authselect_validate.changed
+          - authselect_validate.profile == "winbind"
+          - authselect_validate.features == []
+
+    - name: Switch to sssd with validation
+      community.general.authselect:
+        profile: sssd
+        features:
+          - with-mkhomedir
+        validate: true
+      register: authselect_change_with_validation
+
+    - name: Verify changed configuration passed validation
+      ansible.builtin.assert:
+        that:
+          - authselect_change_with_validation.changed
+          - authselect_change_with_validation.profile == "sssd"
+          - "'with-mkhomedir' in authselect_change_with_validation.features"
+
+    - name: Get authselect backups before rollback-protected change
+      ansible.builtin.command:
+        argv:
+          - authselect
+          - backup-list
+      register: authselect_backups_before
+      changed_when: false
+
+    - name: Switch to winbind with rollback protection
+      community.general.authselect:
+        profile: winbind
+        validate: true
+        rollback_on_failure: true
+      register: authselect_rollback_success
+
+    - name: Get authselect backups after rollback-protected change
+      ansible.builtin.command:
+        argv:
+          - authselect
+          - backup-list
+      register: authselect_backups_after
+      changed_when: false
+
+    - name: Verify successful rollback-protected change cleaned up its backup
+      ansible.builtin.assert:
+        that:
+          - authselect_rollback_success.changed
+          - authselect_rollback_success.profile == "winbind"
+          - authselect_rollback_success.features == []
+          - authselect_backups_after.stdout_lines | sort == authselect_backups_before.stdout_lines | sort
+
+    - name: Create backup for restore test
+      ansible.builtin.command:
+        argv:
+          - authselect
+          - apply-changes
+          - --backup=ansible-test-authselect-restore
+      changed_when: true
+
+    - name: Switch to sssd for restore test
+      community.general.authselect:
+        profile: sssd
+        features:
+          - with-mkhomedir
+      register: authselect_before_restore
+
+    - name: Verify configuration changed before restore
+      ansible.builtin.assert:
+        that:
+          - authselect_before_restore.changed
+          - authselect_before_restore.profile == "sssd"
+          - "'with-mkhomedir' in authselect_before_restore.features"
+
+    - name: Restore saved winbind configuration through libauthselect
+      authselect_restore_test:
+        name: ansible-test-authselect-restore
+
+    - name: Verify restored configuration through the module
+      community.general.authselect:
+        profile: winbind
+      register: authselect_after_restore
+
+    - name: Verify backup restore returned to winbind
+      ansible.builtin.assert:
+        that:
+          - not authselect_after_restore.changed
+          - authselect_after_restore.profile == "winbind"
+          - authselect_after_restore.features == []
+
+    - name: Remove restore test backup
+      ansible.builtin.command:
+        argv:
+          - authselect
+          - backup-remove
+          - ansible-test-authselect-restore
+      changed_when: true
+
+  always:
+    - name: Restore original authentication configuration
+      ansible.builtin.command:
+        argv:
+          - authselect
+          - backup-restore
+          - ansible-test-authselect-original
+      changed_when: true
+      when:
+        - authselect_initial_setup is defined
+        - authselect_initial_setup is succeeded
+
+    - name: Remove integration test backup
+      ansible.builtin.command:
+        argv:
+          - authselect
+          - backup-remove
+          - ansible-test-authselect-original
+      changed_when: true
+      when:
+        - authselect_initial_setup is defined
+        - authselect_initial_setup is succeeded
