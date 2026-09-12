@@ -1,0 +1,2 @@
+bugfixes:
+  - xenserver_guest - skip provisioning when existing VM is used as a template (https://github.com/ansible-collections/community.general/issues/12576, https://github.com/ansible-collections/community.general/pull/12717).
