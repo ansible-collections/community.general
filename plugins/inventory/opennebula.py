@@ -48,6 +48,7 @@ options:
       - name: ONE_PASSWORD
     required: false
     type: string
+    secret: true
   api_authfile:
     description:
       - If both O(api_username) or O(api_password) are not set, then it tries to authenticate with ONE auth file. Default

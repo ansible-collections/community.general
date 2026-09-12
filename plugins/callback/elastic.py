@@ -41,12 +41,14 @@ options:
       - Use the APM server token.
     env:
       - name: ELASTIC_APM_SECRET_TOKEN
+    secret: true
   apm_api_key:
     type: str
     description:
       - Use the APM API key.
     env:
       - name: ELASTIC_APM_API_KEY
+    secret: true
   apm_verify_server_cert:
     default: true
     type: bool

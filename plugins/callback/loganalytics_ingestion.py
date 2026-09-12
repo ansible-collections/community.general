@@ -77,6 +77,7 @@ options:
     ini:
       - section: callback_loganalytics
         key: client_secret
+    secret: true
   include_content:
     description: Send the content to the Azure Log Analytics workspace.
     type: bool
