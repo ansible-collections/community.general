@@ -120,6 +120,35 @@ test_cases:
           out: "/tmp/foo cap_net_raw,cap_sys_chroot=ep\n"
           err: ''
 
+  # Using '=' on a capability that is already set with extra flags must clear
+  # the flags not mentioned in the request, not merge/OR them in.
+  - id: present_equals_clears_nonmatching_flags
+    input:
+      path: /tmp/foo
+      capability: cap_sys_chroot=ep
+      state: present
+    output:
+      changed: true
+      state: present
+    mocks:
+      run_command:
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_sys_chroot=eip\n"
+          err: ''
+        - command: [/testbin/setcap, -v, cap_sys_chroot=ep, /tmp/foo]
+          rc: 1
+          out: "/tmp/foo differs in [i]\n"
+          err: ''
+        - command: [/testbin/setcap, cap_sys_chroot=ep, /tmp/foo]
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/getcap, -v, /tmp/foo]
+          rc: 0
+          out: "/tmp/foo cap_sys_chroot=ep\n"
+          err: ''
+
   # setcap --verify claims a difference, but setcap does not actually change
   # anything (effective flag without permitted flag). Re-reading the caps shows
   # no change, so the task must be reported as not changed.
