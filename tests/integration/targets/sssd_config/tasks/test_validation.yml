@@ -1,0 +1,102 @@
+---
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Seed the validation test configuration
+  ansible.builtin.copy:
+    content: "{{ sssd_config_test_baseline }}"
+    dest: "{{ sssd_config_test_validation_path }}"
+    mode: "0600"
+
+- name: Inspect before option validation failures
+  ansible.builtin.include_tasks: inspect.yml
+  vars:
+    sssd_config_test_inspect_path: "{{ sssd_config_test_validation_path }}"
+
+- name: Save the hash before option validation failures
+  ansible.builtin.set_fact:
+    sssd_config_test_hash_before: "{{ sssd_config_test_config.sha256 }}"
+
+- name: Require a non-explicit option for state=present
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_validation_path }}"
+    must_exist: true
+    options:
+      debug_level: 2
+  register: sssd_config_test_present_missing_explicit_option
+  ignore_errors: true
+
+- name: Reject an option that is absent from the runtime schema
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_validation_path }}"
+    options:
+      ansible_test_option_that_does_not_exist: true
+  register: sssd_config_test_invalid_schema_option
+  ignore_errors: true
+
+- name: Verify present-state validation errors
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_present_missing_explicit_option is failed
+      - sssd_config_test_invalid_schema_option is failed
+      - "'must already exist' in sssd_config_test_present_missing_explicit_option.msg"
+
+- name: Confirm must_exist has no effect for state=absent
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_validation_path }}"
+    state: absent
+    must_exist: true
+    options:
+      debug_level: ignored
+  register: sssd_config_test_absent_must_exist
+
+- name: Verify absent removal of a missing option is idempotent
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_absent_must_exist is not changed
+
+- name: Inspect after option validation failures
+  ansible.builtin.include_tasks: inspect.yml
+  vars:
+    sssd_config_test_inspect_path: "{{ sssd_config_test_validation_path }}"
+
+- name: Verify validation failures did not write the configuration
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_config.sha256 == sssd_config_test_hash_before
+
+- name: Seed a configuration without an sssd section
+  ansible.builtin.copy:
+    content: |
+      [nss]
+      debug_level = 2
+    dest: "{{ sssd_config_test_validation_path }}"
+    mode: "0600"
+
+- name: Reject a configuration without an sssd section
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_validation_path }}"
+    options:
+      debug_level: 2
+  register: sssd_config_test_missing_sssd_section
+  ignore_errors: true
+
+- name: Verify a missing sssd section fails explicitly
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_missing_sssd_section is failed
+      - "'sssd section does not exist' in sssd_config_test_missing_sssd_section.msg"
+
+- name: Reject a nonexistent configuration path
+  community.general.sssd_config:
+    path: "{{ sssd_config_test_temp.path }}/does-not-exist.conf"
+    options:
+      debug_level: 2
+  register: sssd_config_test_missing_path
+  ignore_errors: true
+
+- name: Verify a nonexistent configuration path fails
+  ansible.builtin.assert:
+    that:
+      - sssd_config_test_missing_path is failed

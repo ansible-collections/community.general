@@ -1,0 +1,24 @@
+---
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+sssd_config_test_package_map:
+  RedHat:
+    - python3-sssdconfig
+  Debian:
+    - python3-sss
+    - sssd-common
+  Suse:
+    - python3-sssd-config
+  Archlinux:
+    - sssd
+
+# Set this to a package list on a distro whose names differ from the map.
+sssd_config_test_packages_override: null
+
+sssd_config_test_baseline: |
+  [sssd]
+  config_file_version = 2
+  services =
+  domains =
