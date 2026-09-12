@@ -96,3 +96,20 @@ tests:
       b: keep
       nested:
         value: keep
+  - template: options.j2
+    values: ['^foo', '^bar']
+    matching_parameter: regex
+    recursive: true
+    group:
+      - {tt: multiple regex values are matched recursively}
+    input:
+      foo_value: foo-value
+      bar_value: bar-value
+      other_value: other-value
+      nested:
+        foo_value: foo-nested
+        other_value: other-nested
+    result:
+      other_value: other-value
+      nested:
+        other_value: other-nested

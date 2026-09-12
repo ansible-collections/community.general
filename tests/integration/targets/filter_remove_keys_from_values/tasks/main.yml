@@ -5,3 +5,6 @@
 
 - name: Tests
   ansible.builtin.import_tasks: tests.yml
+
+- name: Test regex without values
+  ansible.builtin.import_tasks: regex_missing_values.yml
