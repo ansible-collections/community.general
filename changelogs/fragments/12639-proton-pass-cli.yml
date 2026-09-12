@@ -1,0 +1,2 @@
+bugfixes:
+  - proton_pass lookup plugin - use ``pass-cli info`` instead of the removed ``pass-cli test`` command when checking for an active session, restoring session detection with ``pass-cli`` 2.2.4 and later (https://github.com/ansible-collections/community.general/pull/12639).
