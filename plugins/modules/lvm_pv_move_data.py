@@ -13,6 +13,13 @@ description:
   - Moves data from one LVM Physical Volume (PV) to another.
 author:
   - Klention Mali (@klention)
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   source:
     description:
