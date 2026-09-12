@@ -162,8 +162,9 @@ options:
   visibility:
     description:
       - Default visibility of the group.
+      - The default value for this param is C(private) but that is being deprecated
+      - and it will be replaced with an empty default in community.general 14.0.0.
     choices: ["private", "internal", "public"]
-    default: private
     type: str
   wiki_access_level:
     description:
@@ -436,7 +437,7 @@ def main():
             state=dict(type="str", default="present", choices=["absent", "present"]),
             subgroup_creation_level=dict(type="str", choices=["maintainer", "owner"]),
             two_factor_grace_period=dict(type="str"),
-            visibility=dict(type="str", default="private", choices=["internal", "private", "public"]),
+            visibility=dict(type="str", choices=["internal", "private", "public"]),
             wiki_access_level=dict(type="str", choices=["enabled", "private", "disabled"]),
         )
     )
@@ -460,6 +461,14 @@ def main():
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
+    if module.params["visibility"] is None:
+        group_visibility = "private"
+        module.deprecate(
+            'The default value "private" for parameter visibility is being deprecated and it will be replaced by am empty value',
+            version="14.0.0",
+            collection_name="community.general",
+        )
+
     auto_devops_enabled = module.params["auto_devops_enabled"]
     avatar_path = module.params["avatar_path"]
     default_branch = module.params["default_branch"]
@@ -468,7 +477,6 @@ def main():
     force_delete = module.params["force_delete"]
     group_name = module.params["name"]
     group_path = module.params["path"]
-    group_visibility = module.params["visibility"]
     lfs_enabled = module.params["lfs_enabled"]
     lock_duo_features_enabled = module.params["lock_duo_features_enabled"]
     membership_lock = module.params["membership_lock"]
