@@ -76,6 +76,7 @@ options:
       - name: ansible_ssh_password
       - name: ansible_paramiko_pass
       - name: ansible_paramiko_password
+    secret: true
   use_rsa_sha2_algorithms:
     description:
       - Whether or not to enable RSA SHA2 algorithms for pubkeys and hostkeys.

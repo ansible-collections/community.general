@@ -41,6 +41,7 @@ options:
     aliases:
       - private_token
       - access_token
+    secret: true
   filter:
     description: Filter runners from GitLab API.
     env:
