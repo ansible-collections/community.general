@@ -9,29 +9,33 @@ from collections.abc import Mapping, Sequence
 
 try:
     from ansible.module_utils.secrets import mask_secrets as _mask_secrets  # type: ignore[import-not-found]
-    from ansible.module_utils.secrets import register_secret  # type: ignore[import-not-found]
+    from ansible.module_utils.secrets import register_secret, register_secrets  # type: ignore[import-not-found]
 
     HAS_SECRETS_API = True
 except ImportError:
     HAS_SECRETS_API = False
 
 
-def _mark_recursively(value: t.Any, *, int_to_string: bool = False) -> t.Any:
+def _collect_recursively(value: t.Any, collected_values: list[str], *, int_to_string: bool = False) -> None:
     if isinstance(value, Mapping):
-        return {k: _mark_recursively(v, int_to_string=int_to_string) for k, v in value.items()}
-    if isinstance(value, str):
-        return register_secret(value)
-    if isinstance(value, Sequence):
-        return [_mark_recursively(v, int_to_string=int_to_string) for v in value]
-    if int_to_string and isinstance(value, int):
-        register_secret(str(value))
-    return value
+        for v in value.items():
+            _collect_recursively(v, collected_values, int_to_string=int_to_string)
+    elif isinstance(value, str):
+        collected_values.append(value)
+    elif isinstance(value, Sequence):
+        for v in value:
+            _collect_recursively(v, collected_values, int_to_string=int_to_string)
+    elif int_to_string and isinstance(value, int):
+        collected_values.append(str(value))
 
 
 def mark_values_as_secrets(value: t.Any, *, int_to_string: bool = False) -> t.Any:
     """Register all strings appearing in the (potentially nested) data structure ``value`` as secrets."""
     if HAS_SECRETS_API:
-        value = _mark_recursively(value)
+        collected_values: list[str] = []
+        _collect_recursively(value, collected_values, int_to_string=int_to_string)
+        if collected_values:
+            register_secrets(collected_values)
     return value
 
 
