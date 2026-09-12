@@ -246,6 +246,7 @@ from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 display = Display()
@@ -255,9 +256,13 @@ display = Display()
 # ---------------------------------------------------------------------------
 
 _LOGIN_FIELDS = ("username", "email", "password", "totp_uri")
+_LOGIN_SECRET_FIELDS = {"password", "totp_uri"}
 _CREDIT_CARD_FIELDS = ("cardholder_name", "card_type", "number", "verification_number", "expiration_date", "pin")
+_CREDIT_CARD_SECRET_FIELDS = {"number", "verification_number", "pin"}
 _WIFI_FIELDS = ("ssid", "password", "security")
+_WIFI_SECRET_FIELDS = {"password"}
 _SSH_KEY_FIELDS = ("private_key", "public_key", "fingerprint", "key_type")
+_SSH_KEY_SECRET_FIELDS = {"private_key"}
 _IDENTITY_FIELDS = (
     "full_name",
     "email",
@@ -292,6 +297,11 @@ _IDENTITY_FIELDS = (
     "work_phone_number",
     "work_email",
 )
+_IDENTITY_SECRET_FIELDS = {
+    "social_security_number",
+    "passport_number",
+    "license_number",
+}
 
 
 class ProtonPassCLIError(AnsibleLookupError):
@@ -389,7 +399,7 @@ class ProtonPassClient:
 
     # --- single-field retrieval --------------------------------------------------
 
-    def fetch_all_fields(self, vault: str, title: str) -> dict[str, str | list[str]]:
+    def fetch_all_fields(self, vault: str, title: str) -> dict[str, tuple[bool, str | list[str]]]:
         """Return all fields for *title* as a flat ``{field_name: value}`` dict.
 
         Always calls pass-cli — no caching, so callers always receive the
@@ -430,7 +440,9 @@ class ProtonPassClient:
                 f"proton_pass: field '{field}' not found in item '{title}'{vault_hint}. "
                 f"Available fields: {', '.join(sorted(all_fields)) or '(none)'}"
             )
-        value = all_fields[field]
+        secret, value = all_fields[field]
+        if secret:
+            mark_values_as_secrets(value)
         return value if isinstance(value, str) else ", ".join(value)
 
 
@@ -462,30 +474,30 @@ def _raise_item_error(title: str, vault: str, field: str | None, stderr: str) ->
 # ---------------------------------------------------------------------------
 
 
-def _extract_scalar_fields(source: dict, keys: tuple) -> dict[str, str]:
+def _extract_scalar_fields(source: dict, keys: tuple[str, ...], secret_keys: set[str]) -> dict[str, tuple[bool, str]]:
     """Return a dict of *keys* from *source*, skipping None and empty-string values."""
-    return {key: str(val) for key in keys if (val := source.get(key)) is not None and val != ""}
+    return {key: (key in secret_keys, str(val)) for key in keys if (val := source.get(key)) is not None and val != ""}
 
 
-def _extract_typed_fields(type_key: str, type_data: dict) -> dict[str, str | list[str]]:
+def _extract_typed_fields(type_key: str, type_data: dict) -> dict[str, tuple[bool, str | list[str]]]:
     """Return type-specific standard fields extracted from *type_data*."""
-    fields: dict[str, str | list[str]] = {}
+    fields: dict[str, tuple[bool, str | list[str]]] = {}
     tk = type_key.lower()
     if tk == "login":
-        fields.update(_extract_scalar_fields(type_data, _LOGIN_FIELDS))
+        fields.update(_extract_scalar_fields(type_data, _LOGIN_FIELDS, _LOGIN_SECRET_FIELDS))
         urls = type_data.get("urls")
         if urls:
-            fields["urls"] = urls if isinstance(urls, list) else [urls]
+            fields["urls"] = (False, urls if isinstance(urls, list) else [urls])
     elif tk == "creditcard":
-        fields.update(_extract_scalar_fields(type_data, _CREDIT_CARD_FIELDS))
+        fields.update(_extract_scalar_fields(type_data, _CREDIT_CARD_FIELDS, _CREDIT_CARD_SECRET_FIELDS))
     elif tk == "wifi":
-        fields.update(_extract_scalar_fields(type_data, _WIFI_FIELDS))
+        fields.update(_extract_scalar_fields(type_data, _WIFI_FIELDS, _WIFI_SECRET_FIELDS))
     elif tk == "sshkey":
-        fields.update(_extract_scalar_fields(type_data, _SSH_KEY_FIELDS))
+        fields.update(_extract_scalar_fields(type_data, _SSH_KEY_FIELDS, _SSH_KEY_SECRET_FIELDS))
         for section in type_data.get("sections", []):
             fields.update(_extract_extra_fields(section.get("extra_fields", [])))
     elif tk == "identity":
-        fields.update(_extract_scalar_fields(type_data, _IDENTITY_FIELDS))
+        fields.update(_extract_scalar_fields(type_data, _IDENTITY_FIELDS, _IDENTITY_SECRET_FIELDS))
         for sub_key in (
             "extra_personal_details",
             "extra_address_details",
@@ -499,14 +511,14 @@ def _extract_typed_fields(type_key: str, type_data: dict) -> dict[str, str | lis
         for alias_key in ("aliased_email", "aliased_address"):
             val = type_data.get(alias_key)
             if val:
-                fields["aliased_email"] = val
+                fields["aliased_email"] = (False, val)
                 break
     return fields
 
 
-def _parse_fields(raw: dict, title: str) -> dict[str, str | list[str]]:
-    """Extract a flat ``{field_name: value}`` dict from a pass-cli JSON response."""
-    fields: dict[str, str | list[str]] = {}
+def _parse_fields(raw: dict, title: str) -> dict[str, tuple[bool, str | list[str]]]:
+    """Extract a flat ``{field_name: (secret, value)}`` dict from a pass-cli JSON response."""
+    fields: dict[str, tuple[bool, str | list[str]]] = {}
 
     item_obj = raw.get("item", raw)
     state = item_obj.get("state", "")
@@ -519,7 +531,7 @@ def _parse_fields(raw: dict, title: str) -> dict[str, str | list[str]]:
     content_wrapper = item_obj.get("content", {})
     note = content_wrapper.get("note")
     if note:
-        fields["note"] = str(note)
+        fields["note"] = (False, str(note))
 
     type_dict = content_wrapper.get("content")
     if isinstance(type_dict, dict):
@@ -541,7 +553,7 @@ def _parse_fields(raw: dict, title: str) -> dict[str, str | list[str]]:
     return fields
 
 
-def _extract_extra_fields(extra_fields: list[dict]) -> dict[str, str]:
+def _extract_extra_fields(extra_fields: list[dict]) -> dict[str, tuple[bool, str]]:
     """Return a flat ``{field_name: value}`` dict from a pass-cli extra_fields list.
 
     Each entry has the shape::
@@ -551,15 +563,15 @@ def _extract_extra_fields(extra_fields: list[dict]) -> dict[str, str]:
     The type wrapper key varies; the actual value is always the first dict value.
     Non-string values (for example ``Timestamp`` integers) are converted to strings.
     """
-    result: dict[str, str] = {}
+    result: dict[str, tuple[bool, str]] = {}
     for extra in extra_fields:
         name = extra.get("name", "")
         if not name:
             continue
         content = extra.get("content")
         if isinstance(content, dict):
-            raw_value = next((v for v in content.values() if v is not None), "")
-            result[name] = str(raw_value)
+            key, raw_value = next(((k, v) for k, v in content.items() if v is not None), ("", ""))
+            result[name] = (key in {"Hidden", "Totp"}, str(raw_value))
     return result
 
 
@@ -608,6 +620,10 @@ class LookupModule(LookupBase):
             if field:
                 results.append(client.fetch_field(vault=vault, title=title, field=field))
             else:
-                results.append(client.fetch_all_fields(vault=vault, title=title))
+                values = client.fetch_all_fields(vault=vault, title=title)
+                for secret, value in values.values():
+                    if secret:
+                        mark_values_as_secrets(value)
+                results.append({key: value for key, (secret, value) in values.items()})
 
         return results

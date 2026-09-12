@@ -147,18 +147,18 @@ MOCK_TRASHED_ITEM = _make_item(
 class TestParseFields(unittest.TestCase):
     def test_login_item_with_extra_fields(self):
         fields = _parse_fields(MOCK_LOGIN_ITEM, "example_item")
-        self.assertEqual(fields["api_token"], "token_value_abc")
-        self.assertEqual(fields["backup_secret"], "secure_value_1")
-        self.assertEqual(fields["password"], "correct-horse-battery")
+        self.assertEqual(fields["api_token"], (True, "token_value_abc"))
+        self.assertEqual(fields["backup_secret"], (True, "secure_value_1"))
+        self.assertEqual(fields["password"], (True, "correct-horse-battery"))
 
     def test_sectioned_item(self):
         fields = _parse_fields(MOCK_SECTIONED_ITEM, "grouped_item")
-        self.assertEqual(fields["backup_secret"], "secure_value_2")
-        self.assertEqual(fields["storage_key"], "secure_value_3")
+        self.assertEqual(fields["backup_secret"], (True, "secure_value_2"))
+        self.assertEqual(fields["storage_key"], (True, "secure_value_3"))
 
     def test_note_item(self):
         fields = _parse_fields(MOCK_NOTE_ITEM, "notes_item")
-        self.assertEqual(fields["note"], "some free-text note")
+        self.assertEqual(fields["note"], (False, "some free-text note"))
 
     def test_empty_item_raises(self):
         empty = _make_item("Custom", {"sections": []})
@@ -168,58 +168,60 @@ class TestParseFields(unittest.TestCase):
 
     def test_login_urls_returned_as_list(self):
         fields = _parse_fields(MOCK_LOGIN_URLS_ITEM, "web_login")
-        self.assertEqual(fields["username"], "user@example.com")
-        self.assertEqual(fields["password"], "secret")
-        self.assertEqual(fields["totp_uri"], "otpauth://totp/example?secret=JBSWY3DPEHPK3PXP")
-        self.assertEqual(fields["urls"], ["https://example.com", "https://app.example.com"])
+        self.assertEqual(fields["username"], (False, "user@example.com"))
+        self.assertEqual(fields["password"], (True, "secret"))
+        self.assertEqual(fields["totp_uri"], (True, "otpauth://totp/example?secret=JBSWY3DPEHPK3PXP"))
+        self.assertEqual(fields["urls"], (False, ["https://example.com", "https://app.example.com"]))
 
     def test_credit_card_item(self):
         fields = _parse_fields(MOCK_CREDIT_CARD_ITEM, "my_visa")
-        self.assertEqual(fields["cardholder_name"], "John Doe")
-        self.assertEqual(fields["card_type"], "Visa")
-        self.assertEqual(fields["number"], "4111111111111111")
-        self.assertEqual(fields["verification_number"], "123")
-        self.assertEqual(fields["expiration_date"], "2027-12")
-        self.assertEqual(fields["pin"], "1234")
+        self.assertEqual(fields["cardholder_name"], (False, "John Doe"))
+        self.assertEqual(fields["card_type"], (False, "Visa"))
+        self.assertEqual(fields["number"], (True, "4111111111111111"))
+        self.assertEqual(fields["verification_number"], (True, "123"))
+        self.assertEqual(fields["expiration_date"], (False, "2027-12"))
+        self.assertEqual(fields["pin"], (True, "1234"))
 
     def test_wifi_item(self):
         fields = _parse_fields(MOCK_WIFI_ITEM, "home_wifi")
-        self.assertEqual(fields["ssid"], "HomeNetwork")
-        self.assertEqual(fields["password"], "wifipass123")
-        self.assertEqual(fields["security"], "WPA2")
+        self.assertEqual(fields["ssid"], (False, "HomeNetwork"))
+        self.assertEqual(fields["password"], (True, "wifipass123"))
+        self.assertEqual(fields["security"], (False, "WPA2"))
         self.assertNotIn("username", fields)
 
     def test_identity_item(self):
         fields = _parse_fields(MOCK_IDENTITY_ITEM, "my_identity")
-        self.assertEqual(fields["first_name"], "John")
-        self.assertEqual(fields["last_name"], "Doe")
-        self.assertEqual(fields["email"], "john@example.com")
-        self.assertEqual(fields["organization"], "ACME")
-        self.assertEqual(fields["city"], "Springfield")
-        self.assertEqual(fields["country_or_region"], "US")
+        self.assertEqual(fields["first_name"], (False, "John"))
+        self.assertEqual(fields["last_name"], (False, "Doe"))
+        self.assertEqual(fields["email"], (False, "john@example.com"))
+        self.assertEqual(fields["organization"], (False, "ACME"))
+        self.assertEqual(fields["city"], (False, "Springfield"))
+        self.assertEqual(fields["country_or_region"], (False, "US"))
 
     def test_identity_sub_array_extra_fields(self):
         """Extra fields nested in Identity sub-arrays are merged into the result."""
         fields = _parse_fields(MOCK_IDENTITY_ITEM, "my_identity")
-        self.assertEqual(fields["custom_personal"], "personal_secret")
-        self.assertEqual(fields["custom_address"], "123 Main St")
+        self.assertEqual(fields["custom_personal"], (True, "personal_secret"))
+        self.assertEqual(fields["custom_address"], (False, "123 Main St"))
 
     def test_ssh_key_item(self):
         fields = _parse_fields(MOCK_SSH_KEY_ITEM, "deploy_key")
-        self.assertIn("-----BEGIN OPENSSH PRIVATE KEY-----", fields["private_key"])
-        self.assertIn("ssh-ed25519", fields["public_key"])
-        self.assertEqual(fields["fingerprint"], "SHA256:abc123fake")
-        self.assertEqual(fields["key_type"], "ed25519")
+        self.assertIn("-----BEGIN OPENSSH PRIVATE KEY-----", fields["private_key"][1])
+        self.assertEqual(True, fields["private_key"][0])
+        self.assertIn("ssh-ed25519", fields["public_key"][1])
+        self.assertEqual(False, fields["public_key"][0])
+        self.assertEqual(fields["fingerprint"], (False, "SHA256:abc123fake"))
+        self.assertEqual(fields["key_type"], (False, "ed25519"))
 
     def test_alias_item(self):
         fields = _parse_fields(MOCK_ALIAS_ITEM, "shopping_alias")
-        self.assertEqual(fields["aliased_email"], "shopping.abc123@pm.me")
+        self.assertEqual(fields["aliased_email"], (False, "shopping.abc123@pm.me"))
 
     def test_alias_item_aliased_address_fallback(self):
         """aliased_address is accepted when aliased_email is absent."""
         item = _make_item("Alias", {"aliased_address": "alt.abc@pm.me"})
         fields = _parse_fields(item, "alias2")
-        self.assertEqual(fields["aliased_email"], "alt.abc@pm.me")
+        self.assertEqual(fields["aliased_email"], (False, "alt.abc@pm.me"))
 
     def test_timestamp_extra_field_converted_to_string(self):
         """Timestamp integer values in extra_fields must be stored as strings."""
@@ -229,7 +231,7 @@ class TestParseFields(unittest.TestCase):
             extra_fields=[{"name": "expiry", "content": {"Timestamp": 1735689600}}],
         )
         fields = _parse_fields(item, "item")
-        self.assertEqual(fields["expiry"], "1735689600")
+        self.assertEqual(fields["expiry"], (False, "1735689600"))
 
     def test_trashed_item_raises(self):
         """Items in the Proton Pass trash must raise AnsibleLookupError."""
@@ -249,26 +251,26 @@ class TestExtractExtraFields(unittest.TestCase):
         from ansible_collections.community.general.plugins.lookup.proton_pass import _extract_extra_fields
 
         result = _extract_extra_fields([{"name": "my_key", "content": {"Hidden": "secret_val"}}])
-        self.assertEqual(result, {"my_key": "secret_val"})
+        self.assertEqual(result, {"my_key": (True, "secret_val")})
 
     def test_text_field(self):
         from ansible_collections.community.general.plugins.lookup.proton_pass import _extract_extra_fields
 
         result = _extract_extra_fields([{"name": "my_key", "content": {"Text": "text_val"}}])
-        self.assertEqual(result, {"my_key": "text_val"})
+        self.assertEqual(result, {"my_key": (False, "text_val")})
 
     def test_totp_field(self):
         from ansible_collections.community.general.plugins.lookup.proton_pass import _extract_extra_fields
 
         uri = "otpauth://totp/Test?secret=ABC"
         result = _extract_extra_fields([{"name": "otp", "content": {"Totp": uri}}])
-        self.assertEqual(result, {"otp": uri})
+        self.assertEqual(result, {"otp": (True, uri)})
 
     def test_timestamp_field_converted_to_string(self):
         from ansible_collections.community.general.plugins.lookup.proton_pass import _extract_extra_fields
 
         result = _extract_extra_fields([{"name": "expiry", "content": {"Timestamp": 1735689600}}])
-        self.assertEqual(result, {"expiry": "1735689600"})
+        self.assertEqual(result, {"expiry": (False, "1735689600")})
 
     def test_skips_field_with_no_name(self):
         from ansible_collections.community.general.plugins.lookup.proton_pass import _extract_extra_fields
@@ -442,8 +444,8 @@ class TestProtonPassClientFetch(unittest.TestCase):
         mock_popen.return_value = _make_popen_mock(0, payload, b"")
         client = ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="")
         result = client.fetch_all_fields(vault="vault", title="example_item")
-        self.assertEqual(result["api_token"], "token_value_abc")
-        self.assertEqual(result["backup_secret"], "secure_value_1")
+        self.assertEqual(result["api_token"], (True, "token_value_abc"))
+        self.assertEqual(result["backup_secret"], (True, "secure_value_1"))
 
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.display")
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
@@ -456,7 +458,7 @@ class TestProtonPassClientFetch(unittest.TestCase):
         result = client.fetch_all_fields(vault="vault", title="example_item")
         mock_display.warning.assert_called_once()
         self.assertIn("example_item", mock_display.warning.call_args[0][0])
-        self.assertEqual(result["api_token"], "token_value_abc")
+        self.assertEqual(result["api_token"], (True, "token_value_abc"))
 
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.display")
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
@@ -467,7 +469,7 @@ class TestProtonPassClientFetch(unittest.TestCase):
         client = ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="", debug=False)
         result = client.fetch_all_fields(vault="vault", title="example_item")
         mock_display.warning.assert_not_called()
-        self.assertEqual(result["api_token"], "token_value_abc")
+        self.assertEqual(result["api_token"], (True, "token_value_abc"))
 
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
     def test_fetch_all_fields_invalid_json_raises(self, mock_popen):
@@ -516,7 +518,7 @@ class TestLookupModule(unittest.TestCase):
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.ProtonPassClient")
     def test_all_fields_mode(self, mock_client_cls):
         mock_client = MagicMock()
-        mock_client.fetch_all_fields.return_value = {"api_key": "secret123"}
+        mock_client.fetch_all_fields.return_value = {"api_key": (True, "secret123")}
         mock_client_cls.return_value = mock_client
 
         result = self._run(["vm"], vault="myvault")
@@ -576,7 +578,7 @@ class TestLookupModule(unittest.TestCase):
     def test_debug_option_passed_to_client(self, mock_client_cls):
         """Verify that the debug option is passed to ProtonPassClient."""
         mock_client = MagicMock()
-        mock_client.fetch_all_fields.return_value = {"api_key": "secret123"}
+        mock_client.fetch_all_fields.return_value = {"api_key": (True, "secret123")}
         mock_client_cls.return_value = mock_client
 
         self._run(["vm"], vault="myvault", debug=True)
