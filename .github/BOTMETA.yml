@@ -204,6 +204,7 @@ files:
   $filters/random_mac.py: {}
   $filters/remove_keys.py:
     maintainers: vbotka
+  $filters/remove_keys_from_values.py: {}
   $filters/replace_keys.py:
     maintainers: vbotka
   $filters/reveal_ansible_type.py:
