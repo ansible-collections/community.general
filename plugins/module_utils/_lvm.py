@@ -102,8 +102,8 @@ def pvchange_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             metadataignore=cmd_runner_fmt.as_bool(
                 ["--metadataignore", "y"], ["--metadataignore", "n"], ignore_none=True
             ),
-            addtag=cmd_runner_fmt.as_func(lambda tags: [x for t in tags for x in ("--addtag", t)]),
-            deltag=cmd_runner_fmt.as_func(lambda tags: [x for t in tags for x in ("--deltag", t)]),
+            addtag=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--addtag"),
+            deltag=cmd_runner_fmt.stack(cmd_runner_fmt.as_opt_val)("--deltag"),
             device=cmd_runner_fmt.as_list(),
         ),
         **kwargs,
@@ -111,7 +111,7 @@ def pvchange_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
 
 
 def pvresize_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
-    """s
+    """
     Runner for C(pvresize). Used by: community.general.lvg, community.general.lvm_pv,
     community.general.filesystem.
 

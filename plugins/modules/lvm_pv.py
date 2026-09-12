@@ -14,6 +14,13 @@ description:
   - Creates, resizes or removes LVM Physical Volumes.
 author:
   - Klention Mali (@klention)
+extends_documentation_fragment:
+  - community.general._attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   device:
     description:
@@ -283,34 +290,33 @@ def main():
                 actions.append("attributes would be set")
             else:
                 current = get_pv_attrs()
-                change_args = []
-                run_kwargs = {}
 
+                change_allocatable = None
                 if allocatable is not None and current["allocatable"] != allocatable:
-                    change_args.append("allocatable")
+                    change_allocatable = allocatable
 
+                change_metadataignore = None
                 if metadataignore is not None and current["metadataignore"] != metadataignore:
-                    change_args.append("metadataignore")
+                    change_metadataignore = metadataignore
 
+                to_add = to_del = None
                 if tags is not None:
                     current_tags = set(current["tags"])
                     desired_tags = set(tags)
-                    to_add = sorted(desired_tags - current_tags)
-                    to_del = sorted(current_tags - desired_tags)
-                    if to_add:
-                        change_args.append("addtag")
-                        run_kwargs["addtag"] = to_add
-                    if to_del:
-                        change_args.append("deltag")
-                        run_kwargs["deltag"] = to_del
+                    to_add = sorted(desired_tags - current_tags) or None
+                    to_del = sorted(current_tags - desired_tags) or None
 
-                if change_args:
+                if change_allocatable is not None or change_metadataignore is not None or to_add or to_del:
                     if module.check_mode:
                         changed = True
                         actions.append("attributes would be changed")
                     else:
-                        change_args.append("device")
-                        pvchange(" ".join(change_args), check_rc=True).run(**run_kwargs)
+                        pvchange("allocatable metadataignore addtag deltag device", check_rc=True).run(
+                            allocatable=change_allocatable,
+                            metadataignore=change_metadataignore,
+                            addtag=to_add,
+                            deltag=to_del,
+                        )
                         changed = True
                         actions.append("attributes changed")
 
