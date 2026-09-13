@@ -41,10 +41,7 @@ def main() -> None:
         )
         parser.read_string(raw.decode("utf-8"))
 
-        sections = {
-            section: dict(parser.items(section, raw=True))
-            for section in parser.sections()
-        }
+        sections = {section: dict(parser.items(section, raw=True)) for section in parser.sections()}
         mode = format(stat.S_IMODE(os.stat(path).st_mode), "04o")
         sha256 = hashlib.sha256(raw).hexdigest()
     except (OSError, UnicodeError, configparser.Error) as exc:

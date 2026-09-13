@@ -8,27 +8,31 @@
 from __future__ import annotations
 
 import traceback
+import typing as t
 from dataclasses import dataclass
-from typing import Any, Iterable, Mapping, Optional, Union, cast
+
+from ansible.module_utils.common import respawn
 
 HAS_SSSD_LIB = False
-SSSDCONFIG_IMPORT_ERROR = ""
-_SSSDConfig: Any = None
+SSSDCONFIG_IMPORT_ERROR: t.Optional[str] = None
 
 try:
-    from SSSDConfig import SSSDConfig as _ImportedSSSDConfig  # type: ignore[import-not-found]
-
-    _SSSDConfig = _ImportedSSSDConfig
-    HAS_SSSD_LIB = True
+    from SSSDConfig import SSSDConfig  # type: ignore[import-not-found]
 except ImportError:
     SSSDCONFIG_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_SSSD_LIB = True
+    SSSDCONFIG_IMPORT_ERROR = None
+
+
+SSSDOptionMapping = t.Mapping[str, object]
 
 
 @dataclass(frozen=True)
 class SSSDTarget:
     path: str
     section: str
-    name: Optional[str] = None
+    name: t.Optional[str] = None
 
     @property
     def section_name(self) -> str:
@@ -36,7 +40,7 @@ class SSSDTarget:
             return f"domain/{self.name}"
 
         if self.section == "service":
-            return cast(str, self.name)
+            return t.cast(str, self.name)
 
         return "sssd"
 
@@ -44,9 +48,9 @@ class SSSDTarget:
 @dataclass(frozen=True)
 class EnsurePresent:
     target: SSSDTarget
-    options: Mapping[str, Any]
+    options: SSSDOptionMapping
     must_exist: bool = False
-    active: Optional[bool] = None
+    active: t.Optional[bool] = None
 
 
 @dataclass(frozen=True)
@@ -60,17 +64,30 @@ class RemoveSection:
     target: SSSDTarget
 
 
-SSSDRequest = Union[EnsurePresent, RemoveOptions, RemoveSection]
+SSSDRequest = t.Union[EnsurePresent, RemoveOptions, RemoveSection]
 
 
-def create_sssd_config():
-    if _SSSDConfig is None:
+def _respawn_sssdconfig() -> None:
+    if respawn.has_respawned():
+        return
+    system_interpreters = (
+        "/usr/libexec/platform-python",
+        "/usr/bin/python3",
+        "/usr/bin/python",
+    )
+    interpreter = respawn.probe_interpreters_for_module(system_interpreters, "SSSDConfig")
+    if interpreter:
+        respawn.respawn_module(interpreter)
+
+
+def create_sssd_config() -> SSSDConfig:
+    if not HAS_SSSD_LIB:
         raise ImportError("the SSSDConfig Python library is unavailable")
 
-    return _SSSDConfig()
+    return SSSDConfig()
 
 
-def get_explicit_options(sssd_config, section_name: str) -> dict:
+def get_explicit_options(sssd_config, section_name: str) -> dict[str, object]:
     if not sssd_config.has_section(section_name):
         return {}
 
@@ -80,7 +97,7 @@ def get_explicit_options(sssd_config, section_name: str) -> dict:
     }
 
 
-def set_domain_options(domain, requested_options: Mapping[str, Any], explicit_options: Mapping[str, Any]) -> bool:
+def set_domain_options(domain, requested_options: SSSDOptionMapping, explicit_options: SSSDOptionMapping) -> bool:
     before = dict(domain.get_all_options())
 
     provider_options = {name: value for name, value in requested_options.items() if name.endswith("_provider")}
@@ -104,7 +121,7 @@ def set_domain_options(domain, requested_options: Mapping[str, Any], explicit_op
     return before != after or any(option not in explicit_options for option in requested_options)
 
 
-def set_service_options(service, requested_options: Mapping[str, Any], explicit_options: Mapping[str, Any]) -> bool:
+def set_service_options(service, requested_options: SSSDOptionMapping, explicit_options: SSSDOptionMapping) -> bool:
     before = dict(service.get_all_options())
 
     for option, value in requested_options.items():
@@ -115,7 +132,7 @@ def set_service_options(service, requested_options: Mapping[str, Any], explicit_
     return before != after or any(option not in explicit_options for option in requested_options)
 
 
-def set_domain_active(domain, created: bool, requested: Optional[bool]) -> bool:
+def set_domain_active(domain, created: bool, requested: t.Optional[bool]) -> bool:
     if requested is None:
         if not created:
             return False
@@ -129,7 +146,7 @@ def set_domain_active(domain, created: bool, requested: Optional[bool]) -> bool:
     return True
 
 
-def set_service_active(sssd_config, name: str, created: bool, requested: Optional[bool]) -> bool:
+def set_service_active(sssd_config, name: str, created: bool, requested: t.Optional[bool]) -> bool:
     if requested is None:
         if not created:
             return False
@@ -156,7 +173,7 @@ def delete_service(sssd_config, name: str) -> None:
     sssd_config.delete_service(name)
 
 
-def serialize_option_value(option: str, value: Any) -> str:
+def serialize_option_value(option: str, value: object) -> str:
     if isinstance(value, list):
         value = ", ".join(str(item) for item in value)
 
@@ -166,7 +183,7 @@ def serialize_option_value(option: str, value: Any) -> str:
     return str(value)
 
 
-def set_sssd_options(sssd_config, requested_options: Mapping[str, Any]) -> bool:
+def set_sssd_options(sssd_config, requested_options: SSSDOptionMapping) -> bool:
     # the SSSDConfig class exposes the [sssd] section schema through its SSSDService class
     # writing the [sssd] section itself requires SSSDConfig
     sssd_section = sssd_config.get_service("sssd")
@@ -193,7 +210,7 @@ def set_sssd_options(sssd_config, requested_options: Mapping[str, Any]) -> bool:
     return changed
 
 
-def remove_domain_options(domain, option_names: Iterable[str]) -> bool:
+def remove_domain_options(domain, option_names: t.Iterable[str]) -> bool:
     option_names = tuple(option_names)
 
     for option in option_names:
@@ -205,7 +222,7 @@ def remove_domain_options(domain, option_names: Iterable[str]) -> bool:
     return bool(option_names)
 
 
-def remove_service_options(service, option_names: Iterable[str]) -> bool:
+def remove_service_options(service, option_names: t.Iterable[str]) -> bool:
     option_names = tuple(option_names)
 
     for option in option_names:
@@ -214,7 +231,7 @@ def remove_service_options(service, option_names: Iterable[str]) -> bool:
     return bool(option_names)
 
 
-def remove_sssd_options(sssd_config, option_names: Iterable[str]) -> bool:
+def remove_sssd_options(sssd_config, option_names: t.Iterable[str]) -> bool:
     option_names = tuple(option_names)
 
     if not option_names:

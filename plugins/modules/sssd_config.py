@@ -27,13 +27,9 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     support: full
-    details:
-      - Reports whether the requested options would result in a change
-        to the specified configuration file.
   diff_mode:
     support: full
     details:
-      - Reports changes to configured option names.
       - Option values are omitted because they can contain sensitive data.
 options:
   state:
@@ -159,7 +155,7 @@ option_names:
     - services
 """
 
-from typing import Any, Mapping, Optional, Union, cast
+import typing as t
 
 from ansible.module_utils.basic import missing_required_lib
 
@@ -169,17 +165,19 @@ from ansible_collections.community.general.plugins.module_utils._sssd_config imp
     SSSDCONFIG_IMPORT_ERROR,
     EnsurePresent,
     RemoveOptions,
+    SSSDOptionMapping,
     SSSDTarget,
+    _respawn_sssdconfig,
     create_sssd_config,
     get_explicit_options,
     remove_sssd_options,
     set_sssd_options,
 )
 
-_SSSDRequest = Union[EnsurePresent, RemoveOptions]
+_SSSDRequest = t.Union[EnsurePresent, RemoveOptions]
 
 
-def _parse_request(*, state: str, path: str, options: Mapping[str, Any], must_exist: bool) -> _SSSDRequest:
+def _parse_request(*, state: str, path: str, options: SSSDOptionMapping, must_exist: bool) -> _SSSDRequest:
     target = SSSDTarget(path=path, section="sssd")
 
     if state == "present":
@@ -189,7 +187,7 @@ def _parse_request(*, state: str, path: str, options: Mapping[str, Any], must_ex
 
 
 class SSSDConfigModule(StateModuleHelper):
-    _result_diff: Optional[dict] = None
+    _result_diff: t.Optional[dict] = None
 
     module = dict(
         argument_spec=dict(
@@ -225,6 +223,7 @@ class SSSDConfigModule(StateModuleHelper):
         )
 
         if not HAS_SSSD_LIB:
+            _respawn_sssdconfig()
             self.module.fail_json(
                 msg=missing_required_lib("SSSDConfig"),
                 exception=SSSDCONFIG_IMPORT_ERROR,
@@ -292,7 +291,7 @@ class SSSDConfigModule(StateModuleHelper):
         return result
 
     def state_present(self):
-        request = cast(EnsurePresent, self.request)
+        request = t.cast(EnsurePresent, self.request)
         explicit_options = self._get_explicit_options()
 
         if request.must_exist:
@@ -305,7 +304,7 @@ class SSSDConfigModule(StateModuleHelper):
             self.changed = True
 
     def state_absent(self):
-        request = cast(RemoveOptions, self.request)
+        request = t.cast(RemoveOptions, self.request)
         explicit_options = self._get_explicit_options()
         options_to_remove = tuple(option for option in request.option_names if option in explicit_options)
 

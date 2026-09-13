@@ -133,17 +133,26 @@ class TestRequestParsing(unittest.TestCase):
 
 
 class TestModuleInitialization(unittest.TestCase):
-    def test_missing_sssdconfig_library_fails(self):
+    def test_missing_sssdconfig_library_attempts_respawn_then_fails(self):
         helper = make_helper(options={})
         helper.module.fail_json.side_effect = ModuleRaisedError
 
         with patch.object(sssd_config, "HAS_SSSD_LIB", False):
-            with self.assertRaises(ModuleRaisedError):
-                helper.__init_module__()
+            with patch.object(
+                sssd_config,
+                "_respawn_sssdconfig",
+            ) as respawn_sssdconfig:
+                with self.assertRaises(ModuleRaisedError):
+                    helper.__init_module__()
+
+        respawn_sssdconfig.assert_called_once_with()
 
         kwargs = helper.module.fail_json.call_args.kwargs
         self.assertIn("SSSDConfig", kwargs["msg"])
-        self.assertEqual(kwargs["exception"], sssd_config.SSSDCONFIG_IMPORT_ERROR)
+        self.assertEqual(
+            kwargs["exception"],
+            sssd_config.SSSDCONFIG_IMPORT_ERROR,
+        )
 
     def test_initialization_imports_existing_sssd_configuration(self):
         helper = make_helper(
