@@ -89,8 +89,9 @@ options:
     description:
       - Personal Access Token used for non-interactive authentication.
       - Format is C(pst_<token>::<key>).
-      - When provided, the plugin runs C(pass-cli login --pat <value>) before
-        the first item lookup if no active session is detected.
+      - When provided, the plugin runs C(pass-cli login) before the first item
+        lookup if no active session is detected, passing the token through the
+        E(PROTON_PASS_PERSONAL_ACCESS_TOKEN) environment variable.
     type: str
     default: ""
     ini:
@@ -319,12 +320,15 @@ class ProtonPassClient:
         self.debug = debug
         self._session_ok = False
 
-    def _run(self, args: list[str]) -> tuple[int, str, str]:
+    def _run(self, args: list[str], extra_env: dict[str, str] | None = None) -> tuple[int, str, str]:
         """Run pass-cli with *args* and return (returncode, stdout, stderr).
 
         When ``agent_reason`` is set, PROTON_PASS_AGENT_REASON is injected into
         the subprocess environment so that pass-cli records the reason in its
         encrypted audit log.
+
+        *extra_env* is merged into the subprocess environment. Use it for
+        secrets, which must never be passed in *args*.
 
         Raises:
             ProtonPassCLIError: if the binary is not found or the call times out.
@@ -335,6 +339,8 @@ class ProtonPassClient:
         env = os.environ.copy()
         if self.agent_reason:
             env["PROTON_PASS_AGENT_REASON"] = self.agent_reason
+        if extra_env:
+            env.update(extra_env)
 
         try:
             proc = Popen(command, stdin=DEVNULL, stdout=PIPE, stderr=PIPE, env=env)
@@ -346,9 +352,10 @@ class ProtonPassClient:
                 "ANSIBLE_PROTON_PASS_CLI_PATH / [proton_pass_lookup] cli_path "
                 "in ansible.cfg"
             ) from e
-        except TimeoutExpired as e:
+        except TimeoutExpired:
             proc.kill()
-            raise ProtonPassCLIError(f"pass-cli timed out after {self.timeout}s") from e
+            # Do not chain: the TimeoutExpired message embeds the full command line.
+            raise ProtonPassCLIError(f"pass-cli timed out after {self.timeout}s") from None
 
         return (
             rc,
@@ -365,7 +372,8 @@ class ProtonPassClient:
 
     def login_with_pat(self, pat: str) -> None:
         """Authenticate using a Personal Access Token (``pst_<token>::<key>``)."""
-        rc, _out, err = self._run(["login", "--pat", pat])
+        # Passed via the environment so the token stays out of the process list and error messages.
+        rc, _out, err = self._run(["login"], extra_env={"PROTON_PASS_PERSONAL_ACCESS_TOKEN": pat})
         if rc != 0:
             raise AnsibleLookupError(
                 f"pass-cli login failed: {err.strip()} — verify the PAT format is pst_<token>::<key>"

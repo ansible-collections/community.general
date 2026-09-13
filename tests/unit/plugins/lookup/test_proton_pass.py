@@ -5,7 +5,9 @@
 from __future__ import annotations
 
 import json
+import traceback
 import unittest
+from subprocess import TimeoutExpired
 from unittest.mock import MagicMock, patch
 
 from ansible.errors import AnsibleLookupError, AnsibleOptionsError
@@ -354,15 +356,17 @@ class TestProtonPassClientRun(unittest.TestCase):
 
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
     def test_timeout_raises(self, mock_popen):
-        from subprocess import TimeoutExpired
-
         mock_proc = MagicMock()
-        mock_proc.communicate.side_effect = TimeoutExpired(cmd="pass-cli", timeout=30)
+        mock_proc.communicate.side_effect = TimeoutExpired(cmd=["pass-cli", "test", "sensitive-arg"], timeout=30)
         mock_popen.return_value = mock_proc
         client = ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="")
         with self.assertRaises(ProtonPassCLIError) as ctx:
-            client._run(["test"])
+            client._run(["test", "sensitive-arg"])
         self.assertIn("timed out", str(ctx.exception))
+        # The command line embedded in TimeoutExpired must not leak into the error.
+        self.assertNotIn("sensitive-arg", str(ctx.exception))
+        self.assertIsNone(ctx.exception.__cause__)
+        self.assertTrue(ctx.exception.__suppress_context__)
 
 
 class TestProtonPassClientAuth(unittest.TestCase):
@@ -405,6 +409,9 @@ class TestProtonPassClientAuth(unittest.TestCase):
         client = ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="")
         client.ensure_authenticated(pat="pst_token::key")
         self.assertEqual(mock_popen.call_count, 2)
+        login_call = mock_popen.call_args_list[1]
+        self.assertEqual(login_call.args[0], ["pass-cli", "login"])
+        self.assertEqual(login_call.kwargs["env"]["PROTON_PASS_PERSONAL_ACCESS_TOKEN"], "pst_token::key")
 
 
 class TestProtonPassClientFetch(unittest.TestCase):
@@ -584,3 +591,30 @@ class TestLookupModule(unittest.TestCase):
         mock_client_cls.assert_called_once()
         call_kwargs = mock_client_cls.call_args[1]
         self.assertTrue(call_kwargs["debug"])
+
+    @patch("ansible_collections.community.general.plugins.lookup.proton_pass.display")
+    @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
+    def test_pat_not_exposed_when_login_times_out(self, mock_popen, mock_display):
+        """The PAT must not appear in the error, its traceback, or verbose output."""
+        pat = "pst_SECRETTOKEN::SECRETKEY"
+
+        def popen(command, **kwargs):
+            if command[1:] == ["info"]:
+                return _make_popen_mock(1, b"", b"not logged in\n")
+            mock_proc = MagicMock()
+            mock_proc.communicate.side_effect = TimeoutExpired(cmd=command, timeout=30)
+            return mock_proc
+
+        mock_popen.side_effect = popen
+
+        with self.assertRaises(ProtonPassCLIError) as ctx:
+            self._run(["vm"], vault="myvault", pat=pat)
+
+        exc = ctx.exception
+        rendered = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+        self.assertIn("timed out", rendered)
+        self.assertNotIn("SECRETTOKEN", rendered)
+        for call in mock_display.method_calls:
+            self.assertNotIn("SECRETTOKEN", str(call))
+        for call in mock_popen.call_args_list:
+            self.assertNotIn(pat, call.args[0])
