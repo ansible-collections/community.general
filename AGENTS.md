@@ -11,14 +11,14 @@
 ## Ansible Collection
 
 - This collection follows Semantic Versioning.
-- Being an Ansible collection, its version number is specificied in the `galaxy.yml`.
+- Being an Ansible collection, its version number is specified in the `galaxy.yml`.
 - The version set there, for the `main` branch is the next version to be released that accepts new features.
 - For this collection, you will want to read the description
   of the issue: https://github.com/ansible-collections/community.general/issues/11482
 - The guidelines for contributors are found in the `CONTRIBUTING.md`.
 - It is very important to maintain backwards compatibility in the changes.
 - When something needs to change and break that, a longer process must be taken,
-  involving deprecations and sometimes feature flags to enable the new behaviour.
+  involving deprecations and sometimes feature flags to enable the new behavior.
 - Deprecations usually plan for the removal of the deprecated code in two major versions (X+2).0.0 from
   the current version. Depending on the situation, this target may be pushed for the (X+3).0.0 version.
 - If a deprecation is needed, ingest https://github.com/russoz-ansible/ansible-contrib-unofficial/blob/main/deprecations.md for more information on how to implement the deprecations.
@@ -29,7 +29,7 @@
 ## Licensing and Copyright
 
 This project abides to the REUSE specification from the Free Software Foundation.
-They provide a tool, `reuse`, to to check for compliance; the command `nox -e license-check`
+They provide a tool, `reuse`, to check for compliance; the command `nox -e license-check`
 can be used to perform that check, but only when a marker is added, changed or removed.
 
 ### Licensing and Copyright Rules
@@ -130,7 +130,7 @@ approval before committing or pushing it.
 
 ## BOTMETA Rules
 
-- Add an entry to the `.github/BOTMETA.yml` file every time a new file is added within the  paths:
+- Add an entry to the `.github/BOTMETA.yml` file every time a new file is added within the paths:
   - docs/docsite/rst/**
   - plugins/**
 - The entry should be placed within the existing section where it belongs,
@@ -146,7 +146,7 @@ approval before committing or pushing it.
 - When branching:
   - Always ensure you are branching off the `main` branch
   - Do not use `fix` or any other prefix indicating the type of the branch
-  - If there is an issue associated with the branch, prefix the name with `####-` (where #### is the is issue number), e.g. if fixing issue 9999 about the xfconf module, name it like `9999-xfconf-something`.
+  - If there is an issue associated with the branch, prefix the name with `####-` (where #### is the issue number), e.g. if fixing issue 9999 about the xfconf module, name it like `9999-xfconf-something`.
 
 ## Github Issues Rules
 
