@@ -88,12 +88,16 @@ RETURN = r"""
 _raw:
   description:
     - Value(s) stored in Credstash.
-  type: str
+    - B(Note) on ansible-core 2.22+, the values will be registered as secrets.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
+  type: list
+  elements: str
 """
 
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 CREDSTASH_INSTALLED = False
@@ -147,7 +151,11 @@ class LookupModule(LookupBase):
         ret = []
         for term in terms:
             try:
-                ret.append(credstash.getSecret(term, version, region, table, context=context, **kwargs_pass))
+                ret.append(
+                    mark_values_as_secrets(
+                        credstash.getSecret(term, version, region, table, context=context, **kwargs_pass)
+                    )
+                )
             except credstash.ItemNotFound as e:
                 raise AnsibleError(f"Key {term} not found") from e
             except Exception as e:
