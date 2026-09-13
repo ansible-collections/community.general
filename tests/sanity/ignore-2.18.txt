@@ -1,3 +1,25 @@
+plugins/become/doas.py validate-modules:invalid-documentation  # secret not supported
+plugins/become/dzdo.py validate-modules:invalid-documentation  # secret not supported
+plugins/become/ksu.py validate-modules:invalid-documentation  # secret not supported
+plugins/become/machinectl.py validate-modules:invalid-documentation  # secret not supported
+plugins/become/pbrun.py validate-modules:invalid-documentation  # secret not supported
+plugins/become/pfexec.py validate-modules:invalid-documentation  # secret not supported
+plugins/become/pmrun.py validate-modules:invalid-documentation  # secret not supported
+plugins/become/sesu.py validate-modules:invalid-documentation  # secret not supported
+plugins/become/sudosu.py validate-modules:invalid-documentation  # secret not supported
+plugins/callback/elastic.py validate-modules:invalid-documentation  # secret not supported
+plugins/callback/jabber.py validate-modules:invalid-documentation  # secret not supported
+plugins/callback/loganalytics.py validate-modules:invalid-documentation  # secret not supported
+plugins/callback/loganalytics_ingestion.py validate-modules:invalid-documentation  # secret not supported
+plugins/callback/splunk.py validate-modules:invalid-documentation  # secret not supported
+plugins/connection/wsl.py validate-modules:invalid-documentation  # secret not supported
+plugins/inventory/cobbler.py validate-modules:invalid-documentation  # secret not supported
+plugins/inventory/gitlab_runners.py validate-modules:invalid-documentation  # secret not supported
+plugins/inventory/icinga2.py validate-modules:invalid-documentation  # secret not supported
+plugins/inventory/lxd.py validate-modules:invalid-documentation  # secret not supported
+plugins/inventory/opennebula.py validate-modules:invalid-documentation  # secret not supported
+plugins/inventory/scaleway.py validate-modules:invalid-documentation  # secret not supported
+plugins/inventory/xen_orchestra.py validate-modules:invalid-documentation  # secret not supported
 plugins/module_utils/_crypt.py import-3.11  # Uses deprecated stdlib library 'crypt'
 plugins/module_utils/_crypt.py import-3.12  # Uses deprecated stdlib library 'crypt'
 plugins/modules/consul_session.py validate-modules:parameter-state-invalid-choice
@@ -6,5 +28,19 @@ plugins/modules/osx_defaults.py validate-modules:parameter-state-invalid-choice
 plugins/modules/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/xfconf.py validate-modules:return-syntax-error
+plugins/lookup/bitwarden.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/bitwarden_secrets_manager.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/credstash.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/dsv.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/etcd3.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/github_app_access_token.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/onepassword_doc.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/onepassword.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/onepassword_raw.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/onepassword_ssh_key.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/passwordstore.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/proton_pass.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/revbitspss.py validate-modules:invalid-documentation  # secret not supported
+plugins/lookup/tss.py validate-modules:invalid-documentation  # secret not supported
 plugins/plugin_utils/_unsafe.py pep8:E704
 tests/unit/plugins/modules/test_gio_mime.yaml no-smart-quotes
