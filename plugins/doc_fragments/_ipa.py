@@ -61,7 +61,7 @@ options:
     description:
       - This only applies if O(ipa_prot) is V(https).
       - If set to V(false), the SSL certificates are not validated.
-      - This should only be set to V(false) and used on personally controlled sites using self-signed certificates.
+      - This should only be set to V(false) when used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
   ipa_timeout:
