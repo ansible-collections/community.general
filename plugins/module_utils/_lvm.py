@@ -36,13 +36,22 @@ def pvs_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     community.general.lvm_pv_move_data, community.general.lvg_rename,
     community.general.filesystem.
 
-    Suggested arg_formats keys: noheadings nosuffix readonly units separator fields select devices
+    Suggested arg_formats keys: noheadings nosuffix readonly units separator fields select
+    pv_size pv_attr devices
+
+    Note: C(pv_size) and C(pv_attr) are fixed shortcuts used by community.general.lvm_pv.
+    C(pv_size) reports the PV size in bytes (C(--units b -o pv_size)). C(pv_attr) reports
+    C(pv_attr,pv_tags,pv_mda_count,pv_mda_used_count) using C(|) as the field separator.
     """
     return CmdRunner(
         module,
         command="pvs",
         arg_formats=dict(
             **_REPORT_ARG_FORMATS,
+            pv_size=cmd_runner_fmt.as_fixed(["--units", "b", "-o", "pv_size"]),
+            pv_attr=cmd_runner_fmt.as_fixed(
+                ["-o", "pv_attr,pv_tags,pv_mda_count,pv_mda_used_count", "--separator", "|"]
+            ),
             devices=cmd_runner_fmt.as_list(),
         ),
         **kwargs,

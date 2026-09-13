@@ -229,14 +229,13 @@ def main():
         return rc == 0
 
     def get_pv_size():
-        with pvs("noheadings nosuffix readonly units fields devices") as ctx:
-            dummy, out, dummy = ctx.run(units="b", fields="pv_size", devices=[device])
+        with pvs("noheadings nosuffix readonly pv_size devices") as ctx:
+            dummy, out, dummy = ctx.run(devices=[device])
         return int(out.strip())
 
     def get_pv_attrs():
-        fields = "pv_attr,pv_tags,pv_mda_count,pv_mda_used_count"
-        with pvs("noheadings readonly fields separator devices") as ctx:
-            dummy, out, dummy = ctx.run(fields=fields, separator="|", devices=[device])
+        with pvs("noheadings readonly pv_attr devices") as ctx:
+            dummy, out, dummy = ctx.run(devices=[device])
         attr, tags_str, mda_count, mda_used_count = (p.strip() for p in out.strip().split("|"))
         return dict(
             allocatable=attr[:1] == "a",
