@@ -218,7 +218,7 @@ Beware of:
   `.../ansible_collections/community/general` contains the project repository, so `ansible-test` and
   other standard tools should work without any additional setup
 - By default, the devcontainer installs `pre-commit` and configures it to perform `ruff check` and
-  `ruff format` on the Python files, prior to commiting. That configuration is going to be used by
+  `ruff format` on the Python files, prior to committing. That configuration is going to be used by
   `git` even outside the devcontainer. To prevent errors, you have to either install `pre-commit` in
   your computer, outside the devcontainer, or run `pre-commit uninstall` from within the devcontainer
   before quitting it.

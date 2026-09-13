@@ -123,7 +123,7 @@ Changelog Fragments:
 
 
 Given the fact that the PR number is required for the file name and for the URLs part of the entry,
-the fragment must be generated (then commited and pushed) after the PR is first created.
+the fragment must be generated (then committed and pushed) after the PR is first created.
 
 After drafting a changelog fragment, always present it to the user for review and explicit
 approval before committing or pushing it.
@@ -140,7 +140,7 @@ approval before committing or pushing it.
 ## Git usage
 
 - Never mention any user or group  with `@` in the commit message.
-- Before commiting changes:
+- Before committing changes:
   - Ensure you are in the right branch
   - If containing _code_ changes, look for unit and integration tests and apply them as possible
 - When branching:
