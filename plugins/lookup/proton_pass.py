@@ -373,7 +373,8 @@ class ProtonPassClient:
     def login_with_pat(self, pat: str) -> None:
         """Authenticate using a Personal Access Token (``pst_<token>::<key>``)."""
         # Passed via the environment so the token stays out of the process list and error messages.
-        rc, _out, err = self._run(["login"], extra_env={"PROTON_PASS_PERSONAL_ACCESS_TOKEN": pat})
+        extra_env = {"PROTON_PASS_PERSONAL_ACCESS_TOKEN": pat} if pat else None
+        rc, _out, err = self._run(["login"], extra_env=extra_env)
         if rc != 0:
             raise AnsibleLookupError(
                 f"pass-cli login failed: {err.strip()} — verify the PAT format is pst_<token>::<key>"
