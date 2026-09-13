@@ -49,4 +49,16 @@ class Sha256Mock(TestCaseMock):
         pass
 
 
-UTHelper.from_module(composer, __name__, mocks=[RunCommandMock, OsPathExistsMock, OsPathIsfileMock, Sha256Mock])
+class WarningContainsMock(TestCaseMock):
+    name = "warning_contains"
+
+    def setup(self, mocker):
+        pass
+
+    def check(self, test_case, results):
+        assert self.mock_specs["text"] in str(results.get("warnings", []))
+
+
+UTHelper.from_module(
+    composer, __name__, mocks=[RunCommandMock, OsPathExistsMock, OsPathIsfileMock, Sha256Mock, WarningContainsMock]
+)

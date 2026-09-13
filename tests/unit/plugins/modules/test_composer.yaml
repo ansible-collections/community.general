@@ -70,6 +70,23 @@ test_cases:
       run_command:
         - *help_create_project
 
+  - id: composer_as_root
+    input:
+      command: install
+      working_dir: "/var/www/foo"
+    output:
+      changed: true
+    mocks:
+      warning_contains:
+        text: "Do not run Composer as root/super user"
+      run_command:
+        - *help_install
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "install"]
+          rc: 0
+          out: ''
+          err: |
+            Do not run Composer as root/super user! See https://getcomposer.org/root for details
+
   - id: create_project_force
     input:
       command: create-project
