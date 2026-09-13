@@ -1,0 +1,4 @@
+minor_changes:
+  - composer - relay composer's own warning about running as root/super user as an Ansible warning
+    (https://github.com/ansible-collections/community.general/issues/2388,
+    https://github.com/ansible-collections/community.general/pull/12090).
