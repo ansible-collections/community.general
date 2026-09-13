@@ -112,15 +112,111 @@ class TestRequestDataClasses(unittest.TestCase):
         self.assertFalse(hasattr(remove_section, "must_exist"))
 
 
+class TestRespawnSSSDConfig(unittest.TestCase):
+    def test_already_respawned_does_not_probe_interpreters(self):
+        with patch.object(
+            _sssd_config.respawn,
+            "has_respawned",
+            return_value=True,
+        ) as has_respawned:
+            with patch.object(
+                _sssd_config.respawn,
+                "probe_interpreters_for_module",
+            ) as probe_interpreters:
+                with patch.object(
+                    _sssd_config.respawn,
+                    "respawn_module",
+                ) as respawn_module:
+                    _sssd_config._respawn_sssdconfig()
+
+        has_respawned.assert_called_once_with()
+        probe_interpreters.assert_not_called()
+        respawn_module.assert_not_called()
+
+    def test_respawns_with_interpreter_that_provides_sssdconfig(self):
+        expected_interpreters = (
+            "/usr/libexec/platform-python",
+            "/usr/bin/python3",
+            "/usr/bin/python",
+        )
+
+        with patch.object(
+            _sssd_config.respawn,
+            "has_respawned",
+            return_value=False,
+        ) as has_respawned:
+            with patch.object(
+                _sssd_config.respawn,
+                "probe_interpreters_for_module",
+                return_value="/usr/libexec/platform-python",
+            ) as probe_interpreters:
+                with patch.object(
+                    _sssd_config.respawn,
+                    "respawn_module",
+                ) as respawn_module:
+                    _sssd_config._respawn_sssdconfig()
+
+        has_respawned.assert_called_once_with()
+        probe_interpreters.assert_called_once_with(
+            expected_interpreters,
+            "SSSDConfig",
+        )
+        respawn_module.assert_called_once_with("/usr/libexec/platform-python")
+
+    def test_missing_compatible_interpreter_does_not_respawn(self):
+        expected_interpreters = (
+            "/usr/libexec/platform-python",
+            "/usr/bin/python3",
+            "/usr/bin/python",
+        )
+
+        with patch.object(
+            _sssd_config.respawn,
+            "has_respawned",
+            return_value=False,
+        ) as has_respawned:
+            with patch.object(
+                _sssd_config.respawn,
+                "probe_interpreters_for_module",
+                return_value=None,
+            ) as probe_interpreters:
+                with patch.object(
+                    _sssd_config.respawn,
+                    "respawn_module",
+                ) as respawn_module:
+                    _sssd_config._respawn_sssdconfig()
+
+        has_respawned.assert_called_once_with()
+        probe_interpreters.assert_called_once_with(
+            expected_interpreters,
+            "SSSDConfig",
+        )
+        respawn_module.assert_not_called()
+
+
 class TestLibraryAdapter(unittest.TestCase):
     def test_create_sssd_config_uses_imported_constructor(self):
         config = object()
 
-        with patch.object(_sssd_config, "_SSSDConfig", return_value=config) as constructor:
-            result = _sssd_config.create_sssd_config()
+        with patch.object(_sssd_config, "HAS_SSSD_LIB", True):
+            with patch.object(
+                _sssd_config,
+                "SSSDConfig",
+                create=True,
+                return_value=config,
+            ) as constructor:
+                result = _sssd_config.create_sssd_config()
 
         self.assertIs(result, config)
         constructor.assert_called_once_with()
+
+    def test_create_sssd_config_rejects_missing_library(self):
+        with patch.object(_sssd_config, "HAS_SSSD_LIB", False):
+            with self.assertRaisesRegex(
+                ImportError,
+                "the SSSDConfig Python library is unavailable",
+            ):
+                _sssd_config.create_sssd_config()
 
     def test_get_explicit_options_returns_empty_mapping_when_section_is_absent(self):
         config = MagicMock()
