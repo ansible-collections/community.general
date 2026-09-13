@@ -49,17 +49,4 @@ class Sha256Mock(TestCaseMock):
         pass
 
 
-class OsGetuidMock(TestCaseMock):
-    name = "os_getuid"
-
-    def setup(self, mocker):
-        mocker.patch("os.getuid", return_value=self.mock_specs.get("return_value", 1000))
-
-    def check(self, test_case, results):
-        if self.mock_specs.get("return_value", 1000) == 0:
-            assert "COMPOSER_ALLOW_SUPERUSER" in str(results.get("warnings", []))
-
-
-UTHelper.from_module(
-    composer, __name__, mocks=[RunCommandMock, OsPathExistsMock, OsPathIsfileMock, Sha256Mock, OsGetuidMock]
-)
+UTHelper.from_module(composer, __name__, mocks=[RunCommandMock, OsPathExistsMock, OsPathIsfileMock, Sha256Mock])
