@@ -60,4 +60,6 @@ class OsGetuidMock(TestCaseMock):
             assert "COMPOSER_ALLOW_SUPERUSER" in str(results.get("warnings", []))
 
 
-UTHelper.from_module(composer, __name__, mocks=[RunCommandMock, OsPathExistsMock, OsPathIsfileMock, Sha256Mock, OsGetuidMock])
+UTHelper.from_module(
+    composer, __name__, mocks=[RunCommandMock, OsPathExistsMock, OsPathIsfileMock, Sha256Mock, OsGetuidMock]
+)
