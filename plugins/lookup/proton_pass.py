@@ -321,13 +321,13 @@ class ProtonPassClient:
         self._session_ok = False
 
     def _run(self, args: list[str], extra_env: dict[str, str] | None = None) -> tuple[int, str, str]:
-        """Run pass-cli with *args* and return (returncode, stdout, stderr).
+        """Run pass-cli with ``args`` and return (returncode, stdout, stderr).
 
         When ``agent_reason`` is set, PROTON_PASS_AGENT_REASON is injected into
         the subprocess environment so that pass-cli records the reason in its
         encrypted audit log.
 
-        *extra_env* is merged into the subprocess environment. Use it for
+        ``extra_env`` is merged into the subprocess environment. Use it for
         secrets, which must never be passed in *args*.
 
         Raises:
