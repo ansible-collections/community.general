@@ -55,7 +55,8 @@ mypy_extra_deps = [
 ]
 
 [sessions.docs_check]
-validate_collection_refs="all"
+# TODO: Set validate_collection_refs="all" once ansible-core 2.22 has been released.
+validate_collection_refs="self"
 codeblocks_restrict_types = [
     "ansible-output",
     "console",
