@@ -76,12 +76,9 @@ test_cases:
       working_dir: "/var/www/foo"
     output:
       changed: true
-      warnings:
-        - __ansible_type: WarningSummary
-          event:
-            __ansible_type: Event
-            msg: "Do not run Composer as root/super user! See https://getcomposer.org/root for details"
     mocks:
+      warning_contains:
+        text: "Do not run Composer as root/super user"
       run_command:
         - *help_install
         - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "install"]
