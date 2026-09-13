@@ -81,7 +81,7 @@ test_cases:
         return_value: 0
       run_command:
         - *help_install
-        - command: ["/testbin/php", "/testbin/composer", "install", "--working-dir", "/var/www/foo"]
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "install"]
           rc: 0
           out: ''
           err: ''
