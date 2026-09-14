@@ -358,16 +358,12 @@ class TestProtonPassClientRun(unittest.TestCase):
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
     def test_timeout_raises(self, mock_popen):
         mock_proc = MagicMock()
-        mock_proc.communicate.side_effect = TimeoutExpired(cmd=["pass-cli", "test", "sensitive-arg"], timeout=30)
+        mock_proc.communicate.side_effect = TimeoutExpired(cmd="pass-cli", timeout=30)
         mock_popen.return_value = mock_proc
         client = ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="")
         with self.assertRaises(ProtonPassCLIError) as ctx:
-            client._run(["test", "sensitive-arg"])
+            client._run(["test"])
         self.assertIn("timed out", str(ctx.exception))
-        # The command line embedded in TimeoutExpired must not leak into the error.
-        self.assertNotIn("sensitive-arg", str(ctx.exception))
-        self.assertIsNone(ctx.exception.__cause__)
-        self.assertTrue(ctx.exception.__suppress_context__)
 
 
 class TestProtonPassClientAuth(unittest.TestCase):

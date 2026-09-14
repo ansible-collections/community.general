@@ -352,10 +352,9 @@ class ProtonPassClient:
                 "ANSIBLE_PROTON_PASS_CLI_PATH / [proton_pass_lookup] cli_path "
                 "in ansible.cfg"
             ) from e
-        except TimeoutExpired:
+        except TimeoutExpired as e:
             proc.kill()
-            # Do not chain: the TimeoutExpired message embeds the full command line.
-            raise ProtonPassCLIError(f"pass-cli timed out after {self.timeout}s") from None
+            raise ProtonPassCLIError(f"pass-cli timed out after {self.timeout}s") from e
 
         return (
             rc,
