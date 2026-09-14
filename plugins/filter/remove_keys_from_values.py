@@ -178,11 +178,12 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
 
     def clean(obj):
         if isinstance(obj, dict):
-            return {
-                k: clean(v) if recursive else v
-                for k, v in obj.items()
-                if not should_remove(clean(v) if recursive else v)
-            }
+            result = {}
+            for key, value in obj.items():
+                cleaned_value = clean(value) if recursive else value
+                if not should_remove(cleaned_value):
+                    result[key] = cleaned_value
+            return result
         elif isinstance(obj, list):
             return [clean(i) if recursive else i for i in obj]
         return obj
