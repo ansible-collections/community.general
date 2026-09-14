@@ -27,7 +27,7 @@ def _collect_recursively(value: t.Any, collected_values: list[str], *, int_to_st
     elif isinstance(value, Sequence):
         for v in value:
             _collect_recursively(v, collected_values, int_to_string=int_to_string)
-    elif int_to_string and isinstance(value, int):
+    elif int_to_string and isinstance(value, int) and not isinstance(value, bool):
         collected_values.append(str(value))
 
 
