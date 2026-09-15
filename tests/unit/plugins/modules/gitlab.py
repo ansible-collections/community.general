@@ -501,6 +501,14 @@ PROJECT API
 """
 
 
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/version", method="get")
+def resp_get_gitlab_version(url, request):
+    headers = {"content-type": "application/json"}
+    content = '{"version": "15.0.0", "revision": "abcdef0"}'
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects", method="get")
 def resp_find_project(url, request):
     headers = {"content-type": "application/json"}
