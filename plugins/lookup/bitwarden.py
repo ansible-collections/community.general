@@ -119,6 +119,10 @@ _raw:
     - A one-element list that contains a list of requested fields or JSON objects of matches.
     - If you use C(query), you get a list of lists. If you use C(lookup) without C(wantlist=true), this always gets reduced
       to a list of field values or JSON objects.
+    - B(Note) on ansible-core 2.22+, if O(field) is specified, the values will be registered as secrets.
+      If O(field) is B(not) specified, you are responsible to handle secrets yourself,
+      for example using the P(ansible.builtin.register_secret#filter) filter plugin.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   type: list
   elements: list
 """
@@ -130,6 +134,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
@@ -242,7 +247,7 @@ class Bitwarden:
         if matches and not field_matches:
             raise AnsibleError(f"field {field} does not exist in {search_value}")
 
-        return field_matches
+        return mark_values_as_secrets(field_matches)
 
     def get_collection_ids(self, collection_name: str, organization_id=None) -> list[str]:
         """Return matching IDs of collections whose name is equal to collection_name."""

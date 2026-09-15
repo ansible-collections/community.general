@@ -55,7 +55,10 @@ EXAMPLES = r"""
 
 RETURN = r"""
 passphrase:
-  description: A string containing the password.
+  description:
+    - A string containing the password.
+    - B(Note) on ansible-core 2.22+, the password will be registered as a secret.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   returned: success and the password exists
   type: str
   sample: Password123
@@ -65,6 +68,8 @@ import traceback
 from shlex import quote
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 
 try:
     import keyring
@@ -124,7 +129,7 @@ def run_module():
 
     if passphrase is not None:
         result["msg"] = f"Successfully retrieved password for {module.params['service']}@{module.params['username']}"
-        result["passphrase"] = passphrase
+        result["passphrase"] = mark_values_as_secrets(passphrase)
     if passphrase is None:
         result["msg"] = f"Password for {module.params['service']}@{module.params['username']} does not exist."
     module.exit_json(**result)
