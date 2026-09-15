@@ -15,7 +15,7 @@ If you are a committer, also refer to the [collection's committer guidelines](ht
 ## Issue tracker
 
 Whether you are looking for an opportunity to contribute or you found a bug and already know how to solve it, please go to the [issue tracker](https://github.com/ansible-collections/community.general/issues).
-There you can find feature ideas to implement, reports about bugs to solve, or submit an issue to discuss your idea before implementing it which can help choose a right direction at the beginning of your work and potentially save a lot of time and effort.
+There you can find feature ideas to implement, reports about bugs to solve, or submit an issue to discuss your idea before implementing it which can help choose the right direction at the beginning of your work and potentially save a lot of time and effort.
 Also somebody may already have started discussing or working on implementing the same or a similar idea,
 so you can cooperate to create a better solution together.
 
@@ -41,7 +41,7 @@ Please read our ['Contributing to collections'](https://docs.ansible.com/project
 * Make sure your PR includes a [changelog fragment](https://docs.ansible.com/projects/ansible/devel/community/collection_development_process.html#creating-a-changelog-fragment).
   * You must not include a fragment for new modules or new plugins. Also you shouldn't include one for docs-only changes. (If you're not sure, simply don't include one, we'll tell you whether one is needed or not :) )
   * Please always include a link to the pull request itself, and if the PR is about an issue, also a link to the issue. Also make sure the fragment ends with a period, and begins with a lower-case letter after `-`. (Again, if you don't do this, we'll add suggestions to fix it, so don't worry too much :) )
-* Note that we format the code with `ruff format`. If your change does not match the formatters expectations, CI will fail and your PR will not get merged. See below for how to format code with antsibull-nox.
+* Note that we format the code with `ruff format`. If your change does not match the formatter's expectations, CI will fail and your PR will not get merged. See below for how to format code with antsibull-nox.
 
 You can also read the Ansible community's [Quick-start development guide](https://docs.ansible.com/projects/ansible/devel/community/create_pr_quick_start.html).
 
@@ -218,7 +218,7 @@ Beware of:
   `.../ansible_collections/community/general` contains the project repository, so `ansible-test` and
   other standard tools should work without any additional setup
 - By default, the devcontainer installs `pre-commit` and configures it to perform `ruff check` and
-  `ruff format` on the Python files, prior to commiting. That configuration is going to be used by
+  `ruff format` on the Python files, prior to committing. That configuration is going to be used by
   `git` even outside the devcontainer. To prevent errors, you have to either install `pre-commit` in
   your computer, outside the devcontainer, or run `pre-commit uninstall` from within the devcontainer
   before quitting it.

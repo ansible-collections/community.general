@@ -62,7 +62,7 @@ options:
     type: int
   ecs_role_name:
     description:
-      - The RAM Role Name attached on a ECS instance for API operations. You can retrieve this from the 'Access Control' section
+      - The RAM Role Name attached on an ECS instance for API operations. You can retrieve this from the 'Access Control' section
         of the Alibaba Cloud console.
       - If you are running Ansible from an ECS instance with RAM Instance using RAM Role, Ansible just accesses the metadata
         U(http://100.100.100.200/latest/meta-data/ram/security-credentials/<ecs_role_name>) to obtain the STS credential.
@@ -90,6 +90,6 @@ notes:
     E(ALICLOUD_ACCESS_KEY) or E(ALICLOUD_ACCESS_KEY_ID), E(ALICLOUD_SECRET_KEY) or E(ALICLOUD_SECRET_ACCESS_KEY), E(ALICLOUD_REGION)
     or E(ALICLOUD_REGION_ID), E(ALICLOUD_SECURITY_TOKEN), E(ALICLOUD_ECS_ROLE_NAME), E(ALICLOUD_SHARED_CREDENTIALS_FILE),
     E(ALICLOUD_PROFILE), E(ALICLOUD_ASSUME_ROLE_ARN), E(ALICLOUD_ASSUME_ROLE_SESSION_NAME), E(ALICLOUD_ASSUME_ROLE_SESSION_EXPIRATION).
-  - E(ALICLOUD_REGION) or E(ALICLOUD_REGION_ID) can be typically be used to specify the Alicloud region, when required, but
+  - E(ALICLOUD_REGION) or E(ALICLOUD_REGION_ID) can typically be used to specify the Alicloud region, when required, but
     this can also be configured in the footmark config file.
 """
