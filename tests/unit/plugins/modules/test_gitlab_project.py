@@ -22,6 +22,7 @@ try:
 
     from .gitlab import (
         GitlabModuleTestCase,
+        resp_archive_project,
         resp_create_project,
         resp_delete_project,
         resp_get_gitlab_version,
@@ -29,11 +30,13 @@ try:
         resp_get_project,
         resp_get_project_by_name,
         resp_get_user,
+        resp_unarchive_project,
     )
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
     # Need to set these to something so that we don't fail when parsing
     GitlabModuleTestCase = object  # type: ignore
+    resp_archive_project = _dummy
     resp_get_group = _dummy
     resp_get_project_by_name = _dummy
     resp_create_project = _dummy
@@ -41,6 +44,7 @@ except ImportError:
     resp_delete_project = _dummy
     resp_get_user = _dummy
     resp_get_gitlab_version = _dummy
+    resp_unarchive_project = _dummy
 
 # Unit tests requirements
 try:
@@ -236,6 +240,28 @@ class TestGitlabProject(GitlabModuleTestCase):
         self.assertEqual(changed, True)
         self.assertEqual(type(self.moduleUtil.project_object), Project)
         self.assertEqual(self.moduleUtil.project_object.attributes["description"], "New description")
+
+    @with_httmock(resp_get_project)
+    @with_httmock(resp_archive_project)
+    def test_archive_project(self):
+        project = self.gitlab_instance.projects.get(1)
+
+        changed = self.moduleUtil.archive_project(project)
+
+        self.assertEqual(changed, True)
+        self.assertEqual(type(project), Project)
+        self.assertEqual(project.archived, True)
+
+    @with_httmock(resp_get_project)
+    @with_httmock(resp_unarchive_project)
+    def test_unarchive_project(self):
+        project = self.gitlab_instance.projects.get(1)
+
+        changed = self.moduleUtil.unarchive_project(project)
+
+        self.assertEqual(changed, True)
+        self.assertEqual(type(project), Project)
+        self.assertEqual(project.archived, False)
 
     @with_httmock(resp_get_group)
     @with_httmock(resp_get_project_by_name)

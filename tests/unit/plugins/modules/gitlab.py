@@ -629,6 +629,50 @@ def resp_create_project(url, request):
     return response(201, content, headers, None, 5, request)
 
 
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/archive", method="post")
+def resp_archive_project(url, request):
+    headers = {"content-type": "application/json"}
+    content = (
+        '{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
+        '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
+        '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
+        '"archived": true,'
+        '"web_url": "http://example.com/diaspora/diaspora-client",'
+        '"readme_url": "http://example.com/diaspora/diaspora-client/blob/master/README.md",'
+        '"tag_list": ["example","disapora client"],"name": "Diaspora Client",'
+        '"name_with_namespace": "Diaspora / Diaspora Client","path": "diaspora-client",'
+        '"path_with_namespace": "diaspora/diaspora-client","created_at": "2013-09-30T13:46:02Z",'
+        '"last_activity_at": "2013-09-30T13:46:02Z","forks_count": 0,'
+        '"avatar_url": "http://example.com/uploads/project/avatar/4/uploads/avatar.png",'
+        '"star_count": 0}'
+    )
+    content = content.encode("utf-8")
+
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1/unarchive", method="post")
+def resp_unarchive_project(url, request):
+    headers = {"content-type": "application/json"}
+    content = (
+        '{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
+        '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
+        '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
+        '"archived": false,'
+        '"web_url": "http://example.com/diaspora/diaspora-client",'
+        '"readme_url": "http://example.com/diaspora/diaspora-client/blob/master/README.md",'
+        '"tag_list": ["example","disapora client"],"name": "Diaspora Client",'
+        '"name_with_namespace": "Diaspora / Diaspora Client","path": "diaspora-client",'
+        '"path_with_namespace": "diaspora/diaspora-client","created_at": "2013-09-30T13:46:02Z",'
+        '"last_activity_at": "2013-09-30T13:46:02Z","forks_count": 0,'
+        '"avatar_url": "http://example.com/uploads/project/avatar/4/uploads/avatar.png",'
+        '"star_count": 0}'
+    )
+    content = content.encode("utf-8")
+
+    return response(200, content, headers, None, 5, request)
+
+
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1", method="delete")
 def resp_delete_project(url, request):
     headers = {"content-type": "application/json"}
