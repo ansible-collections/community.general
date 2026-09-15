@@ -1,0 +1,100 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test that a special vdev is read back from an existing pool
+  block:
+    - name: Ensure a pool with a special vdev exists
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        force: true # This is necessary because of the mismatched replication level
+        vdevs:
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
+          - role: special
+            type: mirror
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
+        state: present
+
+    - name: Check if the special vdev was created
+      ansible.builtin.command:
+        cmd: "zpool status -P -L {{ zpool_generic_pool_name }}"
+      register: special_vdev_check
+      changed_when: false
+
+    - name: Assert that the special vdev is present
+      ansible.builtin.assert:
+        that:
+          - "'special' in special_vdev_check.stdout"
+          - "zpool_vdevs_disk_config.vdev3[0] in special_vdev_check.stdout"
+          - "zpool_vdevs_disk_config.vdev3[1] in special_vdev_check.stdout"
+
+    - name: Declare the very same pool again
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        force: true
+        vdevs:
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
+          - role: special
+            type: mirror
+            disks: "{{ zpool_vdevs_disk_config.vdev3 }}"
+        state: present
+      register: special_vdev_again
+
+    - name: Assert that declaring the same pool again reports no change
+      ansible.builtin.assert:
+        that:
+          - special_vdev_again is not changed
+
+    - name: Ensure the pool is absent
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        state: absent
+
+- name: Test that a dedup vdev is read back from an existing pool
+  block:
+    - name: Ensure a pool with a dedup vdev exists
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        force: true # This is necessary because of the mismatched replication level
+        vdevs:
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
+          - role: dedup
+            type: mirror
+            disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
+        state: present
+
+    - name: Check if the dedup vdev was created
+      ansible.builtin.command:
+        cmd: "zpool status -P -L {{ zpool_generic_pool_name }}"
+      register: dedup_vdev_check
+      changed_when: false
+
+    - name: Assert that the dedup vdev is present
+      ansible.builtin.assert:
+        that:
+          - "'dedup' in dedup_vdev_check.stdout"
+          - "zpool_vdevs_disk_config.vdev4[0] in dedup_vdev_check.stdout"
+          - "zpool_vdevs_disk_config.vdev4[1] in dedup_vdev_check.stdout"
+
+    - name: Declare the very same pool again
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        force: true
+        vdevs:
+          - disks: "{{ zpool_vdevs_disk_config.vdev1 }}"
+          - role: dedup
+            type: mirror
+            disks: "{{ zpool_vdevs_disk_config.vdev4 }}"
+        state: present
+      register: dedup_vdev_again
+
+    - name: Assert that declaring the same pool again reports no change
+      ansible.builtin.assert:
+        that:
+          - dedup_vdev_again is not changed
+
+    - name: Ensure the pool is absent
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        state: absent
