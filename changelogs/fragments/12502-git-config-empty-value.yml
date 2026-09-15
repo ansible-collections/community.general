@@ -1,0 +1,5 @@
+bugfixes:
+  - 'git_config - allow to set a setting to an empty string, the way ``git config user.email ""`` does. Passing an
+    empty ``value`` failed with ``If state=present, a value must be specified``, and once a setting had an empty
+    value the module was no longer idempotent for it
+    (https://github.com/ansible-collections/community.general/issues/12502).'

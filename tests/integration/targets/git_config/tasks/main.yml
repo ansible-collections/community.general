@@ -30,6 +30,8 @@
     - ansible.builtin.import_tasks: unset_check_mode.yml
     # testing for case in issue #1776
     - ansible.builtin.import_tasks: set_value_with_tilde.yml
+    # testing for case in issue #12502
+    - ansible.builtin.import_tasks: set_empty_value.yml
     - ansible.builtin.import_tasks: set_multi_value.yml
     - ansible.builtin.import_tasks: unset_multi_value.yml
   when: git_installed is succeeded and git_version.stdout is version(git_version_supporting_includes, ">=")

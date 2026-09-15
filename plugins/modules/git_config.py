@@ -63,6 +63,7 @@ options:
       - When specifying the name of a single setting, supply a value to set that setting to the given value.
       - From community.general 11.0.0 on, O(value) is required if O(state=present). To read values, use the M(community.general.git_config_info)
         module instead.
+      - An empty string is a valid value; it sets the setting to an empty value, like C(git config user.email "") does.
     type: str
   add_mode:
     description:
@@ -167,10 +168,10 @@ def main():
 
     name = params["name"] or ""
     unset = params["state"] == "absent"
-    new_value = params["value"] or ""
+    new_value = params["value"]
     add_mode = params["add_mode"]
 
-    if not unset and not new_value:
+    if not unset and new_value is None:
         module.fail_json(
             msg="If state=present, a value must be specified. Use the community.general.git_config_info module to read a config value."
         )
@@ -197,7 +198,11 @@ def main():
         # If the return code is 1, it just means the option hasn't been set yet, which is fine.
         module.fail_json(rc=rc, msg=err, cmd=" ".join(list_args))
 
-    old_values = out.rstrip().splitlines()
+    # 'git config --get-all' terminates every value with a newline, so splitting always yields a
+    # trailing empty element which must not be mistaken for a configured empty value.
+    old_values = out.split("\n")
+    if old_values and old_values[-1] == "":
+        old_values.pop()
 
     if unset and not out:
         module.exit_json(changed=False, msg="no setting to unset")
