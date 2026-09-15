@@ -1,0 +1,115 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+tests:
+  - template: default.j2
+    group:
+      - {tt: default values are removed recursively}
+    input:
+      - {a: foo, b: '', c: [], nested: {empty: '', value: keep}}
+      - {a: bar, b: {}, c: null}
+      - {a: ok, b: {}, c: null}
+    result:
+      - {a: foo, nested: {value: keep}}
+      - {a: bar}
+      - {a: ok}
+  - template: values.j2
+    values: ''
+    group:
+      - {tt: a single value can be removed}
+    input:
+      - {a: foo, b: '', c: [], nested: {empty: '', value: keep}}
+      - {a: bar, b: {}, c: null}
+    result:
+      - {a: foo, c: [], nested: {value: keep}}
+      - {a: bar, b: {}, c: null}
+  - template: values.j2
+    values: null
+    group:
+      - {tt: an explicit null uses the default values}
+    input:
+      - {a: foo, b: '', c: []}
+      - {a: bar, b: {}, c: null}
+    result:
+      - {a: foo}
+      - {a: bar}
+  - template: values.j2
+    values: ['', [], {}, null]
+    group:
+      - {tt: a list of values is removed recursively}
+    input:
+      - {a: foo, b: '', c: [], nested: {empty: '', value: keep}}
+      - {a: bar, b: {}, c: null}
+    result:
+      - {a: foo, nested: {value: keep}}
+      - {a: bar}
+  - template: options.j2
+    values: ['', [], {}, null]
+    recursive: false
+    matching_parameter: equal
+    group:
+      - {tt: recursive false leaves nested values unchanged}
+    input:
+      a: foo
+      b: ''
+      c: []
+      d:
+        - {a: foo, b: '', c: []}
+        - {a: bar, b: {}, c: null}
+    result:
+      a: foo
+      d:
+        - {a: foo, b: '', c: []}
+        - {a: bar, b: {}, c: null}
+  - template: values.j2
+    values: [foo, bar]
+    group:
+      - {tt: matching values are removed recursively}
+    input:
+      a: foo
+      b: ''
+      c: []
+      d:
+        - {a: foo, b: '', c: []}
+        - {a: bar, b: {}, c: null}
+    result:
+      b: ''
+      c: []
+      d:
+        - {b: '', c: []}
+        - {b: {}, c: null}
+  - template: options.j2
+    values: '^$'
+    matching_parameter: regex
+    recursive: true
+    group:
+      - {tt: regex values are matched recursively}
+    input:
+      a: ''
+      b: keep
+      nested:
+        empty: ''
+        value: keep
+    result:
+      b: keep
+      nested:
+        value: keep
+  - template: options.j2
+    values: ['^foo', '^bar']
+    matching_parameter: regex
+    recursive: true
+    group:
+      - {tt: multiple regex values are matched recursively}
+    input:
+      foo_value: foo-value
+      bar_value: bar-value
+      other_value: other-value
+      nested:
+        foo_value: foo-nested
+        other_value: other-nested
+    result:
+      other_value: other-value
+      nested:
+        other_value: other-nested
