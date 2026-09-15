@@ -41,6 +41,7 @@ options:
     description: Password to query the API.
     type: string
     required: true
+    secret: true
   host_filter:
     description:
       - An Icinga2 API valid host filter. Leave blank for no filtering.

@@ -53,6 +53,7 @@ options:
       - section: dsv_lookup
         key: client_secret
     required: true
+    secret: true
   url_template:
     default: https://{}.secretsvaultcloud.{}/v1
     description: The path to prepend to the base URL to form a valid REST API request.

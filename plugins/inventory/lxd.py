@@ -62,6 +62,7 @@ options:
         U(https://documentation.ubuntu.com/lxd/en/latest/authentication/#adding-client-certificates-using-a-trust-password).
       - If O(trust_password) is set, this module send a request for authentication before sending any requests.
     type: str
+    secret: true
   state:
     description: Filter the instance according to the current status.
     type: str

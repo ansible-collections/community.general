@@ -69,6 +69,7 @@ options:
     ini:
       - section: sesu_become_plugin
         key: password
+    secret: true
 """
 
 from ansible.plugins.become import BecomeBase
