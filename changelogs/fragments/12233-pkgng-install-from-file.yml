@@ -1,0 +1,4 @@
+bugfixes:
+  - "pkgng - fix install from a local package file always reporting failure even when the package was installed successfully
+    (https://github.com/ansible-collections/community.general/issues/3428,
+    https://github.com/ansible-collections/community.general/pull/12233)."
