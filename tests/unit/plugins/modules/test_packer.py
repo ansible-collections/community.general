@@ -76,7 +76,11 @@ class TestPackerModule(unittest.TestCase):
     def test_init_successful(self):
         self._setup_module_params(state="init")
         self.mock_module.run_command.side_effect = [
-            (0, "Plugins installed successfully", ""),
+            (
+                0,
+                'Installed plugin github.com/hashicorp/virtualbox v1.1.2 in "/home/user/.config/packer/plugins/..."\n',
+                "",
+            ),
             (0, "Packer v1.9.4", ""),
         ]
 
@@ -84,7 +88,20 @@ class TestPackerModule(unittest.TestCase):
 
         self.assertTrue(result["changed"])
         self.assertEqual(result["rc"], 0)
-        self.assertIn("Plugins installed", result["stdout"])
+        self.assertIn("Installed plugin", result["stdout"])
+        self.assertEqual(self._command(), ["/usr/local/bin/packer", "init", self.template_path])
+
+    def test_init_idempotent(self):
+        self._setup_module_params(state="init")
+        self.mock_module.run_command.side_effect = [
+            (0, "", ""),  # ничего не установлено
+            (0, "Packer v1.9.4", ""),
+        ]
+
+        result = self._module().apply()
+
+        self.assertFalse(result["changed"])
+        self.assertEqual(result["rc"], 0)
         self.assertEqual(self._command(), ["/usr/local/bin/packer", "init", self.template_path])
 
     def test_build_successful(self):

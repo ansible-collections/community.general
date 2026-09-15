@@ -7,19 +7,22 @@ from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: packer
-version_added: 13.4.0
+version_added: 13.5.0
 short_description: Manage HashiCorp Packer builds
 description:
   - Manage Packer builds and templates.
   - Supports building and initializing Packer templates.
-  - In check_mode, runs C(packer validate) instead of building.
 author: "Aleksandr Gabidullin (@a-gabidullin)"
 requirements:
   - packer >= 1.7.0
+extends_documentation_fragment:
+  - community.general._attributes
 attributes:
   check_mode:
     description: In check_mode, runs C(packer validate) instead of building.
     support: full
+  diff_mode:
+    support: none
 options:
   name:
     description:
@@ -95,6 +98,7 @@ options:
     choices: [trace, debug, info, warn, error]
     default: info
 """
+
 EXAMPLES = r"""
 - name: Initialize Packer template (install plugins)
   community.general.packer:
@@ -160,12 +164,22 @@ EXAMPLES = r"""
     template: virtualbox.pkr.hcl
     force: true
 """
+
 RETURN = r"""
 packer_version:
   description: Packer version used.
   returned: always
   type: str
   sample: "1.9.4"
+cmd:
+  description: Full command line executed, as a list of arguments.
+  returned: always
+  type: list
+  elements: str
+  sample:
+    - /usr/local/bin/packer
+    - build
+    - template.pkr.hcl
 artifacts:
   description: List of created artifacts.
   returned: when O(state=build) and build successful (not in check_mode)
@@ -327,12 +341,20 @@ class PackerModule:
             else:
                 artifacts = self.parse_build_output(stdout)
 
+        if command == "build":
+            changed = True
+        elif command == "init":
+            changed = "Installed plugin" in stdout
+        else:
+            changed = False
+
         result_dict = {
-            "changed": command == "build" or command == "init",
+            "changed": changed,
             "stdout": stdout,
             "stderr": stderr,
             "rc": rc,
             "packer_version": self.get_packer_version(),
+            "cmd": cmd,
         }
 
         if command == "build":
