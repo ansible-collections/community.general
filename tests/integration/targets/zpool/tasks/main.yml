@@ -23,3 +23,6 @@
 
     - name: Include properties.yml
       ansible.builtin.include_tasks: properties.yml
+
+    - name: Include special_dedup_vdevs.yml
+      ansible.builtin.include_tasks: special_dedup_vdevs.yml
