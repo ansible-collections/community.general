@@ -246,6 +246,7 @@ from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 display = Display()
@@ -610,4 +611,4 @@ class LookupModule(LookupBase):
             else:
                 results.append(client.fetch_all_fields(vault=vault, title=title))
 
-        return results
+        return mark_values_as_secrets(results)
