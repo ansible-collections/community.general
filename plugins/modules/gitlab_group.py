@@ -162,8 +162,8 @@ options:
   visibility:
     description:
       - Default visibility of the group.
-      - V(unchanged) does not set any visibility but instead uses the
-      - instance default or the visibility-level of the parent-group (if one exists)
+      - V(unchanged) does not set any visibility but instead uses the instance default or the visibility-level of the parent-group (if one exists)
+      - V(unchanged) has been added in community.general 13.5.0
     choices: ["private", "internal", "public", "unchanged"]
     default: private
     type: str
@@ -462,6 +462,11 @@ def main():
     # check prerequisites and connect to gitlab server
     gitlab_instance = gitlab_authentication(module)
 
+    if module.params["visibility"] == "unchanged":
+        visibility = None
+    else:
+        visibility = module.params["visibility"]
+
     auto_devops_enabled = module.params["auto_devops_enabled"]
     avatar_path = module.params["avatar_path"]
     default_branch = module.params["default_branch"]
@@ -470,7 +475,7 @@ def main():
     force_delete = module.params["force_delete"]
     group_name = module.params["name"]
     group_path = module.params["path"]
-    group_visibility = module.params["visibility"]
+    group_visibility = visibility
     lfs_enabled = module.params["lfs_enabled"]
     lock_duo_features_enabled = module.params["lock_duo_features_enabled"]
     membership_lock = module.params["membership_lock"]
