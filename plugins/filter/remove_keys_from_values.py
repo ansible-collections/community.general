@@ -139,8 +139,11 @@ _value:
 """
 
 import re
+from collections.abc import Mapping
 
 from ansible.errors import AnsibleFilterError
+from ansible.module_utils.common.collections import is_sequence
+
 
 
 def remove_keys_from_values(data, values=None, recursive=True, matching_parameter="equal"):
@@ -149,7 +152,7 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
     if their values match the specified values or regex patterns.
     """
 
-    if not isinstance(data, (dict, list)):
+    if not isinstance(data, Mapping) and not is_sequence(data):
         raise AnsibleFilterError("Input must be a dictionary or a list.")
 
     if matching_parameter not in ("equal", "regex"):
@@ -160,7 +163,7 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
 
     if values is None:
         values = ["", [], {}, None]
-    elif not isinstance(values, list):
+    elif not is_sequence(values):
         values = [values]
 
     if matching_parameter == "regex":
@@ -177,14 +180,14 @@ def remove_keys_from_values(data, values=None, recursive=True, matching_paramete
         return False
 
     def clean(obj):
-        if isinstance(obj, dict):
+        if isinstance(obj, Mapping):
             result = {}
             for key, value in obj.items():
                 cleaned_value = clean(value) if recursive else value
                 if not should_remove(cleaned_value):
                     result[key] = cleaned_value
             return result
-        elif isinstance(obj, list):
+        elif is_sequence(obj):
             return [clean(i) if recursive else i for i in obj]
         return obj
 

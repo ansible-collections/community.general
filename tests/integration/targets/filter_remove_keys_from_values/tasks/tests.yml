@@ -14,11 +14,10 @@
     fail_msg: |
       [ERR] result:
       {{ result | to_yaml }}
-    quiet: "{{ quiet_test | default(true) | bool }}"
   loop: "{{ tests | subelements('group') }}"
   loop_control:
     loop_var: i
     label: "{{ i.1.tt }}"
   vars:
     input: "{{ i.0.input }}"
-    result: "{{ lookup('template', i.0.template) }}"
+    result: "{{ lookup('ansible.builtin.template', i.0.template) }}"
