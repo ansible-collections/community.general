@@ -68,7 +68,9 @@ class Namespace:
         rc, out, err = self.module.run_command(["ip", "netns", "list"])
         if rc != 0:
             self.module.fail_json(msg=f"{err}")
-        return self.name in out
+        return any(
+            line.split()[0] == self.name for line in out.splitlines() if line.strip()
+        )
 
     def add(self):
         """Create network namespace"""
