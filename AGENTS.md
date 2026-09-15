@@ -1,9 +1,3 @@
-<!--
-Copyright (c) Ansible Project
-GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
-SPDX-License-Identifier: GPL-3.0-or-later
--->
-
 # Rules for community.general
 
 ## Scope Discipline
@@ -40,7 +34,6 @@ can be used to perform that check, but only when a marker is added, changed or r
 
 ### Licensing and Copyright Rules
 
-<!-- REUSE-IgnoreStart -->
 - All new content added to this collection must fall under the GPL-3 license.
 - Every file should have a license and copyright markers.
 - These markers should be placed as comments by the beginning of the file.
@@ -59,7 +52,6 @@ can be used to perform that check, but only when a marker is added, changed or r
   There might be multiple Copyright lines, for different authors.
 - Whenever you create a new copyright marker, check the current date and use the current year.
 - Do not update dates in existing copyright markers.
-<!-- REUSE-IgnoreEnd -->
 
 ## Deprecation Rules
 
