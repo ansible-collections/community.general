@@ -785,7 +785,7 @@ def main():
         if project_exists:
             gitlab_project.archive()
             module.exit_json(changed=True, msg=f"Successfully archived project {project_name}")
-        module.exit_json(changed=False, msg="Project deleted or does not exist")
+        module.exit_json(changed=False, msg="Project not found")
 
     if state == "unarchived":
         if project_exists:
