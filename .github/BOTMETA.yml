@@ -1076,6 +1076,8 @@ files:
     ignore: elasticdog
     labels: pacman
     maintainers: elasticdog indrajitr tchernomax jraby
+  $modules/packer.py:
+    maintainers: a-gabidullin
   $modules/pacman_key.py:
     labels: pacman
     maintainers: grawlinson
