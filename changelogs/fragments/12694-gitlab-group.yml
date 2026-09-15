@@ -1,0 +1,2 @@
+minor_changes:
+  - Add new value "unchanged" for visibility-parameter in gitlab_group module - (https://github.com/ansible-collections/community.general/pull/12694)
