@@ -300,7 +300,8 @@ options:
   state:
     description:
       - Create or delete project.
-      - Possible values are present and absent.
+      - Possible values are present, absent, archived or unarchived.
+      - Archived and unarchived states are applicable only to existing projects.
     default: present
     type: str
     choices: ["present", "absent", "archived", "unarchived"]
@@ -388,7 +389,7 @@ EXAMPLES = r"""
     group: "10481470"
     state: archived
 
-- name: Unarchive a GitLab Project
+- name: Unarchive a GitLab Project while updating its settings
   community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     api_username: root
@@ -396,6 +397,8 @@ EXAMPLES = r"""
     name: my_second_project
     group: "10481470"
     state: unarchived
+    wiki_enabled: false
+    issues_enabled: true
 """
 
 RETURN = r"""
@@ -621,6 +624,24 @@ class GitLabProject:
 
         return project.delete()
 
+    def archive_project(self):
+        if self._module.check_mode:
+            return True
+
+        # returns None
+        self.project_object.archive()
+
+        return True
+
+    def unarchive_project(self):
+        if self._module.check_mode:
+            return True
+
+        # returns None
+        self.project_object.unarchive()
+
+        return True
+
     """
     @param namespace User/Group object
     @param name Name of the project
@@ -800,19 +821,24 @@ def main():
             module.exit_json(changed=True, msg=f"Successfully deleted project {project_name}")
         module.exit_json(changed=False, msg="Project deleted or does not exist")
 
-    if state == "archived":
-        if project_exists:
-            gitlab_project.archive()
-            module.exit_json(changed=True, msg=f"Successfully archived project {project_name}")
-        module.exit_json(changed=False, msg="Project not found")
+    _archiving_states = ["archived", "unarchived"]
+    if state in ["present", *_archiving_states]:
+        if state in _archiving_states and not project_exists:
+            module.fail_json(msg=f"{state.capitalize()} state works only on existing projects.")
 
-    if state == "unarchived":
-        if project_exists:
-            gitlab_project.unarchive()
-            module.exit_json(changed=True, msg=f"Successfully unarchived project {project_name}")
-        module.exit_json(changed=False, msg="Project deleted or does not exist")
+        # default log message parts for "present" state
+        _extra_message = ""
+        _message_sep = ""
+        _creation_message = "created or "
 
-    if state == "present":
+        if state in _archiving_states:
+            # adjust log message parts in case of archiving actions
+            _message_sep = " - "
+            _extra_message = f"Successfully {state} project {project_name}"
+            _creation_message = ""
+            _actions = {"archived": gitlab_project.archive_project, "unarchived": gitlab_project.unarchive_project}
+            _actions[state]()
+
         if gitlab_project.create_or_update_project(
             module,
             project_name,
@@ -858,16 +884,27 @@ def main():
                 "wiki_enabled": wiki_enabled,
             },
         ):
+            # log message for both archive/unarchive state change and the project creation/update
             module.exit_json(
                 changed=True,
-                msg=f"Successfully created or updated the project {project_name}",
+                msg=f"{_extra_message}{_message_sep}Successfully {_creation_message}updated the project {project_name}",
                 project=gitlab_project.project_attributes(),
             )
-        module.exit_json(
-            changed=False,
-            msg=f"No need to update the project {project_name}",
-            project=gitlab_project.project_attributes(),
-        )
+
+        if state in _archiving_states:
+            # log messages only when archived/unarchived state changes
+            module.exit_json(
+                changed=True,
+                msg=f"{_extra_message}",
+                project=gitlab_project.project_attributes(),
+            )
+        else:
+            # log messages when no archive/unarchive action nor updating project occurred
+            module.exit_json(
+                changed=False,
+                msg=f"No need to update the project {project_name}",
+                project=gitlab_project.project_attributes(),
+            )
 
 
 if __name__ == "__main__":
