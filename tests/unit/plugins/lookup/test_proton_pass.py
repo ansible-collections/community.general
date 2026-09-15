@@ -5,7 +5,10 @@
 from __future__ import annotations
 
 import json
+import os
+import traceback
 import unittest
+from subprocess import TimeoutExpired
 from unittest.mock import MagicMock, patch
 
 from ansible.errors import AnsibleLookupError, AnsibleOptionsError
@@ -354,8 +357,6 @@ class TestProtonPassClientRun(unittest.TestCase):
 
     @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
     def test_timeout_raises(self, mock_popen):
-        from subprocess import TimeoutExpired
-
         mock_proc = MagicMock()
         mock_proc.communicate.side_effect = TimeoutExpired(cmd="pass-cli", timeout=30)
         mock_popen.return_value = mock_proc
@@ -405,6 +406,32 @@ class TestProtonPassClientAuth(unittest.TestCase):
         client = ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="")
         client.ensure_authenticated(pat="pst_token::key")
         self.assertEqual(mock_popen.call_count, 2)
+        login_call = mock_popen.call_args_list[1]
+        self.assertEqual(login_call.args[0], ["pass-cli", "login"])
+        self.assertEqual(login_call.kwargs["env"]["PROTON_PASS_PERSONAL_ACCESS_TOKEN"], "pst_token::key")
+
+    @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
+    def test_login_pat_env_precedence(self, mock_popen):
+        """The PAT option wins over an inherited token; an empty PAT leaves the environment alone."""
+        env_var = "PROTON_PASS_PERSONAL_ACCESS_TOKEN"
+        cases = [
+            # (pat option, inherited env value or None if unset, expected env value or None if absent)
+            ("pst_option::key", None, "pst_option::key"),
+            ("pst_option::key", "pst_inherited::key", "pst_option::key"),
+            ("", "pst_inherited::key", "pst_inherited::key"),
+            ("", None, None),
+        ]
+        for pat, inherited, expected in cases:
+            with self.subTest(pat=pat, inherited=inherited):
+                mock_popen.reset_mock()
+                mock_popen.return_value = _make_popen_mock(0, b"", b"")
+                with patch.dict("os.environ"):
+                    os.environ.pop(env_var, None)
+                    if inherited is not None:
+                        os.environ[env_var] = inherited
+                    ProtonPassClient(cli_path="pass-cli", timeout=30, agent_reason="").login_with_pat(pat)
+                env = mock_popen.call_args.kwargs["env"]
+                self.assertEqual(env.get(env_var), expected)
 
 
 class TestProtonPassClientFetch(unittest.TestCase):
@@ -584,3 +611,30 @@ class TestLookupModule(unittest.TestCase):
         mock_client_cls.assert_called_once()
         call_kwargs = mock_client_cls.call_args[1]
         self.assertTrue(call_kwargs["debug"])
+
+    @patch("ansible_collections.community.general.plugins.lookup.proton_pass.display")
+    @patch("ansible_collections.community.general.plugins.lookup.proton_pass.Popen")
+    def test_pat_not_exposed_when_login_times_out(self, mock_popen, mock_display):
+        """The PAT must not appear in the error, its traceback, or verbose output."""
+        pat = "pst_SECRETTOKEN::SECRETKEY"
+
+        def popen(command, **kwargs):
+            if command[1:] == ["info"]:
+                return _make_popen_mock(1, b"", b"not logged in\n")
+            mock_proc = MagicMock()
+            mock_proc.communicate.side_effect = TimeoutExpired(cmd=command, timeout=30)
+            return mock_proc
+
+        mock_popen.side_effect = popen
+
+        with self.assertRaises(ProtonPassCLIError) as ctx:
+            self._run(["vm"], vault="myvault", pat=pat)
+
+        exc = ctx.exception
+        rendered = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+        self.assertIn("timed out", rendered)
+        self.assertNotIn("SECRETTOKEN", rendered)
+        for call in mock_display.method_calls:
+            self.assertNotIn("SECRETTOKEN", str(call))
+        for call in mock_popen.call_args_list:
+            self.assertNotIn(pat, call.args[0])
