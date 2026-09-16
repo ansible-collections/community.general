@@ -6,15 +6,6 @@
 
 from __future__ import annotations
 
-import json
-import typing as t
-from http import HTTPStatus
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
-
-from ansible_collections.community.general.plugins.module_utils import _deps as deps
-
 DOCUMENTATION = r"""
 module: github_secrets_info
 short_description: List GitHub repository or organization secrets
@@ -90,6 +81,25 @@ secrets:
       type: str
 """
 
+import json
+import typing as t
+from http import HTTPStatus
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
+
+
+def secrets_url(api_url: str, organization: str, repository: str, environment: str) -> str:
+    """Construct the URL for GitHub secrets based on the provided parameters."""
+    if environment:
+        return f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets"
+    elif repository:
+        return f"{api_url}/repos/{organization}/{repository}/actions/secrets"
+    else:
+        return f"{api_url}/orgs/{organization}/actions/secrets"
+
 
 def list_secrets(
     module: AnsibleModule,
@@ -99,12 +109,7 @@ def list_secrets(
     repository: str,
     environment: str,
 ) -> dict[str, list]:
-    if environment:
-        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets"
-    elif repository:
-        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets"
-    else:
-        url = f"{api_url}/orgs/{organization}/actions/secrets"
+    url = secrets_url(api_url, organization, repository, environment)
 
     resp, info = fetch_url(module, url, headers=headers, method="GET")
 

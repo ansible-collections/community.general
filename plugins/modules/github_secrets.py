@@ -6,15 +6,6 @@
 
 from __future__ import annotations
 
-import json
-import typing as t
-from http import HTTPStatus
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
-
-from ansible_collections.community.general.plugins.module_utils import _deps as deps
-
 DOCUMENTATION = r"""
 module: github_secrets
 short_description: Manage GitHub repository or organization secrets
@@ -114,6 +105,14 @@ result:
   }
 """
 
+import json
+import typing as t
+from http import HTTPStatus
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare(
     "pynacl",
@@ -121,6 +120,16 @@ with deps.declare(
     url="https://pypi.org/project/PyNaCl/",
 ):
     from nacl import encoding, public
+
+
+def secrets_url(api_url: str, organization: str, repository: str, environment: str) -> str:
+    """Construct the URL for GitHub secrets based on the provided parameters."""
+    if environment:
+        return f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets"
+    elif repository:
+        return f"{api_url}/repos/{organization}/{repository}/actions/secrets"
+    else:
+        return f"{api_url}/orgs/{organization}/actions/secrets"
 
 
 def get_public_key(
@@ -132,12 +141,7 @@ def get_public_key(
     environment: str,
 ) -> tuple[str, str]:
     """Retrieve the GitHub Actions public key used to encrypt secrets."""
-    if environment:
-        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets/public-key"
-    elif repository:
-        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/public-key"
-    else:
-        url = f"{api_url}/orgs/{organization}/actions/secrets/public-key"
+    url = f"{secrets_url(api_url, organization, repository, environment)}/public-key"
 
     resp, info = fetch_url(module, url, headers=headers)
 
@@ -168,12 +172,7 @@ def check_secret(
     environment: str,
     key: str,
 ) -> dict[str, int]:
-    if environment:
-        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets/{key}"
-    elif repository:
-        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-    else:
-        url = f"{api_url}/orgs/{organization}/actions/secrets/{key}"
+    url = f"{secrets_url(api_url, organization, repository, environment)}/{key}"
 
     resp, info = fetch_url(module, url, headers=headers)
 
@@ -195,12 +194,7 @@ def upsert_secret(
     key_id: str,
 ) -> dict[str, t.Any]:
     """Create or update a GitHub Actions secret."""
-    if environment:
-        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets/{key}"
-    elif repository:
-        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-    else:
-        url = f"{api_url}/orgs/{organization}/actions/secrets/{key}"
+    url = f"{secrets_url(api_url, organization, repository, environment)}/{key}"
 
     payload = {
         "encrypted_value": encrypted_value,
@@ -253,12 +247,7 @@ def delete_secret(
     key: str,
 ) -> dict[str, t.Any]:
     """Delete a GitHub Actions secret."""
-    if environment:
-        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets/{key}"
-    elif repository:
-        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-    else:
-        url = f"{api_url}/orgs/{organization}/actions/secrets/{key}"
+    url = f"{secrets_url(api_url, organization, repository, environment)}/{key}"
 
     if module.check_mode:
         secret_present = check_secret(module, api_url, headers, organization, repository, environment, key)
