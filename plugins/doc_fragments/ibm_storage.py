@@ -30,7 +30,7 @@ options:
     type: str
     required: true
 notes:
-  - This module requires pyxcli python library. Use C(pip install pyxcli) in order to get pyxcli.
+  - This module requires pyxcli Python library. Use C(pip install pyxcli) in order to get pyxcli.
 requirements:
   - pyxcli
 """
