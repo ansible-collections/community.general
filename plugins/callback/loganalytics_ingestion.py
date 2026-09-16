@@ -157,7 +157,7 @@ from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display
 
-from ansible_collections.community.general.plugins.module_utils._secrets import mark_as_secret
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_as_secret, mask_secrets
 
 display = Display()
 
@@ -233,7 +233,8 @@ class AzureLogAnalyticsIngestionSource:
             f"{self.dce_url}/dataCollectionRules/{self.dcr_id}/streams/{self.stream_name}?api-version=2023-01-01"
         )
         headers = {"Authorization": f"Bearer {self.bearer_token}", "Content-Type": "application/json"}
-        open_url(ingestion_url, data=json.dumps(event_data), headers=headers, method="POST", timeout=self.timeout)
+        data = mask_secrets(json.dumps(event_data))
+        open_url(ingestion_url, data=data, headers=headers, method="POST", timeout=self.timeout)
 
     def _rfc1123date(self):
         return datetime.now(UTC).strftime("%a, %d %b %Y %H:%M:%S GMT")
