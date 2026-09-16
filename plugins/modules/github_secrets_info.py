@@ -6,6 +6,15 @@
 
 from __future__ import annotations
 
+import json
+import typing as t
+from http import HTTPStatus
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
+
 DOCUMENTATION = r"""
 module: github_secrets_info
 short_description: List GitHub repository or organization secrets
@@ -30,6 +39,12 @@ options:
       - If not provided, the listing will be at organization level.
     type: str
     aliases: ["repo"]
+  environment:
+    description:
+      - The GitHub environment name, for environment secrets.
+      - Requires specifying a repository.
+    type: str
+    aliases: ["env"]
   api_url:
     description:
       - The base URL for the GitHub API.
@@ -75,15 +90,6 @@ secrets:
       type: str
 """
 
-import json
-import typing as t
-from http import HTTPStatus
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
-
-from ansible_collections.community.general.plugins.module_utils import _deps as deps
-
 
 def list_secrets(
     module: AnsibleModule,
@@ -91,12 +97,14 @@ def list_secrets(
     headers: dict[str, str],
     organization: str,
     repository: str,
+    environment: str,
 ) -> dict[str, list]:
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets"
-    )
+    if environment:
+        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets"
+    elif repository:
+        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets"
+    else:
+        url = f"{api_url}/orgs/{organization}/actions/secrets"
 
     resp, info = fetch_url(module, url, headers=headers, method="GET")
 
@@ -120,6 +128,7 @@ def main() -> None:
             "required": True,
         },
         "repository": {"type": "str", "aliases": ["repo"]},
+        "environment": {"type": "str", "aliases": ["env"]},
         "api_url": {"type": "str", "default": "https://api.github.com"},
         "token": {"type": "str", "required": True, "no_log": True},
     }
@@ -133,8 +142,16 @@ def main() -> None:
 
     organization: str = module.params["organization"]
     repository: str = module.params["repository"]
+    environment: str = module.params["environment"]
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
+
+    if environment and not repository:
+        module.fail_json(
+            msg="Invalid parameters",
+            details="The 'environment' parameter requires a 'repository' to be specified",
+            params=module.params,
+        )
 
     result: dict[str, t.Any] = {}
 
@@ -144,7 +161,7 @@ def main() -> None:
         "Content-Type": "application/json",
     }
 
-    secrets = list_secrets(module, api_url, headers, organization, repository)
+    secrets = list_secrets(module, api_url, headers, organization, repository, environment)
 
     result["changed"] = False
     result.update(

@@ -116,6 +116,54 @@ def test_create_repo_secret(fetch_url_mock):
     assert result["result"]["response"] == "Secret created"
 
 
+def test_create_environment_secret(fetch_url_mock):
+    fetch_url_mock.side_effect = [
+        make_fetch_url_response(PUBLIC_KEY_PAYLOAD),
+        make_fetch_url_response({}, status=201),
+    ]
+
+    with set_module_args(
+        {
+            "organization": "myorg",
+            "repository": "myrepo",
+            "environment": "production",
+            "key": "MY_SECRET",
+            "value": "secret_value",
+            "state": "present",
+            "token": "ghp_test_token",
+        }
+    ):
+        with pytest.raises(AnsibleExitJson) as exc:
+            github_secrets.main()
+
+    result = exc.value.args[0]
+    assert result["changed"] is True
+    assert result["result"]["response"] == "Secret created"
+    assert fetch_url_mock.call_args_list[0].args[1] == (
+        "https://api.github.com/repos/myorg/myrepo/environments/production/secrets/public-key"
+    )
+    assert fetch_url_mock.call_args_list[1].args[1] == (
+        "https://api.github.com/repos/myorg/myrepo/environments/production/secrets/MY_SECRET"
+    )
+
+
+def test_fail_environment_without_repository():
+    with pytest.raises(AnsibleFailJson) as exc:
+        with set_module_args(
+            {
+                "organization": "myorg",
+                "environment": "production",
+                "key": "MY_SECRET",
+                "value": "secret_value",
+                "state": "present",
+                "token": "ghp_test_token",
+            }
+        ):
+            github_secrets.main()
+
+    assert exc.value.args[0]["details"] == ("The 'environment' parameter requires a 'repository' to be specified")
+
+
 def test_update_repo_secret(fetch_url_mock):
     fetch_url_mock.side_effect = [
         make_fetch_url_response(PUBLIC_KEY_PAYLOAD),

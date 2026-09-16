@@ -6,6 +6,15 @@
 
 from __future__ import annotations
 
+import json
+import typing as t
+from http import HTTPStatus
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
+
 DOCUMENTATION = r"""
 module: github_secrets
 short_description: Manage GitHub repository or organization secrets
@@ -36,6 +45,12 @@ options:
       - If not provided, the secret will be managed at the organization level.
     type: str
     aliases: ["repo"]
+  environment:
+    description:
+      - The GitHub environment name, for environment secrets.
+      - Requires specifying a repository.
+    type: str
+    aliases: ["env"]
   key:
     description:
       - The name of the secret.
@@ -99,14 +114,6 @@ result:
   }
 """
 
-import json
-import typing as t
-from http import HTTPStatus
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.urls import fetch_url
-
-from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 with deps.declare(
     "pynacl",
@@ -122,9 +129,12 @@ def get_public_key(
     headers: dict[str, str],
     organization: str,
     repository: str,
+    environment: str,
 ) -> tuple[str, str]:
     """Retrieve the GitHub Actions public key used to encrypt secrets."""
-    if repository:
+    if environment:
+        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets/public-key"
+    elif repository:
         url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/public-key"
     else:
         url = f"{api_url}/orgs/{organization}/actions/secrets/public-key"
@@ -155,13 +165,15 @@ def check_secret(
     headers: dict[str, str],
     organization: str,
     repository: str,
+    environment: str,
     key: str,
 ) -> dict[str, int]:
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
-    )
+    if environment:
+        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets/{key}"
+    elif repository:
+        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
+    else:
+        url = f"{api_url}/orgs/{organization}/actions/secrets/{key}"
 
     resp, info = fetch_url(module, url, headers=headers)
 
@@ -177,16 +189,18 @@ def upsert_secret(
     headers: dict[str, str],
     organization: str,
     repository: str,
+    environment: str,
     key: str,
     encrypted_value: str,
     key_id: str,
 ) -> dict[str, t.Any]:
     """Create or update a GitHub Actions secret."""
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
-    )
+    if environment:
+        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets/{key}"
+    elif repository:
+        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
+    else:
+        url = f"{api_url}/orgs/{organization}/actions/secrets/{key}"
 
     payload = {
         "encrypted_value": encrypted_value,
@@ -197,7 +211,7 @@ def upsert_secret(
         payload["visibility"] = module.params["visibility"]
 
     if module.check_mode:
-        secret_present = check_secret(module, api_url, headers, organization, repository, key)
+        secret_present = check_secret(module, api_url, headers, organization, repository, environment, key)
         if secret_present["status"] == HTTPStatus.NOT_FOUND:
             check_mode_msg = "OK (2 bytes)"
             check_mode_status = HTTPStatus.CREATED.value
@@ -235,17 +249,19 @@ def delete_secret(
     headers: dict[str, str],
     organization: str,
     repository: str,
+    environment: str,
     key: str,
 ) -> dict[str, t.Any]:
     """Delete a GitHub Actions secret."""
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
-    )
+    if environment:
+        url = f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets/{key}"
+    elif repository:
+        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
+    else:
+        url = f"{api_url}/orgs/{organization}/actions/secrets/{key}"
 
     if module.check_mode:
-        secret_present = check_secret(module, api_url, headers, organization, repository, key)
+        secret_present = check_secret(module, api_url, headers, organization, repository, environment, key)
         info = {
             "msg": (
                 "HTTP Error 404: Not Found"
@@ -279,6 +295,7 @@ def main() -> None:
             "required": True,
         },
         "repository": {"type": "str", "aliases": ["repo"]},
+        "environment": {"type": "str", "aliases": ["env"]},
         "key": {"type": "str", "no_log": False},
         "value": {"type": "str", "no_log": True},
         "visibility": {"type": "str", "choices": ["all", "private", "selected"]},
@@ -302,6 +319,7 @@ def main() -> None:
 
     organization: str = module.params["organization"]
     repository: str = module.params["repository"]
+    environment: str = module.params["environment"]
     key: str = module.params["key"]
     value: str = module.params["value"]
     visibility: str = module.params.get("visibility")
@@ -323,6 +341,13 @@ def main() -> None:
             params=module.params,
         )
 
+    if environment and not repository:
+        module.fail_json(
+            msg="Invalid parameters",
+            details="The 'environment' parameter requires a 'repository' to be specified",
+            params=module.params,
+        )
+
     result: dict[str, t.Any] = {}
 
     headers = {
@@ -338,6 +363,7 @@ def main() -> None:
             headers,
             organization,
             repository,
+            environment,
         )
 
         encrypted_value = encrypt_secret(public_key, value)
@@ -348,6 +374,7 @@ def main() -> None:
             headers,
             organization,
             repository,
+            environment,
             key,
             encrypted_value,
             key_id,
@@ -371,6 +398,7 @@ def main() -> None:
             headers,
             organization,
             repository,
+            environment,
             key,
         )
 
