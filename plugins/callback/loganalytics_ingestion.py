@@ -297,6 +297,8 @@ class CallbackModule(CallbackBase):
     CALLBACK_NAME = "loganalytics_ingestion"
     CALLBACK_NEEDS_ENABLED = True
 
+    ANSIBLE_SUPPORTS_MASKING = True
+
     def __init__(self, display=None):
         super().__init__(display=display)
         self.start_datetimes = {}
