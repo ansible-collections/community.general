@@ -241,25 +241,37 @@ class TestGitlabProject(GitlabModuleTestCase):
         self.assertEqual(type(self.moduleUtil.project_object), Project)
         self.assertEqual(self.moduleUtil.project_object.attributes["description"], "New description")
 
+    @with_httmock(resp_get_group)
     @with_httmock(resp_get_project)
+    @with_httmock(resp_get_project_by_name)
     @with_httmock(resp_archive_project)
     def test_archive_project(self):
+        group = self.gitlab_instance.groups.get(1)
+
+        self.moduleUtil.exists_project(group, "diaspora-client")
+
+        rvalue = self.moduleUtil.archive_project()
+
         project = self.gitlab_instance.projects.get(1)
 
-        changed = self.moduleUtil.archive_project(project)
-
-        self.assertEqual(changed, True)
+        self.assertEqual(rvalue, True)
         self.assertEqual(type(project), Project)
         self.assertEqual(project.archived, True)
 
+    @with_httmock(resp_get_group)
     @with_httmock(resp_get_project)
+    @with_httmock(resp_get_project_by_name)
     @with_httmock(resp_unarchive_project)
     def test_unarchive_project(self):
+        group = self.gitlab_instance.groups.get(1)
+
+        self.moduleUtil.exists_project(group, "diaspora-client")
+
+        rvalue = self.moduleUtil.unarchive_project()
+
         project = self.gitlab_instance.projects.get(1)
 
-        changed = self.moduleUtil.unarchive_project(project)
-
-        self.assertEqual(changed, True)
+        self.assertEqual(rvalue, True)
         self.assertEqual(type(project), Project)
         self.assertEqual(project.archived, False)
 
