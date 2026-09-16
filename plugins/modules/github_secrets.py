@@ -122,7 +122,7 @@ with deps.declare(
     from nacl import encoding, public
 
 
-def secrets_url(api_url: str, organization: str, repository: str, environment: str) -> str:
+def secrets_url(api_url: str, organization: str, repository: t.Optional[str], environment: t.Optional[str]) -> str:
     """Construct the URL for GitHub secrets based on the provided parameters."""
     if environment:
         return f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets"
@@ -137,8 +137,8 @@ def get_public_key(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
-    environment: str,
+    repository: t.Optional[str],
+    environment: t.Optional[str],
 ) -> tuple[str, str]:
     """Retrieve the GitHub Actions public key used to encrypt secrets."""
     url = f"{secrets_url(api_url, organization, repository, environment)}/public-key"
@@ -168,8 +168,8 @@ def check_secret(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
-    environment: str,
+    repository: t.Optional[str],
+    environment: t.Optional[str],
     key: str,
 ) -> dict[str, int]:
     url = f"{secrets_url(api_url, organization, repository, environment)}/{key}"
@@ -187,8 +187,8 @@ def upsert_secret(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
-    environment: str,
+    repository: t.Optional[str],
+    environment: t.Optional[str],
     key: str,
     encrypted_value: str,
     key_id: str,
@@ -242,8 +242,8 @@ def delete_secret(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
-    environment: str,
+    repository: t.Optional[str],
+    environment: t.Optional[str],
     key: str,
 ) -> dict[str, t.Any]:
     """Delete a GitHub Actions secret."""
@@ -307,8 +307,8 @@ def main() -> None:
     deps.validate(module)
 
     organization: str = module.params["organization"]
-    repository: str = module.params["repository"]
-    environment: str = module.params["environment"]
+    repository: t.Optional[str] = module.params["repository"]
+    environment: t.Optional[str] = module.params["environment"]
     key: str = module.params["key"]
     value: str = module.params["value"]
     visibility: str = module.params.get("visibility")

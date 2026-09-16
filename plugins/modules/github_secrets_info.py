@@ -91,7 +91,7 @@ from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 
-def secrets_url(api_url: str, organization: str, repository: str, environment: str) -> str:
+def secrets_url(api_url: str, organization: str, repository: t.Optional[str], environment: t.Optional[str]) -> str:
     """Construct the URL for GitHub secrets based on the provided parameters."""
     if environment:
         return f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets"
@@ -106,8 +106,8 @@ def list_secrets(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
-    environment: str,
+    repository: t.Optional[str],
+    environment: t.Optional[str],
 ) -> dict[str, list]:
     url = secrets_url(api_url, organization, repository, environment)
 
@@ -147,8 +147,8 @@ def main() -> None:
     deps.validate(module)
 
     organization: str = module.params["organization"]
-    repository: str = module.params["repository"]
-    environment: str = module.params["environment"]
+    repository: t.Optional[str] = module.params["repository"]
+    environment: t.Optional[str] = module.params["environment"]
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
 
