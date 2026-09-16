@@ -163,7 +163,7 @@ options:
     description:
       - Default visibility of the group.
       - V(unchanged) does not set any visibility but instead uses the instance default or the visibility-level of the parent-group (if one exists)
-      - V(unchanged) has been added in community.general 13.5.0
+        V(unchanged) has been added in community.general 13.5.0
     choices: ["private", "internal", "public", "unchanged"]
     default: private
     type: str
