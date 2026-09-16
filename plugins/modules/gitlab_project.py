@@ -625,21 +625,15 @@ class GitLabProject:
         return project.delete()
 
     def archive_project(self):
-        if self._module.check_mode:
-            return True
-
-        # returns None
-        self.project_object.archive()
-
+        if not self._module.check_mode:
+            # returns None
+            self.project_object.archive()  
         return True
 
     def unarchive_project(self):
-        if self._module.check_mode:
-            return True
-
-        # returns None
-        self.project_object.unarchive()
-
+        if not self._module.check_mode:
+            # returns None
+            self.project_object.unarchive()
         return True
 
     """
