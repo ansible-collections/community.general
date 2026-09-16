@@ -29,7 +29,7 @@ notes:
     that C(python -m pipx) must work.
   - This module honors C(pipx) environment variables such as but not limited to E(PIPX_HOME) and E(PIPX_BIN_DIR) passed using
     the R(environment Ansible keyword, playbooks_environment).
-  - This module disabled emojis in the output of C(pipx) commands to reduce clutter. In C(pipx) 1.8.0, the environment variable
+  - This module disables emojis in the output of C(pipx) commands to reduce clutter. In C(pipx) 1.8.0, the environment variable
     E(USE_EMOJI) was renamed to E(PIPX_USE_EMOJI) and for compatibility with both versions, starting in community.general
     11.4.0, this module sets them both to C(0) to disable emojis.
 seealso:
