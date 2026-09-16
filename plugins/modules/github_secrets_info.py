@@ -141,6 +141,7 @@ def main() -> None:
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        required_by={"environment": "repository"},
     )
 
     deps.validate(module)
@@ -150,13 +151,6 @@ def main() -> None:
     environment: str = module.params["environment"]
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
-
-    if environment and not repository:
-        module.fail_json(
-            msg="Invalid parameters",
-            details="The 'environment' parameter requires a 'repository' to be specified",
-            params=module.params,
-        )
 
     result: dict[str, t.Any] = {}
 

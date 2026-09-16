@@ -300,7 +300,7 @@ def main() -> None:
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[("state", "present", ["value"])],
-        required_by={"value": "key"},
+        required_by={"value": "key", "environment": "repository"},
         supports_check_mode=True,
     )
 
@@ -327,13 +327,6 @@ def main() -> None:
         module.fail_json(
             msg="Invalid parameters",
             details="When 'state' is 'present' and 'repository' is not set, 'visibility' must be provided",
-            params=module.params,
-        )
-
-    if environment and not repository:
-        module.fail_json(
-            msg="Invalid parameters",
-            details="The 'environment' parameter requires a 'repository' to be specified",
             params=module.params,
         )
 

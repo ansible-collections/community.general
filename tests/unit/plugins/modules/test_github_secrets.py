@@ -12,7 +12,6 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     AnsibleExitJson,
     AnsibleFailJson,
     exit_json,
-    fail_json,
     set_module_args,
 )
 
@@ -36,7 +35,6 @@ def patch_module():
     with patch.multiple(
         "ansible.module_utils.basic.AnsibleModule",
         exit_json=exit_json,
-        fail_json=fail_json,
     ):
         yield
 
@@ -161,7 +159,7 @@ def test_fail_environment_without_repository():
         ):
             github_secrets.main()
 
-    assert exc.value.args[0]["details"] == ("The 'environment' parameter requires a 'repository' to be specified")
+    assert exc.value.args[0]["msg"] == ("missing parameter(s) required by 'environment': repository")
 
 
 def test_update_repo_secret(fetch_url_mock):
