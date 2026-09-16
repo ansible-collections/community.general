@@ -627,7 +627,7 @@ class GitLabProject:
     def archive_project(self):
         if not self._module.check_mode:
             # returns None
-            self.project_object.archive()  
+            self.project_object.archive()
         return True
 
     def unarchive_project(self):
