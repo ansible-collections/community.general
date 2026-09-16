@@ -1130,6 +1130,8 @@ files:
     maintainers: munchtoast
   $modules/pacemaker_stonith.py:
     maintainers: munchtoast
+  $modules/packer.py:
+    maintainers: a-gabidullin
   $modules/packet_:
     maintainers: nurfet-becirevic t0mk
   $modules/packet_device.py:
@@ -1140,8 +1142,6 @@ files:
     ignore: elasticdog
     labels: pacman
     maintainers: elasticdog indrajitr tchernomax jraby
-  $modules/packer.py:
-    maintainers: a-gabidullin
   $modules/pacman_key.py:
     labels: pacman
     maintainers: grawlinson
