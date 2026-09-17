@@ -5,10 +5,6 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = ""
-EXAMPLES = ""
-RETURN = ""
-
 import configparser
 import hashlib
 import os
