@@ -5,61 +5,93 @@ from __future__ import annotations
 
 import hashlib
 import io
-import json
+import sys
+from pathlib import Path
 
 import pytest
 from ansible.module_utils import basic
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 from ansible_collections.community.general.plugins.modules import maven_artifact
 
-pytestmark = pytest.mark.usefixtures("patch_ansible_module")
+from .uthelper import TestCaseMock as MockBase
+from .uthelper import UTHelper
 
 
-@pytest.mark.parametrize("patch_ansible_module", [None])
-@pytest.mark.parametrize("checksum_alg", ["md5", "sha1", "sha256", "sha512"])
-@pytest.mark.parametrize("verify_checksum", ["download", "change", "always"])
-@pytest.mark.parametrize("existing_content", [None, b"artifact content", b"old artifact"])
-def test_main_checksum(mocker, tmp_path, capsys, checksum_alg, verify_checksum, existing_content):
+class ArtifactRepositoryMock(MockBase):
+    name = "artifact_repository"
     content = b"artifact content"
-    digest = hashlib.new(checksum_alg, content).hexdigest()
     artifact_url = "https://repo.example.com/com/example/demo/1.0/demo-1.0.jar"
-    requested_urls = []
 
-    def fetch_url(module, url, **kwargs):
-        requested_urls.append(url)
-        if url == artifact_url:
-            return io.BytesIO(content), {"status": 200}
-        assert url == f"{artifact_url}.{checksum_alg}"
-        return io.BytesIO(f"{digest.upper()}  demo-1.0.jar\n".encode()), {"status": 200}
+    def fixtures(self):
+        @pytest.fixture
+        def artifact_directory(monkeypatch, tmp_path):
+            monkeypatch.chdir(tmp_path)
 
-    mocker.patch.object(maven_artifact, "fetch_url", side_effect=fetch_url)
-    dest = tmp_path / "demo.jar"
-    if existing_content is not None:
-        dest.write_bytes(existing_content)
-    args = dict(
-        group_id="com.example",
-        artifact_id="demo",
-        version="1.0",
-        repository_url="https://repo.example.com",
-        dest=str(dest),
-        checksum_alg=checksum_alg,
-        verify_checksum=verify_checksum,
-    )
-    with set_module_args(args), pytest.raises(SystemExit) as exc:
-        maven_artifact.main()
+        return {"artifact_directory": artifact_directory}
 
-    assert exc.value.code == 0
-    result = json.loads(capsys.readouterr().out)
-    changed = existing_content is None or (existing_content != content and verify_checksum != "download")
-    assert result["changed"] is changed
-    assert dest.read_bytes() == (content if changed else existing_content)
-    assert requested_urls.count(artifact_url) == int(changed)
-    checksum_requests = int(existing_content is not None and verify_checksum in ("change", "always"))
-    checksum_requests += int(changed and verify_checksum in ("download", "always"))
-    assert requested_urls.count(f"{artifact_url}.{checksum_alg}") == checksum_requests
+    def setup(self, mocker):
+        self.requested_urls = []
+        self.dest = Path("demo.jar")
+        existing_content = self.mock_specs["existing_content"]
+        if existing_content is not None:
+            self.dest.write_bytes(existing_content)
+
+        def fetch_url(module, url, **kwargs):
+            self.requested_urls.append(url)
+            if url == self.artifact_url:
+                return io.BytesIO(self.content), {"status": 200}
+            checksum_alg = module.params["checksum_alg"]
+            assert url == f"{self.artifact_url}.{checksum_alg}"
+            digest = hashlib.new(checksum_alg, self.content).hexdigest()
+            return io.BytesIO(f"{digest.upper()}  demo-1.0.jar\n".encode()), {"status": 200}
+
+        mocker.patch.object(maven_artifact, "fetch_url", side_effect=fetch_url)
+
+    def check(self, test_case, results):
+        assert not results.get("failed", False)
+        changed = test_case.output["changed"]
+        existing_content = self.mock_specs["existing_content"]
+        checksum_alg = test_case.input["checksum_alg"]
+        verify_checksum = test_case.input["verify_checksum"]
+        assert self.dest.read_bytes() == (self.content if changed else existing_content)
+        assert self.requested_urls.count(self.artifact_url) == int(changed)
+        checksum_requests = int(existing_content is not None and verify_checksum in ("change", "always"))
+        checksum_requests += int(changed and verify_checksum in ("download", "always"))
+        assert self.requested_urls.count(f"{self.artifact_url}.{checksum_alg}") == checksum_requests
 
 
+TEST_SPEC = dict(
+    test_cases=[
+        dict(
+            id=f"checksum_{checksum_alg}_{verify_checksum}_{existing_state}",
+            input=dict(
+                group_id="com.example",
+                artifact_id="demo",
+                version="1.0",
+                repository_url="https://repo.example.com",
+                dest="demo.jar",
+                checksum_alg=checksum_alg,
+                verify_checksum=verify_checksum,
+            ),
+            output=dict(
+                changed=existing_state == "absent" or (existing_state == "different" and verify_checksum != "download")
+            ),
+            mocks=dict(artifact_repository=dict(existing_content=existing_content)),
+        )
+        for checksum_alg in ("md5", "sha1", "sha256", "sha512")
+        for verify_checksum in ("download", "change", "always")
+        for existing_state, existing_content in (
+            ("absent", None),
+            ("matching", b"artifact content"),
+            ("different", b"old artifact"),
+        )
+    ]
+)
+
+UTHelper.from_spec(maven_artifact, sys.modules[__name__], TEST_SPEC, mocks=[ArtifactRepositoryMock])
+
+
+@pytest.mark.usefixtures("patch_ansible_module")
 @pytest.mark.parametrize("patch_ansible_module", [None])
 @pytest.mark.parametrize("checksum_alg", ["sha256", "sha512"])
 @pytest.mark.parametrize("remote_checksum", [b"incorrect", b"", None])
@@ -83,6 +115,7 @@ def test_download_invalid_checksum(mocker, tmp_path, checksum_alg, remote_checks
     assert list(tmp_path.iterdir()) == [dest]
 
 
+@pytest.mark.usefixtures("patch_ansible_module")
 @pytest.mark.parametrize("patch_ansible_module", [None])
 @pytest.mark.parametrize("checksum_alg", ["md5", "sha1", "sha256", "sha512"])
 @pytest.mark.parametrize("matching", [True, False])
@@ -154,6 +187,7 @@ maven_metadata_example = b"""<?xml version="1.0" encoding="UTF-8"?>
         (None, "[2.0,)", "4.13-beta-2"),
     ],
 )
+@pytest.mark.usefixtures("patch_ansible_module")
 def test_find_version_by_spec(mocker, version_by_spec, version_choosed):
     _getContent = mocker.patch(
         "ansible_collections.community.general.plugins.modules.maven_artifact.MavenDownloader._getContent"
@@ -242,6 +276,7 @@ snapshot_metadata_no_snapshot_block = b"""<?xml version="1.0" encoding="UTF-8"?>
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
+@pytest.mark.usefixtures("patch_ansible_module")
 def test_find_uri_for_snapshot_resolves_to_latest(mocker):
     """When metadata has multiple snapshotVersion entries per extension,
     the entry with the newest updated timestamp should be resolved."""
@@ -258,6 +293,7 @@ def test_find_uri_for_snapshot_resolves_to_latest(mocker):
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
+@pytest.mark.usefixtures("patch_ansible_module")
 def test_find_uri_for_snapshot_without_snapshot_block_uses_snapshot_versions(mocker):
     """When metadata lacks a <snapshot> block, fall back to scanning
     <snapshotVersions> entries."""
@@ -304,6 +340,7 @@ snapshot_metadata_incomplete_snapshot_block = b"""<?xml version="1.0" encoding="
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
+@pytest.mark.usefixtures("patch_ansible_module")
 def test_find_uri_for_snapshot_incomplete_snapshot_block_uses_snapshot_versions(mocker):
     """When the <snapshot> block is incomplete (e.g. missing <buildNumber>),
     fall back to <snapshotVersions> instead of raising an error."""
@@ -320,6 +357,7 @@ def test_find_uri_for_snapshot_incomplete_snapshot_block_uses_snapshot_versions(
 
 
 @pytest.mark.parametrize("patch_ansible_module", [None])
+@pytest.mark.usefixtures("patch_ansible_module")
 def test_find_uri_for_release_version_unaffected(mocker):
     """Non-SNAPSHOT versions must not be affected by snapshot resolution logic."""
     artifact = maven_artifact.Artifact("com.example", "my-lib", "2.1.0", None, "", "jar")
@@ -345,6 +383,7 @@ def test_find_uri_for_release_version_unaffected(mocker):
         (None, False, False, False, False),  # regression case reported in issue 4796
     ],
 )
+@pytest.mark.usefixtures("patch_ansible_module")
 def test_should_keep_version_in_filename(
     keep_name, keep_name_only_when_resolved, version_resolved_dynamically, expected
 ):
