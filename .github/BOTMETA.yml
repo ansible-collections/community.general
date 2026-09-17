@@ -437,6 +437,8 @@ files:
     maintainers: russoz
   $module_utils/_ssh.py:
     maintainers: russoz
+  $module_utils/_sssd_config.py:
+    maintainers: NicholasBrodersen
   $module_utils/_systemd.py:
     maintainers: NomakCooper
   $module_utils/_utm_utils.py:
@@ -1304,6 +1306,8 @@ files:
     maintainers: farhan7500 gautamphegde
   $modules/ssh_config.py:
     maintainers: gaqzi Akasurde
+  $modules/sssd_config.py:
+    maintainers: NicholasBrodersen
   $modules/sssd_info.py:
     maintainers: a-gabidullin
   $modules/stacki_host.py:
