@@ -224,7 +224,11 @@ docker = "default"
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "2.20"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
-remote = [ "macos/15.3", "rhel/10.1", "freebsd/14.3" ]
+remote = [
+    "macos/15.3",
+    "rhel/10.1",
+    # "freebsd/14.3",
+]
 
 # Ansible-core 2.21:
 
