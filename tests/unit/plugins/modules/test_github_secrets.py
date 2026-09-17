@@ -12,6 +12,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     AnsibleExitJson,
     AnsibleFailJson,
     exit_json,
+    fail_json,
     set_module_args,
 )
 
@@ -35,6 +36,7 @@ def patch_module():
     with patch.multiple(
         "ansible.module_utils.basic.AnsibleModule",
         exit_json=exit_json,
+        fail_json=fail_json,
     ):
         yield
 
@@ -155,6 +157,7 @@ def test_fail_environment_without_repository():
                 "value": "secret_value",
                 "state": "present",
                 "token": "ghp_test_token",
+                "visibility": "all",
             }
         ):
             github_secrets.main()

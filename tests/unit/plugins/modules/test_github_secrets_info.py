@@ -12,6 +12,7 @@ from ansible_collections.community.internal_test_tools.tests.unit.plugins.module
     AnsibleExitJson,
     AnsibleFailJson,
     exit_json,
+    fail_json,
     set_module_args,
 )
 
@@ -46,6 +47,7 @@ def patch_module():
     with patch.multiple(
         "ansible.module_utils.basic.AnsibleModule",
         exit_json=exit_json,
+        fail_json=fail_json,
     ):
         yield
 
@@ -121,14 +123,14 @@ def test_list_environment_secrets(fetch_url_mock):
 
 
 def test_fail_environment_without_repository(fetch_url_mock):
-    with set_module_args(
-        {
-            "organization": "myorg",
-            "environment": "production",
-            "token": "ghp_test_token",
-        }
-    ):
-        with pytest.raises(AnsibleFailJson) as exc:
+    with pytest.raises(AnsibleFailJson) as exc:
+        with set_module_args(
+            {
+                "organization": "myorg",
+                "environment": "production",
+                "token": "ghp_test_token",
+            }
+        ):
             github_secrets_info.main()
 
     result = exc.value.args[0]
