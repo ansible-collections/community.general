@@ -94,7 +94,7 @@ class TestPackerModule(unittest.TestCase):
     def test_init_idempotent(self):
         self._setup_module_params(state="init")
         self.mock_module.run_command.side_effect = [
-            (0, "", ""),  # ничего не установлено
+            (0, "", ""),
             (0, "Packer v1.9.4", ""),
         ]
 
@@ -103,6 +103,18 @@ class TestPackerModule(unittest.TestCase):
         self.assertFalse(result["changed"])
         self.assertEqual(result["rc"], 0)
         self.assertEqual(self._command(), ["/usr/local/bin/packer", "init", self.template_path])
+
+    def test_init_in_check_mode(self):
+        self._setup_module_params(state="init")
+        self.mock_module.check_mode = True
+
+        result = self._module().apply()
+
+        self.assertFalse(result["changed"])
+        self.assertIn("msg", result)
+        self.assertIn("Check mode", result["msg"])
+        self.assertEqual(result["cmd"], ["/usr/local/bin/packer", "init", self.template_path])
+        self.mock_module.run_command.assert_not_called()
 
     def test_build_successful(self):
         self._setup_module_params(state="build")
@@ -192,7 +204,8 @@ class TestPackerModule(unittest.TestCase):
 
         self._module().apply()
 
-        self.assertIn("-no-color", self._command())
+        self.assertIn("-color=false", self._command())
+        self.assertNotIn("-no-color", self._command())
 
     def test_build_with_color_enabled(self):
         self._setup_module_params(state="build", color=True)

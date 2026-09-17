@@ -19,7 +19,9 @@ extends_documentation_fragment:
   - community.general._attributes
 attributes:
   check_mode:
-    description: In check_mode, runs C(packer validate) instead of building.
+    description:
+      - In check_mode, runs C(packer validate) instead of building.
+      - C(state=init), no command is executed in check mode; only the planned command is reported.
     support: full
   diff_mode:
     support: none
@@ -72,18 +74,17 @@ options:
     default: false
   parallel:
     description:
-      - Enable parallel building (C(-parallel=false) if V(false)).
+      - Disable parallel building (C(-parallel=false) if V(false)).
     type: bool
     default: true
   color:
     description:
-      - Disable colored output (C(-no-color) if V(false)).
+      - Enable colored output if V(true).
     type: bool
     default: false
   machine_readable:
     description:
-      - Output in machine-readable format (C(-machine-readable) if V(true)).
-      - Recommended for parsing artifacts reliably.
+      - Generate the output in machine-readable format (C(-machine-readable) if V(true)).
     type: bool
     default: false
   cleanup:
@@ -172,7 +173,7 @@ packer_version:
   type: str
   sample: "1.9.4"
 cmd:
-  description: Full command line executed, as a list of arguments.
+  description: Full command line executed as a list.
   returned: always
   type: list
   elements: str
@@ -182,7 +183,7 @@ cmd:
     - template.pkr.hcl
 artifacts:
   description: List of created artifacts.
-  returned: when O(state=build) and build successful (not in check_mode)
+  returned: when O(state=build) and build successful
   type: list
   elements: dict
   sample:
@@ -277,7 +278,7 @@ class PackerModule:
 
         if command in ["build", "validate"]:
             if not self.color:
-                cmd.append("-no-color")
+                cmd.append("-color=false")
             if self.machine_readable:
                 cmd.append("-machine-readable")
 
@@ -372,7 +373,14 @@ class PackerModule:
         self.validate_parameters()
 
         if self.state == "init":
+            if self.module.check_mode:
+                return {
+                    "changed": False,
+                    "cmd": self.build_command("init"),
+                    "msg": "Check mode: would run 'packer init' to install required plugins.",
+                }
             return self.execute_packer("init")
+
         if self.module.check_mode:
             return self.execute_packer("validate")
         return self.execute_packer("build")
