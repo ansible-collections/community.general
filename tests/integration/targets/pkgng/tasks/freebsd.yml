@@ -107,6 +107,9 @@
       check_mode: true
       register: pkgng_example4_wildcard_checkmode
 
+    - command: "pkg upgrade -n {{ pkgng_test_pkg_name }}"
+      ignore_errors: true
+
     - name: Check for available package upgrade (checkmode)
       community.general.pkgng:
         name: '{{ pkgng_test_pkg_name }}'
