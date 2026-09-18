@@ -353,6 +353,12 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
+            - name: FreeBSD 15.0 + group 1
+              test: ansible-test-integration-2.21-freebsd-15.0-azp-posix-1
+            - name: FreeBSD 15.0 + group 2
+              test: ansible-test-integration-2.21-freebsd-15.0-azp-posix-2
+            - name: FreeBSD 15.0 + group 3
+              test: ansible-test-integration-2.21-freebsd-15.0-azp-posix-3
             - name: RHEL 10.1 + group 1
               test: ansible-test-integration-2.21-rhel-10.1-azp-posix-1
             - name: RHEL 10.1 + group 2
@@ -371,6 +377,18 @@ stages:
           targets:
             - name: Alpine 3.24 + extra VMs
               test: ansible-test-integration-2.22-alpine-3.24-azp-posix-vm
+            - name: FreeBSD 14.5 + group 1
+              test: ansible-test-integration-2.22-freebsd-14.5-azp-posix-1
+            - name: FreeBSD 14.5 + group 2
+              test: ansible-test-integration-2.22-freebsd-14.5-azp-posix-2
+            - name: FreeBSD 14.5 + group 3
+              test: ansible-test-integration-2.22-freebsd-14.5-azp-posix-3
+            - name: FreeBSD 15.1 + group 1
+              test: ansible-test-integration-2.22-freebsd-15.1-azp-posix-1
+            - name: FreeBSD 15.1 + group 2
+              test: ansible-test-integration-2.22-freebsd-15.1-azp-posix-2
+            - name: FreeBSD 15.1 + group 3
+              test: ansible-test-integration-2.22-freebsd-15.1-azp-posix-3
             - name: macOS 26.3 + group 1
               test: ansible-test-integration-2.22-macos-26.3-azp-posix-1
             - name: macOS 26.3 + group 2
