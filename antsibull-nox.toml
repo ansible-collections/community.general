@@ -122,10 +122,12 @@ doc_fragment = "community.general.scaleway.actiongroup_scaleway"
 run_galaxy_importer = true
 
 [sessions.ansible_test_sanity]
-include_devel = true
+include_devel = false
+max_version = "2.22"
 
 [sessions.ansible_test_units]
-include_devel = true
+include_devel = false
+max_version = "2.22"
 split_by_python_version = true
 
 [sessions.ansible_test_units.core_python_versions]
@@ -274,14 +276,14 @@ remote = [
     # "rhel/9.7",
 ]
 
-# Ansible-core devel:
+# Ansible-core 2.22:
 
 [[sessions.ansible_test_integration.groups]]
-session_name = "ansible-test-integration-devel"
-description = "Meta session for running all ansible-test-integration-devel-* sessions."
+session_name = "ansible-test-integration-2.22"
+description = "Meta session for running all ansible-test-integration-2.22-* sessions."
 
 [[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "devel"
+ansible_core = "2.22"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 docker = [
     "fedora44",
@@ -291,37 +293,37 @@ docker = [
 ]
 
 [[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "devel"
+ansible_core = "2.22"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 python_version = "3.11"
 docker = "quay.io/ansible-community/test-image:debian-bookworm"
 
 [[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "devel"
+ansible_core = "2.22"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 python_version = "3.13"
 docker = "quay.io/ansible-community/test-image:debian-13-trixie"
 
 [[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "devel"
+ansible_core = "2.22"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 python_version = "3.13"
 docker = "quay.io/ansible-community/test-image:opensuse-tumbleweed"
 
 [[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "devel"
+ansible_core = "2.22"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 python_version = "3.14"
 docker = "quay.io/ansible-community/test-image:archlinux"
 
 [[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "devel"
+ansible_core = "2.22"
 target = [ "azp/generic/1/" ]
 python_version = [ "3.9", "3.13", "3.15" ]
 docker = "default"
 
 [[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "devel"
+ansible_core = "2.22"
 target = [ "azp/posix/vm/" ]
 remote = [
     "alpine/3.24",
@@ -331,7 +333,7 @@ remote = [
 ]
 
 [[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "devel"
+ansible_core = "2.22"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 remote = [
     "macos/26.3",
