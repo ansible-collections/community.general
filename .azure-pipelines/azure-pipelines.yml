@@ -73,6 +73,8 @@ stages:
               test: ansible-test-sanity-2.20
             - name: ansible-core 2.21
               test: ansible-test-sanity-2.21
+            - name: ansible-core 2.22
+              test: ansible-test-sanity-2.22
             - name: ansible-core devel
               test: ansible-test-sanity-devel
             - name: Extra sanity tests
@@ -126,6 +128,22 @@ stages:
             - name: Python 3.14
               test: ansible-test-units-2.21-3.14
 
+  - stage: units_2_22
+    displayName: Units 2.22
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Python 3.10
+              test: ansible-test-units-2.22-3.10
+            - name: Python 3.13
+              test: ansible-test-units-2.22-3.13
+            - name: Python 3.15
+              test: ansible-test-units-2.22-3.15
+
   - stage: units_devel
     displayName: Units devel
     dependsOn: []
@@ -135,8 +153,6 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: Python 3.9
-              test: ansible-test-units-devel-3.9
             - name: Python 3.10
               test: ansible-test-units-devel-3.10
             - name: Python 3.11
@@ -241,6 +257,34 @@ stages:
               test: ansible-test-integration-2.21-ubuntu2404-azp-posix-2
             - name: Ubuntu 24.04 + group 3
               test: ansible-test-integration-2.21-ubuntu2404-azp-posix-3
+
+  - stage: docker_2_22
+    displayName: Docker 2.22
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: Generic + py3.13 + generic group 1
+              test: ansible-test-integration-2.22-default-3.13-azp-generic-1
+            - name: Generic + py3.15 + generic group 1
+              test: ansible-test-integration-2.22-default-3.15-azp-generic-1
+            - name: Generic + py3.9 + generic group 1
+              test: ansible-test-integration-2.22-default-3.9-azp-generic-1
+            - name: Fedora 44 + group 1
+              test: ansible-test-integration-2.22-fedora44-azp-posix-1
+            - name: Fedora 44 + group 2
+              test: ansible-test-integration-2.22-fedora44-azp-posix-2
+            - name: Fedora 44 + group 3
+              test: ansible-test-integration-2.22-fedora44-azp-posix-3
+            - name: Ubuntu 26.04 + group 1
+              test: ansible-test-integration-2.22-ubuntu2604-azp-posix-1
+            - name: Ubuntu 26.04 + group 2
+              test: ansible-test-integration-2.22-ubuntu2604-azp-posix-2
+            - name: Ubuntu 26.04 + group 3
+              test: ansible-test-integration-2.22-ubuntu2604-azp-posix-3
 
   - stage: docker_devel
     displayName: Docker devel
@@ -360,6 +404,28 @@ stages:
             - name: RHEL 10.1 + group 3
               test: ansible-test-integration-2.21-rhel-10.1-azp-posix-3
 
+  - stage: remote_2_22
+    displayName: Remote 2.22
+    dependsOn: []
+    variables:
+      entryPoint: tests/utils/shippable/nox.sh
+    jobs:
+      - template: templates/matrix.yml
+        parameters:
+          targets:
+            - name: macOS 26.3 + group 1
+              test: ansible-test-integration-2.22-macos-26.3-azp-posix-1
+            - name: macOS 26.3 + group 2
+              test: ansible-test-integration-2.22-macos-26.3-azp-posix-2
+            - name: macOS 26.3 + group 3
+              test: ansible-test-integration-2.22-macos-26.3-azp-posix-3
+            - name: RHEL 10.2 + group 1
+              test: ansible-test-integration-2.22-rhel-10.2-azp-posix-1
+            - name: RHEL 10.2 + group 2
+              test: ansible-test-integration-2.22-rhel-10.2-azp-posix-2
+            - name: RHEL 10.2 + group 3
+              test: ansible-test-integration-2.22-rhel-10.2-azp-posix-3
+
   - stage: remote_devel
     displayName: Remote devel
     dependsOn: []
@@ -401,14 +467,17 @@ stages:
       - units_2_19
       - units_2_20
       - units_2_21
+      - units_2_22
       - units_devel
       - docker_2_19
       - docker_2_20
       - docker_2_21
+      - docker_2_22
       - docker_devel
       - remote_2_19
       - remote_2_20
       - remote_2_21
+      - remote_2_22
       - remote_devel
     jobs:
       - template: templates/coverage.yml
