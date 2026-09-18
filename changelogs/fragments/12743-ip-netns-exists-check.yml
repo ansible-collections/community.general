@@ -1,0 +1,2 @@
+bugfixes:
+  - ip_netns - fix namespace existence checks when one namespace name is a prefix of another (https://github.com/ansible-collections/community.general/issues/12731, https://github.com/ansible-collections/community.general/pull/12743).
