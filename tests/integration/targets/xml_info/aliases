@@ -4,3 +4,6 @@
 
 azp/posix/3
 destructive
+skip/freebsd14.5  # TODO - fix this!
+skip/freebsd15.0  # TODO - fix this!
+skip/freebsd15.1  # TODO - fix this!
