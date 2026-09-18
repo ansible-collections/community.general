@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
+    AnsibleFailJson,
     exit_json,
     fail_json,
     set_module_args,
@@ -96,3 +97,42 @@ def test_fail_list_repo_secrets(fetch_url_mock):
     result = exc.value.args[0]
     assert result["changed"] is False
     assert result["secrets"] == []
+
+
+def test_list_environment_secrets(fetch_url_mock):
+    fetch_url_mock.return_value = make_fetch_url_response(GITHUB_SECRETS_RESPONSE)
+
+    with set_module_args(
+        {
+            "organization": "myorg",
+            "repository": "myrepo",
+            "environment": "production",
+            "token": "ghp_test_token",
+        }
+    ):
+        with pytest.raises(AnsibleExitJson) as exc:
+            github_secrets_info.main()
+
+    result = exc.value.args[0]
+    assert result["changed"] is False
+    assert result["secrets"] == GITHUB_SECRETS_RESPONSE["secrets"]
+    assert fetch_url_mock.call_args.args[1] == (
+        "https://api.github.com/repos/myorg/myrepo/environments/production/secrets"
+    )
+    assert fetch_url_mock.call_args.kwargs["method"] == "GET"
+
+
+def test_fail_environment_without_repository(fetch_url_mock):
+    with pytest.raises(AnsibleFailJson) as exc:
+        with set_module_args(
+            {
+                "organization": "myorg",
+                "environment": "production",
+                "token": "ghp_test_token",
+            }
+        ):
+            github_secrets_info.main()
+
+    result = exc.value.args[0]
+    assert result["msg"] == "missing parameter(s) required by 'environment': repository"
+    fetch_url_mock.assert_not_called()
