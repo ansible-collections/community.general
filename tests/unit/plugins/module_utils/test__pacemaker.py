@@ -11,6 +11,7 @@ import pytest
 from ansible_collections.community.general.plugins.module_utils import _pacemaker
 from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     _DEFAULT_RESOURCE_READY_STATES,
+    _STOPPED_READY_STATES,
     wait_for_resource,
 )
 
@@ -48,6 +49,24 @@ def _no_sleep(mocker):
 def test_default_ready_states_is_started_only():
     """The default must preserve pre-fix behaviour for stonith and non-promotable callers."""
     assert _DEFAULT_RESOURCE_READY_STATES == ("Started",)
+
+
+def test_stopped_ready_states_is_stopped_only():
+    """The stopped-ready-states tuple is used by state=disabled to poll for Stopped."""
+    assert _STOPPED_READY_STATES == ("Stopped",)
+
+
+def test_wait_for_resource_stopped_ready_state():
+    """state=disabled callers poll with _STOPPED_READY_STATES; ``Stopped`` output must short-circuit success."""
+    runner = _make_runner(
+        [
+            (0, "  * virtual-ip\t(ocf:heartbeat:IPaddr2):\t Stopped (disabled)", ""),
+        ]
+    )
+
+    wait_for_resource(runner, "resource", "virtual-ip", wait=30, ready_states=_STOPPED_READY_STATES)
+
+    assert runner.call_count == 1
 
 
 @pytest.mark.parametrize(
