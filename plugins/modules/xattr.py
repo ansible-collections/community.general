@@ -10,9 +10,8 @@ DOCUMENTATION = r"""
 module: xattr
 short_description: Manage user defined extended attributes
 description:
-  - Manages filesystem user defined extended attributes.
-  - Requires that extended attributes are enabled on the target filesystem and that the C(setfattr)/C(getfattr) utilities
-    are present.
+  - Manages filesystem user defined extended attributes, also known as 'xattr'.
+  - Requires that extended attributes are enabled on the target filesystem.
 extends_documentation_fragment:
   - community.general._attributes
 attributes:
@@ -56,6 +55,8 @@ options:
       - If V(true), dereferences symlinks and sets/gets attributes on symlink target, otherwise acts on symlink itself.
     type: bool
     default: true
+notes:
+    - Starting with community.general 13.0.0 this action no longer requires the xattr CLI tools installed on the target.
 author:
   - Brian Coca (@bcoca)
 """
@@ -92,78 +93,42 @@ EXAMPLES = r"""
     state: absent
 """
 
+RETURN = r"""
+xattr:
+    description: The xattr key(s) and value(s) requested
+    returned: success
+    type: dict
+    sample: '{"user.mykey": "heyo"}'
+"""
+
 import os
 
-# import module snippets
 from ansible.module_utils.basic import AnsibleModule
 
 
-def get_xattr_keys(module, path, follow):
-    cmd = [module.get_bin_path("getfattr", True), "--absolute-names"]
-
-    if not follow:
-        cmd.append("-h")
-    cmd.append(path)
-
-    return _run_xattr(module, cmd)
+class XattrFail(Exception):
+    pass
 
 
-def get_xattr(module, path, key, follow):
-    cmd = [module.get_bin_path("getfattr", True), "--absolute-names"]
-
-    if not follow:
-        cmd.append("-h")
-    if key is None:
-        cmd.append("-d")
-    else:
-        cmd.append("-n")
-        cmd.append(key)
-    cmd.append(path)
-
-    return _run_xattr(module, cmd, False)
-
-
-def set_xattr(module, path, key, value, follow):
-    cmd = [module.get_bin_path("setfattr", True)]
-    if not follow:
-        cmd.append("-h")
-    cmd.append("-n")
-    cmd.append(key)
-    cmd.append("-v")
-    cmd.append(value)
-    cmd.append(path)
-
-    return _run_xattr(module, cmd)
-
-
-def rm_xattr(module, path, key, follow):
-    cmd = [module.get_bin_path("setfattr", True)]
-    if not follow:
-        cmd.append("-h")
-    cmd.append("-x")
-    cmd.append(key)
-    cmd.append(path)
-
-    return _run_xattr(module, cmd, False)
-
-
-def _run_xattr(module, cmd, check_rc=True):
+def get_xattr(path, key, follow):
     try:
-        (rc, out, err) = module.run_command(cmd, check_rc=check_rc)
-    except Exception as e:
-        module.fail_json(msg=f"{e}!")
+        return os.getxattr(path, attribute=key, follow_symlinks=follow)
+    except OSError as e:
+        raise XattrFail(f"Could not read key({key}) from {path}") from e
 
-    # result = {'raw': out}
-    result = {}
-    for line in out.splitlines():
-        if line.startswith("#") or line == "":
-            pass
-        elif "=" in line:
-            (key, val) = line.split("=", 1)
-            result[key] = val.strip('"')
-        else:
-            result[line] = ""
-    return result
+
+def set_xattr(path, key, value, follow):
+    try:
+        os.setxattr(path, attribute=key, value=value, follow_symlinks=follow)
+    except OSError as e:
+        raise XattrFail(f"Could not set key({key}) on {path}") from e
+
+
+def rm_xattr(path, key, follow):
+    try:
+        os.removexattr(path, attribute=key, follow_symlinks=follow)
+    except OSError as e:
+        raise XattrFail(f"Could not remove key({key}) fron {path}") from e
 
 
 def main():
@@ -177,24 +142,30 @@ def main():
             follow=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
+        required_if=[
+            ("state", "present", ["key", "value"]),
+            ("state", "absent", ["key"]),
+        ],
     )
-    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
-    path = module.params.get("path")
-    namespace = module.params.get("namespace")
-    key = module.params.get("key")
-    value = module.params.get("value")
-    state = module.params.get("state")
-    follow = module.params.get("follow")
+
+    path = module.params["path"]
+    namespace = module.params["namespace"]
+    key = module.params["key"]
+    value = module.params["value"]
+    state = module.params["state"]
+    follow = module.params["follow"]
 
     if not os.path.exists(path):
         module.fail_json(msg="path not found or not accessible!")
 
+    if state == 'read' and key is None:
+        # NOTE: This is backwards compatible, but should go away if we deprecate and remove 'info states'
+        module.warn('No key provided for state "read", assuming you really want "all"')
+        state == 'all'
+
     changed = False
     msg = ""
     res = {}
-
-    if key is None and state in ["absent", "present"]:
-        module.fail_json(msg=f"{state} needs a key parameter")
 
     # Prepend the key with the namespace if defined
     if (
@@ -205,31 +176,48 @@ def main():
     ):
         key = f"{namespace}.{key}"
 
-    if state == "present" or value is not None:
-        current = get_xattr(module, path, key, follow)
-        if current is None or key not in current or value != current[key]:
-            if not module.check_mode:
-                res = set_xattr(module, path, key, value, follow)
-            changed = True
-        res = current
-        msg = f"{key} set to {value}"
-    elif state == "absent":
-        current = get_xattr(module, path, key, follow)
-        if current is not None and key in current:
-            if not module.check_mode:
-                res = rm_xattr(module, path, key, follow)
-            changed = True
-        res = current
-        msg = f"{key} removed"
-    elif state == "keys":
-        res = get_xattr_keys(module, path, follow)
-        msg = "returning all keys"
-    elif state == "all":
-        res = get_xattr(module, path, None, follow)
-        msg = "dumping all"
-    else:
-        res = get_xattr(module, path, key, follow)
-        msg = f"returning {key}"
+    try:
+        res = {}
+        if state == "all":
+            keys = os.listxattr(path, follow_symlinks=follow)
+            for k in keys:
+                res[k] = get_xattr(path, k, follow)
+            msg = "dumping all"
+        elif state == "read":
+            res[key] = get_xattr(path, key, follow)
+            msg = f"returning {key}"
+        elif state == "keys":
+            res = os.listxattr(path, follow_symlinks=follow)
+            msg = "returning all keys"
+        elif state == "present":
+            try:
+                res[key] = get_xattr(path, key, follow)
+            except XattrFail:
+                pass  # does not exist
+
+            value = value.encode()
+            if not value == res.get(key):
+                changed = True
+                if not module.check_mode:
+                    set_xattr(path, key, value, follow)
+                msg = 'key is set'
+                res = {key: value}
+        elif state == "absent":
+            msg = f"{key} is absent from {path}"
+            try:
+                current = os.listxattr(path, follow_symlinks=follow)
+                if key in current:
+                    changed = True
+                    if not module.check_mode:
+                        rm_xattr(path, key, follow)
+            except XattrFail:
+                module.exit_json(msg=msg, changed=changed, xattr=res)
+        else:
+            # this only happens if we mismatch code with the option definition choices
+            module.exit_json(msg=f'The developer messed up and allowed unsupported option: {state}')
+
+    except XattrFail as e:
+        module.fail_json(xattr=res, msg=str(e), exception=e.__cause__)
 
     module.exit_json(changed=changed, msg=msg, xattr=res)
 
