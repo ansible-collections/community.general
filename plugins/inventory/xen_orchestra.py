@@ -30,28 +30,34 @@ options:
     description:
       - API host to XOA API.
       - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_HOST)
-        is used instead.
+        or E(XO_HOST) is used instead.
     type: str
     env:
       - name: ANSIBLE_XO_HOST
+      - name: XO_HOST
+        version_added: 13.4.0
   user:
     description:
       - Xen Orchestra user.
       - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_USER)
-        is used instead.
+        or E(XO_USER) is used instead.
     required: true
     type: str
     env:
       - name: ANSIBLE_XO_USER
+      - name: XO_USER
+        version_added: 13.4.0
   password:
     description:
       - Xen Orchestra password.
       - If the value is not specified in the inventory configuration, the value of environment variable E(ANSIBLE_XO_PASSWORD)
-        is used instead.
+        or E(XO_PASSWORD) is used instead.
     required: true
     type: str
     env:
       - name: ANSIBLE_XO_PASSWORD
+      - name: XO_PASSWORD
+        version_added: 13.4.0
   validate_certs:
     description: Verify TLS certificate if using HTTPS.
     type: boolean
