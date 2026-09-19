@@ -34,6 +34,7 @@ options:
     required: true
     env:
       - name: JABBER_PASS
+    secret: true
   to:
     description: Chat identifier that receives the message.
     type: str

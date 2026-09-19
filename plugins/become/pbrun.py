@@ -69,6 +69,7 @@ options:
     ini:
       - section: pbrun_become_plugin
         key: password
+    secret: true
   wrap_exe:
     description: Toggle to wrap the command C(pbrun) calls in C(shell -c) or not.
     default: false

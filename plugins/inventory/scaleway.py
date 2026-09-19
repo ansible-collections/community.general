@@ -59,6 +59,7 @@ options:
       - name: SCW_TOKEN
       - name: SCW_API_KEY
       - name: SCW_OAUTH_TOKEN
+    secret: true
   hostnames:
     description: List of preference about what to use as an hostname.
     type: list
