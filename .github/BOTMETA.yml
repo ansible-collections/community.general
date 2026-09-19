@@ -246,6 +246,10 @@ files:
     maintainers: Ajpantuso
   $filters/version_sort.py:
     maintainers: ericzolf
+  $filters/version_sort.yml:
+    maintainers: ericzolf
+  $filters/version_sort_natural.yml:
+    maintainers: ericzolf russoz
   $inventories/:
     labels: inventories
   $inventories/cobbler.py:
