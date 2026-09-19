@@ -1,0 +1,455 @@
+# Copyright (c) 2026, Dexter Le <dextersydney2001@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  profiles_list_ok: &profiles-list-ok
+    command: [/testbin/kopia, notification, profile, list, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: "ops-email"
+    err: ''
+  profiles_list_empty: &profiles-list-empty
+    command: [/testbin/kopia, notification, profile, list, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
+
+test_cases:
+  - id: configure_email_profile
+    input:
+      state: profile_email
+      profile_name: ops-email
+      smtp_server: smtp.example.com
+      smtp_port: 587
+      smtp_username: notify@example.com
+      smtp_password: smtpsecret
+      mail_from: notify@example.com
+      mail_to: ops@example.com
+      min_severity: warning
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *profiles-list-empty
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - configure
+            - email
+            - --profile-name
+            - ops-email
+            - --smtp-server
+            - smtp.example.com
+            - --smtp-port
+            - "587"
+            - --smtp-username
+            - notify@example.com
+            - --smtp-password
+            - smtpsecret
+            - --mail-from
+            - notify@example.com
+            - --mail-to
+            - ops@example.com
+            - --min-severity
+            - warning
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-ok
+
+  - id: configure_pushover_profile
+    input:
+      state: profile_pushover
+      profile_name: ops-pushover
+      pushover_app_token: "aToken123"
+      pushover_user_key: "uKey456"
+      min_severity: error
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *profiles-list-empty
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - configure
+            - pushover
+            - --profile-name
+            - ops-pushover
+            - --app-token
+            - aToken123
+            - --user-key
+            - uKey456
+            - --min-severity
+            - error
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-ok
+
+  - id: configure_webhook_profile
+    input:
+      state: profile_webhook
+      profile_name: ops-webhook
+      webhook_endpoint: https://hooks.example.com/kopia
+      webhook_method: POST
+      webhook_headers:
+        - "Authorization:Bearer mytoken"
+      format: html
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *profiles-list-empty
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - configure
+            - webhook
+            - --profile-name
+            - ops-webhook
+            - --endpoint
+            - https://hooks.example.com/kopia
+            - --method
+            - POST
+            - --http-header
+            - "Authorization:Bearer mytoken"
+            - --format
+            - html
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-ok
+
+  - id: delete_profile
+    input:
+      state: profile_deleted
+      profile_name: ops-email
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - delete
+            - --profile-name
+            - ops-email
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-empty
+
+  - id: delete_profile_no_such_profile
+    input:
+      state: profile_deleted
+      profile_name: ops-email
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-empty
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - delete
+            - --profile-name
+            - ops-email
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'no such profile'
+        - *profiles-list-empty
+
+  - id: list_profiles
+    input:
+      state: profiles_listed
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - list
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "ops-email"
+          err: ''
+        - *profiles-list-ok
+
+  - id: show_profile
+    input:
+      state: profile_shown
+      profile_name: ops-email
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - show
+            - --profile-name
+            - ops-email
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "Profile: ops-email"
+          err: ''
+        - *profiles-list-ok
+
+  - id: set_template
+    input:
+      state: template_set
+      template_name: snapshot-complete
+      template_file: /etc/kopia/templates/snapshot-complete.html
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - template
+            - set
+            - snapshot-complete
+            - /etc/kopia/templates/snapshot-complete.html
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-ok
+
+  - id: list_templates
+    input:
+      state: templates_listed
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - template
+            - list
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "snapshot-complete"
+          err: ''
+        - *profiles-list-ok
+
+  - id: remove_template
+    input:
+      state: template_removed
+      template_name: snapshot-complete
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - template
+            - remove
+            - snapshot-complete
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-ok
+
+  - id: test_profile
+    input:
+      state: profile_tested
+      profile_name: ops-email
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - test
+            - --profile-name
+            - ops-email
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-ok
+
+  - id: show_template
+    input:
+      state: template_shown
+      template_name: snapshot-complete
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - template
+            - show
+            - snapshot-complete
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: "Subject: Snapshot complete"
+          err: ''
+        - *profiles-list-ok
+
+  - id: remove_template_no_such_template
+    input:
+      state: template_removed
+      template_name: snapshot-complete
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *profiles-list-ok
+        - command:
+            - /testbin/kopia
+            - notification
+            - template
+            - remove
+            - snapshot-complete
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'no such template'
+        - *profiles-list-ok
+
+  - id: configure_email_with_cc_and_identity
+    input:
+      state: profile_email
+      profile_name: ops-email
+      smtp_server: smtp.example.com
+      smtp_port: 587
+      smtp_username: notify@example.com
+      smtp_password: smtpsecret
+      smtp_identity: "notify"
+      mail_from: notify@example.com
+      mail_to: ops@example.com
+      mail_cc: manager@example.com
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *profiles-list-empty
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - configure
+            - email
+            - --profile-name
+            - ops-email
+            - --smtp-server
+            - smtp.example.com
+            - --smtp-port
+            - "587"
+            - --smtp-username
+            - notify@example.com
+            - --smtp-password
+            - smtpsecret
+            - --smtp-identity
+            - notify
+            - --mail-from
+            - notify@example.com
+            - --mail-to
+            - ops@example.com
+            - --mail-cc
+            - manager@example.com
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-ok
+
+  - id: configure_webhook_with_send_test
+    input:
+      state: profile_webhook
+      profile_name: ops-webhook
+      webhook_endpoint: https://hooks.example.com/kopia
+      webhook_method: POST
+      format: md
+      send_test: true
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *profiles-list-empty
+        - command:
+            - /testbin/kopia
+            - notification
+            - profile
+            - configure
+            - webhook
+            - --profile-name
+            - ops-webhook
+            - --endpoint
+            - https://hooks.example.com/kopia
+            - --method
+            - POST
+            - --format
+            - md
+            - --send-test-notification
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *profiles-list-ok
