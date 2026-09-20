@@ -1,0 +1,2 @@
+security_fixes:
+  - proton_pass lookup plugin - no longer exposes the personal access token in error messages, verbose output, or the process list (https://github.com/ansible-collections/community.general/issues/12710, https://github.com/ansible-collections/community.general/pull/12726).
