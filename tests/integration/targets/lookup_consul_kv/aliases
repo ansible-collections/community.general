@@ -4,3 +4,4 @@
 
 azp/posix/1
 destructive
+skip/macos  # lookup plugins doing network I/O crash under hosts: localhost on macOS: https://github.com/ansible/ansible/issues/49207
