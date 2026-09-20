@@ -814,23 +814,23 @@ def main():
             module.exit_json(changed=True, msg=f"Successfully deleted project {project_name}")
         module.exit_json(changed=False, msg="Project deleted or does not exist")
 
-    _archiving_states = ["archived", "unarchived"]
-    if state in ["present", *_archiving_states]:
-        if state in _archiving_states and not project_exists:
+    archiving_states = ["archived", "unarchived"]
+    if state in ["present", *archiving_states]:
+        if state in archiving_states and not project_exists:
             module.fail_json(msg=f"{state.capitalize()} state works only on existing projects.")
 
         # default log message parts for "present" state
-        _extra_message = ""
-        _message_sep = ""
-        _creation_message = "created or "
+        extra_message = ""
+        message_sep = ""
+        creation_message = "created or "
 
-        if state in _archiving_states:
+        if state in archiving_states:
             # adjust log message parts in case of archiving actions
-            _message_sep = " - "
-            _extra_message = f"Successfully {state} project {project_name}"
-            _creation_message = ""
-            _actions = {"archived": gitlab_project.archive_project, "unarchived": gitlab_project.unarchive_project}
-            _actions[state]()
+            message_sep = " - "
+            extra_message = f"Successfully {state} project {project_name}"
+            creation_message = ""
+            actions = {"archived": gitlab_project.archive_project, "unarchived": gitlab_project.unarchive_project}
+            actions[state]()
 
         if gitlab_project.create_or_update_project(
             module,
@@ -880,15 +880,15 @@ def main():
             # log message for both archive/unarchive state change and the project creation/update
             module.exit_json(
                 changed=True,
-                msg=f"{_extra_message}{_message_sep}Successfully {_creation_message}updated the project {project_name}",
+                msg=f"{extra_message}{message_sep}Successfully {creation_message}updated the project {project_name}",
                 project=gitlab_project.project_attributes(),
             )
 
-        if state in _archiving_states:
+        if state in archiving_states:
             # log messages only when archived/unarchived state changes
             module.exit_json(
                 changed=True,
-                msg=f"{_extra_message}",
+                msg=f"{extra_message}",
                 project=gitlab_project.project_attributes(),
             )
         else:
