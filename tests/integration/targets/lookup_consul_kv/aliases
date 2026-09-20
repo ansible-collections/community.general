@@ -4,11 +4,3 @@
 
 azp/posix/1
 destructive
-
-# The lookup runs inside a forked worker process, which dies on macOS as soon
-# as the lookup issues its HTTP request ("A worker was found in a dead state").
-# Reproduced on every run, on ansible-core 2.20, 2.22 and devel. This is most
-# likely the Objective-C fork safety crash tracked in
-# https://github.com/ansible/ansible/issues/49207, which is not something this
-# collection can work around.
-skip/macos

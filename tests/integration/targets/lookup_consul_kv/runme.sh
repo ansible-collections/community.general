@@ -8,6 +8,13 @@ set -eux
 # Consul agent and the test that queries it are run against localhost here,
 # rather than relying on ansible-test's usual (possibly separate) target host.
 
+# EXPERIMENT: does this avoid the macOS crash? urllib resolves proxies via
+# _scproxy on macOS, which initializes the Objective-C runtime inside the
+# forked worker. Setting no_proxy makes getproxies() short-circuit on the
+# environment and never reach _scproxy. Everything here talks to localhost,
+# so no proxy is wanted anyway.
+export no_proxy='*'
+
 ANSIBLE_ROLES_PATH=../ \
     ansible-playbook dependencies.yml -v "$@"
 
