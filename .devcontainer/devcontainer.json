@@ -10,7 +10,6 @@
         "terminal.integrated.shell.linux": "/bin/bash",
         "python.pythonPath": "/usr/local/bin/python",
         "editor.defaultFormatter": "charliermarsh.ruff",
-        "editor.formatOnSave": true,
         "files.autoSave": "afterDelay",
         "files.eol": "\n",
         "files.insertFinalNewline": true,
