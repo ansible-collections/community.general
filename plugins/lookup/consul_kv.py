@@ -102,6 +102,11 @@ options:
       python_none: Return a Python V(null)/V(None) value.
       empty_string: Return an empty string.
     version_added: 13.1.0
+notes:
+  - On a macOS controller this lookup can abort the worker process it runs in, with Ansible reporting C(A worker was found
+    in a dead state). Lookups run in a forked process, and resolving the system proxy configuration there initializes macOS
+    frameworks that are not safe to use after a C(fork()); see U(https://github.com/ansible/ansible/issues/49207). Setting
+    any proxy environment variable, for example E(no_proxy), skips the system proxy lookup and avoids the crash.
 """
 
 EXAMPLES = r"""
