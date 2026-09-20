@@ -300,8 +300,7 @@ options:
   state:
     description:
       - Create or delete project.
-      - Possible values are present, absent, archived or unarchived.
-      - Archived and unarchived states are applicable only to existing projects.
+      - States V(archived) and V(unarchived) are only applicable to existing projects.
     default: present
     type: str
     choices: ["present", "absent", "archived", "unarchived"]
