@@ -152,7 +152,19 @@ def query_update(module, run_pkgng, name):
     # rc = 1, updates available
     rc, out, err = run_pkgng("upgrade", "-n", name)
 
-    return rc == 1
+    if rc == 1:
+        return True
+
+    # After many years the pkg maintainers decided to change 'pkg upgrade -n's
+    # exit code in this case from 1 to 0, so that the two cases are no longer
+    # distinguishable by exit code.
+    # (https://github.com/freebsd/pkg/issues/2753)
+
+    # The output contains a line such as:
+    #     The following 1 package(s) will be affected (of 0 checked):
+    # in case a package needs updating.
+    matches = re.findall("^The following ([0-9]+) package\\(?s?\\)? will be affected", out, re.MULTILINE)
+    return any(int(match) > 0 for match in matches)
 
 
 def pkgng_older_than(module, pkgng_path, compare_version):
