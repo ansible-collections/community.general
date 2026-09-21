@@ -378,7 +378,7 @@ class PackerModule:
         if self.state == "init":
             if self.module.check_mode:
                 return {
-                    "changed": False,
+                    "changed": True,
                     "cmd": self.build_command("init"),
                     "msg": "Check mode for 'state=init' is not supported!",
                 }
