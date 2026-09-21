@@ -87,6 +87,12 @@ options:
     choices: ['external', 'gssapi']
     default: external
     version_added: "2.0.0"
+  sasl_auth_id:
+    description:
+      - The SASL authorization identity, equivalent to the C(-X) option of C(ldapmodify).
+      - If not provided, no authorization identity is sent.
+    type: str
+    version_added: "13.5.0"
   xorder_discovery:
     description:
       - Set the behavior on how to process Xordered DNs.

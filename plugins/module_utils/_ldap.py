@@ -45,6 +45,7 @@ def gen_specs(**specs: t.Any) -> dict[str, t.Any]:
             "start_tls": dict(default=False, type="bool"),
             "validate_certs": dict(default=True, type="bool"),
             "sasl_class": dict(choices=["external", "gssapi"], default="external", type="str"),
+            "sasl_auth_id": dict(type="str"),
             "xorder_discovery": dict(choices=["enable", "auto", "disable"], default="auto", type="str"),
             "client_cert": dict(default=None, type="path"),
             "client_key": dict(default=None, type="path"),
@@ -70,6 +71,7 @@ class LdapGeneric:
         self.start_tls = self.module.params["start_tls"]
         self.verify_cert = self.module.params["validate_certs"]
         self.sasl_class = self.module.params["sasl_class"]
+        self.sasl_auth_id = self.module.params["sasl_auth_id"]
         self.xorder_discovery = self.module.params["xorder_discovery"]
         self.client_cert = self.module.params["client_cert"]
         self.client_key = self.module.params["client_key"]
@@ -131,7 +133,8 @@ class LdapGeneric:
                 connection.simple_bind_s(self.bind_dn, self.bind_pw)
             else:
                 klass = SASCL_CLASS.get(self.sasl_class, ldap.sasl.external)
-                connection.sasl_interactive_bind_s("", klass())
+                authz_id = self.sasl_auth_id if self.sasl_auth_id is not None else ""
+                connection.sasl_interactive_bind_s("", klass(authz_id))
         except ldap.LDAPError as e:
             self.fail("Cannot bind to the server.", e)
 
