@@ -21,8 +21,11 @@ attributes:
   check_mode:
     description:
       - In check_mode, runs C(packer validate) instead of building.
-      - C(state=init), no command is executed in check mode; only the planned command is reported.
-    support: full
+      - Check mode is ignored for O(state=init).
+    details:
+      - In check_mode, O(state=build) runs C(packer validate) instead of building.
+      - Check mode is ignored for O(state=init), so C(packer init) is executed and can install required plugins.
+    support: partial
   diff_mode:
     support: none
 options:
@@ -377,7 +380,7 @@ class PackerModule:
                 return {
                     "changed": False,
                     "cmd": self.build_command("init"),
-                    "msg": "Check mode: would run 'packer init' to install required plugins.",
+                    "msg": "Check mode for 'state=init' is not supported!",
                 }
             return self.execute_packer("init")
 
