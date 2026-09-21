@@ -152,6 +152,7 @@ class CallbackModule(CallbackModule_default):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "stdout"
     CALLBACK_NAME = "dense"
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self):
         # From CallbackModule

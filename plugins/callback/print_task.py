@@ -41,8 +41,8 @@ class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "aggregate"
     CALLBACK_NAME = "community.general.print_task"
-
     CALLBACK_NEEDS_ENABLED = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self):
         super().__init__()

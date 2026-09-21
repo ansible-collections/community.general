@@ -79,6 +79,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "stdout"
     CALLBACK_NAME = "community.general.selective"
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None):
         """selective.py callback plugin."""

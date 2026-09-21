@@ -70,6 +70,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "aggregate"
     CALLBACK_NAME = "community.general.cgroup_memory_recap"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None):
         super().__init__(display)

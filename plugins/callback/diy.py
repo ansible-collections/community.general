@@ -811,6 +811,7 @@ class CallbackModule(Default):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "stdout"
     CALLBACK_NAME = "community.general.diy"
+    ANSIBLE_SUPPORTS_MASKING = True
 
     DIY_NS = "ansible_callback_diy"
 

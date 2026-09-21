@@ -27,3 +27,4 @@ class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "stdout"
     CALLBACK_NAME = "community.general.null"
+    ANSIBLE_SUPPORTS_MASKING = True

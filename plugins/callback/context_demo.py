@@ -30,6 +30,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "aggregate"
     CALLBACK_NAME = "community.general.context_demo"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -44,6 +44,7 @@ class CallbackModule(CallbackModule_default):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "stdout"
     CALLBACK_NAME = "community.general.unixy"
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def _run_is_verbose(self, result):
         return (

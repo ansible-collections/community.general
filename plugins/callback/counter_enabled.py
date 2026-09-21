@@ -37,6 +37,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = "stdout"
     CALLBACK_NAME = "community.general.counter_enabled"
+    ANSIBLE_SUPPORTS_MASKING = True
 
     _task_counter = 1
     _task_total = 0
