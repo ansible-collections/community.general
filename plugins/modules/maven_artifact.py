@@ -329,11 +329,6 @@ def adjust_recursive_directory_permissions(pre_existing_dir, new_directory_list,
 
 class Artifact:
     def __init__(self, group_id, artifact_id, version, version_by_spec, classifier="", extension="jar"):
-        if not group_id:
-            raise ValueError("group_id must be set")
-        if not artifact_id:
-            raise ValueError("artifact_id must be set")
-
         self.group_id = group_id
         self.artifact_id = artifact_id
         self.version = version
@@ -378,24 +373,6 @@ class Artifact:
         elif self.extension != "jar":
             result = f"{self.group_id}:{self.artifact_id}:{self.extension}:{self.version}"
         return result
-
-    @staticmethod
-    def parse(input):
-        parts = input.split(":")
-        if len(parts) >= 3:
-            g = parts[0]
-            a = parts[1]
-            v = parts[-1]
-            t = None
-            c = None
-            if len(parts) == 4:
-                t = parts[2]
-            if len(parts) == 5:
-                t = parts[2]
-                c = parts[3]
-            return Artifact(g, a, v, c, t)
-        else:
-            return None
 
 
 class MavenDownloader:
@@ -743,10 +720,12 @@ def main():
     if not version_by_spec and not version:
         version = "latest"
 
-    try:
-        artifact = Artifact(group_id, artifact_id, version, version_by_spec, classifier, extension)
-    except ValueError as e:
-        module.fail_json(msg=e.args[0])
+    if not group_id:
+        module.fail_json(msg="group_id must be set")
+    if not artifact_id:
+        module.fail_json(msg="artifact_id must be set")
+
+    artifact = Artifact(group_id, artifact_id, version, version_by_spec, classifier, extension)
 
     changed = False
     prev_state = "absent"
