@@ -1,2 +1,2 @@
 minor_changes:
-  - Adds support for specifying a SASL authorization identity (equivalent to -X 'dn:...' flag) across all LDAP modules.
+  - ldap_* modules - add support for specifying a SASL authorization identity (equivalent to ``-X 'dn:...' flag``) (https://github.com/ansible-collections/community.general/pull/12781).
