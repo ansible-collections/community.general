@@ -133,7 +133,7 @@ class LdapGeneric:
                 connection.simple_bind_s(self.bind_dn, self.bind_pw)
             else:
                 klass = SASCL_CLASS.get(self.sasl_class, ldap.sasl.external)
-                authz_id = self.sasl_auth_id if self.sasl_auth_id is not None else ""
+                authz_id = self.sasl_auth_id or ""
                 connection.sasl_interactive_bind_s("", klass(authz_id))
         except ldap.LDAPError as e:
             self.fail("Cannot bind to the server.", e)
