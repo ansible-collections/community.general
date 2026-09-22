@@ -89,7 +89,7 @@ options:
     version_added: "2.0.0"
   sasl_auth_id:
     description:
-      - The SASL authorization identity, equivalent to the C(-X) option of C(ldapmodify).
+      - The SASL authorization identity, equivalent to the C(-X) CLI argument.
       - If not provided, no authorization identity is sent.
     type: str
     version_added: "13.5.0"
