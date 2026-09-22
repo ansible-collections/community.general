@@ -35,7 +35,7 @@ options:
       - The GitHub environment name, for environment secrets.
       - Requires specifying a repository.
     type: str
-    aliases: ["env"]
+    version_added: 13.5.0
   api_url:
     description:
       - The base URL for the GitHub API.
@@ -106,8 +106,8 @@ def list_secrets(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: t.Optional[str],
-    environment: t.Optional[str],
+    repository: str | None,
+    environment: str | None,
 ) -> dict[str, list]:
     url = secrets_url(api_url, organization, repository, environment)
 
@@ -147,8 +147,8 @@ def main() -> None:
     deps.validate(module)
 
     organization: str = module.params["organization"]
-    repository: t.Optional[str] = module.params["repository"]
-    environment: t.Optional[str] = module.params["environment"]
+    repository: str | None = module.params["repository"]
+    environment: str | None = module.params["environment"]
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
 
