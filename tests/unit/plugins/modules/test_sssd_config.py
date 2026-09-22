@@ -133,26 +133,46 @@ class TestRequestParsing(unittest.TestCase):
 
 
 class TestModuleInitialization(unittest.TestCase):
-    def test_missing_sssdconfig_library_attempts_respawn_then_fails(self):
-        helper = make_helper(options={})
-        helper.module.fail_json.side_effect = ModuleRaisedError
+    def setUp(self):
+        failed_patcher = patch.object(
+            sssd_config.deps,
+            "failed",
+            return_value=False,
+        )
+        validate_patcher = patch.object(
+            sssd_config.deps,
+            "validate",
+        )
 
-        with patch.object(sssd_config, "HAS_SSSD_LIB", False):
+        self.deps_failed = failed_patcher.start()
+        self.deps_validate = validate_patcher.start()
+
+        self.addCleanup(failed_patcher.stop)
+        self.addCleanup(validate_patcher.stop)
+
+    def test_missing_sssdconfig_library_attempts_respawn_then_fails_validation(self):
+        helper = make_helper(options={})
+        self.deps_failed.return_value = True
+        self.deps_validate.side_effect = ModuleRaisedError
+
+        with patch.object(
+            sssd_config,
+            "_respawn_sssdconfig",
+        ) as respawn_sssdconfig:
             with patch.object(
                 sssd_config,
-                "_respawn_sssdconfig",
-            ) as respawn_sssdconfig:
+                "create_sssd_config",
+            ) as constructor:
                 with self.assertRaises(ModuleRaisedError):
                     helper.__init_module__()
 
+        self.deps_failed.assert_called_once_with("SSSDConfig")
         respawn_sssdconfig.assert_called_once_with()
-
-        kwargs = helper.module.fail_json.call_args.kwargs
-        self.assertIn("SSSDConfig", kwargs["msg"])
-        self.assertEqual(
-            kwargs["exception"],
-            sssd_config.SSSDCONFIG_IMPORT_ERROR,
+        self.deps_validate.assert_called_once_with(
+            helper.module,
+            "SSSDConfig",
         )
+        constructor.assert_not_called()
 
     def test_initialization_imports_existing_sssd_configuration(self):
         helper = make_helper(
@@ -162,14 +182,18 @@ class TestModuleInitialization(unittest.TestCase):
         config = MagicMock()
         config.has_section.return_value = True
 
-        with patch.object(sssd_config, "HAS_SSSD_LIB", True):
-            with patch.object(
-                sssd_config,
-                "create_sssd_config",
-                return_value=config,
-            ) as constructor:
-                helper.__init_module__()
+        with patch.object(
+            sssd_config,
+            "create_sssd_config",
+            return_value=config,
+        ) as constructor:
+            helper.__init_module__()
 
+        self.deps_failed.assert_called_once_with("SSSDConfig")
+        self.deps_validate.assert_called_once_with(
+            helper.module,
+            "SSSDConfig",
+        )
         constructor.assert_called_once_with()
         config.import_config.assert_called_once_with("/tmp/sssd.conf")
         config.has_section.assert_called_once_with("sssd")
@@ -182,14 +206,13 @@ class TestModuleInitialization(unittest.TestCase):
         config = MagicMock()
         config.has_section.return_value = False
 
-        with patch.object(sssd_config, "HAS_SSSD_LIB", True):
-            with patch.object(
-                sssd_config,
-                "create_sssd_config",
-                return_value=config,
-            ):
-                with self.assertRaises(ModuleRaisedError):
-                    helper.__init_module__()
+        with patch.object(
+            sssd_config,
+            "create_sssd_config",
+            return_value=config,
+        ):
+            with self.assertRaises(ModuleRaisedError):
+                helper.__init_module__()
 
         helper.module.fail_json.assert_called_once_with(msg="The sssd section does not exist")
 
@@ -205,17 +228,19 @@ class TestModuleInitialization(unittest.TestCase):
         before_options = {"services": "nss"}
         helper._get_diff_state = MagicMock(return_value=(before, before_options))
 
-        with patch.object(sssd_config, "HAS_SSSD_LIB", True):
-            with patch.object(
-                sssd_config,
-                "create_sssd_config",
-                return_value=config,
-            ):
-                helper.__init_module__()
+        with patch.object(
+            sssd_config,
+            "create_sssd_config",
+            return_value=config,
+        ):
+            helper.__init_module__()
 
         helper._get_diff_state.assert_called_once_with()
         self.assertEqual(helper._diff_before, before)
-        self.assertEqual(helper._diff_before_options, before_options)
+        self.assertEqual(
+            helper._diff_before_options,
+            before_options,
+        )
 
     def test_initialization_skips_initial_diff_state_when_disabled(self):
         helper = make_helper(options={}, diff_mode=False)
@@ -223,13 +248,12 @@ class TestModuleInitialization(unittest.TestCase):
         config.has_section.return_value = True
         helper._get_diff_state = MagicMock()
 
-        with patch.object(sssd_config, "HAS_SSSD_LIB", True):
-            with patch.object(
-                sssd_config,
-                "create_sssd_config",
-                return_value=config,
-            ):
-                helper.__init_module__()
+        with patch.object(
+            sssd_config,
+            "create_sssd_config",
+            return_value=config,
+        ):
+            helper.__init_module__()
 
         helper._get_diff_state.assert_not_called()
 

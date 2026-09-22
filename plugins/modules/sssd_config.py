@@ -157,12 +157,9 @@ option_names:
 
 import typing as t
 
-from ansible.module_utils.basic import missing_required_lib
-
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils._sssd_config import (
-    HAS_SSSD_LIB,
-    SSSDCONFIG_IMPORT_ERROR,
     EnsurePresent,
     RemoveOptions,
     SSSDOptionMapping,
@@ -187,7 +184,7 @@ def _parse_request(*, state: str, path: str, options: SSSDOptionMapping, must_ex
 
 
 class SSSDConfigModule(StateModuleHelper):
-    _result_diff: t.Optional[dict] = None
+    _result_diff: dict | None = None
 
     module = dict(
         argument_spec=dict(
@@ -222,12 +219,10 @@ class SSSDConfigModule(StateModuleHelper):
             must_exist=self.vars.must_exist,
         )
 
-        if not HAS_SSSD_LIB:
+        if deps.failed("SSSDConfig"):
             _respawn_sssdconfig()
-            self.module.fail_json(
-                msg=missing_required_lib("SSSDConfig"),
-                exception=SSSDCONFIG_IMPORT_ERROR,
-            )
+
+        deps.validate(self.module, "SSSDConfig")
 
         self.sssd_config = create_sssd_config()
         self.sssd_config.import_config(self.request.target.path)

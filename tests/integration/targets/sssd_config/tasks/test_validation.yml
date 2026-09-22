@@ -90,7 +90,7 @@
 
 - name: Reject a nonexistent configuration path
   community.general.sssd_config:
-    path: "{{ sssd_config_test_temp.path }}/does-not-exist.conf"
+    path: "{{ remote_tmp_dir }}/does-not-exist.conf"
     options:
       debug_level: 2
   register: sssd_config_test_missing_path

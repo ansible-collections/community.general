@@ -18,30 +18,15 @@
         else sssd_config_test_packages_override
       }}
 
-- name: Require a known package mapping
-  ansible.builtin.assert:
-    that:
-      - ansible_facts.system == 'Linux'
-      - sssd_config_test_packages | length > 0
-    fail_msg: >-
-      No SSSDConfig package mapping is defined for os_family={{ ansible_facts.os_family }}.
-      Add it to defaults/main.yml or set sssd_config_test_packages_override.
-
 - name: Install the native SSSDConfig library and schemas
   ansible.builtin.package:
     name: "{{ sssd_config_test_packages }}"
     state: present
 
-- name: Create a private temporary directory
-  ansible.builtin.tempfile:
-    state: directory
-    prefix: ansible-sssd-config-
-  register: sssd_config_test_temp
-
 - name: Define temporary test paths
   ansible.builtin.set_fact:
-    sssd_config_test_sssd_path: "{{ sssd_config_test_temp.path }}/sssd-section.conf"
-    sssd_config_test_validation_path: "{{ sssd_config_test_temp.path }}/validation.conf"
+    sssd_config_test_sssd_path: "{{ remote_tmp_dir }}/sssd-section.conf"
+    sssd_config_test_validation_path: "{{ remote_tmp_dir }}/validation.conf"
 
 - name: Report the tested runtime
   ansible.builtin.debug:

@@ -193,30 +193,67 @@ class TestRespawnSSSDConfig(unittest.TestCase):
         )
         respawn_module.assert_not_called()
 
+    def test_sssd_target_rejects_unsupported_section(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "Unsupported SSSD section type: invalid",
+        ):
+            _sssd_config.SSSDTarget(
+                path="/etc/sssd/sssd.conf",
+                section="invalid",
+            )
+
+    def test_sssd_target_rejects_name_for_root_section(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            "The sssd section must not have a name",
+        ):
+            _sssd_config.SSSDTarget(
+                path="/etc/sssd/sssd.conf",
+                section="sssd",
+                name="unexpected",
+            )
+
+    def test_named_targets_require_name(self):
+        for section in ("domain", "service"):
+            with self.subTest(section=section):
+                with self.assertRaisesRegex(
+                    ValueError,
+                    f"The {section} section requires a name",
+                ):
+                    _sssd_config.SSSDTarget(
+                        path="/etc/sssd/sssd.conf",
+                        section=section,
+                    )
+
+    def test_named_targets_reject_empty_name(self):
+        for section in ("domain", "service"):
+            with self.subTest(section=section):
+                with self.assertRaisesRegex(
+                    ValueError,
+                    f"The {section} section requires a name",
+                ):
+                    _sssd_config.SSSDTarget(
+                        path="/etc/sssd/sssd.conf",
+                        section=section,
+                        name="",
+                    )
+
 
 class TestLibraryAdapter(unittest.TestCase):
     def test_create_sssd_config_uses_imported_constructor(self):
         config = object()
 
-        with patch.object(_sssd_config, "HAS_SSSD_LIB", True):
-            with patch.object(
-                _sssd_config,
-                "SSSDConfig",
-                create=True,
-                return_value=config,
-            ) as constructor:
-                result = _sssd_config.create_sssd_config()
+        with patch.object(
+            _sssd_config,
+            "SSSDConfig",
+            create=True,
+            return_value=config,
+        ) as constructor:
+            result = _sssd_config.create_sssd_config()
 
         self.assertIs(result, config)
         constructor.assert_called_once_with()
-
-    def test_create_sssd_config_rejects_missing_library(self):
-        with patch.object(_sssd_config, "HAS_SSSD_LIB", False):
-            with self.assertRaisesRegex(
-                ImportError,
-                "the SSSDConfig Python library is unavailable",
-            ):
-                _sssd_config.create_sssd_config()
 
     def test_get_explicit_options_returns_empty_mapping_when_section_is_absent(self):
         config = MagicMock()

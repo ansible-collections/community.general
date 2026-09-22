@@ -7,22 +7,15 @@
 
 from __future__ import annotations
 
-import traceback
 import typing as t
 from dataclasses import dataclass
 
 from ansible.module_utils.common import respawn
 
-HAS_SSSD_LIB = False
-SSSDCONFIG_IMPORT_ERROR: t.Optional[str] = None
+from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
-try:
+with deps.declare("SSSDConfig"):
     from SSSDConfig import SSSDConfig  # type: ignore[import-not-found]
-except ImportError:
-    SSSDCONFIG_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_SSSD_LIB = True
-    SSSDCONFIG_IMPORT_ERROR = None
 
 
 SSSDOptionMapping = t.Mapping[str, object]
@@ -32,17 +25,32 @@ SSSDOptionMapping = t.Mapping[str, object]
 class SSSDTarget:
     path: str
     section: str
-    name: t.Optional[str] = None
+    name: str | None = None
+
+    def __post_init__(self) -> None:
+        # Validation here so that other modules like sssd_domain and sssd_service can use this and be used safely
+        if self.section not in ("sssd", "domain", "service"):
+            raise ValueError(f"Unsupported SSSD section type: {self.section}")
+
+        if self.section == "sssd":
+            if self.name is not None:
+                raise ValueError("The sssd section must not have a name")
+        elif not self.name:
+            raise ValueError(f"The {self.section} section requires a name")
 
     @property
     def section_name(self) -> str:
+        if self.section == "sssd":
+            return "sssd"
+
+        name = self.name
+        if name is None:
+            raise ValueError(f"The {self.section} section requires a name")
+
         if self.section == "domain":
-            return f"domain/{self.name}"
+            return f"domain/{name}"
 
-        if self.section == "service":
-            return t.cast(str, self.name)
-
-        return "sssd"
+        return name
 
 
 @dataclass(frozen=True)
@@ -50,7 +58,7 @@ class EnsurePresent:
     target: SSSDTarget
     options: SSSDOptionMapping
     must_exist: bool = False
-    active: t.Optional[bool] = None
+    active: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -81,9 +89,6 @@ def _respawn_sssdconfig() -> None:
 
 
 def create_sssd_config() -> SSSDConfig:
-    if not HAS_SSSD_LIB:
-        raise ImportError("the SSSDConfig Python library is unavailable")
-
     return SSSDConfig()
 
 
@@ -108,7 +113,7 @@ def set_domain_options(domain, requested_options: SSSDOptionMapping, explicit_op
         current_value = domain.get_all_options().get(option)
 
         if current_value is not None and current_value != value:
-            provider_type = option[: -len("_provider")]
+            provider_type = option[:-9]
             domain.remove_provider(provider_type)
 
         domain.set_option(option, value)
@@ -132,7 +137,7 @@ def set_service_options(service, requested_options: SSSDOptionMapping, explicit_
     return before != after or any(option not in explicit_options for option in requested_options)
 
 
-def set_domain_active(domain, created: bool, requested: t.Optional[bool]) -> bool:
+def set_domain_active(domain, created: bool, requested: bool | None) -> bool:
     if requested is None:
         if not created:
             return False
@@ -146,7 +151,7 @@ def set_domain_active(domain, created: bool, requested: t.Optional[bool]) -> boo
     return True
 
 
-def set_service_active(sssd_config, name: str, created: bool, requested: t.Optional[bool]) -> bool:
+def set_service_active(sssd_config, name: str, created: bool, requested: bool | None) -> bool:
     if requested is None:
         if not created:
             return False
@@ -211,44 +216,42 @@ def set_sssd_options(sssd_config, requested_options: SSSDOptionMapping) -> bool:
 
 
 def remove_domain_options(domain, option_names: t.Iterable[str]) -> bool:
-    option_names = tuple(option_names)
-
+    changed = False
     for option in option_names:
         if option.endswith("_provider"):
-            domain.remove_provider(option[: -len("_provider")])
+            domain.remove_provider(option[:-9])
         else:
             domain.remove_option(option)
-
-    return bool(option_names)
+        changed = True
+    return changed
 
 
 def remove_service_options(service, option_names: t.Iterable[str]) -> bool:
-    option_names = tuple(option_names)
-
+    changed = False
     for option in option_names:
         service.remove_option(option)
-
-    return bool(option_names)
+        changed = True
+    return changed
 
 
 def remove_sssd_options(sssd_config, option_names: t.Iterable[str]) -> bool:
-    option_names = tuple(option_names)
-
-    if not option_names:
-        return False
-
-    sssd_section = sssd_config.findOpts(
-        sssd_config.opts,
-        "section",
-        "sssd",
-    )[1]
+    sssd_section = None
+    changed = False
 
     for option in option_names:
+        if sssd_section is None:
+            sssd_section = sssd_config.findOpts(
+                sssd_config.opts,
+                "section",
+                "sssd",
+            )[1]
+
         sssd_config.delete_option_subtree(
             sssd_section["value"],
             "option",
             option,
             True,
         )
+        changed = True
 
-    return True
+    return changed
