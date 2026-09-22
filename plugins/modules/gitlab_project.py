@@ -818,7 +818,7 @@ def main():
     if state in ["present", *archiving_states]:
         changed = False
         msgs = []
-        
+
         if state in archiving_states and not project_exists:
             module.fail_json(msg=f"{state.capitalize()} state works only on existing projects.")
 
@@ -876,7 +876,7 @@ def main():
             changed = True
             msgs.append(f"Successfully created or updated the project {project_name}")
 
-        if changed == True:
+        if changed:
             module.exit_json(
                 changed=True,
                 msg=" - ".join(msgs),
