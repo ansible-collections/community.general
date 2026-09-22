@@ -19,12 +19,10 @@ extends_documentation_fragment:
   - community.general._attributes
 attributes:
   check_mode:
-    description:
-      - In check_mode, runs C(packer validate) instead of building.
-      - Check mode is ignored for O(state=init).
     details:
-      - In check_mode, O(state=build) runs C(packer validate) instead of building.
+      - In check mode, O(state=build) runs C(packer validate) instead of building.
       - Check mode is ignored for O(state=init), so C(packer init) is executed and can install required plugins.
+      - O(state=init) always returns V(changed=true) in check mode.
     support: partial
   diff_mode:
     support: none
@@ -40,8 +38,12 @@ options:
     type: str
     required: true
     choices:
-      build: builds the image from template (or validates in check mode).
-      init: initializes the template (installs required plugins).
+      build:
+        - Build the image from template.
+        - In check mode, the build configuration will be validated.
+      init:
+        - Initializes the template.
+        - This installs required plugins.
   template:
     description:
       - Path to the Packer template file or directory.

@@ -302,7 +302,3 @@ class TestPackerModule(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             packer.main()
         self.assertIn("fail_json called", str(context.exception))
-
-
-if __name__ == "__main__":
-    unittest.main()
