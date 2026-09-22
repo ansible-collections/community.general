@@ -89,6 +89,8 @@ from ansible.errors import AnsibleError, AnsibleRuntimeError
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values, mask_secrets
+
 ELASTIC_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from elasticapm import Client, capture_span, instrument, label, trace_parent_from_string
@@ -231,7 +233,7 @@ class ElasticSource:
     def create_span_data(self, apm_cli: Client, task_data: TaskData, host_data: HostData):
         """create the span with the given TaskData and HostData"""
 
-        name = f"[{host_data.name}] {task_data.play}: {task_data.name}"
+        name = f"[{host_data.name}] {task_data.play}: {mask_secrets(task_data.name)}"
 
         message = "success"
         status = "success"
@@ -253,13 +255,13 @@ class ElasticSource:
                 status = "unknown"
 
         with capture_span(
-            task_data.name,
+            mask_secrets(task_data.name),
             start=task_data.start,
             span_type="ansible.task.run",
             duration=host_data.finish - task_data.start,
             labels={
-                "ansible.task.args": task_data.args,
-                "ansible.task.message": message,
+                "ansible.task.args": mask_secret_values(task_data.args),
+                "ansible.task.message": mask_secrets(message),
                 "ansible.task.module": task_data.action,
                 "ansible.task.name": name,
                 "ansible.task.result": rc,
@@ -272,6 +274,7 @@ class ElasticSource:
                 exception = AnsibleRuntimeError(
                     message=f"{task_data.action}: {name} failed with error message {enriched_error_message}"
                 )
+                # TODO: mask secrets in traceback and exception!
                 apm_cli.capture_exception(exc_info=(type(exception), exception, exception.__traceback__), handled=True)
 
     def init_apm_client(
@@ -322,6 +325,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.elastic"
     CALLBACK_NEEDS_ENABLED = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None) -> None:
         super().__init__(display=display)
