@@ -97,6 +97,7 @@ from ansible.plugins.callback import CallbackBase
 from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
 
 
 class SplunkHTTPCollectorSource:
@@ -146,7 +147,7 @@ class SplunkHTTPCollectorSource:
         data["ansible_result"] = result._result
 
         # This wraps the json payload in and outer json event needed by Splunk
-        jsondata = json.dumps({"event": data}, cls=AnsibleJSONEncoder, sort_keys=True)
+        jsondata = json.dumps({"event": mask_secret_values(data)}, cls=AnsibleJSONEncoder, sort_keys=True)
 
         open_url(
             url,
@@ -162,6 +163,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.splunk"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None):
         super().__init__(display=display)

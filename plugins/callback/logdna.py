@@ -63,6 +63,8 @@ from uuid import getnode
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
+
 try:
     from logdna import LogDNAHandler
 
@@ -113,6 +115,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.logdna"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None):
         super().__init__(display=display)
@@ -171,7 +174,7 @@ class CallbackModule(CallbackBase):
 
     def flush(self, log, options):
         if HAS_LOGDNA:
-            self.log.info(json.dumps(log), options)
+            self.log.info(json.dumps(mask_secret_values(log)), options)
 
     def sendLog(self, host, category, logdata):
         options = {"app": "ansible", "meta": {"playbook": self.playbook_name, "host": host, "category": category}}

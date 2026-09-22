@@ -60,6 +60,8 @@ import socket
 
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values, mask_secrets
+
 
 class CallbackModule(CallbackBase):
     """
@@ -70,6 +72,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.syslog_json"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self):
         super().__init__()
@@ -92,10 +95,10 @@ class CallbackModule(CallbackBase):
         res = result._result
         host = result._host.get_name()
         self.logger.error(
-            "%s ansible-command: task execution FAILED; host: %s; message: %s",
+            mask_secrets("%s ansible-command: task execution FAILED; host: %s; message: %s"),
             self.hostname,
             host,
-            self._dump_results(res),
+            self._dump_results(mask_secret_values(res)),
         )
 
     def v2_runner_on_ok(self, result):
@@ -103,26 +106,29 @@ class CallbackModule(CallbackBase):
         host = result._host.get_name()
         if result._task.action != "gather_facts" or self.get_option("setup"):
             self.logger.info(
-                "%s ansible-command: task execution OK; host: %s; message: %s",
+                mask_secrets("%s ansible-command: task execution OK; host: %s; message: %s"),
                 self.hostname,
                 host,
-                self._dump_results(res),
+                self._dump_results(mask_secret_values(res)),
             )
 
     def v2_runner_on_skipped(self, result):
         host = result._host.get_name()
         self.logger.info(
-            "%s ansible-command: task execution SKIPPED; host: %s; message: %s", self.hostname, host, "skipped"
+            mask_secrets("%s ansible-command: task execution SKIPPED; host: %s; message: %s"),
+            self.hostname,
+            host,
+            "skipped",
         )
 
     def v2_runner_on_unreachable(self, result):
         res = result._result
         host = result._host.get_name()
         self.logger.error(
-            "%s ansible-command: task execution UNREACHABLE; host: %s; message: %s",
+            mask_secrets("%s ansible-command: task execution UNREACHABLE; host: %s; message: %s"),
             self.hostname,
             host,
-            self._dump_results(res),
+            self._dump_results(mask_secret_values(res)),
         )
 
     def v2_runner_on_async_failed(self, result):
@@ -130,26 +136,26 @@ class CallbackModule(CallbackBase):
         host = result._host.get_name()
         # jid = result._result.get("ansible_job_id")
         self.logger.error(
-            "%s ansible-command: task execution FAILED; host: %s; message: %s",
+            mask_secrets("%s ansible-command: task execution FAILED; host: %s; message: %s"),
             self.hostname,
             host,
-            self._dump_results(res),
+            self._dump_results(mask_secret_values(res)),
         )
 
     def v2_playbook_on_import_for_host(self, result, imported_file):
         host = result._host.get_name()
         self.logger.info(
-            "%s ansible-command: playbook IMPORTED; host: %s; message: imported file %s",
+            mask_secrets("%s ansible-command: playbook IMPORTED; host: %s; message: imported file %s"),
             self.hostname,
             host,
-            imported_file,
+            mask_secrets(imported_file),
         )
 
     def v2_playbook_on_not_import_for_host(self, result, missing_file):
         host = result._host.get_name()
         self.logger.info(
-            "%s ansible-command: playbook NOT IMPORTED; host: %s; message: missing file %s",
+            mask_secrets("%s ansible-command: playbook NOT IMPORTED; host: %s; message: missing file %s"),
             self.hostname,
             host,
-            missing_file,
+            mask_secrets(missing_file),
         )

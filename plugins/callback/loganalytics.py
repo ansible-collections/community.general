@@ -72,6 +72,7 @@ from ansible.plugins.callback import CallbackBase
 from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
 
 
 class AzureLogAnalyticsSource:
@@ -133,7 +134,7 @@ class AzureLogAnalyticsSource:
         data["extra_vars"] = self.extra_vars
 
         # Preparing the playbook logs as JSON format and send to Azure log analytics
-        jsondata = json.dumps({"event": data}, cls=AnsibleJSONEncoder, sort_keys=True)
+        jsondata = json.dumps({"event": mask_secret_values(data)}, cls=AnsibleJSONEncoder, sort_keys=True)
         content_length = len(jsondata)
         rfc1123date = self.__rfc1123date()
         signature = self.__build_signature(rfc1123date, workspace_id, shared_key, content_length)
@@ -157,6 +158,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "loganalytics"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None):
         super().__init__(display=display)
