@@ -133,7 +133,7 @@ def main() -> None:
             "required": True,
         },
         "repository": {"type": "str", "aliases": ["repo"]},
-        "environment": {"type": "str", "aliases": ["env"]},
+        "environment": {"type": "str"},
         "api_url": {"type": "str", "default": "https://api.github.com"},
         "token": {"type": "str", "required": True, "no_log": True},
     }

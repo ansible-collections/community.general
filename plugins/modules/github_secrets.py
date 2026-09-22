@@ -284,7 +284,7 @@ def main() -> None:
             "required": True,
         },
         "repository": {"type": "str", "aliases": ["repo"]},
-        "environment": {"type": "str", "aliases": ["env"]},
+        "environment": {"type": "str"},
         "key": {"type": "str", "no_log": False},
         "value": {"type": "str", "no_log": True},
         "visibility": {"type": "str", "choices": ["all", "private", "selected"]},
