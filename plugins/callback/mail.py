@@ -89,6 +89,8 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
 
 class CallbackModule(CallbackBase):
     """This Ansible callback plugin mails errors to interested parties."""
@@ -191,7 +193,7 @@ class CallbackModule(CallbackBase):
         # Make playbook name visible (e.g. in Outlook/Gmail condensed view)
         body = f"Playbook: {os.path.basename(self.playbook._file_name)}\n"
         if result._task.name:
-            body += f"Task: {result._task.name}\n"
+            body += f"Task: {mask_secrets(result._task.name)}\n"
         body += f"Module: {result._task.action}\n"
         body += f"Host: {host}\n"
         body += "\n"
@@ -203,7 +205,7 @@ class CallbackModule(CallbackBase):
                 f"{result._task.action}: {json.dumps(result._result['invocation']['module_args'], indent=4)}\n"
             )
         elif result._task.name:
-            body += self.indent(f"{result._task.name} ({result._task.action})\n")
+            body += self.indent(f"{mask_secrets(result._task.name)} ({result._task.action})\n")
         else:
             body += self.indent(f"{result._task.action}\n")
         body += "\n"
@@ -212,7 +214,7 @@ class CallbackModule(CallbackBase):
         if self.itembody:
             body += self.itembody
         elif result._result.get("failed_when_result") is True:
-            fail_cond_list = "\n- ".join(result._task.failed_when)
+            fail_cond_list = "\n- ".join(mask_secrets(result._task.failed_when))
             fail_cond = self.indent(f"failed_when:\n- {fail_cond_list}")
             body += f"due to the following condition:\n\n{fail_cond}\n\n"
         elif result._result.get("msg"):
