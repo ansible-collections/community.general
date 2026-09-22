@@ -816,19 +816,15 @@ def main():
 
     archiving_states = ["archived", "unarchived"]
     if state in ["present", *archiving_states]:
+        changed = False
+        msgs = []
+        
         if state in archiving_states and not project_exists:
             module.fail_json(msg=f"{state.capitalize()} state works only on existing projects.")
 
-        # default log message parts for "present" state
-        extra_message = ""
-        message_sep = ""
-        creation_message = "created or "
-
         if state in archiving_states:
-            # adjust log message parts in case of archiving actions
-            message_sep = " - "
-            extra_message = f"Successfully {state} project {project_name}"
-            creation_message = ""
+            changed = True
+            msgs.append(f"Successfully {state} project {project_name}")
             actions = {"archived": gitlab_project.archive_project, "unarchived": gitlab_project.unarchive_project}
             actions[state]()
 
@@ -877,18 +873,13 @@ def main():
                 "wiki_enabled": wiki_enabled,
             },
         ):
-            # log message for both archive/unarchive state change and the project creation/update
-            module.exit_json(
-                changed=True,
-                msg=f"{extra_message}{message_sep}Successfully {creation_message}updated the project {project_name}",
-                project=gitlab_project.project_attributes(),
-            )
+            changed = True
+            msgs.append(f"Successfully created or updated the project {project_name}")
 
-        if state in archiving_states:
-            # log messages only when archived/unarchived state changes
+        if changed == True:
             module.exit_json(
                 changed=True,
-                msg=f"{extra_message}",
+                msg=" - ".join(msgs),
                 project=gitlab_project.project_attributes(),
             )
         else:
