@@ -38,9 +38,9 @@ options:
     type: str
     choices: [present, absent]
     default: present
-  method:
+  scope:
     description:
-      - Defines whether the mask or unmask operation applies system-wide (V(system)) or only to the current user (V(user)).
+      - Whether the mask or unmask operation applies to the system-wide installation (V(system)) or to the user installation (V(user)).
     type: str
     choices: [system, user]
     default: system
@@ -60,22 +60,22 @@ EXAMPLES = r"""
   flatpak_mask:
     name: "org.gtk.*"
 
-- name: Mask a flatpak application for the current user only
+- name: Mask a flatpak application for the user installation only
   flatpak_mask:
     name: "org.gtk.Gtk3theme.Adwaita-dark"
-    method: user
+    scope: user
 """
 
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 
 
 class FlatpakMask(StateModuleHelper):
-    output_params = ("name", "state", "method")
+    output_params = ("name", "state", "scope")
     module = dict(
         argument_spec=dict(
             name=dict(type="str", required=True, aliases=["app"]),
             state=dict(type="str", default="present", choices=["present", "absent"]),
-            method=dict(type="str", default="system", choices=["user", "system"]),
+            scope=dict(type="str", default="system", choices=["user", "system"]),
         ),
         supports_check_mode=True,
     )
@@ -86,7 +86,7 @@ class FlatpakMask(StateModuleHelper):
         self.vars.masked = self.vars.state == "present"
 
     def check_is_masked(self):
-        check_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask"]
+        check_cmd = [self.flatpak_bin, f"--{self.vars.scope}", "mask"]
 
         rc, out, err = self.module.run_command(check_cmd)
         if rc != 0:
@@ -96,14 +96,14 @@ class FlatpakMask(StateModuleHelper):
         return self.vars.name in masked_apps
 
     def apply_mask(self):
-        set_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask", self.vars.name]
+        set_cmd = [self.flatpak_bin, f"--{self.vars.scope}", "mask", self.vars.name]
 
         rc, out, err = self.module.run_command(set_cmd)
         if rc != 0:
             self.do_raise(msg="Failed to mask flatpak app", rc=rc, stdout=out, stderr=err)
 
     def apply_unmask(self):
-        set_cmd = [self.flatpak_bin, f"--{self.vars.method}", "mask", "--remove", self.vars.name]
+        set_cmd = [self.flatpak_bin, f"--{self.vars.scope}", "mask", "--remove", self.vars.name]
 
         rc, out, err = self.module.run_command(set_cmd)
         if rc != 0:
