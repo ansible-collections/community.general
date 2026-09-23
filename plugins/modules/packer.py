@@ -20,7 +20,7 @@ extends_documentation_fragment:
 attributes:
   check_mode:
     details:
-      - In check mode, O(state=build) runs C(packer validate) instead of building.
+      - In check mode, O(state=built) runs C(packer validate) instead of building.
       - Check mode is ignored for O(state=init), so C(packer init) is executed and can install required plugins.
       - O(state=init) always returns V(changed=true) in check mode.
     support: partial
@@ -34,15 +34,15 @@ options:
     required: true
   state:
     description:
-      - Desired operation to perform.
+      - Desired state of the Packer build configuration.
     type: str
     required: true
     choices:
-      build:
+      built:
         - Build the image from template.
         - In check mode, the build configuration will be validated.
-      init:
-        - Initializes the template.
+      initialized:
+        - Initialize the template.
         - This installs required plugins.
   template:
     description:
@@ -109,19 +109,19 @@ EXAMPLES = r"""
 - name: Initialize Packer template (install plugins)
   community.general.packer:
     name: init-template
-    state: init
+    state: initialized
     template: aws-ubuntu.pkr.hcl
 
 - name: Initialize Packer template from directory
   community.general.packer:
     name: init-template-dir
-    state: init
+    state: ininitializedit
     template: ./packer-templates/
 
 - name: Build AWS AMI with Packer (or validate in check_mode)
   community.general.packer:
     name: my-ami
-    state: build
+    state: built
     template: aws-ubuntu.pkr.hcl
     variables:
       aws_region: us-west-2
@@ -138,7 +138,7 @@ EXAMPLES = r"""
 - name: Validate template using check_mode
   community.general.packer:
     name: validate-check
-    state: build
+    state: built
     template: template.pkr.hcl
     var_files:
       - dev.pkrvars.hcl
@@ -148,7 +148,7 @@ EXAMPLES = r"""
 - name: Build with force rebuild
   community.general.packer:
     name: force-build
-    state: build
+    state: built
     template: template.pkr.hcl
     force: true
     parallel: false
@@ -157,7 +157,7 @@ EXAMPLES = r"""
 - name: Build only specific builders
   community.general.packer:
     name: selective-build
-    state: build
+    state: built
     template: template.pkr.hcl
     only:
       - amazon-ebs.builder1
@@ -166,7 +166,7 @@ EXAMPLES = r"""
 - name: Build local artifact (VirtualBox)
   community.general.packer:
     name: local-build
-    state: build
+    state: built
     template: virtualbox.pkr.hcl
     force: true
 """
@@ -188,7 +188,7 @@ cmd:
     - template.pkr.hcl
 artifacts:
   description: List of created artifacts.
-  returned: when O(state=build) and build successful
+  returned: when O(state=built) and build successful
   type: list
   elements: dict
   sample:
@@ -197,12 +197,12 @@ artifacts:
       build_index: 0
 artifacts_count:
   description: Number of artifacts created.
-  returned: when O(state=build) and build successful
+  returned: when O(state=built) and build successful
   type: int
   sample: 1
 build_start_timestamp:
   description: Timestamp when the build started (UTC).
-  returned: when O(state=build)
+  returned: when O(state=built)
   type: str
   sample: "2024-01-15T10:30:00Z"
 """
@@ -377,12 +377,12 @@ class PackerModule:
     def apply(self) -> dict[str, object]:
         self.validate_parameters()
 
-        if self.state == "init":
+        if self.state == "initialized":
             if self.module.check_mode:
                 return {
                     "changed": True,
                     "cmd": self.build_command("init"),
-                    "msg": "Check mode for 'state=init' is not supported!",
+                    "msg": "Check mode for 'state=initialized' is not supported!",
                 }
             return self.execute_packer("init")
 
@@ -398,7 +398,7 @@ def main() -> None:
             state=dict(
                 type="str",
                 required=True,
-                choices=["build", "init"],
+                choices=["built", "initialized"],
             ),
             template=dict(type="path", required=True),
             variables=dict(type="dict", default={}),

@@ -74,7 +74,7 @@ class TestPackerModule(unittest.TestCase):
         return self.mock_module.run_command.call_args_list[0].args[0]
 
     def test_init_successful(self):
-        self._setup_module_params(state="init")
+        self._setup_module_params(state="initialized")
         self.mock_module.run_command.side_effect = [
             (
                 0,
@@ -92,7 +92,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(self._command(), ["/usr/local/bin/packer", "init", self.template_path])
 
     def test_init_idempotent(self):
-        self._setup_module_params(state="init")
+        self._setup_module_params(state="initialized")
         self.mock_module.run_command.side_effect = [
             (0, "", ""),
             (0, "Packer v1.9.4", ""),
@@ -105,7 +105,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(self._command(), ["/usr/local/bin/packer", "init", self.template_path])
 
     def test_build_successful(self):
-        self._setup_module_params(state="build")
+        self._setup_module_params(state="built")
         self.mock_module.run_command.side_effect = [
             (0, "--> null.test: null artifact\nBuild finished successfully", ""),
             (0, "Packer v1.9.4", ""),
@@ -119,7 +119,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(result["artifacts"][0]["name"], "null artifact")
 
     def test_build_with_force(self):
-        self._setup_module_params(state="build", force=True)
+        self._setup_module_params(state="built", force=True)
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -130,7 +130,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("-force", self._command())
 
     def test_build_with_only(self):
-        self._setup_module_params(state="build", only=["null.test"])
+        self._setup_module_params(state="built", only=["null.test"])
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -142,7 +142,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("null.test", self._command())
 
     def test_build_with_variables(self):
-        self._setup_module_params(state="build", variables={"aws_region": "us-west-2", "instance_type": "t2.micro"})
+        self._setup_module_params(state="built", variables={"aws_region": "us-west-2", "instance_type": "t2.micro"})
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -160,7 +160,7 @@ class TestPackerModule(unittest.TestCase):
         with open(var_file, "w") as f:
             f.write('aws_region = "us-west-2"\n')
 
-        self._setup_module_params(state="build", var_files=[var_file])
+        self._setup_module_params(state="built", var_files=[var_file])
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -173,7 +173,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn(var_file, command)
 
     def test_build_with_parallel_disabled(self):
-        self._setup_module_params(state="build", parallel=False)
+        self._setup_module_params(state="built", parallel=False)
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -184,7 +184,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("-parallel=false", self._command())
 
     def test_build_with_color_disabled(self):
-        self._setup_module_params(state="build", color=False)
+        self._setup_module_params(state="built", color=False)
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -196,7 +196,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertNotIn("-no-color", self._command())
 
     def test_build_with_color_enabled(self):
-        self._setup_module_params(state="build", color=True)
+        self._setup_module_params(state="built", color=True)
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -207,7 +207,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertNotIn("-no-color", self._command())
 
     def test_build_with_machine_readable(self):
-        self._setup_module_params(state="build", machine_readable=True)
+        self._setup_module_params(state="built", machine_readable=True)
         mock_output = "artifact,0,amazon-ebs,ami-12345678\nartifact,1,docker,my-image:latest\n"
         self.mock_module.run_command.side_effect = [
             (0, mock_output, ""),
@@ -224,7 +224,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(result["artifacts"][1]["name"], "my-image:latest")
 
     def test_build_with_log_level(self):
-        self._setup_module_params(state="build", log_level="debug")
+        self._setup_module_params(state="built", log_level="debug")
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -236,7 +236,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(command[1:3], ["--log-level", "debug"])
 
     def test_build_in_check_mode(self):
-        self._setup_module_params(state="build", color=True)
+        self._setup_module_params(state="built", color=True)
         self.mock_module.check_mode = True
         self.mock_module.run_command.side_effect = [
             (0, "Template validated successfully", ""),
@@ -250,7 +250,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(self._command()[1], "validate")
 
     def test_run_command_uses_check_rc(self):
-        self._setup_module_params(state="build")
+        self._setup_module_params(state="built")
         self.mock_module.run_command.side_effect = [
             (0, "Build finished", ""),
             (0, "Packer v1.9.4", ""),
@@ -262,7 +262,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(call_kwargs.get("check_rc"), True)
 
     def test_build_failure(self):
-        self._setup_module_params(state="build")
+        self._setup_module_params(state="built")
         self.mock_module.run_command.side_effect = [
             (1, "", "Error: missing required variable"),
             (0, "Packer v1.9.4", ""),
@@ -273,7 +273,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertEqual(call_kwargs.get("check_rc"), True)
 
     def test_template_missing(self):
-        self._setup_module_params(state="build", template="/nonexistent/template.pkr.hcl")
+        self._setup_module_params(state="built", template="/nonexistent/template.pkr.hcl")
 
         with self.assertRaises(Exception):  # noqa: B017
             self._module().apply()
@@ -282,7 +282,7 @@ class TestPackerModule(unittest.TestCase):
         )
 
     def test_var_file_not_exists(self):
-        self._setup_module_params(state="build", var_files=["/nonexistent/file.pkrvars.hcl"])
+        self._setup_module_params(state="built", var_files=["/nonexistent/file.pkrvars.hcl"])
 
         with self.assertRaises(Exception):  # noqa: B017
             self._module().apply()
