@@ -808,13 +808,20 @@ def main():
         module.fail_json(msg="Failed to find the namespace for the project")
     project_exists = gitlab_project.exists_project(namespace, project_path)
 
+    is_archived = project_exists.attributes["archived"]
+
     if state == "absent":
         if project_exists:
             gitlab_project.delete_project()
             module.exit_json(changed=True, msg=f"Successfully deleted project {project_name}")
         module.exit_json(changed=False, msg="Project deleted or does not exist")
 
-    archiving_states = ["archived", "unarchived"]
+    archive_actions = {
+        "archived": (True, gitlab_project.archive_project, "archived"),
+        "unarchived": (False, gitlab_project.unarchive_project, "unarchived"),
+    }
+
+    archiving_states = list(archive_actions.keys())
     if state in ["present", *archiving_states]:
         changed = False
         msgs = []
@@ -822,11 +829,12 @@ def main():
         if state in archiving_states and not project_exists:
             module.fail_json(msg=f"{state.capitalize()} state works only on existing projects.")
 
-        if state in archiving_states:
-            changed = True
-            msgs.append(f"Successfully {state} project {project_name}")
-            actions = {"archived": gitlab_project.archive_project, "unarchived": gitlab_project.unarchive_project}
-            actions[state]()
+        if state in archive_actions:
+            target_archived, action_func, verb = archive_actions[state]
+            if is_archived != target_archived:
+                changed = True
+                msgs.append(f"Successfully {verb} project {project_name}")
+                action_func()
 
         if gitlab_project.create_or_update_project(
             module,
