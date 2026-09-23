@@ -39,6 +39,8 @@ exclude_paths:
   - tests/integration/targets/filter_jc/runme.yml
   - tests/integration/targets/filter_json_patch/runme.yml
   - tests/integration/targets/filter_json_query/runme.yml
+  - tests/integration/targets/lookup_consul_kv/dependencies.yml
+  - tests/integration/targets/lookup_consul_kv/test_lookup_consul_kv.yml
   - tests/integration/targets/lookup_etcd3/dependencies.yml
   - tests/integration/targets/lookup_etcd3/test_lookup_etcd3.yml
   - tests/integration/targets/test_fqdn_valid/runme.yml
