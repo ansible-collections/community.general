@@ -216,8 +216,7 @@ class AzureLogAnalyticsIngestionSource:
         )
         response = open_url(url, data=data, force=True, headers=headers, method="POST", timeout=self.timeout)
         j = json.loads(response.read().decode("utf-8"))
-        access_token = j.get("access_token")
-        mark_as_secret(access_token)
+        access_token = mark_as_secret(j["access_token"])
 
         self.token_expiration_time = datetime.now() + timedelta(seconds=j.get("expires_in"))
 
