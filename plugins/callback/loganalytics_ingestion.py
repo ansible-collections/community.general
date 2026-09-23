@@ -218,7 +218,9 @@ class AzureLogAnalyticsIngestionSource:
         j = json.loads(response.read().decode("utf-8"))
         access_token = j.get("access_token")
         mark_as_secret(access_token)
+
         self.token_expiration_time = datetime.now() + timedelta(seconds=j.get("expires_in"))
+
         return access_token
 
     def is_token_valid(self):
@@ -233,7 +235,7 @@ class AzureLogAnalyticsIngestionSource:
             f"{self.dce_url}/dataCollectionRules/{self.dcr_id}/streams/{self.stream_name}?api-version=2023-01-01"
         )
         headers = {"Authorization": f"Bearer {self.bearer_token}", "Content-Type": "application/json"}
-        data = mask_secrets(json.dumps(event_data))
+        data = mask_secret_values(json.dumps(event_data))
         open_url(ingestion_url, data=data, headers=headers, method="POST", timeout=self.timeout)
 
     def _rfc1123date(self):
