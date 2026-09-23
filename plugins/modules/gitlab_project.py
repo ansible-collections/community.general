@@ -808,7 +808,7 @@ def main():
         module.fail_json(msg="Failed to find the namespace for the project")
     project_exists = gitlab_project.exists_project(namespace, project_path)
 
-    is_archived = project_exists.attributes["archived"]
+    is_archived = project_exists.attributes.get("archived") or False
 
     if state == "absent":
         if project_exists:
