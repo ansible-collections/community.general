@@ -131,7 +131,7 @@ EXAMPLES = r"""
 - name: Build from directory containing multiple templates
   community.general.packer:
     name: multi-template-build
-    state: build
+    state: built
     template: ./packer-templates/
     force: false
 
