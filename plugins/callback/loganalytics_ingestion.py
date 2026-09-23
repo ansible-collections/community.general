@@ -157,7 +157,7 @@ from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display
 
-from ansible_collections.community.general.plugins.module_utils._secrets import mark_as_secret, mask_secrets
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_as_secret, mask_secret_values
 
 display = Display()
 
