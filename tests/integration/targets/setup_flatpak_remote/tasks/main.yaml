@@ -13,6 +13,18 @@
       ansible_facts.distribution == 'Fedora' or
       ansible_facts.distribution == 'Ubuntu' and not ansible_facts.distribution_major_version | int < 16
   block:
+    - name: Ensure xz is present on Fedora
+      ansible.builtin.dnf:
+        name: xz
+        state: present
+      when: ansible_facts.distribution == 'Fedora'
+
+    - name: Ensure xz is present on Ubuntu
+      ansible.builtin.apt:
+        name: xz-utils
+        state: present
+      when: ansible_facts.distribution == 'Ubuntu'
+
     - name: Copy repo into place
       ansible.builtin.unarchive:
         src: repo.tar.xz
