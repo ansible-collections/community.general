@@ -21,8 +21,8 @@ attributes:
   check_mode:
     details:
       - In check mode, O(state=built) runs C(packer validate) instead of building.
-      - Check mode is ignored for O(state=init), so C(packer init) is executed and can install required plugins.
-      - O(state=init) always returns V(changed=true) in check mode.
+      - Check mode is ignored for O(state=initialized), so C(packer init) is executed and can install required plugins.
+      - O(state=initialized) always returns V(changed=true) in check mode.
     support: partial
   diff_mode:
     support: none
@@ -115,7 +115,7 @@ EXAMPLES = r"""
 - name: Initialize Packer template from directory
   community.general.packer:
     name: init-template-dir
-    state: ininitializedit
+    state: initialized
     template: ./packer-templates/
 
 - name: Build AWS AMI with Packer (or validate in check_mode)
