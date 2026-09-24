@@ -103,17 +103,17 @@ class TaskData:
     Data about an individual task.
     """
 
-    def __init__(self, uuid, name, path, play, action, args):
+    def __init__(self, uuid: str, name: str, path: str, play: str, action: str, args) -> None:
         self.uuid = uuid
         self.name = name
         self.path = path
         self.play = play
-        self.host_data = OrderedDict()
+        self.host_data: dict[str, HostData] = OrderedDict()
         self.start = time.time()
         self.action = action
         self.args = args
 
-    def add_host(self, host):
+    def add_host(self, host: HostData) -> None:
         if host.uuid in self.host_data:
             if host.status == "included":
                 # concatenate task include output from multiple items
@@ -129,7 +129,7 @@ class HostData:
     Data about an individual host.
     """
 
-    def __init__(self, uuid, name, status, result):
+    def __init__(self, uuid: str, name: str, status: str, result) -> None:
         self.uuid = uuid
         self.name = name
         self.status = status
@@ -138,19 +138,19 @@ class HostData:
 
 
 class ElasticSource:
-    def __init__(self, display):
+    def __init__(self, display) -> None:
         self.ansible_playbook = ""
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
         try:
-            self.ip_address = socket.gethostbyname(socket.gethostname())
+            self.ip_address: str | None = socket.gethostbyname(socket.gethostname())
         except Exception:
             self.ip_address = None
         self.user = getpass.getuser()
 
         self._display = display
 
-    def start_task(self, tasks_data, hide_task_arguments, play_name, task):
+    def start_task(self, tasks_data: dict[str, TaskData], hide_task_arguments: bool, play_name: str, task) -> None:
         """record the start of a task for one or more hosts"""
 
         uuid = task._uuid
@@ -168,7 +168,7 @@ class ElasticSource:
 
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
 
-    def finish_task(self, tasks_data, status, result):
+    def finish_task(self, tasks_data: dict[str, TaskData], status: str, result) -> None:
         """record the results of a task for a single host"""
 
         task_uuid = result._task._uuid
@@ -186,16 +186,16 @@ class ElasticSource:
 
     def generate_distributed_traces(
         self,
-        tasks_data,
-        status,
+        tasks_data: dict[str, TaskData],
+        status: str,
         end_time,
-        traceparent,
-        apm_service_name,
-        apm_server_url,
-        apm_verify_server_cert,
-        apm_secret_token,
-        apm_api_key,
-    ):
+        traceparent: str | None,
+        apm_service_name: str,
+        apm_server_url: str | None,
+        apm_verify_server_cert: bool,
+        apm_secret_token: str | None,
+        apm_api_key: str | None,
+    ) -> None:
         """generate distributed traces from the collected TaskData and HostData"""
 
         tasks = []
@@ -228,7 +228,7 @@ class ElasticSource:
 
                 apm_cli.end_transaction(name=__name__, result=status, duration=end_time - parent_start_time)
 
-    def create_span_data(self, apm_cli, task_data, host_data):
+    def create_span_data(self, apm_cli: Client, task_data: TaskData, host_data: HostData):
         """create the span with the given TaskData and HostData"""
 
         name = f"[{host_data.name}] {task_data.play}: {task_data.name}"
@@ -267,14 +267,21 @@ class ElasticSource:
                 "ansible.task.host.status": host_data.status,
             },
         ) as span:
-            span.outcome = status
+            span.outcome = status  # type: ignore[union-attr]
             if "failure" in status:
                 exception = AnsibleRuntimeError(
                     message=f"{task_data.action}: {name} failed with error message {enriched_error_message}"
                 )
                 apm_cli.capture_exception(exc_info=(type(exception), exception, exception.__traceback__), handled=True)
 
-    def init_apm_client(self, apm_server_url, apm_service_name, apm_verify_server_cert, apm_secret_token, apm_api_key):
+    def init_apm_client(
+        self,
+        apm_server_url: str | None,
+        apm_service_name: str,
+        apm_verify_server_cert: bool,
+        apm_secret_token: str | None,
+        apm_api_key: str | None,
+    ) -> Client | None:
         if apm_server_url:
             return Client(
                 service_name=apm_service_name,
@@ -285,6 +292,7 @@ class ElasticSource:
                 use_elastic_traceparent_header=True,
                 debug=True,
             )
+        return None
 
     @staticmethod
     def get_error_message(result):
@@ -293,12 +301,12 @@ class ElasticSource:
         return result.get("msg", "failed")
 
     @staticmethod
-    def _last_line(text):
+    def _last_line(text: str) -> str:
         lines = text.strip().split("\n")
         return lines[-1]
 
     @staticmethod
-    def enrich_error_message(result):
+    def enrich_error_message(result) -> str:
         message = result.get("msg", "failed")
         exception = result.get("exception")
         stderr = result.get("stderr")
@@ -315,14 +323,13 @@ class CallbackModule(CallbackBase):
     CALLBACK_NAME = "community.general.elastic"
     CALLBACK_NEEDS_ENABLED = True
 
-    def __init__(self, display=None):
+    def __init__(self, display=None) -> None:
         super().__init__(display=display)
-        self.hide_task_arguments = None
-        self.apm_service_name = None
+        self.hide_task_arguments = False
+        self.apm_service_name: str = ""
         self.ansible_playbook = None
-        self.traceparent = False
+        self.traceparent: str | None = None
         self.play_name = None
-        self.tasks_data = None
         self.errors = 0
         self.disabled = False
 
@@ -331,23 +338,21 @@ class CallbackModule(CallbackBase):
                 "The `elastic-apm` must be installed to use this plugin"
             ) from ELASTIC_LIBRARY_IMPORT_ERROR
 
-        self.tasks_data = OrderedDict()
+        self.tasks_data: dict[str, TaskData] = OrderedDict()
 
         self.elastic = ElasticSource(display=self._display)
 
-    def set_options(self, task_keys=None, var_options=None, direct=None):
+    def set_options(self, task_keys=None, var_options=None, direct=None) -> None:
         super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.hide_task_arguments = self.get_option("hide_task_arguments")
 
-        self.apm_service_name = self.get_option("apm_service_name")
-        if not self.apm_service_name:
-            self.apm_service_name = "ansible"
+        self.apm_service_name = self.get_option("apm_service_name") or "ansible"
 
-        self.apm_server_url = self.get_option("apm_server_url")
-        self.apm_secret_token = self.get_option("apm_secret_token")
-        self.apm_api_key = self.get_option("apm_api_key")
-        self.apm_verify_server_cert = self.get_option("apm_verify_server_cert")
+        self.apm_server_url: str | None = self.get_option("apm_server_url")
+        self.apm_secret_token: str | None = self.get_option("apm_secret_token")
+        self.apm_api_key: str | None = self.get_option("apm_api_key")
+        self.apm_verify_server_cert: bool = self.get_option("apm_verify_server_cert")
         self.traceparent = self.get_option("traceparent")
 
     def v2_playbook_on_start(self, playbook):

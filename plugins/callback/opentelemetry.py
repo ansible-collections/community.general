@@ -168,18 +168,18 @@ class TaskData:
     Data about an individual task.
     """
 
-    def __init__(self, uuid, name, path, play, action, args):
+    def __init__(self, uuid: str, name: str, path: str, play: str, action: str, args) -> None:
         self.uuid = uuid
         self.name = name
         self.path = path
         self.play = play
-        self.host_data = OrderedDict()
+        self.host_data: dict[str, HostData] = OrderedDict()
         self.start = time_ns()
         self.action = action
         self.args = args
         self.dump = None
 
-    def add_host(self, host):
+    def add_host(self, host: HostData) -> None:
         if host.uuid in self.host_data:
             if host.status == "included":
                 # concatenate task include output from multiple items
@@ -196,39 +196,41 @@ class HostData:
     Data about an individual host.
     """
 
-    def __init__(self, uuid, name, status, result=None):
+    def __init__(self, uuid: str, name: str, status: str, result=None) -> None:
         self.uuid = uuid
         self.name = name
         self.status = status
         self.result = result
-        self.finish = None
+        self.finish: int | None = None
         self.start = time_ns()
 
-    def update(self, status, result):
+    def update(self, status: str, result) -> None:
         self.status = status
         self.result = result
         self.finish = time_ns()
 
 
 class OpenTelemetrySource:
-    def __init__(self, display):
+    def __init__(self, display) -> None:
         self.ansible_playbook = ""
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
         try:
-            self.ip_address = socket.gethostbyname(socket.gethostname())
+            self.ip_address: str | None = socket.gethostbyname(socket.gethostname())
         except Exception:
             self.ip_address = None
         self.user = getpass.getuser()
 
         self._display = display
 
-    def traceparent_context(self, traceparent):
+    def traceparent_context(self, traceparent: bool):
         carrier = dict()
         carrier["traceparent"] = traceparent
         return TraceContextTextMapPropagator().extract(carrier=carrier)
 
-    def start_task(self, tasks_data, hide_task_arguments, play_name, task, host):
+    def start_task(
+        self, tasks_data: dict[str, TaskData], hide_task_arguments: bool, play_name: str, task, host
+    ) -> None:
         """record the start of a task for one or more hosts"""
 
         uuid = task._uuid
@@ -248,7 +250,7 @@ class OpenTelemetrySource:
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
         tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started"))
 
-    def finish_task(self, tasks_data, status, result, dump):
+    def finish_task(self, tasks_data: dict[str, TaskData], status: str, result, dump) -> None:
         """record the results of a task for a single host"""
 
         task_uuid = result._task._uuid
@@ -267,16 +269,16 @@ class OpenTelemetrySource:
 
     def generate_distributed_traces(
         self,
-        otel_service_name,
-        ansible_playbook,
-        tasks_data,
-        status,
-        traceparent,
-        disable_logs,
-        disable_attributes_in_logs,
-        otel_exporter_otlp_traces_protocol,
-        store_spans_in_file,
-    ):
+        otel_service_name: str,
+        ansible_playbook: str,
+        tasks_data: dict[str, TaskData],
+        status: Status,
+        traceparent: bool,
+        disable_logs: bool,
+        disable_attributes_in_logs: bool,
+        otel_exporter_otlp_traces_protocol: str,
+        store_spans_in_file: str | None,
+    ) -> InMemorySpanExporter | GRPCOTLPSpanExporter | HTTPOTLPSpanExporter:
         """generate distributed traces from the collected TaskData and HostData"""
 
         tasks = []
@@ -325,7 +327,9 @@ class OpenTelemetrySource:
 
         return otel_exporter
 
-    def update_span_data(self, task_data, host_data, span, disable_logs, disable_attributes_in_logs):
+    def update_span_data(
+        self, task_data: TaskData, host_data: HostData, span, disable_logs: bool, disable_attributes_in_logs: bool
+    ) -> None:
         """update the span with the given TaskData and HostData"""
 
         name = f"[{host_data.name}] {task_data.play}: {task_data.name}"
@@ -388,7 +392,7 @@ class OpenTelemetrySource:
         # Close span always
         span.end(end_time=host_data.finish)
 
-    def set_span_attributes(self, span, attributes):
+    def set_span_attributes(self, span, attributes) -> None:
         """update the span attributes with the given attributes if not None"""
 
         if span is None and self._display is not None:
@@ -397,7 +401,7 @@ class OpenTelemetrySource:
             if attributes is not None:
                 span.set_attributes(attributes)
 
-    def add_attributes_for_service_map_if_possible(self, span, task_data):
+    def add_attributes_for_service_map_if_possible(self, span, task_data: TaskData) -> None:
         """Update the span attributes with the service that the task interacted with, if possible."""
 
         redacted_url = self.parse_and_redact_url_if_possible(task_data.args)
@@ -418,7 +422,7 @@ class OpenTelemetrySource:
         return None
 
     @staticmethod
-    def url_from_args(args):
+    def url_from_args(args) -> str:
         # the order matters
         url_args = (
             "url",
@@ -497,27 +501,26 @@ class CallbackModule(CallbackBase):
     CALLBACK_NAME = "community.general.opentelemetry"
     CALLBACK_NEEDS_ENABLED = True
 
-    def __init__(self, display=None):
+    def __init__(self, display=None) -> None:
         super().__init__(display=display)
-        self.hide_task_arguments = None
-        self.disable_attributes_in_logs = None
-        self.disable_logs = None
-        self.otel_service_name = None
-        self.ansible_playbook = None
-        self.play_name = None
-        self.tasks_data = None
+        self.hide_task_arguments = False
+        self.disable_attributes_in_logs = False
+        self.disable_logs = False
+        self.otel_service_name = ""
+        self.ansible_playbook: str | None = None
+        self.play_name: str | None = None
         self.errors = 0
         self.disabled = False
         self.traceparent = False
-        self.store_spans_in_file = False
-        self.otel_exporter_otlp_traces_protocol = None
+        self.store_spans_in_file: str | None = None
+        self.otel_exporter_otlp_traces_protocol = ""
 
         if OTEL_LIBRARY_IMPORT_ERROR:
             raise AnsibleError(
                 "The `opentelemetry-api`, `opentelemetry-exporter-otlp` or `opentelemetry-sdk` must be installed to use this plugin"
             ) from OTEL_LIBRARY_IMPORT_ERROR
 
-        self.tasks_data = OrderedDict()
+        self.tasks_data: dict[str, TaskData] = OrderedDict()
 
         self.opentelemetry = OpenTelemetrySource(display=self._display)
 
@@ -539,10 +542,7 @@ class CallbackModule(CallbackBase):
 
         self.store_spans_in_file = self.get_option("store_spans_in_file")
 
-        self.otel_service_name = self.get_option("otel_service_name")
-
-        if not self.otel_service_name:
-            self.otel_service_name = "ansible"
+        self.otel_service_name = self.get_option("otel_service_name") or "ansible"
 
         # See https://github.com/open-telemetry/opentelemetry-specification/issues/740
         self.traceparent = self.get_option("traceparent")
