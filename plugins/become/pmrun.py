@@ -54,6 +54,7 @@ options:
     ini:
       - section: pmrun_become_plugin
         key: password
+    secret: true
 notes:
   - This plugin ignores the C(become_user) supplied and uses C(pmrun)'s own configuration to select the user.
 """
