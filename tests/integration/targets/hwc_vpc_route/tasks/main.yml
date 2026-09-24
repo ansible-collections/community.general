@@ -48,7 +48,7 @@
 - ansible.builtin.assert:
     that:
       - not result.id
-      - result.changed
+      - result is changed
 # ----------------------------------------------------------
 - name: create a route
   community.general.hwc_vpc_route:
@@ -73,7 +73,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # -----------------------------------------------------------
 - name: create a route that already exists
   community.general.hwc_vpc_route:
@@ -119,7 +119,7 @@
 - name: not changed
   ansible.builtin.assert:
     that:
-      not result.changed
+      result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a route that does not exist
   community.general.hwc_vpc_route:

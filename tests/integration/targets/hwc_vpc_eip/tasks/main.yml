@@ -85,7 +85,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: create a eip that already exists
   community.general.hwc_vpc_eip:
@@ -148,7 +148,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a eip that does not exist
   community.general.hwc_vpc_eip:

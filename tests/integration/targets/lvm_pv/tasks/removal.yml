@@ -12,5 +12,5 @@
 - name: Asserting physical volume was removed
   ansible.builtin.assert:
     that:
-      - remove_result.changed == true
+      - remove_result is changed
       - "'removed' in remove_result.msg"

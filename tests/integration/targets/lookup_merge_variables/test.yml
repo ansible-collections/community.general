@@ -226,5 +226,5 @@
         - name: Validate that the error is reported
           ansible.builtin.assert:
             that:
-              - "_override_error_result.failed"
+              - "_override_error_result is failed"
               - "'key_to_override' in _override_error_result.msg"

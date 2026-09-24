@@ -293,8 +293,8 @@
       # We don't know if we start from jks or pkcs12 format, anyway check mode
       # and actual mode must return the same 'changed' state, and 'jks' and
       # 'pkcs12' must give opposite results on a same host.
-      - result_type_jks_check.changed != result_type_pkcs12_check.changed
-      - result_type_jks_check.changed == result_type_jks.changed
+      - (result_type_jks_check is changed) != (result_type_pkcs12_check is changed)
+      - (result_type_jks_check is changed) == (result_type_jks is changed)
 
       - result_type_change is changed
       - result_type_change_check is changed

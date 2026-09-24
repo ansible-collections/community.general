@@ -33,8 +33,8 @@
 - name: Check mode test
   ansible.builtin.assert:
     that:
-      - decompressed_check_mode.changed
-      - decompressed_check_mode_2.changed
+      - decompressed_check_mode is changed
+      - decompressed_check_mode_2 is changed
       - original_file.stat.exists
       - not nonexisting_stat.stat.exists
 
@@ -66,7 +66,7 @@
   ansible.builtin.assert:
     that:
       - not compressed_stat.stat.exists
-      - not decompress_non_existing_src.changed
+      - decompress_non_existing_src is not changed
 
 - name: Delete decompressed file
   ansible.builtin.file:

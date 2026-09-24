@@ -69,7 +69,7 @@
 - name: Assert token deletion
   ansible.builtin.assert:
     that:
-      - delete_token_result.changed is true
+      - delete_token_result is changed
     fail_msg: "Token deletion failed"
     success_msg: "Token successfully deleted"
 

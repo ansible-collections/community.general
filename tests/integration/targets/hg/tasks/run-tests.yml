@@ -29,7 +29,7 @@
       - "'before' in hg_result"
       - "'after' in hg_result"
       - "not hg_result.before"
-      - "hg_result.changed"
+      - "hg_result is changed"
 
 - name: repeated checkout
   community.general.hg:
@@ -59,7 +59,7 @@
 - name: verify on a re-clone things are marked unchanged
   ansible.builtin.assert:
     that:
-      - "not hg_result2.changed"
+      - "hg_result2 is not changed"
 
 - name: Checkout non-existent repo clone
   community.general.hg:
@@ -73,4 +73,4 @@
   ansible.builtin.assert:
     that:
       - "'abort: HTTP Error' in hg_result3.msg"
-      - "not hg_result3.changed"
+      - "hg_result3 is not changed"
