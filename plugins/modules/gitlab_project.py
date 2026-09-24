@@ -625,13 +625,11 @@ class GitLabProject:
 
     def archive_project(self):
         if not self._module.check_mode:
-            # returns None
             self.project_object.archive()
         return True
 
     def unarchive_project(self):
         if not self._module.check_mode:
-            # returns None
             self.project_object.unarchive()
         return True
 
@@ -885,18 +883,15 @@ def main():
             msgs.append(f"Successfully created or updated the project {project_name}")
 
         if changed:
-            module.exit_json(
-                changed=True,
-                msg=" - ".join(msgs),
-                project=gitlab_project.project_attributes(),
-            )
+            msg = " - ".join(msgs)
         else:
-            # log messages when no archive/unarchive action nor updating project occurred
-            module.exit_json(
-                changed=False,
-                msg=f"No need to update the project {project_name}",
-                project=gitlab_project.project_attributes(),
-            )
+            msg = f"No need to update the project {project_name}"
+
+        module.exit_json(
+            changed=changed,
+            msg=msg,
+            project=gitlab_project.project_attributes(),
+        )
 
 
 if __name__ == "__main__":
