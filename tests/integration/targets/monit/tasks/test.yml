@@ -22,12 +22,12 @@
   vars:
     state: unmonitored
     initial_state: up
-    expected_state: down
+    expected_state: up
 
 - ansible.builtin.import_tasks: test_state.yml
   vars:
     state: monitored
-    initial_state: down
+    initial_state: up
     expected_state: up
 
 - ansible.builtin.import_tasks: test_errors.yml

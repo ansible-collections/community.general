@@ -14,7 +14,7 @@
 - name: "{{ reason }} ('down')"
   ansible.builtin.command: "curl -sf http://localhost:8082/hello"
   register: curl_result
-  failed_when: curl_result == 0
+  failed_when: curl_result.rc == 0
   when: service_state == 'down'
   until: curl_result is not failed
   retries: 5
