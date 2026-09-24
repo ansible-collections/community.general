@@ -51,6 +51,15 @@ notes:
     C(api_token), C(gpg_keyphrase)).
   - Sections (C(extra_sections)) are supported — fields nested inside a section
     are merged into the same flat dict as top-level extra fields.
+  - On ansible-core 2.22+, values of the following fields that are returned by the plugin
+    will be automatically registered as secrets:
+    C(password) and C(totp_uri) login fields;
+    C(number), C(verification_number), and C(pin) credit card fields;
+    C(password) WiFi field;
+    C(private_key) SSH key field;
+    C(social_security_number), C(passport_number), and C(license_number) identity fields;
+    extra fields of type C(Hidden) or C(Totp).
+    See R(Masking secrets in Ansible output, secret_masking) for more information.
 options:
   _terms:
     description:
@@ -232,6 +241,11 @@ _raw:
       item-type fields (C(username)/C(password) for login, C(ssid)/C(password) for
       wi-fi, C(private_key)/C(public_key) for ssh-key, etc.) and every custom extra
       field to its string value.
+    - B(Note) that on ansible-core 2.22+, some fields and elements will automatically
+      be registered as secrets. See the notes on details which fields are affected.
+      If other fields contain secrets as well, it is your responsibility to register
+      them as secrets or otherwise handle them in a sensitive manner.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   type: list
   elements: raw
 """
