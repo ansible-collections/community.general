@@ -198,11 +198,7 @@ def main():
         # If the return code is 1, it just means the option hasn't been set yet, which is fine.
         module.fail_json(rc=rc, msg=err, cmd=" ".join(list_args))
 
-    # 'git config --get-all' terminates every value with a newline, so splitting always yields a
-    # trailing empty element which must not be mistaken for a configured empty value.
-    old_values = out.split("\n")
-    if old_values and old_values[-1] == "":
-        old_values.pop()
+    old_values = out.splitlines()
 
     if unset and not out:
         module.exit_json(changed=False, msg="no setting to unset")
