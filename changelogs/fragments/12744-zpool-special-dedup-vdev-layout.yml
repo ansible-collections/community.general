@@ -1,2 +1,2 @@
 bugfixes:
-  - zpool - read back ``special`` and ``dedup`` vdevs from an existing pool, so that a pool carrying one is no longer reported as differing from its definition on every run (https://github.com/ansible-collections/community.general/issues/12744, https://github.com/ansible-collections/community.general/pull/12745).
+  - zpool - Fix idempotency of vdevs ``special`` and ``dedup`` (https://github.com/ansible-collections/community.general/issues/12744, https://github.com/ansible-collections/community.general/pull/12745).
