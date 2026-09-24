@@ -69,4 +69,4 @@
 
 - ansible.builtin.assert:
     that:
-      - "xattr_set_again_result is not changed"
+      - "xattr_unset_result is not changed"
