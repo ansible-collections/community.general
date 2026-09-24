@@ -586,3 +586,15 @@ class TestLookupModule(unittest.TestCase):
         mock_client_cls.assert_called_once()
         call_kwargs = mock_client_cls.call_args[1]
         self.assertTrue(call_kwargs["debug"])
+
+    @patch("ansible_collections.community.general.plugins.lookup.proton_pass.mark_values_as_secrets")
+    @patch("ansible_collections.community.general.plugins.lookup.proton_pass.ProtonPassClient")
+    def test_register_calls(self, mock_client_cls, mock_mark_values_as_secrets):
+        mock_client = MagicMock()
+        mock_client.fetch_all_fields.return_value = {"api_key": (True, "secret123"), "foobar": (False, "hello")}
+        mock_client_cls.return_value = mock_client
+
+        result = self._run(["vm"], vault="myvault")
+        self.assertEqual(result, [{"api_key": "secret123", "foobar": "hello"}])
+        mock_client.fetch_all_fields.assert_called_once_with(vault="myvault", title="vm")
+        mock_mark_values_as_secrets.assert_called_once_with("secret123")
