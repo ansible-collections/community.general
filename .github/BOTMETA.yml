@@ -1068,6 +1068,8 @@ files:
     maintainers: munchtoast
   $modules/pacemaker_stonith.py:
     maintainers: munchtoast
+  $modules/packer.py:
+    maintainers: a-gabidullin
   $modules/packet_:
     maintainers: nurfet-becirevic t0mk
   $modules/packet_device.py:
