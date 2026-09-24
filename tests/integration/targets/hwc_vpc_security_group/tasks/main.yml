@@ -45,7 +45,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - result is not changed
+      - idemponent is not changed
 # ----------------------------------------------------------------------------
 - name: create a security group that already exists
   community.general.hwc_vpc_security_group:
