@@ -1,0 +1,71 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Regression test for an existing snapshot ensure hanging or failing (GH-12477)
+
+- name: Create origin logical volume for snapshot
+  community.general.lvol:
+    vg: testvg1
+    lv: testorigin
+    size: 8m
+  register: snapshot_origin_create
+
+- name: Assert snapshot origin was created
+  ansible.builtin.assert:
+    that:
+      - snapshot_origin_create is success
+      - snapshot_origin_create is changed
+
+- name: Create snapshot of origin logical volume
+  community.general.lvol:
+    vg: testvg1
+    lv: testorigin
+    snapshot: testsnap
+    size: 4m
+    force: false
+    state: present
+  register: snapshot_create
+
+- name: Assert snapshot was created
+  ansible.builtin.assert:
+    that:
+      - snapshot_create is success
+      - snapshot_create is changed
+
+- name: Ensure existing snapshot is unchanged
+  community.general.lvol:
+    vg: testvg1
+    lv: testorigin
+    snapshot: testsnap
+    size: 4m
+    force: false
+    state: present
+  register: snapshot_again
+  async: 30
+  poll: 5
+
+- name: Assert existing snapshot is idempotent
+  ansible.builtin.assert:
+    that:
+      - snapshot_again is success
+      - snapshot_again is not changed
+
+- name: Ensure existing snapshot stays unchanged
+  community.general.lvol:
+    vg: testvg1
+    lv: testorigin
+    snapshot: testsnap
+    size: 4m
+    force: false
+    state: present
+  register: snapshot_third
+  async: 30
+  poll: 5
+
+- name: Assert existing snapshot remains idempotent
+  ansible.builtin.assert:
+    that:
+      - snapshot_third is success
+      - snapshot_third is not changed

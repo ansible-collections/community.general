@@ -22,5 +22,7 @@
 
     - ansible.builtin.import_tasks: test_pvs.yml
 
+    - ansible.builtin.import_tasks: test_snapshot.yml
+
   always:
     - ansible.builtin.import_tasks: teardown.yml
