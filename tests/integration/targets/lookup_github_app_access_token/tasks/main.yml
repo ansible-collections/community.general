@@ -28,3 +28,14 @@
     that:
       - github_app_access_token is failed
       - '"Github return error" in github_app_access_token.msg'
+
+- name: Generate Github App Token with client_id
+  register: github_app_access_token_client_id
+  ignore_errors: true
+  ansible.builtin.set_fact:
+    github_app_token: "{{ lookup('community.general.github_app_access_token', client_id=github_app_client_id, installation_id=github_app_installation_id, private_key=github_app_private_key) }}"
+
+- ansible.builtin.assert:
+    that:
+      - github_app_access_token_client_id is failed
+      - '"Github return error" in github_app_access_token_client_id.msg'

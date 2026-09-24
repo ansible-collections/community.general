@@ -24,8 +24,16 @@ options:
   app_id:
     description:
       - Your GitHub App ID, you can find this in the Settings page.
-    required: true
+      - Either O(app_id) or O(client_id) must be specified.
+      - This option is deprecated and will be removed in community.general 15.0.0. GitHub recommends authenticating
+        as a GitHub App using its client ID instead of its numeric app ID. Use O(client_id) instead.
     type: str
+  client_id:
+    description:
+      - Your GitHub App Client ID, you can find this in the Settings page.
+      - Either O(app_id) or O(client_id) must be specified.
+    type: str
+    version_added: 13.5.0
   installation_id:
     description:
       - The installation ID that contains the git repository you would like access to.
@@ -55,6 +63,16 @@ options:
 """
 
 EXAMPLES = r"""
+- name: Get access token to be used for git checkout with client_id=Iv1.a1b2c3d4e5f6g7h8, installation_id=64209
+  ansible.builtin.git:
+    repo: >-
+      https://x-access-token:{{ github_token }}@github.com/hidden_user/super-secret-repo.git
+    dest: /srv/checkout
+  vars:
+    github_token: >-
+      {{ lookup('community.general.github_app_access_token', key_path='/home/to_your/key',
+                client_id='Iv1.a1b2c3d4e5f6g7h8', installation_id='64209') }}
+
 - name: Get access token to be used for git checkout with app_id=123456, installation_id=64209
   ansible.builtin.git:
     repo: >-
@@ -217,9 +235,22 @@ class LookupModule(LookupBase):
         if self.get_option("key_path") and self.get_option("private_key"):
             raise AnsibleOptionsError("key_path and private_key are mutually exclusive")
 
+        if not (self.get_option("app_id") or self.get_option("client_id")):
+            raise AnsibleOptionsError("One of app_id or client_id is required")
+        if self.get_option("app_id") and self.get_option("client_id"):
+            raise AnsibleOptionsError("app_id and client_id are mutually exclusive")
+
+        if self.get_option("app_id"):
+            display.deprecated(
+                "The app_id option is deprecated. GitHub recommends authenticating as a GitHub App using its "
+                "client ID instead of its numeric app ID. Use the client_id option instead.",
+                version="15.0.0",
+                collection_name="community.general",
+            )
+
         t = get_token(
             self.get_option("key_path"),
-            self.get_option("app_id"),
+            self.get_option("client_id") or self.get_option("app_id"),
             self.get_option("installation_id"),
             self.get_option("private_key"),
             self.get_option("github_url"),
