@@ -59,7 +59,7 @@
 - name: verify no change on re-uninstall
   ansible.builtin.assert:
     that:
-      - "not zypper_result.changed"
+      - "zypper_result is not changed"
 
 # INSTALL
 - name: install hello
@@ -82,7 +82,7 @@
   ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
-      - "zypper_result.changed"
+      - "zypper_result is changed"
       - "rpm_result.rc == 0"
 
 # INSTALL AGAIN
@@ -95,7 +95,7 @@
 - name: verify no change on second install
   ansible.builtin.assert:
     that:
-      - "not zypper_result.changed"
+      - "zypper_result is not changed"
 
 # Multiple packages
 - name: uninstall hello and metamail
@@ -144,7 +144,7 @@
   ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
-      - "zypper_result.changed"
+      - "zypper_result is changed"
       - "rpm_hello_result.rc == 0"
       - "rpm_metamail_result.rc == 0"
 
@@ -249,7 +249,7 @@
   ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
-      - "zypper_result.changed"
+      - "zypper_result is changed"
       - "rpm_result.rc == 0"
 
 - name: uninstall empty
@@ -328,7 +328,7 @@
   ansible.builtin.assert:
     that:
       - "zypper_result.rc == 0"
-      - "zypper_result.changed"
+      - "zypper_result is changed"
       - "rpm_result.rc == 0"
 
 - name: uninstall post_error
@@ -352,7 +352,7 @@
   ansible.builtin.assert:
     that:
       - "zypper_result.rc == 107"
-      - "not zypper_result.changed"
+      - "zypper_result is not changed"
       - "rpm_result.rc == 0"
 
 - name: uninstall post_error

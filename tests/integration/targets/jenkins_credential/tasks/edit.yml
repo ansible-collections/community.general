@@ -51,7 +51,7 @@
 - name: Assert CUSTOM scope changed value
   ansible.builtin.assert:
     that:
-      - custom_scope.changed == true
+      - custom_scope is changed
     fail_msg: "CUSTOM scope changed status when it shouldn't"
     success_msg: "CUSTOM scope behaved correctly"
 
@@ -70,7 +70,7 @@
 - name: Assert user_and_pass changed value
   ansible.builtin.assert:
     that:
-      - userpass_cred.changed == true
+      - userpass_cred is changed
     fail_msg: "user_and_pass credential changed status incorrect"
     success_msg: "user_and_pass credential behaved correctly"
 
@@ -89,7 +89,7 @@
 - name: Assert file credential changed value
   ansible.builtin.assert:
     that:
-      - file_cred.changed == true
+      - file_cred is changed
     fail_msg: "file credential changed status incorrect"
     success_msg: "file credential behaved correctly"
 
@@ -109,7 +109,7 @@
 - name: Assert text credential changed value
   ansible.builtin.assert:
     that:
-      - text_cred.changed == true
+      - text_cred is changed
     fail_msg: "text credential changed status incorrect"
     success_msg: "text credential behaved correctly"
 
@@ -129,7 +129,7 @@
 - name: Assert githubApp credential changed value
   ansible.builtin.assert:
     that:
-      - githubapp_cred.changed == true
+      - githubapp_cred is changed
     fail_msg: "githubApp credential changed status incorrect"
     success_msg: "githubApp credential behaved correctly"
 
@@ -149,7 +149,7 @@
 - name: Assert sshKey credential changed value
   ansible.builtin.assert:
     that:
-      - sshkey_cred.changed == true
+      - sshkey_cred is changed
     fail_msg: "sshKey credential changed status incorrect"
     success_msg: "sshKey credential behaved correctly"
 
@@ -168,7 +168,7 @@
 - name: Assert certificate (p12) credential changed value
   ansible.builtin.assert:
     that:
-      - cert_p12_cred.changed == true
+      - cert_p12_cred is changed
     fail_msg: "certificate (p12) credential changed status incorrect"
     success_msg: "certificate (p12) credential behaved correctly"
 
@@ -187,6 +187,6 @@
 - name: Assert certificate (pem) credential changed value
   ansible.builtin.assert:
     that:
-      - cert_pem_cred.changed == true
+      - cert_pem_cred is changed
     fail_msg: "certificate (pem) credential changed status incorrect"
     success_msg: "certificate (pem) credential behaved correctly"

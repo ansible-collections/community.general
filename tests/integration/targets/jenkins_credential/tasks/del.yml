@@ -13,7 +13,7 @@
 - name: Assert user_and_pass changed value
   ansible.builtin.assert:
     that:
-      - userpass_cred.changed == (run_number == 1)
+      - (userpass_cred is changed) == (run_number == 1)
     fail_msg: "user_and_pass credential changed status incorrect on run {{ run_number }}"
     success_msg: "user_and_pass credential behaved correctly on run {{ run_number }}"
 
@@ -29,7 +29,7 @@
 - name: Assert file credential changed value
   ansible.builtin.assert:
     that:
-      - file_cred.changed == (run_number == 1)
+      - (file_cred is changed) == (run_number == 1)
     fail_msg: "file credential changed status incorrect on run {{ run_number }}"
     success_msg: "file credential behaved correctly on run {{ run_number }}"
 
@@ -45,7 +45,7 @@
 - name: Assert CUSTOM scope changed value
   ansible.builtin.assert:
     that:
-      - custom_scope.changed == (run_number == 1)
+      - (custom_scope is changed) == (run_number == 1)
     fail_msg: "CUSTOM scope changed status incorrect on run {{ run_number }}"
     success_msg: "CUSTOM scope behaved correctly on run {{ run_number }}"
 
@@ -62,7 +62,7 @@
 - name: Assert text credential changed value
   ansible.builtin.assert:
     that:
-      - text_cred.changed == (run_number == 1)
+      - (text_cred is changed) == (run_number == 1)
     fail_msg: "text credential changed status incorrect on run {{ run_number }}"
     success_msg: "text credential behaved correctly on run {{ run_number }}"
 
@@ -77,7 +77,7 @@
 - name: Assert githubApp credential changed value
   ansible.builtin.assert:
     that:
-      - githubapp_cred.changed == (run_number == 1)
+      - (githubapp_cred is changed) == (run_number == 1)
     fail_msg: "githubApp credential changed status incorrect on run {{ run_number }}"
     success_msg: "githubApp credential behaved correctly on run {{ run_number }}"
 
@@ -93,7 +93,7 @@
 - name: Assert sshKey credential changed value
   ansible.builtin.assert:
     that:
-      - sshkey_cred.changed == (run_number == 1)
+      - (sshkey_cred is changed) == (run_number == 1)
     fail_msg: "sshKey credential changed status incorrect on run {{ run_number }}"
     success_msg: "sshKey credential behaved correctly on run {{ run_number }}"
 
@@ -108,7 +108,7 @@
 - name: Assert certificate (p12) credential changed value
   ansible.builtin.assert:
     that:
-      - cert_p12_cred.changed == (run_number == 1)
+      - (cert_p12_cred is changed) == (run_number == 1)
     fail_msg: "certificate (p12) credential changed status incorrect on run {{ run_number }}"
     success_msg: "certificate (p12) credential behaved correctly on run {{ run_number }}"
 
@@ -123,6 +123,6 @@
 - name: Assert certificate (pem) credential changed value
   ansible.builtin.assert:
     that:
-      - cert_pem_cred.changed == (run_number == 1)
+      - (cert_pem_cred is changed) == (run_number == 1)
     fail_msg: "certificate (pem) credential changed status incorrect on run {{ run_number }}"
     success_msg: "certificate (pem) credential behaved correctly on run {{ run_number }}"

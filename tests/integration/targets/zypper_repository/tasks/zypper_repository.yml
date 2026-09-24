@@ -24,7 +24,7 @@
 - name: verify no change on test repo deletion
   ansible.builtin.assert:
     that:
-      - "not zypper_result.changed"
+      - "zypper_result is not changed"
 
 - name: Add test repo
   community.general.zypper_repository:
@@ -36,7 +36,7 @@
 - name: verify repo addition
   ansible.builtin.assert:
     that:
-      - "zypper_result.changed"
+      - "zypper_result is changed"
 
 - name: Add same repo again
   community.general.zypper_repository:
@@ -48,7 +48,7 @@
 - name: verify no change on second install
   ansible.builtin.assert:
     that:
-      - "not zypper_result.changed"
+      - "zypper_result is not changed"
 
 - name: Change repo URL
   community.general.zypper_repository:
@@ -60,7 +60,7 @@
 - name: Verify change on URL only change
   ansible.builtin.assert:
     that:
-      - "zypper_result.changed"
+      - "zypper_result is changed"
 
 - name: use refresh option
   community.general.zypper_repository:

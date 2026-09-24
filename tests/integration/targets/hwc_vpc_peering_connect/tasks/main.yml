@@ -42,7 +42,7 @@
   ansible.builtin.assert:
     that:
       - not result.id
-      - result.changed
+      - result is changed
 # ----------------------------------------------------------
 - name: create a peering connect
   community.general.hwc_vpc_peering_connect:
@@ -69,7 +69,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: create a peering connect that already exists
   community.general.hwc_vpc_peering_connect:
@@ -124,7 +124,7 @@
 - name: assert changed is false
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a peering connect that does not exist
   community.general.hwc_vpc_peering_connect:

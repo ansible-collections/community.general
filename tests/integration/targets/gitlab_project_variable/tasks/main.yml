@@ -314,7 +314,7 @@
 - name: edit one variable state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 1
       - gitlab_project_variable_state.project_variable.removed|length == 0
@@ -334,7 +334,7 @@
 - name: append one variable state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 1
       - gitlab_project_variable_state.project_variable.untouched|length == 2
       - gitlab_project_variable_state.project_variable.removed|length == 0
@@ -355,7 +355,7 @@
 - name: re-set all variables state must not be changed
   ansible.builtin.assert:
     that:
-      - not gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is not changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 3
       - gitlab_project_variable_state.project_variable.removed|length == 0
@@ -374,7 +374,7 @@
 - name: set one variables and purge all others state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 1
       - gitlab_project_variable_state.project_variable.removed|length == 2
@@ -393,7 +393,7 @@
 - name: only one variable is left state must not be changed
   ansible.builtin.assert:
     that:
-      - not gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is not changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 1
       - gitlab_project_variable_state.project_variable.removed|length == 0
@@ -413,7 +413,7 @@
 - name: only one variable is left state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 0
@@ -432,7 +432,7 @@
 - name: only one variable is left state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 0
@@ -451,7 +451,7 @@
 - name: no variable is left state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 1
@@ -473,7 +473,7 @@
 - name: append one variable state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 1
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 0
@@ -526,7 +526,7 @@
 - name: no variable is left state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 1
@@ -616,7 +616,7 @@
 - name: check that no variables are untouched state must be changed
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 40
@@ -646,7 +646,7 @@
 - name: verify two vars
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.added|length == 2
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 0
@@ -665,7 +665,7 @@
 - name: verify fail
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.failed
+      - gitlab_project_variable_state is failed
       - gitlab_project_variable_state is not changed
 
 - name: set a new variable to delete it later
@@ -682,7 +682,7 @@
 - name: verify the change
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
 
 - name: delete variable without referencing its value
   community.general.gitlab_project_variable:
@@ -697,5 +697,5 @@
 - name: verify deletion
   ansible.builtin.assert:
     that:
-      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state is changed
       - gitlab_project_variable_state.project_variable.removed|length == 1

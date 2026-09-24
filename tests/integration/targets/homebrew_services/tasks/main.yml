@@ -57,7 +57,7 @@
     - name: Check for idempotency
       ansible.builtin.assert:
         that:
-          - start_result.changed == 0
+          - start_result is not changed
 
     - name: Restart the black service
       community.general.homebrew_services:

@@ -40,7 +40,7 @@
 - name: ensure community.general.apache2_module is idempotent
   ansible.builtin.assert:
     that:
-      - 'not enabletwo.changed'
+      - 'enabletwo is not changed'
 
 - name: disable userdir module, final run
   community.general.apache2_module:
@@ -51,7 +51,7 @@
 - name: ensure changed on successful disable
   ansible.builtin.assert:
     that:
-      - 'disablefinal.changed'
+      - 'disablefinal is changed'
 
 - name: set userdir to original state
   community.general.apache2_module:
@@ -153,7 +153,7 @@
     - name: ensure changed mpm_event
       ansible.builtin.assert:
         that:
-          - 'enabledmpmevent.changed'
+          - 'enabledmpmevent is changed'
 
     - name: switch between mpm_event and mpm_worker
       community.general.apache2_module:
@@ -175,7 +175,7 @@
     - name: ensure mpm_worker unchanged
       ansible.builtin.assert:
         that:
-          - 'not enabledmpmworker.changed'
+          - 'enabledmpmworker is not changed'
 
     - name: try to disable all mpm modules with configcheck
       community.general.apache2_module:

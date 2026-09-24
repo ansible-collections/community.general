@@ -36,7 +36,7 @@
     - name: Assert default user limits results
       ansible.builtin.assert:
         that:
-          - test_uquota_default_before.changed
+          - test_uquota_default_before is changed
           - test_uquota_default_before.bsoft == uquota_default_bsoft|human_to_bytes
           - test_uquota_default_before.bhard == uquota_default_bhard|human_to_bytes
           - test_uquota_default_before.isoft == uquota_default_isoft
@@ -59,7 +59,7 @@
     - name: Assert user limits results
       ansible.builtin.assert:
         that:
-          - test_uquota_user_before.changed
+          - test_uquota_user_before is changed
           - test_uquota_user_before.bsoft == uquota_user_bsoft|human_to_bytes
           - test_uquota_user_before.bhard == uquota_user_bhard|human_to_bytes
           - test_uquota_user_before.isoft == uquota_user_isoft
@@ -81,7 +81,7 @@
     - name: Assert default user limits results after re-apply
       ansible.builtin.assert:
         that:
-          - not test_uquota_default_after.changed
+          - test_uquota_default_after is not changed
     - name: Re-apply user limits
       community.general.xfs_quota:
         bsoft: '{{ uquota_user_bsoft }}'
@@ -98,7 +98,7 @@
     - name: Assert user limits results for xfsquotauser after re-apply
       ansible.builtin.assert:
         that:
-          - not test_uquota_user_after.changed
+          - test_uquota_user_after is not changed
     - name: Reset default user limits
       community.general.xfs_quota:
         mountpoint: '{{ remote_tmp_dir }}/uquota'
@@ -109,7 +109,7 @@
     - name: Assert reset of default user limits results
       ansible.builtin.assert:
         that:
-          - test_reset_uquota_default.changed
+          - test_reset_uquota_default is changed
           - test_reset_uquota_default.bsoft == 0
           - test_reset_uquota_default.bhard == 0
           - test_reset_uquota_default.isoft == 0
@@ -127,7 +127,7 @@
     - name: Assert reset of default user limits results
       ansible.builtin.assert:
         that:
-          - test_reset_uquota_user.changed
+          - test_reset_uquota_user is changed
           - test_reset_uquota_user.bsoft == 0
           - test_reset_uquota_user.bhard == 0
           - test_reset_uquota_user.isoft == 0

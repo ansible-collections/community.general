@@ -98,7 +98,7 @@
 - name: "assert test_{{test_number}} worked"
   ansible.builtin.assert:
     that:
-      - result.changed
+      - result is changed
 
 # HOST ENABLEMENT
 
@@ -125,7 +125,7 @@
 - name: "assert test_{{test_number}} worked"
   ansible.builtin.assert:
     that:
-      - result.changed
+      - result is changed
 
 # TEMPLATE MANAGEMENT
 
@@ -156,7 +156,7 @@
 - name: "assert test_{{test_number}} worked"
   ansible.builtin.assert:
     that:
-      - result.changed
+      - result is changed
 
 # ---
 
@@ -213,7 +213,7 @@
 - name: "assert test_{{test_number}} worked"
   ansible.builtin.assert:
     that:
-      - result.changed
+      - result is changed
 
 # HOST OFFLINE
 
@@ -239,7 +239,7 @@
 - name: "assert test_{{test_number}} worked"
   ansible.builtin.assert:
     that:
-      - result.changed
+      - result is changed
 
 # TEARDOWN
 

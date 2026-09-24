@@ -62,7 +62,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: create a port that already exists
   community.general.hwc_vpc_port:
@@ -109,7 +109,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a port that does not exist
   community.general.hwc_vpc_port:
