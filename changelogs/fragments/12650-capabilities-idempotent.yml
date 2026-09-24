@@ -1,0 +1,4 @@
+bugfixes:
+  - capabilities - fix idempotency when the installed ``libcap`` normalizes capability operators or flags, or when
+    multiple capabilities are set at once (https://github.com/ansible-collections/community.general/issues/4067,
+    https://github.com/ansible-collections/community.general/pull/12650).

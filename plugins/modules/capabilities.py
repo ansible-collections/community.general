@@ -28,6 +28,8 @@ options:
   capability:
     description:
       - Desired capability to set (with operator and flags, if O(state=present)) or remove (if O(state=absent)).
+      - The value is passed to C(setcap) as is, so it accepts the same syntax, including setting several capabilities
+        at once (for example V(cap_chown,cap_fowner+ep)).
     type: str
     required: true
     aliases: [cap]
@@ -38,10 +40,10 @@ options:
     choices: [absent, present]
     default: present
 notes:
-  - The capabilities system automatically transforms operators and flags into the effective set, so for example, C(cap_foo=ep)
-    probably becomes C(cap_foo+ep).
-  - This module does not attempt to determine the final operator and flags to compare, so you want to ensure that your capabilities
-    argument matches the final capabilities.
+  - Whether a change is required is determined with C(setcap --verify), so a task is reported as changed only when
+    the capabilities on O(path) actually differ from the request, regardless of how the local C(libcap) version
+    normalizes operators and flags (some versions turn C(cap_foo+ep) into C(cap_foo=ep)).
+  - When O(state=present), capabilities already set on O(path) that are not listed in O(capability) are left untouched.
 author:
   - Nate Coraor (@natefoo)
 """
@@ -76,37 +78,48 @@ class CapabilitiesModule:
         self.state = module.params["state"]
         self.getcap_cmd = module.get_bin_path("getcap", required=True)
         self.setcap_cmd = module.get_bin_path("setcap", required=True)
-        self.capability_tup = self._parse_cap(self.capability, op_required=self.state == "present")
+
+        if self.state == "present" and not any(op in self.capability for op in OPS):
+            self.module.fail_json(msg=f"Couldn't find operator (one of: {OPS})")
 
         self.run()
 
     def run(self):
         current = self.getcap(self.path)
-        caps = [cap[0] for cap in current]
+        current_names = [cap[0] for cap in current]
+        requested_names = self._requested_cap_names()
 
-        if self.state == "present" and self.capability_tup not in current:
-            # need to add capability
-            if self.module.check_mode:
-                self.module.exit_json(changed=True, msg="capabilities changed")
-            else:
-                # remove from current cap list if it is already set (but op/flags differ)
-                current = [x for x in current if x[0] != self.capability_tup[0]]
-                # add new cap with correct op/flags
-                current.append(self.capability_tup)
-                self.module.exit_json(
-                    changed=True, state=self.state, msg="capabilities changed", stdout=self.setcap(self.path, current)
-                )
-        elif self.state == "absent" and self.capability_tup[0] in caps:
-            # need to remove capability
-            if self.module.check_mode:
-                self.module.exit_json(changed=True, msg="capabilities changed")
-            else:
-                # remove from current cap list and then set current list
-                current = [x for x in current if x[0] != self.capability_tup[0]]
-                self.module.exit_json(
-                    changed=True, state=self.state, msg="capabilities changed", stdout=self.setcap(self.path, current)
-                )
-        self.module.exit_json(changed=False, state=self.state)
+        # Preserve capabilities already on the file that the user did not mention.
+        kept = [self._cap_str(cap) for cap in current if cap[0] not in requested_names]
+
+        if self.state == "present":
+            clauses = " ".join(kept + [self.capability])
+        else:
+            if not any(name in current_names for name in requested_names):
+                self.module.exit_json(changed=False, state=self.state)
+            clauses = " ".join(kept)
+
+        if clauses:
+            already_set = self._verify(clauses)
+        else:
+            # Desired state is "no capabilities": it already matches only if the file has none.
+            already_set = not current
+
+        if already_set:
+            self.module.exit_json(changed=False, state=self.state)
+
+        if self.module.check_mode:
+            # setcap --verify can report a difference that setcap would not actually apply
+            # (for example an effective-only flag without the matching permitted flag), but
+            # check mode cannot run setcap to find out for sure without mutating the file, so
+            # a reported difference is taken at face value here.
+            self.module.exit_json(changed=True, state=self.state, msg="capabilities changed")
+
+        stdout = self.setcap(self.path, clauses)
+        # Now that setcap has actually run, confirm the change by re-reading the
+        # capabilities instead of trusting the --verify result from above.
+        changed = sorted(current) != sorted(self.getcap(self.path))
+        self.module.exit_json(changed=changed, state=self.state, msg="capabilities changed", stdout=stdout)
 
     def getcap(self, path):
         rval = []
@@ -143,14 +156,35 @@ class CapabilitiesModule:
                     rval.append(self._parse_cap(cap))
         return rval
 
-    def setcap(self, path, caps):
-        caps = " ".join(["".join(cap) for cap in caps])
-        cmd = [self.setcap_cmd, caps, path]
+    def setcap(self, path, clauses):
+        cmd = [self.setcap_cmd, clauses, path]
         rc, stdout, stderr = self.module.run_command(cmd)
         if rc != 0:
             self.module.fail_json(msg=f"Unable to set capabilities of {path}", stdout=stdout, stderr=stderr)
-        else:
-            return stdout
+        return stdout
+
+    def _verify(self, clauses):
+        """Return True when setcap does not need to run because the file already matches clauses."""
+        cmd = [self.setcap_cmd, "-v", clauses, self.path]
+        rc, dummy, dummy2 = self.module.run_command(cmd)
+        return rc == 0
+
+    def _requested_cap_names(self):
+        """Return the capability names referenced by the capability parameter, ignoring operators and flags."""
+        names = []
+        for clause in self.capability.split():
+            cut = len(clause)
+            for op in OPS:
+                pos = clause.find(op)
+                if pos != -1:
+                    cut = min(cut, pos)
+            names.extend(name for name in clause[:cut].split(",") if name)
+        return names
+
+    @staticmethod
+    def _cap_str(cap):
+        name, op, flags = cap
+        return f"{name}{op}{flags}"
 
     def _parse_cap(self, cap, op_required=True):
         opind = -1
