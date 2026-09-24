@@ -27,7 +27,7 @@
 - name: Asserting physical volume was created
   ansible.builtin.assert:
     that:
-      - result.changed == true
+      - result is changed
       - (pv_size_output.stdout | trim | regex_replace('M', '') | float) > 45
       - (pv_size_output.stdout | trim | regex_replace('M', '') | float) < 55
       - "'created' in result.msg"

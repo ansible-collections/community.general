@@ -144,7 +144,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: create a instance that already exists
   community.general.hwc_ecs_instance:
@@ -254,7 +254,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a instance that does not exist
   community.general.hwc_ecs_instance:

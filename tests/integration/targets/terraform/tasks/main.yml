@@ -21,7 +21,7 @@
     - name: Set terraform version
       ansible.builtin.set_fact:
         terraform_version_installed: "{{ terraform_version_output.stdout | regex_search('(?!Terraform.*v)([0-9]+\\.[0-9]+\\.[0-9]+)') }}"
-      when: terraform_version_output.changed
+      when: terraform_version_output is changed
 
 # This block handles the tasks of installing the Terraform binary. This happens if there is no existing
 # terraform in $PATH OR version does not match `terraform_version`.

@@ -23,7 +23,7 @@
 - name: Check that file was decompressed correctly ({{ format }} test)
   ansible.builtin.assert:
     that:
-      - first_decompression.changed
+      - first_decompression is changed
       - decompressed_file_stat.stat.exists
       - decompressed_file_stat.stat.mode == decompressed_mode
       - orig_file_stat.stat.checksum == decompressed_file_stat.stat.checksum

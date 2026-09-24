@@ -32,7 +32,7 @@
 - name: Options - Check if changes are made in check mode
   ansible.builtin.assert:
     that:
-      - options_add.changed
+      - options_add is changed
       - "'options.example.com' in options_add.hosts_added"
       - options_add.hosts_changed is defined
       - options_add.hosts_removed is defined
@@ -69,7 +69,7 @@
 - name: Options - Check if changes are made
   ansible.builtin.assert:
     that:
-      - options_add.changed
+      - options_add is changed
       - "'options.example.com' in options_add.hosts_added"
       - options_add.hosts_changed is defined
       - options_add.hosts_removed is defined
@@ -96,7 +96,7 @@
 - name: Options - Check for idempotency
   ansible.builtin.assert:
     that:
-      - not options_add_again.changed
+      - options_add_again is not changed
       - options_add.hosts_changed is defined
       - options_add.hosts_removed is defined
       - options_add.hosts_added is defined
@@ -143,7 +143,7 @@
 - name: Options - Check for update operation
   ansible.builtin.assert:
     that:
-      - options_update.changed
+      - options_update is changed
       - options_update.hosts_changed is defined
       - "'options.example.com' in options_update.hosts_changed"
       - options_update.hosts_removed is defined
@@ -172,7 +172,7 @@
 - name: Options - Check update operation for idempotency
   ansible.builtin.assert:
     that:
-      - not options_update.changed
+      - options_update is not changed
       - options_update.hosts_changed is defined
       - options_update.hosts_removed is defined
       - options_update.hosts_added is defined
@@ -208,7 +208,7 @@
 - name: Options - Check that no update took place
   ansible.builtin.assert:
     that:
-      - not options_update.changed
+      - options_update is not changed
       - options_update.hosts_changed is defined
       - options_update.hosts_removed is defined
       - options_update.hosts_added is defined
@@ -248,7 +248,7 @@
 - name: Options - Check if host was removed
   ansible.builtin.assert:
     that:
-      - options_delete.changed
+      - options_delete is changed
       - "'options.example.com' in options_delete.hosts_removed"
       - options_delete.hosts_changed is defined
       - options_delete.hosts_added is defined
@@ -263,7 +263,7 @@
 - name: Options - Check delete operation for idempotency
   ansible.builtin.assert:
     that:
-      - not options_delete_again.changed
+      - options_delete_again is not changed
       - options_delete_again.hosts_changed is defined
       - options_delete_again.hosts_removed is defined
       - options_delete_again.hosts_added is defined
@@ -319,7 +319,7 @@
 - name: Options - Check if changes are made in check mode
   ansible.builtin.assert:
     that:
-      - options_add.changed
+      - options_add is changed
       - "'options.example.com' in options_add.hosts_added"
       - options_add.hosts_changed is defined
       - options_add.hosts_removed is defined
@@ -356,7 +356,7 @@
 - name: Options - Check if changes are made
   ansible.builtin.assert:
     that:
-      - options_add.changed
+      - options_add is changed
       - "'options.example.com' in options_add.hosts_added"
       - options_add.hosts_changed is defined
       - options_add.hosts_removed is defined
@@ -383,7 +383,7 @@
 - name: Options - Check for idempotency
   ansible.builtin.assert:
     that:
-      - not options_add_again.changed
+      - options_add_again is not changed
       - options_add.hosts_changed is defined
       - options_add.hosts_removed is defined
       - options_add.hosts_added is defined
@@ -430,7 +430,7 @@
 - name: Options - Check for update operation
   ansible.builtin.assert:
     that:
-      - options_update.changed
+      - options_update is changed
       - options_update.hosts_changed is defined
       - "'options.example.com' in options_update.hosts_changed"
       - options_update.hosts_removed is defined
@@ -459,7 +459,7 @@
 - name: Options - Check update operation for idempotency
   ansible.builtin.assert:
     that:
-      - not options_update.changed
+      - options_update is not changed
       - options_update.hosts_changed is defined
       - options_update.hosts_removed is defined
       - options_update.hosts_added is defined
@@ -495,7 +495,7 @@
 - name: Options - Check that no update took place
   ansible.builtin.assert:
     that:
-      - not options_update.changed
+      - options_update is not changed
       - options_update.hosts_changed is defined
       - options_update.hosts_removed is defined
       - options_update.hosts_added is defined
@@ -535,7 +535,7 @@
 - name: Options - Check if host was removed
   ansible.builtin.assert:
     that:
-      - options_delete.changed
+      - options_delete is changed
       - "'options.example.com' in options_delete.hosts_removed"
       - options_delete.hosts_changed is defined
       - options_delete.hosts_added is defined
@@ -550,7 +550,7 @@
 - name: Options - Check delete operation for idempotency
   ansible.builtin.assert:
     that:
-      - not options_delete_again.changed
+      - options_delete_again is not changed
       - options_delete_again.hosts_changed is defined
       - options_delete_again.hosts_removed is defined
       - options_delete_again.hosts_added is defined

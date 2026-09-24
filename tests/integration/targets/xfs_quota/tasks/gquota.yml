@@ -36,7 +36,7 @@
     - name: Assert default group limits results
       ansible.builtin.assert:
         that:
-          - test_gquota_default_before.changed
+          - test_gquota_default_before is changed
           - test_gquota_default_before.bsoft == gquota_default_bsoft|human_to_bytes
           - test_gquota_default_before.bhard == gquota_default_bhard|human_to_bytes
           - test_gquota_default_before.isoft == gquota_default_isoft
@@ -59,7 +59,7 @@
     - name: Assert group limits results for xfsquotauser
       ansible.builtin.assert:
         that:
-          - test_gquota_group_before.changed
+          - test_gquota_group_before is changed
           - test_gquota_group_before.bsoft == gquota_group_bsoft|human_to_bytes
           - test_gquota_group_before.bhard == gquota_group_bhard|human_to_bytes
           - test_gquota_group_before.isoft == gquota_group_isoft
@@ -81,7 +81,7 @@
     - name: Assert default group limits results after re-apply
       ansible.builtin.assert:
         that:
-          - not test_gquota_default_after.changed
+          - test_gquota_default_after is not changed
     - name: Re-apply group limits
       community.general.xfs_quota:
         bsoft: '{{ gquota_group_bsoft }}'
@@ -98,7 +98,7 @@
     - name: Assert group limits results for xfsquotauser after re-apply
       ansible.builtin.assert:
         that:
-          - not test_gquota_group_after.changed
+          - test_gquota_group_after is not changed
     - name: Reset default group limits
       community.general.xfs_quota:
         mountpoint: '{{ remote_tmp_dir }}/gquota'
@@ -109,7 +109,7 @@
     - name: Assert reset of default group limits results
       ansible.builtin.assert:
         that:
-          - test_reset_gquota_default.changed
+          - test_reset_gquota_default is changed
           - test_reset_gquota_default.bsoft == 0
           - test_reset_gquota_default.bhard == 0
           - test_reset_gquota_default.isoft == 0
@@ -127,7 +127,7 @@
     - name: Assert reset of default group limits results
       ansible.builtin.assert:
         that:
-          - test_reset_gquota_group.changed
+          - test_reset_gquota_group is changed
           - test_reset_gquota_group.bsoft == 0
           - test_reset_gquota_group.bhard == 0
           - test_reset_gquota_group.isoft == 0
