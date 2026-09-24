@@ -22,6 +22,6 @@
 - name: Asserting physical volume was resized
   ansible.builtin.assert:
     that:
-      - resize_result.changed == true
+      - resize_result is changed
       - (pv_size_output.stdout | trim | regex_replace('M', '') | float) > 95
       - "'resized' in resize_result.msg"

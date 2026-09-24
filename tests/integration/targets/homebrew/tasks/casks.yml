@@ -30,7 +30,7 @@
 
 # - ansible.builtin.assert:
 #     that:
-#       - upgrade_option_result.changed
+#       - upgrade_option_result is changed
 
 - vars:
     package_name: kitty

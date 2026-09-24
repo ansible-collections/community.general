@@ -34,7 +34,7 @@
 - name: Check if ssh_config fails for required parameter host
   ansible.builtin.assert:
     that:
-      - not host_required.changed
+      - host_required is not changed
 
 - name: Add a host in check mode
   community.general.ssh_config:
@@ -50,7 +50,7 @@
 - name: Check if changes are made in check mode
   ansible.builtin.assert:
     that:
-      - host_add.changed
+      - host_add is changed
       - "'example.com' in host_add.hosts_added"
       - host_add.hosts_changed is defined
       - host_add.hosts_removed is defined
@@ -68,7 +68,7 @@
 - name: Check if changes are made
   ansible.builtin.assert:
     that:
-      - host_add.changed
+      - host_add is changed
       - "'example.com' in host_add.hosts_added"
       - host_add.hosts_changed is defined
       - host_add.hosts_removed is defined
@@ -86,7 +86,7 @@
 - name: Check for idempotency
   ansible.builtin.assert:
     that:
-      - not host_add_again.changed
+      - host_add_again is not changed
       - host_add.hosts_changed is defined
       - host_add.hosts_removed is defined
       - host_add.hosts_added is defined
@@ -104,7 +104,7 @@
 - name: Check for update operation
   ansible.builtin.assert:
     that:
-      - host_update.changed
+      - host_update is changed
       - host_update.hosts_changed is defined
       - "'example.com' in host_update.hosts_changed"
       - host_update.hosts_removed is defined
@@ -124,7 +124,7 @@
 - name: Check update operation for idempotency
   ansible.builtin.assert:
     that:
-      - not host_update.changed
+      - host_update is not changed
       - host_update.hosts_changed is defined
       - host_update.hosts_removed is defined
       - host_update.hosts_added is defined
@@ -140,7 +140,7 @@
 - name: Check if changes are made
   ansible.builtin.assert:
     that:
-      - host_delete.changed
+      - host_delete is changed
       - "'example.com' in host_delete.hosts_removed"
       - host_delete.hosts_changed is defined
       - host_delete.hosts_added is defined
@@ -156,7 +156,7 @@
 - name: Check for idempotency
   ansible.builtin.assert:
     that:
-      - not host_delete_again.changed
+      - host_delete_again is not changed
       - host_delete_again.hosts_changed is defined
       - host_delete_again.hosts_removed is defined
       - host_delete_again.hosts_added is defined
@@ -176,7 +176,7 @@
 - name: Check mutual exclusive test - user and ssh_config_file
   ansible.builtin.assert:
     that:
-      - not mut_ex.changed
+      - mut_ex is not changed
       - "'parameters are mutually exclusive' in mut_ex.msg"
 
 - name: Check if proxycommand and proxyjump are mutually exclusive
@@ -195,7 +195,7 @@
 - name: Check mutual exclusive test - proxycommand and proxyjump
   ansible.builtin.assert:
     that:
-      - not proxy_mut_ex.changed
+      - proxy_mut_ex is not changed
       - "'parameters are mutually exclusive' in proxy_mut_ex.msg"
 
 - name: Add a full name host

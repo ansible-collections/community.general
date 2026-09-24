@@ -38,7 +38,7 @@
   ansible.builtin.assert:
     that:
       - not result.id
-      - result.changed
+      - result is changed
 # ---------------------------------------------------------
 - name: create a subnet
   community.general.hwc_vpc_subnet:
@@ -67,7 +67,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: create a subnet that already exists
   community.general.hwc_vpc_subnet:
@@ -126,7 +126,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a subnet that does not exist
   community.general.hwc_vpc_subnet:

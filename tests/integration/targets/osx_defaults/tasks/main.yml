@@ -36,7 +36,7 @@
 - name: Test if AppleMeasurementUnits value is changed to Centimeters in check_mode
   ansible.builtin.assert:
     that:
-      - measure_task_check_mode.changed
+      - measure_task_check_mode is changed
 
 - name: Find the current value of AppleMeasurementUnits
   community.general.osx_defaults:
@@ -68,7 +68,7 @@
 - name: Test if AppleMeasurementUnits value is changed to {{ new_value }}
   ansible.builtin.assert:
     that:
-      - change_value.changed
+      - change_value is changed
 
 - name: Again change value of AppleMeasurementUnits to {{ new_value }}
   community.general.osx_defaults:
@@ -82,7 +82,7 @@
 - name: Again test if AppleMeasurementUnits value is not changed to {{ new_value }}
   ansible.builtin.assert:
     that:
-      - not change_value.changed
+      - change_value is not changed
 
 - name: Check a fake setting for delete operation
   community.general.osx_defaults:
@@ -97,7 +97,7 @@
 - name: Check if fake value is listed
   ansible.builtin.assert:
     that:
-      - not list_fake_value.changed
+      - list_fake_value is not changed
 
 - name: Create a fake setting for delete operation
   community.general.osx_defaults:
@@ -113,8 +113,8 @@
 - name: Check if fake is created
   ansible.builtin.assert:
     that:
-      - present_fake_value.changed
-  when: present_fake_value.changed
+      - present_fake_value is changed
+  when: present_fake_value is changed
 
 - name: List a fake setting
   community.general.osx_defaults:
@@ -139,8 +139,8 @@
 - name: Check if fake setting is deleted
   ansible.builtin.assert:
     that:
-      - absent_task.changed
-  when: present_fake_value.changed
+      - absent_task is changed
+  when: present_fake_value is changed
 
 - name: Try deleting a fake setting again
   community.general.osx_defaults:
@@ -155,7 +155,7 @@
 - name: Check if fake setting is not deleted
   ansible.builtin.assert:
     that:
-      - not absent_task.changed
+      - absent_task is not changed
 
 - name: Delete operation in check_mode
   community.general.osx_defaults:
@@ -171,7 +171,7 @@
 - name: Check delete operation with check mode
   ansible.builtin.assert:
     that:
-      - not absent_check_mode_task.changed
+      - absent_check_mode_task is not changed
 
 
 - name: Use different data types and check if it works with them
@@ -229,7 +229,7 @@
   register: test_array_add
 
 - ansible.builtin.assert:
-    that: test_array_add.changed
+    that: test_array_add is changed
 
 - name: add for the second time, should be skipped
   community.general.osx_defaults:
@@ -242,7 +242,7 @@
   register: test_array_add
 
 - ansible.builtin.assert:
-    that: not test_array_add.changed
+    that: test_array_add is not changed
 
 - name: Clean up test key
   community.general.osx_defaults:
@@ -252,7 +252,7 @@
   register: test_array_add
 
 - ansible.builtin.assert:
-    that: test_array_add.changed
+    that: test_array_add is changed
 
 
 - name: Ensure dict test key does not exist
@@ -272,7 +272,7 @@
   register: test_dict_write
 
 - ansible.builtin.assert:
-    that: test_dict_write.changed
+    that: test_dict_write is changed
 
 - name: Write same dict value again, should not change
   community.general.osx_defaults:
@@ -285,7 +285,7 @@
   register: test_dict_write
 
 - ansible.builtin.assert:
-    that: not test_dict_write.changed
+    that: test_dict_write is not changed
 
 - name: Write different dict value, should change
   community.general.osx_defaults:
@@ -298,7 +298,7 @@
   register: test_dict_write
 
 - ansible.builtin.assert:
-    that: test_dict_write.changed
+    that: test_dict_write is changed
 
 - name: Add new key via dict_add
   community.general.osx_defaults:
@@ -311,7 +311,7 @@
   register: test_dict_add
 
 - ansible.builtin.assert:
-    that: test_dict_add.changed
+    that: test_dict_add is changed
 
 - name: Add same key via dict_add again, should not change
   community.general.osx_defaults:
@@ -324,7 +324,7 @@
   register: test_dict_add
 
 - ansible.builtin.assert:
-    that: not test_dict_add.changed
+    that: test_dict_add is not changed
 
 - name: Use dict_add on non-existent key, should create it
   community.general.osx_defaults:
@@ -337,7 +337,7 @@
   register: test_dict_add_new
 
 - ansible.builtin.assert:
-    that: test_dict_add_new.changed
+    that: test_dict_add_new is changed
 
 - name: Clean up dict test keys
   community.general.osx_defaults:

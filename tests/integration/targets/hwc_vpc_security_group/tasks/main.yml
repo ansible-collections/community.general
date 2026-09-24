@@ -24,7 +24,7 @@
   ansible.builtin.assert:
     that:
       - not result.id
-      - result.changed
+      - result is changed
 # ----------------------------------------------------------
 - name: create a security group
   community.general.hwc_vpc_security_group:
@@ -45,7 +45,7 @@
 - name: idemponent
   ansible.builtin.assert:
     that:
-      - not result.changed
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: create a security group that already exists
   community.general.hwc_vpc_security_group:

@@ -53,7 +53,7 @@
 - name: Check if changes are not made idempotency
   ansible.builtin.assert:
     that:
-      - not soft_limit_test.changed
+      - soft_limit_test is not changed
 
 - name: Change hard limit for Joe user for diff
   community.general.pam_limits:

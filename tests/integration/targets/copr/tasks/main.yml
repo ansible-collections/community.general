@@ -83,7 +83,7 @@
 
         - name: check uninstall test package
           ansible.builtin.assert:
-            that: result.changed | bool
+            that: result is changed
 
     - name: remove copr project
       community.general.copr:
