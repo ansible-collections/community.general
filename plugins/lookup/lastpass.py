@@ -34,7 +34,10 @@ EXAMPLES = r"""
 
 RETURN = r"""
 _raw:
-  description: Secrets stored.
+  description:
+    - Secrets stored.
+    - B(Note) on ansible-core 2.22+, the values will be registered as secrets.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   type: list
   elements: str
 """
@@ -45,6 +48,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
@@ -101,5 +105,5 @@ class LookupModule(LookupBase):
 
         values = []
         for term in terms:
-            values.append(lp.get_field(term, field))
+            values.append(mark_values_as_secrets(lp.get_field(term, field)))
         return values
