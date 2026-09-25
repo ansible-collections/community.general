@@ -11,17 +11,12 @@ test_cases:
     output:
       failed: true
       msg: "pcs resource config failed with error (rc=1): Error: unable to get cib"
-      version: "0.10.0"
+      version: "0.11.7"
       cluster_info:
         cluster_name: test_cluster
         cluster_uuid: test_uuid
     mocks:
       run_command:
-        - command: [/testbin/pcs, --version]
-          environ: *env-def
-          rc: 0
-          out: "0.10.0"
-          err: ""
         - command: [/testbin/pcs, cluster, config, --output-format=json]
           environ: *env-def
           rc: 0
@@ -45,7 +40,7 @@ test_cases:
   - id: test_info_initial_online
     input: {}
     output:
-      version: "0.10.0"
+      version: "0.11.7"
       cluster_info:
         cluster_name: test_cluster
         cluster_uuid: test_uuid
@@ -77,11 +72,6 @@ test_cases:
             value: corosync
     mocks:
       run_command:
-        - command: [/testbin/pcs, --version]
-          environ: *env-def
-          rc: 0
-          out: "0.10.0"
-          err: ""
         - command: [/testbin/pcs, cluster, config, --output-format=json]
           environ: *env-def
           rc: 0
