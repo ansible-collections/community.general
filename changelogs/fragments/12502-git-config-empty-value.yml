@@ -1,0 +1,4 @@
+bugfixes:
+  - 'git_config and git_config_info - allow empty string values and preserve idempotency
+    (https://github.com/ansible-collections/community.general/issues/12502,
+    https://github.com/ansible-collections/community.general/pull/12708).'
