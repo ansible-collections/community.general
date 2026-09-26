@@ -104,13 +104,16 @@ def test_restore_passes_requested_flags_to_selinux(make_module, selinux_mock, co
 
 
 def test_restore_reports_the_changed_path(make_module, selinux_mock):
+    previous = "unconfined_u:system_r:var_t:s0:c0.c3"
+    restored = "unconfined_u:system_r:tmp_t:s0:c0.c3"
+    selinux_mock.lgetfilecon_raw.side_effect = [(len(previous), previous), (len(restored), restored)]
     module = make_module()
 
     module.__run__()
     module.__quit_module__()
 
     assert module.output["changed_paths"] == [
-        {"path": module.module.params["path"], "previous": PREVIOUS, "restored": DESIRED},
+        {"path": module.module.params["path"], "previous": previous, "restored": restored},
     ]
     assert module.changed is True
     selinux_mock.selabel_close.assert_called_once_with(selinux_mock.selabel_open.return_value)
@@ -128,18 +131,39 @@ def test_matching_context_is_unchanged(make_module, selinux_mock):
     selinux_mock.selinux_restorecon.assert_not_called()
 
 
-def test_check_mode_reports_change_without_restoring(make_module, selinux_mock):
-    module = make_module()
+@pytest.mark.parametrize(
+    ("context", "restored"),
+    [
+        ("type", "unconfined_u:system_r:tmp_t:s0:c0.c3"),
+        ("user_role", "system_u:object_r:tmp_t:s0:c0.c3"),
+        ("full", DESIRED),
+    ],
+)
+def test_check_mode_reports_change_without_restoring(make_module, selinux_mock, context, restored):
+    previous = "unconfined_u:system_r:var_t:s0:c0.c3"
+    selinux_mock.lgetfilecon_raw.return_value = (len(previous), previous)
+    module = make_module(context=context)
     module.module.check_mode = True
 
     module.__run__()
     module.__quit_module__()
 
     assert module.output["changed_paths"] == [
-        {"path": module.module.params["path"], "previous": PREVIOUS, "restored": DESIRED},
+        {"path": module.module.params["path"], "previous": previous, "restored": restored},
     ]
     assert module.changed is True
     selinux_mock.selinux_restorecon.assert_not_called()
+
+
+def test_successful_restore_with_no_label_change_is_unchanged(make_module, selinux_mock):
+    module = make_module()
+
+    module.__run__()
+    module.__quit_module__()
+
+    selinux_mock.selinux_restorecon.assert_called_once()
+    assert module.changed is False
+    assert module.output["changed_paths"] == []
 
 
 def test_path_without_a_policy_match_is_unchanged(make_module, selinux_mock):

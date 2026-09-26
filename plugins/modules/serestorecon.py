@@ -8,7 +8,7 @@ from __future__ import annotations
 DOCUMENTATION = r"""
 module: serestorecon
 short_description: Restore SELinux file contexts
-version_added: 13.6.0
+version_added: 13.5.0
 description:
   - Restores SELinux file contexts to the values defined by the active SELinux policy.
   - Similar to the C(restorecon) command.
@@ -123,7 +123,7 @@ changed_paths:
       sample: system_u:object_r:var_t:s0
     restored:
       description:
-        - SELinux context restored on the path.
+        - SELinux context read back after restoration.
       type: str
       returned: success
       sample: system_u:object_r:httpd_sys_content_t:s0
@@ -187,11 +187,7 @@ class SERestoreconModule(ModuleHelper):
 
     def get_desired_label(self, handle, path: Path) -> str | None:
         try:
-            rc, desired = selinux.selabel_lookup_raw(
-                handle,
-                os.fspath(path),
-                stat.S_IFMT(os.lstat(path).st_mode)
-            )
+            rc, desired = selinux.selabel_lookup_raw(handle, os.fspath(path), stat.S_IFMT(os.lstat(path).st_mode))
             if rc != 0:
                 self.do_raise(f"Failed to get desired label for {path}")
             return desired
@@ -206,21 +202,23 @@ class SERestoreconModule(ModuleHelper):
             self.do_raise(f"Failed to get current SELinux context for {path}")
         return current
 
-    def labels_differ(self, desired: str, current: str) -> bool:
-        """
-        Example of a label: system_u:object_r:httpd_sys_content_t:s0
-        """
-
+    def get_expected_label(self, desired: str, current: str) -> str:
+        """Apply the selected policy components while preserving the others."""
         if self.vars.context == "full":
-            return desired != current
+            return desired
 
         desired_parts = desired.split(":", 3)
         current_parts = current.split(":", 3)
 
         if self.vars.context == "user_role":
-            return desired_parts[:3] != current_parts[:3]
+            current_parts[:3] = desired_parts[:3]
+        else:
+            current_parts[2] = desired_parts[2]
 
-        return desired_parts[2] != current_parts[2]
+        return ":".join(current_parts)
+
+    def labels_differ(self, desired: str, current: str) -> bool:
+        return self.get_expected_label(desired, current) != current
 
     def restore_file_context(self, path: Path, flags: int) -> None:
         rc = selinux.selinux_restorecon(
@@ -245,32 +243,26 @@ class SERestoreconModule(ModuleHelper):
         #
         # However if we use the python bindings recurive and exclusions functions, we
         # will not get back the file paths that have been changed which is needed for return information.
+        # This feature may also not be available based on the OS version.
         #
         # Therefore, we want to manually iterate and exclude file paths on our own, and just apply restorecon
         # on each path we yield.
-        
         yield self.path
 
         if not self.vars.recurse:
             return
-        all_paths = self.path.rglob('*')
+        all_paths = self.path.rglob("*")
         exclude_paths = tuple(map(Path, self.vars.exclude_paths))
 
         all_paths_filtered = [
             path
             for path in all_paths
-            if not any(
-                path == excluded or excluded in path.parents
-                for excluded in exclude_paths
-            )
+            if not any(path == excluded or excluded in path.parents for excluded in exclude_paths)
         ]
 
         primary_filesystem_id = self.path.lstat().st_dev
         if not self.vars.cross_filesystems:
-            all_paths_filtered = filter(
-                lambda path: path.lstat().st_dev == primary_filesystem_id,
-                all_paths_filtered
-            )
+            all_paths_filtered = filter(lambda path: path.lstat().st_dev == primary_filesystem_id, all_paths_filtered)
 
         yield from all_paths_filtered
 
@@ -303,17 +295,25 @@ class SERestoreconModule(ModuleHelper):
                 if not self.labels_differ(desired_label, current_label):
                     continue
 
-                if not self.check_mode:
+                if self.check_mode:
+                    restored_label = self.get_expected_label(desired_label, current_label)
+                else:
                     self.restore_file_context(
                         path,
                         self.restorecon_flags,
                     )
+                    restored_label = self.get_current_label(path)
 
-                self.changed_paths.append({
-                    "path": str(path),
-                    "previous": current_label,
-                    "restored": desired_label,
-                })
+                if restored_label == current_label:
+                    continue
+
+                self.changed_paths.append(
+                    {
+                        "path": str(path),
+                        "previous": current_label,
+                        "restored": restored_label,
+                    }
+                )
 
         finally:
             selinux.selabel_close(se_label_handle)
