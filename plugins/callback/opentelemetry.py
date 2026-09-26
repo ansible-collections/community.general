@@ -145,7 +145,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.plugins.callback import CallbackBase
 
-from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values, mask_secrets
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
 
 OTEL_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
@@ -356,12 +356,10 @@ class OpenTelemetrySource:
                     message = self.get_error_message(res)
                     enriched_error_message = self.enrich_error_message(res)
 
-            message = mask_secrets(message)
-
             if host_data.status == "failed":
                 status = Status(status_code=StatusCode.ERROR, description=message)
                 # Record an exception with the task message
-                span.record_exception(BaseException(mask_secret_values(enriched_error_message)))
+                span.record_exception(BaseException(enriched_error_message))
             elif host_data.status == "skipped":
                 message = res["skip_reason"] if "skip_reason" in res else "skipped"
                 status = Status(status_code=StatusCode.UNSET)
@@ -380,10 +378,8 @@ class OpenTelemetrySource:
             "ansible.task.host.status": host_data.status,
         }
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
-            names = tuple(self.transform_ansible_unicode_to_str(mask_secrets(k)) for k in task_data.args.keys())
-            values = tuple(
-                self.transform_ansible_unicode_to_str(mask_secret_values(k)) for k in task_data.args.values()
-            )
+            names = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.keys())
+            values = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.values())
             attributes[("ansible.task.args.name")] = names
             attributes[("ansible.task.args.value")] = values
 
@@ -412,7 +408,7 @@ class OpenTelemetrySource:
 
         redacted_url = self.parse_and_redact_url_if_possible(task_data.args)
         if redacted_url:
-            span.set_attribute("http.url", mask_secrets(redacted_url.geturl()))
+            span.set_attribute("http.url", redacted_url.geturl())
 
     @staticmethod
     def parse_and_redact_url_if_possible(args):
@@ -506,7 +502,6 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.opentelemetry"
     CALLBACK_NEEDS_ENABLED = True
-    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None) -> None:
         super().__init__(display=display)
@@ -568,7 +563,7 @@ class CallbackModule(CallbackBase):
         # ansible.builtin.slurp contains the response in the content field
         if "content" in save and task.action in ("ansible.builtin.slurp", "ansible.legacy.slurp", "slurp"):
             save.pop("content")
-        return self._dump_results(mask_secret_values(save))
+        return self._dump_results(save)
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
