@@ -145,6 +145,8 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
 OTEL_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from opentelemetry import trace
@@ -332,7 +334,7 @@ class OpenTelemetrySource:
     ) -> None:
         """update the span with the given TaskData and HostData"""
 
-        name = f"[{host_data.name}] {task_data.play}: {task_data.name}"
+        name = f"[{host_data.name}] {task_data.play}: {mask_secrets(task_data.name)}"
 
         message = "success"
         res = {}
