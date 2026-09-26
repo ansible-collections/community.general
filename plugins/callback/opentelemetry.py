@@ -334,7 +334,7 @@ class OpenTelemetrySource:
     ) -> None:
         """update the span with the given TaskData and HostData"""
 
-        name = f"[{host_data.name}] {task_data.play}: {mask_secrets(task_data.name)}"
+        name = f"[{host_data.name}] {mask_secrets(task_data.play)}: {mask_secrets(task_data.name)}"
 
         message = "success"
         res = {}
@@ -356,12 +356,10 @@ class OpenTelemetrySource:
                     message = self.get_error_message(res)
                     enriched_error_message = self.enrich_error_message(res)
 
-            message = mask_secrets(message)
-
             if host_data.status == "failed":
                 status = Status(status_code=StatusCode.ERROR, description=message)
                 # Record an exception with the task message
-                span.record_exception(BaseException(mask_secret_values(enriched_error_message)))
+                span.record_exception(BaseException(enriched_error_message))
             elif host_data.status == "skipped":
                 message = res["skip_reason"] if "skip_reason" in res else "skipped"
                 status = Status(status_code=StatusCode.UNSET)
@@ -410,9 +408,9 @@ class OpenTelemetrySource:
     def add_attributes_for_service_map_if_possible(self, span, task_data: TaskData) -> None:
         """Update the span attributes with the service that the task interacted with, if possible."""
 
-        redacted_url = self.parse_and_redact_url_if_possible(task_data.args)
+        redacted_url = mask_secret_values(self.parse_and_redact_url_if_possible(task_data.args))
         if redacted_url:
-            span.set_attribute("http.url", mask_secrets(redacted_url.geturl()))
+            span.set_attribute("http.url", redacted_url.geturl())
 
     @staticmethod
     def parse_and_redact_url_if_possible(args):
@@ -506,7 +504,6 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.opentelemetry"
     CALLBACK_NEEDS_ENABLED = True
-    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None) -> None:
         super().__init__(display=display)
@@ -568,7 +565,7 @@ class CallbackModule(CallbackBase):
         # ansible.builtin.slurp contains the response in the content field
         if "content" in save and task.action in ("ansible.builtin.slurp", "ansible.legacy.slurp", "slurp"):
             save.pop("content")
-        return self._dump_results(mask_secret_values(save))
+        return self._dump_results(save)
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
