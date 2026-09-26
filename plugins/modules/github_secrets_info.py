@@ -30,6 +30,12 @@ options:
       - If not provided, the listing will be at organization level.
     type: str
     aliases: ["repo"]
+  environment:
+    description:
+      - The GitHub environment name, for environment secrets.
+      - Requires specifying a repository.
+    type: str
+    version_added: 13.5.0
   api_url:
     description:
       - The base URL for the GitHub API.
@@ -85,18 +91,25 @@ from ansible.module_utils.urls import fetch_url
 from ansible_collections.community.general.plugins.module_utils import _deps as deps
 
 
+def secrets_url(api_url: str, organization: str, repository: t.Optional[str], environment: t.Optional[str]) -> str:
+    """Construct the URL for GitHub secrets based on the provided parameters."""
+    if environment:
+        return f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets"
+    elif repository:
+        return f"{api_url}/repos/{organization}/{repository}/actions/secrets"
+    else:
+        return f"{api_url}/orgs/{organization}/actions/secrets"
+
+
 def list_secrets(
     module: AnsibleModule,
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
+    repository: str | None,
+    environment: str | None,
 ) -> dict[str, list]:
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets"
-    )
+    url = secrets_url(api_url, organization, repository, environment)
 
     resp, info = fetch_url(module, url, headers=headers, method="GET")
 
@@ -120,6 +133,7 @@ def main() -> None:
             "required": True,
         },
         "repository": {"type": "str", "aliases": ["repo"]},
+        "environment": {"type": "str"},
         "api_url": {"type": "str", "default": "https://api.github.com"},
         "token": {"type": "str", "required": True, "no_log": True},
     }
@@ -127,12 +141,14 @@ def main() -> None:
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        required_by={"environment": "repository"},
     )
 
     deps.validate(module)
 
     organization: str = module.params["organization"]
-    repository: str = module.params["repository"]
+    repository: str | None = module.params["repository"]
+    environment: str | None = module.params["environment"]
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]
 
@@ -144,7 +160,7 @@ def main() -> None:
         "Content-Type": "application/json",
     }
 
-    secrets = list_secrets(module, api_url, headers, organization, repository)
+    secrets = list_secrets(module, api_url, headers, organization, repository, environment)
 
     result["changed"] = False
     result.update(

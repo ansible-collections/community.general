@@ -36,6 +36,12 @@ options:
       - If not provided, the secret will be managed at the organization level.
     type: str
     aliases: ["repo"]
+  environment:
+    description:
+      - The GitHub environment name, for environment secrets.
+      - Requires specifying a repository.
+    type: str
+    version_added: 13.5.0
   key:
     description:
       - The name of the secret.
@@ -116,18 +122,26 @@ with deps.declare(
     from nacl import encoding, public
 
 
+def secrets_url(api_url: str, organization: str, repository: str | None, environment: str | None) -> str:
+    """Construct the URL for GitHub secrets based on the provided parameters."""
+    if environment:
+        return f"{api_url}/repos/{organization}/{repository}/environments/{environment}/secrets"
+    elif repository:
+        return f"{api_url}/repos/{organization}/{repository}/actions/secrets"
+    else:
+        return f"{api_url}/orgs/{organization}/actions/secrets"
+
+
 def get_public_key(
     module: AnsibleModule,
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
+    repository: str | None,
+    environment: str | None,
 ) -> tuple[str, str]:
     """Retrieve the GitHub Actions public key used to encrypt secrets."""
-    if repository:
-        url = f"{api_url}/repos/{organization}/{repository}/actions/secrets/public-key"
-    else:
-        url = f"{api_url}/orgs/{organization}/actions/secrets/public-key"
+    url = f"{secrets_url(api_url, organization, repository, environment)}/public-key"
 
     resp, info = fetch_url(module, url, headers=headers)
 
@@ -154,14 +168,11 @@ def check_secret(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
+    repository: str | None,
+    environment: str | None,
     key: str,
 ) -> dict[str, int]:
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
-    )
+    url = f"{secrets_url(api_url, organization, repository, environment)}/{key}"
 
     resp, info = fetch_url(module, url, headers=headers)
 
@@ -176,17 +187,14 @@ def upsert_secret(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
+    repository: str | None,
+    environment: str | None,
     key: str,
     encrypted_value: str,
     key_id: str,
 ) -> dict[str, t.Any]:
     """Create or update a GitHub Actions secret."""
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
-    )
+    url = f"{secrets_url(api_url, organization, repository, environment)}/{key}"
 
     payload = {
         "encrypted_value": encrypted_value,
@@ -197,7 +205,7 @@ def upsert_secret(
         payload["visibility"] = module.params["visibility"]
 
     if module.check_mode:
-        secret_present = check_secret(module, api_url, headers, organization, repository, key)
+        secret_present = check_secret(module, api_url, headers, organization, repository, environment, key)
         if secret_present["status"] == HTTPStatus.NOT_FOUND:
             check_mode_msg = "OK (2 bytes)"
             check_mode_status = HTTPStatus.CREATED.value
@@ -234,18 +242,15 @@ def delete_secret(
     api_url: str,
     headers: dict[str, str],
     organization: str,
-    repository: str,
+    repository: str | None,
+    environment: str | None,
     key: str,
 ) -> dict[str, t.Any]:
     """Delete a GitHub Actions secret."""
-    url = (
-        f"{api_url}/repos/{organization}/{repository}/actions/secrets/{key}"
-        if repository
-        else f"{api_url}/orgs/{organization}/actions/secrets/{key}"
-    )
+    url = f"{secrets_url(api_url, organization, repository, environment)}/{key}"
 
     if module.check_mode:
-        secret_present = check_secret(module, api_url, headers, organization, repository, key)
+        secret_present = check_secret(module, api_url, headers, organization, repository, environment, key)
         info = {
             "msg": (
                 "HTTP Error 404: Not Found"
@@ -279,6 +284,7 @@ def main() -> None:
             "required": True,
         },
         "repository": {"type": "str", "aliases": ["repo"]},
+        "environment": {"type": "str"},
         "key": {"type": "str", "no_log": False},
         "value": {"type": "str", "no_log": True},
         "visibility": {"type": "str", "choices": ["all", "private", "selected"]},
@@ -294,14 +300,15 @@ def main() -> None:
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[("state", "present", ["value"])],
-        required_by={"value": "key"},
+        required_by={"value": "key", "environment": "repository"},
         supports_check_mode=True,
     )
 
     deps.validate(module)
 
     organization: str = module.params["organization"]
-    repository: str = module.params["repository"]
+    repository: str | None = module.params["repository"]
+    environment: str | None = module.params["environment"]
     key: str = module.params["key"]
     value: str = module.params["value"]
     visibility: str = module.params.get("visibility")
@@ -338,6 +345,7 @@ def main() -> None:
             headers,
             organization,
             repository,
+            environment,
         )
 
         encrypted_value = encrypt_secret(public_key, value)
@@ -348,6 +356,7 @@ def main() -> None:
             headers,
             organization,
             repository,
+            environment,
             key,
             encrypted_value,
             key_id,
@@ -371,6 +380,7 @@ def main() -> None:
             headers,
             organization,
             repository,
+            environment,
             key,
         )
 
