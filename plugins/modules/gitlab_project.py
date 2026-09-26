@@ -300,10 +300,10 @@ options:
   state:
     description:
       - Create or delete project.
-      - Possible values are present and absent.
+      - States V(archived) and V(unarchived) are only applicable to existing projects.
     default: present
     type: str
-    choices: ["present", "absent"]
+    choices: ["present", "absent", "archived", "unarchived"]
   topics:
     description:
       - A topic or list of topics to be assigned to a project.
@@ -378,6 +378,26 @@ EXAMPLES = r"""
     api_password: "{{ initial_root_password }}"
     name: my_second_project
     group: "10481470"
+
+- name: Archive a GitLab Project
+  community.general.gitlab_project:
+    api_url: https://gitlab.example.com/
+    api_username: root
+    api_password: "{{ initial_root_password }}"
+    name: my_second_project
+    group: "10481470"
+    state: archived
+
+- name: Unarchive a GitLab Project while updating its settings
+  community.general.gitlab_project:
+    api_url: https://gitlab.example.com/
+    api_username: root
+    api_password: "{{ initial_root_password }}"
+    name: my_second_project
+    group: "10481470"
+    state: unarchived
+    wiki_enabled: false
+    issues_enabled: true
 """
 
 RETURN = r"""
@@ -603,6 +623,16 @@ class GitLabProject:
 
         return project.delete()
 
+    def archive_project(self):
+        if not self._module.check_mode:
+            self.project_object.archive()
+        return True
+
+    def unarchive_project(self):
+        if not self._module.check_mode:
+            self.project_object.unarchive()
+        return True
+
     """
     @param namespace User/Group object
     @param name Name of the project
@@ -669,7 +699,7 @@ def main():
             shared_runners_enabled=dict(type="bool"),
             snippets_enabled=dict(default=True, type="bool"),
             squash_option=dict(type="str", choices=["never", "always", "default_off", "default_on"]),
-            state=dict(type="str", default="present", choices=["absent", "present"]),
+            state=dict(type="str", default="present", choices=["absent", "present", "archived", "unarchived"]),
             topics=dict(type="list", elements="str"),
             username=dict(type="str"),
             visibility=dict(
@@ -776,13 +806,34 @@ def main():
         module.fail_json(msg="Failed to find the namespace for the project")
     project_exists = gitlab_project.exists_project(namespace, project_path)
 
+    is_archived = project_exists.attributes.get("archived") or False
+
     if state == "absent":
         if project_exists:
             gitlab_project.delete_project()
             module.exit_json(changed=True, msg=f"Successfully deleted project {project_name}")
         module.exit_json(changed=False, msg="Project deleted or does not exist")
 
-    if state == "present":
+    archive_actions = {
+        "archived": (True, gitlab_project.archive_project, "archived"),
+        "unarchived": (False, gitlab_project.unarchive_project, "unarchived"),
+    }
+
+    archiving_states = list(archive_actions.keys())
+    if state in ["present", *archiving_states]:
+        changed = False
+        msgs = []
+
+        if state in archiving_states and not project_exists:
+            module.fail_json(msg=f"{state.capitalize()} state works only on existing projects.")
+
+        if state in archive_actions:
+            target_archived, action_func, verb = archive_actions[state]
+            if is_archived != target_archived:
+                changed = True
+                msgs.append(f"Successfully {verb} project {project_name}")
+                action_func()
+
         if gitlab_project.create_or_update_project(
             module,
             project_name,
@@ -828,14 +879,17 @@ def main():
                 "wiki_enabled": wiki_enabled,
             },
         ):
-            module.exit_json(
-                changed=True,
-                msg=f"Successfully created or updated the project {project_name}",
-                project=gitlab_project.project_attributes(),
-            )
+            changed = True
+            msgs.append(f"Successfully created or updated the project {project_name}")
+
+        if changed:
+            msg = " - ".join(msgs)
+        else:
+            msg = f"No need to update the project {project_name}"
+
         module.exit_json(
-            changed=False,
-            msg=f"No need to update the project {project_name}",
+            changed=changed,
+            msg=msg,
             project=gitlab_project.project_attributes(),
         )
 
