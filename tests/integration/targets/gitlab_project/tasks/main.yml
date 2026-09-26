@@ -47,3 +47,70 @@
 - ansible.builtin.assert:
     that:
       - gitlab_project_state_again is not changed
+
+- name: Archive {{ gitlab_project_name }}
+  community.general.gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: archived
+  register: gitlab_project_archived_state
+
+- ansible.builtin.assert:
+    that:
+      - gitlab_project_archived_state is changed
+
+- name: Archive {{ gitlab_project_name }} (Test idempotency)
+  community.general.gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: archived
+  register: gitlab_project_archived_state_again
+
+- ansible.builtin.assert:
+    that:
+      - gitlab_project_archived_state_again is not changed
+
+- name: Change something in {{ gitlab_project_name }} while Archived
+  community.general.gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    wiki_enabled: false
+    issues_enabled: true
+    state: archived
+  register: gitlab_project_attributes_archived_state
+
+- ansible.builtin.assert:
+    that:
+      - gitlab_project_attributes_archived_state is changed
+
+- name: Unarchive {{ gitlab_project_name }}
+  community.general.gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: unarchived
+  register: gitlab_project_unarchived_state
+
+- ansible.builtin.assert:
+    that:
+      - gitlab_project_unarchived_state is changed
+
+- name: Unarchive {{ gitlab_project_name }} (Test idempotency)
+  community.general.gitlab_project:
+    server_url: "{{ gitlab_host }}"
+    validate_certs: false
+    login_token: "{{ gitlab_login_token }}"
+    name: "{{ gitlab_project_name }}"
+    state: unarchived
+  register: gitlab_project_unarchived_state_again
+
+- ansible.builtin.assert:
+    that:
+      - gitlab_project_unarchived_state_again is not changed
