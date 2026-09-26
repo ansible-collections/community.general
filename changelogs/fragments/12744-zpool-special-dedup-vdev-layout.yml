@@ -1,0 +1,2 @@
+bugfixes:
+  - zpool - Fix idempotency of vdevs ``special`` and ``dedup`` (https://github.com/ansible-collections/community.general/issues/12744, https://github.com/ansible-collections/community.general/pull/12745).
