@@ -118,6 +118,8 @@ except ImportError:
 from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
+
 # Todo:
 #  * Better formatting of output before sending out to logentries data/api nodes.
 
@@ -218,6 +220,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.logentries"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self):
         # TODO: allow for alternate posting methods (REST/UDP/agent/etc)
@@ -285,9 +288,9 @@ class CallbackModule(CallbackBase):
     def emit_formatted(self, record):
         if self.flatten:
             results = flatdict.FlatDict(record)
-            self.emit(self._dump_results(results))
+            self.emit(self._dump_results(mask_secret_values(results)))
         else:
-            self.emit(self._dump_results(record))
+            self.emit(self._dump_results(mask_secret_values(record)))
 
     def emit(self, record):
         msg = record.rstrip("\n")

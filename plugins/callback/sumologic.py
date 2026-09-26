@@ -54,6 +54,7 @@ from ansible.plugins.callback import CallbackBase
 from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
 
 
 class SumologicHTTPCollectorSource:
@@ -96,7 +97,7 @@ class SumologicHTTPCollectorSource:
 
         open_url(
             url,
-            data=json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True),
+            data=json.dumps(mask_secret_values(data), cls=AnsibleJSONEncoder, sort_keys=True),
             headers={"Content-type": "application/json", "X-Sumo-Host": data["ansible_host"]},
             method="POST",
         )
@@ -107,6 +108,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.sumologic"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None):
         super().__init__(display=display)

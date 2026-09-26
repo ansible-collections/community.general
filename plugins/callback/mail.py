@@ -89,6 +89,8 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
 
 class CallbackModule(CallbackBase):
     """This Ansible callback plugin mails errors to interested parties."""
@@ -97,6 +99,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.mail"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None):
         super().__init__(display=display)
@@ -138,7 +141,7 @@ class CallbackModule(CallbackBase):
         if self.cc:
             content += f"Cc: {', '.join([email.utils.formataddr(pair) for pair in cc_addresses])}\n"
         content += f"Message-ID: {email.utils.make_msgid(domain=self.get_option('message_id_domain'))}\n"
-        content += f"Subject: {subject.strip()}\n\n"
+        content += f"Subject: {mask_secrets(subject.strip())}\n\n"
         content += body
 
         addresses = to_addresses
@@ -150,7 +153,7 @@ class CallbackModule(CallbackBase):
         if not addresses:
             self._display.warning("No receiver has been specified for the mail callback plugin.")
 
-        smtp.sendmail(self.sender, [address for name, address in addresses], to_bytes(content))
+        smtp.sendmail(self.sender, [address for name, address in addresses], to_bytes(mask_secrets(content)))
 
         smtp.quit()
 

@@ -25,6 +25,8 @@ import subprocess
 from ansible.module_utils.common.process import get_bin_path
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
 
 class CallbackModule(CallbackBase):
     """
@@ -35,6 +37,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.say"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self):
         super().__init__()
@@ -74,7 +77,7 @@ class CallbackModule(CallbackBase):
             )
 
     def say(self, msg, voice):
-        cmd = [self.synthesizer, msg]
+        cmd = [self.synthesizer, mask_secrets(msg)]
         if voice:
             cmd.extend(("-v", voice))
         subprocess.call(cmd)

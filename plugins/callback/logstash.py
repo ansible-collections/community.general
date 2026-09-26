@@ -114,6 +114,7 @@ from ansible.plugins.callback import CallbackBase
 from ansible_collections.community.general.plugins.module_utils._datetime import (
     now,
 )
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values, mask_secrets
 
 
 class CallbackModule(CallbackBase):
@@ -121,6 +122,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.logstash"
     CALLBACK_NEEDS_WHITELIST = True
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self):
         super().__init__()
@@ -235,11 +237,11 @@ class CallbackModule(CallbackBase):
             data["ansible_host"] = result._host.name
             data["ansible_play_id"] = self.play_id
             data["ansible_play_name"] = self.play_name
-            data["ansible_task"] = task_name
-            data["ansible_facts"] = self._dump_results(result._result)
+            data["ansible_task"] = mask_secrets(task_name)
+            data["ansible_facts"] = self._dump_results(mask_secret_values(result._result))
 
             if self.ls_format_version == "v2":
-                self.logger.info("SETUP FACTS | %s", self._dump_results(result._result), extra=data)
+                self.logger.info("SETUP FACTS | %s", self._dump_results(mask_secret_values(result._result)), extra=data)
             else:
                 self.logger.info("ansible facts", extra=data)
         else:
@@ -253,13 +255,16 @@ class CallbackModule(CallbackBase):
             data["ansible_host"] = result._host.name
             data["ansible_play_id"] = self.play_id
             data["ansible_play_name"] = self.play_name
-            data["ansible_task"] = task_name
+            data["ansible_task"] = mask_secrets(task_name)
             data["ansible_task_id"] = self.task_id
-            data["ansible_result"] = self._dump_results(result._result)
+            data["ansible_result"] = self._dump_results(mask_secret_values(result._result))
 
             if self.ls_format_version == "v2":
                 self.logger.info(
-                    "TASK OK | %s | RESULT | %s", task_name, self._dump_results(result._result), extra=data
+                    "TASK OK | %s | RESULT | %s",
+                    task_name,
+                    self._dump_results(mask_secret_values(result._result)),
+                    extra=data,
                 )
             else:
                 self.logger.info("ansible ok", extra=data)
@@ -273,9 +278,9 @@ class CallbackModule(CallbackBase):
         data["ansible_host"] = result._host.name
         data["ansible_play_id"] = self.play_id
         data["ansible_play_name"] = self.play_name
-        data["ansible_task"] = task_name
+        data["ansible_task"] = mask_secrets(task_name)
         data["ansible_task_id"] = self.task_id
-        data["ansible_result"] = self._dump_results(result._result)
+        data["ansible_result"] = self._dump_results(mask_secret_values(result._result))
 
         if self.ls_format_version == "v2":
             self.logger.info("TASK SKIPPED | %s", task_name, extra=data)
@@ -289,7 +294,7 @@ class CallbackModule(CallbackBase):
         data["ansible_host"] = result._host.name
         data["ansible_play_id"] = self.play_id
         data["ansible_play_name"] = self.play_name
-        data["imported_file"] = imported_file
+        data["imported_file"] = mask_secrets(imported_file)
 
         if self.ls_format_version == "v2":
             self.logger.info("IMPORT | %s", imported_file, extra=data)
@@ -303,7 +308,7 @@ class CallbackModule(CallbackBase):
         data["ansible_host"] = result._host.name
         data["ansible_play_id"] = self.play_id
         data["ansible_play_name"] = self.play_name
-        data["imported_file"] = missing_file
+        data["imported_file"] = mask_secrets(missing_file)
 
         if self.ls_format_version == "v2":
             self.logger.info("NOT IMPORTED | %s", missing_file, extra=data)
@@ -324,9 +329,9 @@ class CallbackModule(CallbackBase):
         data["ansible_host"] = result._host.name
         data["ansible_play_id"] = self.play_id
         data["ansible_play_name"] = self.play_name
-        data["ansible_task"] = task_name
+        data["ansible_task"] = mask_secrets(task_name)
         data["ansible_task_id"] = self.task_id
-        data["ansible_result"] = self._dump_results(result._result)
+        data["ansible_result"] = self._dump_results(mask_secret_values(result._result))
 
         self.errors += 1
         if self.ls_format_version == "v2":
@@ -334,7 +339,7 @@ class CallbackModule(CallbackBase):
                 "TASK FAILED | %s | HOST | %s | RESULT | %s",
                 task_name,
                 self.hostname,
-                self._dump_results(result._result),
+                self._dump_results(mask_secret_values(result._result)),
                 extra=data,
             )
         else:
@@ -349,9 +354,9 @@ class CallbackModule(CallbackBase):
         data["ansible_host"] = result._host.name
         data["ansible_play_id"] = self.play_id
         data["ansible_play_name"] = self.play_name
-        data["ansible_task"] = task_name
+        data["ansible_task"] = mask_secrets(task_name)
         data["ansible_task_id"] = self.task_id
-        data["ansible_result"] = self._dump_results(result._result)
+        data["ansible_result"] = self._dump_results(mask_secret_values(result._result))
 
         self.errors += 1
         if self.ls_format_version == "v2":
@@ -359,7 +364,7 @@ class CallbackModule(CallbackBase):
                 "UNREACHABLE | %s | HOST | %s | RESULT | %s",
                 task_name,
                 self.hostname,
-                self._dump_results(result._result),
+                self._dump_results(mask_secret_values(result._result)),
                 extra=data,
             )
         else:
@@ -374,9 +379,9 @@ class CallbackModule(CallbackBase):
         data["ansible_host"] = result._host.name
         data["ansible_play_id"] = self.play_id
         data["ansible_play_name"] = self.play_name
-        data["ansible_task"] = task_name
+        data["ansible_task"] = mask_secrets(task_name)
         data["ansible_task_id"] = self.task_id
-        data["ansible_result"] = self._dump_results(result._result)
+        data["ansible_result"] = self._dump_results(mask_secret_values(result._result))
 
         self.errors += 1
         if self.ls_format_version == "v2":
@@ -384,7 +389,7 @@ class CallbackModule(CallbackBase):
                 "ASYNC FAILED | %s | HOST | %s | RESULT | %s",
                 task_name,
                 self.hostname,
-                self._dump_results(result._result),
+                self._dump_results(mask_secret_values(result._result)),
                 extra=data,
             )
         else:
