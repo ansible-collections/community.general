@@ -222,7 +222,7 @@ class SSSDConfigModule(StateModuleHelper):
         if deps.failed("SSSDConfig"):
             _respawn_sssdconfig()
 
-        deps.validate(self.module, "SSSDConfig")
+        deps.validate(self.module)
 
         self.sssd_config = create_sssd_config()
         self.sssd_config.import_config(self.request.target.path)
