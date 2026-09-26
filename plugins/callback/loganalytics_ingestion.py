@@ -157,6 +157,8 @@ from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_as_secret, mask_secret_values
+
 display = Display()
 
 
@@ -214,8 +216,11 @@ class AzureLogAnalyticsIngestionSource:
         )
         response = open_url(url, data=data, force=True, headers=headers, method="POST", timeout=self.timeout)
         j = json.loads(response.read().decode("utf-8"))
+        access_token = mark_as_secret(j["access_token"])
+
         self.token_expiration_time = datetime.now() + timedelta(seconds=j.get("expires_in"))
-        return j.get("access_token")
+
+        return access_token
 
     def is_token_valid(self):
         return datetime.now() + timedelta(seconds=10) < self.token_expiration_time
@@ -229,7 +234,8 @@ class AzureLogAnalyticsIngestionSource:
             f"{self.dce_url}/dataCollectionRules/{self.dcr_id}/streams/{self.stream_name}?api-version=2023-01-01"
         )
         headers = {"Authorization": f"Bearer {self.bearer_token}", "Content-Type": "application/json"}
-        open_url(ingestion_url, data=json.dumps(event_data), headers=headers, method="POST", timeout=self.timeout)
+        data = mask_secret_values(json.dumps(event_data))
+        open_url(ingestion_url, data=data, headers=headers, method="POST", timeout=self.timeout)
 
     def _rfc1123date(self):
         return datetime.now(UTC).strftime("%a, %d %b %Y %H:%M:%S GMT")
@@ -291,6 +297,8 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "loganalytics_ingestion"
     CALLBACK_NEEDS_ENABLED = True
+
+    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None):
         super().__init__(display=display)
