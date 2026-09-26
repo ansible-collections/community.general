@@ -261,7 +261,7 @@ class ElasticSource:
             duration=host_data.finish - task_data.start,
             labels={
                 "ansible.task.args": mask_secret_values(task_data.args),
-                "ansible.task.message": mask_secrets(message),
+                "ansible.task.message": message,
                 "ansible.task.module": task_data.action,
                 "ansible.task.name": name,
                 "ansible.task.result": rc,
@@ -274,7 +274,6 @@ class ElasticSource:
                 exception = AnsibleRuntimeError(
                     message=f"{task_data.action}: {name} failed with error message {enriched_error_message}"
                 )
-                # TODO: mask secrets in traceback and exception!
                 apm_cli.capture_exception(exc_info=(type(exception), exception, exception.__traceback__), handled=True)
 
     def init_apm_client(
@@ -325,7 +324,6 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = "notification"
     CALLBACK_NAME = "community.general.elastic"
     CALLBACK_NEEDS_ENABLED = True
-    ANSIBLE_SUPPORTS_MASKING = True
 
     def __init__(self, display=None) -> None:
         super().__init__(display=display)
