@@ -92,15 +92,36 @@ def test_comparison_uses_requested_context_components(make_module, context, curr
 
 
 @pytest.mark.parametrize(
-    ("context", "expected_flags"),
-    [("type", 1 | 2 | 4), ("user_role", 1 | 2 | 4 | 8), ("full", 1 | 2 | 4 | 16)],
+    ("context", "expected_flags", "supports_user_role"),
+    [
+        ("type", 1 | 2 | 4, True),
+        ("user_role", 1 | 2 | 4 | 8, True),
+        ("full", 1 | 2 | 4 | 16, True),
+        ("type", 1 | 2 | 4, False),
+        ("full", 1 | 2 | 4 | 16, False),
+    ],
 )
-def test_restore_passes_requested_flags_to_selinux(make_module, selinux_mock, context, expected_flags):
+def test_restore_passes_requested_flags_to_selinux(
+    make_module, selinux_mock, context, expected_flags, supports_user_role
+):
+    if not supports_user_role:
+        del selinux_mock.SELINUX_RESTORECON_SET_USER_ROLE
     module = make_module(context=context)
 
     module.__run__()
 
     selinux_mock.selinux_restorecon.assert_called_once_with(module.module.params["path"], expected_flags)
+
+
+@pytest.mark.parametrize("check_mode", [False, True])
+def test_user_role_requires_binding_support(make_module, selinux_mock, check_mode):
+    del selinux_mock.SELINUX_RESTORECON_SET_USER_ROLE
+
+    with pytest.raises(serestorecon.SERestoreconModule.ModuleHelperException) as exc:
+        make_module(context="user_role", _ansible_check_mode=check_mode)
+
+    assert exc.value.msg == ("`context: user_role` not available on SELinux version. Use `context: full`.")
+    selinux_mock.selinux_restorecon.assert_not_called()
 
 
 def test_restore_reports_the_changed_path(make_module, selinux_mock):

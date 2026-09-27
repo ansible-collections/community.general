@@ -13,6 +13,18 @@
   when:
     - ansible_facts.os_family == "RedHat"
 
+- name: Check support for restoring user and role
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts.python.executable }}"
+      - -c
+      - |
+        import selinux
+        print(int(hasattr(selinux, "SELINUX_RESTORECON_SET_USER_ROLE")))
+  register: user_role_support
+  changed_when: false
+  check_mode: false
+
 - name: Test serestorecon
   vars:
     test_root: "{{ remote_tmp_dir }}/serestorecon"
@@ -239,26 +251,66 @@
           - recursive_idempotent is not changed
           - recursive_idempotent.changed_paths == []
 
-    - name: Give file an incorrect type for user_role test
-      ansible.builtin.command:
-        argv:
-          - chcon
-          - -t
-          - var_t
-          - "{{ included_file }}"
-      changed_when: true
+    - name: Test user_role when supported
+      when: user_role_support.stdout == "1"
+      block:
+        - name: Give file a different user, type, and range
+          ansible.builtin.command:
+            argv:
+              - chcon
+              - -u
+              - unconfined_u
+              - -t
+              - var_t
+              - -l
+              - s0:c0.c3
+              - "{{ included_file }}"
+          changed_when: true
 
-    - name: Restore user, role, and type
-      community.general.serestorecon:
-        path: "{{ included_file }}"
-        context: user_role
-      register: user_role_restore
+        - name: Restore user, role, and type
+          community.general.serestorecon:
+            path: "{{ included_file }}"
+            context: user_role
+          register: user_role_restore
 
-    - name: Verify user_role restoration
-      ansible.builtin.assert:
-        that:
-          - user_role_restore is changed
-          - user_role_restore.changed_paths | length == 1
+        - name: Read context after user_role restoration
+          ansible.builtin.command:
+            argv:
+              - stat
+              - -c
+              - "%C"
+              - "{{ included_file }}"
+          register: user_role_context
+          changed_when: false
+
+        - name: Verify user_role restores the user and type while preserving the range
+          ansible.builtin.assert:
+            that:
+              - user_role_restore is changed
+              - user_role_restore.changed_paths | length == 1
+              - user_role_restore.changed_paths[0].previous == 'unconfined_u:object_r:var_t:s0:c0.c3'
+              - user_role_restore.changed_paths[0].restored == 'system_u:object_r:tmp_t:s0:c0.c3'
+              - user_role_context.stdout == user_role_restore.changed_paths[0].restored
+
+    - name: Test user_role when unsupported
+      when: user_role_support.stdout == "0"
+      block:
+        - name: Request unsupported user_role restoration
+          community.general.serestorecon:
+            path: "{{ included_file }}"
+            context: user_role
+          register: unsupported_user_role
+          ignore_errors: true
+
+        - name: Verify the unsupported option fails clearly without changes
+          ansible.builtin.assert:
+            that:
+              - unsupported_user_role is failed
+              - unsupported_user_role is not changed
+              - >-
+                unsupported_user_role.msg ==
+                'context=user_role requires SELinux Python bindings that expose '
+                'SELINUX_RESTORECON_SET_USER_ROLE (introduced in libselinux 3.9)'
 
     - name: Give file an incorrect type for full context test
       ansible.builtin.command:
@@ -291,6 +343,7 @@
           - full_context_restore is changed
           - full_context_restore.changed_paths | length == 1
           - full_context.stdout == full_context_restore.changed_paths[0].restored
+          - full_context.stdout == 'system_u:object_r:tmp_t:s0'
   always:
     - name: Remove test SELinux file context
       community.general.sefcontext:

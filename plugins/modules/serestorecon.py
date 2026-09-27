@@ -52,6 +52,8 @@ options:
       - V(type) restores only the SELinux type component.
       - V(user_role) restores the SELinux user, role, and type components while
         preserving the existing range.
+      - V(user_role) requires SELinux Python bindings that expose
+        C(SELINUX_RESTORECON_SET_USER_ROLE), introduced in libselinux 3.9.
       - V(full) restores the complete policy-defined SELinux context.
     type: str
     choices:
@@ -179,6 +181,8 @@ class SERestoreconModule(ModuleHelper):
         )
 
         if self.vars.context == "user_role":
+            if not hasattr(selinux, "SELINUX_RESTORECON_SET_USER_ROLE"):
+                self.do_raise("`context: user_role` not available on SELinux version. Use `context: full`.")
             flags |= selinux.SELINUX_RESTORECON_SET_USER_ROLE
         elif self.vars.context == "full":
             flags |= selinux.SELINUX_RESTORECON_SET_SPECFILE_CTX
@@ -262,7 +266,9 @@ class SERestoreconModule(ModuleHelper):
 
         primary_filesystem_id = self.path.lstat().st_dev
         if not self.vars.cross_filesystems:
-            all_paths_filtered = filter(lambda path: path.lstat().st_dev == primary_filesystem_id, all_paths_filtered)
+            all_paths_filtered = list(
+                filter(lambda path: path.lstat().st_dev == primary_filesystem_id, all_paths_filtered)
+            )
 
         yield from all_paths_filtered
 
