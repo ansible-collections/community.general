@@ -19,7 +19,8 @@ attributes:
   check_mode:
     support: full
   diff_mode:
-    support: none
+    support: full
+    version_added: 13.5.0
 options:
   api_token:
     description:
@@ -710,17 +711,20 @@ class CloudflareAPI:
         zone_id = self._get_zone_id(self.zone)
         records = self.get_dns_records(self.zone, self.type, search_record, search_value)
 
+        deleted_records = []
         for rr in records:
             if solo:
                 if not ((rr["type"] == self.type) and (rr["name"] == search_record) and (rr["content"] == content)):
                     self.changed = True
+                    deleted_records.append(rr)
                     if not self.module.check_mode:
                         result, info = self._cf_api_call(f"/zones/{zone_id}/dns_records/{rr['id']}", "DELETE")
             else:
                 self.changed = True
+                deleted_records.append(rr)
                 if not self.module.check_mode:
                     result, info = self._cf_api_call(f"/zones/{zone_id}/dns_records/{rr['id']}", "DELETE")
-        return self.changed
+        return deleted_records, self.changed
 
     def ensure_dns_record(self):
         search_value = self.value
@@ -871,7 +875,7 @@ class CloudflareAPI:
                         and rr["data"]["tag"] == caa_data["tag"]
                         and rr["data"]["value"] == caa_data["value"]
                     ):
-                        return rr, self.changed
+                        return rr, rr, self.changed
             else:
                 self.module.fail_json(
                     msg="More than one record already exists for the given attributes. That should be impossible, please open an issue!"
@@ -903,15 +907,15 @@ class CloudflareAPI:
                         f"/zones/{zone_id}/dns_records/{records[0]['id']}", "PUT", new_record
                     )
                 self.changed = True
-                return result, self.changed
+                return cur_record, result, self.changed
             else:
-                return records, self.changed
+                return cur_record, records, self.changed
         if self.module.check_mode:
             result = new_record
         else:
             result, info = self._cf_api_call(f"/zones/{zone_id}/dns_records", "POST", new_record)
         self.changed = True
-        return result, self.changed
+        return None, result, self.changed
 
 
 def main():
@@ -1064,16 +1068,31 @@ def main():
     if cf_api.state == "present":
         # delete all records matching record name + type
         if cf_api.is_solo:
-            changed = cf_api.delete_dns_records(solo=cf_api.is_solo)
-        result, changed = cf_api.ensure_dns_record()
+            cf_api.delete_dns_records(solo=cf_api.is_solo)
+        before, result, changed = cf_api.ensure_dns_record()
         if isinstance(result, list):
-            module.exit_json(changed=changed, result={"record": result[0]})
+            result = result[0]
 
-        module.exit_json(changed=changed, result={"record": result})
+        exit_args = {"changed": changed, "result": {"record": result}}
+        if module._diff:
+            exit_args["diff"] = {
+                "before": {"record": before} if before else {},
+                "after": {"record": result} if result else {},
+            }
+        module.exit_json(**exit_args)
     else:
         # force solo to False, just to be sure
-        changed = cf_api.delete_dns_records(solo=False)
-        module.exit_json(changed=changed)
+        deleted_records, changed = cf_api.delete_dns_records(solo=False)
+        exit_args = {"changed": changed}
+        if module._diff:
+            if len(deleted_records) == 1:
+                before = {"record": deleted_records[0]}
+            elif len(deleted_records) > 1:
+                before = {"records": deleted_records}
+            else:
+                before = {}
+            exit_args["diff"] = {"before": before, "after": {}}
+        module.exit_json(**exit_args)
 
 
 if __name__ == "__main__":
