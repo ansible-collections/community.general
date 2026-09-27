@@ -117,7 +117,7 @@ def test_restore_passes_requested_flags_to_selinux(
 def test_user_role_requires_binding_support(make_module, selinux_mock, check_mode):
     del selinux_mock.SELINUX_RESTORECON_SET_USER_ROLE
 
-    with pytest.raises(serestorecon.SERestoreconModule.ModuleHelperException) as exc:
+    with pytest.raises(serestorecon.SERestoreconModule.ModuleHelperException):
         make_module(context="user_role", _ansible_check_mode=check_mode)
 
     selinux_mock.selinux_restorecon.assert_not_called()
