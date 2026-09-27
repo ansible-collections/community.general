@@ -3,24 +3,28 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Show SELinux status when disabled
-  ansible.builtin.debug:
-    msg: SELinux is disabled
-  when:
-    - ansible_facts.selinux is defined
-    - ansible_facts.selinux == false
+- name: Run serestorecon integration tests on supported distributions
+  when: ansible_facts.os_family in ["Debian", "RedHat", "Suse"]
+  block:
+    - name: Install SELinux test requirements
+      ansible.builtin.package:
+        name:
+          - coreutils
+          - policycoreutils
+          - policycoreutils-python-utils
+        state: present
 
-- name: Show SELinux status
-  ansible.builtin.debug:
-    msg: "SELinux is {{ ansible_facts.selinux.status }}"
-  when:
-    - ansible_facts.selinux is defined
-    - ansible_facts.selinux != false
+    - name: Refresh SELinux facts after installing requirements
+      ansible.builtin.setup:
+        gather_subset:
+          - "!all"
+          - "!min"
+          - selinux
 
-- name: Run serestorecon tests
-  ansible.builtin.include_tasks:
-    file: serestorecon.yml
-  when:
-    - ansible_facts.selinux is defined
-    - ansible_facts.selinux != false
-    - ansible_facts.selinux.status == "enabled"
+    - name: Run serestorecon tests
+      ansible.builtin.include_tasks:
+        file: serestorecon.yml
+      when:
+        - ansible_facts.selinux is defined
+        - ansible_facts.selinux is mapping
+        - ansible_facts.selinux.status == "enabled"

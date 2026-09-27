@@ -3,16 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Install SELinux requirements
-  ansible.builtin.package:
-    name:
-      - python3-libselinux
-      - python3-policycoreutils
-      - policycoreutils
-    state: present
-  when:
-    - ansible_facts.os_family == "RedHat"
-
 - name: Check support for restoring user and role
   ansible.builtin.command:
     argv:
