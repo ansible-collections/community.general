@@ -71,6 +71,7 @@ options:
   vdevs:
     description:
       - List of vdev definitions for the pool.
+      - Required when O(state=present).
     type: list
     elements: dict
     suboptions:
@@ -123,8 +124,10 @@ EXAMPLES = r"""
 - name: Set pool and filesystem properties
   community.general.zpool:
     name: tank
-    ashift: 12
-    compression: lz4
+    pool_properties:
+      ashift: 12
+    filesystem_properties:
+      compression: lz4
     vdevs:
       - disks:
           - /dev/sda
