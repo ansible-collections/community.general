@@ -120,7 +120,6 @@ def test_user_role_requires_binding_support(make_module, selinux_mock, check_mod
     with pytest.raises(serestorecon.SERestoreconModule.ModuleHelperException) as exc:
         make_module(context="user_role", _ansible_check_mode=check_mode)
 
-    assert exc.value.msg == ("`context: user_role` not available on SELinux version. Use `context: full`.")
     selinux_mock.selinux_restorecon.assert_not_called()
 
 

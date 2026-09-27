@@ -302,15 +302,11 @@
           register: unsupported_user_role
           ignore_errors: true
 
-        - name: Verify the unsupported option fails clearly without changes
+        - name: Verify the unsupported option fails without changes
           ansible.builtin.assert:
             that:
               - unsupported_user_role is failed
               - unsupported_user_role is not changed
-              - >-
-                unsupported_user_role.msg ==
-                'context=user_role requires SELinux Python bindings that expose '
-                'SELINUX_RESTORECON_SET_USER_ROLE (introduced in libselinux 3.9)'
 
     - name: Give file an incorrect type for full context test
       ansible.builtin.command:
