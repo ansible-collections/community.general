@@ -71,6 +71,7 @@ options:
   vdevs:
     description:
       - List of vdev definitions for the pool.
+      - Required when O(state=present).
     type: list
     elements: dict
     suboptions:
