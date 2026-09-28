@@ -52,7 +52,7 @@ def test_features_rejects_null_output(profile, result):
     AuthselectProfile._get_features.return_value = result
 
     with pytest.raises(RuntimeError):
-        _ = profile.features
+        profile.features
 
     NullTerminatedStringArray._free.assert_not_called()
 
@@ -61,7 +61,7 @@ def test_features_requires_configured_getter(profile, mocker):
     mocker.patch.object(AuthselectProfile, "_get_features", None)
 
     with pytest.raises(RuntimeError):
-        _ = profile.features
+        profile.features
 
 
 @pytest.mark.parametrize("closed", [False, True], ids=["null", "closed"])
@@ -72,7 +72,7 @@ def test_invalid_profiles_cannot_be_used(profile, closed):
         profile = AuthselectProfile()
 
     with pytest.raises(RuntimeError):
-        _ = profile.features
+        profile.features
     with pytest.raises(RuntimeError):
         with profile:
             pass
