@@ -358,7 +358,7 @@ class Zpool:
             if device == self.name:
                 continue
 
-            if device in ("logs", "cache", "spares"):
+            if device in ("logs", "cache", "spares", "special", "dedup"):
                 current = flush_current(current)
                 role = "spare" if device == "spares" else device.rstrip("s")
                 current = {"role": role, "type": None, "disks": []}
