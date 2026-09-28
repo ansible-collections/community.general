@@ -28,8 +28,10 @@ options:
     description:
       - Name or list of names of packages to install/remove.
       - With O(name=*), O(state=latest) operates, but O(state=present) and O(state=absent) are noops.
-      - A name can also be the path of a local package file, in which case the package is installed from that file. The
-        actual package name is read from the file to check and report the installation state.
+      - A name ending in C(.pkg), C(.tzst), C(.txz), C(.tbz), C(.tgz), or C(.tar) is treated as the path of a local package
+        file, in which case the package is installed from that file. The actual package name is read from the file to check
+        and report the installation state. Local package files cannot be used with O(state=latest).
+      - Support for local package files was added in community.general 13.5.0.
     required: true
     aliases: [pkg]
     type: list
@@ -140,11 +142,17 @@ EXAMPLES = r"""
 """
 
 
-import os
 import re
 from collections import defaultdict
 
 from ansible.module_utils.basic import AnsibleModule
+
+# Same suffixes pkg itself uses to tell a package file apart from a package name
+PACKAGE_FILE_SUFFIXES = (".pkg", ".tzst", ".txz", ".tbz", ".tgz", ".tar")
+
+
+def is_package_file(name):
+    return name.endswith(PACKAGE_FILE_SUFFIXES)
 
 
 def query_package(module, run_pkgng, name):
@@ -247,10 +255,15 @@ def install_packages(module, run_pkgng, packages, cached, state):
     stdout = ""
     stderr = ""
 
+    if state == "latest":
+        package_files = [package for package in packages if is_package_file(package)]
+        if package_files:
+            module.fail_json(msg=f"state=latest is not supported for local package files: {', '.join(package_files)}")
+
     # The package database cannot be queried by the path of a local package file,
     # so resolve the real package name from the file and use it for all queries.
     query_name = {
-        package: query_file_package_name(module, run_pkgng, package) if os.path.isfile(package) else package
+        package: query_file_package_name(module, run_pkgng, package) if is_package_file(package) else package
         for package in packages
     }
 
