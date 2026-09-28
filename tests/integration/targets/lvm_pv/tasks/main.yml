@@ -19,6 +19,8 @@
   block:
     - ansible.builtin.import_tasks: creation.yml
 
+    - ansible.builtin.import_tasks: options.yml
+
     - ansible.builtin.import_tasks: resizing.yml
 
     - ansible.builtin.import_tasks: removal.yml
