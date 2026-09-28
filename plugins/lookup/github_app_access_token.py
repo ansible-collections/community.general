@@ -23,8 +23,8 @@ options:
     type: path
   app_id:
     description:
-      - Your GitHub App ID, you can find this in the Settings page.
-      - This also accepts the GitHub App's client ID. GitHub recommends using the client ID instead of the numeric
+      - Your GitHub App's client ID or GitHub App ID. You can find these in the Settings page.
+      - GitHub recommends using the client ID instead of the numeric
         app ID (see U(https://github.blog/changelog/2024-08-23-client-ids-are-now-included-in-app-api-responses/)).
     required: true
     type: str
