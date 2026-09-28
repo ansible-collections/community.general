@@ -4,8 +4,6 @@
 
 from __future__ import annotations
 
-import os
-
 import pytest
 from ansible.module_utils import basic
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
@@ -30,9 +28,6 @@ def run_command(mocker):
         fail_json=fail_json,
     )
     mocker.patch.object(basic.AnsibleModule, "get_bin_path", return_value="/testbin/pkg")
-    # Make only the test package path look like an existing file
-    real_isfile = os.path.isfile
-    mocker.patch("os.path.isfile", side_effect=lambda path: path == PACKAGE_FILE or real_isfile(path))
     return mocker.patch.object(basic.AnsibleModule, "run_command")
 
 
@@ -64,7 +59,7 @@ def test_install_from_package_file(run_command):
         ["/testbin/pkg", "query", "-F", PACKAGE_FILE, "%n"],
         ["/testbin/pkg", "update"],
         ["/testbin/pkg", "info", "-g", "-e", PACKAGE_NAME],
-        ["/testbin/pkg", "install", "-g", "-U", "-y", PACKAGE_FILE],
+        ["/testbin/pkg", "install", "-g", "-y", PACKAGE_FILE],
         ["/testbin/pkg", "info", "-g", "-e", PACKAGE_NAME],
     ]
 
@@ -104,3 +99,42 @@ def test_install_from_unreadable_package_file(run_command):
 
     result = exc.value.args[0]
     assert result["msg"].startswith(f"failed to obtain package name from file {PACKAGE_FILE}")
+
+
+def test_latest_from_package_file_fails(run_command):
+    run_command.side_effect = [
+        (0, "1.18.4", ""),  # pkg -v
+    ]
+
+    with set_module_args({"name": PACKAGE_FILE, "state": "latest"}):
+        with pytest.raises(AnsibleFailJson) as exc:
+            pkgng.main()
+
+    result = exc.value.args[0]
+    assert result["msg"] == f"state=latest is not supported for local package files: {PACKAGE_FILE}"
+    assert called_commands(run_command) == [["/testbin/pkg", "-v"]]
+
+
+@pytest.mark.parametrize("name", ["zsh", "shells/zsh"])
+def test_install_by_name_does_not_query_file(run_command, tmp_path, monkeypatch, name):
+    # A file with the same name as the package in the current directory must not matter
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / name).parent.mkdir(parents=True, exist_ok=True)
+    (tmp_path / name).touch()
+    run_command.side_effect = [
+        (0, "1.18.4", ""),  # pkg -v
+        (0, "", ""),  # pkg update
+        (0, "", ""),  # pkg info (package already installed)
+    ]
+
+    with set_module_args({"name": name}):
+        with pytest.raises(AnsibleExitJson) as exc:
+            pkgng.main()
+
+    result = exc.value.args[0]
+    assert not result["changed"]
+    assert called_commands(run_command) == [
+        ["/testbin/pkg", "-v"],
+        ["/testbin/pkg", "update"],
+        ["/testbin/pkg", "info", "-g", "-e", name],
+    ]
