@@ -30,7 +30,8 @@ options:
       - With O(name=*), O(state=latest) operates, but O(state=present) and O(state=absent) are noops.
       - A name ending in C(.pkg), C(.tzst), C(.txz), C(.tbz), C(.tgz), or C(.tar) is treated as the path of a local package
         file, in which case the package is installed from that file. The actual package name is read from the file to check
-        and report the installation state. Local package files cannot be used with O(state=latest).
+        and report the installation state. Local package files cannot be used with O(state=latest) or
+        O(state=absent).
       - Support for local package files was added in community.general 13.5.0.
     required: true
     aliases: [pkg]
@@ -155,6 +156,12 @@ def is_package_file(name):
     return name.endswith(PACKAGE_FILE_SUFFIXES)
 
 
+def fail_on_package_files(module, packages, state):
+    package_files = [package for package in packages if is_package_file(package)]
+    if package_files:
+        module.fail_json(msg=f"state={state} is not supported for local package files: {', '.join(package_files)}")
+
+
 def query_package(module, run_pkgng, name):
     rc, out, err = run_pkgng("info", "-e", name)
 
@@ -224,6 +231,8 @@ def upgrade_packages(module, run_pkgng):
 
 
 def remove_packages(module, run_pkgng, packages):
+    fail_on_package_files(module, packages, "absent")
+
     remove_c = 0
     stdout = ""
     stderr = ""
@@ -256,9 +265,7 @@ def install_packages(module, run_pkgng, packages, cached, state):
     stderr = ""
 
     if state == "latest":
-        package_files = [package for package in packages if is_package_file(package)]
-        if package_files:
-            module.fail_json(msg=f"state=latest is not supported for local package files: {', '.join(package_files)}")
+        fail_on_package_files(module, packages, state)
 
     # The package database cannot be queried by the path of a local package file,
     # so resolve the real package name from the file and use it for all queries.
