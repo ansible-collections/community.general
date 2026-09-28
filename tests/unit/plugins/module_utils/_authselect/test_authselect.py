@@ -4,508 +4,239 @@
 
 from __future__ import annotations
 
+import ctypes
 import errno
-import os
-import unittest
-from unittest.mock import Mock, patch
+from contextlib import nullcontext
+
+import pytest
 
 from ansible_collections.community.general.plugins.module_utils._authselect import authselect
 
 
-class FakeAllocatedCString:
-    def __init__(self, value: str | None = None):
-        self.value = value
-        self.entered = False
-        self.exited = False
-        self.closed = False
-
-    def __bool__(self):
-        return self.value is not None
-
-    def __enter__(self):
-        self.entered = True
-        return self
-
-    def __exit__(self, *args):
-        self.exited = True
-        self.closed = True
-
-    def close(self):
-        self.closed = True
-
-    def decode(self, encoding="utf-8"):
-        if self.value is None:
-            raise RuntimeError("cannot decode NULL fake string")
-        return self.value.encode("utf-8").decode(encoding)
+@pytest.fixture
+def library(mocker):
+    lib = mocker.Mock()
+    mocker.patch.object(authselect, "get_authselect_lib", return_value=lib)
+    # observe cleanup without calling free()
+    for pointer_type in (
+        authselect.AllocatedCString,
+        authselect.NullTerminatedStringArray,
+        authselect.AuthselectProfile,
+    ):
+        mocker.patch.object(pointer_type, "_free")
+    return lib
 
 
-class FakeStringArray:
-    def __init__(self, values: list[str] | None = None):
-        self.values = values
-        self.entered = False
-        self.exited = False
-
-    def __bool__(self):
-        return self.values is not None
-
-    def __enter__(self):
-        self.entered = True
-        return self
-
-    def __exit__(self, *args):
-        self.exited = True
-
-    def __iter__(self):
-        return iter(self.values or [])
+@pytest.fixture
+def wrapper(library):
+    return authselect.Authselect()
 
 
-class FakePointer:
-    def __init__(self, valid=True):
-        self.valid = valid
-
-    def __bool__(self):
-        return self.valid
+def set_output(output, value):
+    """Fill a real ctypes output parameter and return native success."""
+    ctypes.cast(output, ctypes.POINTER(type(value)))[0] = value
+    return 0
 
 
-class TestAuthselectValidationStatus(unittest.TestCase):
-    def test_validation_complete_value(self):
-        self.assertEqual(
-            authselect.AuthselectValidationStatus.VALIDATION_COMPLETE,
-            0,
-        )
-
-    def test_no_configuration_uses_enoent(self):
-        self.assertEqual(
-            authselect.AuthselectValidationStatus.NO_CONFIGURATION,
-            errno.ENOENT,
-        )
-
-    def test_not_managed_uses_eexist(self):
-        self.assertEqual(
-            authselect.AuthselectValidationStatus.NOT_MANAGED,
-            errno.EEXIST,
-        )
+def c_string(value):
+    if value is None:
+        return authselect.AllocatedCString()
+    return ctypes.cast(ctypes.create_string_buffer(value.encode("utf-8")), authselect.AllocatedCString)
 
 
-class TestAuthselect(unittest.TestCase):
-    def setUp(self):
-        self.lib = Mock()
+def c_array(values):
+    if values is None:
+        return authselect.NullTerminatedStringArray()
+    buffer = (ctypes.c_char_p * (len(values) + 1))(*values, None)
+    return ctypes.cast(buffer, authselect.NullTerminatedStringArray)
 
-        with patch.object(
-            authselect,
-            "get_authselect_lib",
-            return_value=self.lib,
-        ) as get_authselect_lib:
-            self.wrapper = authselect.Authselect()
 
-        get_authselect_lib.assert_called_once_with()
-        self.assertIs(self.wrapper._lib, self.lib)
+@pytest.mark.parametrize(
+    "values, expected, error",
+    [
+        ([], [], None),
+        ([b"sssd", "custom/ü".encode("utf-8")], ["sssd", "custom/ü"], None),
+        ([b"\xff"], None, UnicodeDecodeError),
+    ],
+    ids=["empty", "profiles", "decoding-failure"],
+)
+def test_get_profiles_list_releases_array(wrapper, library, values, expected, error):
+    profiles = c_array(values)
+    library.authselect_list.return_value = profiles
 
-    # ------------------------------------------------------------------
-    # Profile and backup lists
-    # ------------------------------------------------------------------
+    with pytest.raises(error) if error else nullcontext():
+        assert wrapper.get_profiles_list() == expected
 
-    def test_get_profiles_list_returns_values_and_closes_array(self):
-        profiles = FakeStringArray(["sssd", "minimal"])
-        self.lib.authselect_list.return_value = profiles
+    library.authselect_list.assert_called_once_with()
+    authselect.NullTerminatedStringArray._free.assert_called_once_with(profiles)
 
-        result = self.wrapper.get_profiles_list()
 
-        self.assertEqual(result, ["sssd", "minimal"])
-        self.assertTrue(profiles.entered)
-        self.assertTrue(profiles.exited)
-        self.lib.authselect_list.assert_called_once_with()
+def test_get_profile_returns_owned_pointer(wrapper, library):
+    profile = ctypes.cast(ctypes.pointer(authselect.AuthselectProfile._type_()), authselect.AuthselectProfile)
+    library.authselect_profile.side_effect = lambda name, output: set_output(output, profile)
 
-    # ------------------------------------------------------------------
-    # Profiles
-    # ------------------------------------------------------------------
+    result = wrapper.get_profile("custom/ü")
 
-    def test_get_profile_passes_utf8_profile_id_and_returns_profile(self):
-        profile = FakePointer(valid=True)
-        self.lib.authselect_profile.return_value = 0
+    assert isinstance(result, authselect.AuthselectProfile)
+    assert ctypes.addressof(result.contents) == ctypes.addressof(profile.contents)
+    assert library.authselect_profile.call_args.args[0] == "custom/ü".encode("utf-8")
+    # ownership passes to the caller.
+    # `get_profile`` must not free this pointer.
+    authselect.AuthselectProfile._free.assert_not_called()
 
-        with patch.object(authselect, "AuthselectProfile", return_value=profile), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            result = self.wrapper.get_profile("sssd-ü")
 
-        self.assertIs(result, profile)
-        self.lib.authselect_profile.assert_called_once_with(
-            "sssd-ü".encode("utf-8"),
-            profile,
-        )
-
-    def test_get_profile_propagates_nonzero_status_as_runtime_error(self):
-        profile = FakePointer(valid=True)
-        self.lib.authselect_profile.return_value = errno.EINVAL
-
-        with patch.object(authselect, "AuthselectProfile", return_value=profile), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            with self.assertRaisesRegex(RuntimeError, r"authselect_profile\(\) failed"):
-                self.wrapper.get_profile("sssd")
-
-    def test_get_profile_fails_when_success_returns_null_profile(self):
-        profile = FakePointer(valid=False)
-        self.lib.authselect_profile.return_value = 0
-
-        with patch.object(authselect, "AuthselectProfile", return_value=profile), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            with self.assertRaisesRegex(RuntimeError, r"authselect_profile\(\) returned a NULL profile"):
-                self.wrapper.get_profile("sssd")
-
-    # ------------------------------------------------------------------
-    # Current configuration
-    # ------------------------------------------------------------------
-
-    def test_get_current_profile_id_returns_profile_and_closes_string(self):
-        profile_id = FakeAllocatedCString("sssd-ü")
-        self.lib.authselect_current_configuration.return_value = 0
-
-        with patch.object(authselect, "AllocatedCString", return_value=profile_id), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            result = self.wrapper.get_current_profile_id()
-
-        self.assertEqual(result, "sssd-ü")
-        self.assertTrue(profile_id.entered)
-        self.assertTrue(profile_id.exited)
-        self.lib.authselect_current_configuration.assert_called_once_with(
-            profile_id,
-            None,
-        )
-
-    def test_get_current_profile_id_returns_none_when_no_configuration_exists(self):
-        profile_id = FakeAllocatedCString()
-        self.lib.authselect_current_configuration.return_value = errno.ENOENT
-
-        with patch.object(authselect, "AllocatedCString", return_value=profile_id), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            result = self.wrapper.get_current_profile_id()
-
-        self.assertIsNone(result)
-
-    def test_get_current_profile_id_reports_other_library_error(self):
-        profile_id = FakeAllocatedCString()
-        self.lib.authselect_current_configuration.return_value = errno.EACCES
-
-        with patch.object(authselect, "AllocatedCString", return_value=profile_id), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                r"authselect_current_configuration\(\) failed",
-            ):
-                self.wrapper.get_current_profile_id()
-
-    def test_get_current_profile_id_fails_when_success_returns_null_profile_id(self):
-        profile_id = FakeAllocatedCString()
-        self.lib.authselect_current_configuration.return_value = 0
-
-        with patch.object(authselect, "AllocatedCString", return_value=profile_id), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                "returned a NULL profile ID",
-            ):
-                self.wrapper.get_current_profile_id()
-
-    def test_get_current_features_returns_features_and_closes_outputs(self):
-        features = FakeStringArray(["with-faillock", "with-mkhomedir"])
-        profile_id = FakeAllocatedCString("sssd")
-        self.lib.authselect_current_configuration.return_value = 0
-
-        with patch.object(authselect, "NullTerminatedStringArray", return_value=features), patch.object(
-            authselect, "AllocatedCString", return_value=profile_id
-        ), patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
-            result = self.wrapper.get_current_features()
-
-        self.assertEqual(
-            result,
+@pytest.mark.parametrize(
+    "method, profile_id, features, expected, error",
+    [
+        ("get_current_profile_id", "custom/ü", None, "custom/ü", None),
+        ("get_current_features", "sssd", [], [], None),
+        (
+            "get_current_features",
+            "sssd",
+            [b"with-faillock", b"with-mkhomedir"],
             ["with-faillock", "with-mkhomedir"],
-        )
-        self.assertTrue(features.entered)
-        self.assertTrue(features.exited)
-        self.assertTrue(profile_id.closed)
-        self.lib.authselect_current_configuration.assert_called_once_with(
-            profile_id,
-            features,
-        )
-
-    def test_get_current_features_returns_none_when_no_configuration_exists(self):
-        features = FakeStringArray()
-        profile_id = FakeAllocatedCString()
-        self.lib.authselect_current_configuration.return_value = errno.ENOENT
-
-        with patch.object(authselect, "NullTerminatedStringArray", return_value=features), patch.object(
-            authselect, "AllocatedCString", return_value=profile_id
-        ), patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
-            result = self.wrapper.get_current_features()
-
-        self.assertIsNone(result)
-
-    def test_get_current_features_reports_other_library_error(self):
-        features = FakeStringArray()
-        profile_id = FakeAllocatedCString()
-        self.lib.authselect_current_configuration.return_value = errno.EACCES
-
-        with patch.object(authselect, "NullTerminatedStringArray", return_value=features), patch.object(
-            authselect, "AllocatedCString", return_value=profile_id
-        ), patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                r"authselect_current_configuration\(\) failed",
-            ):
-                self.wrapper.get_current_features()
-
-    def test_get_current_features_fails_when_success_returns_null_features(self):
-        features = FakeStringArray()
-        profile_id = FakeAllocatedCString("sssd")
-        self.lib.authselect_current_configuration.return_value = 0
-
-        with patch.object(authselect, "NullTerminatedStringArray", return_value=features), patch.object(
-            authselect, "AllocatedCString", return_value=profile_id
-        ), patch.object(authselect.ctypes, "byref", side_effect=lambda value: value):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                "succeeded but returned NULL features",
-            ):
-                self.wrapper.get_current_features()
-
-        self.assertTrue(profile_id.closed)
-
-    # ------------------------------------------------------------------
-    # Profile activation
-    # ------------------------------------------------------------------
-
-    def test_activate_profile_passes_encoded_arguments(self):
-        c_features = object()
-        self.lib.authselect_activate.return_value = 0
-
-        with patch.object(
-            authselect.CStringArray,
-            "from_strings",
-            return_value=c_features,
-        ) as from_strings:
-            result = self.wrapper.activate_profile(
-                "sssd-ü",
-                ["with-faillock"],
-                force_overwrite=True,
-            )
-
-        self.assertIsNone(result)
-        from_strings.assert_called_once_with(["with-faillock"])
-        self.lib.authselect_activate.assert_called_once_with(
-            "sssd-ü".encode("utf-8"),
-            c_features,
-            True,
-        )
-
-    def test_activate_profile_uses_empty_feature_array_when_features_omitted(self):
-        self.lib.authselect_activate.return_value = 0
-
-        with patch.object(
-            authselect.CStringArray,
-            "from_strings",
-            return_value=object(),
-        ) as from_strings:
-            self.wrapper.activate_profile("sssd")
-
-        from_strings.assert_called_once_with([])
-
-    def test_activate_profile_reports_missing_profile(self):
-        self.lib.authselect_activate.return_value = errno.ENOENT
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "Authselect profile 'missing' does not exist",
-        ):
-            self.wrapper.activate_profile("missing")
-
-    def test_activate_profile_reports_unsupported_feature(self):
-        self.lib.authselect_activate.return_value = errno.EINVAL
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "One or more features are not supported",
-        ):
-            self.wrapper.activate_profile("sssd", ["invalid"])
-
-    def test_activate_profile_reports_existing_unmanaged_configuration(self):
-        self.lib.authselect_activate.return_value = errno.EEXIST
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "Existing system authentication configuration prevents authselect",
-        ):
-            self.wrapper.activate_profile("sssd")
-
-    def test_activate_profile_reports_permission_error(self):
-        self.lib.authselect_activate.return_value = errno.EACCES
-
-        with self.assertRaisesRegex(
-            PermissionError,
-            "Permission denied while activating authselect profile 'sssd'",
-        ):
-            self.wrapper.activate_profile("sssd")
-
-    def test_activate_profile_reports_other_library_error(self):
-        result_code = errno.EIO
-        self.lib.authselect_activate.return_value = result_code
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            rf"\[{result_code}\].*{os.strerror(result_code)}",
-        ):
-            self.wrapper.activate_profile("sssd")
-
-    # ------------------------------------------------------------------
-    # Configuration validation and feature state
-    # ------------------------------------------------------------------
-
-    def test_validate_configuration_returns_complete_status_and_valid_flag(self):
-        self.lib.authselect_validate_configuration.side_effect = lambda is_valid: setattr(is_valid, "value", True) or 0
-
-        with patch.object(
-            authselect.ctypes,
-            "byref",
-            side_effect=lambda value: value,
-        ):
-            result = self.wrapper.validate_configuration()
-
-        self.assertEqual(
-            result,
-            (authselect.AuthselectValidationStatus.VALIDATION_COMPLETE, True),
-        )
-
-    def test_validate_configuration_returns_no_configuration_status(self):
-        self.lib.authselect_validate_configuration.return_value = errno.ENOENT
-
-        result = self.wrapper.validate_configuration()
-
-        self.assertEqual(
-            result,
-            (authselect.AuthselectValidationStatus.NO_CONFIGURATION, False),
-        )
-
-    def test_validate_configuration_returns_not_managed_status(self):
-        self.lib.authselect_validate_configuration.return_value = errno.EEXIST
-
-        result = self.wrapper.validate_configuration()
-
-        self.assertEqual(
-            result,
-            (authselect.AuthselectValidationStatus.NOT_MANAGED, False),
-        )
-
-    def test_validate_configuration_rejects_unknown_status(self):
-        result_code = errno.EIO
-        self.lib.authselect_validate_configuration.return_value = result_code
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            rf"authselect_validate_configuration\(\) failed: \[{result_code}\]",
-        ):
-            self.wrapper.validate_configuration()
-
-    # ------------------------------------------------------------------
-    # Backups
-    # ------------------------------------------------------------------
-
-    def test_create_profile_backup_passes_name_and_returns_path(self):
-        path = FakeAllocatedCString("/var/lib/authselect/backups/test")
-        self.lib.authselect_backup.return_value = 0
-
-        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            result = self.wrapper.create_profile_backup("test-ü")
-
-        self.assertEqual(result, "/var/lib/authselect/backups/test")
-        self.lib.authselect_backup.assert_called_once_with(
-            "test-ü".encode("utf-8"),
-            path,
-        )
-        self.assertTrue(path.entered)
-        self.assertTrue(path.exited)
-
-    def test_create_profile_backup_passes_null_name_when_name_omitted(self):
-        path = FakeAllocatedCString("/var/lib/authselect/backups/generated")
-        self.lib.authselect_backup.return_value = 0
-
-        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            self.wrapper.create_profile_backup()
-
-        self.lib.authselect_backup.assert_called_once_with(
             None,
-            path,
-        )
+        ),
+        ("get_current_features", None, [b"with-faillock"], ["with-faillock"], None),
+        ("get_current_features", "sssd", None, None, RuntimeError),
+        ("get_current_features", "sssd", [b"\xff"], None, UnicodeDecodeError),
+    ],
+    ids=["profile-id", "empty-features", "features", "no-profile-output", "null-features", "decoding-failure"],
+)
+def test_current_configuration_releases_outputs(wrapper, library, method, profile_id, features, expected, error):
+    profile, feature_array = c_string(profile_id), c_array(features)
 
-    def test_create_profile_backup_reports_library_error(self):
-        path = FakeAllocatedCString()
-        self.lib.authselect_backup.return_value = errno.EIO
+    def current_configuration(profile_output, features_output):
+        assert (features_output is not None) == (method == "get_current_features")
+        set_output(profile_output, profile)
+        if features_output is not None:
+            set_output(features_output, feature_array)
+        return 0
 
-        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                r"authselect_backup\(\) failed",
-            ):
-                self.wrapper.create_profile_backup("test")
+    library.authselect_current_configuration.side_effect = current_configuration
 
-    def test_create_profile_backup_fails_when_success_returns_null_path(self):
-        path = FakeAllocatedCString()
-        self.lib.authselect_backup.return_value = 0
+    with pytest.raises(error) if error else nullcontext():
+        assert getattr(wrapper, method)() == expected
 
-        with patch.object(authselect, "AllocatedCString", return_value=path), patch.object(
-            authselect.ctypes, "byref", side_effect=lambda value: value
-        ):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                "succeeded but returned a NULL path",
-            ):
-                self.wrapper.create_profile_backup("test")
-
-    def test_remove_profile_backup_passes_encoded_name(self):
-        self.lib.authselect_backup_remove.return_value = 0
-
-        result = self.wrapper.remove_profile_backup("backup-ü")
-
-        self.assertIsNone(result)
-        self.lib.authselect_backup_remove.assert_called_once_with("backup-ü".encode("utf-8"))
-
-    def test_remove_profile_backup_reports_library_error(self):
-        self.lib.authselect_backup_remove.return_value = errno.EIO
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            r"authselect_backup_remove\(\) failed",
-        ):
-            self.wrapper.remove_profile_backup("backup")
-
-    def test_restore_profile_backup_passes_encoded_name(self):
-        self.lib.authselect_backup_restore.return_value = 0
-
-        result = self.wrapper.restore_profile_backup("backup-ü")
-
-        self.assertIsNone(result)
-        self.lib.authselect_backup_restore.assert_called_once_with("backup-ü".encode("utf-8"))
-
-    def test_restore_profile_backup_reports_library_error(self):
-        self.lib.authselect_backup_restore.return_value = errno.EIO
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            r"authselect_backup_restore\(\) failed",
-        ):
-            self.wrapper.restore_profile_backup("backup")
+    library.authselect_current_configuration.assert_called_once()
+    assert authselect.AllocatedCString._free.call_count == int(profile_id is not None)
+    assert authselect.NullTerminatedStringArray._free.call_count == int(features is not None)
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize("method", ["get_current_profile_id", "get_current_features"])
+def test_missing_configuration_returns_none(wrapper, library, method):
+    library.authselect_current_configuration.return_value = errno.ENOENT
+
+    assert getattr(wrapper, method)() is None
+
+
+@pytest.mark.parametrize(
+    "method, native, args",
+    [
+        ("get_profile", "authselect_profile", ("sssd",)),
+        ("get_current_profile_id", "authselect_current_configuration", ()),
+        ("create_profile_backup", "authselect_backup", ()),
+    ],
+)
+def test_success_with_null_output_is_rejected(wrapper, library, method, native, args):
+    getattr(library, native).return_value = 0
+
+    with pytest.raises(RuntimeError):
+        getattr(wrapper, method)(*args)
+
+
+@pytest.mark.parametrize("features, force", [(None, False), ([], True), (["with-faillock", "with-mkhomedir"], True)])
+def test_activate_profile_passes_requested_options(wrapper, library, mocker, features, force):
+    convert = mocker.patch.object(authselect.CStringArray, "from_strings", return_value=mocker.sentinel.features)
+    library.authselect_activate.return_value = 0
+
+    assert wrapper.activate_profile("custom/ü", features, force_overwrite=force) is None
+
+    convert.assert_called_once_with(features or [])
+    library.authselect_activate.assert_called_once_with("custom/ü".encode("utf-8"), mocker.sentinel.features, force)
+
+
+@pytest.mark.parametrize(
+    "status, exception",
+    [
+        (errno.ENOENT, RuntimeError),
+        (errno.EINVAL, RuntimeError),
+        (errno.EEXIST, RuntimeError),
+        (errno.EACCES, PermissionError),
+    ],
+)
+def test_activate_profile_translates_native_errors(wrapper, library, status, exception):
+    library.authselect_activate.return_value = status
+
+    with pytest.raises(exception):
+        wrapper.activate_profile("sssd")
+
+
+@pytest.mark.parametrize(
+    "result, valid, expected_status",
+    [
+        (0, True, authselect.AuthselectValidationStatus.VALIDATION_COMPLETE),
+        (0, False, authselect.AuthselectValidationStatus.VALIDATION_COMPLETE),
+        (errno.ENOENT, False, authselect.AuthselectValidationStatus.NO_CONFIGURATION),
+        (errno.EEXIST, False, authselect.AuthselectValidationStatus.NOT_MANAGED),
+    ],
+)
+def test_validate_configuration_returns_status_and_flag(wrapper, library, result, valid, expected_status):
+    def validate(output):
+        set_output(output, ctypes.c_bool(valid))
+        return result
+
+    library.authselect_validate_configuration.side_effect = validate
+
+    status, is_valid = wrapper.validate_configuration()
+
+    assert status is expected_status
+    assert is_valid is valid
+
+
+@pytest.mark.parametrize("name", [None, "backup-ü"])
+def test_create_backup_returns_path_and_releases_string(wrapper, library, name):
+    expected = "/var/lib/authselect/backups/backup-ü"
+    path = c_string(expected)
+    library.authselect_backup.side_effect = lambda name, output: set_output(output, path)
+
+    assert wrapper.create_profile_backup(name) == expected
+
+    assert library.authselect_backup.call_args.args[0] == (None if name is None else name.encode("utf-8"))
+    authselect.AllocatedCString._free.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "method, native",
+    [("remove_profile_backup", "authselect_backup_remove"), ("restore_profile_backup", "authselect_backup_restore")],
+)
+def test_backup_operation_passes_encoded_name(wrapper, library, method, native):
+    operation = getattr(library, native)
+    operation.return_value = 0
+
+    assert getattr(wrapper, method)("backup-ü") is None
+
+    operation.assert_called_once_with("backup-ü".encode("utf-8"))
+
+
+@pytest.mark.parametrize(
+    "method, native, args",
+    [
+        ("get_profile", "authselect_profile", ("sssd",)),
+        ("get_current_profile_id", "authselect_current_configuration", ()),
+        ("get_current_features", "authselect_current_configuration", ()),
+        ("activate_profile", "authselect_activate", ("sssd",)),
+        ("validate_configuration", "authselect_validate_configuration", ()),
+        ("create_profile_backup", "authselect_backup", ()),
+        ("remove_profile_backup", "authselect_backup_remove", ("backup",)),
+        ("restore_profile_backup", "authselect_backup_restore", ("backup",)),
+    ],
+)
+def test_native_failure_reports_status(wrapper, library, method, native, args):
+    getattr(library, native).return_value = errno.EIO
+
+    with pytest.raises(RuntimeError) as exc:
+        getattr(wrapper, method)(*args)
+
+    # Check the reported status, not fixed wording or platform-specific strerror text
+    assert str(errno.EIO) in str(exc.value)
