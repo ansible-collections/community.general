@@ -5,460 +5,165 @@
 from __future__ import annotations
 
 import ctypes
-import unittest
-from unittest.mock import Mock, patch
 
-from ansible_collections.community.general.plugins.module_utils._authselect import (
-    authselect_lib,
-)
-from ansible_collections.community.general.plugins.module_utils._authselect.authselect_profile import (
-    AuthselectProfile,
-)
+import pytest
+
+from ansible_collections.community.general.plugins.module_utils._authselect import authselect_lib
+from ansible_collections.community.general.plugins.module_utils._authselect.authselect_profile import AuthselectProfile
 from ansible_collections.community.general.plugins.module_utils._authselect.c_array import (
     CStringArray,
     NullTerminatedStringArray,
 )
-from ansible_collections.community.general.plugins.module_utils._authselect.c_string import (
-    AllocatedCString,
-)
+from ansible_collections.community.general.plugins.module_utils._authselect.c_string import AllocatedCString
 
-AUTHSELECT_FUNCTION_NAMES = (
-    "authselect_set_debug_fn",
-    "authselect_array_free",
-    "authselect_list",
-    "authselect_profile",
-    "authselect_profile_features",
-    "authselect_profile_free",
-    "authselect_current_configuration",
-    "authselect_activate",
-    "authselect_validate_configuration",
-    "authselect_backup",
-    "authselect_backup_remove",
-    "authselect_backup_restore",
-)
-
-
-def make_authselect_library():
-    lib = Mock()
-
-    for name in AUTHSELECT_FUNCTION_NAMES:
-        setattr(lib, name, Mock(name=name))
-
-    return lib
+# ABI declarations
+SIGNATURES = {
+    "authselect_array_free": ([ctypes.POINTER(ctypes.c_char_p)], None),
+    "authselect_list": ([], NullTerminatedStringArray),
+    "authselect_profile": ([ctypes.c_char_p, ctypes.POINTER(AuthselectProfile)], ctypes.c_int),
+    "authselect_profile_features": ([AuthselectProfile], NullTerminatedStringArray),
+    "authselect_profile_free": ([AuthselectProfile], None),
+    "authselect_current_configuration": (
+        [ctypes.POINTER(AllocatedCString), ctypes.POINTER(NullTerminatedStringArray)],
+        ctypes.c_int,
+    ),
+    "authselect_activate": ([ctypes.c_char_p, CStringArray, ctypes.c_bool], ctypes.c_int),
+    "authselect_validate_configuration": ([ctypes.POINTER(ctypes.c_bool)], ctypes.c_int),
+    "authselect_backup": ([ctypes.c_char_p, ctypes.POINTER(AllocatedCString)], ctypes.c_int),
+    "authselect_backup_remove": ([ctypes.c_char_p], ctypes.c_int),
+    "authselect_backup_restore": ([ctypes.c_char_p], ctypes.c_int),
+}
+LOADERS = [
+    (authselect_lib.get_libc_lib, "c", "_LIBC"),
+    (authselect_lib.get_authselect_lib, "authselect", "_LIB"),
+]
 
 
-class TestAuthselectLib(unittest.TestCase):
-    PROFILE_CALLBACK_ATTRIBUTES = (
-        "_free",
-        "_get_id",
-        "_get_name",
-        "_get_path",
-        "_get_description",
-        "_get_features",
-        "_get_nsswitch_maps",
-        "_get_requirements",
+@pytest.fixture
+def libraries(mocker):
+    # restore the original globals and descriptors after every test
+    for target, attributes in (
+        (authselect_lib, ("_LIB", "_LIBC", "_DEBUG_CALLBACK")),
+        (AllocatedCString, ("_free",)),
+        (NullTerminatedStringArray, ("_free",)),
+        (AuthselectProfile, ("_free", "_get_features")),
+    ):
+        for attribute in attributes:
+            mocker.patch.object(target, attribute, None)
+
+    # strict export list catches accidental dependencies on unsupported symbols
+    libraries = {
+        "c": mocker.Mock(spec_set=["free"]),
+        "authselect": mocker.Mock(spec_set=["authselect_set_debug_fn", *SIGNATURES]),
+    }
+    paths = {"c": "libc.so.6", "authselect": "libauthselect.so.1"}
+    mocker.patch.object(authselect_lib, "find_library", side_effect=paths.get)
+    mocker.patch.object(
+        authselect_lib.cdll,
+        "LoadLibrary",
+        side_effect={paths[name]: library for name, library in libraries.items()}.__getitem__,
     )
+    return libraries
 
-    FILES_CALLBACK_ATTRIBUTES = (
-        "_free",
-        "_get_nsswitch",
-        "_get_systemauth",
-        "_get_passwordauth",
-        "_get_smartcardauth",
-        "_get_fingerprintauth",
-        "_get_switchableauth",
-        "_get_postlogin",
-        "_get_dconf_db",
-        "_get_dconf_lock",
+
+@pytest.mark.parametrize("name, signature", SIGNATURES.items(), ids=SIGNATURES)
+def test_authselect_function_signatures(libraries, name, signature):
+    lib = libraries["authselect"]
+    authselect_lib._configure_authselect_lib(lib)
+
+    function = getattr(lib, name)
+    assert (function.argtypes, function.restype) == signature
+
+
+def test_loaders_configure_and_cache_libraries(libraries, mocker):
+    lib, libc = libraries["authselect"], libraries["c"]
+
+    assert authselect_lib.get_authselect_lib() is lib
+    assert authselect_lib.get_authselect_lib() is lib
+    assert authselect_lib.get_libc_lib() is libc
+    assert authselect_lib._LIB is lib
+    assert authselect_lib._LIBC is libc
+    assert authselect_lib.find_library.call_args_list == [mocker.call("authselect"), mocker.call("c")]
+    assert authselect_lib.cdll.LoadLibrary.call_args_list == [
+        mocker.call("libauthselect.so.1"),
+        mocker.call("libc.so.6"),
+    ]
+    lib.authselect_set_debug_fn.assert_called_once()
+    assert libc.free.argtypes == [ctypes.c_void_p]
+    assert libc.free.restype is None
+    assert AllocatedCString._free is libc.free
+    assert NullTerminatedStringArray._free is lib.authselect_array_free
+    assert AuthselectProfile._free is lib.authselect_profile_free
+    assert AuthselectProfile._get_features is lib.authselect_profile_features
+
+
+def test_debug_callback_is_retained_and_silent(libraries, capsys):
+    lib = libraries["authselect"]
+    authselect_lib._configure_authselect_lib(lib)
+
+    callback_type = ctypes.CFUNCTYPE(
+        None, ctypes.c_void_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_ulong, ctypes.c_char_p, ctypes.c_char_p
     )
-
-    def setUp(self):
-        authselect_lib._LIB = None
-        authselect_lib._LIBC = None
-        authselect_lib._DEBUG_CALLBACK = None
-
-        AllocatedCString._free = None
-        NullTerminatedStringArray._free = None
-
-        for attribute in self.PROFILE_CALLBACK_ATTRIBUTES:
-            setattr(AuthselectProfile, attribute, None)
-
-    def tearDown(self):
-        authselect_lib._LIB = None
-        authselect_lib._LIBC = None
-        authselect_lib._DEBUG_CALLBACK = None
-
-        AllocatedCString._free = None
-        NullTerminatedStringArray._free = None
-
-        for attribute in self.PROFILE_CALLBACK_ATTRIBUTES:
-            setattr(AuthselectProfile, attribute, None)
-
-    # ------------------------------------------------------------------
-    # libc configuration and loading
-    # ------------------------------------------------------------------
-
-    def test_configure_libc_sets_free_signature_and_allocated_string_free_function(self):
-        libc = Mock()
-        libc.free = Mock()
-
-        authselect_lib._configure_libc_lib(libc)
-
-        self.assertEqual(
-            libc.free.argtypes,
-            [ctypes.c_void_p],
-        )
-        self.assertIsNone(libc.free.restype)
-        self.assertIs(AllocatedCString._free, libc.free)
-
-    def test_get_libc_lib_returns_cached_library_without_lookup(self):
-        cached_libc = object()
-        authselect_lib._LIBC = cached_libc
-
-        with patch.object(authselect_lib, "find_library") as find_library, patch.object(
-            authselect_lib.cdll, "LoadLibrary"
-        ) as load_library:
-            result = authselect_lib.get_libc_lib()
-
-        self.assertIs(result, cached_libc)
-        find_library.assert_not_called()
-        load_library.assert_not_called()
-
-    def test_get_libc_lib_fails_when_libc_cannot_be_found(self):
-        with patch.object(
-            authselect_lib,
-            "find_library",
-            return_value=None,
-        ):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                "Cannot find libc",
-            ):
-                authselect_lib.get_libc_lib()
-
-        self.assertIsNone(authselect_lib._LIBC)
-
-    def test_get_libc_lib_loads_configures_and_caches_library(self):
-        libc = Mock()
-
-        with patch.object(
-            authselect_lib,
-            "find_library",
-            return_value="libc.so.6",
-        ) as find_library, patch.object(
-            authselect_lib.cdll,
-            "LoadLibrary",
-            return_value=libc,
-        ) as load_library, patch.object(
-            authselect_lib,
-            "_configure_libc_lib",
-        ) as configure_libc:
-            result = authselect_lib.get_libc_lib()
-
-        self.assertIs(result, libc)
-        self.assertIs(authselect_lib._LIBC, libc)
-        find_library.assert_called_once_with("c")
-        load_library.assert_called_once_with("libc.so.6")
-        configure_libc.assert_called_once_with(libc)
-
-    def test_get_libc_lib_does_not_cache_library_when_configuration_fails(self):
-        libc = Mock()
-
-        with patch.object(
-            authselect_lib,
-            "find_library",
-            return_value="libc.so.6",
-        ), patch.object(
-            authselect_lib.cdll,
-            "LoadLibrary",
-            return_value=libc,
-        ), patch.object(
-            authselect_lib,
-            "_configure_libc_lib",
-            side_effect=RuntimeError("configuration failed"),
-        ):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                "configuration failed",
-            ):
-                authselect_lib.get_libc_lib()
-
-        self.assertIsNone(authselect_lib._LIBC)
-
-    # ------------------------------------------------------------------
-    # authselect library ctypes declarations
-    # ------------------------------------------------------------------
-
-    def test_configure_authselect_sets_function_signatures(self):
-        lib = make_authselect_library()
-
-        authselect_lib._configure_authselect_lib(lib)
-
-        expected_signatures = {
-            "authselect_array_free": (
-                [ctypes.POINTER(ctypes.c_char_p)],
-                None,
-            ),
-            "authselect_list": ([], NullTerminatedStringArray),
-            "authselect_profile": (
-                [
-                    ctypes.c_char_p,
-                    ctypes.POINTER(AuthselectProfile),
-                ],
-                ctypes.c_int,
-            ),
-            "authselect_profile_features": (
-                [AuthselectProfile],
-                NullTerminatedStringArray,
-            ),
-            "authselect_profile_free": (
-                [AuthselectProfile],
-                None,
-            ),
-            "authselect_current_configuration": (
-                [
-                    ctypes.POINTER(AllocatedCString),
-                    ctypes.POINTER(NullTerminatedStringArray),
-                ],
-                ctypes.c_int,
-            ),
-            "authselect_activate": (
-                [
-                    ctypes.c_char_p,
-                    CStringArray,
-                    ctypes.c_bool,
-                ],
-                ctypes.c_int,
-            ),
-            "authselect_validate_configuration": (
-                [ctypes.POINTER(ctypes.c_bool)],
-                ctypes.c_int,
-            ),
-            "authselect_backup": (
-                [
-                    ctypes.c_char_p,
-                    ctypes.POINTER(AllocatedCString),
-                ],
-                ctypes.c_int,
-            ),
-            "authselect_backup_remove": (
-                [ctypes.c_char_p],
-                ctypes.c_int,
-            ),
-            "authselect_backup_restore": (
-                [ctypes.c_char_p],
-                ctypes.c_int,
-            ),
-        }
-
-        for function_name, (expected_argtypes, expected_restype) in expected_signatures.items():
-            with self.subTest(function=function_name):
-                function = getattr(lib, function_name)
-                self.assertEqual(
-                    function.argtypes,
-                    expected_argtypes,
-                )
-                self.assertIs(
-                    function.restype,
-                    expected_restype,
-                )
-
-    def test_configure_authselect_does_not_require_feature_enabled(self):
-        lib = make_authselect_library()
-        del lib.authselect_feature_enabled
-
-        authselect_lib._configure_authselect_lib(lib)
-
-    def test_configure_authselect_configures_debug_callback_signature_and_registers_callback(self):
-        lib = make_authselect_library()
-
-        authselect_lib._configure_authselect_lib(lib)
-
-        self.assertEqual(
-            len(lib.authselect_set_debug_fn.argtypes),
-            2,
-        )
-        self.assertIs(
-            lib.authselect_set_debug_fn.argtypes[1],
-            ctypes.c_void_p,
-        )
-        self.assertIsNone(
-            lib.authselect_set_debug_fn.restype,
-        )
-        self.assertIsNotNone(authselect_lib._DEBUG_CALLBACK)
-        lib.authselect_set_debug_fn.assert_called_once_with(
-            authselect_lib._DEBUG_CALLBACK,
-            None,
-        )
-
-    def test_configure_authselect_keeps_debug_callback_alive_globally(self):
-        lib = make_authselect_library()
-
-        authselect_lib._configure_authselect_lib(lib)
-
-        callback = authselect_lib._DEBUG_CALLBACK
-
-        self.assertIsNotNone(callback)
-        self.assertIs(
-            lib.authselect_set_debug_fn.call_args.args[0],
-            callback,
-        )
-
-    # ------------------------------------------------------------------
-    # Wrapper callback wiring
-    # ------------------------------------------------------------------
-
-    def test_configure_authselect_wires_array_free_function(self):
-        lib = make_authselect_library()
-
-        authselect_lib._configure_authselect_lib(lib)
-
-        self.assertIs(
-            NullTerminatedStringArray._free,
-            lib.authselect_array_free,
-        )
-
-    # ------------------------------------------------------------------
-    # authselect library loading
-    # ------------------------------------------------------------------
-
-    def test_get_authselect_lib_returns_cached_library_without_lookup(self):
-        cached_lib = object()
-        authselect_lib._LIB = cached_lib
-
-        with patch.object(authselect_lib, "find_library") as find_library, patch.object(
-            authselect_lib.cdll, "LoadLibrary"
-        ) as load_library, patch.object(authselect_lib, "get_libc_lib") as get_libc, patch.object(
-            authselect_lib, "_configure_authselect_lib"
-        ) as configure_authselect:
-            result = authselect_lib.get_authselect_lib()
-
-        self.assertIs(result, cached_lib)
-        find_library.assert_not_called()
-        load_library.assert_not_called()
-        get_libc.assert_not_called()
-        configure_authselect.assert_not_called()
-
-    def test_get_authselect_lib_fails_when_library_cannot_be_found(self):
-        with patch.object(
-            authselect_lib,
-            "find_library",
-            return_value=None,
-        ):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                r"Cannot find libauthselect\.so",
-            ):
-                authselect_lib.get_authselect_lib()
-
-        self.assertIsNone(authselect_lib._LIB)
-
-    def test_get_authselect_lib_loads_libc_configures_and_caches_library(self):
-        lib = Mock()
-        libc = Mock()
-
-        with patch.object(
-            authselect_lib,
-            "find_library",
-            return_value="libauthselect.so.1",
-        ) as find_library, patch.object(
-            authselect_lib.cdll,
-            "LoadLibrary",
-            return_value=lib,
-        ) as load_library, patch.object(
-            authselect_lib,
-            "get_libc_lib",
-            return_value=libc,
-        ) as get_libc, patch.object(
-            authselect_lib,
-            "_configure_authselect_lib",
-        ) as configure_authselect:
-            result = authselect_lib.get_authselect_lib()
-
-        self.assertIs(result, lib)
-        self.assertIs(authselect_lib._LIB, lib)
-        find_library.assert_called_once_with("authselect")
-        load_library.assert_called_once_with("libauthselect.so.1")
-        get_libc.assert_called_once_with()
-        configure_authselect.assert_called_once_with(lib)
-
-    def test_get_authselect_lib_configures_before_caching(self):
-        lib = Mock()
-
-        def configure(candidate):
-            self.assertIs(candidate, lib)
-            self.assertIsNone(authselect_lib._LIB)
-
-        with patch.object(
-            authselect_lib,
-            "find_library",
-            return_value="libauthselect.so.1",
-        ), patch.object(
-            authselect_lib.cdll,
-            "LoadLibrary",
-            return_value=lib,
-        ), patch.object(authselect_lib, "get_libc_lib"), patch.object(
-            authselect_lib,
-            "_configure_authselect_lib",
-            side_effect=configure,
-        ):
-            result = authselect_lib.get_authselect_lib()
-
-        self.assertIs(result, lib)
-        self.assertIs(authselect_lib._LIB, lib)
-
-    def test_get_authselect_lib_does_not_cache_library_when_libc_loading_fails(self):
-        lib = Mock()
-
-        with patch.object(
-            authselect_lib,
-            "find_library",
-            return_value="libauthselect.so.1",
-        ), patch.object(
-            authselect_lib.cdll,
-            "LoadLibrary",
-            return_value=lib,
-        ), patch.object(
-            authselect_lib,
-            "get_libc_lib",
-            side_effect=RuntimeError("libc failed"),
-        ), patch.object(
-            authselect_lib,
-            "_configure_authselect_lib",
-        ) as configure_authselect:
-            with self.assertRaisesRegex(
-                RuntimeError,
-                "libc failed",
-            ):
-                authselect_lib.get_authselect_lib()
-
-        self.assertIsNone(authselect_lib._LIB)
-        configure_authselect.assert_not_called()
-
-    def test_get_authselect_lib_does_not_cache_library_when_configuration_fails(self):
-        lib = Mock()
-
-        with patch.object(
-            authselect_lib,
-            "find_library",
-            return_value="libauthselect.so.1",
-        ), patch.object(
-            authselect_lib.cdll,
-            "LoadLibrary",
-            return_value=lib,
-        ), patch.object(authselect_lib, "get_libc_lib"), patch.object(
-            authselect_lib,
-            "_configure_authselect_lib",
-            side_effect=RuntimeError("configuration failed"),
-        ):
-            with self.assertRaisesRegex(
-                RuntimeError,
-                "configuration failed",
-            ):
-                authselect_lib.get_authselect_lib()
-
-        self.assertIsNone(authselect_lib._LIB)
+    callback = authselect_lib._DEBUG_CALLBACK
+    assert isinstance(callback, callback_type)
+    assert lib.authselect_set_debug_fn.argtypes == [callback_type, ctypes.c_void_p]
+    assert lib.authselect_set_debug_fn.restype is None
+    lib.authselect_set_debug_fn.assert_called_once_with(callback, None)
+    callback(None, 1, b"source.c", 42, b"authselect_activate", b"debug message")
+    assert capsys.readouterr() == ("", "")
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize("getter, name, cache", LOADERS)
+def test_missing_library_does_not_load_or_cache(libraries, getter, name, cache):
+    authselect_lib.find_library.side_effect = None
+    authselect_lib.find_library.return_value = None
+
+    with pytest.raises(RuntimeError):
+        getter()
+
+    authselect_lib.find_library.assert_called_once_with(name)
+    authselect_lib.cdll.LoadLibrary.assert_not_called()
+    assert getattr(authselect_lib, cache) is None
+
+
+@pytest.mark.parametrize("getter, name, cache", LOADERS)
+def test_load_error_is_propagated_and_can_be_retried(libraries, getter, name, cache):
+    load = authselect_lib.cdll.LoadLibrary
+    successful_load = load.side_effect
+    error = OSError("library cannot be loaded")
+    load.side_effect = error
+
+    with pytest.raises(OSError) as exc:
+        getter()
+
+    assert exc.value is error
+    assert getattr(authselect_lib, cache) is None
+    load.side_effect = successful_load
+    assert getter() is libraries[name]
+
+
+@pytest.mark.parametrize("getter, name, cache", LOADERS)
+def test_missing_symbol_does_not_cache_a_partially_configured_library(libraries, getter, name, cache):
+    lib = libraries[name]
+    symbol = "free" if name == "c" else "authselect_backup_restore"
+    function = getattr(lib, symbol)
+    delattr(lib, symbol)
+
+    with pytest.raises(AttributeError):
+        getter()
+
+    assert getattr(authselect_lib, cache) is None
+    setattr(lib, symbol, function)
+    assert getter() is lib
+
+
+def test_libc_failure_prevents_authselect_configuration(libraries):
+    lib = libraries["authselect"]
+    authselect_lib.find_library.side_effect = ["libauthselect.so.1", None]
+
+    with pytest.raises(RuntimeError):
+        authselect_lib.get_authselect_lib()
+
+    assert authselect_lib._LIB is None
+    assert authselect_lib._LIBC is None
+    lib.authselect_set_debug_fn.assert_not_called()
