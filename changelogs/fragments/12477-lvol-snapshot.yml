@@ -1,0 +1,4 @@
+bugfixes:
+  - lvol - fix a hang when ensuring an LVM snapshot that already exists
+    (https://github.com/ansible-collections/community.general/issues/12477,
+    https://github.com/ansible-collections/community.general/pull/12810).

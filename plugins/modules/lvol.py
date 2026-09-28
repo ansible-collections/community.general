@@ -663,6 +663,11 @@ def main():
                     module.fail_json(msg=f"Unable to resize {lv} to {size}{size_unit}", rc=rc, err=err)
 
     if this_lv is not None:
+        # lvchange on an existing COW snapshot prompts before touching the origin.
+        # Skip it when the LV is already in the requested active state so an
+        # unchanged ensure does not hang waiting for that prompt.
+        if this_lv["active"] == active:
+            module.exit_json(changed=changed, vg=vg, lv=this_lv["name"], size=this_lv["size"])
         if active:
             with lvchange("active lv") as ctx:
                 rc, dummy, err = ctx.run(active=True, lv=[f"{vg}/{this_lv['name']}"])
