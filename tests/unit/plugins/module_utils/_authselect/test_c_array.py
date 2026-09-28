@@ -6,8 +6,9 @@ from __future__ import annotations
 
 import ctypes
 import gc
-import unittest
-from unittest.mock import Mock
+from contextlib import nullcontext
+
+import pytest
 
 from ansible_collections.community.general.plugins.module_utils._authselect.c_array import (
     CStringArray,
@@ -15,194 +16,106 @@ from ansible_collections.community.general.plugins.module_utils._authselect.c_ar
 )
 
 
-class TestCStringArray(unittest.TestCase):
-    def test_from_strings_converts_strings_to_utf8_bytes(self):
-        array = CStringArray.from_strings(
-            [
-                "with-faillock",
-                "mkhomedir-ü",
-            ]
-        )
-
-        self.assertEqual(array[0], b"with-faillock")
-        self.assertEqual(array[1], "mkhomedir-ü".encode("utf-8"))
-
-    def test_from_strings_adds_null_terminator(self):
-        values = [
-            "with-faillock",
-            "with-mkhomedir",
-        ]
-
-        array = CStringArray.from_strings(values)
-
-        self.assertIsNone(array[len(values)])
-
-    def test_from_strings_empty_list_creates_null_terminated_empty_array(self):
-        array = CStringArray.from_strings([])
-
-        self.assertIsInstance(array, CStringArray)
-        self.assertIsNone(array[0])
-
-    def test_from_strings_keeps_backing_memory_alive(self):
-        array = CStringArray.from_strings(
-            [
-                "with-faillock",
-                "with-mkhomedir",
-            ]
-        )
-
-        gc.collect()
-
-        self.assertEqual(array[0], b"with-faillock")
-        self.assertEqual(array[1], b"with-mkhomedir")
-        self.assertIsNone(array[2])
-        self.assertTrue(hasattr(array, "_backing_array"))
-        self.assertTrue(hasattr(array, "_encoded_values"))
+@pytest.fixture
+def free(mocker):
+    mocker.patch.object(NullTerminatedStringArray, "_free", None)
+    callback = mocker.Mock()
+    NullTerminatedStringArray.set_free_function(callback)
+    return callback
 
 
-class TestNullTerminatedStringArray(unittest.TestCase):
-    def setUp(self):
-        NullTerminatedStringArray._free = None
+@pytest.fixture
+def array(free):
+    backing = (ctypes.c_char_p * 2)(b"with-faillock", None)
+    yield ctypes.cast(backing, NullTerminatedStringArray)
 
-    def tearDown(self):
-        NullTerminatedStringArray._free = None
 
-    @staticmethod
-    def make_array(values):
-        encoded_values = [value.encode("utf-8") for value in values]
-        array_type = ctypes.c_char_p * (len(encoded_values) + 1)
-        backing_array = array_type(*encoded_values, None)
-        pointer = ctypes.cast(backing_array, NullTerminatedStringArray)
+@pytest.mark.parametrize(
+    "values, expected",
+    [
+        ([], []),
+        ([""], [b""]),
+        (["with-faillock", "mkhomedir-ü"], [b"with-faillock", b"mkhomedir-\xc3\xbc"]),
+    ],
+    ids=["empty-array", "empty-string", "utf8"],
+)
+def test_from_strings_owns_utf8_data_and_null_terminator(values, expected):
+    source = list(values)
+    pointer = CStringArray.from_strings(source)
+    source.clear()
+    gc.collect()
 
-        # The test owns this memory, so keep it alive while the pointer is used.
-        pointer._test_backing_array = backing_array
+    assert isinstance(pointer, CStringArray)
+    assert [pointer[index] for index in range(len(expected) + 1)] == [*expected, None]
 
-        return pointer
 
-    def test_iter_decodes_strings_and_stops_at_null_terminator(self):
-        array = self.make_array(
-            [
-                "with-faillock",
-                "with-mkhomedir",
-            ]
-        )
+@pytest.mark.parametrize(
+    "values, expected, error",
+    [
+        ([None], [], None),
+        ([b"with-faillock", b"mkhomedir-\xc3\xbc", None], ["with-faillock", "mkhomedir-ü"], None),
+        ([b"", b"after-empty", None], ["", "after-empty"], None),
+        ([b"first", None, b"ignored", None], ["first"], None),
+        ([b"\xff", None], None, UnicodeDecodeError),
+    ],
+    ids=["empty-array", "utf8", "empty-string", "first-null", "invalid-utf8"],
+)
+def test_iteration_decodes_until_first_null(free, values, expected, error):
+    backing = (ctypes.c_char_p * len(values))(*values)
+    pointer = ctypes.cast(backing, NullTerminatedStringArray)
 
-        self.assertEqual(
-            list(array),
-            [
-                "with-faillock",
-                "with-mkhomedir",
-            ],
-        )
+    with pytest.raises(error) if error else nullcontext():
+        assert list(pointer) == expected
 
-    def test_iter_decodes_utf8_strings(self):
-        array = self.make_array(["mkhomedir-ü"])
+    free.assert_not_called()
 
-        self.assertEqual(list(array), ["mkhomedir-ü"])
 
-    def test_null_pointer_cannot_be_iterated(self):
+@pytest.mark.parametrize("state", ["null", "closed"])
+def test_invalid_arrays_cannot_be_used(array, free, state):
+    if state == "closed":
+        array.close()
+    else:
         array = NullTerminatedStringArray()
 
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "NullTerminatedStringArray pointer is NULL",
-        ):
-            list(array)
+    with pytest.raises(RuntimeError):
+        list(array)
+    with pytest.raises(RuntimeError):
+        with array:
+            pass
 
-    def test_null_pointer_cannot_enter_context_manager(self):
-        array = NullTerminatedStringArray()
+    assert free.call_count == int(state == "closed")
 
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "NullTerminatedStringArray pointer is NULL",
-        ):
-            with array:
-                pass
 
-    def test_close_on_null_pointer_is_noop(self):
-        array = NullTerminatedStringArray()
+def test_close_on_null_pointer_is_noop(free):
+    NullTerminatedStringArray().close()
 
+    free.assert_not_called()
+
+
+def test_missing_free_callback_can_be_configured_and_retried(array, free, mocker):
+    mocker.patch.object(NullTerminatedStringArray, "_free", None)
+
+    with pytest.raises(RuntimeError):
         array.close()
 
-    def test_close_without_free_function_fails(self):
-        array = self.make_array(["with-faillock"])
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "No free function configured for NullTerminatedStringArray",
-        ):
-            array.close()
-
-    def test_close_calls_configured_free_function(self):
-        free_function = Mock()
-        NullTerminatedStringArray.set_free_function(free_function)
-        array = self.make_array(["with-faillock"])
-
-        array.close()
-
-        free_function.assert_called_once_with(array)
-        self.assertTrue(array._closed)
-
-    def test_close_is_idempotent(self):
-        free_function = Mock()
-        NullTerminatedStringArray.set_free_function(free_function)
-        array = self.make_array(["with-faillock"])
-
-        array.close()
-        array.close()
-
-        free_function.assert_called_once_with(array)
-
-    def test_closed_array_cannot_be_iterated(self):
-        free_function = Mock()
-        NullTerminatedStringArray.set_free_function(free_function)
-        array = self.make_array(["with-faillock"])
-        array.close()
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "NullTerminatedStringArray has already been freed",
-        ):
-            list(array)
-
-    def test_closed_array_cannot_enter_context_manager(self):
-        free_function = Mock()
-        NullTerminatedStringArray.set_free_function(free_function)
-        array = self.make_array(["with-faillock"])
-        array.close()
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "NullTerminatedStringArray has already been freed",
-        ):
-            with array:
-                pass
-
-    def test_context_manager_returns_same_array_and_frees_on_exit(self):
-        free_function = Mock()
-        NullTerminatedStringArray.set_free_function(free_function)
-        array = self.make_array(["with-faillock"])
-
-        with array as entered_array:
-            self.assertIs(entered_array, array)
-            self.assertEqual(list(entered_array), ["with-faillock"])
-            free_function.assert_not_called()
-
-        free_function.assert_called_once_with(array)
-        self.assertTrue(array._closed)
-
-    def test_context_manager_frees_array_when_body_raises(self):
-        free_function = Mock()
-        NullTerminatedStringArray.set_free_function(free_function)
-        array = self.make_array(["with-faillock"])
-
-        with self.assertRaisesRegex(RuntimeError, "test failure"):
-            with array:
-                raise RuntimeError("test failure")
-
-        free_function.assert_called_once_with(array)
-        self.assertTrue(array._closed)
+    NullTerminatedStringArray.set_free_function(free)
+    array.close()
+    free.assert_called_once_with(array)
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize("fail", [False, True], ids=["normal-exit", "body-failure"])
+def test_context_manager_frees_exactly_once(array, free, fail):
+    error = ValueError("context body failed")
+
+    with pytest.raises(ValueError) if fail else nullcontext() as exc:
+        with array as entered:
+            assert entered is array
+            free.assert_not_called()
+            if fail:
+                raise error
+
+    if fail:
+        assert exc.value is error
+    free.assert_called_once_with(array)
+    array.close()
+    free.assert_called_once_with(array)
