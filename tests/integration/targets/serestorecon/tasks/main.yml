@@ -21,6 +21,14 @@
           - "!min"
           - selinux
 
+    - ansible.builtin.meta: end_play
+      # The module needs the system Python, which is no longer supported
+      # on RHEL 9 for ansible-core 2.23+.
+      when: >-
+        ansible_facts.distribution == 'RedHat' and
+        ansible_facts.distribution_major_version|int < 10 and
+        ansible_version.full is version("2.23", ">=")
+
     - name: Run serestorecon tests
       ansible.builtin.include_tasks:
         file: serestorecon.yml
