@@ -18,7 +18,7 @@
   when: ansible_facts.selinux is defined and ansible_facts.selinux != False
 
 - ansible.builtin.meta: end_play
-  # The module respawns with the system Python, which is no longer supported
+  # The module needs the system Python, which is no longer supported
   # on RHEL 9 for ansible-core 2.23+.
   when: >-
     ansible_facts.distribution == 'RedHat' and
