@@ -17,7 +17,7 @@ from ansible_collections.community.general.plugins.module_utils._authselect.c_ar
 from ansible_collections.community.general.plugins.module_utils._authselect.c_string import AllocatedCString
 
 # ABI declarations
-SIGNATURES = {
+SIGNATURES: dict[str, tuple[list[type], type | None]] = {
     "authselect_array_free": ([ctypes.POINTER(ctypes.c_char_p)], None),
     "authselect_list": ([], NullTerminatedStringArray),
     "authselect_profile": ([ctypes.c_char_p, ctypes.POINTER(AuthselectProfile)], ctypes.c_int),
