@@ -101,17 +101,18 @@ def test_install_from_unreadable_package_file(run_command):
     assert result["msg"].startswith(f"failed to obtain package name from file {PACKAGE_FILE}")
 
 
-def test_latest_from_package_file_fails(run_command):
+@pytest.mark.parametrize("state", ["latest", "absent"])
+def test_package_file_with_unsupported_state_fails(run_command, state):
     run_command.side_effect = [
         (0, "1.18.4", ""),  # pkg -v
     ]
 
-    with set_module_args({"name": PACKAGE_FILE, "state": "latest"}):
+    with set_module_args({"name": PACKAGE_FILE, "state": state}):
         with pytest.raises(AnsibleFailJson) as exc:
             pkgng.main()
 
     result = exc.value.args[0]
-    assert result["msg"] == f"state=latest is not supported for local package files: {PACKAGE_FILE}"
+    assert result["msg"] == f"state={state} is not supported for local package files: {PACKAGE_FILE}"
     assert called_commands(run_command) == [["/testbin/pkg", "-v"]]
 
 
