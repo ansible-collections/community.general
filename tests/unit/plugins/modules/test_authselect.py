@@ -4,1295 +4,371 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch
+import json
 
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
-    AnsibleExitJson,
-    AnsibleFailJson,
-    ModuleTestCase,
-    set_module_args,
-)
+import pytest
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
-from ansible_collections.community.general.plugins.module_utils._mh.deco import no_handle_exceptions
+from ansible_collections.community.general.plugins.module_utils._module_helper import ModuleHelperException
 from ansible_collections.community.general.plugins.modules import authselect
 
-PROFILE_FEATURES = {
-    "sssd": {
-        "with-faillock",
-        "with-mkhomedir",
-        "with-sudo",
-    },
-    "minimal": {
-        "with-faillock",
-        "with-mkhomedir",
-    },
-}
+VALID = (authselect.AuthselectValidationStatus.VALIDATION_COMPLETE, True)
+INVALID = (authselect.AuthselectValidationStatus.VALIDATION_COMPLETE, False)
+NOT_MANAGED = (authselect.AuthselectValidationStatus.NOT_MANAGED, False)
+NO_CONFIGURATION = (authselect.AuthselectValidationStatus.NO_CONFIGURATION, False)
 
 
-class FakeExceptionWithMessage(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-        super().__init__()
+@pytest.fixture
+def backend(mocker):
+    backend = mocker.MagicMock(spec=authselect.Authselect)
+    backend.get_current_profile_id.return_value = "sssd"
+    backend.get_current_features.return_value = ["with-sudo", "with-faillock"]
+    backend.validate_configuration.return_value = VALID
+    profiles = {}
+    for name, features in {
+        "sssd": {"with-faillock", "with-mkhomedir", "with-sudo"},
+        "minimal": {"with-faillock", "with-mkhomedir"},
+    }.items():
+        profile = mocker.MagicMock()
+        profile.__enter__.return_value.features = features
+        profiles[name] = profile
+    backend.get_profiles_list.return_value = list(profiles)
+    backend.get_profile.side_effect = profiles.__getitem__
+    mocker.patch.object(authselect, "Authselect", return_value=backend)
+    return backend
 
 
-class FakeProfile:
-    def __init__(self, features):
-        self.features = set(features)
+@pytest.fixture
+def run_module(capsys):
+    def run(failed=False, **params):
+        with set_module_args(params):
+            with pytest.raises(SystemExit):
+                authselect.main()
+        result = json.loads(capsys.readouterr().out)
+        assert result.get("failed", False) is failed
+        return result
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        return False
+    return run
 
 
-class FakeAuthselect:
-    """
-    Stateful fake for the public Authselect wrapper used by the module.
-
-    It intentionally models only the operations the authselect module calls.
-    Tests can inject failures or validation results at specific stages.
-    """
-
-    def __init__(
-        self,
-        current_profile="sssd",
-        current_features=None,
-        profile_features=None,
-        validation_results=None,
-        activate_exception=None,
-        create_backup_exception=None,
-        restore_backup_exception=None,
-        remove_backup_exception=None,
-        apply_activation=True,
-    ):
-        self.current_profile = current_profile
-
-        if current_profile is None:
-            self.current_features = None
-        elif current_features is None:
-            self.current_features = set()
-        else:
-            self.current_features = set(current_features)
-
-        self.profile_features = {
-            profile: set(features) for profile, features in (profile_features or PROFILE_FEATURES).items()
+def configuration_calls(backend):
+    return [
+        call
+        for call in backend.method_calls
+        if call[0]
+        in {
+            "activate_profile",
+            "validate_configuration",
+            "create_profile_backup",
+            "restore_profile_backup",
+            "remove_profile_backup",
         }
+    ]
 
-        self.validation_results = list(validation_results or [(None, True)])
-        self._last_validation_result = self.validation_results[-1]
 
-        self.activate_exception = activate_exception
-        self.create_backup_exception = create_backup_exception
-        self.restore_backup_exception = restore_backup_exception
-        self.remove_backup_exception = remove_backup_exception
-        self.apply_activation = apply_activation
+@pytest.mark.parametrize("check_mode", [False, True], ids=["apply", "check"])
+@pytest.mark.parametrize("profile", [None, "sssd"], ids=["current", "named"])
+@pytest.mark.parametrize(
+    "state, requested, expected",
+    [
+        ("present", ["with-mkhomedir", "with-mkhomedir"], ["with-faillock", "with-mkhomedir", "with-sudo"]),
+        ("absent", ["with-faillock", "not-a-feature", "with-faillock"], ["with-sudo"]),
+    ],
+)
+def test_feature_changes_preserve_unrequested_features(
+    backend, run_module, mocker, state, requested, expected, profile, check_mode
+):
+    result = run_module(
+        state=state,
+        profile=profile,
+        features=requested,
+        force=True,
+        _ansible_check_mode=check_mode,
+        rollback_on_failure=check_mode,
+    )
 
-        self.events = []
-        self.activate_calls = []
-        self.validate_calls = 0
-        self.create_backup_calls = []
-        self.restore_backup_calls = []
-        self.remove_backup_calls = []
-        self.backups = {}
+    assert result["changed"] is True
+    assert (result["profile"], result["features"]) == ("sssd", expected)
+    assert configuration_calls(backend) == (
+        []
+        if check_mode
+        else [
+            mocker.call.activate_profile(profile_id="sssd", features=expected, force_overwrite=True),
+        ]
+    )
 
-    def get_current_profile_id(self):
-        return self.current_profile
 
-    def get_current_features(self):
-        if self.current_features is None:
-            return None
-        return list(self.current_features)
+@pytest.mark.parametrize("check_mode", [False, True], ids=["apply", "check"])
+@pytest.mark.parametrize("features", [None, ["with-mkhomedir"]], ids=["no-features", "explicit-features"])
+def test_switching_profiles_replaces_features(backend, run_module, mocker, features, check_mode):
+    result = run_module(profile="minimal", features=features, _ansible_check_mode=check_mode)
 
-    def get_profiles_list(self):
-        return list(self.profile_features)
+    assert result["changed"] is True
+    assert (result["profile"], result["features"]) == ("minimal", features or [])
+    assert configuration_calls(backend) == (
+        []
+        if check_mode
+        else [
+            mocker.call.activate_profile(profile_id="minimal", features=features or [], force_overwrite=False),
+        ]
+    )
 
-    def get_profile(self, profile_id):
-        return FakeProfile(self.profile_features[profile_id])
 
-    def activate_profile(self, profile_id, features, force_overwrite=False):
-        features = set(features)
+@pytest.mark.parametrize("validate", [False, True])
+@pytest.mark.parametrize(
+    "params",
+    [
+        pytest.param({"profile": "sssd"}, id="same-profile"),
+        pytest.param({"features": ["with-faillock"]}, id="enabled-feature"),
+        pytest.param({"features": []}, id="empty-present"),
+        pytest.param({"state": "absent", "features": []}, id="empty-absent"),
+        pytest.param({"state": "absent", "features": ["with-mkhomedir", "unknown"]}, id="missing-features"),
+        pytest.param({"state": "absent", "profile": "minimal", "features": ["with-sudo"]}, id="inactive-profile"),
+        pytest.param({"features": ["with-faillock"], "_ansible_check_mode": True}, id="check-no-change"),
+    ],
+)
+def test_no_change_leaves_configuration_and_backups_alone(backend, run_module, mocker, params, validate):
+    result = run_module(**params, validate=validate, rollback_on_failure=True)
 
-        self.events.append("activate")
-        self.activate_calls.append(
-            {
-                "profile_id": profile_id,
-                "features": features,
-                "force_overwrite": force_overwrite,
-            }
+    assert result["changed"] is False
+    assert (result["profile"], result["features"]) == ("sssd", ["with-faillock", "with-sudo"])
+    assert configuration_calls(backend) == ([mocker.call.validate_configuration()] if validate else [])
+
+
+@pytest.mark.parametrize(
+    "params, invalid_value",
+    [
+        ({"profile": "missing"}, "missing"),
+        ({"state": "absent", "profile": "missing", "features": []}, "missing"),
+        ({"features": ["unknown"]}, "unknown"),
+        ({"profile": "minimal", "features": ["with-sudo"]}, "with-sudo"),
+    ],
+)
+def test_invalid_requests_fail_before_writing(backend, run_module, params, invalid_value):
+    result = run_module(failed=True, **params)
+
+    assert invalid_value in result["msg"]
+    assert configuration_calls(backend) == []
+
+
+@pytest.mark.parametrize("params", [{}, {"state": "absent"}, {"state": "absent", "profile": "sssd"}])
+def test_features_require_an_active_profile(backend, run_module, params):
+    backend.get_current_profile_id.return_value = None
+    backend.get_current_features.return_value = None
+
+    run_module(failed=True, features=["with-mkhomedir"], **params)
+
+    backend.get_profile.assert_not_called()
+    assert configuration_calls(backend) == []
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        pytest.param({"features": ["with-faillock"]}, id="unchanged-present"),
+        pytest.param({"state": "absent", "features": ["with-mkhomedir"]}, id="unchanged-absent"),
+        pytest.param({"state": "absent", "profile": "minimal", "features": ["with-sudo"]}, id="inactive-profile"),
+        pytest.param({"features": ["with-mkhomedir"], "_ansible_check_mode": True}, id="check-present"),
+        pytest.param({"state": "absent", "features": ["with-sudo"], "_ansible_check_mode": True}, id="check-absent"),
+        pytest.param({"features": ["with-mkhomedir"], "rollback_on_failure": True}, id="before-backup"),
+    ],
+)
+def test_invalid_existing_configuration_stops_before_writing(backend, run_module, mocker, params):
+    backend.validate_configuration.return_value = INVALID
+
+    run_module(failed=True, validate=True, **params)
+
+    assert configuration_calls(backend) == [mocker.call.validate_configuration()]
+
+
+@pytest.mark.parametrize("state", ["present", "absent"])
+def test_check_mode_validates_without_creating_backups(backend, run_module, mocker, state):
+    result = run_module(
+        state=state,
+        features=["with-faillock", "with-mkhomedir"],
+        validate=True,
+        rollback_on_failure=True,
+        _ansible_check_mode=True,
+    )
+
+    assert result["changed"] is True
+    assert configuration_calls(backend) == [mocker.call.validate_configuration()]
+
+
+@pytest.mark.parametrize(
+    "status, state, force",
+    [(NOT_MANAGED, "present", False), (NOT_MANAGED, "absent", True), (NO_CONFIGURATION, "absent", False)],
+)
+def test_unmanaged_or_missing_configuration_is_not_safe_to_modify(backend, run_module, mocker, status, state, force):
+    backend.validate_configuration.return_value = status
+
+    run_module(
+        failed=True,
+        state=state,
+        features=["with-faillock", "with-mkhomedir"],
+        validate=True,
+        rollback_on_failure=True,
+        force=force,
+    )
+
+    assert configuration_calls(backend) == [mocker.call.validate_configuration()]
+
+
+@pytest.mark.parametrize("status, force", [(NO_CONFIGURATION, False), (NOT_MANAGED, True)])
+def test_initial_configuration_and_forced_takeover_are_allowed(backend, run_module, status, force):
+    backend.get_current_profile_id.return_value = None
+    backend.get_current_features.return_value = None
+    backend.validate_configuration.side_effect = [status, VALID]
+
+    result = run_module(profile="sssd", validate=True, rollback_on_failure=True, force=force)
+
+    assert result["changed"] is True
+    assert (result["profile"], result["features"]) == ("sssd", [])
+    backend.activate_profile.assert_called_once_with(profile_id="sssd", features=[], force_overwrite=force)
+
+
+@pytest.mark.parametrize("status", [INVALID, NOT_MANAGED, NO_CONFIGURATION], ids=["invalid", "unmanaged", "missing"])
+@pytest.mark.parametrize("state", ["present", "absent"])
+def test_post_change_validation_cannot_be_bypassed_by_force(backend, run_module, mocker, state, status):
+    backend.validate_configuration.return_value = status
+    features = ["with-faillock", "with-mkhomedir"]
+    expected = ["with-faillock", "with-mkhomedir", "with-sudo"] if state == "present" else ["with-sudo"]
+
+    run_module(failed=True, state=state, features=features, validate=True, force=True)
+
+    assert configuration_calls(backend) == [
+        mocker.call.activate_profile(profile_id="sssd", features=expected, force_overwrite=True),
+        mocker.call.validate_configuration(),
+    ]
+
+
+@pytest.mark.parametrize("validate", [False, True])
+def test_successful_change_discards_temporary_backup(backend, run_module, mocker, validate):
+    result = run_module(features=["with-mkhomedir"], rollback_on_failure=True, validate=validate)
+    backup = backend.create_profile_backup.call_args[0][0]
+    validation = [mocker.call.validate_configuration()] if validate else []
+
+    assert result["changed"] is True
+    assert configuration_calls(backend) == validation + [
+        mocker.call.create_profile_backup(backup),
+        mocker.call.activate_profile(
+            profile_id="sssd", features=["with-faillock", "with-mkhomedir", "with-sudo"], force_overwrite=False
+        ),
+    ] + validation + [mocker.call.remove_profile_backup(backup)]
+
+
+def test_backup_failure_prevents_activation(backend, run_module):
+    backend.create_profile_backup.side_effect = RuntimeError("backup unavailable")
+
+    run_module(failed=True, features=["with-mkhomedir"], rollback_on_failure=True)
+
+    backend.activate_profile.assert_not_called()
+    backend.restore_profile_backup.assert_not_called()
+    backend.remove_profile_backup.assert_not_called()
+
+
+@pytest.mark.parametrize("error_type", [RuntimeError, ModuleHelperException])
+@pytest.mark.parametrize("rollback", [False, True])
+def test_activation_failure_preserves_cause_and_rolls_back_only_when_requested(
+    backend, run_module, mocker, error_type, rollback
+):
+    cause = "injected activation failure"
+    backend.activate_profile.side_effect = error_type(cause)
+
+    result = run_module(failed=True, features=["with-mkhomedir"], rollback_on_failure=rollback)
+
+    assert cause in result["msg"]
+    expected = [
+        mocker.call.activate_profile(
+            profile_id="sssd",
+            features=["with-faillock", "with-mkhomedir", "with-sudo"],
+            force_overwrite=False,
         )
-
-        if self.activate_exception is not None:
-            raise self.activate_exception
-
-        if self.apply_activation:
-            self.current_profile = profile_id
-            self.current_features = features
-
-    def validate_configuration(self):
-        self.events.append("validate")
-        self.validate_calls += 1
-
-        if self.validation_results:
-            self._last_validation_result = self.validation_results.pop(0)
-
-        return self._last_validation_result
-
-    def create_profile_backup(self, backup_name):
-        self.events.append("create_backup")
-        self.create_backup_calls.append(backup_name)
-
-        if self.create_backup_exception is not None:
-            raise self.create_backup_exception
-
-        features = None if self.current_features is None else set(self.current_features)
-        self.backups[backup_name] = (self.current_profile, features)
-
-    def restore_profile_backup(self, backup_name):
-        self.events.append("restore_backup")
-        self.restore_backup_calls.append(backup_name)
-
-        if self.restore_backup_exception is not None:
-            raise self.restore_backup_exception
-
-        profile, features = self.backups[backup_name]
-        self.current_profile = profile
-        self.current_features = None if features is None else set(features)
-
-    def remove_profile_backup(self, backup_name):
-        self.events.append("remove_backup")
-        self.remove_backup_calls.append(backup_name)
-
-        if self.remove_backup_exception is not None:
-            raise self.remove_backup_exception
-
-        del self.backups[backup_name]
+    ]
+    if rollback:
+        backup = backend.create_profile_backup.call_args[0][0]
+        expected = (
+            [mocker.call.create_profile_backup(backup)]
+            + expected
+            + [
+                mocker.call.restore_profile_backup(backup),
+                mocker.call.remove_profile_backup(backup),
+            ]
+        )
+    assert configuration_calls(backend) == expected
 
 
-class FakeAuthselectWrongProfile(FakeAuthselect):
-    def activate_profile(
-        self,
-        profile_id,
-        features,
+@pytest.mark.parametrize("initial_status, force", [(VALID, False), (NOT_MANAGED, True)], ids=["managed", "unmanaged"])
+@pytest.mark.parametrize("rollback_valid", [True, False], ids=["restored", "restored-but-invalid"])
+def test_failed_validation_restores_and_revalidates_before_cleanup(
+    backend, run_module, mocker, initial_status, force, rollback_valid
+):
+    backend.validate_configuration.side_effect = [
+        initial_status,
+        INVALID,
+        initial_status if rollback_valid else INVALID,
+    ]
+
+    run_module(failed=True, features=["with-mkhomedir"], validate=True, rollback_on_failure=True, force=force)
+    backup = backend.create_profile_backup.call_args[0][0]
+
+    expected = [
+        mocker.call.validate_configuration(),
+        mocker.call.create_profile_backup(backup),
+        mocker.call.activate_profile(
+            profile_id="sssd", features=["with-faillock", "with-mkhomedir", "with-sudo"], force_overwrite=force
+        ),
+        mocker.call.validate_configuration(),
+        mocker.call.restore_profile_backup(backup),
+        mocker.call.validate_configuration(),
+    ]
+    if rollback_valid:
+        expected.append(mocker.call.remove_profile_backup(backup))
+    assert configuration_calls(backend) == expected
+
+
+def test_failed_restore_preserves_backup_and_both_causes(backend, run_module):
+    operation_cause, restore_cause = "injected activation failure", "injected restore failure"
+    backend.activate_profile.side_effect = RuntimeError(operation_cause)
+    backend.restore_profile_backup.side_effect = RuntimeError(restore_cause)
+
+    result = run_module(failed=True, features=["with-mkhomedir"], rollback_on_failure=True)
+
+    assert operation_cause in result["msg"]
+    assert restore_cause in result["msg"]
+    backend.restore_profile_backup.assert_called_once_with(backend.create_profile_backup.call_args[0][0])
+    backend.remove_profile_backup.assert_not_called()
+
+
+@pytest.mark.parametrize("error_type", [RuntimeError, ModuleHelperException])
+def test_cleanup_failure_after_rollback_preserves_both_causes(backend, run_module, error_type):
+    operation_cause, cleanup_cause = "injected activation failure", "injected cleanup failure"
+    backend.activate_profile.side_effect = error_type(operation_cause)
+    backend.remove_profile_backup.side_effect = RuntimeError(cleanup_cause)
+
+    result = run_module(failed=True, features=["with-mkhomedir"], rollback_on_failure=True)
+    backup = backend.create_profile_backup.call_args[0][0]
+
+    assert operation_cause in result["msg"]
+    assert cleanup_cause in result["msg"]
+    assert backup in result["msg"]
+    backend.restore_profile_backup.assert_called_once_with(backup)
+    backend.remove_profile_backup.assert_called_once_with(backup)
+
+
+def test_cleanup_failure_does_not_rollback_a_successful_change(backend, run_module):
+    cause = "injected cleanup failure"
+    backend.remove_profile_backup.side_effect = RuntimeError(cause)
+
+    result = run_module(failed=True, features=["with-mkhomedir"], rollback_on_failure=True)
+    backup = backend.create_profile_backup.call_args[0][0]
+
+    assert cause in result["msg"]
+    assert backup in result["msg"]
+    backend.activate_profile.assert_called_once_with(
+        profile_id="sssd",
+        features=["with-faillock", "with-mkhomedir", "with-sudo"],
         force_overwrite=False,
-    ):
-        super().activate_profile(
-            profile_id=profile_id,
-            features=features,
-            force_overwrite=force_overwrite,
-        )
-
-        self.current_profile = "wrong-profile"
-
-
-class TestAuthselect(ModuleTestCase):
-    def run_success(self, module_args, fake_authselect):
-        with set_module_args(module_args):
-            with patch.object(
-                authselect,
-                "Authselect",
-                return_value=fake_authselect,
-            ):
-                with no_handle_exceptions(
-                    AnsibleExitJson,
-                    AnsibleFailJson,
-                ):
-                    with self.assertRaises(AnsibleExitJson) as result:
-                        authselect.main()
-
-        return result.exception.args[0]
-
-    def run_failure(self, module_args, fake_authselect=None):
-        fake_authselect = fake_authselect or FakeAuthselect()
-
-        with set_module_args(module_args):
-            with patch.object(
-                authselect,
-                "Authselect",
-                return_value=fake_authselect,
-            ):
-                with no_handle_exceptions(
-                    AnsibleExitJson,
-                    AnsibleFailJson,
-                ):
-                    with self.assertRaises(AnsibleFailJson) as result:
-                        authselect.main()
-
-        return result.exception.args[0]
-
-    # ------------------------------------------------------------------
-    # Argument validation
-    # ------------------------------------------------------------------
-
-    def test_profile_or_features_is_required(self):
-        result = self.run_failure({})
-
-        self.assertIn("one of the following is required", result["msg"])
-
-    def test_absent_requires_features(self):
-        result = self.run_failure(
-            {
-                "profile": "sssd",
-                "state": "absent",
-            }
-        )
-
-        self.assertIn("features", result["msg"])
-
-    def test_invalid_state_is_rejected(self):
-        result = self.run_failure(
-            {
-                "profile": "sssd",
-                "state": "invalid",
-            }
-        )
-
-        self.assertIn("state", result["msg"])
-
-    # ------------------------------------------------------------------
-    # Profile validation
-    # ------------------------------------------------------------------
-
-    def test_invalid_profile_fails(self):
-        fake = FakeAuthselect()
-
-        result = self.run_failure(
-            {
-                "profile": "does-not-exist",
-            },
-            fake,
-        )
-
-        self.assertIn("not a valid authselect profile", result["msg"])
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_present_features_without_current_profile_fails(self):
-        fake = FakeAuthselect(
-            current_profile=None,
-            current_features=None,
-        )
-
-        self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-            },
-            fake,
-        )
-
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_present_profile_activates_when_no_profile_is_current(self):
-        fake = FakeAuthselect(
-            current_profile=None,
-            current_features=None,
-        )
-
-        result = self.run_success(
-            {
-                "profile": "sssd",
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["profile"], "sssd")
-        self.assertEqual(result["features"], [])
-        self.assertEqual(
-            fake.activate_calls,
-            [
-                {
-                    "profile_id": "sssd",
-                    "features": set(),
-                    "force_overwrite": False,
-                }
-            ],
-        )
-
-    def test_present_profile_only_same_profile_is_idempotent(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "profile": "sssd",
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertEqual(result["profile"], "sssd")
-        self.assertEqual(result["features"], ["with-faillock"])
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_present_profile_only_switches_profile_with_no_optional_features(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-sudo"},
-        )
-
-        result = self.run_success(
-            {
-                "profile": "minimal",
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["profile"], "minimal")
-        self.assertEqual(result["features"], [])
-        self.assertEqual(
-            fake.activate_calls,
-            [
-                {
-                    "profile_id": "minimal",
-                    "features": set(),
-                    "force_overwrite": False,
-                }
-            ],
-        )
-
-    # ------------------------------------------------------------------
-    # state=present feature behavior
-    # ------------------------------------------------------------------
-
-    def test_present_adds_feature_to_current_profile(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["profile"], "sssd")
-        self.assertEqual(
-            result["features"],
-            ["with-faillock", "with-mkhomedir"],
-        )
-        self.assertEqual(
-            fake.activate_calls[0]["features"],
-            {"with-faillock", "with-mkhomedir"},
-        )
-
-    def test_present_preserves_unspecified_features_on_current_profile(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-sudo"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(
-            set(result["features"]),
-            {"with-faillock", "with-mkhomedir", "with-sudo"},
-        )
-
-    def test_present_existing_feature_is_idempotent(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-mkhomedir"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_present_switch_profile_uses_requested_features_as_complete_set(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-sudo"},
-        )
-
-        result = self.run_success(
-            {
-                "profile": "minimal",
-                "features": ["with-mkhomedir"],
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["profile"], "minimal")
-        self.assertEqual(result["features"], ["with-mkhomedir"])
-        self.assertEqual(
-            fake.activate_calls[0]["features"],
-            {"with-mkhomedir"},
-        )
-
-    def test_present_invalid_feature_fails(self):
-        fake = FakeAuthselect()
-
-        result = self.run_failure(
-            {
-                "features": ["not-a-feature"],
-            },
-            fake,
-        )
-
-        self.assertIn("not valid profile features: not-a-feature", result["msg"])
-        self.assertEqual(fake.activate_calls, [])
-
-    # ------------------------------------------------------------------
-    # state=absent feature behavior
-    # ------------------------------------------------------------------
-
-    def test_absent_removes_requested_feature(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-mkhomedir"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["profile"], "sssd")
-        self.assertEqual(result["features"], ["with-faillock"])
-
-    def test_absent_missing_feature_is_idempotent(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_absent_invalid_feature_is_ignored(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["not-a-feature"],
-                "state": "absent",
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertEqual(result["features"], ["with-faillock"])
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_absent_named_current_profile_removes_feature(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-mkhomedir"},
-        )
-
-        result = self.run_success(
-            {
-                "profile": "sssd",
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["profile"], "sssd")
-        self.assertEqual(result["features"], ["with-faillock"])
-
-    def test_absent_named_different_profile_is_noop(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-mkhomedir"},
-        )
-
-        result = self.run_success(
-            {
-                "profile": "minimal",
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertEqual(result["profile"], "sssd")
-        self.assertEqual(
-            result["features"],
-            ["with-faillock", "with-mkhomedir"],
-        )
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_absent_without_current_profile_fails(self):
-        fake = FakeAuthselect(
-            current_profile=None,
-            current_features=None,
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-            },
-            fake,
-        )
-
-        self.assertIn("no currently configured authselect profiles", result["msg"].lower())
-
-    def test_absent_named_profile_without_current_profile_fails(self):
-        fake = FakeAuthselect(
-            current_profile=None,
-            current_features=None,
-        )
-
-        result = self.run_failure(
-            {
-                "profile": "sssd",
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-            },
-            fake,
-        )
-
-        self.assertIn("there are no currently configured authselect profiles", result["msg"])
-        self.assertEqual(fake.activate_calls, [])
-
-    # ------------------------------------------------------------------
-    # Check mode
-    # ------------------------------------------------------------------
-
-    def test_check_mode_present_reports_change_without_activation(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "_ansible_check_mode": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(
-            result["features"],
-            ["with-faillock", "with-mkhomedir"],
-        )
-        self.assertEqual(fake.activate_calls, [])
-        self.assertEqual(fake.current_features, {"with-faillock"})
-
-    def test_check_mode_profile_switch_reports_predicted_profile(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "profile": "minimal",
-                "features": ["with-mkhomedir"],
-                "_ansible_check_mode": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["profile"], "minimal")
-        self.assertEqual(result["features"], ["with-mkhomedir"])
-        self.assertEqual(fake.current_profile, "sssd")
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_check_mode_absent_reports_predicted_feature_removal(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-mkhomedir"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-                "_ansible_check_mode": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["features"], ["with-faillock"])
-        self.assertEqual(
-            fake.current_features,
-            {"with-faillock", "with-mkhomedir"},
-        )
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_check_mode_absent_with_validate_validates_without_mutation(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-mkhomedir"},
-            validation_results=[(None, True)],
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-                "validate": True,
-                "_ansible_check_mode": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["features"], ["with-faillock"])
-        self.assertEqual(fake.validate_calls, 1)
-        self.assertEqual(fake.activate_calls, [])
-        self.assertEqual(
-            fake.current_features,
-            {"with-faillock", "with-mkhomedir"},
-        )
-
-    def test_check_mode_idempotent_state_reports_no_change(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-faillock"],
-                "_ansible_check_mode": True,
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_check_mode_with_validate_validates_without_mutation(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[(None, True)],
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "_ansible_check_mode": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(fake.validate_calls, 1)
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_check_mode_invalid_configuration_fails_without_mutation(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (None, False),
-            ],
-        )
-
-        self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "_ansible_check_mode": True,
-            },
-            fake,
-        )
-
-        self.assertEqual(fake.activate_calls, [])
-        self.assertEqual(fake.current_features, {"with-faillock"})
-        self.assertEqual(fake.validate_calls, 1)
-
-    def test_check_mode_with_rollback_does_not_create_backup(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "rollback_on_failure": True,
-                "_ansible_check_mode": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(fake.activate_calls, [])
-        self.assertEqual(fake.create_backup_calls, [])
-        self.assertEqual(fake.restore_backup_calls, [])
-        self.assertEqual(fake.remove_backup_calls, [])
-
-    # ------------------------------------------------------------------
-    # Validation
-    # ------------------------------------------------------------------
-
-    def test_validate_noop_validates_current_configuration(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[(None, True)],
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-faillock"],
-                "validate": True,
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertEqual(fake.validate_calls, 1)
-
-    def test_validate_noop_invalid_configuration_fails(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[(None, False)],
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-faillock"],
-                "validate": True,
-            },
-            fake,
-        )
-
-        self.assertIn("current authselect configuration is not valid", result["msg"].lower())
-
-    def test_absent_named_different_profile_still_validates(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[(None, False)],
-        )
-
-        self.run_failure(
-            {
-                "profile": "minimal",
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-                "validate": True,
-            },
-            fake,
-        )
-
-        self.assertEqual(fake.validate_calls, 1)
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_post_change_validate_invalid_fails_with_changed_true_without_rollback(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[(None, False)],
-        )
-
-        self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-            },
-            fake,
-        )
-
-        self.assertEqual(fake.current_features, {"with-faillock", "with-mkhomedir"})
-
-    def test_invalid_configuration_with_rollback_fails_before_change(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (None, False),
-            ],
-        )
-
-        self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertEqual(fake.activate_calls, [])
-        self.assertEqual(fake.create_backup_calls, [])
-        self.assertEqual(fake.restore_backup_calls, [])
-
-    # ------------------------------------------------------------------
-    # force and validation status
-    # ------------------------------------------------------------------
-
-    def test_force_is_passed_to_activate(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "force": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertTrue(fake.activate_calls[0]["force_overwrite"])
-
-    def test_not_managed_without_force_fails_before_backup(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (authselect.AuthselectValidationStatus.NOT_MANAGED, False),
-            ],
-        )
-
-        self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertEqual(fake.create_backup_calls, [])
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_force_allows_not_managed_prechange_then_requires_valid_postchange(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (authselect.AuthselectValidationStatus.NOT_MANAGED, False),
-                (None, True),
-            ],
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "rollback_on_failure": True,
-                "force": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(fake.validate_calls, 2)
-        self.assertEqual(fake.events, ["validate", "create_backup", "activate", "validate", "remove_backup"])
-
-    def test_force_not_managed_after_change_fails_and_rolls_back(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (authselect.AuthselectValidationStatus.NOT_MANAGED, False),
-                (authselect.AuthselectValidationStatus.NOT_MANAGED, False),
-                (authselect.AuthselectValidationStatus.NOT_MANAGED, False),
-            ],
-        )
-
-        self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "rollback_on_failure": True,
-                "force": True,
-            },
-            fake,
-        )
-
-        self.assertEqual(fake.current_features, {"with-faillock"})
-        self.assertEqual(fake.validate_calls, 3)
-        self.assertEqual(len(fake.restore_backup_calls), 1)
-        self.assertEqual(len(fake.remove_backup_calls), 1)
-
-    def test_absent_not_managed_configuration_fails_after_change(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock", "with-mkhomedir"},
-            validation_results=[
-                (authselect.AuthselectValidationStatus.NOT_MANAGED, False),
-            ],
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-                "validate": True,
-            },
-            fake,
-        )
-
-        self.assertIn(
-            "does not currently manage",
-            result["msg"],
-        )
-        self.assertEqual(
-            fake.current_features,
-            {"with-faillock"},
-        )
-
-    def test_no_configuration_present_is_allowed_before_first_configuration(self):
-        fake = FakeAuthselect(
-            current_profile=None,
-            current_features=None,
-            validation_results=[
-                (authselect.AuthselectValidationStatus.NO_CONFIGURATION, False),
-                (None, True),
-            ],
-        )
-
-        result = self.run_success(
-            {
-                "profile": "sssd",
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(result["profile"], "sssd")
-        self.assertEqual(result["features"], ["with-mkhomedir"])
-        self.assertEqual(fake.validate_calls, 2)
-
-    def test_absent_no_configuration_fails_even_without_change(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (authselect.AuthselectValidationStatus.NO_CONFIGURATION, False),
-            ],
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "state": "absent",
-                "validate": True,
-            },
-            fake,
-        )
-
-        self.assertIn("there currently is no authselect configuration", result["msg"])
-        self.assertEqual(fake.activate_calls, [])
-        self.assertEqual(fake.validate_calls, 1)
-
-    def test_no_configuration_after_change_fails(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (authselect.AuthselectValidationStatus.NO_CONFIGURATION, False),
-            ],
-        )
-
-        self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-            },
-            fake,
-        )
-
-        self.assertEqual(
-            fake.current_features,
-            {"with-faillock", "with-mkhomedir"},
-        )
-
-    # ------------------------------------------------------------------
-    # Backup and rollback
-    # ------------------------------------------------------------------
-
-    def test_rollback_on_failure_does_not_create_backup_when_no_change_needed(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-faillock"],
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertFalse(result["changed"])
-        self.assertEqual(fake.create_backup_calls, [])
-        self.assertEqual(fake.restore_backup_calls, [])
-        self.assertEqual(fake.remove_backup_calls, [])
-        self.assertEqual(fake.activate_calls, [])
-
-    def test_rollback_enabled_successful_change_creates_and_removes_backup(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-        )
-
-        result = self.run_success(
-            {
-                "features": ["with-mkhomedir"],
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertTrue(result["changed"])
-        self.assertEqual(len(fake.create_backup_calls), 1)
-        self.assertEqual(fake.restore_backup_calls, [])
-        self.assertEqual(fake.remove_backup_calls, fake.create_backup_calls)
-        self.assertEqual(fake.backups, {})
-        self.assertEqual(fake.events, ["create_backup", "activate", "remove_backup"])
-
-    def test_create_backup_failure_prevents_activation(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            create_backup_exception=RuntimeError("backup creation failed"),
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertIn("backup creation failed", result["msg"])
-        self.assertEqual(fake.activate_calls, [])
-        self.assertEqual(fake.restore_backup_calls, [])
-
-    def test_activation_failure_without_rollback_reports_operation_error(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            activate_exception=RuntimeError("activation failed"),
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-            },
-            fake,
-        )
-
-        self.assertIn("unable to apply authselect changes: activation failed", result["msg"])
-        self.assertEqual(fake.create_backup_calls, [])
-        self.assertEqual(fake.restore_backup_calls, [])
-        self.assertEqual(fake.remove_backup_calls, [])
-
-    def test_activation_failure_uses_exception_msg_attribute(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            activate_exception=FakeExceptionWithMessage("activation message"),
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-            },
-            fake,
-        )
-
-        self.assertIn("unable to apply authselect changes: activation message", result["msg"])
-
-    def test_activation_failure_rolls_back_and_removes_backup(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            activate_exception=RuntimeError("activation failed"),
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertIn("activation failed", result["msg"])
-        self.assertEqual(fake.current_profile, "sssd")
-        self.assertEqual(fake.current_features, {"with-faillock"})
-        self.assertEqual(len(fake.restore_backup_calls), 1)
-        self.assertEqual(len(fake.remove_backup_calls), 1)
-        self.assertEqual(fake.backups, {})
-        self.assertEqual(
-            fake.events,
-            ["create_backup", "activate", "restore_backup", "remove_backup"],
-        )
-
-    def test_post_change_validation_failure_rolls_back(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (None, True),
-                (None, False),
-                (None, True),
-            ],
-        )
-
-        self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertEqual(fake.current_features, {"with-faillock"})
-        self.assertEqual(fake.validate_calls, 3)
-        self.assertEqual(
-            fake.events,
-            [
-                "validate",
-                "create_backup",
-                "activate",
-                "validate",
-                "restore_backup",
-                "validate",
-                "remove_backup",
-            ],
-        )
-
-    def test_rollback_failure_preserves_backup_and_reports_both_failures(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            activate_exception=RuntimeError("activation failed"),
-            restore_backup_exception=RuntimeError("restore failed"),
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertIn("unable to apply authselect changes: activation failed", result["msg"])
-        self.assertIn("rollback also failed: restore failed", result["msg"])
-        self.assertEqual(len(fake.backups), 1)
-        self.assertEqual(fake.remove_backup_calls, [])
-
-    def test_validation_after_rollback_failure_preserves_backup(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            validation_results=[
-                (None, True),
-                (None, False),
-                (None, False),
-            ],
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "validate": True,
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertIn("unable to apply authselect changes", result["msg"])
-        self.assertIn("rollback also failed", result["msg"])
-        self.assertIn("current authselect configuration is not valid", result["msg"])
-        self.assertEqual(len(fake.backups), 1)
-        self.assertEqual(fake.remove_backup_calls, [])
-
-    def test_backup_delete_failure_after_rollback_reports_failure_and_preserves_backup(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            activate_exception=RuntimeError("activation failed"),
-            remove_backup_exception=RuntimeError("delete failed"),
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertIn("activation failed", result["msg"])
-        self.assertIn("the original configuration was restored", result["msg"])
-        self.assertIn("could not be removed: delete failed", result["msg"])
-        self.assertEqual(len(fake.backups), 1)
-
-    def test_backup_delete_failure_after_success_does_not_rollback_valid_change(self):
-        fake = FakeAuthselect(
-            current_profile="sssd",
-            current_features={"with-faillock"},
-            remove_backup_exception=RuntimeError("delete failed"),
-        )
-
-        result = self.run_failure(
-            {
-                "features": ["with-mkhomedir"],
-                "rollback_on_failure": True,
-            },
-            fake,
-        )
-
-        self.assertIn("delete failed", result["msg"])
-        self.assertEqual(
-            fake.current_features,
-            {"with-faillock", "with-mkhomedir"},
-        )
-        self.assertEqual(fake.restore_backup_calls, [])
-        self.assertEqual(len(fake.backups), 1)
+    )
+    backend.restore_profile_backup.assert_not_called()
+    backend.remove_profile_backup.assert_called_once_with(backup)
