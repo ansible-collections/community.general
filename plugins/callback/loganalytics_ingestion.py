@@ -157,7 +157,7 @@ from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display
 
-from ansible_collections.community.general.plugins.module_utils._secrets import mark_as_secret
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_as_secret, mask_secret_values
 
 display = Display()
 
@@ -276,8 +276,8 @@ class AzureLogAnalyticsIngestionSource:
                 "User": self.user,
                 "Playbook": playbook_name,
                 "Role": ansible_role,
-                "TaskName": result._task.get_name(),
-                "Task": result._task_fields,
+                "TaskName": mask_secret_values(result._task.get_name()),
+                "Task": mask_secret_values(result._task_fields),
                 "Action": result._task_fields["action"],
                 "State": state,
                 "Result": result._result,
