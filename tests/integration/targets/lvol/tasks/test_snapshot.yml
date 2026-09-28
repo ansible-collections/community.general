@@ -9,7 +9,7 @@
   community.general.lvol:
     vg: testvg1
     lv: testorigin
-    size: 8m
+    size: 4m
   register: snapshot_origin_create
 
 - name: Assert snapshot origin was created
@@ -52,20 +52,20 @@
       - snapshot_again is success
       - snapshot_again is not changed
 
-- name: Ensure existing snapshot stays unchanged
+- name: Extend existing snapshot
   community.general.lvol:
     vg: testvg1
     lv: testorigin
     snapshot: testsnap
-    size: 4m
+    size: 6m
     force: false
     state: present
-  register: snapshot_third
+  register: snapshot_extend
   async: 30
   poll: 5
 
-- name: Assert existing snapshot remains idempotent
+- name: Assert existing snapshot was extended
   ansible.builtin.assert:
     that:
-      - snapshot_third is success
-      - snapshot_third is not changed
+      - snapshot_extend is success
+      - snapshot_extend is changed
