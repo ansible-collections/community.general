@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - lvm_pv - add ``zero``, ``metadatasize``, ``dataalignment``, and ``pvmetadatacopies`` options to control ``pvcreate``
+    behavior, and ``allocatable``, ``metadataignore``, and ``tags`` options to manage existing physical volume attributes
+    with ``pvchange`` (https://github.com/ansible-collections/community.general/pull/12701).

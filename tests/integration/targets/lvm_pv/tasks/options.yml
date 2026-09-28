@@ -1,0 +1,139 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Removing physical volume before testing creation-time options
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    state: absent
+
+- name: Creating physical volume with metadata layout options
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    zero: false
+    metadatasize: 128m
+    dataalignment: 1m
+    pvmetadatacopies: 2
+  register: create_options_result
+
+- name: Re-creating physical volume with the same metadata layout options (idempotency check)
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    zero: false
+    metadatasize: 128m
+    dataalignment: 1m
+    pvmetadatacopies: 2
+  register: create_options_result_again
+
+- name: Checking physical volume metadata area count
+  ansible.builtin.command: pvs --noheadings -o pv_mda_count {{ loop_device.stdout }}
+  register: pv_mda_count_output
+
+- name: Asserting physical volume was created with the requested metadata layout
+  ansible.builtin.assert:
+    that:
+      - create_options_result.changed == true
+      - "'created' in create_options_result.msg"
+      - create_options_result_again.changed == false
+      - (pv_mda_count_output.stdout | trim | int) == 2
+
+- name: Setting metadataignore on the orphan physical volume
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    metadataignore: true
+  register: ignore_result
+
+- name: Re-applying the same metadataignore value (idempotency check)
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    metadataignore: true
+  register: ignore_result_again
+
+- name: Checking physical volume metadata area usage
+  ansible.builtin.command: pvs --noheadings -o pv_mda_used_count {{ loop_device.stdout }}
+  register: pv_mda_used_count_output
+
+- name: Asserting metadataignore was applied
+  ansible.builtin.assert:
+    that:
+      - ignore_result.changed == true
+      - "'attributes changed' in ignore_result.msg"
+      - ignore_result_again.changed == false
+      - (pv_mda_used_count_output.stdout | trim | int) == 0
+
+- name: Restoring metadataignore to false
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    metadataignore: false
+  register: unignore_result
+
+- name: Checking physical volume metadata area usage again
+  ansible.builtin.command: pvs --noheadings -o pv_mda_used_count {{ loop_device.stdout }}
+  register: pv_mda_used_count_output_again
+
+- name: Asserting metadataignore was reverted
+  ansible.builtin.assert:
+    that:
+      - unignore_result.changed == true
+      - (pv_mda_used_count_output_again.stdout | trim | int) == 2
+
+- name: Creating a volume group on the physical volume (allocatable/tags only apply to PVs in a VG)
+  ansible.builtin.command: vgcreate test_lvm_pv_vg {{ loop_device.stdout }}
+  args:
+    creates: /dev/test_lvm_pv_vg
+
+- name: Setting allocatable and tags on the physical volume
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    allocatable: false
+    tags:
+      - fast_disks
+      - site_a
+  register: attrs_result
+
+- name: Re-applying the same attributes (idempotency check)
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    allocatable: false
+    tags:
+      - fast_disks
+      - site_a
+  register: attrs_result_again
+
+- name: Checking physical volume attributes
+  ansible.builtin.command: pvs --noheadings -o pv_attr,pv_tags --separator | {{ loop_device.stdout }}
+  register: pv_attrs_output
+
+- name: Asserting physical volume attributes were changed
+  ansible.builtin.assert:
+    that:
+      - attrs_result.changed == true
+      - "'attributes changed' in attrs_result.msg"
+      - attrs_result_again.changed == false
+      - pv_attrs_output.stdout.split('|')[0].strip()[0:1] != 'a'
+      - "'fast_disks' in pv_attrs_output.stdout.split('|')[1]"
+      - "'site_a' in pv_attrs_output.stdout.split('|')[1]"
+
+- name: Changing tags and re-enabling allocation
+  community.general.lvm_pv:
+    device: "{{ loop_device.stdout }}"
+    allocatable: true
+    tags:
+      - site_a
+  register: attrs_update_result
+
+- name: Checking updated physical volume attributes
+  ansible.builtin.command: pvs --noheadings -o pv_attr,pv_tags --separator | {{ loop_device.stdout }}
+  register: pv_attrs_updated_output
+
+- name: Asserting physical volume attributes were updated
+  ansible.builtin.assert:
+    that:
+      - attrs_update_result.changed == true
+      - pv_attrs_updated_output.stdout.split('|')[0].strip()[0:1] == 'a'
+      - "'fast_disks' not in pv_attrs_updated_output.stdout.split('|')[1]"
+      - "'site_a' in pv_attrs_updated_output.stdout.split('|')[1]"
+
+- name: Removing the volume group so the physical volume becomes an orphan again
+  ansible.builtin.command: vgremove -f test_lvm_pv_vg
