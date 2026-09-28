@@ -5,192 +5,112 @@
 from __future__ import annotations
 
 import ctypes
-import unittest
-from unittest.mock import Mock
+from contextlib import nullcontext
+
+import pytest
 
 from ansible_collections.community.general.plugins.module_utils._authselect.authselect_profile import (
     AuthselectProfile,
     _AuthselectProfileStruct,
 )
+from ansible_collections.community.general.plugins.module_utils._authselect.c_array import NullTerminatedStringArray
 
 
-class FakeStringArray:
-    def __init__(self, values):
-        self.values = list(values)
-        self.entered = False
-        self.exited = False
-
-    def __enter__(self):
-        self.entered = True
-        return self
-
-    def __exit__(self, *args):
-        self.exited = True
-
-    def __iter__(self):
-        return iter(self.values)
+@pytest.fixture
+def profile(mocker):
+    mocker.patch.object(AuthselectProfile, "_free")
+    mocker.patch.object(AuthselectProfile, "_get_features")
+    mocker.patch.object(NullTerminatedStringArray, "_free")
+    backing = _AuthselectProfileStruct()
+    yield ctypes.cast(ctypes.pointer(backing), AuthselectProfile)
 
 
-class FakeAllocatedString:
-    def __init__(self, value):
-        self.value = value
-        self.entered = False
-        self.exited = False
+@pytest.mark.parametrize(
+    "values, expected, error",
+    [
+        ([], [], None),
+        ([b"with-faillock", b"with-mkhomedir"], ["with-faillock", "with-mkhomedir"], None),
+        ([b"\xff"], None, UnicodeDecodeError),
+    ],
+    ids=["empty", "features", "decoding-failure"],
+)
+def test_features_releases_array_but_keeps_profile(profile, values, expected, error):
+    backing = (ctypes.c_char_p * (len(values) + 1))(*values, None)
+    array = ctypes.cast(backing, NullTerminatedStringArray)
+    AuthselectProfile._get_features.return_value = array
 
-    def __enter__(self):
-        self.entered = True
-        return self
+    with pytest.raises(error) if error else nullcontext():
+        assert profile.features == expected
 
-    def __exit__(self, *args):
-        self.exited = True
-
-    def decode(self, encoding="utf-8"):
-        return self.value.decode(encoding)
+    AuthselectProfile._get_features.assert_called_once_with(profile)
+    NullTerminatedStringArray._free.assert_called_once_with(array)
+    AuthselectProfile._free.assert_not_called()
 
 
-class TestAuthselectProfile(unittest.TestCase):
-    CALLBACK_ATTRIBUTES = (
-        "_free",
-        "_get_id",
-        "_get_name",
-        "_get_path",
-        "_get_description",
-        "_get_features",
-        "_get_nsswitch_maps",
-        "_get_requirements",
-    )
+@pytest.mark.parametrize("result", [None, NullTerminatedStringArray()], ids=["none", "null-pointer"])
+def test_features_rejects_null_output(profile, result):
+    AuthselectProfile._get_features.return_value = result
 
-    def setUp(self):
-        for attribute in self.CALLBACK_ATTRIBUTES:
-            setattr(AuthselectProfile, attribute, None)
+    with pytest.raises(RuntimeError):
+        _ = profile.features
 
-    def tearDown(self):
-        for attribute in self.CALLBACK_ATTRIBUTES:
-            setattr(AuthselectProfile, attribute, None)
+    NullTerminatedStringArray._free.assert_not_called()
 
-    @staticmethod
-    def make_profile():
-        backing_struct = _AuthselectProfileStruct()
-        pointer = ctypes.cast(
-            ctypes.pointer(backing_struct),
-            AuthselectProfile,
-        )
 
-        # The test owns this memory, so keep it alive while the pointer is used.
-        pointer._test_backing_struct = backing_struct
+def test_features_requires_configured_getter(profile, mocker):
+    mocker.patch.object(AuthselectProfile, "_get_features", None)
 
-        return pointer
+    with pytest.raises(RuntimeError):
+        _ = profile.features
 
-    # ------------------------------------------------------------------
-    # Features and derived profile data
-    # ------------------------------------------------------------------
 
-    def test_features_returns_list_and_closes_returned_array(self):
-        profile = self.make_profile()
-        values = FakeStringArray(
-            [
-                "with-faillock",
-                "with-mkhomedir",
-            ]
-        )
-        get_features = Mock(return_value=values)
-        AuthselectProfile._get_features = get_features
-
-        result = profile.features
-
-        self.assertEqual(
-            result,
-            [
-                "with-faillock",
-                "with-mkhomedir",
-            ],
-        )
-        get_features.assert_called_once_with(profile)
-        self.assertTrue(values.entered)
-        self.assertTrue(values.exited)
-
-    def test_features_fails_when_getter_returns_null(self):
-        profile = self.make_profile()
-        AuthselectProfile._get_features = Mock(return_value=None)
-
-        self.assertRaisesRegex(
-            RuntimeError,
-            r"authselect_profile_features\(\) returned NULL",
-            lambda: profile.features,
-        )
-
-    # ------------------------------------------------------------------
-    # Pointer lifetime
-    # ------------------------------------------------------------------
-
-    def test_null_pointer_cannot_enter_context_manager(self):
+@pytest.mark.parametrize("closed", [False, True], ids=["null", "closed"])
+def test_invalid_profiles_cannot_be_used(profile, closed):
+    if closed:
+        profile.close()
+    else:
         profile = AuthselectProfile()
 
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "Authselect profile pointer is NULL",
-        ):
-            with profile:
-                pass
+    with pytest.raises(RuntimeError):
+        _ = profile.features
+    with pytest.raises(RuntimeError):
+        with profile:
+            pass
 
-    def test_close_on_null_pointer_is_noop(self):
-        profile = AuthselectProfile()
+    AuthselectProfile._get_features.assert_not_called()
 
+
+def test_close_on_null_pointer_is_noop(profile):
+    AuthselectProfile().close()
+
+    AuthselectProfile._free.assert_not_called()
+
+
+def test_missing_free_callback_can_be_configured_and_retried(profile, mocker):
+    free = AuthselectProfile._free
+    mocker.patch.object(AuthselectProfile, "_free", None)
+
+    with pytest.raises(RuntimeError):
         profile.close()
 
-    def test_close_without_free_function_fails(self):
-        profile = self.make_profile()
-
-        with self.assertRaisesRegex(
-            RuntimeError,
-            "AuthselectProfile free function has not been configured",
-        ):
-            profile.close()
-
-    def test_close_calls_configured_free_function(self):
-        profile = self.make_profile()
-        free_function = Mock()
-        AuthselectProfile._free = free_function
-
-        profile.close()
-
-        free_function.assert_called_once_with(profile)
-        self.assertTrue(profile._closed)
-
-    def test_close_is_idempotent(self):
-        profile = self.make_profile()
-        free_function = Mock()
-        AuthselectProfile._free = free_function
-
-        profile.close()
-        profile.close()
-
-        free_function.assert_called_once_with(profile)
-
-    def test_context_manager_returns_same_profile_and_frees_on_exit(self):
-        profile = self.make_profile()
-        free_function = Mock()
-        AuthselectProfile._free = free_function
-
-        with profile as entered_profile:
-            self.assertIs(entered_profile, profile)
-            free_function.assert_not_called()
-
-        free_function.assert_called_once_with(profile)
-        self.assertTrue(profile._closed)
-
-    def test_context_manager_frees_profile_when_body_raises(self):
-        profile = self.make_profile()
-        free_function = Mock()
-        AuthselectProfile._free = free_function
-
-        with self.assertRaisesRegex(RuntimeError, "test failure"):
-            with profile:
-                raise RuntimeError("test failure")
-
-        free_function.assert_called_once_with(profile)
-        self.assertTrue(profile._closed)
+    mocker.patch.object(AuthselectProfile, "_free", free)
+    profile.close()
+    free.assert_called_once_with(profile)
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize("fail", [False, True], ids=["normal-exit", "body-failure"])
+def test_context_manager_frees_exactly_once(profile, fail):
+    error = ValueError("context body failed")
+
+    with pytest.raises(ValueError) if fail else nullcontext() as exc:
+        with profile as entered:
+            assert entered is profile
+            AuthselectProfile._free.assert_not_called()
+            if fail:
+                raise error
+
+    if fail:
+        assert exc.value is error
+    AuthselectProfile._free.assert_called_once_with(profile)
+    profile.close()
+    AuthselectProfile._free.assert_called_once_with(profile)
