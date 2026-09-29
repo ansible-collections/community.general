@@ -87,6 +87,7 @@ options:
   state_filter:
     description:
       - Filter specifying state of issues while searching.
+      - The value V(all) has been added in community.general 13.5.0.
     type: str
     choices: ["opened", "closed", "all"]
     default: opened
