@@ -26,6 +26,7 @@ options:
       - Your GitHub App's client ID or GitHub App ID. You can find these in the Settings page.
       - GitHub recommends using the client ID instead of the numeric
         app ID (see U(https://github.blog/changelog/2024-08-23-client-ids-are-now-included-in-app-api-responses/)).
+      - The O(client_id) alias has been added in community.general 13.5.0.
     required: true
     type: str
     aliases: [client_id]
