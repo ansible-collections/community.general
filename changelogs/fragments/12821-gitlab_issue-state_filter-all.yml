@@ -1,0 +1,2 @@
+minor_changes:
+  - gitlab_issue - add ``all`` as a valid value for the ``state_filter`` parameter (https://github.com/ansible-collections/community.general/pull/12821).
