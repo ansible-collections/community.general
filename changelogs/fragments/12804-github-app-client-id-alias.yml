@@ -1,0 +1,4 @@
+minor_changes:
+  - github_app_access_token lookup plugin - add ``client_id`` as an alias for ``app_id`` so the GitHub App's client ID
+    can be used directly (https://github.com/ansible-collections/community.general/issues/12802,
+    https://github.com/ansible-collections/community.general/pull/12804).
