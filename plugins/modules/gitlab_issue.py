@@ -87,8 +87,9 @@ options:
   state_filter:
     description:
       - Filter specifying state of issues while searching.
+      - The value V(all) has been added in community.general 13.5.0.
     type: str
-    choices: ["opened", "closed"]
+    choices: ["opened", "closed", "all"]
     default: opened
   title:
     description:
@@ -301,7 +302,7 @@ def main():
         milestone_group_id=dict(type="str"),
         project=dict(type="str", required=True),
         state=dict(type="str", default="present", choices=["absent", "present"]),
-        state_filter=dict(type="str", default="opened", choices=["opened", "closed"]),
+        state_filter=dict(type="str", default="opened", choices=["opened", "closed", "all"]),
         title=dict(type="str", required=True),
     )
 
