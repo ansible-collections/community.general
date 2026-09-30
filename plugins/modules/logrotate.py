@@ -818,6 +818,13 @@ class LogrotateConfig:
                 self.module.fail_json(msg=f"Cannot change enabled state: target path '{new_path}' already exists")
 
             self.result["changed"] = True
+            if self.module._diff:
+                self.result["diff"] = {
+                    "before_header": str(old_path),
+                    "after_header": str(new_path),
+                    "before": existing_content or "",
+                    "after": existing_content or "",
+                }
             if not self.module.check_mode:
                 try:
                     self.module.atomic_move(old_path, new_path, unsafe_writes=False)
@@ -840,6 +847,14 @@ class LogrotateConfig:
         self.result["config_file"] = self.get_config_path(target_enabled)
 
         needs_update = existing_content is None or existing_content != new_content or target_enabled != current_enabled
+
+        if needs_update and self.module._diff:
+            self.result["diff"] = {
+                "before_header": str(self.get_config_path(current_enabled)) if existing_content is not None else "(new file)",
+                "after_header": str(self.get_config_path(target_enabled)),
+                "before": existing_content if existing_content is not None else "",
+                "after": new_content,
+            }
 
         if needs_update:
             if not self.module.check_mode:

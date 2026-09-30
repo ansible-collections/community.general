@@ -47,6 +47,7 @@ class TestLogrotateConfig(unittest.TestCase):
         self.mock_module.fail_json = Mock(side_effect=Exception("fail_json called"))
         self.mock_module.exit_json = Mock()
         self.mock_module.check_mode = False
+        self.mock_module._diff = False
         self.mock_module.get_bin_path = Mock(return_value="/usr/sbin/logrotate")
         self.mock_module.atomic_move = Mock()
         self.mock_module.warn = Mock()
@@ -945,3 +946,155 @@ class TestLogrotateConfig(unittest.TestCase):
                     self.mock_module.run_command.assert_called_once()
                     call_args = self.mock_module.run_command.call_args[0][0]
                     self.assertEqual(call_args[0], test_logrotate_path)
+
+    def test_diff_mode_new_file(self):
+        """Test that diff is emitted when creating a new config file with _diff=True."""
+        from ansible_collections.community.general.plugins.modules import logrotate
+
+        self._setup_module_params()
+        self.mock_module._diff = True
+        self.mock_module.check_mode = True
+        config_path = os.path.join(self.config_dir, "test")
+
+        def exists_side_effect(path):
+            if path == self.config_dir:
+                return True
+            elif path == config_path:
+                return False
+            return False
+
+        with patch("os.path.exists", side_effect=exists_side_effect):
+            logrotate_bin = self.mock_module.get_bin_path.return_value
+            config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+            result = config.apply()
+
+        self.assertTrue(result["changed"])
+        self.assertIn("diff", result)
+        self.assertEqual(result["diff"]["before"], "")
+        self.assertEqual(result["diff"]["before_header"], "(new file)")
+        self.assertEqual(result["diff"]["after_header"], config_path)
+        self.assertIn("/var/log/test/*.log", result["diff"]["after"])
+
+    def test_diff_mode_update_existing(self):
+        """Test that diff shows before/after when updating an existing config with _diff=True."""
+        from ansible_collections.community.general.plugins.modules import logrotate
+
+        self._setup_module_params(rotate_count=14)
+        self.mock_module._diff = True
+        self.mock_module.check_mode = True
+        config_path = os.path.join(self.config_dir, "test")
+        existing_content = "/var/log/test/*.log {\n    daily\n    rotate 7\n}\n"
+
+        def exists_side_effect(path):
+            if path == self.config_dir:
+                return True
+            elif path == config_path:
+                return True
+            return False
+
+        with patch("os.path.exists", side_effect=exists_side_effect):
+            with patch("builtins.open", mock_open(read_data=existing_content)):
+                logrotate_bin = self.mock_module.get_bin_path.return_value
+                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                result = config.apply()
+
+        self.assertTrue(result["changed"])
+        self.assertIn("diff", result)
+        self.assertEqual(result["diff"]["before"], existing_content)
+        self.assertEqual(result["diff"]["before_header"], config_path)
+        self.assertEqual(result["diff"]["after_header"], config_path)
+        self.assertIn("rotate 14", result["diff"]["after"])
+
+    def test_diff_mode_no_change(self):
+        """Test that diff is absent when the config is already up to date."""
+        from ansible_collections.community.general.plugins.modules import logrotate
+
+        self._setup_module_params(rotate_count=7, compress=True, rotation_period="daily",
+                                  missing_ok=True, not_if_empty=True)
+        self.mock_module._diff = True
+        config_path = os.path.join(self.config_dir, "test")
+
+        logrotate_bin = self.mock_module.get_bin_path.return_value
+        config_obj = None
+
+        def exists_side_effect(path):
+            if path == self.config_dir:
+                return True
+            elif path == config_path:
+                return True
+            return False
+
+        with patch("os.path.exists", side_effect=exists_side_effect):
+            with patch("builtins.open", mock_open()):
+                with patch("os.chmod"):
+                    config_obj = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                    generated = config_obj.generate_config_content()
+
+        self.mock_module.params = dict(self.mock_module.params)
+
+        with patch("os.path.exists", side_effect=exists_side_effect):
+            with patch("builtins.open", mock_open(read_data=generated)):
+                config_obj2 = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                result = config_obj2.apply()
+
+        self.assertFalse(result["changed"])
+        self.assertNotIn("diff", result)
+
+    def test_diff_mode_enable_disable(self):
+        """Test that diff shows path rename when enabling/disabling with _diff=True."""
+        from ansible_collections.community.general.plugins.modules import logrotate
+
+        self._setup_module_params(enabled=False, paths=None)
+        self.mock_module._diff = True
+        self.mock_module.check_mode = True
+        config_path = os.path.join(self.config_dir, "test")
+        disabled_path = config_path + ".disabled"
+        existing_content = "/var/log/test/*.log {\n    daily\n    rotate 7\n}\n"
+
+        def exists_side_effect(path):
+            if path == self.config_dir:
+                return True
+            elif path == config_path:
+                return True
+            elif path == disabled_path:
+                return False
+            return False
+
+        with patch("os.path.exists", side_effect=exists_side_effect):
+            with patch("builtins.open", mock_open(read_data=existing_content)):
+                logrotate_bin = self.mock_module.get_bin_path.return_value
+                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                result = config.apply()
+
+        self.assertTrue(result["changed"])
+        self.assertIn("diff", result)
+        self.assertEqual(result["diff"]["before_header"], config_path)
+        self.assertEqual(result["diff"]["after_header"], disabled_path)
+        self.assertEqual(result["diff"]["before"], existing_content)
+        self.assertEqual(result["diff"]["after"], existing_content)
+
+    def test_diff_mode_false_no_diff_key(self):
+        """Test that diff key is absent when _diff=False even if content changes."""
+        from ansible_collections.community.general.plugins.modules import logrotate
+
+        self._setup_module_params(rotate_count=14)
+        self.mock_module._diff = False
+        self.mock_module.check_mode = True
+        config_path = os.path.join(self.config_dir, "test")
+        existing_content = "/var/log/test/*.log {\n    daily\n    rotate 7\n}\n"
+
+        def exists_side_effect(path):
+            if path == self.config_dir:
+                return True
+            elif path == config_path:
+                return True
+            return False
+
+        with patch("os.path.exists", side_effect=exists_side_effect):
+            with patch("builtins.open", mock_open(read_data=existing_content)):
+                logrotate_bin = self.mock_module.get_bin_path.return_value
+                config = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
+                result = config.apply()
+
+        self.assertTrue(result["changed"])
+        self.assertNotIn("diff", result)
