@@ -1,0 +1,337 @@
+---
+# Copyright (c) 2026, Nicholas Brodersen <nicholasbrodersen01@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Check support for restoring user and role
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts.python.executable }}"
+      - -c
+      - |
+        import selinux
+        print(int(hasattr(selinux, "SELINUX_RESTORECON_SET_USER_ROLE")))
+  register: user_role_support
+  changed_when: false
+  check_mode: false
+
+- name: Test serestorecon
+  vars:
+    test_root: "{{ remote_tmp_dir }}/serestorecon"
+    included_dir: "{{ test_root }}/included"
+    test_context_target: "{{ test_root }}(/.*)?"
+    included_file: "{{ included_dir }}/file1"
+    excluded_dir: "{{ test_root }}/excluded"
+    excluded_file: "{{ excluded_dir }}/file2"
+
+  block:
+    - name: Create test directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ test_root }}"
+        - "{{ included_dir }}"
+        - "{{ excluded_dir }}"
+
+    - name: Create test files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: touch
+        mode: "0644"
+      loop:
+        - "{{ included_file }}"
+        - "{{ excluded_file }}"
+
+    - name: Define test SELinux file context
+      community.general.sefcontext:
+        target: "{{ test_context_target }}"
+        setype: tmp_t
+        state: present
+
+    - name: Restore initial policy-defined contexts
+      ansible.builtin.command:
+        argv:
+          - restorecon
+          - -RF
+          - "{{ test_root }}"
+      changed_when: false
+
+    - name: Give the included file an incorrect SELinux type
+      ansible.builtin.command:
+        argv:
+          - chcon
+          - -t
+          - var_t
+          - "{{ included_file }}"
+      changed_when: true
+
+    - name: Restore a single file
+      community.general.serestorecon:
+        path: "{{ included_file }}"
+      register: single_restore
+
+    - name: Verify single file result
+      ansible.builtin.assert:
+        that:
+          - single_restore is changed
+          - single_restore.changed_paths | length == 1
+          - single_restore.changed_paths[0].path == included_file
+          - single_restore.changed_paths[0].previous.split(':')[2] == 'var_t'
+          - single_restore.changed_paths[0].restored.split(':')[2] != 'var_t'
+
+    - name: Read restored file context
+      ansible.builtin.command:
+        argv:
+          - stat
+          - -c
+          - "%C"
+          - "{{ included_file }}"
+      register: single_context
+      changed_when: false
+
+    - name: Verify context was actually restored
+      ansible.builtin.assert:
+        that:
+          - single_context.stdout == single_restore.changed_paths[0].restored
+
+    - name: Restore the same file again
+      community.general.serestorecon:
+        path: "{{ included_file }}"
+      register: idempotent_restore
+
+    - name: Verify idempotence
+      ansible.builtin.assert:
+        that:
+          - idempotent_restore is not changed
+          - idempotent_restore.changed_paths == []
+
+    - name: Give the included file an incorrect type again
+      ansible.builtin.command:
+        argv:
+          - chcon
+          - -t
+          - var_t
+          - "{{ included_file }}"
+      changed_when: true
+
+    - name: Check restoration with diff mode
+      community.general.serestorecon:
+        path: "{{ included_file }}"
+      check_mode: true
+      diff: true
+      register: check_restore
+
+    - name: Verify check and diff result
+      ansible.builtin.assert:
+        that:
+          - check_restore is changed
+          - check_restore.changed_paths | length == 1
+          - check_restore.diff.before.file_contexts | length == 1
+          - check_restore.diff.after.file_contexts | length == 1
+          - check_restore.diff.before.file_contexts[0].path == included_file
+          - check_restore.diff.after.file_contexts[0].path == included_file
+          - check_restore.diff.before.file_contexts[0].context.split(':')[2] == 'var_t'
+          - check_restore.diff.after.file_contexts[0].context.split(':')[2] != 'var_t'
+
+    - name: Read context after check mode
+      ansible.builtin.command:
+        argv:
+          - stat
+          - -c
+          - "%C"
+          - "{{ included_file }}"
+      register: check_context
+      changed_when: false
+
+    - name: Verify check mode did not modify the file
+      ansible.builtin.assert:
+        that:
+          - check_context.stdout.split(':')[2] == 'var_t'
+
+    - name: Restore file after check mode test
+      community.general.serestorecon:
+        path: "{{ included_file }}"
+
+    - name: Restore tree to known state
+      ansible.builtin.command:
+        argv:
+          - restorecon
+          - -RF
+          - "{{ test_root }}"
+      changed_when: false
+
+    - name: Give entire tree an incorrect SELinux type
+      ansible.builtin.command:
+        argv:
+          - chcon
+          - -R
+          - -t
+          - var_t
+          - "{{ test_root }}"
+      changed_when: true
+
+    - name: Restore recursively while excluding a directory
+      community.general.serestorecon:
+        path: "{{ test_root }}"
+        recurse: true
+        exclude_paths:
+          - "{{ excluded_dir }}"
+      register: recursive_restore
+
+    - name: Verify recursive result
+      ansible.builtin.assert:
+        that:
+          - recursive_restore is changed
+          - test_root in (recursive_restore.changed_paths | map(attribute='path') | list)
+          - included_dir in (recursive_restore.changed_paths | map(attribute='path') | list)
+          - included_file in (recursive_restore.changed_paths | map(attribute='path') | list)
+          - excluded_dir not in (recursive_restore.changed_paths | map(attribute='path') | list)
+          - excluded_file not in (recursive_restore.changed_paths | map(attribute='path') | list)
+
+    - name: Read included file context
+      ansible.builtin.command:
+        argv:
+          - stat
+          - -c
+          - "%C"
+          - "{{ included_file }}"
+      register: included_context
+      changed_when: false
+
+    - name: Read excluded file context
+      ansible.builtin.command:
+        argv:
+          - stat
+          - -c
+          - "%C"
+          - "{{ excluded_file }}"
+      register: excluded_context
+      changed_when: false
+
+    - name: Verify exclusion behavior
+      ansible.builtin.assert:
+        that:
+          - included_context.stdout.split(':')[2] != 'var_t'
+          - excluded_context.stdout.split(':')[2] == 'var_t'
+
+    - name: Restore the full tree
+      community.general.serestorecon:
+        path: "{{ test_root }}"
+        recurse: true
+      register: full_recursive_restore
+
+    - name: Verify previously excluded paths were restored
+      ansible.builtin.assert:
+        that:
+          - full_recursive_restore is changed
+          - excluded_dir in (full_recursive_restore.changed_paths | map(attribute='path') | list)
+          - excluded_file in (full_recursive_restore.changed_paths | map(attribute='path') | list)
+
+    - name: Restore the full tree again
+      community.general.serestorecon:
+        path: "{{ test_root }}"
+        recurse: true
+      register: recursive_idempotent
+
+    - name: Verify recursive idempotence
+      ansible.builtin.assert:
+        that:
+          - recursive_idempotent is not changed
+          - recursive_idempotent.changed_paths == []
+
+    - name: Test user_role when supported
+      when: user_role_support.stdout == "1"
+      block:
+        - name: Give file a different user, type, and range
+          ansible.builtin.command:
+            argv:
+              - chcon
+              - -u
+              - unconfined_u
+              - -t
+              - var_t
+              - -l
+              - s0:c0.c3
+              - "{{ included_file }}"
+          changed_when: true
+
+        - name: Restore user, role, and type
+          community.general.serestorecon:
+            path: "{{ included_file }}"
+            context: user_role
+          register: user_role_restore
+
+        - name: Read context after user_role restoration
+          ansible.builtin.command:
+            argv:
+              - stat
+              - -c
+              - "%C"
+              - "{{ included_file }}"
+          register: user_role_context
+          changed_when: false
+
+        - name: Verify user_role restores the user and type while preserving the range
+          ansible.builtin.assert:
+            that:
+              - user_role_restore is changed
+              - user_role_restore.changed_paths | length == 1
+              - user_role_restore.changed_paths[0].previous == 'unconfined_u:object_r:var_t:s0:c0.c3'
+              - user_role_restore.changed_paths[0].restored == 'system_u:object_r:tmp_t:s0:c0.c3'
+              - user_role_context.stdout == user_role_restore.changed_paths[0].restored
+
+    - name: Test user_role when unsupported
+      when: user_role_support.stdout == "0"
+      block:
+        - name: Request unsupported user_role restoration
+          community.general.serestorecon:
+            path: "{{ included_file }}"
+            context: user_role
+          register: unsupported_user_role
+          ignore_errors: true
+
+        - name: Verify the unsupported option fails without changes
+          ansible.builtin.assert:
+            that:
+              - unsupported_user_role is failed
+              - unsupported_user_role is not changed
+
+    - name: Give file an incorrect type for full context test
+      ansible.builtin.command:
+        argv:
+          - chcon
+          - -t
+          - var_t
+          - "{{ included_file }}"
+      changed_when: true
+
+    - name: Restore complete context
+      community.general.serestorecon:
+        path: "{{ included_file }}"
+        context: full
+      register: full_context_restore
+
+    - name: Read full restored context
+      ansible.builtin.command:
+        argv:
+          - stat
+          - -c
+          - "%C"
+          - "{{ included_file }}"
+      register: full_context
+      changed_when: false
+
+    - name: Verify complete context restoration
+      ansible.builtin.assert:
+        that:
+          - full_context_restore is changed
+          - full_context_restore.changed_paths | length == 1
+          - full_context.stdout == full_context_restore.changed_paths[0].restored
+          - full_context.stdout == 'system_u:object_r:tmp_t:s0'
+  always:
+    - name: Remove test SELinux file context
+      community.general.sefcontext:
+        target: "{{ test_context_target }}"
+        state: absent

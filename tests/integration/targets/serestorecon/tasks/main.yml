@@ -1,0 +1,38 @@
+---
+# Copyright (c) 2026, Nicholas Brodersen <nicholasbrodersen01@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Run serestorecon integration tests on supported distributions
+  when: ansible_facts.os_family in ["Debian", "RedHat", "Suse"]
+  block:
+    - ansible.builtin.meta: end_play
+      # The module needs the system Python, which is no longer supported
+      # on RHEL 9 for ansible-core 2.23+.
+      when: >-
+        ansible_facts.distribution == 'RedHat' and
+        ansible_facts.distribution_major_version|int < 10 and
+        ansible_version.full is version("2.23", ">=")
+
+    - name: Install SELinux test requirements
+      ansible.builtin.package:
+        name:
+          - coreutils
+          - policycoreutils
+          - policycoreutils-python-utils
+        state: present
+
+    - name: Refresh SELinux facts after installing requirements
+      ansible.builtin.setup:
+        gather_subset:
+          - "!all"
+          - "!min"
+          - selinux
+
+    - name: Run serestorecon tests
+      ansible.builtin.include_tasks:
+        file: serestorecon.yml
+      when:
+        - ansible_facts.selinux is defined
+        - ansible_facts.selinux is mapping
+        - ansible_facts.selinux.status == "enabled"

@@ -1267,6 +1267,8 @@ files:
     maintainers: makaimc
   $modules/seport.py:
     maintainers: dankeder
+  $modules/serestorecon.py:
+    maintainers: NicholasBrodersen
   $modules/serverless.py:
     ignore: ryansb
   $modules/shutdown.py:
