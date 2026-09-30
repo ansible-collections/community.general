@@ -1,2 +1,2 @@
 bugfixes:
-  - ip_netns - report no change in check mode when the requested namespace already exists (https://github.com/ansible-collections/community.general/issues/12839, https://github.com/ansible-collections/community.general/pull/12842).
+  - ip_netns - report no change in check mode for ``state=present`` when the requested namespace already exists (https://github.com/ansible-collections/community.general/issues/12839, https://github.com/ansible-collections/community.general/pull/12842).
