@@ -125,3 +125,27 @@ class TestLookupModule(unittest.TestCase):
                     [], app_id="app_id", installation_id="installation_id", private_key="foo_bar", token_expiry=600
                 ),
             )
+
+
+def test_get_token_with_client_id_alias(mocker):
+    pyjwt = types.ModuleType("jwt")
+    encode_mock = MagicMock(return_value=ENCODE_RESULT)
+    pyjwt.encode = encode_mock
+    module = "ansible_collections.community.general.plugins.lookup.github_app_access_token"
+    mocker.patch.dict(sys.modules, {"jwt": pyjwt})
+    mocker.patch.multiple(
+        module,
+        open=mock_open(read_data="foo_bar"),
+        open_url=MagicMock(return_value=MockResponse()),
+        HAS_JWT=True,
+        HAS_CRYPTOGRAPHY=True,
+        serialization=serialization(),
+    )
+
+    lookup = lookup_loader.get("community.general.github_app_access_token")
+    result = lookup.run(
+        [], key_path="key", client_id="Iv1.a1b2c3d4e5f6g7h8", installation_id="installation_id", token_expiry=600
+    )
+
+    assert result == [MockResponse.response_token]
+    assert encode_mock.call_args.args[0]["iss"] == "Iv1.a1b2c3d4e5f6g7h8"
