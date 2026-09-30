@@ -810,7 +810,7 @@ class LogrotateConfig:
 
         if only_changing_enabled:
             old_path = self.get_config_path(not target_enabled)
-            new_path = self.get_config_path(target_enabled)
+            new_path = self.get_config_path(bool(target_enabled))
 
             if not os.path.exists(old_path):
                 self.module.fail_json(msg=f"Cannot change enabled state: config file '{old_path}' not found")
@@ -844,14 +844,19 @@ class LogrotateConfig:
 
         new_content = self.generate_config_content()
         self.result["config_content"] = new_content
-        self.result["config_file"] = self.get_config_path(target_enabled)
+        self.result["config_file"] = self.get_config_path(bool(target_enabled))
 
         needs_update = existing_content is None or existing_content != new_content or target_enabled != current_enabled
 
         if needs_update and self.module._diff:
+            before_header = (
+                str(self.get_config_path(bool(current_enabled)))
+                if existing_content is not None
+                else "(new file)"
+            )
             self.result["diff"] = {
-                "before_header": str(self.get_config_path(current_enabled)) if existing_content is not None else "(new file)",
-                "after_header": str(self.get_config_path(target_enabled)),
+                "before_header": before_header,
+                "after_header": str(self.get_config_path(bool(target_enabled))),
                 "before": existing_content if existing_content is not None else "",
                 "after": new_content,
             }
