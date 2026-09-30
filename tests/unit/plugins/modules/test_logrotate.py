@@ -1006,16 +1006,19 @@ class TestLogrotateConfig(unittest.TestCase):
         self.assertIn("rotate 14", result["diff"]["after"])
 
     def test_diff_mode_no_change(self):
-        """Test that diff is absent when the config is already up to date."""
+        """Test that diff key is absent when the config is already up to date."""
         from ansible_collections.community.general.plugins.modules import logrotate
 
-        self._setup_module_params(rotate_count=7, compress=True, rotation_period="daily",
-                                  missing_ok=True, not_if_empty=True)
+        self._setup_module_params(
+            rotate_count=7,
+            compress=True,
+            rotation_period="daily",
+            missing_ok=True,
+            not_if_empty=True,
+        )
         self.mock_module._diff = True
         config_path = os.path.join(self.config_dir, "test")
-
         logrotate_bin = self.mock_module.get_bin_path.return_value
-        config_obj = None
 
         def exists_side_effect(path):
             if path == self.config_dir:
@@ -1029,8 +1032,6 @@ class TestLogrotateConfig(unittest.TestCase):
                 with patch("os.chmod"):
                     config_obj = logrotate.LogrotateConfig(self.mock_module, logrotate_bin)
                     generated = config_obj.generate_config_content()
-
-        self.mock_module.params = dict(self.mock_module.params)
 
         with patch("os.path.exists", side_effect=exists_side_effect):
             with patch("builtins.open", mock_open(read_data=generated)):

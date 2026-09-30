@@ -849,11 +849,10 @@ class LogrotateConfig:
         needs_update = existing_content is None or existing_content != new_content or target_enabled != current_enabled
 
         if needs_update and self.module._diff:
-            before_header = (
-                str(self.get_config_path(bool(current_enabled)))
-                if existing_content is not None
-                else "(new file)"
-            )
+            if existing_content is not None:
+                before_header = str(self.get_config_path(bool(current_enabled)))
+            else:
+                before_header = "(new file)"
             self.result["diff"] = {
                 "before_header": before_header,
                 "after_header": str(self.get_config_path(bool(target_enabled))),
