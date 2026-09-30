@@ -1,0 +1,2 @@
+minor_changes:
+  - logrotate - add diff mode support, showing before/after content of the configuration file when running with ``--diff`` (https://github.com/ansible-collections/community.general/issues/12845, https://github.com/ansible-collections/community.general/pull/12846).
