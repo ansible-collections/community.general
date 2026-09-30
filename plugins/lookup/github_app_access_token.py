@@ -23,9 +23,13 @@ options:
     type: path
   app_id:
     description:
-      - Your GitHub App ID, you can find this in the Settings page.
+      - Your GitHub App's client ID or GitHub App ID. You can find these in the Settings page.
+      - GitHub recommends using the client ID instead of the numeric
+        app ID (see U(https://github.blog/changelog/2024-08-23-client-ids-are-now-included-in-app-api-responses/)).
+      - The O(client_id) alias has been added in community.general 13.5.0.
     required: true
     type: str
+    aliases: [client_id]
   installation_id:
     description:
       - The installation ID that contains the git repository you would like access to.
@@ -64,6 +68,16 @@ EXAMPLES = r"""
     github_token: >-
       {{ lookup('community.general.github_app_access_token', key_path='/home/to_your/key',
                 app_id='123456', installation_id='64209') }}
+
+- name: Get access token using the GitHub App's client ID instead of its numeric app ID
+  ansible.builtin.git:
+    repo: >-
+      https://x-access-token:{{ github_token }}@github.com/hidden_user/super-secret-repo.git
+    dest: /srv/checkout
+  vars:
+    github_token: >-
+      {{ lookup('community.general.github_app_access_token', key_path='/home/to_your/key',
+                client_id='Iv1.a1b2c3d4e5f6g7h8', installation_id='64209') }}
 """
 
 RETURN = r"""
