@@ -17,6 +17,10 @@
   ansible.builtin.command: "service netif cloneup"
   changed_when: false
 
+- name: Load pf kernel module
+  ansible.builtin.command: "kldload -n pf"
+  changed_when: false
+
 - name: Add nat rule for cloned interfaces
   ansible.builtin.copy:
     dest: /etc/pf.conf
