@@ -4,12 +4,18 @@
 
 from __future__ import annotations
 
+import http.client
+
 import pytest
 from ansible.inventory.data import InventoryData
 from ansible.parsing.dataloader import DataLoader
 from ansible.plugins.loader import inventory_loader
 
-from ansible_collections.community.general.plugins.inventory.cobbler import InventoryModule
+from ansible_collections.community.general.plugins.inventory.cobbler import (
+    InventoryModule,
+    TimeoutSafeTransport,
+    TimeoutTransport,
+)
 
 
 @pytest.fixture(scope="module")
@@ -89,3 +95,39 @@ def test_verify_file(tmp_path, inventory):
 
 def test_verify_file_bad_config(inventory):
     assert inventory.verify_file("foobar.cobbler.yml") is False
+
+
+def _server_call(mocker, url, connection_timeout):
+    """Run parse() and return the arguments the XML-RPC server proxy was created with."""
+    options = {"url": url, "connection_timeout": connection_timeout, "cache_plugin": "memory"}
+    plugin = InventoryModule()
+    # Ansible populates every declared option, so an unset connection_timeout is present as None.
+    plugin._options = options
+    mocker.patch.object(plugin, "_read_config_data")
+    mocker.patch.object(plugin, "get_option", side_effect=options.get)
+    mocker.patch.object(plugin, "_get_profiles", return_value=[])
+    mocker.patch.object(plugin, "_get_systems", return_value=[])
+    server = mocker.patch("ansible_collections.community.general.plugins.inventory.cobbler.xmlrpc_client.Server")
+    plugin.parse(InventoryData(), None, "dummy.cobbler.yml")
+    return server.call_args
+
+
+@pytest.mark.parametrize(
+    "url, transport_cls, connection_cls, port",
+    [
+        ("http://cobbler/cobbler_api", TimeoutTransport, http.client.HTTPConnection, 80),
+        ("https://cobbler/cobbler_api", TimeoutSafeTransport, http.client.HTTPSConnection, 443),
+        ("HTTPS://cobbler/cobbler_api", TimeoutSafeTransport, http.client.HTTPSConnection, 443),
+    ],
+)
+def test_parse_connection_timeout_transport(mocker, url, transport_cls, connection_cls, port):
+    transport = _server_call(mocker, url, 30).kwargs["transport"]
+    assert type(transport) is transport_cls
+    conn = transport.make_connection("cobbler")
+    assert type(conn) is connection_cls
+    assert conn.port == port
+    assert conn.timeout == 30
+
+
+def test_parse_without_connection_timeout_uses_default_transport(mocker):
+    assert "transport" not in _server_call(mocker, "http://cobbler/cobbler_api", None).kwargs
