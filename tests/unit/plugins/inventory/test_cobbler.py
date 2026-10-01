@@ -55,6 +55,13 @@ def test_parse_without_cache(tmp_path, server):
     assert "cobbler_web" in inventory.groups
 
 
+@pytest.mark.parametrize("method", ["get_profiles", "get_systems"])
+def test_parse_without_cache_connection_error(tmp_path, server, method):
+    getattr(server, method).side_effect = ConnectionRefusedError(111, "Connection refused")
+    with pytest.raises(ConnectionRefusedError):
+        _parse(tmp_path, "plugin: community.general.cobbler\nurl: http://cobbler/cobbler_api\n")
+
+
 def test_parse_with_cache(tmp_path, server):
     config = (
         "plugin: community.general.cobbler\n"

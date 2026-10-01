@@ -229,6 +229,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                         else:
                             data[i] = self.cobbler.get_system_as_rendered(host["name"])
             except (socket.gaierror, OSError, xmlrpc_client.ProtocolError):
+                if not self.use_cache:
+                    raise
                 self._reload_cache()
             else:
                 return self._store_result("systems", data)
