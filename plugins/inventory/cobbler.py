@@ -204,6 +204,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 else:
                     data = self.cobbler.get_profiles()
             except (socket.gaierror, OSError, xmlrpc_client.ProtocolError):
+                if not self.use_cache:
+                    raise
                 self._reload_cache()
             else:
                 return self._store_result("profiles", data)
