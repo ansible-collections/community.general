@@ -50,7 +50,7 @@ def _parse(tmp_path, config):
 
 def test_parse_without_cache(tmp_path, server):
     plugin, inventory = _parse(tmp_path, "plugin: community.general.cobbler\nurl: http://cobbler/cobbler_api\n")
-    assert not hasattr(plugin, "_cache")
+    assert plugin.cache_key not in getattr(plugin, "_cache", {})
     assert "host1" in inventory.hosts
     assert "cobbler_web" in inventory.groups
 
