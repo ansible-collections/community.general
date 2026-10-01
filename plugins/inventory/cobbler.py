@@ -265,6 +265,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         if self.get_option("user") is not None:
             self.token = self.cobbler.login(str(self.get_option("user")), str(self.get_option("password")))
 
+        self.load_cache_plugin()
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option("cache")
 
