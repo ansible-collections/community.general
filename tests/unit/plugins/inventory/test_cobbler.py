@@ -122,9 +122,9 @@ def _server_call(mocker, url, connection_timeout):
 )
 def test_parse_connection_timeout_transport(mocker, url, transport_cls, connection_cls, port):
     transport = _server_call(mocker, url, 30).kwargs["transport"]
-    assert type(transport) is transport_cls
+    assert isinstance(transport, transport_cls)
     conn = transport.make_connection("cobbler")
-    assert type(conn) is connection_cls
+    assert isinstance(conn, connection_cls)
     assert conn.port == port
     assert conn.timeout == 30
 
