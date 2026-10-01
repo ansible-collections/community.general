@@ -183,6 +183,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         if self.cache_key not in self._cache:
             self._cache[self.cache_key] = {}
 
+    def _store_result(self, key, data):
+        if self.get_option("cache"):
+            self._init_cache()
+            self._cache[self.cache_key][key] = data
+        return data
+
     def _reload_cache(self):
         if self.get_option("cache_fallback"):
             self.display.vvv("Cannot connect to server, loading cache\n")
@@ -200,8 +206,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             except (socket.gaierror, OSError, xmlrpc_client.ProtocolError):
                 self._reload_cache()
             else:
-                self._init_cache()
-                self._cache[self.cache_key]["profiles"] = data
+                return self._store_result("profiles", data)
 
         return self._cache[self.cache_key]["profiles"]
 
@@ -224,8 +229,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             except (socket.gaierror, OSError, xmlrpc_client.ProtocolError):
                 self._reload_cache()
             else:
-                self._init_cache()
-                self._cache[self.cache_key]["systems"] = data
+                return self._store_result("systems", data)
 
         return self._cache[self.cache_key]["systems"]
 
@@ -265,7 +269,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         if self.get_option("user") is not None:
             self.token = self.cobbler.login(str(self.get_option("user")), str(self.get_option("password")))
 
-        self.load_cache_plugin()
         self.cache_key = self.get_cache_key(path)
         self.use_cache = cache and self.get_option("cache")
 

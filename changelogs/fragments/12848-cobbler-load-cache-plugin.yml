@@ -1,2 +1,0 @@
-bugfixes:
-  - cobbler inventory plugin - fix a crash about a missing ``_cache`` attribute on every inventory run (https://github.com/ansible-collections/community.general/pull/12848).
