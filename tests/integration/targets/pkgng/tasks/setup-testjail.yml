@@ -70,7 +70,7 @@
 
 - name: Setup ezjail base
   when: not ezjail_base_jail.stat.exists
-  ansible.builtin.shell: "ezjail-admin install {{ pkgng_jail_log_redirect }}"
+  ansible.builtin.shell: "ezjail-admin install {{ pkgng_jail_log_redirect }}"  # noqa: command-instead-of-shell
   changed_when: false
 
 - name: Has testjail
