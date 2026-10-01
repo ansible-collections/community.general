@@ -184,7 +184,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             self._cache[self.cache_key] = {}
 
     def _store_result(self, key, data):
-        if self.get_option("cache"):
+        if self.use_cache:
             self._init_cache()
             self._cache[self.cache_key][key] = data
         return data
