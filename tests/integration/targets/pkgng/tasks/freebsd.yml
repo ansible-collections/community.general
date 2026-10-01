@@ -521,6 +521,10 @@
       ansible.builtin.include_tasks: setup-testjail.yml
 
     - name: Install package in jail as rootdir
+      # NOTE: on FreeBSD 14.4+, pkg cannot find /usr/share/keys/pkg/trusted under the rootdir,
+      #       likely because ezjail links usr/share to /basejail, which only resolves inside the jail
+      #       (see https://github.com/ansible-collections/community.general/issues/5795)
+      when: ansible_facts.distribution_version is version('14.4', '<')
       ansible.builtin.include_tasks: install_single_package.yml
       vars:
         pkgng_test_rootdir: /usr/jails/testjail
