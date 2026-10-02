@@ -166,7 +166,7 @@ class IPAClient:
         if "result" in resp:
             result = resp.get("result")
             failed = result.get("failed")
-            if failed:
+            if failed and failed != {"member": {"host": [], "hostgroup": []}}:
                 self._fail(f"response {method}", failed)
             if "result" in result:
                 result = result.get("result")
