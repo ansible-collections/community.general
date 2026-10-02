@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 #
-# Instructions for setting up a jail
-# https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/jails-ezjail.html
+# Set up a thick jail with the FreeBSD base system and jail(8)
+# https://docs.freebsd.org/en/books/handbook/jails/
 #
 - name: Setup cloned interfaces
   ansible.builtin.lineinfile:
@@ -34,54 +34,22 @@
     state: started
     enabled: true
 
-- name: Install ezjail
-  community.general.pkgng:
-    name: ezjail
-
-- name: Configure ezjail to use http
-  when: ansible_facts.distribution_version is version('11.01', '>')
-  ansible.builtin.lineinfile:
-    dest: /usr/local/etc/ezjail.conf
-    regexp: ^ezjail_ftphost
-    line: ezjail_ftphost=http://ftp.freebsd.org
-
-- name: Configure ezjail to use archive for old freebsd releases
-  when: ansible_facts.distribution_version is version('11.01', '<=')
-  ansible.builtin.lineinfile:
-    dest: /usr/local/etc/ezjail.conf
-    regexp: ^ezjail_ftphost
-    line: ezjail_ftphost=http://ftp-archive.freebsd.org
-
-- name: Start ezjail
-  ignore_errors: true
-  ansible.builtin.service:
-    name: ezjail
-    state: started
-    enabled: true
-
-- name: Redirect logs depending on verbosity
-  ansible.builtin.set_fact:
-    pkgng_jail_log_redirect: "2>&1 | tee -a /tmp/ezjail.log {{ '> /dev/null' if ansible_verbosity < 2 else '' }}"
-
-- name: Has ezjail
-  register: ezjail_base_jail
-  ansible.builtin.stat:
-    path: /usr/jails/basejail
-
-- name: Setup ezjail base
-  when: not ezjail_base_jail.stat.exists
-  ansible.builtin.shell: "ezjail-admin install {{ pkgng_jail_log_redirect }}"  # noqa: command-instead-of-shell
-  changed_when: false
-
-- name: Has testjail
-  register: ezjail_test_jail
-  ansible.builtin.stat:
+- name: Create testjail directory
+  ansible.builtin.file:
     path: /usr/jails/testjail
+    state: directory
+    mode: "0755"
 
-- name: Create testjail
-  when: not ezjail_test_jail.stat.exists
-  ansible.builtin.shell: "ezjail-admin create testjail 'lo1|127.0.1.1' {{ pkgng_jail_log_redirect }}"
-  changed_when: false
+- name: Download FreeBSD base system
+  ansible.builtin.get_url:
+    url: "https://download.freebsd.org/releases/{{ ansible_facts.architecture }}/{{ ansible_facts.distribution_version }}-RELEASE/base.txz"
+    dest: /usr/jails/base.txz
+    mode: "0644"
+
+- name: Extract FreeBSD base system into testjail
+  ansible.builtin.command:
+    cmd: tar -xf /usr/jails/base.txz -C /usr/jails/testjail
+    creates: /usr/jails/testjail/bin/sh
 
 - name: Configure testjail to use Cloudflare DNS
   ansible.builtin.lineinfile:
@@ -94,11 +62,13 @@
     - "1.0.0.1"
 
 - name: Is testjail running
-  ansible.builtin.shell: "jls | grep testjail"
+  ansible.builtin.command: "jls -j testjail"
   changed_when: false
   failed_when: false
   register: is_testjail_up
 
 - name: Start testjail
-  when: is_testjail_up.rc == 1
-  ansible.builtin.command: "ezjail-admin start testjail"
+  when: is_testjail_up.rc != 0
+  ansible.builtin.command: >-
+    jail -c name=testjail path=/usr/jails/testjail host.hostname=testjail
+    ip4.addr=lo1|127.0.1.1 mount.devfs persist
