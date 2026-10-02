@@ -546,6 +546,11 @@
       changed_when: false
       ansible.builtin.command: "jail -r testjail"
 
+    - name: Unmount devfs in testjail
+      failed_when: false
+      changed_when: false
+      ansible.builtin.command: "umount /usr/jails/testjail/dev"
+
     - name: Clear immutable flags in testjail
       failed_when: false
       changed_when: false
