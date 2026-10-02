@@ -5,6 +5,9 @@
 from __future__ import annotations
 
 import pytest
+from ansible.inventory.data import InventoryData
+from ansible.parsing.dataloader import DataLoader
+from ansible.plugins.loader import inventory_loader
 
 from ansible_collections.community.general.plugins.inventory.cobbler import InventoryModule
 
@@ -12,6 +15,70 @@ from ansible_collections.community.general.plugins.inventory.cobbler import Inve
 @pytest.fixture(scope="module")
 def inventory():
     return InventoryModule()
+
+
+PROFILES = [{"name": "web", "parent": None}]
+SYSTEMS = [
+    {
+        "name": "host1",
+        "hostname": "host1",
+        "profile": "web",
+        "interfaces": {},
+        "mgmt_classes": [],
+        "owners": [],
+        "status": "",
+    }
+]
+
+
+@pytest.fixture
+def server(mocker):
+    server = mocker.patch("ansible_collections.community.general.plugins.inventory.cobbler.xmlrpc_client.Server")
+    server.return_value.get_profiles.return_value = PROFILES
+    server.return_value.get_systems.return_value = SYSTEMS
+    return server.return_value
+
+
+def _parse(tmp_path, config):
+    path = tmp_path / "test.cobbler.yml"
+    path.write_text(config)
+    plugin = inventory_loader.get("community.general.cobbler")
+    inventory = InventoryData()
+    plugin.parse(inventory, DataLoader(), str(path))
+    return plugin, inventory
+
+
+def test_parse_without_cache(tmp_path, server):
+    plugin, inventory = _parse(tmp_path, "plugin: community.general.cobbler\nurl: http://cobbler/cobbler_api\n")
+    assert plugin.cache_key not in getattr(plugin, "_cache", {})
+    assert "host1" in inventory.hosts
+    assert "cobbler_web" in inventory.groups
+
+
+@pytest.mark.parametrize("method", ["get_profiles", "get_systems"])
+def test_parse_without_cache_connection_error(tmp_path, server, method):
+    getattr(server, method).side_effect = ConnectionRefusedError(111, "Connection refused")
+    with pytest.raises(ConnectionRefusedError):
+        _parse(tmp_path, "plugin: community.general.cobbler\nurl: http://cobbler/cobbler_api\n")
+
+
+def test_parse_with_cache(tmp_path, server):
+    config = (
+        "plugin: community.general.cobbler\n"
+        "url: http://cobbler/cobbler_api\n"
+        "cache: true\n"
+        "cache_plugin: ansible.builtin.jsonfile\n"
+        f"cache_connection: {tmp_path / 'cache'}\n"
+    )
+    plugin, inventory = _parse(tmp_path, config)
+    plugin.update_cache_if_changed()
+    assert "host1" in inventory.hosts
+
+    server.reset_mock()
+    plugin, inventory = _parse(tmp_path, config)
+    server.get_profiles.assert_not_called()
+    server.get_systems.assert_not_called()
+    assert "host1" in inventory.hosts
 
 
 def test_verify_file(tmp_path, inventory):

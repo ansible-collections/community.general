@@ -183,6 +183,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         if self.cache_key not in self._cache:
             self._cache[self.cache_key] = {}
 
+    def _store_result(self, key, data):
+        if self.use_cache:
+            self._init_cache()
+            self._cache[self.cache_key][key] = data
+        return data
+
     def _reload_cache(self):
         if self.get_option("cache_fallback"):
             self.display.vvv("Cannot connect to server, loading cache\n")
@@ -198,10 +204,11 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 else:
                     data = self.cobbler.get_profiles()
             except (socket.gaierror, OSError, xmlrpc_client.ProtocolError):
+                if not self.use_cache:
+                    raise
                 self._reload_cache()
             else:
-                self._init_cache()
-                self._cache[self.cache_key]["profiles"] = data
+                return self._store_result("profiles", data)
 
         return self._cache[self.cache_key]["profiles"]
 
@@ -222,10 +229,11 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                         else:
                             data[i] = self.cobbler.get_system_as_rendered(host["name"])
             except (socket.gaierror, OSError, xmlrpc_client.ProtocolError):
+                if not self.use_cache:
+                    raise
                 self._reload_cache()
             else:
-                self._init_cache()
-                self._cache[self.cache_key]["systems"] = data
+                return self._store_result("systems", data)
 
         return self._cache[self.cache_key]["systems"]
 
