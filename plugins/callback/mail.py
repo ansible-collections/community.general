@@ -89,7 +89,7 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 
-from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values, mask_secrets
 
 
 class CallbackModule(CallbackBase):
@@ -214,7 +214,7 @@ class CallbackModule(CallbackBase):
         if self.itembody:
             body += self.itembody
         elif result._result.get("failed_when_result") is True:
-            fail_cond_list = "\n- ".join(mask_secrets(result._task.failed_when))
+            fail_cond_list = "\n- ".join(mask_secret_values(result._task.failed_when))
             fail_cond = self.indent(f"failed_when:\n- {fail_cond_list}")
             body += f"due to the following condition:\n\n{fail_cond}\n\n"
         elif result._result.get("msg"):

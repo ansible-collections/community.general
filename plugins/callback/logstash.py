@@ -215,7 +215,7 @@ class CallbackModule(CallbackBase):
         data["ansible_play_name"] = mask_secrets(self.play_name)
 
         if self.ls_format_version == "v2":
-            self.logger.info("START PLAY | %s", self.play_name, extra=data)
+            self.logger.info("START PLAY | %s", mask_secrets(self.play_name), extra=data)
         else:
             self.logger.info("ansible play", extra=data)
 
@@ -261,7 +261,7 @@ class CallbackModule(CallbackBase):
             if self.ls_format_version == "v2":
                 self.logger.info(
                     "TASK OK | %s | RESULT | %s",
-                    task_name,
+                    mask_secrets(task_name),
                     self._dump_results(result._result),
                     extra=data,
                 )
@@ -282,7 +282,7 @@ class CallbackModule(CallbackBase):
         data["ansible_result"] = self._dump_results(result._result)
 
         if self.ls_format_version == "v2":
-            self.logger.info("TASK SKIPPED | %s", task_name, extra=data)
+            self.logger.info("TASK SKIPPED | %s", mask_secrets(task_name), extra=data)
         else:
             self.logger.info("ansible skipped", extra=data)
 
@@ -296,7 +296,7 @@ class CallbackModule(CallbackBase):
         data["imported_file"] = mask_secrets(imported_file)
 
         if self.ls_format_version == "v2":
-            self.logger.info("IMPORT | %s", imported_file, extra=data)
+            self.logger.info("IMPORT | %s", mask_secrets(imported_file), extra=data)
         else:
             self.logger.info("ansible import", extra=data)
 
@@ -310,7 +310,7 @@ class CallbackModule(CallbackBase):
         data["imported_file"] = mask_secrets(missing_file)
 
         if self.ls_format_version == "v2":
-            self.logger.info("NOT IMPORTED | %s", missing_file, extra=data)
+            self.logger.info("NOT IMPORTED | %s", mask_secrets(missing_file), extra=data)
         else:
             self.logger.info("ansible import", extra=data)
 
@@ -336,7 +336,7 @@ class CallbackModule(CallbackBase):
         if self.ls_format_version == "v2":
             self.logger.error(
                 "TASK FAILED | %s | HOST | %s | RESULT | %s",
-                task_name,
+                mask_secrets(task_name),
                 self.hostname,
                 self._dump_results(result._result),
                 extra=data,
@@ -361,7 +361,7 @@ class CallbackModule(CallbackBase):
         if self.ls_format_version == "v2":
             self.logger.error(
                 "UNREACHABLE | %s | HOST | %s | RESULT | %s",
-                task_name,
+                mask_secrets(task_name),
                 self.hostname,
                 self._dump_results(result._result),
                 extra=data,
@@ -386,7 +386,7 @@ class CallbackModule(CallbackBase):
         if self.ls_format_version == "v2":
             self.logger.error(
                 "ASYNC FAILED | %s | HOST | %s | RESULT | %s",
-                task_name,
+                mask_secrets(task_name),
                 self.hostname,
                 self._dump_results(result._result),
                 extra=data,
