@@ -1,0 +1,2 @@
+bugfixes:
+  - cobbler inventory plugin - do not use TLS when connecting to ``http://`` URLs (https://github.com/ansible-collections/community.general/issues/11246, https://github.com/ansible-collections/community.general/pull/12847).
