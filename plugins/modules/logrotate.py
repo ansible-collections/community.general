@@ -856,7 +856,7 @@ class LogrotateConfig:
             self.result["diff"] = {
                 "before_header": before_header,
                 "after_header": self.get_config_path(target_enabled),
-                "before": existing_content if existing_content is not None else "",
+                "before": existing_content or "",
                 "after": new_content,
             }
 
