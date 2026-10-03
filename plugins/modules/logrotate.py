@@ -808,7 +808,7 @@ class LogrotateConfig:
             return self.result
 
         existing_content = self.read_existing_config()
-        current_enabled = self.result.get("enabled_state", True)
+        current_enabled = self.result["enabled_state"]
 
         target_enabled = self.params.get("enabled")
         if target_enabled is None:
