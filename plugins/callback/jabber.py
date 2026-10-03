@@ -52,6 +52,8 @@ except ImportError:
 
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
@@ -86,7 +88,7 @@ class CallbackModule(CallbackBase):
         client = xmpp.Client(self.serv, debug=[])
         client.connect(server=(self.serv, 5222))
         client.auth(jid.getNode(), self.j_pass, resource=jid.getResource())
-        message = xmpp.Message(self.j_to, msg)
+        message = xmpp.Message(self.j_to, mask_secrets(msg))
         message.setAttr("type", "chat")
         client.send(message)
         client.disconnect()
