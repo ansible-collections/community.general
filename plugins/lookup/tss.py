@@ -332,6 +332,7 @@ from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 try:
@@ -604,11 +605,14 @@ class LookupModule(LookupBase):
                 return [tss.get_secret_ids_by_folderid(term) for term in terms]
             raise AnsibleError("latest python-tss-sdk must be installed to use this plugin")
         return [
-            tss.get_secret(
-                term,
-                self.get_option("secret_path"),
-                self.get_option("fetch_attachments"),
-                self.get_option("file_download_path"),
+            # TODO: restrict marking to specific fields? Needs more domain knowledge.
+            mark_values_as_secrets(
+                tss.get_secret(
+                    term,
+                    self.get_option("secret_path"),
+                    self.get_option("fetch_attachments"),
+                    self.get_option("file_download_path"),
+                )
             )
             for term in terms
         ]

@@ -85,6 +85,7 @@ EXAMPLES = r"""
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 sdk_is_missing = False
@@ -139,7 +140,8 @@ class LookupModule(LookupBase):
                     raise AnsibleOptionsError(f"Invalid secret path: {term}")
 
                 display.vvv(f"DevOps Secrets Vault GET /secrets/{path}")
-                result.append(vault.get_secret_json(path))
+                # TODO: restrict marking to ["data"]["password"]? Needs more domain knowledge.
+                result.append(mark_values_as_secrets(vault.get_secret_json(path)))
             except SecretsVaultError as error:
                 raise AnsibleError(f"DevOps Secrets Vault lookup failure: {error.message}") from error
         return result
