@@ -45,6 +45,7 @@ options:
       - section: callback_nrdp
         key: token
     type: string
+    secret: true
   hostname:
     description: Hostname where the passive check is linked to.
     required: true
