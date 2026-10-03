@@ -87,10 +87,7 @@ class Namespace:
         """Run check mode"""
         changed = False
 
-        if self.state == "present" and self.exists():
-            changed = True
-
-        elif self.state == "absent" and self.exists():
+        if self.state == "absent" and self.exists():
             changed = True
         elif self.state == "present" and not self.exists():
             changed = True
