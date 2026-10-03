@@ -1,0 +1,4 @@
+bugfixes:
+  - opentelemetry callback plugin - fix ``KeyError`` when a meta task is skipped by its ``when`` condition
+    (https://github.com/ansible-collections/community.general/issues/12833,
+    https://github.com/ansible-collections/community.general/pull/12837).
