@@ -31,6 +31,9 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
 
+MIN_API_VERSION = "2.0"
+
+
 def _env_then_dns_fallback(*args, **kwargs) -> str:
     """Load value from environment or DNS in that order"""
     try:
@@ -133,11 +136,11 @@ class IPAClient:
 
         # TODO: We should probably handle this a little better.
         if method in ("ping", "config_show", "otpconfig_show"):
-            data["params"] = [[], {}]
+            data["params"] = [[], {"version": MIN_API_VERSION}]
         elif method in ("config_mod", "otpconfig_mod"):
-            data["params"] = [[], item]
+            data["params"] = [[], {**item, "version": MIN_API_VERSION}]
         else:
-            data["params"] = [[name], item]
+            data["params"] = [[name], {**item, "version": MIN_API_VERSION}]
 
         try:
             resp, info = fetch_url(
@@ -163,7 +166,7 @@ class IPAClient:
         if "result" in resp:
             result = resp.get("result")
             failed = result.get("failed")
-            if failed:
+            if failed and failed != {"member": {"host": [], "hostgroup": []}}:
                 self._fail(f"response {method}", failed)
             if "result" in result:
                 result = result.get("result")
