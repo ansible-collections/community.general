@@ -71,7 +71,8 @@ options:
   vdevs:
     description:
       - List of vdev definitions for the pool.
-      - Required when O(state=present).
+      - Required when O(state=present) and the pool does not exist.
+      - When the pool already exists and O(vdevs) is omitted, its vdev layout is left unchanged.
     type: list
     elements: dict
     suboptions:
@@ -131,6 +132,12 @@ EXAMPLES = r"""
     vdevs:
       - disks:
           - /dev/sda
+
+- name: Set a pool property on the existing pool "tank" without changing its vdevs
+  community.general.zpool:
+    name: tank
+    pool_properties:
+      autotrim: true
 
 - name: Destroy pool "tank"
   community.general.zpool:
@@ -537,7 +544,6 @@ def main():
             ),
         ),
         supports_check_mode=True,
-        required_if=[("state", "present", ["vdevs"])],
     )
 
     name = module.params.get("name")
@@ -556,7 +562,7 @@ def main():
             if isinstance(value, bool):
                 module.params[property_key][key] = "on" if value else "off"
 
-    if state != "absent":
+    if state != "absent" and vdevs is not None:
         for idx, vdev in enumerate(vdevs, start=1):
             disks = vdev.get("disks")
             if not isinstance(disks, list) or len(disks) == 0:
@@ -582,10 +588,12 @@ def main():
 
     if state == "present":
         if zpool.exists():
-            vdev_layout_diff = zpool.diff_layout()
-
-            add_vdev_diff = zpool.add_vdevs() or {}
-            remove_vdev_diff = zpool.remove_vdevs() or {}
+            if vdevs is None:
+                vdev_layout_diff = add_vdev_diff = remove_vdev_diff = {}
+            else:
+                vdev_layout_diff = zpool.diff_layout()
+                add_vdev_diff = zpool.add_vdevs() or {}
+                remove_vdev_diff = zpool.remove_vdevs() or {}
             pool_properties_diff = zpool.set_pool_properties_if_changed()
             filesystem_properties_diff = zpool.set_filesystem_properties_if_changed()
 
@@ -604,6 +612,8 @@ def main():
                         prepared += diff["prepared"] if not prepared else f"\n{diff['prepared']}"
                 result["diff"]["prepared"] = prepared
         else:
+            if vdevs is None:
+                module.fail_json(msg=f"vdevs is required to create the pool {name}")
             if module.check_mode:
                 result["diff"] = zpool.create()
             else:

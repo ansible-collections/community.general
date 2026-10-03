@@ -121,3 +121,18 @@
       ansible.builtin.assert:
         that:
           - "'no such pool' in raidz_disk_pool_check.stderr"
+
+- name: Test pool creation without vdevs
+  block:
+    - name: Try to create a pool without vdevs
+      community.general.zpool:
+        name: "{{ zpool_single_disk_pool_name }}"
+        state: present
+      register: no_vdevs_create
+      ignore_errors: true
+
+    - name: Assert that pool creation without vdevs fails
+      ansible.builtin.assert:
+        that:
+          - no_vdevs_create is failed
+          - "'vdevs is required' in no_vdevs_create.msg"
