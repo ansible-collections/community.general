@@ -140,7 +140,7 @@ def main():
         # If the return code is 1, it just means the option hasn't been set yet, which is fine.
         module.fail_json(rc=rc, msg=err, cmd=" ".join(args))
 
-    output_lines = out.strip("\0").split("\0") if out else []
+    output_lines = (out[:-1] if out.endswith("\0") else out).split("\0") if out else []
 
     if name:
         first_value = output_lines[0] if output_lines else ""
