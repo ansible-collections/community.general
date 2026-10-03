@@ -28,6 +28,11 @@ options:
     description:
       - Name or list of names of packages to install/remove.
       - With O(name=*), O(state=latest) operates, but O(state=present) and O(state=absent) are noops.
+      - A name ending in C(.pkg), C(.tzst), C(.txz), C(.tbz), C(.tgz), or C(.tar) is treated as the path of a local package
+        file, in which case the package is installed from that file. The actual package name is read from the file to check
+        and report the installation state. Local package files cannot be used with O(state=latest) or
+        O(state=absent).
+      - Support for local package files was added in community.general 13.5.0.
     required: true
     aliases: [pkg]
     type: list
@@ -131,6 +136,10 @@ EXAMPLES = r"""
     name: foo/bar
     state: latest
     use_globs: false
+
+- name: Install package from a local package file
+  community.general.pkgng:
+    name: /tmp/mypackage-1.2.pkg
 """
 
 
@@ -139,11 +148,32 @@ from collections import defaultdict
 
 from ansible.module_utils.basic import AnsibleModule
 
+# Same suffixes pkg itself uses to tell a package file apart from a package name
+PACKAGE_FILE_SUFFIXES = (".pkg", ".tzst", ".txz", ".tbz", ".tgz", ".tar")
+
+
+def is_package_file(name):
+    return name.endswith(PACKAGE_FILE_SUFFIXES)
+
+
+def fail_on_package_files(module, packages, state):
+    package_files = [package for package in packages if is_package_file(package)]
+    if package_files:
+        module.fail_json(msg=f"state={state} is not supported for local package files: {', '.join(package_files)}")
+
 
 def query_package(module, run_pkgng, name):
     rc, out, err = run_pkgng("info", "-e", name)
 
     return rc == 0
+
+
+def query_file_package_name(module, run_pkgng, file_path):
+    # Resolve the real package name from a local package file
+    rc, out, err = run_pkgng("query", "-F", file_path, "%n")
+    if rc != 0:
+        module.fail_json(msg=f"failed to obtain package name from file {file_path}: {err}")
+    return out.strip()
 
 
 def query_update(module, run_pkgng, name):
@@ -201,6 +231,8 @@ def upgrade_packages(module, run_pkgng):
 
 
 def remove_packages(module, run_pkgng, packages):
+    fail_on_package_files(module, packages, "absent")
+
     remove_c = 0
     stdout = ""
     stderr = ""
@@ -232,6 +264,16 @@ def install_packages(module, run_pkgng, packages, cached, state):
     stdout = ""
     stderr = ""
 
+    if state == "latest":
+        fail_on_package_files(module, packages, state)
+
+    # The package database cannot be queried by the path of a local package file,
+    # so resolve the real package name from the file and use it for all queries.
+    query_name = {
+        package: query_file_package_name(module, run_pkgng, package) if is_package_file(package) else package
+        for package in packages
+    }
+
     if not module.check_mode and not cached:
         rc, out, err = run_pkgng("update")
         stdout += out
@@ -240,11 +282,11 @@ def install_packages(module, run_pkgng, packages, cached, state):
             module.fail_json(msg=f"Could not update catalogue [{rc}]: {out} {err}", stdout=stdout, stderr=stderr)
 
     for package in packages:
-        already_installed = query_package(module, run_pkgng, package)
+        already_installed = query_package(module, run_pkgng, query_name[package])
         if already_installed and state == "present":
             continue
 
-        if already_installed and state == "latest" and not query_update(module, run_pkgng, package):
+        if already_installed and state == "latest" and not query_update(module, run_pkgng, query_name[package]):
             continue
 
         if already_installed:
@@ -270,9 +312,9 @@ def install_packages(module, run_pkgng, packages, cached, state):
         for package in package_list:
             verified = False
             if action == "install":
-                verified = query_package(module, run_pkgng, package)
+                verified = query_package(module, run_pkgng, query_name[package])
             elif action == "upgrade":
-                verified = not query_update(module, run_pkgng, package)
+                verified = not query_update(module, run_pkgng, query_name[package])
 
             if verified:
                 action_count[action] += 1
