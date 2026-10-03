@@ -1,0 +1,2 @@
+minor_changes:
+  - "logrotate - fix type hints (https://github.com/ansible-collections/community.general/pull/12866)."

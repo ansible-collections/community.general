@@ -467,8 +467,18 @@ backup_file:
 import os
 import re
 import tempfile
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
+
+
+class ResultDict(t.TypedDict):
+    changed: bool
+    config_file: str
+    config_content: str | None
+    enabled_state: bool
+    backup_file: t.NotRequired[str | None]
+    diff: t.NotRequired[t.Any | None]
 
 
 class LogrotateConfig:
@@ -478,7 +488,7 @@ class LogrotateConfig:
         self.module = module
         self.params = module.params
         self.logrotate_bin = logrotate_bin
-        self.result: dict[str, object] = {
+        self.result: ResultDict = {
             "changed": False,
             "config_file": "",
             "config_content": "",
@@ -770,7 +780,7 @@ class LogrotateConfig:
 
         return "\n".join(lines)
 
-    def apply(self) -> dict[str, object]:
+    def apply(self) -> ResultDict:
         """Apply logrotate configuration."""
         self.validate_parameters()
         state = self.params["state"]
@@ -798,7 +808,7 @@ class LogrotateConfig:
             return self.result
 
         existing_content = self.read_existing_config()
-        current_enabled = bool(self.result.get("enabled_state", True))
+        current_enabled = self.result.get("enabled_state", True)
 
         target_enabled = self.params.get("enabled")
         if target_enabled is None:
