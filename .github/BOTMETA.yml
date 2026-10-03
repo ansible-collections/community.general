@@ -352,6 +352,8 @@ files:
     labels: module_utils
   $module_utils/_android_sdkmanager.py:
     maintainers: shamilovstas
+  $module_utils/_authselect/:
+    maintainers: NicholasBrodersen
   $module_utils/_btrfs.py:
     maintainers: gnfzdz
   $module_utils/_cmd_runner_fmt.py:
@@ -500,6 +502,8 @@ files:
     maintainers: evgkrsk
   $modules/archive.py:
     maintainers: bendoh aardbol
+  $modules/authselect.py:
+    maintainers: NicholasBrodersen
   $modules/awall.py:
     maintainers: tdtrask
   $modules/beadm.py:
