@@ -61,7 +61,10 @@ EXAMPLES = r"""
 
 RETURN = r"""
 _raw:
-  description: List containing one or more secrets.
+  description:
+    - List containing one or more secrets.
+    - B(Note) on ansible-core 2.22+, the values will be registered as secrets.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   type: list
   elements: dict
 """
@@ -74,6 +77,7 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.parsing.ajson import AnsibleJSONDecoder
 from ansible.plugins.lookup import LookupBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
@@ -142,7 +146,7 @@ class BitwardenSecretsManager:
         if rc != 0:
             raise BitwardenSecretsManagerException(to_text(err))
 
-        return AnsibleJSONDecoder().raw_decode(out)[0]
+        return mark_values_as_secrets(AnsibleJSONDecoder().raw_decode(out)[0])
 
 
 class LookupModule(LookupBase):
