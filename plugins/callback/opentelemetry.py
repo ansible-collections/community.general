@@ -589,6 +589,11 @@ class CallbackModule(CallbackBase):
         )
 
     def v2_runner_on_skipped(self, result):
+        if result._task._uuid not in self.tasks_data:
+            # meta tasks skipped by a conditional do not trigger v2_runner_on_start
+            self.opentelemetry.start_task(
+                self.tasks_data, self.hide_task_arguments, self.play_name, result._task, result._host
+            )
         self.opentelemetry.finish_task(
             self.tasks_data, "skipped", result, self.dump_results(self.tasks_data[result._task._uuid], result)
         )
