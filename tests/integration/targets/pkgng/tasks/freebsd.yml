@@ -541,7 +541,22 @@
         pkgng_test_install_prefix: /usr/jails/testjail
         pkgng_test_install_cleanup: true
   always:
-    - name: Stop and remove testjail
+    - name: Stop testjail
       failed_when: false
       changed_when: false
-      ansible.builtin.command: "ezjail-admin delete -wf testjail"
+      ansible.builtin.command: "jail -r testjail"
+
+    - name: Unmount devfs in testjail
+      failed_when: false
+      changed_when: false
+      ansible.builtin.command: "umount /usr/jails/testjail/dev"
+
+    - name: Clear immutable flags in testjail
+      failed_when: false
+      changed_when: false
+      ansible.builtin.command: "chflags -R 0 /usr/jails/testjail"
+
+    - name: Remove testjail
+      ansible.builtin.file:
+        path: /usr/jails/testjail
+        state: absent
