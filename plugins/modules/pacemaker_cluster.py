@@ -14,6 +14,11 @@ author:
   - Dexter Le (@munchtoast)
 description:
   - This module can manage a pacemaker cluster and nodes from Ansible using the pacemaker CLI.
+requirements:
+  - pcs
+notes:
+  - Maintenance-mode detection uses C(pcs property config --output-format=json) on C(pcs) >= 0.11.6
+    and falls back to plaintext parsing of C(pcs property config maintenance-mode) on older versions.
 extends_documentation_fragment:
   - community.general._attributes
 attributes:

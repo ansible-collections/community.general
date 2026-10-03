@@ -5,6 +5,10 @@
 ---
 anchors:
   environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  property_config_no_maintenance: &prop-no-maint >
+    {"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null, "nvpairs": []}]}
+  property_config_maintenance_true: &prop-maint-true >
+    {"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null, "nvpairs": [{"id": "cib-bootstrap-options-maintenance-mode", "name": "maintenance-mode", "value": "true"}]}]}
 test_cases:
   - id: test_online_minimal_input_initial_online_all_no_maintenance
     input:
@@ -20,15 +24,10 @@ test_cases:
           rc: 0
           out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, cluster, status]
           environ: *env-def
@@ -49,16 +48,10 @@ test_cases:
           rc: 0
           out: '   * Online: [ pc1, pc2, pc3 ]'
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
-            maintenance-mode=true
+          rc: 0
+          out: *prop-maint-true
           err: ""
         - command: [/testbin/pcs, property, set, maintenance-mode=false]
           environ: *env-def
@@ -89,16 +82,10 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
           rc: 0
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
-            maintenance-mode=true
+          out: *prop-maint-true
           err: ""
         - command: [/testbin/pcs, property, set, maintenance-mode=false]
           environ: *env-def
@@ -130,15 +117,10 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, cluster, status]
           environ: *env-def
@@ -165,15 +147,10 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, cluster, status]
           environ: *env-def
@@ -277,15 +254,10 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, cluster, status]
           environ: *env-def
@@ -316,15 +288,10 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, cluster, status]
           environ: *env-def
@@ -355,16 +322,10 @@ test_cases:
           rc: 0
           out: "Starting Cluster..."
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
           rc: 0
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
-            maintenance-mode=true
+          out: *prop-maint-true
           err: ""
         - command: [/testbin/pcs, property, set, maintenance-mode=false]
           environ: *env-def

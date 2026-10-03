@@ -10,8 +10,27 @@
 
 from __future__ import annotations
 
+import pytest
+
+from ansible_collections.community.general.plugins.module_utils import _pacemaker
 from ansible_collections.community.general.plugins.modules import pacemaker_info
 
 from .uthelper import RunCommandMock, UTHelper
+
+
+@pytest.fixture(autouse=True)
+def _pacemaker_json_capable(mocker):
+    """All pacemaker_info module tests behave as if ``pcs`` supports JSON output.
+
+    The version-probe / plaintext-fallback dispatch is exhaustively unit-tested
+    in ``tests/unit/plugins/module_utils/test__pacemaker.py``; module-level
+    tests exercise the module's own logic, not the shared dispatch.
+    """
+    mocker.patch.object(
+        _pacemaker.PacemakerRunner,
+        "_probe_version",
+        return_value="0.11.7",
+    )
+
 
 UTHelper.from_module(pacemaker_info, __name__, mocks=[RunCommandMock])
