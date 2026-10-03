@@ -1,0 +1,81 @@
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+test_cases:
+  - id: check_present_existing
+    flags:
+      check: true
+    input:
+      name: testns
+      state: present
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [ip, netns, list]
+          rc: 0
+          out: "testns\n"
+          err: ''
+
+  - id: check_present_missing
+    flags:
+      check: true
+    input:
+      name: testns
+      state: present
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [ip, netns, list]
+          rc: 0
+          out: ''
+          err: ''
+
+  - id: check_absent_existing
+    flags:
+      check: true
+    input:
+      name: testns
+      state: absent
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [ip, netns, list]
+          rc: 0
+          out: "testns\n"
+          err: ''
+
+  - id: check_absent_missing
+    flags:
+      check: true
+    input:
+      name: testns
+      state: absent
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [ip, netns, list]
+          rc: 0
+          out: ''
+          err: ''
+
+  - id: check_list_failure
+    flags:
+      check: true
+    input:
+      name: testns
+      state: present
+    output:
+      failed: true
+      msg: Cannot list namespaces
+    mocks:
+      run_command:
+        - command: [ip, netns, list]
+          rc: 1
+          out: ''
+          err: Cannot list namespaces
