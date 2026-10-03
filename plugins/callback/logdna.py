@@ -24,6 +24,7 @@ options:
     ini:
       - section: callback_logdna
         key: conf_key
+    secret: true
   plugin_ignore_errors:
     required: false
     description: Whether to ignore errors on failing or not.
