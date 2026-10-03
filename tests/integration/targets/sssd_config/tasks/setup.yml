@@ -1,0 +1,35 @@
+---
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Gather target distribution and Python facts
+  ansible.builtin.setup:
+    gather_subset:
+      - "!all"
+      - min
+
+- name: Select the native SSSDConfig packages
+  ansible.builtin.set_fact:
+    sssd_config_test_packages: >-
+      {{
+        sssd_config_test_package_map.get(ansible_facts.os_family, [])
+        if sssd_config_test_packages_override is none
+        else sssd_config_test_packages_override
+      }}
+
+- name: Install the native SSSDConfig library and schemas
+  ansible.builtin.package:
+    name: "{{ sssd_config_test_packages }}"
+    state: present
+
+- name: Define temporary test paths
+  ansible.builtin.set_fact:
+    sssd_config_test_sssd_path: "{{ remote_tmp_dir }}/sssd-section.conf"
+    sssd_config_test_validation_path: "{{ remote_tmp_dir }}/validation.conf"
+
+- name: Report the tested runtime
+  ansible.builtin.debug:
+    msg:
+      distribution: "{{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
+      packages: "{{ sssd_config_test_packages }}"
