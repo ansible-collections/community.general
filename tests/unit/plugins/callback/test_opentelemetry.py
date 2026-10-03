@@ -13,7 +13,12 @@ from ansible.executor.task_result import TaskResult
 from ansible.playbook.task import Task
 from ansible.release import __version__ as ansible_release
 
-from ansible_collections.community.general.plugins.callback.opentelemetry import HostData, OpenTelemetrySource, TaskData
+from ansible_collections.community.general.plugins.callback.opentelemetry import (
+    CallbackModule,
+    HostData,
+    OpenTelemetrySource,
+    TaskData,
+)
 
 if tuple(int(x) for x in ansible_release.split(".")[:2]) >= (2, 21):
     # https://github.com/ansible/ansible/issues/86761
@@ -92,6 +97,20 @@ class TestOpentelemetry(unittest.TestCase):
         self.assertEqual(host_data.uuid, "include")
         self.assertEqual(host_data.name, "include")
         self.assertEqual(host_data.status, "ok")
+
+    @patch("ansible_collections.community.general.plugins.callback.opentelemetry.OTEL_LIBRARY_IMPORT_ERROR", None)
+    def test_skipped_task_without_runner_start(self):
+        callback = CallbackModule()
+        callback.play_name = "myplay"
+
+        callback.v2_runner_on_skipped(self.my_task_result)
+
+        task_data = callback.tasks_data["myuuid"]
+        self.assertEqual(task_data.name, "mytask")
+        self.assertEqual(task_data.play, "myplay")
+        host_data = task_data.host_data["myhost_uuid"]
+        self.assertEqual(host_data.name, "myhost")
+        self.assertEqual(host_data.status, "skipped")
 
     @patch("ansible_collections.community.general.plugins.callback.opentelemetry.Status", create=True)
     @patch("ansible_collections.community.general.plugins.callback.opentelemetry.StatusCode", create=True)
