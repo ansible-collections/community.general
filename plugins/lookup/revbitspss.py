@@ -64,6 +64,7 @@ from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 ANOTHER_LIBRARY_IMPORT_ERROR: ImportError | None
@@ -98,7 +99,7 @@ class LookupModule(LookupBase):
         for term in terms:
             try:
                 display.vvv(f"Secret Server lookup of Secret with ID {term}")
-                result.append({term: secret_server.get_pam_secret(term)})
+                result.append({term: mark_values_as_secrets(secret_server.get_pam_secret(term))})
             except Exception as error:
                 raise AnsibleError(f"Secret Server lookup failure: {error.message}") from error
         return result
