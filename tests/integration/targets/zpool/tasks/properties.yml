@@ -67,6 +67,55 @@
         that:
           - "'lz4' in compression_check.stdout"
 
+- name: Test changing of properties without specifying vdevs
+  block:
+    - name: Enable autoexpand and set compression to zstd without vdevs
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        pool_properties:
+          autoexpand: true
+        filesystem_properties:
+          compression: zstd
+        state: present
+      register: no_vdevs_result
+
+    - name: Enable autoexpand and set compression to zstd without vdevs (idempotency)
+      community.general.zpool:
+        name: "{{ zpool_generic_pool_name }}"
+        pool_properties:
+          autoexpand: true
+        filesystem_properties:
+          compression: zstd
+        state: present
+      register: no_vdevs_idempotency
+
+    - name: Check autoexpand
+      ansible.builtin.command:
+        cmd: "zpool get -H -o value autoexpand {{ zpool_generic_pool_name }}"
+      changed_when: false
+      register: autoexpand_check
+
+    - name: Check compression
+      ansible.builtin.command:
+        cmd: "zfs get -H -o value compression {{ zpool_generic_pool_name }}"
+      changed_when: false
+      register: compression_check
+
+    - name: Check vdev layout
+      ansible.builtin.command:
+        cmd: "zpool list -H -v -P {{ zpool_generic_pool_name }}"
+      changed_when: false
+      register: layout_check
+
+    - name: Assert properties changed and vdev layout is unchanged
+      ansible.builtin.assert:
+        that:
+          - no_vdevs_result is changed
+          - no_vdevs_idempotency is not changed
+          - "'on' in autoexpand_check.stdout"
+          - "'zstd' in compression_check.stdout"
+          - "(zpool_vdevs_disk_config.vdev3 + zpool_vdevs_disk_config.vdev4) is subset(layout_check.stdout.split())"
+
 - name: Cleanup pool
   community.general.zpool:
     name: "{{ zpool_generic_pool_name }}"
