@@ -790,6 +790,7 @@ class Pacman:
             # Format of lines:
             #     strace 5.14-1 -> 5.15-1
             #     systemd 249.7-1 -> 249.7-2 [ignored]
+            yay_age_badge_re = re.compile(r"^\[(?:\d+[dhm])+\]$")
             for l in stdout.splitlines():
                 l = l.strip()
                 if not l:
@@ -797,6 +798,9 @@ class Pacman:
                 if "[ignored]" in l or "Avoid running" in l:
                     continue
                 s = l.split()
+                # yay appends an age badge for AUR packages, e.g. "pkg 1.0-1 -> 1.1-1 [9d2h]"
+                if len(s) == 5 and yay_age_badge_re.match(s[4]):
+                    del s[4]
                 if len(s) != 4:
                     self.fail(msg=f"Invalid line: {l}")
 

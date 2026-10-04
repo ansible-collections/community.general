@@ -284,6 +284,31 @@ class TestPacman:
                 None,
             ),
             (
+                # --query --upgrades with yay's AUR age badge, e.g. "sqlite 3.36.0-1 -> 3.37.0-1 [9d2h]"
+                {
+                    **empty_inventory,
+                    "upgradable_pkgs": {
+                        "sqlite": VersionTuple(current="3.36.0-1", latest="3.37.0-1"),
+                    },
+                },
+                [
+                    (0, "", ""),
+                    (0, "", ""),
+                    (0, "", ""),
+                    (0, "", ""),
+                    (
+                        0,
+                        """sqlite 3.36.0-1 -> 3.37.0-1 [9d2h]
+                        systemd 249.6-3 -> 249.7-2 [ignored]
+                        """,
+                        "",
+                    ),
+                    (0, "", ""),
+                    (0, "", ""),
+                ],
+                None,
+            ),
+            (
                 # All good, but call to --query --upgrades return 1. aka nothing to upgrade
                 # with a pacman warning
                 empty_inventory,
