@@ -157,6 +157,8 @@ from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_as_secret, mask_secret_values
+
 display = Display()
 
 
@@ -214,8 +216,11 @@ class AzureLogAnalyticsIngestionSource:
         )
         response = open_url(url, data=data, force=True, headers=headers, method="POST", timeout=self.timeout)
         j = json.loads(response.read().decode("utf-8"))
+        access_token = mark_as_secret(j["access_token"])
+
         self.token_expiration_time = datetime.now() + timedelta(seconds=j.get("expires_in"))
-        return j.get("access_token")
+
+        return access_token
 
     def is_token_valid(self):
         return datetime.now() + timedelta(seconds=10) < self.token_expiration_time
@@ -271,8 +276,8 @@ class AzureLogAnalyticsIngestionSource:
                 "User": self.user,
                 "Playbook": playbook_name,
                 "Role": ansible_role,
-                "TaskName": result._task.get_name(),
-                "Task": result._task_fields,
+                "TaskName": mask_secret_values(result._task.get_name()),
+                "Task": mask_secret_values(result._task_fields),
                 "Action": result._task_fields["action"],
                 "State": state,
                 "Result": result._result,
