@@ -467,8 +467,18 @@ backup_file:
 import os
 import re
 import tempfile
+import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
+
+
+class ResultDict(t.TypedDict):
+    changed: bool
+    config_file: str
+    config_content: str | None
+    enabled_state: bool
+    backup_file: t.NotRequired[str | None]
+    diff: t.NotRequired[t.Any | None]
 
 
 class LogrotateConfig:
@@ -478,7 +488,7 @@ class LogrotateConfig:
         self.module = module
         self.params = module.params
         self.logrotate_bin = logrotate_bin
-        self.result: dict[str, object] = {
+        self.result: ResultDict = {
             "changed": False,
             "config_file": "",
             "config_content": "",
@@ -498,11 +508,11 @@ class LogrotateConfig:
 
     def validate_parameters(self) -> None:
         """Validate module parameters."""
-        if self.params.get("start") is not None:
+        if self.params["start"] is not None:
             if self.params["start"] < 0 or self.params["start"] > 999:
                 self.module.fail_json(msg="'start' must be between 0 and 999")
 
-        su_val = self.params.get("su")
+        su_val = self.params["su"]
         if su_val is not None:
             if su_val == "":
                 pass
@@ -511,21 +521,21 @@ class LogrotateConfig:
                 if len(su_parts) != 2:
                     self.module.fail_json(msg="'su' parameter must be in format 'user group' or empty string to remove")
 
-        if self.params.get("create") is not None:
+        if self.params["create"] is not None:
             create_val = self.params["create"]
             if not re.match(r"^\d{3,4}(\s+\S+\s+\S+)?\s*$", create_val):
                 self.module.fail_json(
                     msg="'create' must be in format 'mode' or 'mode user group' (for example '0640' or '0640 root adm')"
                 )
 
-        if self.params.get("shred_cycles") is not None:
+        if self.params["shred_cycles"] is not None:
             if self.params["shred_cycles"] < 1:
                 self.module.fail_json(msg="'shred_cycles' must be a positive integer")
-            if self.params.get("shred") is False:
+            if self.params["shred"] is False:
                 self.module.fail_json(msg="'shred_cycles' requires 'shred=true'")
 
         for size_param in ["size", "min_size", "max_size"]:
-            if self.params.get(size_param):
+            if self.params[size_param]:
                 if not re.match(r"^\d+[kMG]?$", self.params[size_param], re.I):
                     self.module.fail_json(
                         msg=f"'{size_param}' must be in format 'number[k|M|G]' (for example '100M', '1G')"
@@ -533,7 +543,7 @@ class LogrotateConfig:
 
         if self.params["state"] == "present":
             existing_content = self.read_existing_config()
-            if not existing_content and not self.params.get("paths"):
+            if not existing_content and not self.params["paths"]:
                 self.module.fail_json(msg="'paths' parameter is required when creating a new configuration")
 
     def read_existing_config(self) -> str | None:
@@ -552,7 +562,7 @@ class LogrotateConfig:
 
     def generate_config_content(self) -> str:
         """Generate logrotate configuration content."""
-        if not self.params.get("paths"):
+        if not self.params["paths"]:
             existing_content = self.read_existing_config()
             if existing_content:
                 lines = existing_content.strip().split("\n")
@@ -602,30 +612,30 @@ class LogrotateConfig:
         lines.append("{")
         lines.append("")
 
-        rotation_period = self.params.get("rotation_period")
-        if rotation_period is not None and not self.params.get("size") and not self.params.get("max_size"):
+        rotation_period = self.params["rotation_period"]
+        if rotation_period is not None and not self.params["size"] and not self.params["max_size"]:
             lines.append(f"    {rotation_period}")
 
-        if self.params.get("size") is not None:
+        if self.params["size"] is not None:
             lines.append(f"    size {self.params['size']}")
-        elif self.params.get("max_size") is not None:
+        elif self.params["max_size"] is not None:
             lines.append(f"    maxsize {self.params['max_size']}")
 
-        if self.params.get("min_size") is not None:
+        if self.params["min_size"] is not None:
             lines.append(f"    minsize {self.params['min_size']}")
 
-        rotate_count = self.params.get("rotate_count")
+        rotate_count = self.params["rotate_count"]
         if rotate_count is not None:
             lines.append(f"    rotate {rotate_count}")
 
-        start_val = self.params.get("start")
+        start_val = self.params["start"]
         if start_val is not None:
             lines.append(f"    start {start_val}")
 
-        compress_val = self.params.get("compress")
+        compress_val = self.params["compress"]
         if compress_val is not None:
             if compress_val:
-                comp_method = self.params.get("compression_method")
+                comp_method = self.params["compression_method"]
                 if comp_method is not None and comp_method != "gzip":
                     lines.append(f"    compresscmd /usr/bin/{comp_method}")
                     if comp_method == "zstd":
@@ -637,49 +647,49 @@ class LogrotateConfig:
                     lines.append(f"    compressext .{comp_method}")
                 lines.append("    compress")
 
-                if self.params.get("compress_options") is not None:
+                if self.params["compress_options"] is not None:
                     lines.append(f"    compressoptions {self.params['compress_options']}")
             else:
                 lines.append("    nocompress")
 
-        delay_compress_val = self.params.get("delay_compress")
+        delay_compress_val = self.params["delay_compress"]
         if delay_compress_val is not None:
             if delay_compress_val:
                 lines.append("    delaycompress")
 
-        no_delay_compress_val = self.params.get("no_delay_compress")
+        no_delay_compress_val = self.params["no_delay_compress"]
         if no_delay_compress_val is not None:
             if no_delay_compress_val:
                 lines.append("    nodelaycompress")
 
-        shred_val = self.params.get("shred")
+        shred_val = self.params["shred"]
         if shred_val is not None and shred_val:
             lines.append("    shred")
-            shred_cycles_val = self.params.get("shred_cycles")
+            shred_cycles_val = self.params["shred_cycles"]
             if shred_cycles_val is not None:
                 lines.append(f"    shredcycles {shred_cycles_val}")
 
-        missing_ok_val = self.params.get("missing_ok")
+        missing_ok_val = self.params["missing_ok"]
         if missing_ok_val is not None:
             if not missing_ok_val:
                 lines.append("    nomissingok")
             else:
                 lines.append("    missingok")
 
-        not_if_empty_val = self.params.get("not_if_empty")
+        not_if_empty_val = self.params["not_if_empty"]
         if not_if_empty_val is not None:
             if not_if_empty_val:
                 lines.append("    notifempty")
             else:
                 lines.append("    ifempty")
 
-        create_val = self.params.get("create")
+        create_val = self.params["create"]
         if create_val is not None:
             lines.append(f"    create {create_val}")
 
-        copy_val = self.params.get("copy")
-        rename_copy_val = self.params.get("rename_copy")
-        copy_truncate_val = self.params.get("copy_truncate")
+        copy_val = self.params["copy"]
+        rename_copy_val = self.params["rename_copy"]
+        copy_truncate_val = self.params["copy_truncate"]
 
         if copy_val is not None and copy_val:
             lines.append("    copy")
@@ -688,72 +698,72 @@ class LogrotateConfig:
         elif copy_truncate_val is not None and copy_truncate_val:
             lines.append("    copytruncate")
 
-        if self.params.get("max_age") is not None:
+        if self.params["max_age"] is not None:
             lines.append(f"    maxage {self.params['max_age']}")
 
-        date_ext_val = self.params.get("date_ext")
+        date_ext_val = self.params["date_ext"]
         if date_ext_val is not None and date_ext_val:
             lines.append("    dateext")
-            date_yesterday_val = self.params.get("date_yesterday")
+            date_yesterday_val = self.params["date_yesterday"]
             if date_yesterday_val is not None and date_yesterday_val:
                 lines.append("    dateyesterday")
-            date_format_val = self.params.get("date_format")
+            date_format_val = self.params["date_format"]
             if date_format_val is not None:
                 lines.append(f"    dateformat {date_format_val}")
 
-        shared_scripts_val = self.params.get("shared_scripts")
+        shared_scripts_val = self.params["shared_scripts"]
         if shared_scripts_val is not None and shared_scripts_val:
             lines.append("    sharedscripts")
 
-        su_val = self.params.get("su")
+        su_val = self.params["su"]
         if su_val is not None:
             if su_val != "":
                 lines.append(f"    su {su_val}")
 
-        no_old_dir_val = self.params.get("no_old_dir")
-        old_dir_val = self.params.get("old_dir")
+        no_old_dir_val = self.params["no_old_dir"]
+        old_dir_val = self.params["old_dir"]
 
         if no_old_dir_val is not None and no_old_dir_val:
             lines.append("    noolddir")
         elif old_dir_val is not None:
             lines.append(f"    olddir {old_dir_val}")
-            create_old_dir_val = self.params.get("create_old_dir")
+            create_old_dir_val = self.params["create_old_dir"]
             if create_old_dir_val is not None and create_old_dir_val:
                 lines.append("    createolddir")
 
-        if self.params.get("extension") is not None:
+        if self.params["extension"] is not None:
             lines.append(f"    extension {self.params['extension']}")
 
-        mail_val = self.params.get("mail")
+        mail_val = self.params["mail"]
         if mail_val is not None:
             lines.append(f"    mail {mail_val}")
-            mail_first_val = self.params.get("mail_first")
-            mail_last_val = self.params.get("mail_last")
+            mail_first_val = self.params["mail_first"]
+            mail_last_val = self.params["mail_last"]
             if mail_first_val is not None and mail_first_val:
                 lines.append("    mailfirst")
             elif mail_last_val is not None and mail_last_val:
                 lines.append("    maillast")
 
-        if self.params.get("include") is not None:
+        if self.params["include"] is not None:
             lines.append(f"    include {self.params['include']}")
 
-        if self.params.get("taboo_ext") is not None:
+        if self.params["taboo_ext"] is not None:
             taboo_ext = self.params["taboo_ext"]
             if isinstance(taboo_ext, list):
                 taboo_ext = " ".join(taboo_ext)
             if taboo_ext.strip():
                 lines.append(f"    tabooext {taboo_ext}")
 
-        syslog_val = self.params.get("syslog")
+        syslog_val = self.params["syslog"]
         if syslog_val is not None and syslog_val:
             lines.append("    syslog")
 
         scripts = {
-            "prerotate": self.params.get("pre_rotate"),
-            "postrotate": self.params.get("post_rotate"),
-            "firstaction": self.params.get("first_action"),
-            "lastaction": self.params.get("last_action"),
-            "preremove": self.params.get("pre_remove"),
+            "prerotate": self.params["pre_rotate"],
+            "postrotate": self.params["post_rotate"],
+            "firstaction": self.params["first_action"],
+            "lastaction": self.params["last_action"],
+            "preremove": self.params["pre_remove"],
         }
 
         for script_name, script_content in scripts.items():
@@ -770,7 +780,7 @@ class LogrotateConfig:
 
         return "\n".join(lines)
 
-    def apply(self) -> dict[str, object]:
+    def apply(self) -> ResultDict:
         """Apply logrotate configuration."""
         self.validate_parameters()
         state = self.params["state"]
@@ -798,14 +808,14 @@ class LogrotateConfig:
             return self.result
 
         existing_content = self.read_existing_config()
-        current_enabled = bool(self.result.get("enabled_state", True))
+        current_enabled = self.result["enabled_state"]
 
-        target_enabled = self.params.get("enabled")
+        target_enabled = self.params["enabled"]
         if target_enabled is None:
             target_enabled = current_enabled
 
         only_changing_enabled = (
-            existing_content is not None and not self.params.get("paths") and target_enabled != current_enabled
+            existing_content is not None and not self.params["paths"] and target_enabled != current_enabled
         )
 
         if only_changing_enabled:
