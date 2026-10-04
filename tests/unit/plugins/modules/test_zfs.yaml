@@ -1,0 +1,171 @@
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  env_rc: &env-rc {check_rc: true}
+  zpool_version: &zpool-version
+    command: [/testbin/zpool, get, version, pool]
+    environ: *env-rc
+    rc: 0
+    out: |
+      NAME  PROPERTY  VALUE  SOURCE
+      pool  version   -      default
+    err: ''
+  exists_vol: &exists-vol
+    command: [/testbin/zfs, list, -t, all, pool/vol1]
+    environ: {}
+    rc: 0
+    out: |
+      NAME        USED  AVAIL  REFER  MOUNTPOINT
+      pool/vol1   4.13G 10G    56K    -
+    err: ''
+  props_vol: &props-vol
+    command: [/testbin/zfs, get, -H, -p, -o, "property,source", all, pool/vol1]
+    environ: {}
+    rc: 0
+    out: "type\t-\nvolsize\tlocal\nvolblocksize\t-\ncompression\tdefault\n"
+    err: ''
+  get_volblocksize: &get-volblocksize
+    command: [/testbin/zfs, get, -H, -p, -o, value, volblocksize, pool/vol1]
+    environ: {}
+    rc: 0
+    out: "4096\n"
+    err: ''
+  get_volsize: &get-volsize
+    command: [/testbin/zfs, get, -H, -p, -o, value, volsize, pool/vol1]
+    environ: {}
+    rc: 0
+    out: "4294967296\n"
+    err: ''
+  exists_fs: &exists-fs
+    command: [/testbin/zfs, list, -t, all, pool/fs1]
+    environ: {}
+    rc: 0
+    out: |
+      NAME      USED  AVAIL  REFER  MOUNTPOINT
+      pool/fs1  96K   10G    96K    /pool/fs1
+    err: ''
+  props_fs: &props-fs
+    command: [/testbin/zfs, get, -H, -p, -o, "property,source", all, pool/fs1]
+    environ: {}
+    rc: 0
+    out: "type\t-\nencryption\t-\ncompression\tlocal\n"
+    err: ''
+test_cases:
+  - id: create_volume_with_volblocksize
+    input:
+      name: pool/vol1
+      state: present
+      extra_zfs_properties:
+        volsize: 4G
+        volblocksize: 4k
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *zpool-version
+        - command: [/testbin/zfs, list, -t, all, pool/vol1]
+          environ: {}
+          rc: 1
+          out: ''
+          err: "cannot open 'pool/vol1': dataset does not exist\n"
+        - command: [/testbin/zfs, create, -p, -V, 4G, -b, 4k, pool/vol1]
+          environ: *env-rc
+          rc: 0
+          out: ''
+          err: ''
+  - id: existing_volume_human_readable_sizes_unchanged
+    input:
+      name: pool/vol1
+      state: present
+      extra_zfs_properties:
+        volsize: 4G
+        volblocksize: 4k
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *zpool-version
+        - *exists-vol
+        - *props-vol
+        - *get-volblocksize
+        - *get-volsize
+        - *props-vol
+        - *get-volsize
+  - id: existing_volume_volblocksize_differs_not_set
+    input:
+      name: pool/vol1
+      state: present
+      extra_zfs_properties:
+        volblocksize: 8k
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *zpool-version
+        - *exists-vol
+        - *props-vol
+        - *get-volblocksize
+        - *props-vol
+  - id: existing_volume_volsize_grown
+    input:
+      name: pool/vol1
+      state: present
+      extra_zfs_properties:
+        volsize: 8G
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *zpool-version
+        - *exists-vol
+        - *props-vol
+        - *get-volsize
+        - command: [/testbin/zfs, set, volsize=8G, pool/vol1]
+          environ: *env-rc
+          rc: 0
+          out: ''
+          err: ''
+        - *props-vol
+        - command: [/testbin/zfs, get, -H, -p, -o, value, volsize, pool/vol1]
+          environ: {}
+          rc: 0
+          out: "8589934592\n"
+          err: ''
+  - id: existing_fs_encryption_skipped_compression_set
+    input:
+      name: pool/fs1
+      state: present
+      extra_zfs_properties:
+        encryption: true
+        compression: zstd
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *zpool-version
+        - *exists-fs
+        - *props-fs
+        - command: [/testbin/zfs, get, -H, -p, -o, value, encryption, pool/fs1]
+          environ: {}
+          rc: 0
+          out: "aes-256-gcm\n"
+          err: ''
+        - command: [/testbin/zfs, get, -H, -p, -o, value, compression, pool/fs1]
+          environ: {}
+          rc: 0
+          out: "lz4\n"
+          err: ''
+        - command: [/testbin/zfs, set, compression=zstd, pool/fs1]
+          environ: *env-rc
+          rc: 0
+          out: ''
+          err: ''
+        - *props-fs
+        - command: [/testbin/zfs, get, -H, -p, -o, value, compression, pool/fs1]
+          environ: {}
+          rc: 0
+          out: "zstd\n"
+          err: ''

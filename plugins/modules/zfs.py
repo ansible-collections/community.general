@@ -19,8 +19,7 @@ attributes:
     support: partial
     details:
       - In certain situations it may report a task as changed that is not reported as changed when C(check_mode) is disabled.
-      - For example, this might occur when the zpool C(altroot) option is set or when a size is written using human-readable
-        notation, such as V(1M) or V(1024K), instead of as an unqualified byte count, such as V(1048576).
+      - For example, this might occur when the zpool C(altroot) option is set.
   diff_mode:
     support: full
 options:
@@ -44,6 +43,12 @@ options:
     description:
       - A dictionary of zfs properties to be set.
       - See the zfs(8) man page for more information.
+      - Properties that can only be set when the dataset is created (V(casesensitivity), V(encryption), V(keyformat),
+        V(normalization), V(pbkdf2iters), V(utf8only), V(volblocksize)) are not changed if the dataset already exists.
+        A warning is issued if their current value differs from the requested one.
+      - Values of size properties (V(quota), V(recordsize), V(refquota), V(refreservation), V(reservation),
+        V(special_small_blocks), V(volblocksize), V(volsize)) written in human-readable notation, such as V(4k)
+        or V(1.5G), are compared to the current value as byte counts.
     type: dict
     default: {}
 author:
@@ -90,8 +95,50 @@ EXAMPLES = r"""
 """
 
 import os
+import re
+from decimal import Decimal
 
 from ansible.module_utils.basic import AnsibleModule
+
+# properties that cannot be changed with "zfs set" once the dataset exists
+CREATE_ONLY_PROPERTIES = frozenset(
+    (
+        "casesensitivity",
+        "encryption",
+        "keyformat",
+        "normalization",
+        "pbkdf2iters",
+        "utf8only",
+        "volblocksize",
+    )
+)
+
+SIZE_PROPERTIES = frozenset(
+    (
+        "quota",
+        "recordsize",
+        "refquota",
+        "refreservation",
+        "reservation",
+        "special_small_blocks",
+        "volblocksize",
+        "volsize",
+    )
+)
+SIZE_SUFFIXES = "BKMGTPEZ"
+SIZE_RE = re.compile(r"(?P<number>\d+(?:\.\d+)?)(?:(?P<suffix>[KMGTPEZ])(?:i?B)?|B)?", re.IGNORECASE)
+
+
+# convert human-readable sizes, such as 4k or 1.5G, to the byte count reported by "zfs get -p"
+def normalize_value(prop, value):
+    if value is None or prop not in SIZE_PROPERTIES:
+        return value
+    match = SIZE_RE.fullmatch(str(value))
+    if not match:
+        return value
+    suffix = (match.group("suffix") or "B").upper()
+    multiplier = 1024 ** SIZE_SUFFIXES.index(suffix)
+    return str(int(Decimal(match.group("number")) * multiplier))
 
 
 class Zfs:
@@ -186,9 +233,20 @@ class Zfs:
         diff = {"before": {"extra_zfs_properties": {}}, "after": {"extra_zfs_properties": {}}}
         current_properties = self.list_properties()
         previous_values = {}
+        settable_properties = {}
         for prop, value in self.extra_zfs_properties.items():
+            if prop not in CREATE_ONLY_PROPERTIES:
+                settable_properties[prop] = value
+                continue
             current_value = self.get_property(prop, current_properties)
-            if current_value != value:
+            if normalize_value(prop, current_value) != normalize_value(prop, value):
+                self.module.warn(
+                    f"Property {prop} can only be set when the dataset is created, "
+                    f"current value {current_value!r} differs from requested value {value!r}"
+                )
+        for prop, value in settable_properties.items():
+            current_value = self.get_property(prop, current_properties)
+            if normalize_value(prop, current_value) != normalize_value(prop, value):
                 previous_values[prop] = current_value
                 self.set_property(prop, value)
                 diff["before"]["extra_zfs_properties"][prop] = current_value
@@ -196,7 +254,7 @@ class Zfs:
         if self.module.check_mode:
             return diff
         updated_properties = self.list_properties()
-        for prop in self.extra_zfs_properties:
+        for prop in settable_properties:
             value = self.get_property(prop, updated_properties)
             if value is None:
                 self.module.fail_json(msg=f"zfsprop was not present after being successfully set: {prop}")
