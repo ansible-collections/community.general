@@ -12,6 +12,7 @@ plugins/callback/jabber.py validate-modules:invalid-documentation  # secret not 
 plugins/callback/loganalytics.py validate-modules:invalid-documentation  # secret not supported
 plugins/callback/loganalytics_ingestion.py validate-modules:invalid-documentation  # secret not supported
 plugins/callback/logdna.py validate-modules:invalid-documentation  # secret not supported
+plugins/callback/logentries.py validate-modules:invalid-documentation  # secret not supported
 plugins/callback/nrdp.py validate-modules:invalid-documentation  # secret not supported
 plugins/callback/splunk.py validate-modules:invalid-documentation  # secret not supported
 plugins/connection/wsl.py validate-modules:invalid-documentation  # secret not supported
