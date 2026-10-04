@@ -71,6 +71,8 @@ from ansible.module_utils.common.text.converters import to_bytes
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
 
 class CallbackModule(CallbackBase):
     """
@@ -157,7 +159,7 @@ class CallbackModule(CallbackBase):
         """
         Display info about playbook statistics
         """
-        name = self.play
+        name = mask_secrets(self.play.name)
         gstats = ""
         hosts = sorted(stats.processed.keys())
         critical = warning = 0

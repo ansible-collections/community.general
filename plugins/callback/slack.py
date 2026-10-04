@@ -68,6 +68,8 @@ from ansible import context
 from ansible.module_utils.urls import open_url
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
+
 try:
     import prettytable
 
@@ -169,7 +171,7 @@ class CallbackModule(CallbackBase):
             if subset:
                 invocation_items.append(f"Limit:      {subset}")
             if extra_vars:
-                invocation_items.append(f"Extra Vars: {' '.join(extra_vars)}")
+                invocation_items.append(f"Extra Vars: {' '.join(mask_secret_values(extra_vars))}")
 
             title.append(f"by *{context.CLIARGS['remote_user']}*")
 
