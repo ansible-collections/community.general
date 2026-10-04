@@ -37,6 +37,8 @@ from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 from ansible.utils.path import makedirs_safe
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
 # NOTE: in Ansible 1.2 or later general logging is available without
 # this plugin, just set ANSIBLE_LOG_PATH as an environment variable
 # or log_path in the DEFAULTS section of your ansible configuration
@@ -58,7 +60,7 @@ class CallbackModule(CallbackBase):
 
     @staticmethod
     def _make_msg(now, playbook, task_name, task_action, category, data):
-        return f"{now} - {playbook} - {task_name} - {task_action} - {category} - {data}\n\n"
+        return f"{now} - {playbook} - {mask_secrets(task_name)} - {task_action} - {category} - {data}\n\n"
 
     def __init__(self):
         super().__init__()
@@ -110,7 +112,9 @@ class CallbackModule(CallbackBase):
         self.playbook = playbook._file_name
 
     def v2_playbook_on_import_for_host(self, result, imported_file):
-        self.log(result, "IMPORTED", imported_file)
+        # TODO: passing more parameters than allowed!
+        self.log(result, "IMPORTED", mask_secrets(imported_file))
 
     def v2_playbook_on_not_import_for_host(self, result, missing_file):
-        self.log(result, "NOTIMPORTED", missing_file)
+        # TODO: passing more parameters than allowed!
+        self.log(result, "NOTIMPORTED", mask_secrets(missing_file))
