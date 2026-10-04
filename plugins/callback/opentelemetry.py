@@ -145,6 +145,8 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values, mask_secrets
+
 OTEL_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
     from opentelemetry import trace
@@ -318,7 +320,7 @@ class OpenTelemetrySource:
     def update_span_data(self, task_data, host_data, span, disable_logs, disable_attributes_in_logs):
         """update the span with the given TaskData and HostData"""
 
-        name = f"[{host_data.name}] {task_data.play}: {task_data.name}"
+        name = f"[{host_data.name}] {mask_secrets(task_data.play)}: {mask_secrets(task_data.name)}"
 
         message = "success"
         res = {}
@@ -362,8 +364,10 @@ class OpenTelemetrySource:
             "ansible.task.host.status": host_data.status,
         }
         if isinstance(task_data.args, dict) and "gather_facts" not in task_data.action:
-            names = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.keys())
-            values = tuple(self.transform_ansible_unicode_to_str(k) for k in task_data.args.values())
+            names = tuple(self.transform_ansible_unicode_to_str(mask_secrets(k)) for k in task_data.args.keys())
+            values = tuple(
+                self.transform_ansible_unicode_to_str(mask_secret_values(k)) for k in task_data.args.values()
+            )
             attributes[("ansible.task.args.name")] = names
             attributes[("ansible.task.args.value")] = values
 
@@ -390,7 +394,7 @@ class OpenTelemetrySource:
     def add_attributes_for_service_map_if_possible(self, span, task_data):
         """Update the span attributes with the service that the task interacted with, if possible."""
 
-        redacted_url = self.parse_and_redact_url_if_possible(task_data.args)
+        redacted_url = mask_secret_values(self.parse_and_redact_url_if_possible(task_data.args))
         if redacted_url:
             span.set_attribute("http.url", redacted_url.geturl())
 
