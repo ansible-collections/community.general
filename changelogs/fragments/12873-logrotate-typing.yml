@@ -1,0 +1,2 @@
+minor_changes:
+  - "logrotate - refactor without changing functionality (https://github.com/ansible-collections/community.general/pull/12873)."
