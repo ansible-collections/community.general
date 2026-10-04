@@ -58,19 +58,19 @@ options:
       - Required to enable TLS when connecting to an HTTPS etcd3 endpoint.
     env:
       - name: ETCDCTL_CACERT
-    type: str
+    type: path
   cert_cert:
     description:
       - Etcd3 client certificate.
     env:
       - name: ETCDCTL_CERT
-    type: str
+    type: path
   cert_key:
     description:
       - Etcd3 client private key.
     env:
       - name: ETCDCTL_KEY
-    type: str
+    type: path
   timeout:
     description:
       - Client timeout.
