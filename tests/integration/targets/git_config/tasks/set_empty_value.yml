@@ -82,5 +82,5 @@
 - name: assert empty values work with add mode
   ansible.builtin.assert:
     that:
-      - 'get_added_values.config_values == {"push.pushoption": ["", "foo"]}'
+      - get_added_values.config_values["push.pushoption"] == ["", "foo"]
 ...
