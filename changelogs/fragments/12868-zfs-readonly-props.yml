@@ -1,0 +1,2 @@
+bugfixes:
+  - zfs - do not try to change create-only properties on existing datasets and compare size properties as byte counts (https://github.com/ansible-collections/community.general/issues/4699, https://github.com/ansible-collections/community.general/pull/12868).
