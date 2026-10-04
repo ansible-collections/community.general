@@ -60,6 +60,8 @@ import socket
 
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
 
 class CallbackModule(CallbackBase):
     """
@@ -112,7 +114,10 @@ class CallbackModule(CallbackBase):
     def v2_runner_on_skipped(self, result):
         host = result._host.get_name()
         self.logger.info(
-            "%s ansible-command: task execution SKIPPED; host: %s; message: %s", self.hostname, host, "skipped"
+            "%s ansible-command: task execution SKIPPED; host: %s; message: %s",
+            self.hostname,
+            host,
+            "skipped",
         )
 
     def v2_runner_on_unreachable(self, result):
@@ -142,7 +147,7 @@ class CallbackModule(CallbackBase):
             "%s ansible-command: playbook IMPORTED; host: %s; message: imported file %s",
             self.hostname,
             host,
-            imported_file,
+            mask_secrets(imported_file),
         )
 
     def v2_playbook_on_not_import_for_host(self, result, missing_file):
@@ -151,5 +156,5 @@ class CallbackModule(CallbackBase):
             "%s ansible-command: playbook NOT IMPORTED; host: %s; message: missing file %s",
             self.hostname,
             host,
-            missing_file,
+            mask_secrets(missing_file),
         )

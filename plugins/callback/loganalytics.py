@@ -68,6 +68,7 @@ from ansible.plugins.callback import CallbackBase
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
 
 
 class AzureLogAnalyticsSource:
@@ -117,7 +118,7 @@ class AzureLogAnalyticsSource:
         data["ansible_host"] = result._host.name
         data["ansible_playbook"] = self.ansible_playbook
         data["ansible_role"] = ansible_role
-        data["ansible_task"] = result._task_fields
+        data["ansible_task"] = mask_secret_values(result._task_fields)
         # Removing args since it can contain sensitive data
         if "args" in data["ansible_task"]:
             data["ansible_task"].pop("args")
