@@ -51,10 +51,10 @@ from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
-from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values
 
 
 class SumologicHTTPCollectorSource:

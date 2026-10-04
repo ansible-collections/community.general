@@ -111,10 +111,10 @@ except ImportError:
 
 from ansible.plugins.callback import CallbackBase
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
 from ansible_collections.community.general.plugins.module_utils.datetime import (
     now,
 )
-from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
 
 
 class CallbackModule(CallbackBase):
