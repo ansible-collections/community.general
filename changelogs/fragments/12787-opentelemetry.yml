@@ -1,0 +1,2 @@
+minor_changes:
+  - "opentelemetry callback plugin - redact sensitive output on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12787)."
