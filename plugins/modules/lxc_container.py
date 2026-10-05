@@ -170,7 +170,6 @@ options:
     elements: str
 requirements:
   - 'lxc >= 2.0 # OS package'
-  - 'python3 >= 3.5 # OS Package'
   - 'python3-lxc # OS Package'
 notes:
   - Containers must have a unique name. If you attempt to create a container with a name that already exists in the users

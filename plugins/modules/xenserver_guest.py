@@ -24,7 +24,7 @@ notes:
   - If no scheme is specified in O(hostname), module defaults to C(http://) because C(https://) is problematic in most setups.
     Make sure you are accessing XenServer host in trusted environment or use C(https://) scheme explicitly.
   - To use C(https://) scheme for O(hostname) you have to either import host certificate to your OS certificate store or use
-    O(validate_certs=false) which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.
+    O(validate_certs=false) which requires XenAPI library from XenServer 7.2 SDK or newer.
   - 'Network configuration inside a guest OS, by using parameters O(networks[].type), O(networks[].ip), O(networks[].gateway)
     and so on, is supported on XenServer 7.0 or newer for Windows guests by using official XenServer Guest agent support for
     network configuration. The module tries to detect if such support is available and utilize it, else it uses a custom method

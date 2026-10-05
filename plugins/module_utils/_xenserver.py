@@ -813,8 +813,7 @@ class XAPI:
                 # ignore_ssl is supported in XenAPI library from XenServer 7.2
                 # SDK onward but there is no way to tell which version we
                 # are using. TypeError will be raised if ignore_ssl is not
-                # supported. Additionally, ignore_ssl requires Python 2.7.9
-                # or newer.
+                # supported.
                 cls._xapi_session = XenAPI.Session(hostname, ignore_ssl=ignore_ssl)
             except TypeError:
                 # Try without ignore_ssl.

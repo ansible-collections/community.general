@@ -40,9 +40,6 @@ options:
       - Password for API authentication.
     type: str
 
-requirements:
-  - Python >= 2.7.9
-
 notes:
   - 'A sample configuration file for the config parameter can be found at:
     U(https://github.com/HewlettPackard/oneview-ansible/blob/master/examples/oneview_config-rename.json).'
