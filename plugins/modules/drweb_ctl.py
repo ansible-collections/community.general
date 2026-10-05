@@ -490,12 +490,14 @@ class DrwebCtlModule:
         cmd = self.build_command("cfset")
 
         if current_value == desired_value:
-            return {
+            result: dict[str, object] = {
                 "changed": False,
                 "cmd": cmd,
                 "current_value": current_value,
-                "drweb_version": self.get_drweb_version(),
             }
+            if not self.module.check_mode:
+                result["drweb_version"] = self.get_drweb_version()
+            return result
 
         if self.module.check_mode:
             return {
