@@ -26,6 +26,7 @@ options:
       - name: ONLINE_TOKEN
       - name: ONLINE_API_KEY
       - name: ONLINE_OAUTH_TOKEN
+    secret: true
   hostnames:
     description: List of preference about what to use as an hostname.
     type: list

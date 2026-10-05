@@ -44,11 +44,13 @@ options:
     type: str
     env:
       - name: AWS_SECRET_ACCESS_KEY
+    secret: true
   aws_session_token:
     description: AWS session token.
     type: str
     env:
       - name: AWS_SESSION_TOKEN
+    secret: true
 """
 
 EXAMPLES = r"""

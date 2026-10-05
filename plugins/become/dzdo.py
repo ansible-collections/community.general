@@ -68,6 +68,7 @@ options:
     ini:
       - section: dzdo_become_plugin
         key: password
+    secret: true
 """
 
 from ansible.plugins.become import BecomeBase
