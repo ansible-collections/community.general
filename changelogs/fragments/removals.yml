@@ -7,3 +7,5 @@ removed_features:
   - "puppet - the deprecated ``timeout`` option has been removed. Use the task-level ``timeout`` instead (https://github.com/ansible-collections/community.general/pull/12891)."
   - "pacemaker_cluster - the deprecated ``cleanup`` state has been removed. Use the community.general.pacemaker_resource module instead (https://github.com/ansible-collections/community.general/pull/12891)."
   - "monit - no longer supports monit < 5.19 (https://github.com/ansible-collections/community.general/pull/12891)."
+breaking_changes:
+  - "pfexec become plugin - the default for ``wrap_exe`` changed from ``false`` to ``true`` (https://github.com/ansible-collections/community.general/pull/12891)."
