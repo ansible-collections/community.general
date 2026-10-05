@@ -75,8 +75,7 @@ def test_pfexec_custom_flags(mocker, parser, reset_cli_args):
         "become_method": "community.general.pfexec",
         "become_flags": pfexec_flags,
     }
-    var_options = {
-    }
+    var_options = {}
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
     assert (
