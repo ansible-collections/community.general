@@ -48,12 +48,6 @@ anchors:
     rc: 0
     out: "other_process\n"
     err: ''
-  summary_present_518: &summary_present_518
-    command: [/testbin/monit, summary]
-    environ: {check_rc: true}
-    rc: 0
-    out: "processX\n"
-    err: ''
 
   # status commands with -B (version > 5.18)
   status_ok_526: &status_ok_526
@@ -189,19 +183,6 @@ test_cases:
       run_command:
         - *version_526
         - *summary_present_526
-
-  - id: state_present_already_present_old_monit
-    input:
-      name: processX
-      state: present
-    output:
-      changed: false
-      name: processX
-      state: present
-    mocks:
-      run_command:
-        - *version_518
-        - *summary_present_518
 
   - id: state_started_already_running
     # main(): is_process_present → wait_for_pending (get_status) → is_process_running (get_status)
@@ -951,28 +932,28 @@ test_cases:
           err: ''
         - *status_not_monitored_526
 
+  # no longer supported versions:
+
+  - id: parse_version_518
+    input:
+      name: processX
+      state: present
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version_518
+
   - id: parse_version_5181
     # "5.18.1" → (5, 18) not > (5, 18) → no -B; monit_version="5.18.1" in output
     input:
       name: processX
       state: stopped
     output:
-      changed: true
-      monit_version: "5.18.1"
-      state: stopped
+      failed: true
     mocks:
       run_command:
         - *version_5181
-        - *summary_present_518       # no -B because (5,18) == (5,18)
-        - *status_ok_no_b
-        - *status_ok_no_b
-        - *status_ok_no_b
-        - command: [/testbin/monit, stop, processX]
-          environ: {check_rc: true}
-          rc: 0
-          out: ''
-          err: ''
-        - *status_not_monitored_no_b
 
   - id: parse_version_5112
     # "5.1.12" → (5, 1) not > (5, 18) → no -B; monit_version="5.1.12" in output
@@ -980,19 +961,7 @@ test_cases:
       name: processX
       state: stopped
     output:
-      changed: true
-      monit_version: "5.1.12"
-      state: stopped
+      failed: true
     mocks:
       run_command:
         - *version_5112
-        - *summary_present_518       # no -B because (5,1) < (5,18)
-        - *status_ok_no_b
-        - *status_ok_no_b
-        - *status_ok_no_b
-        - command: [/testbin/monit, stop, processX]
-          environ: {check_rc: true}
-          rc: 0
-          out: ''
-          err: ''
-        - *status_not_monitored_no_b
