@@ -36,9 +36,9 @@ dnspython
 # requirement for the opentelemetry callback plugin
 # WARNING: these libraries rely on Protobuf for Python, which regularly stops installing.
 #          That's why they are disabled for now.
-# opentelemetry-api ; python_version >= '3.6' and python_version < '3.10'
-# opentelemetry-exporter-otlp ; python_version >= '3.6' and python_version < '3.10'
-# opentelemetry-sdk ; python_version >= '3.6' and python_version < '3.10'
+# opentelemetry-api ; python_version < '3.10'
+# opentelemetry-exporter-otlp ; python_version < '3.10'
+# opentelemetry-sdk ; python_version < '3.10'
 
 # requirement for the elastic callback plugin
 elastic-apm
@@ -50,11 +50,10 @@ passlib[argon2]
 python-nomad >= 2.0.0
 
 # requirement for jenkins_build, jenkins_node, jenkins_plugin modules
-python-jenkins < 1.8.0
-python-jenkins >= 0.4.12 ; python_version >= '3.8'
+python-jenkins >= 0.4.12
 
 # requirement for json_patch, json_patch_recipe and json_patch plugins
 jsonpatch
 
 # requirements for the wsl connection plugin
-paramiko >= 3.0.0 ; python_version >= '3.6'
+paramiko >= 3.0.0
