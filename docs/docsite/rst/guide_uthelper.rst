@@ -386,9 +386,5 @@ Known issues/opportunities for improvement:
 
 * Only one ``UTHelper`` per test module: UTHelper injects a test function with a fixed name into the module's namespace,
   so placing a second ``UTHelper`` instance is going to overwrite the function created by the first one.
-* Order of elements in module's namespace is not consistent across executions in Python 3.5, so if adding more tests to the test module
-  might make Test Helper add its function before or after the other test functions.
-  In the community.general collection the CI processes uses ``pytest-xdist`` to paralellize and distribute the tests,
-  and it requires the order of the tests to be consistent.
 
 .. versionadded:: 7.5.0

@@ -2,7 +2,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-cryptography >= 3.3, < 3.4 ; python_version < '3.9' # FIXME: the upper limit is needed for RHEL8.2, CentOS 8, Ubuntu 18.04, and OpenSuSE 15
 pywinrm >= 0.3.0 # message encryption support
 pycrypto >= 2.6 # Need features found in 2.6 and greater
 ncclient >= 0.5.2 # Need features added in 0.5.2 and greater
