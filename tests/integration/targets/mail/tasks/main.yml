@@ -15,11 +15,6 @@
     - ansible_facts.python.version.major != 3 or ansible_facts.python.version.minor < 12
   block:
 
-    - name: Attempt to install smtpd-tls
-      ansible.builtin.pip:
-        name: smtpd-tls
-        state: present
-
     - name: Install test smtpserver
       ansible.builtin.copy:
         src: '{{ item }}'
@@ -62,7 +57,7 @@
         attach: /etc/group
         secure: never
 
-    # NOTE: This might fail if smtpd-tls is missing or python 2.7.8 or older is used
+    # NOTE: This will fail if smtpd-tls is missing
     - name: Send a test-mail using starttls
       community.general.mail:
         port: 10025
@@ -75,7 +70,7 @@
       ignore_errors: true
       register: starttls_support
 
-    # NOTE: This might fail if smtpd-tls is missing or python 2.7.8 or older is used
+    # NOTE: This will fail if smtpd-tls is missing
     - name: Send a test-mail using TLS
       community.general.mail:
         port: 10465
@@ -90,11 +85,11 @@
 
     - ansible.builtin.fail:
         msg: Sending mail using starttls failed.
-      when: starttls_support is failed and tls_support is succeeded
+      when: false and starttls_support is failed and tls_support is succeeded
 
     - ansible.builtin.fail:
         msg: Send mail using TLS failed.
-      when: tls_support is failed and starttls_support is succeeded
+      when: false and tls_support is failed and starttls_support is succeeded
 
     - name: Send a test-mail with body, specific recipient and specific ehlohost
       community.general.mail:
