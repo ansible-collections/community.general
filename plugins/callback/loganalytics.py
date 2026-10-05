@@ -35,6 +35,7 @@ options:
     ini:
       - section: callback_loganalytics
         key: shared_key
+    secret: true
 deprecated:
   removed_in: 14.0.0
   why: The "HTTP Data Collector API" used by the plugin has been deprecated in Azure Monitor and replaced with the "Logs Ingestion API".

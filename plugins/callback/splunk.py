@@ -34,6 +34,7 @@ options:
     ini:
       - section: callback_splunk
         key: authtoken
+    secret: true
   validate_certs:
     description: Whether to validate certificates for connections to HEC. It is not recommended to set to V(false) except
       when you are sure that nobody can intercept the connection between this plugin and HEC, as setting it to V(false) allows

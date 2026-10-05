@@ -52,6 +52,7 @@ options:
     type: str
     env:
       - name: ANSIBLE_XO_PASSWORD
+    secret: true
   validate_certs:
     description: Verify TLS certificate if using HTTPS.
     type: boolean

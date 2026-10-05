@@ -69,6 +69,7 @@ options:
   userpass:
     description: Specify a password to save, instead of a generated one.
     type: str
+    secret: true
   length:
     description: The length of the generated password.
     type: integer
