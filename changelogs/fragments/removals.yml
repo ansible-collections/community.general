@@ -5,3 +5,4 @@ removed_features:
   - "layman - the deprecated module has been removed (https://github.com/ansible-collections/community.general/pull/12891)."
   - "linode - the deprecated module has been removed. Use community.general.linode_v4 instead (https://github.com/ansible-collections/community.general/pull/12891)."
   - "puppet - the deprecated ``timeout`` option has been removed. Use the task-level ``timeout`` instead (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "pacemaker_cluster - the deprecated ``cleanup`` state has been removed. Use the community.general.pacemaker_resource module instead (https://github.com/ansible-collections/community.general/pull/12891)."
