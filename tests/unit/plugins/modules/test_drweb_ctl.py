@@ -237,25 +237,17 @@ class TestDrwebCtlModule(unittest.TestCase):
         self.mock_module.run_command.assert_not_called()
 
     def test_scan_missing_path(self):
-        self._setup_module_params(
-            command="scan",
-            path=None,
-        )
-
-        with self.assertRaises(Exception):
+        self._setup_module_params(command="scan", path=None)
+        with self.assertRaises(Exception) as context:
             self._module().apply()
-
+        self.assertIn("fail_json called", str(context.exception))
         self.mock_module.fail_json.assert_called_with(msg="'path' is required when command=scan")
 
     def test_scan_nonexistent_path(self):
-        self._setup_module_params(
-            command="scan",
-            path="/nonexistent/path",
-        )
-
-        with self.assertRaises(Exception):
+        self._setup_module_params(command="scan", path="/nonexistent/path")
+        with self.assertRaises(Exception) as context:
             self._module().apply()
-
+        self.assertIn("fail_json called", str(context.exception))
         self.mock_module.fail_json.assert_called_with(msg="Scan path does not exist: /nonexistent/path")
 
     def test_threats(self):
@@ -424,31 +416,21 @@ class TestDrwebCtlModule(unittest.TestCase):
             1,
         )
 
-    def test_cfset_missing_key(self):
-        self._setup_module_params(
-            command="cfset",
-            parameter=None,
-            value="debug",
-        )
-
-        with self.assertRaises(Exception):
+    def test_cfset_missing_parament(self):
+        self._setup_module_params(command="cfset", parameter=None, value="debug")
+        with self.assertRaises(Exception) as context:
             self._module().apply()
-
-        self.mock_module.fail_json.assert_called_with(msg="'parameter' is required when command=cfset")
+        self.assertIn("fail_json called", str(context.exception))
+        self.mock_module.fail_json.assert_called_with(msg="'parament' is required when command=cfset")
 
     def test_cfset_missing_value(self):
-        self._setup_module_params(
-            command="cfset",
-            parameter="Update.LogLevel",
-            value=None,
-        )
-
-        with self.assertRaises(Exception):
+        self._setup_module_params(command="cfset", parameter="Update.LogLevel", value=None)
+        with self.assertRaises(Exception) as context:
             self._module().apply()
-
+        self.assertIn("fail_json called", str(context.exception))
         self.mock_module.fail_json.assert_called_with(msg="'value' is required when command=cfset")
 
-    def test_cfshow_key(self):
+    def test_cfshow_parameter(self):
         self._setup_module_params(
             command="cfshow",
             parameter="Update.LogLevel",
@@ -544,14 +526,10 @@ class TestDrwebCtlModule(unittest.TestCase):
         )
 
     def test_log_invalid_lines(self):
-        self._setup_module_params(
-            command="log",
-            lines=0,
-        )
-
-        with self.assertRaises(Exception):
+        self._setup_module_params(command="log", lines=0)
+        with self.assertRaises(Exception) as context:
             self._module().apply()
-
+        self.assertIn("fail_json called", str(context.exception))
         self.mock_module.fail_json.assert_called_with(msg="'lines' must be greater than zero when command=log")
 
     def test_check_mode_read_only(self):
@@ -575,10 +553,10 @@ class TestDrwebCtlModule(unittest.TestCase):
             if name == "drweb-ctl" and required
             else None
         )
-        mock_module.fail_json.side_effect = Exception("fail_json called")
+        mock_module.fail_json.side_effect = SystemExit("fail_json called")
         mock_ansible_module.return_value = mock_module
 
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(SystemExit) as context:
             drweb_ctl.main()
 
         self.assertIn(

@@ -350,7 +350,7 @@ class DrwebCtlModule:
         return self.parse_kv(stdout)
 
     def parse_baseinfo(self, stdout: str) -> dict[str, object]:
-        result: dict[str, object] = self.parse_kv(stdout)
+        result: dict[str, object] = dict(self.parse_kv(stdout))
         result["loaded"] = "Virus databases are not loaded" not in stdout
         return result
 
