@@ -68,7 +68,10 @@ EXAMPLES = r"""
 
 RETURN = r"""
 _raw:
-  description: A one-element list containing your GitHub access token.
+  description:
+    - A one-element list containing your GitHub access token.
+    - B(Note) on ansible-core 2.22+, the token will be registered as a secret.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   type: list
   elements: str
 """
@@ -104,6 +107,8 @@ from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.module_utils.urls import open_url
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
+
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 
 display = Display()
 
@@ -223,4 +228,4 @@ class LookupModule(LookupBase):
             self.get_option("token_expiry"),
         )
 
-        return [t]
+        return [mark_values_as_secrets(t)]
