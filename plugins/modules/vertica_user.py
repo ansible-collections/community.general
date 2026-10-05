@@ -376,8 +376,6 @@ def main():
         module.fail_json(msg=f"{e}", ansible_facts={"vertica_users": user_facts})
     except CannotDropError as e:
         module.fail_json(msg=f"{e}", ansible_facts={"vertica_users": user_facts})
-    except SystemExit:
-        raise
     except Exception as e:
         module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 
