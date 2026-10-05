@@ -69,6 +69,7 @@ options:
     ini:
       - section: ksu_become_plugin
         key: password
+    secret: true
   prompt_l10n:
     description:
       - List of localized strings to match for prompt detection.

@@ -43,6 +43,7 @@ options:
     required: false
     env:
       - name: COBBLER_PASSWORD
+    secret: true
   cache_fallback:
     description: Fallback to cached results if connection to cobbler fails.
     type: boolean

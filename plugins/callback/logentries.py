@@ -52,6 +52,7 @@ options:
     ini:
       - section: callback_logentries
         key: token
+    secret: true
   use_tls:
     description:
       - Toggle to decide whether to use TLS to encrypt the communications with the API server.

@@ -53,6 +53,7 @@ options:
     description: Pass session key instead of reading from env.
     type: str
     version_added: 8.4.0
+    secret: true
   result_count:
     description:
       - Number of results expected for the lookup query. Task fails if O(result_count) is set but does not match the number

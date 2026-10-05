@@ -72,6 +72,7 @@ options:
     ini:
       - section: pfexec_become_plugin
         key: password
+    secret: true
   wrap_exe:
     description:
       - Toggle to wrap the command C(pfexec) calls in C(shell -c) or not.
