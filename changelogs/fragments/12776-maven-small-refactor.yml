@@ -1,2 +1,0 @@
-minor_changes:
-  - maven_artifact - internal refactoring, no change in behavior (https://github.com/ansible-collections/community.general/pull/12776).

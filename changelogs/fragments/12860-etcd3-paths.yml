@@ -1,2 +1,0 @@
-minor_changes:
-  - "etcd3 lookup plugin - change the type of the ``ca_cert``, ``cert_cert``, and ``cert_key`` options from string to path, since they specify paths to certificates/keys (https://github.com/ansible-collections/community.general/pull/12860)."
