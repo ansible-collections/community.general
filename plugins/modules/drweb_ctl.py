@@ -439,14 +439,14 @@ class DrwebCtlModule:
 
     def get_current_cfvalue(self) -> str | None:
         rc, stdout, stderr = self.module.run_command(
-            [self.drweb_bin, "cfshow", self.key],
+            [self.drweb_bin, "cfshow", self.parameter],
             check_rc=True,
         )
 
         if rc != 0:
-            self.module.fail_json(msg=f"Failed to read configuration key '{self.key}': {stderr}")
+            self.module.fail_json(msg=f"Failed to read configuration key '{self.parameter}': {stderr}")
 
-        return self.parse_cfvalue(stdout, self.key)
+        return self.parse_cfvalue(stdout, self.parameter)
 
     def execute_command(self) -> dict[str, object]:
         cmd = self.build_command()
