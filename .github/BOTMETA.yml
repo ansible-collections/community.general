@@ -63,8 +63,6 @@ files:
     maintainers: v1v
   $callbacks/jabber.py: {}
   $callbacks/log_plays.py: {}
-  $callbacks/loganalytics.py:
-    maintainers: zhcli
   $callbacks/loganalytics_ingestion.py:
     ignore: zhcli
     maintainers: pboushy vsh47 wtcline-intc
