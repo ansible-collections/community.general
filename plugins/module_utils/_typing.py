@@ -155,10 +155,10 @@ if t.TYPE_CHECKING:  # pragma: no cover
         diff: t.NotRequired[ModuleDiffValue[_T]]
 
     class ModuleReturnDiffEx(t.TypedDict, t.Generic[_T]):
-        msg: ModuleDiffValue[_T]
+        diff: ModuleDiffValue[_T]
 
     class ModuleReturnDiffList(t.TypedDict, t.Generic[_T]):
         diff: t.NotRequired[MutableSequence[ModuleDiffValue[_T]]]
 
     class ModuleReturnDiffListEx(t.TypedDict, t.Generic[_T]):
-        msg: MutableSequence[ModuleDiffValue[_T]]
+        diff: MutableSequence[ModuleDiffValue[_T]]
