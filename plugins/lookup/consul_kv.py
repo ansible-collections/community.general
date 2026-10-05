@@ -34,6 +34,7 @@ options:
   token:
     description: The acl token to allow access to restricted values.
     type: str
+    secret: true
   host:
     default: localhost
     type: str

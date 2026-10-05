@@ -49,6 +49,7 @@ options:
     required: true
     env:
       - name: LINODE_ACCESS_TOKEN
+    secret: true
   regions:
     description: Populate inventory with instances in this region.
     default: []

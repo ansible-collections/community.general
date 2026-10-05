@@ -40,6 +40,7 @@ options:
       - Either O(key_path) or O(private_key) must be specified.
     type: str
     version_added: 10.0.0
+    secret: true
   token_expiry:
     description:
       - How long the token should last for in seconds.

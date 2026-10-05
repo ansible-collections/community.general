@@ -35,6 +35,7 @@ options:
     ini:
       - section: callback_loganalytics
         key: shared_key
+    secret: true
 """
 
 EXAMPLES = r"""

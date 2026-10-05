@@ -69,6 +69,7 @@ options:
     ini:
       - section: machinectl_become_plugin
         key: password
+    secret: true
 notes:
   - When not using this plugin with user V(root), it only works correctly with a polkit rule which alters the behaviour
     of C(machinectl). This rule must alter the prompt behaviour to ask directly for the user credentials, if the user is allowed

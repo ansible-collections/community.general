@@ -25,6 +25,7 @@ options:
       - name: BWS_ACCESS_TOKEN
     required: true
     type: str
+    secret: true
 """
 
 EXAMPLES = r"""
