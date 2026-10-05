@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import typing as t
 
-if t.TYPE_CHECKING:
+if t.TYPE_CHECKING:  # pragma: no cover
     from ansible_collections.community.general.plugins.module_utils._typing import ArgumentSpecT
 
 
