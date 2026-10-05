@@ -2893,3 +2893,176 @@ releases:
       - 9020-haproxy-drain-down-guard.yml
       - homebrew_cask-version-regex-multisegment.yml
     release_date: '2026-09-07'
+  12.6.6:
+    changes:
+      bugfixes:
+        - bitwarden lookup plugin - mark the ``bw_session`` option as sensitive so
+          that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - bitwarden_secrets_manager lookup plugin - mark the ``bws_access_token``
+          option as sensitive so that ansible-core 2.22+ will automatically redact
+          its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - capabilities - fix idempotency when the installed ``libcap`` normalizes
+          capability operators or flags, or when multiple capabilities are set at
+          once (https://github.com/ansible-collections/community.general/issues/4067,
+          https://github.com/ansible-collections/community.general/pull/12650).
+        - cobbler inventory plugin - do not use TLS when connecting to ``http://``
+          URLs (https://github.com/ansible-collections/community.general/issues/11246,
+          https://github.com/ansible-collections/community.general/pull/12847).
+        - cobbler inventory plugin - fix crash about a missing ``_cache`` attribute
+          when inventory caching is disabled (https://github.com/ansible-collections/community.general/pull/12848).
+        - cobbler inventory plugin - mark the ``password`` option as sensitive so
+          that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - consul_kv lookup plugin - mark the ``token`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - credstash lookup plugin - mark the ``aws_secret_access_key`` and ``aws_session_token``
+          options as sensitive so that ansible-core 2.22+ will automatically redact
+          its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - doas become plugin - mark the ``become_pass`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - dsv lookup plugin - mark the ``client_secret`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - dzdo become plugin - mark the ``become_pass`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - elastic callback plugin - mark the ``apm_secret_token`` and ``apm_api_key``
+          options as sensitive so that ansible-core 2.22+ will automatically redact
+          its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - etcd3 lookup plugin - mark the ``password`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - git_config and git_config_info - allow empty string values and preserve
+          idempotency (https://github.com/ansible-collections/community.general/issues/12502,
+          https://github.com/ansible-collections/community.general/pull/12708).
+        - github_app_access_token lookup plugin - mark the ``private_key`` option
+          as sensitive so that ansible-core 2.22+ will automatically redact its values
+          in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - github_app_access_token lookup plugin - mark the return value as a secret
+          on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12884).
+        - gitlab_runners inventory plugin - mark the ``api_token`` option as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - icinga2 inventory plugin - mark the ``password`` option as sensitive so
+          that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - ip_netns - fix namespace existence checks when one namespace name is a prefix
+          of another (https://github.com/ansible-collections/community.general/issues/12731,
+          https://github.com/ansible-collections/community.general/pull/12743).
+        - ip_netns - report no change in check mode for ``state=present`` when the
+          requested namespace already exists (https://github.com/ansible-collections/community.general/issues/12839,
+          https://github.com/ansible-collections/community.general/pull/12842).
+        - jabber callback plugin - mark the ``password`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - ksu become plugin - mark the ``become_pass`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - linode inventory plugin - mark the ``access_token`` option as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - loganalytics callback plugin - mark the ``client_secret`` option as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - loganalytics_ingestion callback plugin - mark the ``shared_key`` option
+          as sensitive so that ansible-core 2.22+ will automatically redact its values
+          in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - logdna callback plugin - mark the ``conf_key`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - logentries callback plugin - mark the ``token`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - lxd inventory plugin - mark the ``trust_password`` option as sensitive so
+          that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - machinectl become plugin - mark the ``become_pass`` option as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - nrdp callback plugin - mark the ``token`` option as sensitive so that ansible-core
+          2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - onepassword, onepassword_doc, onepassword_raw, and onepassword_ssh_key lookup
+          plugins - mark the ``master_password``, ``secret_key``, ``service_account_token``,
+          and ``connect_token`` options as sensitive so that ansible-core 2.22+ will
+          automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - online inventory plugin - mark the ``oauth_token`` option as sensitive so
+          that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - opennebula inventory plugin - mark the ``api_password`` option as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - pacman - tolerate the AUR package age badge (for example ``[9d2h]``) that
+          AUR helpers such as ``yay`` append to the ``--query --upgrades`` output,
+          instead of failing with an ``Invalid line`` error (https://github.com/ansible-collections/community.general/pull/12857).
+        - passwordstore lookup plugin - mark the ``userpass`` option as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - pbrun become plugin - mark the ``become_pass`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - pfexec become plugin - mark the ``become_pass`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - pkgng - fix ``state=latest`` for specific packages on FreeBSD 14.4+ (https://github.com/ansible-collections/community.general/issues/11907,
+          https://github.com/ansible-collections/community.general/pull/12789).
+        - pmrun become plugin - mark the ``become_pass`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - revbitspss lookup plugin - mark the ``api_key`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - scaleway inventory plugin - mark the ``oauth_token`` option as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - sesu become plugin - mark the ``become_pass`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - splunk callback plugin - mark the ``authtoken`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - sudosu become plugin - mark the ``become_pass`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - tss lookup plugin - mark the ``password`` and ``token`` options as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - wsl connection plugin - mark the ``password`` option as sensitive so that
+          ansible-core 2.22+ will automatically redact its values in outputs (https://github.com/ansible-collections/community.general/pull/12723).
+        - xen_orchestra inventory plugin - mark the ``password`` option as sensitive
+          so that ansible-core 2.22+ will automatically redact its values in outputs
+          (https://github.com/ansible-collections/community.general/pull/12723).
+        - xenserver_guest - skip provisioning when existing VM is used as a template
+          (https://github.com/ansible-collections/community.general/issues/12576,
+          https://github.com/ansible-collections/community.general/pull/12717).
+        - zpool - fix idempotency of vdevs ``special`` and ``dedup`` (https://github.com/ansible-collections/community.general/issues/12744,
+          https://github.com/ansible-collections/community.general/pull/12745).
+      minor_changes:
+        - elastic callback plugin - redact sensitive output on ansible-core 2.22+
+          (https://github.com/ansible-collections/community.general/pull/12829).
+        - jabber callback plugin - redact sensitive output on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12785).
+        - log_plays callback plugin - redact sensitive output on ansible-core 2.22+
+          (https://github.com/ansible-collections/community.general/pull/12785).
+        - loganalytics callback plugin - redact sensitive output on ansible-core 2.22+
+          (https://github.com/ansible-collections/community.general/pull/12785).
+        - loganalytics_ingestion callback plugin - refactor to use ansible-core 2.22's
+          new secrets API in order to properly mark and mask secrets (https://github.com/ansible-collections/community.general/pull/12758).
+        - logstash callback plugin - redact sensitive output on ansible-core 2.22+
+          (https://github.com/ansible-collections/community.general/pull/12785).
+        - mail callback plugin - redact sensitive output on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12785).
+        - nrdp callback plugin - redact sensitive output on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12785).
+        - opentelemetry callback plugin - redact sensitive output on ansible-core
+          2.22+ (https://github.com/ansible-collections/community.general/pull/12787).
+        - say callback plugin - redact sensitive output on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12785).
+        - slack callback plugin - redact sensitive output on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12785).
+        - splunk callback plugin - redact sensitive output on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12785).
+        - sumologic callback plugin - redact sensitive output on ansible-core 2.22+
+          (https://github.com/ansible-collections/community.general/pull/12785).
+        - syslog_json callback plugin - redact sensitive output on ansible-core 2.22+
+          (https://github.com/ansible-collections/community.general/pull/12785).
+      release_summary: Regular bugfix release.
+    fragments:
+      - 12.6.6.yml
+      - 12502-git-config-empty-value.yml
+      - 12650-capabilities-idempotent.yml
+      - 12717-xenserver-skip-provisioning-on-existing-vm-as-template.yml
+      - 12723-secret.yml
+      - 12743-ip-netns-exists-check.yml
+      - 12744-zpool-special-dedup-vdev-layout.yml
+      - 12758-update-log-analytics-ingestion-to-use-the-new-secrets-api.yml
+      - 12785-callback-secrets.yml
+      - 12787-opentelemetry.yml
+      - 12789-pkgng.yml
+      - 12829-elastic.yml
+      - 12842-ip-netns-check-mode.yml
+      - 12847-cobbler-http-transport.yml
+      - 12848-cobbler-cache-disabled.yml
+      - 12857-pacman-yay-age-badge.yml
+      - 12884-return-value-secrets.yml
+    release_date: '2026-10-05'

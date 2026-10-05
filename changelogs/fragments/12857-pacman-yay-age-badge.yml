@@ -1,4 +1,0 @@
-bugfixes:
-  - pacman - tolerate the AUR package age badge (for example ``[9d2h]``) that AUR helpers
-    such as ``yay`` append to the ``--query --upgrades`` output, instead of failing with
-    an ``Invalid line`` error (https://github.com/ansible-collections/community.general/pull/12857).
