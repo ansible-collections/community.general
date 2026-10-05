@@ -44,8 +44,8 @@ options:
     type: str
     description:
       - The explicit executable or a pathname to the executable to be used to run easy_install for a specific version of Python
-        installed in the system. For example V(easy_install-3.3), if there are both Python 2.7 and 3.3 installations in the
-        system and you want to run easy_install for the Python 3.3 installation.
+        installed in the system. For example V(easy_install-3.14), if there are both Python 3.9 and 3.14 installations in the
+        system and you want to run easy_install for the Python 3.14 installation.
     default: easy_install
   state:
     type: str

@@ -93,7 +93,6 @@ options:
 requirements:
   - PyGithub>=1.54
 notes:
-  - For Python 3, PyGithub>=1.54 should be used.
   - The O(visibility) option requires PyGithub>=1.58 which added support for the C(visibility) parameter
     in V(Organization.create_repo(\)) and V(Repository.edit(\)).
 author:

@@ -189,8 +189,7 @@ def _write_structured_data(basedir, basename, data):
         os.makedirs(basedir)
     file_path = os.path.join(basedir, f"{basename}.json")
     # This is more complex than you might normally expect because we want to
-    # open the file with only u+rw set. Also, we use the stat constants
-    # because ansible still supports python 2.4 and the octal syntax changed
+    # open the file with only u+rw set.
     out_file = os.fdopen(os.open(file_path, os.O_CREAT | os.O_WRONLY, stat.S_IRUSR | stat.S_IWUSR), "w")
     out_file.write(json.dumps(data))
     out_file.close()
