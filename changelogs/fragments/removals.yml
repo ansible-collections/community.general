@@ -1,0 +1,2 @@
+removed_features:
+  - "The collection no longer supports ansible-core 2.18. It requires at least ansible-core 2.19.0+ (https://github.com/ansible-collections/community.general/pull/12891)."
