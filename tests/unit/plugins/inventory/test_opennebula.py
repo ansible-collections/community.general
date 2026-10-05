@@ -15,8 +15,6 @@ from ansible import constants as C
 from ansible.inventory.data import InventoryData
 from ansible.inventory.manager import InventoryManager
 from ansible.module_utils.common.text.converters import to_native
-from ansible.parsing.dataloader import DataLoader
-from ansible.template import Templar
 from ansible_collections.community.internal_test_tools.tests.unit.mock.loader import DictDataLoader
 from ansible_collections.community.internal_test_tools.tests.unit.mock.path import mock_unfrackpath_noop
 from ansible_collections.community.internal_test_tools.tests.unit.utils.trust import (
@@ -68,9 +66,6 @@ class HistoryRecords:
 def inventory():
     r = InventoryModule()
     r.inventory = InventoryData()
-    if not hasattr(r, "templar"):
-        # This is necessary for ansible-core 2.18; 2.19+ provide this out-of-the-box
-        r.templar = Templar(loader=DataLoader())
     return r
 
 
