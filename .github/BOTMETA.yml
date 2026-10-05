@@ -876,8 +876,6 @@ files:
     maintainers: Sedward
   $modules/linode:
     maintainers: $team_linode
-  $modules/linode.py:
-    maintainers: zbal
   $modules/listen_ports_facts.py:
     maintainers: ndavison
   $modules/lldp_facts.py:
