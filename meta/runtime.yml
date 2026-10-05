@@ -3,7 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-requires_ansible: '>=2.18.0'
+requires_ansible: '>=2.19.0'
 action_groups:
   consul:
     - consul_agent_check
@@ -71,7 +71,7 @@ plugin_routing:
         removal_version: 10.0.0
         warning_text: The hipchat service has been discontinued and the self-hosted variant has been End of Life since 2020.
     loganalytics:
-      deprecation:
+      tombstone:
         removal_version: 14.0.0
         warning_text: The "HTTP Data Collector API" used by the plugin has been deprecated in Azure and replaced with the "Logs Ingestion API".  Please migrate to the 'community.general.loganalytics_ingestion' plugin.
     osx_say:
@@ -538,7 +538,7 @@ plugin_routing:
         removal_version: 15.0.0
         warning_text: Use ibm.power_aix.installp instead. The C(ibm.power_aix) collection is actively maintained by IBM.
     jboss:
-      deprecation:
+      tombstone:
         removal_version: 14.0.0
         warning_text: Use role middleware_automation.wildfly.wildfly_app_deploy instead.
     jenkins_job_facts:
@@ -750,7 +750,7 @@ plugin_routing:
         removal_version: 16.0.0
         warning_text: The lldp module has been renamed to lldp_facts.
     layman:
-      deprecation:
+      tombstone:
         removal_version: 14.0.0
         warning_text: Gentoo deprecated C(layman) in mid-2023.
     ldap_attr:
@@ -758,7 +758,7 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: Use community.general.ldap_attrs instead.
     linode:
-      deprecation:
+      tombstone:
         removal_version: 14.0.0
         warning_text: The module relies on the sunset Linode API v3; use community.general.linode_v4 instead.
     logicmonitor:

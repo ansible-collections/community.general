@@ -27,7 +27,7 @@ options:
       - Indicate desired state of the cluster.
       - The value V(maintenance) has been added in community.general 11.1.0.
       - The value V(unmaintenance) has been added in community.general 13.3.0.
-    choices: [cleanup, offline, online, restart, maintenance, unmaintenance]
+    choices: [offline, online, restart, maintenance, unmaintenance]
     type: str
     required: true
   name:
@@ -78,7 +78,7 @@ class PacemakerCluster(StateModuleHelper):
         argument_spec=dict(
             state=dict(
                 type="str",
-                choices=["cleanup", "offline", "online", "restart", "maintenance", "unmaintenance"],
+                choices=["offline", "online", "restart", "maintenance", "unmaintenance"],
                 required=True,
             ),
             name=dict(type="str", aliases=["node"]),
@@ -97,20 +97,10 @@ class PacemakerCluster(StateModuleHelper):
             get_args["cli_action"] = "property"
             get_args["state"] = "config"
             get_args["name"] = "maintenance-mode"
-        elif self.module.params["state"] == "cleanup":
-            get_args["cli_action"] = "resource"
-            get_args["name"] = self.module.params["name"]
 
         self.vars.set("get_args", get_args)
         self.vars.set("previous_value", self._get()["out"])
         self.vars.set("value", self.vars.previous_value, change=True, diff=True)
-
-        if self.module.params["state"] == "cleanup":
-            self.module.deprecate(
-                'The value `cleanup` for "state" is being deprecated, use pacemaker_resource module instead.',
-                version="14.0.0",
-                collection_name="community.general",
-            )
 
     def __quit_module__(self):
         self.vars.set("value", self._get()["out"])
@@ -145,12 +135,6 @@ class PacemakerCluster(StateModuleHelper):
                     return False
 
         return True
-
-    def state_cleanup(self):
-        with self.runner(
-            "cli_action state name", output_process=self._process_command_output(True, "Fail"), check_mode_skip=True
-        ) as ctx:
-            ctx.run(cli_action="resource")
 
     def state_offline(self):
         with self.runner(

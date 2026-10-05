@@ -19,14 +19,6 @@ attributes:
   diff_mode:
     support: none
 options:
-  timeout:
-    description:
-      - How long to wait for C(puppet) to finish.
-      - This parameter is deprecated and will be removed in community.general 14.0.0.
-        Use the task-level C(timeout) keyword instead.
-        To suppress this deprecation warning, set O(timeout) to V("").
-    type: str
-    default: 30m
   puppetmaster:
     description:
       - The hostname of the puppetmaster to contact.
@@ -144,10 +136,6 @@ EXAMPLES = r"""
 - name: Run puppet agent and fail if anything goes wrong
   community.general.puppet:
 
-- name: Run puppet and timeout in 5 minutes
-  community.general.puppet:
-    timeout: 5m
-
 - name: Run puppet using a different environment
   community.general.puppet:
     environment: testing
@@ -211,7 +199,6 @@ def _write_structured_data(basedir, basename, data):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            timeout=dict(type="str", default="30m"),
             puppetmaster=dict(type="str"),
             modulepath=dict(type="str"),
             manifest=dict(type="str"),
@@ -242,15 +229,6 @@ def main():
         ],
     )
     p = module.params
-
-    if p["timeout"]:
-        module.deprecate(
-            'The "timeout" parameter is deprecated and will be removed in community.general 14.0.0. '
-            'Use the task-level "timeout" keyword instead. '
-            "To suppress this warning, set \"timeout: ''\" in the task.",
-            version="14.0.0",
-            collection_name="community.general",
-        )
 
     if p["manifest"]:
         if not os.path.exists(p["manifest"]):

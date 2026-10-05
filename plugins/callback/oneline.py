@@ -44,23 +44,14 @@ COLOR_SKIP = C.COLOR_SKIP  # type: ignore[attr-defined]
 
 
 def get_result(result: CallbackTaskResult) -> Mapping[str, t.Any]:
-    if not hasattr(result, "result"):
-        # ansible-core 2.18 fallback
-        return result._result
     return result.result
 
 
 def get_host(result: CallbackTaskResult) -> Host:
-    if not hasattr(result, "host"):
-        # ansible-core 2.18 fallback
-        return result._host
     return result.host
 
 
 def get_task(result: CallbackTaskResult) -> Task:
-    if not hasattr(result, "task"):
-        # ansible-core 2.18 fallback
-        return result._task
     return result.task
 
 

@@ -40,7 +40,7 @@ author:
   - Darryl Stoflet (@dstoflet)
   - Simon Kelly (@snopoke)
 requirements:
-  - Monit. Support for versions 5.18 and older is deprecated and will be removed in community.general 14.0.0.
+  - Monit >= 5.19
 """
 
 EXAMPLES = r"""
@@ -128,11 +128,7 @@ class Monit:
         self._status_change_retry_count = 6
 
         if self.monit_version() <= (5, 18):
-            module.deprecate(
-                "Support for monit 5.18 and older is deprecated and will be removed in community.general 14.0.0.",
-                version="14.0.0",
-                collection_name="community.general",
-            )
+            module.fail_json(msg="The module requires monit 5.19 or newer.")
 
     def monit_version(self):
         if self._monit_version is None:
@@ -165,10 +161,6 @@ class Monit:
             state=state,
         )
 
-    @property
-    def command_args(self):
-        return ["-B"] if self.monit_version() > (5, 18) else []
-
     def get_status(self, validate=False) -> Status:
         """Return the status of the process in monit.
 
@@ -176,7 +168,7 @@ class Monit:
         """
         monit_command = "validate" if validate else "status"
         check_rc = not validate  # 'validate' always has rc = 1
-        command = [self.monit_bin_path, monit_command] + self.command_args + [self.process_name]
+        command = [self.monit_bin_path, monit_command, "-B", self.process_name]
         rc, out, err = self.module.run_command(command, check_rc=check_rc)
         return self._parse_status(out, err)
 
@@ -216,7 +208,7 @@ class Monit:
             return status
 
     def is_process_present(self):
-        command = [self.monit_bin_path, "summary"] + self.command_args
+        command = [self.monit_bin_path, "summary", "-B"]
         rc, out, err = self.module.run_command(command, check_rc=True)
         return bool(re.findall(rf"\b{self.process_name}\b", out))
 

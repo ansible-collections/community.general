@@ -85,7 +85,7 @@ options:
       - name: ANSIBLE_DOAS_PROMPT_L10N
   allow_pipelining:
     description:
-      - When set to V(true), do allow pipelining with ansible-core 2.19+.
+      - When set to V(true), do allow pipelining.
       - This should only be used when doas is configured to not ask for a password (C(nopass)).
     type: boolean
     default: false
@@ -100,9 +100,8 @@ options:
 notes:
   - This become plugin does not work when connection pipelining is enabled
     and doas requests a password.
-    With ansible-core 2.19+, using this plugin automatically disables pipelining,
+    Using this plugin automatically disables pipelining,
     unless O(allow_pipelining=true) is explicitly set by the user.
-    On ansible-core 2.18 and before, pipelining must explicitly be disabled by the user.
 """
 
 import re

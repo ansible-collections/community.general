@@ -60,8 +60,8 @@ options:
     type: string
 notes:
   - This plugin only works when a C(polkit) rule is in place.
-  - This become plugin does not work when connection pipelining is enabled. With ansible-core 2.19+, using it automatically
-    disables pipelining. On ansible-core 2.18 and before, pipelining must explicitly be disabled by the user.
+  - This become plugin does not work when connection pipelining is enabled. Using it automatically
+    disables pipelining.
 """
 
 EXAMPLES = r"""

@@ -120,7 +120,6 @@ include_devel = true
 split_by_python_version = true
 
 [sessions.ansible_test_units.core_python_versions]
-"2.18" = ["3.8", "3.11", "3.13"]
 "2.19" = ["3.8", "3.11", "3.13"]
 "2.20" = ["3.9", "3.12", "3.14"]
 "2.21" = ["3.9", "3.12", "3.14"]
@@ -146,31 +145,6 @@ retry_on_error = "in-ci"
 "quay.io/ansible-community/test-image:opensuse-tumbleweed" = "OpenSuSE Tumbleweed"
 
 ##################################################################################################
-
-# Ansible-core 2.18:
-
-[[sessions.ansible_test_integration.groups]]
-session_name = "ansible-test-integration-2.18"
-description = "Meta session for running all ansible-test-integration-2.18-* sessions."
-
-[[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "2.18"
-target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
-docker = [ "fedora40", "ubuntu2404", "alpine320" ]
-
-[[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "2.18"
-target = [ "azp/generic/1/" ]
-python_version = [ "3.8", "3.13" ]
-docker = "default"
-
-[[sessions.ansible_test_integration.groups.sessions]]
-ansible_core = "2.18"
-target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
-remote = [
-    # "macos/14.3",
-    # "freebsd/14.1"
-]
 
 # Ansible-core 2.19:
 

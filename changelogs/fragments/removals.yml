@@ -1,0 +1,11 @@
+removed_features:
+  - "The collection no longer supports ansible-core 2.18. It requires at least ansible-core 2.19.0+ (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "loganalytics callback plugin - the deprecated plugin has been removed. Please migrate to the community.general.loganalytics_ingestion callback plugin instead (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "jboss - the deprecated module has been removed. Please migrate to the role middleware_automation.wildfly.wildfly_app_deploy instead (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "layman - the deprecated module has been removed (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "linode - the deprecated module has been removed. Use community.general.linode_v4 instead (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "puppet - the deprecated ``timeout`` option has been removed. Use the task-level ``timeout`` instead (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "pacemaker_cluster - the deprecated ``cleanup`` state has been removed. Use the community.general.pacemaker_resource module instead (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "monit - no longer supports monit < 5.19 (https://github.com/ansible-collections/community.general/pull/12891)."
+breaking_changes:
+  - "pfexec become plugin - the default for ``wrap_exe`` changed from ``false`` to ``true`` (https://github.com/ansible-collections/community.general/pull/12891)."

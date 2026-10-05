@@ -120,36 +120,7 @@
             - "{{ bar }}"
             - "{{ foo }}"
 
-    - when: ansible_version.full is version("2.19", "<")
-      ansible.builtin.assert:
-        that:
-          - complex == exp_complex
-          # With ansible-core 2.18 and before, the vaulted string is decryped before it reaches the filter,
-          # so the redaction does not work there.
-          - complex_redact == exp_complex
-          - complex_nice == exp_complex_nice
-          # With ansible-core 2.18 and before, the vaulted string is decryped before it reaches the filter,
-          # so the redaction does not work there.
-          - complex_nice_redact == exp_complex_nice
-      vars:
-        exp_complex: |
-          bam: foobar
-          bang: ['2025-01-02 03:04:05+00:00', foobarbaz, bar]
-          bar: 1.23
-          baz: true
-          foo: 123
-        exp_complex_nice: |
-          bam: foobar
-          bang:
-          - '2025-01-02 03:04:05+00:00'
-          - foobarbaz
-          - bar
-          bar: 1.23
-          baz: true
-          foo: 123
-
-    - when: ansible_version.full is version("2.19", ">=")
-      ansible.builtin.assert:
+    - ansible.builtin.assert:
         that:
           - complex == exp_complex
           - complex_redact == exp_complex_redact

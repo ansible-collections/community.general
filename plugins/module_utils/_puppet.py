@@ -51,16 +51,6 @@ def ensure_agent_enabled(module: AnsibleModule) -> None:
 
 
 def puppet_runner(module: AnsibleModule) -> CmdRunner:
-    # Keeping backward compatibility, allow for running with the `timeout` CLI command.
-    # If this can be replaced with ansible `timeout` parameter in playbook,
-    # then this function could be removed.
-    def _prepare_base_cmd():
-        if module.params["timeout"]:
-            _tout_cmd = module.get_bin_path("timeout", False)
-            if _tout_cmd:
-                return ["timeout", "-s", "9", module.params["timeout"], _puppet_cmd(module)]
-        return ["puppet"]
-
     def noop_func(v):
         return ["--noop"] if module.check_mode or v else ["--no-noop"]
 
@@ -78,7 +68,7 @@ def puppet_runner(module: AnsibleModule) -> CmdRunner:
 
     runner = CmdRunner(
         module,
-        command=_prepare_base_cmd(),
+        command=["puppet"],
         path_prefix=_PUPPET_PATH_PREFIX,
         arg_formats=dict(
             _agent_fixed=cmd_runner_fmt.as_fixed(

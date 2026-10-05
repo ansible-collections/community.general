@@ -122,20 +122,13 @@ from collections.abc import Mapping, Sequence
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
-from ansible.template import Templar
+from ansible.template import trust_as_template as _trust_as_template
 
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
-try:
-    from ansible.template import trust_as_template as _trust_as_template
-
-    HAS_DATATAGGING = True
-except ImportError:
-    HAS_DATATAGGING = False
-
 
 def _make_safe(value):
-    if HAS_DATATAGGING and isinstance(value, str):
+    if isinstance(value, str):
         return _trust_as_template(value)
     return value
 
@@ -201,10 +194,7 @@ class LookupModule(LookupBase):
 
         result = []
         if len(terms) > 0:
-            if HAS_DATATAGGING:
-                templar = self._templar.copy_with_new_env(available_variables={})
-            else:
-                templar = Templar(loader=self._templar._loader)
+            templar = self._templar.copy_with_new_env(available_variables={})
             data = []
             vars_so_far = set()
             for index, term in enumerate(terms):

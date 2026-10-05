@@ -75,8 +75,8 @@ notes:
     of C(machinectl). This rule must alter the prompt behaviour to ask directly for the user credentials, if the user is allowed
     to perform the action (take a look at the examples section). If such a rule is not present the plugin only works if it
     is used in context with the root user, because then no further prompt is shown by C(machinectl).
-  - This become plugin does not work when connection pipelining is enabled. With ansible-core 2.19+, using it automatically
-    disables pipelining. On ansible-core 2.18 and before, pipelining must explicitly be disabled by the user.
+  - This become plugin does not work when connection pipelining is enabled. Using it automatically
+    disables pipelining.
 """
 
 EXAMPLES = r"""

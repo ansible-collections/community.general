@@ -3,9 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Bail out if Python < 3.8
-  when: ansible_facts.python_version is version('3.8', '<')
-  ansible.builtin.meta: end_play
 - name: Install pipx>=1.7.0
   ansible.builtin.pip:
     name: pipx>=1.7.0
