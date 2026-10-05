@@ -538,7 +538,7 @@ plugin_routing:
         removal_version: 15.0.0
         warning_text: Use ibm.power_aix.installp instead. The C(ibm.power_aix) collection is actively maintained by IBM.
     jboss:
-      deprecation:
+      tombstone:
         removal_version: 14.0.0
         warning_text: Use role middleware_automation.wildfly.wildfly_app_deploy instead.
     jenkins_job_facts:

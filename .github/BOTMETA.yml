@@ -820,9 +820,6 @@ files:
     maintainers: haad absynth76
   $modules/java_keystore.py:
     maintainers: Mogztter quidame
-  $modules/jboss.py:
-    labels: jboss
-    maintainers: $team_jboss jhoekx
   $modules/jenkins_build.py:
     maintainers: brettmilford unnecessary-username juanmcasanova
   $modules/jenkins_build_info.py:
@@ -1599,7 +1596,6 @@ macros:
   team_hpux: bcoca davx8342
   team_huawei: QijunPan TommyLike edisonxiang freesky-edward hwDCN niuzhenguo xuxiaowei0512 yanzhangi zengchen1024 zhongjun2
   team_ipa: Akasurde Nosmoht justchris1
-  team_jboss: Wolfant jairojunior wbrefvem
   team_linode: InTheCloudDan decentral1se displague rmcintosh Charliekenney23 LBGarber
   team_macos: Akasurde kyleabenson martinm82 danieljaouen indrajitr
   team_manageiq: abellotti cben gtanzillo yaacov zgalor dkorn evertmulder
