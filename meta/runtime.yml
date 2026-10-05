@@ -750,7 +750,7 @@ plugin_routing:
         removal_version: 16.0.0
         warning_text: The lldp module has been renamed to lldp_facts.
     layman:
-      deprecation:
+      tombstone:
         removal_version: 14.0.0
         warning_text: Gentoo deprecated C(layman) in mid-2023.
     ldap_attr:

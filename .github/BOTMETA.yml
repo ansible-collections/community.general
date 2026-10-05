@@ -860,8 +860,6 @@ files:
     maintainers: bakanovskii
   $modules/launchd.py:
     maintainers: martinm82
-  $modules/layman.py:
-    maintainers: jirutka
   $modules/lbu.py:
     maintainers: kunkku
   $modules/ldap_attrs.py:
