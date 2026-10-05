@@ -4,3 +4,4 @@ removed_features:
   - "jboss - the deprecated module has been removed. Please migrate to the role middleware_automation.wildfly.wildfly_app_deploy instead (https://github.com/ansible-collections/community.general/pull/12891)."
   - "layman - the deprecated module has been removed (https://github.com/ansible-collections/community.general/pull/12891)."
   - "linode - the deprecated module has been removed. Use community.general.linode_v4 instead (https://github.com/ansible-collections/community.general/pull/12891)."
+  - "puppet - the deprecated ``timeout`` option has been removed. Use the task-level ``timeout`` instead (https://github.com/ansible-collections/community.general/pull/12891)."
