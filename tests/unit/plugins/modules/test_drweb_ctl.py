@@ -421,7 +421,7 @@ class TestDrwebCtlModule(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             self._module().apply()
         self.assertIn("fail_json called", str(context.exception))
-        self.mock_module.fail_json.assert_called_with(msg="'parament' is required when command=cfset")
+        self.mock_module.fail_json.assert_called_with(msg="'parameter' is required when command=cfset")
 
     def test_cfset_missing_value(self):
         self._setup_module_params(command="cfset", parameter="Update.LogLevel", value=None)
