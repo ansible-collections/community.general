@@ -1,2 +1,2 @@
 bugfixes:
-  - ipa_hostgroup - fix task failure when it actually succeeded (https://github.com/ansible-collections/community.general/issues/12853).
+  - ipa_hostgroup - fix task failure when it actually succeeded (https://github.com/ansible-collections/community.general/issues/12853, https://github.com/ansible-collections/community.general/pull/12854).
