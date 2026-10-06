@@ -50,6 +50,61 @@ IGNORE_NO_MAINTAINERS = [
     "plugins/lookup/shelvefile.py",
     "plugins/filter/json_query.py",
     "plugins/filter/random_mac.py",
+
+    # TODO:
+    "plugins/doc_fragments/_alicloud.py",
+    "plugins/doc_fragments/_attributes.py",
+    "plugins/doc_fragments/_auth_basic.py",
+    "plugins/doc_fragments/_bitbucket.py",
+    "plugins/doc_fragments/_consul.py",
+    "plugins/doc_fragments/_emc.py",
+    "plugins/doc_fragments/_gitlab.py",
+    "plugins/doc_fragments/_ibm_storage.py",
+    "plugins/doc_fragments/_influxdb.py",
+    "plugins/doc_fragments/_ipa.py",
+    "plugins/doc_fragments/_kopia.py",
+    "plugins/doc_fragments/_ldap.py",
+    "plugins/doc_fragments/_lxca_common.py",
+    "plugins/doc_fragments/_manageiq.py",
+    "plugins/doc_fragments/_onepassword.py",
+    "plugins/doc_fragments/_oneview.py",
+    "plugins/doc_fragments/_online.py",
+    "plugins/doc_fragments/_opennebula.py",
+    "plugins/doc_fragments/_openswitch.py",
+    "plugins/doc_fragments/_pritunl.py",
+    "plugins/doc_fragments/_redfish.py",
+    "plugins/doc_fragments/_redis.py",
+    "plugins/doc_fragments/_rundeck.py",
+    "plugins/doc_fragments/_scaleway.py",
+    "plugins/doc_fragments/_scaleway_waitable_resource.py",
+    "plugins/doc_fragments/_utm.py",
+    "plugins/doc_fragments/_vexata.py",
+    "plugins/module_utils/_alicloud_ecs.py",
+    "plugins/module_utils/_bitbucket.py",
+    "plugins/module_utils/_consul.py",
+    "plugins/module_utils/_csv.py",
+    "plugins/module_utils/_filelock.py",
+    "plugins/module_utils/_gandi_livedns_api.py",
+    "plugins/module_utils/_heroku.py",
+    "plugins/module_utils/_homebrew.py",
+    "plugins/module_utils/_ibm_sa_utils.py",
+    "plugins/module_utils/_ilo_redfish_utils.py",
+    "plugins/module_utils/_influxdb.py",
+    "plugins/module_utils/_ldap.py",
+    "plugins/module_utils/_linode.py",
+    "plugins/module_utils/_locale_gen.py",
+    "plugins/module_utils/_lxd.py",
+    "plugins/module_utils/_memset.py",
+    "plugins/module_utils/_ocapi_utils.py",
+    "plugins/module_utils/_onepassword.py",
+    "plugins/module_utils/_oneview.py",
+    "plugins/module_utils/_online.py",
+    "plugins/module_utils/_opennebula.py",
+    "plugins/module_utils/_redis.py",
+    "plugins/module_utils/_rundeck.py",
+    "plugins/module_utils/_stormssh.py",
+    "plugins/module_utils/_univention_umc.py",
+    "plugins/module_utils/_vexata.py",
 ]
 
 
@@ -125,8 +180,6 @@ class BotmetaCheck:
 
     def validate(self, filename: str, filedata: dict) -> None:
         if not filename.startswith("plugins/"):
-            return
-        if filename.startswith(("plugins/doc_fragments/", "plugins/module_utils/")):
             return
         # Compile list of all active and inactive maintainers
         all_maintainers = filedata["maintainers"] + filedata["ignore"]
