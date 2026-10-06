@@ -40,19 +40,6 @@ CSVError = csv.Error
 
 
 def initialize_dialect(dialect: str, **kwargs: t.Unpack[DialectParamsOrNone]) -> str:
-    # Add Unix dialect from Python 3
-    class unix_dialect(csv.Dialect):
-        """Describe the usual properties of Unix-generated CSV files."""
-
-        delimiter = ","
-        quotechar = '"'
-        doublequote = True
-        skipinitialspace = False
-        lineterminator = "\n"
-        quoting = csv.QUOTE_ALL
-
-    csv.register_dialect("unix", unix_dialect)
-
     if dialect not in csv.list_dialects():
         raise DialectNotAvailableError(f"Dialect '{dialect}' is not supported by your version of python.")
 

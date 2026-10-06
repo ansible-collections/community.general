@@ -114,7 +114,7 @@ cmd:
   elements: str
   sample:
     [
-      "/usr/bin/python3.10",
+      "/usr/bin/python3.14",
       "-m",
       "pipx",
       "list",

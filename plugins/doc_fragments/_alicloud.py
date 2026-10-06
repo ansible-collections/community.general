@@ -86,8 +86,6 @@ options:
     type: str
 author:
   - "He Guimin (@xiaozhu36)"
-requirements:
-  - "Python >= 3.6"
 notes:
   - If parameters are not set within the module, the following environment variables can be used in decreasing order of precedence
     E(ALICLOUD_ACCESS_KEY) or E(ALICLOUD_ACCESS_KEY_ID), E(ALICLOUD_SECRET_KEY) or E(ALICLOUD_SECRET_ACCESS_KEY), E(ALICLOUD_REGION)

@@ -1,0 +1,5 @@
+minor_changes:
+  - "vertica_* modules - remove Python < 2.5 compatibility (https://github.com/ansible-collections/community.general/pull/12893)."
+  - "consul - remove Python < 2.5 compatibility (https://github.com/ansible-collections/community.general/pull/12893)."
+  - "from_csv filter plugin - remove Python 2 compatibility (https://github.com/ansible-collections/community.general/pull/12893)."
+  - "read_csv - remove Python 2 compatibility (https://github.com/ansible-collections/community.general/pull/12893)."

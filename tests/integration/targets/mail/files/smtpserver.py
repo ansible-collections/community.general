@@ -13,6 +13,7 @@ import sys
 
 # Handle TLS and non-TLS support
 try:
+    # NOTE: This library is totally broken and won't install on any Python we support
     import smtpd_tls
 
     HAS_TLS = True

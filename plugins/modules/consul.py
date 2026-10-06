@@ -618,8 +618,6 @@ def main():
 
     try:
         register_with_consul(module)
-    except SystemExit:
-        raise
     except ConnectionError as e:
         module.fail_json(msg=f"Could not connect to consul agent at {p['host']}:{p['port']}, error was {e}")
     except Exception as e:

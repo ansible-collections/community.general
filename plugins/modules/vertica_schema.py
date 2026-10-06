@@ -320,9 +320,6 @@ def main():
         module.fail_json(msg=f"{e}", ansible_facts={"vertica_schemas": schema_facts})
     except CannotDropError as e:
         module.fail_json(msg=f"{e}", ansible_facts={"vertica_schemas": schema_facts})
-    except SystemExit:
-        # avoid catching this on python 2.4
-        raise
     except Exception as e:
         module.fail_json(msg=f"{e}", exception=traceback.format_exc())
 

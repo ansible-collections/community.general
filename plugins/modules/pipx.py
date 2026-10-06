@@ -182,7 +182,7 @@ EXAMPLES = r"""
   community.general.pipx:
     name: black
     state: reinstall
-    python: 3.7
+    python: 3.14
 
 - name: Uninstall pycowsay
   community.general.pipx:

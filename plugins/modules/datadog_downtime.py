@@ -17,7 +17,6 @@ author:
   - Datadog (@Datadog)
 requirements:
   - datadog-api-client
-  - Python 3.6+
 extends_documentation_fragment:
   - community.general._attributes
 attributes:
