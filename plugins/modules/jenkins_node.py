@@ -284,26 +284,23 @@ def bool_to_text(value: bool) -> str:
 
 
 class Element:
-    def __init__(self, root: et.Element | None) -> None:
+    def __init__(self, root: et.Element) -> None:
         self.root = root
 
     def get(self, key: str) -> str | None:
-        return None if self.root is None else self.root.get(key)
+        return self.root.get(key)
 
     def set(self, key: str, value: str) -> None:
-        if self.root is not None:
-            self.root.set(key, value)
+        self.root.set(key, value)
 
     def find(self, path: str) -> et.Element | None:
-        return None if self.root is None else self.root.find(path)
+        return self.root.find(path)
 
     def remove(self, element: et.Element) -> None:
-        if self.root is not None:
-            self.root.remove(element)
+        self.root.remove(element)
 
     def append(self, element: et.Element) -> None:
-        if self.root is not None:
-            self.root.append(element)
+        self.root.append(element)
 
     @property
     def class_(self) -> str | None:
@@ -550,11 +547,13 @@ class SSHLauncherConfig(LauncherConfig):
                 updated = True
 
         if self.host_key_verify is not None:
-            if wrapper.host_key_verify is None or Element(wrapper.host_key_verify).class_ != self.host_key_verify.CLASS:
-                wrapper.host_key_verify = self.host_key_verify.init()
+            host_key_verify = wrapper.host_key_verify
+            if host_key_verify is None or Element(host_key_verify).class_ != self.host_key_verify.CLASS:
+                host_key_verify = self.host_key_verify.init()
+                wrapper.host_key_verify = host_key_verify
                 updated = True
 
-            if self.host_key_verify.update(wrapper.host_key_verify):
+            if self.host_key_verify.update(host_key_verify):
                 updated = True
 
         return updated
@@ -709,17 +708,21 @@ class JenkinsNode:
             self.module.fail_json(msg=f"Unable to connect to Jenkins server, {e}")
 
     def configure_launch(self, config: et.Element) -> bool:
+        if self.launch is None:
+            return False
+
+        launch = self.launch
         configured = False
         launcher = config.find(LauncherElement.TAG)
 
-        if launcher is None or Element(launcher).class_ != self.launch.CLASS:
+        if launcher is None or Element(launcher).class_ != launch.CLASS:
             if launcher is not None:
                 config.remove(launcher)
-            launcher = self.launch.init()
+            launcher = launch.init()
             config.append(launcher)
             configured = True
 
-        if self.launch.update(launcher):
+        if launch.update(launcher):
             configured = True
 
         return configured
