@@ -17,7 +17,7 @@ requirements:
   - logstash (Python library)
 options:
   server:
-    description: Address of the Logstash server.
+    description: Address of the Logstash server. Used with all C(protocol) choices.
     type: str
     env:
       - name: LOGSTASH_SERVER
@@ -27,7 +27,7 @@ options:
         version_added: 1.0.0
     default: localhost
   port:
-    description: Port on which logstash is listening.
+    description: Port on which Logstash is listening. Used with all C(protocol) choices.
     type: int
     env:
       - name: LOGSTASH_PORT
@@ -36,8 +36,116 @@ options:
         key: port
         version_added: 1.0.0
     default: 5000
+  protocol:
+    description: Transport protocol to use when sending events to Logstash.
+    type: str
+    choices:
+      - tcp
+      - http
+      - https
+    env:
+      - name: LOGSTASH_PROTOCOL
+    ini:
+      - section: callback_logstash
+        key: protocol
+    default: tcp
+    version_added: '14.0.0'
+  http_path:
+    description: >-
+      HTTP request path, for example when sending events through a reverse proxy. This option is used only with
+      C(protocol=http) or C(protocol=https).
+    type: str
+    env:
+      - name: LOGSTASH_HTTP_PATH
+    ini:
+      - section: callback_logstash
+        key: http_path
+    default: /
+    version_added: '14.0.0'
+  username:
+    description: >-
+      Username for HTTP Basic authentication. This option is used only with C(protocol=http) or C(protocol=https),
+      and must be set together with C(password).
+    type: str
+    env:
+      - name: LOGSTASH_USERNAME
+    ini:
+      - section: callback_logstash
+        key: username
+    version_added: '14.0.0'
+  password:
+    description: >-
+      Password for HTTP Basic authentication. This option is used only with C(protocol=http) or C(protocol=https),
+      and must be set together with C(username). Use HTTPS to protect credentials and events in transit.
+    type: str
+    env:
+      - name: LOGSTASH_PASSWORD
+    ini:
+      - section: callback_logstash
+        key: password
+    version_added: '14.0.0'
+  validate_certs:
+    description: Whether to validate the TLS certificate of the Logstash server. This option is used only with C(protocol=https).
+    type: bool
+    default: true
+    env:
+      - name: LOGSTASH_VALIDATE_CERTS
+    ini:
+      - section: callback_logstash
+        key: validate_certs
+    version_added: '14.0.0'
+  ca_path:
+    description: PEM-formatted file containing the CA certificate used to validate the Logstash server. This option is used only with C(protocol=https).
+    type: path
+    env:
+      - name: LOGSTASH_CA_PATH
+    ini:
+      - section: callback_logstash
+        key: ca_path
+    version_added: '14.0.0'
+  client_cert:
+    description: PEM-formatted certificate chain file for TLS client authentication. This option is used only with C(protocol=https).
+    type: path
+    env:
+      - name: LOGSTASH_CLIENT_CERT
+    ini:
+      - section: callback_logstash
+        key: client_cert
+    version_added: '14.0.0'
+  client_key:
+    description: >-
+      PEM-formatted private key file for TLS client authentication. The key can also be included in C(client_cert).
+      This option is used only with C(protocol=https).
+    type: path
+    env:
+      - name: LOGSTASH_CLIENT_KEY
+    ini:
+      - section: callback_logstash
+        key: client_key
+    version_added: '14.0.0'
+  timeout:
+    description: Maximum time in seconds to wait for an HTTP request to complete. This option is used only with C(protocol=http) or C(protocol=https).
+    type: int
+    default: 10
+    env:
+      - name: LOGSTASH_TIMEOUT
+    ini:
+      - section: callback_logstash
+        key: timeout
+    version_added: '14.0.0'
+  retries:
+    description: Number of retries for HTTP 429 responses. This option is used only with C(protocol=http) or C(protocol=https).
+    type: int
+    default: 3
+    choices: [0, 1, 2, 3, 4, 5]
+    env:
+      - name: LOGSTASH_RETRIES
+    ini:
+      - section: callback_logstash
+        key: retries
+    version_added: '14.0.0'
   type:
-    description: Message type.
+    description: Message type. Used with all C(protocol) choices.
     type: str
     env:
       - name: LOGSTASH_TYPE
@@ -47,7 +155,7 @@ options:
         version_added: 1.0.0
     default: ansible
   pre_command:
-    description: Executes command before run and its result is added to the C(ansible_pre_command_output) logstash field.
+    description: Executes command before run and adds its result to the C(ansible_pre_command_output) Logstash field. Used with all C(protocol) choices.
     type: str
     version_added: 2.0.0
     ini:
@@ -56,7 +164,7 @@ options:
     env:
       - name: LOGSTASH_PRE_COMMAND
   format_version:
-    description: Logging format.
+    description: Logging format. Used with all C(protocol) choices.
     type: str
     version_added: 2.0.0
     ini:
@@ -79,8 +187,37 @@ ansible.cfg: |
   [callback_logstash]
       server = logstash.example.com
       port = 5000
+      protocol = tcp
       pre_command = git rev-parse HEAD
       type = ansible
+
+  HTTP(S) configuration with Basic authentication:
+
+    Store the password in the callback's environment variable or a secrets manager, not in the configuration file.
+
+    [defaults]
+      callbacks_enabled = community.general.logstash
+
+    [callback_logstash]
+      protocol = https
+      server = logstash.example.com
+      port = 8080
+      http_path = /
+      username = ansible
+
+Logstash HTTP input configuration:
+
+11-input-http.conf: |-
+    input {
+    http {
+      port => 8080
+      user => "${LOGSTASH_USERNAME}"
+      password => "${LOGSTASH_PASSWORD}"
+      ssl_enabled => true
+      ssl_certificate => "/etc/logstash/server.crt"
+      ssl_key => "/etc/logstash/server.pkcs8.key"
+    }
+    }
 
 11-input-tcp.conf: |-
   # Enable Logstash TCP Input
@@ -97,17 +234,24 @@ ansible.cfg: |
 import json
 import logging
 import os
+import random
 import socket
+import time
 import uuid
+from urllib.error import HTTPError
 
 from ansible import context
+from ansible.module_utils.urls import open_url
+from ansible.utils.display import Display
 
 try:
     import logstash
+    from logstash.formatter import LogstashFormatterVersion1
 
     HAS_LOGSTASH = True
 except ImportError:
     HAS_LOGSTASH = False
+    LogstashFormatterVersion1 = None
 
 from ansible.plugins.callback import CallbackBase
 
@@ -115,6 +259,87 @@ from ansible_collections.community.general.plugins.module_utils._datetime import
     now,
 )
 from ansible_collections.community.general.plugins.module_utils._secrets import mask_secrets
+
+
+class LogstashHTTPHandler(logging.Handler):
+    def __init__(
+        self,
+        url,
+        formatter,
+        username=None,
+        password=None,
+        validate_certs=True,
+        ca_path=None,
+        client_cert=None,
+        client_key=None,
+        timeout=10,
+        retries=3,
+        display=None,
+    ):
+        super().__init__()
+        self.url = url
+        self.formatter = formatter
+        self.username = username
+        self.password = password
+        self.validate_certs = validate_certs
+        self.ca_path = ca_path
+        self.client_cert = client_cert
+        self.client_key = client_key
+        self.timeout = timeout
+        self.retries = retries
+        self._display = display or Display()
+
+    def emit(self, record):
+        try:
+            data = self.formatter.format(record)
+        except Exception:
+            self._display.warning("Could not format event for Logstash HTTP delivery.")
+            return
+        kwargs = {
+            "data": data,
+            "headers": {"Content-Type": "application/json"},
+            "method": "POST",
+            "timeout": self.timeout,
+            "validate_certs": self.validate_certs,
+            "use_netrc": False,
+            "follow_redirects": "none",
+        }
+        if self.username and self.password:
+            kwargs.update(
+                url_username=self.username,
+                url_password=self.password,
+                force_basic_auth=True,
+            )
+        if self.ca_path is not None:
+            kwargs["ca_path"] = self.ca_path
+        if self.client_cert is not None:
+            kwargs["client_cert"] = self.client_cert
+        if self.client_key is not None:
+            kwargs["client_key"] = self.client_key
+
+        status = None
+        for attempt in range(self.retries + 1):
+            try:
+                response = open_url(self.url, **kwargs)
+            except HTTPError as error:
+                status = error.code
+                error.close()
+            except Exception:
+                self._display.warning("Could not send event to Logstash over HTTP.")
+                return
+            else:
+                try:
+                    status = response.getcode()
+                finally:
+                    response.close()
+
+            if status in (200, 201, 202, 204):
+                return
+            if status != 429 or attempt == self.retries:
+                break
+            time.sleep(0.5 * 2**attempt + random.uniform(0, 0.25))
+
+        self._display.warning(f"Logstash HTTP request failed with status code {status}.")
 
 
 class CallbackModule(CallbackBase):
@@ -137,9 +362,32 @@ class CallbackModule(CallbackBase):
             self.logger = logging.getLogger("python-logstash-logger")
             self.logger.setLevel(logging.DEBUG)
 
-            self.handler = logstash.TCPLogstashHandler(
-                self.ls_server, self.ls_port, version=1, message_type=self.ls_type
-            )
+            if self.ls_protocol == "tcp":
+                self.handler = logstash.TCPLogstashHandler(
+                    self.ls_server, self.ls_port, version=1, message_type=self.ls_type
+                )
+            else:
+                server = self.ls_server
+                if ":" in server and not server.startswith("["):
+                    server = f"[{server}]"
+                path = self.ls_http_path or "/"
+                if not path.startswith("/"):
+                    path = f"/{path}"
+                url = f"{self.ls_protocol}://{server}:{self.ls_port}{path}"
+                formatter = LogstashFormatterVersion1(message_type=self.ls_type)
+                self.handler = LogstashHTTPHandler(
+                    url=url,
+                    formatter=formatter,
+                    username=self.ls_username,
+                    password=self.ls_password,
+                    validate_certs=self.ls_validate_certs,
+                    ca_path=self.ls_ca_path,
+                    client_cert=self.ls_client_cert,
+                    client_key=self.ls_client_key,
+                    timeout=self.ls_timeout,
+                    retries=self.ls_retries,
+                    display=self._display,
+                )
 
             self.logger.addHandler(self.handler)
             self.hostname = socket.gethostname()
@@ -162,9 +410,33 @@ class CallbackModule(CallbackBase):
 
         self.ls_server = self.get_option("server")
         self.ls_port = int(self.get_option("port"))
+        self.ls_protocol = self.get_option("protocol")
+        self.ls_http_path = self.get_option("http_path")
+        self.ls_username = self.get_option("username")
+        self.ls_password = self.get_option("password")
+        self.ls_validate_certs = self.get_option("validate_certs")
+        self.ls_ca_path = self.get_option("ca_path")
+        self.ls_client_cert = self.get_option("client_cert")
+        self.ls_client_key = self.get_option("client_key")
+        self.ls_timeout = self.get_option("timeout")
+        self.ls_retries = self.get_option("retries")
         self.ls_type = self.get_option("type")
         self.ls_pre_command = self.get_option("pre_command")
         self.ls_format_version = self.get_option("format_version")
+
+        if self.ls_protocol != "tcp":
+            if bool(self.ls_username) != bool(self.ls_password):
+                self.disabled = True
+                self._display.warning("Both Logstash HTTP username and password must be configured.")
+            if self.ls_timeout <= 0:
+                self.disabled = True
+                self._display.warning("Logstash HTTP timeout must be greater than zero.")
+            if self.ls_protocol != "https" and (self.ls_ca_path or self.ls_client_cert or self.ls_client_key):
+                self.disabled = True
+                self._display.warning("Logstash TLS certificate options can only be used with HTTPS.")
+            if self.ls_client_key and not self.ls_client_cert:
+                self.disabled = True
+                self._display.warning("Logstash client_key requires client_cert.")
 
         self._init_plugin()
 
