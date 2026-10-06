@@ -1,0 +1,2 @@
+bugfixes:
+  - pkgng - the module no longer hangs forever when ``pkg`` asks an interactive question, such as the one about an OS version mismatch; the question now takes its default answer, so the task fails instead of blocking (https://github.com/ansible-collections/community.general/issues/12896, https://github.com/ansible-collections/community.general/pull/12898).
