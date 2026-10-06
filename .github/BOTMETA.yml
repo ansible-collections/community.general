@@ -348,6 +348,8 @@ files:
     maintainers: delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
+  $module_utils/__init__.py:
+    maintainers: felixfontein
   $module_utils/_android_sdkmanager.py:
     maintainers: shamilovstas
   $module_utils/_btrfs.py:
@@ -358,6 +360,8 @@ files:
     maintainers: russoz
   $module_utils/_crypt.py:
     maintainers: russoz
+  $module_utils/_datetime.py:
+    maintainers: felixfontein
   $module_utils/_deps.py:
     maintainers: russoz
   $module_utils/_django.py:
@@ -445,6 +449,8 @@ files:
   $module_utils/_vardict.py:
     labels: vardict
     maintainers: russoz
+  $module_utils/_version.py:
+    maintainers: felixfontein
   $module_utils/_wdc_redfish_utils.py:
     labels: wdc_redfish_utils
     maintainers: $team_wdc
