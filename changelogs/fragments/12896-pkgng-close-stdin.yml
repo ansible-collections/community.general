@@ -1,0 +1,2 @@
+bugfixes:
+  - pkgng - feed a newline to ``pkg`` and let its standard input be closed afterwards, so that an interactive question such as the one about an OS version mismatch takes its default answer instead of blocking the task forever (https://github.com/ansible-collections/community.general/issues/12896).
