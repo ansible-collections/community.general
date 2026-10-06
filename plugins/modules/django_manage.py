@@ -112,6 +112,7 @@ notes:
   - 'B(ATTENTION): Support for Django releases older than 4.1 has been removed in community.general version 9.0.0. While the
     module allows for free-form commands, not verifying the version of Django being used, it is B(strongly recommended) to
     use a more recent version of the framework.'
+  - Please notice that Django 4.1 requires Python 3.8 or greater.
   - This module does not create a virtualenv if the O(virtualenv) parameter is specified and a virtual environment does not
     already exist at the given location. This behavior changed in community.general version 9.0.0.
   - The recommended way to create a virtual environment in Ansible is by using M(ansible.builtin.pip).
