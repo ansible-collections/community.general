@@ -475,11 +475,11 @@ if t.TYPE_CHECKING:  # pragma: no cover
     from ansible_collections.community.general.plugins.module_utils._typing import (
         ArgumentSpecT,
         ModuleReturnBackupFile,
-        ModuleReturnChangedEx,
+        ModuleReturnChangedReq,
         ModuleReturnDiff,
     )
 
-    class ResultDict(ModuleReturnChangedEx, ModuleReturnBackupFile, ModuleReturnDiff[str]):
+    class ResultDict(ModuleReturnChangedReq, ModuleReturnBackupFile, ModuleReturnDiff[str]):
         config_file: str
         config_content: str | None
         enabled_state: bool

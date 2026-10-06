@@ -100,7 +100,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
     class ModuleReturnChanged(t.TypedDict):
         changed: t.NotRequired[bool]
 
-    class ModuleReturnChangedEx(t.TypedDict):
+    class ModuleReturnChangedReq(t.TypedDict):
         changed: bool
 
     # Message
@@ -108,7 +108,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
     class ModuleReturnMsg(t.TypedDict):
         msg: t.NotRequired[str]
 
-    class ModuleReturnMsgEx(t.TypedDict):
+    class ModuleReturnMsgReq(t.TypedDict):
         msg: str
 
     # Standard out
@@ -116,7 +116,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
     class ModuleReturnStdout(t.TypedDict):
         stdout: t.NotRequired[str]
 
-    class ModuleReturnStdoutEx(t.TypedDict):
+    class ModuleReturnStdoutReq(t.TypedDict):
         stdout: str
 
     # Standard error
@@ -124,7 +124,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
     class ModuleReturnStderr(t.TypedDict):
         stderr: t.NotRequired[str]
 
-    class ModuleReturnStderrEx(t.TypedDict):
+    class ModuleReturnStderrReq(t.TypedDict):
         stderr: str
 
     # Return code
@@ -132,7 +132,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
     class ModuleReturnRc(t.TypedDict):
         rc: t.NotRequired[int]
 
-    class ModuleReturnRcEx(t.TypedDict):
+    class ModuleReturnRcReq(t.TypedDict):
         rc: int
 
     # Backup file
@@ -140,7 +140,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
     class ModuleReturnBackupFile(t.TypedDict):
         backup_file: t.NotRequired[str | None]
 
-    class ModuleReturnBackupFileEx(t.TypedDict):
+    class ModuleReturnBackupFileReq(t.TypedDict):
         backup_file: str | None
 
     # Diff
@@ -154,11 +154,11 @@ if t.TYPE_CHECKING:  # pragma: no cover
     class ModuleReturnDiff(t.TypedDict, t.Generic[_T]):
         diff: t.NotRequired[ModuleDiffValue[_T]]
 
-    class ModuleReturnDiffEx(t.TypedDict, t.Generic[_T]):
+    class ModuleReturnDiffReq(t.TypedDict, t.Generic[_T]):
         diff: ModuleDiffValue[_T]
 
     class ModuleReturnDiffList(t.TypedDict, t.Generic[_T]):
         diff: t.NotRequired[MutableSequence[ModuleDiffValue[_T]]]
 
-    class ModuleReturnDiffListEx(t.TypedDict, t.Generic[_T]):
+    class ModuleReturnDiffListReq(t.TypedDict, t.Generic[_T]):
         diff: MutableSequence[ModuleDiffValue[_T]]
