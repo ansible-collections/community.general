@@ -188,7 +188,7 @@ class BotmetaCheck:
                 self.report_error(f"{self.botmeta_filename}:0:0: {message}")
             return
 
-        yaml_files = (botmeta.get("files") or {})
+        yaml_files = botmeta.get("files") or {}
 
         # Check order
         expected = sorted(yaml_files)
