@@ -6,11 +6,6 @@
 notifications: true
 automerge: true
 files:
-  plugins/:
-    supershipit: quidame
-  changelogs/: {}
-  changelogs/fragments/:
-    support: community
   $actions:
     labels: action
   $actions/iptables_state.py:
@@ -107,10 +102,10 @@ files:
   $connections/chroot.py: {}
   $connections/funcd.py:
     maintainers: mscherer
-  $connections/iocage.py: {}
   $connections/incus.py:
     labels: incus
     maintainers: stgraber
+  $connections/iocage.py: {}
   $connections/jail.py:
     maintainers: $team_ansible_core
   $connections/lxc.py: {}
@@ -192,12 +187,12 @@ files:
     maintainers: $team_e_spirit
   $doc_fragments/_vexata.py:
     maintainers: vexata
-  $doc_fragments/_xml.py:
-    labels: xml
-    maintainers: Shreyashxredhat dagwieers magnus919 tbielawa
   $doc_fragments/_xenserver.py:
     labels: xenserver
     maintainers: bvitnik
+  $doc_fragments/_xml.py:
+    labels: xml
+    maintainers: Shreyashxredhat dagwieers magnus919 tbielawa
   $filters/accumulate.py:
     maintainers: VannTen
   $filters/counter.py:
@@ -300,13 +295,13 @@ files:
     maintainers: opoplawski
   $inventories/gitlab_runners.py:
     maintainers: morph027
-  $inventories/iocage.py:
-    maintainers: vbotka
   $inventories/icinga2.py:
     maintainers: BongoEADGC6
   $inventories/incus.py:
     labels: incus
     maintainers: stgraber
+  $inventories/iocage.py:
+    maintainers: vbotka
   $inventories/linode.py:
     keywords: linode dynamic inventory script
     labels: cloud linode
@@ -330,12 +325,10 @@ files:
     labels: lookups
   $lookups/binary_file.py:
     maintainers: felixfontein
-  $lookups/bitwarden_secrets_manager.py:
-    maintainers: jantari
   $lookups/bitwarden.py:
     maintainers: lungj
-  $lookups/proton_pass.py:
-    maintainers: jeankhawand
+  $lookups/bitwarden_secrets_manager.py:
+    maintainers: jantari
   $lookups/cartesian.py: {}
   $lookups/chef_databag.py: {}
   $lookups/collection_version.py:
@@ -382,6 +375,8 @@ files:
   $lookups/onepassword_ssh_key.py:
     maintainers: mohammedbabelly20
   $lookups/passwordstore.py: {}
+  $lookups/proton_pass.py:
+    maintainers: jeankhawand
   $lookups/random_pet.py:
     maintainers: Akasurde
   $lookups/random_string.py:
@@ -408,9 +403,9 @@ files:
     maintainers: catcombo
   $module_utils/_btrfs.py:
     maintainers: gnfzdz
-  $module_utils/_cmd_runner_fmt.py:
-    maintainers: russoz
   $module_utils/_cmd_runner.py:
+    maintainers: russoz
+  $module_utils/_cmd_runner_fmt.py:
     maintainers: russoz
   $module_utils/_consul.py:
     maintainers: $team_consul
@@ -472,13 +467,13 @@ files:
     maintainers: $team_linode
   $module_utils/_locale_gen.py:
     maintainers: AugustusKling russoz
+  $module_utils/_lvm.py:
+    labels: lvm
+    maintainers: russoz
   $module_utils/_lxc.py:
     maintainers: russoz
   $module_utils/_lxca_common.py:
     maintainers: navalkp prabhosa
-  $module_utils/_lvm.py:
-    labels: lvm
-    maintainers: russoz
   $module_utils/_manageiq.py:
     labels: manageiq
     maintainers: $team_manageiq
@@ -502,8 +497,6 @@ files:
     maintainers: remyleone
   $module_utils/_opennebula.py:
     maintainers: $team_opennebula
-  $module_utils/_pritunl_api.py:
-    maintainers: Lowess
   $module_utils/_pacemaker.py:
     maintainers: munchtoast
   $module_utils/_pipx.py:
@@ -511,10 +504,12 @@ files:
     maintainers: russoz
   $module_utils/_pkg_req.py:
     maintainers: russoz
-  $module_utils/_python_runner.py:
-    maintainers: russoz
+  $module_utils/_pritunl_api.py:
+    maintainers: Lowess
   $module_utils/_puppet.py:
     labels: puppet
+    maintainers: russoz
+  $module_utils/_python_runner.py:
     maintainers: russoz
   $module_utils/_redfish_utils.py:
     labels: redfish_utils
@@ -683,10 +678,10 @@ files:
     ignore: scottanderson42 tastychutney
     labels: django_manage
     maintainers: russoz
-  $modules/dnf_versionlock.py:
-    maintainers: moreda
   $modules/dnf_config_manager.py:
     maintainers: ahyattdev
+  $modules/dnf_versionlock.py:
+    maintainers: moreda
   $modules/dnsimple.py:
     maintainers: drcapulet
   $modules/dnsimple_info.py:
@@ -709,13 +704,13 @@ files:
   $modules/facter_facts.py:
     labels: facter
     maintainers: russoz $team_ansible_core gamethis
+  $modules/file_remove.py:
+    maintainers: shahargolshani
   $modules/filesize.py:
     maintainers: quidame
   $modules/filesystem.py:
     labels: filesystem
     maintainers: pilou- abulimov quidame
-  $modules/file_remove.py:
-    maintainers: shahargolshani
   $modules/flatpak.py:
     maintainers: $team_flatpak
   $modules/flatpak_mask.py:
@@ -764,6 +759,10 @@ files:
     ignore: dj-wasabi
   $modules/gitlab_branch.py:
     maintainers: paytroff
+  $modules/gitlab_group_access_token.py:
+    maintainers: pixslx
+  $modules/gitlab_instance_variable.py:
+    maintainers: benibr
   $modules/gitlab_issue.py:
     maintainers: zvaraondrej
   $modules/gitlab_label.py:
@@ -772,20 +771,16 @@ files:
     maintainers: zvaraondrej
   $modules/gitlab_milestone.py:
     maintainers: gpongelli
-  $modules/gitlab_instance_variable.py:
-    maintainers: benibr
+  $modules/gitlab_project_access_token.py:
+    maintainers: pixslx
+  $modules/gitlab_project_approvals.py:
+    maintainers: masa-orca
   $modules/gitlab_project_variable.py:
     maintainers: markuman
   $modules/gitlab_runner.py:
     maintainers: SamyCoenen
   $modules/gitlab_user.py:
     maintainers: LennertMertens stgrace
-  $modules/gitlab_group_access_token.py:
-    maintainers: pixslx
-  $modules/gitlab_project_access_token.py:
-    maintainers: pixslx
-  $modules/gitlab_project_approvals.py:
-    maintainers: masa-orca
   $modules/golang_package.py:
     maintainers: shrbhosa
   $modules/google_chat.py:
@@ -812,17 +807,17 @@ files:
     labels: homebrew_ macos
     maintainers: $team_macos enriclluelles
     notify: chris-short
+  $modules/homebrew_services.py:
+    ignore: ryansb
+    keywords: brew cask services darwin homebrew macosx macports osx
+    labels: homebrew_ macos
+    maintainers: $team_macos kitizz
   $modules/homebrew_tap.py:
     ignore: ryansb
     keywords: brew cask darwin homebrew macosx macports osx
     labels: homebrew_ macos
     maintainers: $team_macos
     notify: chris-short
-  $modules/homebrew_services.py:
-    ignore: ryansb
-    keywords: brew cask services darwin homebrew macosx macports osx
-    labels: homebrew_ macos
-    maintainers: $team_macos kitizz
   $modules/homectl.py:
     maintainers: jameslivulpi
   $modules/honeybadger_deployment.py:
@@ -879,17 +874,17 @@ files:
   $modules/interfaces_file.py:
     labels: interfaces_file
     maintainers: obourdon hryamzik
-  $modules/ip_netns.py:
-    maintainers: bregman-arie
   $modules/ip2location_info.py:
     maintainers: ip2location
+  $modules/ip_netns.py:
+    maintainers: bregman-arie
   $modules/ipa_:
     maintainers: $team_ipa
     ignore: fxfitz
-  $modules/ipa_getkeytab.py:
-    maintainers: bakanovskii
   $modules/ipa_dnsrecord.py:
     maintainers: $team_ipa jwbernin
+  $modules/ipa_getkeytab.py:
+    maintainers: bakanovskii
   $modules/ipa_pwpolicy.py:
     maintainers: adralioh
   $modules/ipa_service.py:
@@ -954,9 +949,9 @@ files:
     maintainers: ahussey-redhat
   $modules/kibana_plugin.py:
     maintainers: barryib
-  $modules/kopia_repository_info.py:
-    maintainers: munchtoast
   $modules/kopia_repository.py:
+    maintainers: munchtoast
+  $modules/kopia_repository_info.py:
     maintainers: munchtoast
   $modules/krb_ticket.py:
     maintainers: bakanovskii
@@ -996,12 +991,12 @@ files:
     maintainers: nerzhul
   $modules/lvg.py:
     maintainers: abulimov
+  $modules/lvg_rename.py:
+    maintainers: lszomor
   $modules/lvm_pv.py:
     maintainers: klention
   $modules/lvm_pv_move_data.py:
     maintainers: klention
-  $modules/lvg_rename.py:
-    maintainers: lszomor
   $modules/lvol.py:
     maintainers: abulimov jhoekx zigaSRC unkaputtbar112
   $modules/lxc_container.py:
@@ -1576,9 +1571,9 @@ files:
     maintainers: vbotka
   $plugin_utils/_lookup.py:
     maintainers: felixfontein
-  $plugin_utils/_unsafe.py:
-    maintainers: felixfontein
   $plugin_utils/_tags.py:
+    maintainers: felixfontein
+  $plugin_utils/_unsafe.py:
     maintainers: felixfontein
   $tests/a_module.py:
     maintainers: felixfontein
@@ -1587,6 +1582,18 @@ files:
   $tests/fqdn_valid.py:
     maintainers: vbotka
   #########################
+  changelogs/: {}
+  changelogs/fragments/:
+    support: community
+  #########################
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-keep_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-remove_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-replace_keys.rst:
+    maintainers: vbotka
+  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries.rst:
+    maintainers: vbotka
   docs/docsite/rst/filter_guide.rst: {}
   docs/docsite/rst/filter_guide_abstract_informations.rst: {}
   docs/docsite/rst/filter_guide_abstract_informations_counting_elements_in_sequence.rst:
@@ -1597,14 +1604,6 @@ files:
     maintainers: felixfontein
   docs/docsite/rst/filter_guide_abstract_informations_lists_helper.rst:
     maintainers: cfiehe
-  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-keep_keys.rst:
-    maintainers: vbotka
-  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-remove_keys.rst:
-    maintainers: vbotka
-  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries-replace_keys.rst:
-    maintainers: vbotka
-  docs/docsite/rst/filter_guide-abstract_informations-lists_of_dictionaries.rst:
-    maintainers: vbotka
   docs/docsite/rst/filter_guide_abstract_informations_merging_lists_of_dictionaries.rst:
     maintainers: vbotka
   docs/docsite/rst/filter_guide_conversions.rst:
@@ -1657,6 +1656,9 @@ files:
     maintainers: russoz
   docs/docsite/rst/test_guide.rst:
     maintainers: felixfontein
+  #########################
+  plugins/:
+    supershipit: quidame
   #########################
   tests/:
     labels: tests

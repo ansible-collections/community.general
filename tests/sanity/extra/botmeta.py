@@ -188,6 +188,14 @@ class BotmetaCheck:
                 self.report_error(f"{self.botmeta_filename}:0:0: {message}")
             return
 
+        yaml_files = (botmeta.get("files") or {})
+
+        # Check order
+        expected = sorted(yaml_files)
+        for i, (exp, act) in enumerate(zip(expected, yaml_files)):
+            if exp != act:
+                self.report_error(f"{self.botmeta_filename}:0:0: Entry #{i + 1} should be {exp!r}, but is {act!r}")
+
         # Preprocess (substitute macros, convert to lists)
         macros = botmeta.get("macros") or {}
         macro_re = re.compile(r"\$([a-zA-Z_]+)")
@@ -204,7 +212,7 @@ class BotmetaCheck:
 
         files = {}
         try:
-            for file, filedata in (botmeta.get("files") or {}).items():
+            for file, filedata in yaml_files.items():
                 file = convert_macros(file, macros)
                 filedata = {k: convert_macros(v, macros) for k, v in filedata.items()}
                 files[file] = filedata
