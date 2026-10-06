@@ -430,6 +430,8 @@ files:
   $module_utils/_scaleway.py:
     labels: cloud scaleway
     maintainers: $team_scaleway
+  $module_utils/_secrets.py:
+    maintainers: felixfontein
   $module_utils/_snap.py:
     labels: snap
     maintainers: russoz
