@@ -16,6 +16,9 @@ DOCUMENTATION:
       type: list
       elements: string
       required: true
+  seealso:
+    - plugin: community.general.version_sort_natural
+      plugin_type: filter
 
 EXAMPLES: |
   - name: Sort a list of strings by version
