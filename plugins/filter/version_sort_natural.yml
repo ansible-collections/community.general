@@ -6,7 +6,7 @@
 DOCUMENTATION:
   name: version_sort_natural
   short_description: Sort a list of strings by natural version order
-  version_added: 13.4.0
+  version_added: 14.0.0
   author: Alexei Znamensky (@russoz)
   description:
     - Sort a list of strings by natural version order, comparing runs of digits numerically and everything else as text.
