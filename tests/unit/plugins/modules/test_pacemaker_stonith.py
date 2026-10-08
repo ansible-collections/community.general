@@ -14,9 +14,26 @@ import json
 
 import pytest
 
+from ansible_collections.community.general.plugins.module_utils import _pacemaker
 from ansible_collections.community.general.plugins.modules import pacemaker_stonith
 
 from .uthelper import RunCommandMock, UTHelper
+
+
+@pytest.fixture(autouse=True)
+def _pacemaker_json_capable(mocker):
+    """All pacemaker_stonith module tests behave as if ``pcs`` supports JSON output.
+
+    The version-probe / plaintext-fallback dispatch is exhaustively unit-tested
+    in ``tests/unit/plugins/module_utils/test__pacemaker.py``; module-level
+    tests should not have to mock ``pcs --version`` for every scenario.
+    """
+    mocker.patch.object(
+        _pacemaker.PacemakerRunner,
+        "_probe_version",
+        return_value="0.11.7",
+    )
+
 
 UTHelper.from_module(pacemaker_stonith, __name__, mocks=[RunCommandMock])
 
