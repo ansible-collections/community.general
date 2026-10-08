@@ -6,10 +6,11 @@ from __future__ import annotations
 
 import os
 import shutil
-import sys
 import tempfile
 import unittest
 from unittest.mock import Mock, mock_open, patch
+
+from ansible_collections.community.general.plugins.modules import logrotate
 
 
 class TestLogrotateConfig(unittest.TestCase):
@@ -23,19 +24,10 @@ class TestLogrotateConfig(unittest.TestCase):
         cls.mock_ansible_basic.AnsibleModule = Mock()
         cls.mock_converters = Mock()
         cls.mock_converters.to_native = str
-        cls.patcher_basic = patch.dict(
-            "sys.modules",
-            {
-                "ansible.module_utils.basic": cls.mock_ansible_basic,
-                "ansible.module_utils.common.text.converters": cls.mock_converters,
-            },
-        )
-        cls.patcher_basic.start()
 
     @classmethod
     def tearDownClass(cls):
         """Clean up after all tests."""
-        cls.patcher_basic.stop()
         if os.path.exists(cls.test_dir):
             shutil.rmtree(cls.test_dir)
 
@@ -105,9 +97,6 @@ class TestLogrotateConfig(unittest.TestCase):
         self.mock_ansible_basic.AnsibleModule.return_value = self.mock_module
         self.config_dir = os.path.join(self.test_dir, "logrotate.d")
         os.makedirs(self.config_dir, exist_ok=True)
-        for module_name in list(sys.modules.keys()):
-            if "logrotate" in module_name or "ansible_collections.community.general.plugins.modules" in module_name:
-                del sys.modules[module_name]
 
     def tearDown(self):
         """Clean up after test."""
@@ -138,8 +127,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_create_new_configuration(self):
         """Test creating a new logrotate configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params()
         config_path = os.path.join(self.config_dir, "test")
 
@@ -163,8 +150,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_update_existing_configuration(self):
         """Test updating an existing logrotate configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(rotate_count=14)
         config_path = os.path.join(self.config_dir, "test")
         existing_content = """/var/log/test/*.log {
@@ -197,8 +182,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_remove_configuration(self):
         """Test removing a logrotate configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(state="absent")
         config_path = os.path.join(self.config_dir, "test")
 
@@ -217,8 +200,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_disable_configuration(self):
         """Test disabling a logrotate configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(enabled=False)
         config_path = os.path.join(self.config_dir, "test")
         existing_content = """/var/log/test/*.log {
@@ -248,8 +229,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_enable_configuration(self):
         """Test enabling a disabled logrotate configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(enabled=True)
         config_path = os.path.join(self.config_dir, "test")
         existing_content = """/var/log/test/*.log {
@@ -278,8 +257,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_validation_missing_paths(self):
         """Test validation when paths are missing for new configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(paths=None)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -299,8 +276,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_check_mode(self):
         """Test that no changes are made in check mode."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params()
         self.mock_module.check_mode = True
         config_path = os.path.join(self.config_dir, "test")
@@ -321,8 +296,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_generate_config_with_scripts(self):
         """Test generating configuration with pre/post scripts."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(
             pre_rotate=["echo 'Pre-rotation'"],
             post_rotate=["systemctl reload test", "logger 'Rotation done'"],
@@ -354,8 +327,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_compression_methods(self):
         """Test different compression methods."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         compression_methods = ["gzip", "bzip2", "xz", "zstd", "lzma", "lz4"]
         for method in compression_methods:
             with self.subTest(method=method):
@@ -386,8 +357,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_size_based_rotation(self):
         """Test size-based rotation configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(size="100M", rotation_period="daily")
         config_path = os.path.join(self.config_dir, "test")
 
@@ -410,8 +379,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_logrotate_not_installed(self):
         """Test error when logrotate is not installed."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         mock_module_for_test = Mock()
         mock_module_for_test.params = {
             "name": "test",
@@ -458,8 +425,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_parse_existing_config_paths(self):
         """Test parsing paths from existing configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(paths=None)
         config_path = os.path.join(self.config_dir, "test")
         existing_content = """/var/log/app1/*.log
@@ -489,8 +454,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_no_delay_compress_parameter(self):
         """Test no_delay_compress parameter."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(no_delay_compress=True)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -513,8 +476,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_shred_and_shred_cycles_parameters(self):
         """Test shred and shred_cycles parameters."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(shred=True, shred_cycles=3)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -538,8 +499,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_copy_parameter(self):
         """Test copy parameter."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(copy=True, copy_truncate=False)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -563,8 +522,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_rename_copy_parameter(self):
         """Test rename_copy parameter."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(rename_copy=True)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -587,8 +544,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_min_size_parameter(self):
         """Test min_size parameter."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(min_size="100k")
         config_path = os.path.join(self.config_dir, "test")
 
@@ -611,8 +566,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_date_yesterday_parameter(self):
         """Test date_yesterday parameter."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(date_ext=True, date_yesterday=True)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -636,8 +589,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_create_old_dir_parameter(self):
         """Test create_old_dir parameter."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(old_dir="/var/log/archives", create_old_dir=True)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -661,8 +612,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_start_parameter(self):
         """Test start parameter."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(start=1)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -685,8 +634,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_syslog_parameter(self):
         """Test syslog parameter."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(syslog=True)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -709,8 +656,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_validation_shred_cycles_positive(self):
         """Test validation when shred_cycles is not positive."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(shred_cycles=0)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -730,8 +675,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_validation_start_non_negative(self):
         """Test validation when start is negative."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(start=-1)
         config_path = os.path.join(self.config_dir, "test")
 
@@ -751,8 +694,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_all_new_parameters_together(self):
         """Test all new parameters together in one configuration."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(
             no_delay_compress=True,
             shred=True,
@@ -807,8 +748,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_size_format_validation(self):
         """Test validation of size format parameters."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         valid_sizes = ["100k", "100M", "1G", "10", "500K", "2M", "3G"]
 
         for size in valid_sizes:
@@ -857,8 +796,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_max_size_format_validation(self):
         """Test validation of max_size format parameters."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         valid_sizes = ["100k", "100M", "1G", "10", "500K", "2M", "3G"]
 
         for size in valid_sizes:
@@ -907,8 +844,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_backup_disabled_skips_backup(self):
         """Test that backup is not created when backup parameter is False."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(rotate_count=14, backup=False)
         config_path = os.path.join(self.config_dir, "test")
         existing_content = """/var/log/test/*.log {
@@ -937,8 +872,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_backup_enabled_by_default(self):
         """Test that backup is created by default."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(rotate_count=14)
         config_path = os.path.join(self.config_dir, "test")
         expected_backup_path = config_path + ".20260101_120000"
@@ -969,8 +902,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_logrotate_bin_used_in_apply(self):
         """Test that logrotate binary path is used in apply method."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params()
 
         test_logrotate_path = "/usr/local/sbin/logrotate"
@@ -997,8 +928,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_diff_mode_new_file(self):
         """Test that diff is emitted when creating a new config file with _diff=True."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params()
         self.mock_module._diff = True
         self.mock_module.check_mode = True
@@ -1025,8 +954,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_diff_mode_update_existing(self):
         """Test that diff shows before/after when updating an existing config with _diff=True."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(rotate_count=14)
         self.mock_module._diff = True
         self.mock_module.check_mode = True
@@ -1055,8 +982,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_diff_mode_no_change(self):
         """Test that diff key is absent when the config is already up to date."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(
             rotate_count=7,
             compress=True,
@@ -1091,8 +1016,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_diff_mode_enable_disable(self):
         """Test that diff shows path rename when enabling/disabling with _diff=True."""
-        from ansible_collections.community.general.plugins.modules import logrotate
-
         self._setup_module_params(enabled=False, paths=None)
         self.mock_module._diff = True
         self.mock_module.check_mode = True
@@ -1124,7 +1047,6 @@ class TestLogrotateConfig(unittest.TestCase):
 
     def test_diff_mode_false_no_diff_key(self):
         """Test that diff key is absent when _diff=False even if content changes."""
-        from ansible_collections.community.general.plugins.modules import logrotate
 
         self._setup_module_params(rotate_count=14)
         self.mock_module._diff = False

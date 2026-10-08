@@ -21,15 +21,9 @@ class TestPackerModule(unittest.TestCase):
         cls.test_dir = tempfile.mkdtemp()
         cls.mock_ansible_basic = Mock()
         cls.mock_ansible_basic.AnsibleModule = Mock()
-        cls.patcher_basic = patch.dict(
-            "sys.modules",
-            {"ansible.module_utils.basic": cls.mock_ansible_basic},
-        )
-        cls.patcher_basic.start()
 
     @classmethod
     def tearDownClass(cls):
-        cls.patcher_basic.stop()
         if os.path.exists(cls.test_dir):
             shutil.rmtree(cls.test_dir)
 
