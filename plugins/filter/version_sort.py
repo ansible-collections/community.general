@@ -44,23 +44,31 @@ EXAMPLES = r"""
 
 - name: Sort a list of strings by version, comparing digits numerically and everything else as text
   ansible.builtin.set_fact:
-    sorted_list: "{{ ['1.1.0-SNAPSHOT', '1.0alpha', '1.1-SNAPSHOT', '1.0.1', '1.0-alpha'] | community.general.version_sort(style='natural') }}"
+    sorted_list: "{{ versions | community.general.version_sort(style='natural') }}"
     # Result is ['1.0-alpha', '1.0.1', '1.0alpha', '1.1-SNAPSHOT', '1.1.0-SNAPSHOT']
+  vars:
+    versions: ['1.1.0-SNAPSHOT', '1.0alpha', '1.1-SNAPSHOT', '1.0.1', '1.0-alpha']
 
 - name: Sort a list of strings by version, placing text suffixes before the release
   ansible.builtin.set_fact:
-    sorted_list: "{{ ['1.0.1', '1.0', '1.0rc1', '1.0alpha'] | community.general.version_sort(style='pre_release') }}"
+    sorted_list: "{{ versions | community.general.version_sort(style='pre_release') }}"
     # Result is ['1.0alpha', '1.0rc1', '1.0', '1.0.1']
+  vars:
+    versions: ['1.0.1', '1.0', '1.0rc1', '1.0alpha']
 
 - name: Sort a list of strings by version, placing text suffixes after the release but before further numbers
   ansible.builtin.set_fact:
-    sorted_list: "{{ ['1.0.1', '1.0', '1.0rc1', '1.0alpha'] | community.general.version_sort(style='post_release') }}"
+    sorted_list: "{{ versions | community.general.version_sort(style='post_release') }}"
     # Result is ['1.0', '1.0alpha', '1.0rc1', '1.0.1']
+  vars:
+    versions: ['1.0.1', '1.0', '1.0rc1', '1.0alpha']
 
 - name: Sort a list of strings by version, placing further numbers before text suffixes
   ansible.builtin.set_fact:
-    sorted_list: "{{ ['1.0.1', '1.0', '1.0rc1', '1.0alpha'] | community.general.version_sort(style='numbers_first') }}"
+    sorted_list: "{{ versions | community.general.version_sort(style='numbers_first') }}"
     # Result is ['1.0', '1.0.1', '1.0alpha', '1.0rc1']
+  vars:
+    versions: ['1.0.1', '1.0', '1.0rc1', '1.0alpha']
 """
 
 RETURN = r"""
