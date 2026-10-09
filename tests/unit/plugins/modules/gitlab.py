@@ -281,6 +281,17 @@ def resp_get_missing_group(url, request):
     return response(404, content, headers, None, 5, request)
 
 
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/namespaces/1", method="get")
+def resp_get_namespace(url, request):
+    headers = {"content-type": "application/json"}
+    content = (
+        '{"id": 1, "name": "Foobar Group", "path": "foo-bar", "kind": "group",'
+        '"full_path": "foo-bar", "parent_id": null, "web_url": "http://localhost:3000/groups/foo-bar"}'
+    )
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups", method="post")
 def resp_create_group(url, request):
     headers = {"content-type": "application/json"}
@@ -551,6 +562,34 @@ def resp_get_project(url, request):
 
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/foo-bar%2Fdiaspora-client", method="get")
 def resp_get_project_by_name(url, request):
+    headers = {"content-type": "application/json"}
+    content = (
+        '{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
+        '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
+        '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
+        '"web_url": "http://example.com/diaspora/diaspora-client",'
+        '"readme_url": "http://example.com/diaspora/diaspora-client/blob/master/README.md",'
+        '"tag_list": ["example","disapora client"],"name": "Diaspora Client",'
+        '"name_with_namespace": "Diaspora / Diaspora Client","path": "diaspora-client",'
+        '"path_with_namespace": "diaspora/diaspora-client","created_at": "2013-09-30T13:46:02Z",'
+        '"last_activity_at": "2013-09-30T13:46:02Z","forks_count": 0,'
+        '"avatar_url": "http://example.com/uploads/project/avatar/4/uploads/avatar.png",'
+        '"star_count": 0}'
+    )
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path=r"/api/v4/projects/.*missing-project$", method="get")
+def resp_get_missing_project(url, request):
+    headers = {"content-type": "application/json"}
+    content = "{}"
+    content = content.encode("utf-8")
+    return response(404, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1", method="put")
+def resp_update_project(url, request):
     headers = {"content-type": "application/json"}
     content = (
         '{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
