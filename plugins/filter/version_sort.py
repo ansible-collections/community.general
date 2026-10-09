@@ -80,6 +80,7 @@ _value:
 
 import re
 import typing as t
+from collections.abc import Iterable
 
 from ansible.errors import AnsibleFilterError
 
@@ -122,11 +123,24 @@ _SORT_KEYS: dict[str, t.Callable[[str], t.Any]] = {
 }
 
 
-def version_sort(value: list[str], reverse: bool = False, style: str = "loose") -> list[str]:
-    """Sort a list according to loose versions so that e.g. 2.9 is smaller than 2.10"""
-    if style not in _SORT_KEYS:
+def _validate_value(value: t.Any) -> list[str]:
+    if isinstance(value, (str, bytes)) or not isinstance(value, Iterable):
+        raise AnsibleFilterError(f"Input must be a list of strings, got {type(value).__name__}")
+    items = list(value)
+    for item in items:
+        if not isinstance(item, str):
+            raise AnsibleFilterError(f"Input elements must be strings, got {type(item).__name__}: {item!r}")
+    return items
+
+
+def version_sort(value: t.Any, reverse: t.Any = False, *, style: t.Any = "loose") -> list[str]:
+    """Sort a list according to the selected style"""
+    items = _validate_value(value)
+    if not isinstance(reverse, bool):
+        raise AnsibleFilterError(f"reverse must be a boolean, got {type(reverse).__name__}")
+    if not isinstance(style, str) or style not in _SORT_KEYS:
         raise AnsibleFilterError(f"style must be one of {', '.join(_SORT_KEYS)}, got {style!r}")
-    return sorted(value, key=_SORT_KEYS[style], reverse=reverse)
+    return sorted(items, key=_SORT_KEYS[style], reverse=reverse)
 
 
 class FilterModule:

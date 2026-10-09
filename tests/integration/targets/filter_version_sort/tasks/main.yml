@@ -54,14 +54,36 @@
       - "['2.1', '2.10', '2.9'] | community.general.version_sort(style=item, reverse=true) == ['2.10', '2.9', '2.1']"
   loop: [loose, natural, pre_release, post_release, numbers_first]
 
-- name: sort with an invalid style
-  ansible.builtin.set_fact:
-    invalid_style_result: "{{ ['2.1', '2.10'] | community.general.version_sort(style='bogus') }}"
-  register: invalid_style
-  ignore_errors: true
-
-- name: validate that an invalid style fails
+- name: validate that a non-list iterable input is accepted
   ansible.builtin.assert:
     that:
-      - invalid_style is failed
-      - "'style must be one of' in invalid_style.msg"
+      - "['2.1', '2.10', '2.9'] | map('trim') | community.general.version_sort == ['2.1', '2.9', '2.10']"
+
+- name: sort with invalid arguments
+  ansible.builtin.set_fact:
+    invalid_result: "{{ item.input | community.general.version_sort(item.reverse | default(false), style=item.style | default('loose')) }}"
+  loop:
+    - input: '2.1'
+      msg: Input must be a list of strings
+    - input: ['2.1', 2]
+      msg: Input elements must be strings
+    - input: ['2.1']
+      reverse: 'yes'
+      msg: reverse must be a boolean
+    - input: ['2.1']
+      style: bogus
+      msg: style must be one of
+    - input: ['2.1']
+      style: [natural]
+      msg: style must be one of
+  register: invalid_args
+  ignore_errors: true
+
+- name: validate that invalid arguments fail
+  ansible.builtin.assert:
+    that:
+      - item is failed
+      - item.item.msg in item.msg
+  loop: "{{ invalid_args.results }}"
+  loop_control:
+    label: "{{ item.item.msg }}"
