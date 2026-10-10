@@ -424,3 +424,24 @@ def test_runner_context(runner_input, cmd_execution, expected):
         with runner(**runner_input["runner_ctx_args"]) as ctx2:
             results2 = ctx2.run(**cmd_execution["runner_ctx_run_args"])
             _assert_run(runner_input, cmd_execution, expected, ctx2, results2)
+
+
+def test_runner_context_environ_update_isolation():
+    module = MagicMock()
+    module.get_bin_path.return_value = "/mock/bin/testing"
+    module.run_command.return_value = (0, "", "")
+    module.check_mode = False
+    runner_environ = {"FOO": "bar"}
+    runner = CmdRunner(module=module, command="testing", environ_update=runner_environ)
+
+    with runner(environ_update={"SECRET": "s3cr3t"}) as ctx:
+        ctx.run()
+    with runner() as ctx:
+        ctx.run()
+
+    environs = [call.kwargs["environ_update"] for call in module.run_command.call_args_list]
+    assert environs == [
+        {"FOO": "bar", "SECRET": "s3cr3t", "LANGUAGE": "C", "LC_ALL": "C"},
+        {"FOO": "bar", "LANGUAGE": "C", "LC_ALL": "C"},
+    ]
+    assert runner_environ == {"FOO": "bar"}

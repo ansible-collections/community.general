@@ -180,7 +180,7 @@ class _CmdRunnerContext:
         self.check_mode_return = check_mode_return
         self.run_command_args = dict(kwargs)
 
-        self.environ_update = runner.environ_update
+        self.environ_update = dict(runner.environ_update)
         self.environ_update.update(self.run_command_args.get("environ_update", {}))
         if runner.force_lang:
             self.environ_update.update(
