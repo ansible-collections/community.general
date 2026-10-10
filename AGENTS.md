@@ -96,6 +96,33 @@ Instead:
 - May be pushed to `(X+3).0.0` depending on the situation
 
 
+## Writing plugin code
+
+- Modules and module utils run on the target nodes, other plugins run on the controller.
+  Check https://github.com/ansible-collections/community.general/issues/11482 for the lowest Python version
+  supported on each side, and do not use language or standard library features newer than that
+  (e.g. `str.removesuffix()` requires Python 3.9).
+- Access module parameters with `module.params["name"]`, not `module.params.get("name")`:
+  every option declared in the argument spec is always present.
+- Type hints:
+  - Use `import typing as t`, not `from typing import ...`.
+  - Use `X | None` instead of `t.Optional[X]`.
+  - Do not use `t.Any` for objects from third-party libraries, it disables type checking for them.
+  - In filter and test plugins, the input can be anything the user passes: type it as `t.Any` and validate it.
+- When handling user-provided data structures, use `collections.abc.Mapping` and
+  `ansible.module_utils.common.collections.is_sequence` instead of checking for `dict` and `list`.
+- Compile regular expressions once, outside of loops, and use the compiled object inside the loop.
+- Do not place code or constants (other than conditional imports) before the imports. Imports come after
+  the `DOCUMENTATION`, `EXAMPLES`, and `RETURN` strings.
+- Do not use names starting with `_` for variables or methods in module files.
+- Avoid redundant code, for example:
+  - Conversions to a type the value already has (`str()` on a string, `bool()` on a boolean, `str(e)` inside an f-string).
+  - `if changed == True:` instead of `if changed:`.
+  - `x if x is not None else ""` where `x or ""` does the same.
+  - Comments that only restate the code.
+- Extract code that is repeated (e.g. building the same URL in several places) into a function.
+
+
 ## Writing changelog fragments
 
 Changelog Fragments:
