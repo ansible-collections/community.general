@@ -129,7 +129,9 @@ def _validate_value(value: t.Any) -> list[str]:
     items = list(value)
     for index, item in enumerate(items):
         if not isinstance(item, str):
-            raise AnsibleFilterError(f"Input elements must be strings, got {type(item).__name__} for index {index}: {item!r}")
+            raise AnsibleFilterError(
+                f"Input elements must be strings, got {type(item).__name__} for index {index}: {item!r}"
+            )
     return items
 
 
