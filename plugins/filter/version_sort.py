@@ -127,9 +127,9 @@ def _validate_value(value: t.Any) -> list[str]:
     if isinstance(value, (str, bytes)) or not isinstance(value, Iterable):
         raise AnsibleFilterError(f"Input must be a list of strings, got {type(value).__name__}")
     items = list(value)
-    for item in items:
+    for index, item in enumerate(items):
         if not isinstance(item, str):
-            raise AnsibleFilterError(f"Input elements must be strings, got {type(item).__name__}: {item!r}")
+            raise AnsibleFilterError(f"Input elements must be strings, got {type(item).__name__} for index {index}: {item!r}")
     return items
 
 
@@ -138,7 +138,7 @@ def version_sort(value: t.Any, reverse: t.Any = False, *, style: t.Any = "loose"
     items = _validate_value(value)
     if not isinstance(reverse, bool):
         raise AnsibleFilterError(f"reverse must be a boolean, got {type(reverse).__name__}")
-    if not isinstance(style, str) or style not in _SORT_KEYS:
+    if style not in _SORT_KEYS:
         raise AnsibleFilterError(f"style must be one of {', '.join(_SORT_KEYS)}, got {style!r}")
     return sorted(items, key=_SORT_KEYS[style], reverse=reverse)
 
