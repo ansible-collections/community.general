@@ -144,10 +144,7 @@ class LookupModule(LookupBase):
         open_br = "{{"
         close_br = "}}"
         quoted_expression = f"{open_br}{expression}{close_br}"
-        if hasattr(templar, "evaluate_expression"):
-            # This is available since the Data Tagging PR has been merged
-            return templar.evaluate_expression(_make_safe(expression))
-        return templar.template(quoted_expression)
+        return templar.evaluate_expression(_make_safe(expression))
 
     def __process(self, result, terms, index, current, templar, variables):
         """Fills ``result`` list with evaluated items.
