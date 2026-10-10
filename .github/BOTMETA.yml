@@ -153,6 +153,8 @@ files:
     maintainers: kamsz
   $doc_fragments/_ipa.py:
     maintainers: $team_ipa
+  $doc_fragments/_keycloak.py:
+    maintainers: $team_keycloak
   $doc_fragments/_kopia.py:
     maintainers: munchtoast
   $doc_fragments/_ldap.py:
@@ -461,11 +463,11 @@ files:
   $module_utils/_jenkins.py:
     labels: jenkins
     maintainers: russoz
+  $module_utils/_keycloak.py:
+    maintainers: $team_keycloak
   $module_utils/_keycloak_clientsecret.py:
     maintainers: $team_keycloak fynncfchen johncant
   $module_utils/_keycloak_utils.py:
-    maintainers: $team_keycloak
-  $module_utils/_keycloak.py:
     maintainers: $team_keycloak
   $module_utils/_kopia.py:
     maintainers: munchtoast
@@ -976,10 +978,10 @@ files:
     maintainers: Gaetan2907
   $modules/keycloak_client_rolescope.py:
     maintainers: desand01
-  $modules/keycloak_clientscope_rolemappings.py:
-    maintainers: felix-grzelka
   $modules/keycloak_clientscope.py:
     maintainers: Gaetan2907
+  $modules/keycloak_clientscope_rolemappings.py:
+    maintainers: felix-grzelka
   $modules/keycloak_clientscope_type.py:
     maintainers: simonpahl
   $modules/keycloak_clientsecret_info.py:
