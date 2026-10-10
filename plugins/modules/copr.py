@@ -17,6 +17,8 @@ requirements:
   - dnf-plugins-core
 notes:
   - Supports C(check_mode).
+  - On systems where dnf5 is the default package manager, for example Fedora 41 and later, the (python3-dnf) package
+    must be installed.
 extends_documentation_fragment:
   - community.general._attributes
 attributes:
@@ -498,7 +500,10 @@ def run_module():
 
     if not HAS_DNF_PACKAGES:
         _respawn_dnf()
-        module.fail_json(msg=missing_required_lib("dnf"), exception=DNF_IMP_ERR)
+        msg = missing_required_lib("dnf")
+        if os.path.realpath("/usr/bin/dnf") == "/usr/bin/dnf5":
+            msg += " This system uses dnf5; install the python3-dnf package to use this module."
+        module.fail_json(msg=msg, exception=DNF_IMP_ERR)
 
     CoprModule.ansible_module = module
     copr_module = CoprModule(
