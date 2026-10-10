@@ -123,6 +123,38 @@ Instead:
 - Extract code that is repeated (e.g. building the same URL in several places) into a function.
 
 
+## Writing plugin documentation
+
+- Use semantic markup: `O()` for options, `V()` for values, `RV()` for return values, `C()` for code, commands, and paths.
+  See https://docs.ansible.com/projects/ansible/latest/dev_guide/ansible_markup.html.
+- Each `description` is a list of paragraphs:
+  - Do not split a sentence over two list items.
+  - Keep information about the same subject in the same paragraph.
+- Do not list the possible values in the `description` when the option has `choices`, they are rendered automatically.
+  To explain the values, make `choices` a dictionary mapping each value to its description:
+  ```yaml
+  choices:
+    normal: Utilizes this node as much as possible.
+    exclusive:
+      - Only builds jobs with label expressions matching this node.
+      - Additional paragraph.
+  ```
+- Values of `state` describe the resulting state (`present`, `absent`, `built`, `initialized`), not the command run to reach it (`build`, `init`).
+- Describe boolean options by what happens when they are V(true).
+- Do not add aliases to options unless strictly necessary.
+- In new features, use the current terminology of the tool or service being managed, not legacy names.
+- State explicitly any behavior that is not obvious for users who are not Python programmers, for example:
+  - Comparing values with equality treats `0` and `false` (and `1` and `true`) as equal.
+  - `re.match()` only matches at the beginning of the string.
+  - A list value must be passed nested inside another list when the option takes a list of values.
+- Attributes:
+  - Add `community.general._attributes` to `extends_documentation_fragment`.
+  - Under each attribute set `support` and, when needed, `details`. Do not set `description`, it comes from the doc fragment.
+  - Use `details` to explain limitations; it is usually not needed for `support: full`.
+- Keep lines in `EXAMPLES` short: move long values into `vars:` or use YAML folded scalars.
+- Separate the `DOCUMENTATION`, `EXAMPLES`, and `RETURN` strings with a blank line.
+
+
 ## Writing changelog fragments
 
 Changelog Fragments:
