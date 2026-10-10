@@ -371,6 +371,20 @@ approval before committing or pushing it.
   - Use local alternatives as possible, e.g. docker images (use `setup_docker`)
   - Be implemented in a "black-box" style: we provide inputs and assert the outputs, not interested in the internal details
   - Assert idempotency, i.e. run the same command twice and assert the second time bears no change
+    - One repeated run is enough to verify idempotency
+    - Also test changing an attribute of an object that already exists in the requested state
+  - Assert only the values the test changed, not entire configurations or outputs
+  - Test error paths with a regular task using `ignore_errors: true` and `register`, then assert that the result
+    `is failed` and that its `msg` contains the expected error. Do not write and execute separate playbooks for that.
+  - Use FQCNs everywhere, including lookups and filters (e.g. `lookup('ansible.builtin.template', ...)`)
+  - Use distinct, descriptive names for registered variables
+  - Not depend on variables that can only be set on the command line - CI cannot set them
+  - Keep resource usage (disk images, downloads) as small as possible, CI VMs have limited resources
+- For targets that only work on some platforms:
+  - Add `skip/<platform>` entries (e.g. `skip/macos`, `skip/freebsd`, `skip/alpine`) to `aliases`
+  - Also skip unsupported systems at the start of the tasks, before installing packages or doing any other setup work,
+    since the aliases do not cover every environment CI uses (e.g. `skip/alpine` does not skip the Alpine container)
+  - Do not add precondition assertions or messages explaining why something is skipped, they only add noise
 - For modules with larget sets of functions, break the tests into smaller files and use `include_tasks`
 
 ## Use of AI for contributions
