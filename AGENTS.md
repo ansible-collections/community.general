@@ -397,4 +397,11 @@ approval before committing or pushing it.
 
 **Please note that using AI is accepted but you MUST comply with the [Ansible Community Policy for AI-Assisted Contributions](https://docs.ansible.com/projects/ansible/devel/community/ai_policy.html)**!
 
-The main point is being transparent about it. Add a `Co-authored:` tag in the issues and PR descriptions, as well as in the commit texts.
+The main points are:
+
+- Be transparent: disclose the use of AI when a significant part of the contribution is taken from the AI output
+  without significant changes. Grammar, spelling, and style corrections do not need disclosure.
+  - In commits, add a trailer `Assisted-by: <model>`, e.g. `Assisted-by: Claude Opus 5.5`.
+  - In issues, PR descriptions, and comments, add a short note stating that AI was used.
+- Contributions assisted by AI must follow the project's standards and guidelines, including this file.
+- The contributor is fully accountable for the contribution, with or without AI assistance.
