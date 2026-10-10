@@ -1,0 +1,2 @@
+minor_changes:
+  - nginx_status_info - stop using a module-level global variable (https://github.com/ansible-collections/community.general/pull/12910).
