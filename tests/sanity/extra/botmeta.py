@@ -37,7 +37,6 @@ IGNORE_NO_MAINTAINERS = [
     "plugins/connection/iocage.py",
     "plugins/connection/lxc.py",
     "plugins/doc_fragments/_auth_basic.py",
-    "plugins/doc_fragments/_openswitch.py",  # can be removed?
     "plugins/filter/json_query.py",
     "plugins/filter/random_mac.py",
     "plugins/inventory/nmap.py",
