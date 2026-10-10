@@ -23,8 +23,20 @@
   the current version. Depending on the situation, this target may be pushed for the (X+3).0.0 version.
 - If a deprecation is needed, ingest https://github.com/russoz-ansible/ansible-contrib-unofficial/blob/main/deprecations.md for more information on how to implement the deprecations.
 - Always refer to modules and plugins by their FQCN.
-- When setting `version_added` on a new parameter or plugin, always read `galaxy.yml` and use
-  that version string directly — it holds the next version for a feature release.
+- Use `version_added` to record in which version something new became available:
+  - Always read `galaxy.yml` and use that version string directly — it holds the next version for a feature release.
+  - New module or plugin: set `version_added` at the top level of `DOCUMENTATION`.
+  - New option or suboption in an existing module or plugin: set `version_added` in that option's documentation.
+    Options that come together with a new module or plugin do not need it.
+  - New choice value or new alias for an existing option: there is no `version_added` field for these,
+    so add a paragraph to the option's `description` instead, for example:
+    ```yaml
+    - The value V(all) has been added in community.general 13.5.0.
+    - The O(client_id) alias has been added in community.general 13.5.0.
+    ```
+  - Do not add or change `version_added` for things that already existed.
+  - Once that version is released, the value is stale. After rebasing, or when a release happened while
+    the PR was open, read `galaxy.yml` again and update every `version_added` (and description note) added by the PR.
 
 ## Licensing and Copyright
 
