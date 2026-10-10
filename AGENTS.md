@@ -155,6 +155,22 @@ Instead:
 - Separate the `DOCUMENTATION`, `EXAMPLES`, and `RETURN` strings with a blank line.
 
 
+## Check mode, diff mode, and idempotency
+
+- In check mode the module must not change anything, but it must report the same `changed` value a real run would.
+  Do not return a fixed `changed` value in check mode.
+- Determine `changed` by comparing the requested state with the current state of the system or service.
+  Do not report `changed=true` just because an action was performed: many APIs and commands are idempotent
+  and do not tell whether anything changed.
+- An attribute (`check_mode`, `diff_mode`) may only declare `support: full` if every code path honors it.
+  Otherwise declare `support: partial` and explain the limitation in `details`.
+  New states and options added to a module that declares `full` support must honor it as well.
+- Normalize values before comparing them, so that equivalent values do not produce a change on every run
+  (e.g. `None` versus `""`, human-readable sizes versus bytes).
+- In diff mode, return `diff` with `before` and `after`. When the content of a file is compared, also set
+  `before_header` and `after_header` to the paths, the same way `ansible.builtin.copy` does.
+
+
 ## Writing changelog fragments
 
 Changelog Fragments:
