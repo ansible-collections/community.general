@@ -77,21 +77,10 @@ import os
 
 from ansible.module_utils.basic import AnsibleModule
 
-module = None
-init_script = None
-
-
-# ===============================
-# Check if service is enabled
-def is_enabled():
-    rc, dummy, dummy = module.run_command([init_script, "enabled"])
-    return rc == 0
-
 
 # ===========================================
 # Main control flow
 def main():
-    global module, init_script
     # init
     module = AnsibleModule(
         argument_spec=dict(
@@ -115,6 +104,11 @@ def main():
     # check if service exists
     if not os.path.exists(init_script):
         module.fail_json(msg=f"service {service} does not exist")
+
+    # Check if service is enabled
+    def is_enabled():
+        rc, dummy, dummy = module.run_command([init_script, "enabled"])
+        return rc == 0
 
     # Enable/disable service startup at boot if requested
     if module.params["enabled"] is not None:
