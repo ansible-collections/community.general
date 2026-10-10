@@ -53,6 +53,7 @@ from ansible_collections.community.general.plugins.lookup.onepassword import (
     OnePass,
     OnePassCLIv2,
 )
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
@@ -108,4 +109,7 @@ class LookupModule(LookupBase):
         )
         op.assert_logged_in()
 
-        return [self.get_ssh_key(op.get_raw(term, vault), term, ssh_format=ssh_format) for term in terms]
+        return [
+            mark_values_as_secrets(self.get_ssh_key(op.get_raw(term, vault), term, ssh_format=ssh_format))
+            for term in terms
+        ]

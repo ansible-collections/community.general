@@ -90,6 +90,7 @@ class LookupModule(LookupBase):
         values = []
         for term in terms:
             data = json.loads(op.get_raw(term, vault))
+            # TODO should we actually do this?   data = mark_values_as_secrets(data)
             values.append(data)
 
         return values
