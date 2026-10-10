@@ -33,11 +33,15 @@ IGNORE_NO_MAINTAINERS = [
     "plugins/callback/slack.py",
     "plugins/callback/splunk.py",
     "plugins/callback/yaml.py",
-    "plugins/inventory/nmap.py",
-    "plugins/inventory/virtualbox.py",
     "plugins/connection/chroot.py",
     "plugins/connection/iocage.py",
     "plugins/connection/lxc.py",
+    "plugins/doc_fragments/_auth_basic.py",
+    "plugins/doc_fragments/_openswitch.py",  # can be removed?
+    "plugins/filter/json_query.py",
+    "plugins/filter/random_mac.py",
+    "plugins/inventory/nmap.py",
+    "plugins/inventory/virtualbox.py",
     "plugins/lookup/cartesian.py",
     "plugins/lookup/chef_databag.py",
     "plugins/lookup/consul_kv.py",
@@ -48,8 +52,10 @@ IGNORE_NO_MAINTAINERS = [
     "plugins/lookup/lastpass.py",
     "plugins/lookup/passwordstore.py",
     "plugins/lookup/shelvefile.py",
-    "plugins/filter/json_query.py",
-    "plugins/filter/random_mac.py",
+    "plugins/module_utils/_lxd.py",
+    "plugins/module_utils/_memset.py",
+    "plugins/module_utils/_stormssh.py",
+    "plugins/module_utils/_univention_umc.py",
 ]
 
 
@@ -126,8 +132,6 @@ class BotmetaCheck:
     def validate(self, filename: str, filedata: dict) -> None:
         if not filename.startswith("plugins/"):
             return
-        if filename.startswith(("plugins/doc_fragments/", "plugins/module_utils/")):
-            return
         # Compile list of all active and inactive maintainers
         all_maintainers = filedata["maintainers"] + filedata["ignore"]
         if not filename.startswith(
@@ -184,6 +188,14 @@ class BotmetaCheck:
                 self.report_error(f"{self.botmeta_filename}:0:0: {message}")
             return
 
+        yaml_files = botmeta.get("files") or {}
+
+        # Check order
+        expected = sorted(yaml_files)
+        for i, (exp, act) in enumerate(zip(expected, yaml_files)):
+            if exp != act:
+                self.report_error(f"{self.botmeta_filename}:0:0: Entry #{i + 1} should be {exp!r}, but is {act!r}")
+
         # Preprocess (substitute macros, convert to lists)
         macros = botmeta.get("macros") or {}
         macro_re = re.compile(r"\$([a-zA-Z_]+)")
@@ -200,7 +212,7 @@ class BotmetaCheck:
 
         files = {}
         try:
-            for file, filedata in (botmeta.get("files") or {}).items():
+            for file, filedata in yaml_files.items():
                 file = convert_macros(file, macros)
                 filedata = {k: convert_macros(v, macros) for k, v in filedata.items()}
                 files[file] = filedata
