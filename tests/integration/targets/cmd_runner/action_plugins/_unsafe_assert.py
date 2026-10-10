@@ -9,10 +9,10 @@ from ansible.playbook.conditional import Conditional
 from ansible.plugins.action import ActionBase
 
 try:
-    from ansible.utils.datatag import trust_value as _trust_value  # type: ignore[import-not-found]
+    from ansible.template import trust_as_template as _trust_value
 except ImportError:
 
-    def _trust_value(input):
+    def _trust_value(input):  # type: ignore[misc]
         return input
 
 
@@ -46,7 +46,7 @@ class ActionModule(ActionBase):
 
         for that in thats:
             if hasattr(self._templar, "evaluate_conditional"):
-                trusted_that = _trust_value(that) if _trust_value else that
+                trusted_that = _trust_value(that)
                 test_result = self._templar.evaluate_conditional(conditional=trusted_that)
             else:
                 cond = Conditional(loader=self._loader)
