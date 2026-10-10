@@ -15,6 +15,7 @@ ignore = [
     "E741",  # Ambiguous variable name
     "UP012",  # unnecessary-encode-utf8
     "UP015",  # Unnecessary mode argument
+    "UP017",  # Convert datetime.timezone.utc to datetime.UTC
     "SIM105",  # suppressible-exception
     "SIM108",  # if-else-block-instead-of-if-exp
     # To fix later:
