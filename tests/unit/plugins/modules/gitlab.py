@@ -17,6 +17,7 @@ class FakeAnsibleModule:
     def __init__(self, module_params=None):
         self.check_mode = False
         self.params = module_params if module_params else {}
+        self.warn = unittest.mock.Mock()
 
     def fail_json(self, **args):
         pass
