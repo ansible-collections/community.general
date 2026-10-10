@@ -439,7 +439,7 @@ def test_runner_context_environ_update_isolation():
     with runner() as ctx:
         ctx.run()
 
-    environs = [call.kwargs["environ_update"] for call in module.run_command.call_args_list]
+    environs = [call[1]["environ_update"] for call in module.run_command.call_args_list]
     assert environs == [
         {"FOO": "bar", "SECRET": "s3cr3t", "LANGUAGE": "C", "LC_ALL": "C"},
         {"FOO": "bar", "LANGUAGE": "C", "LC_ALL": "C"},
