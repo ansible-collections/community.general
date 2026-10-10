@@ -11,14 +11,7 @@ import typing as t
 from collections.abc import Mapping
 
 from ansible.errors import AnsibleFilterError
-
-try:
-    # Introduced with Data Tagging (https://github.com/ansible/ansible/pull/84621):
-    from ansible.module_utils.datatag import native_type_name as _native_type_name
-
-    HAS_NATIVE_TYPE_NAME = True
-except ImportError:
-    HAS_NATIVE_TYPE_NAME = False
+from ansible.module_utils.datatag import native_type_name as _native_type_name
 
 
 def _atype(data: t.Any, alias: Mapping, *, use_native_type: bool = False) -> str:
@@ -26,7 +19,7 @@ def _atype(data: t.Any, alias: Mapping, *, use_native_type: bool = False) -> str
     Returns the name of the type class.
     """
 
-    if use_native_type and HAS_NATIVE_TYPE_NAME:
+    if use_native_type:
         data_type = _native_type_name(data)
     else:
         data_type = type(data).__name__
