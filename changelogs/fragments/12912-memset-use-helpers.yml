@@ -1,0 +1,3 @@
+minor_changes:
+  - memset_zone - use existing module utils helper to look up zones (https://github.com/ansible-collections/community.general/pull/12912).
+  - memset_zone_domain - use existing module utils helper to look up zone domains (https://github.com/ansible-collections/community.general/pull/12912).
