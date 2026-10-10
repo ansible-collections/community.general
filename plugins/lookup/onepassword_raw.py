@@ -54,11 +54,13 @@ import json
 
 from ansible.plugins.lookup import LookupBase
 
-from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
+from ansible_collections.community.general.plugins.lookup.onepassword import onepassword_errors, run_command
+from ansible_collections.community.general.plugins.module_utils._onepassword_cli import OnePass
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
 class LookupModule(LookupBase):
+    @onepassword_errors()
     def run(self, terms, variables=None, **kwargs):
         self.set_options(var_options=variables, direct=kwargs)
         check_for_wrong_terms(self, direct=kwargs)
@@ -84,6 +86,7 @@ class LookupModule(LookupBase):
             account_id=account_id,
             connect_host=connect_host,
             connect_token=connect_token,
+            run_command=run_command,
         )
         op.assert_logged_in()
 
