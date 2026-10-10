@@ -6,8 +6,7 @@ from __future__ import annotations
 
 from ansible.errors import AnsibleError
 from ansible.plugins.action import ActionBase
-
-from ansible.utils.datatag import trust_value as _trust_value
+from ansible.template import trust_as_template as _trust_value
 
 
 class ActionModule(ActionBase):

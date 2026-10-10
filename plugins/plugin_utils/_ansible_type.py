@@ -11,7 +11,6 @@ import typing as t
 from collections.abc import Mapping
 
 from ansible.errors import AnsibleFilterError
-
 from ansible.module_utils.datatag import native_type_name as _native_type_name
 
 
