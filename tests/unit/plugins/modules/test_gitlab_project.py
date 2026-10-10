@@ -4,8 +4,17 @@
 
 from __future__ import annotations
 
-import pytest
+from unittest.mock import patch
 
+import pytest
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    exit_json,
+    fail_json,
+    set_module_args,
+)
+
+from ansible_collections.community.general.plugins.modules import gitlab_project
 from ansible_collections.community.general.plugins.modules.gitlab_project import GitLabProject
 
 
@@ -27,10 +36,14 @@ try:
         resp_delete_project,
         resp_get_gitlab_version,
         resp_get_group,
+        resp_get_group_by_name,
+        resp_get_missing_project,
+        resp_get_namespace,
         resp_get_project,
         resp_get_project_by_name,
         resp_get_user,
         resp_unarchive_project,
+        resp_update_project,
     )
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
@@ -38,6 +51,10 @@ except ImportError:
     GitlabModuleTestCase = object  # type: ignore
     resp_archive_project = _dummy
     resp_get_group = _dummy
+    resp_get_group_by_name = _dummy
+    resp_get_namespace = _dummy
+    resp_get_missing_project = _dummy
+    resp_update_project = _dummy
     resp_get_project_by_name = _dummy
     resp_create_project = _dummy
     resp_get_project = _dummy
@@ -276,3 +293,60 @@ class TestGitlabProject(GitlabModuleTestCase):
         rvalue = self.moduleUtil.delete_project()
 
         self.assertEqual(rvalue, None)
+
+    # Regression tests for https://github.com/ansible-collections/community.general/issues/12902:
+    # main() crashed with "'bool' object has no attribute 'attributes'" because the bool returned
+    # by exists_project() was treated as the project object, both when the project already
+    # exists and when it does not.
+    @with_httmock(resp_get_group_by_name)
+    @with_httmock(resp_get_namespace)
+    @with_httmock(resp_get_project_by_name)
+    @with_httmock(resp_get_gitlab_version)
+    @with_httmock(resp_archive_project)
+    @with_httmock(resp_update_project)
+    def test_main_archived_state_with_existing_project(self):
+        with patch.multiple("ansible.module_utils.basic.AnsibleModule", exit_json=exit_json, fail_json=fail_json):
+            with patch(
+                "ansible_collections.community.general.plugins.modules.gitlab_project.gitlab_authentication",
+                return_value=self.gitlab_instance,
+            ):
+                with set_module_args(
+                    {
+                        "api_url": "http://localhost",
+                        "api_token": "private_token",
+                        "name": "Diaspora Client",
+                        "path": "diaspora-client",
+                        "group": "foo-bar",
+                        "state": "archived",
+                    }
+                ):
+                    with pytest.raises(AnsibleExitJson) as exc:
+                        gitlab_project.main()
+
+        self.assertEqual(exc.value.args[0]["changed"], True)
+
+    @with_httmock(resp_get_group_by_name)
+    @with_httmock(resp_get_namespace)
+    @with_httmock(resp_get_missing_project)
+    @with_httmock(resp_get_gitlab_version)
+    @with_httmock(resp_create_project)
+    def test_main_present_state_with_missing_project(self):
+        with patch.multiple("ansible.module_utils.basic.AnsibleModule", exit_json=exit_json, fail_json=fail_json):
+            with patch(
+                "ansible_collections.community.general.plugins.modules.gitlab_project.gitlab_authentication",
+                return_value=self.gitlab_instance,
+            ):
+                with set_module_args(
+                    {
+                        "api_url": "http://localhost",
+                        "api_token": "private_token",
+                        "name": "Missing Project",
+                        "path": "missing-project",
+                        "group": "foo-bar",
+                        "state": "present",
+                    }
+                ):
+                    with pytest.raises(AnsibleExitJson) as exc:
+                        gitlab_project.main()
+
+        self.assertEqual(exc.value.args[0]["changed"], True)
