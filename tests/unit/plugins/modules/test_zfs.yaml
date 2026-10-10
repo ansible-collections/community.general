@@ -94,12 +94,44 @@ test_cases:
         - *get-volsize
         - *props-vol
         - *get-volsize
-  - id: existing_volume_volblocksize_differs_not_set
+  - id: existing_volume_volblocksize_differs_fail
     input:
       name: pool/vol1
       state: present
       extra_zfs_properties:
         volblocksize: 8k
+    output:
+      failed: true
+      msg: "Property volblocksize can only be set when the dataset is created, current value '4096' differs from requested value '8k'"
+    mocks:
+      run_command:
+        - *zpool-version
+        - *exists-vol
+        - *props-vol
+        - *get-volblocksize
+  - id: existing_volume_volblocksize_differs_warn
+    input:
+      name: pool/vol1
+      state: present
+      extra_zfs_properties:
+        volblocksize: 8k
+      create_only_mismatch: warn
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *zpool-version
+        - *exists-vol
+        - *props-vol
+        - *get-volblocksize
+        - *props-vol
+  - id: existing_volume_volblocksize_differs_ignore
+    input:
+      name: pool/vol1
+      state: present
+      extra_zfs_properties:
+        volblocksize: 8k
+      create_only_mismatch: ignore
     output:
       changed: false
     mocks:
@@ -141,6 +173,7 @@ test_cases:
       extra_zfs_properties:
         encryption: true
         compression: zstd
+      create_only_mismatch: warn
     output:
       changed: true
     mocks:

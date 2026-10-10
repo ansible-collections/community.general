@@ -45,12 +45,23 @@ options:
       - See the zfs(8) man page for more information.
       - Properties that can only be set when the dataset is created (V(casesensitivity), V(encryption), V(keyformat),
         V(normalization), V(pbkdf2iters), V(utf8only), V(volblocksize)) are not changed if the dataset already exists.
-        A warning is issued if their current value differs from the requested one.
+        See O(create_only_mismatch) for what happens if their current value differs from the requested one.
       - Values of size properties (V(quota), V(recordsize), V(refquota), V(refreservation), V(reservation),
         V(special_small_blocks), V(volblocksize), V(volsize)) written in human-readable notation, such as V(4k)
         or V(1.5G), are compared to the current value as byte counts.
     type: dict
     default: {}
+  create_only_mismatch:
+    description:
+      - What to do when the dataset already exists and the current value of a property that can only be set at creation
+        time differs from the one requested in O(extra_zfs_properties).
+    type: str
+    choices:
+      fail: Make the module fail.
+      warn: Issue a warning and leave the property unchanged.
+      ignore: Silently leave the property unchanged.
+    default: fail
+    version_added: 14.0.0
 author:
   - Johan Wiren (@johanwiren)
 """
@@ -229,6 +240,18 @@ class Zfs:
         cmd = [self.zfs_cmd, "set", f"{prop}={value!s}", self.name]
         self.module.run_command(cmd, check_rc=True)
 
+    def handle_create_only_mismatch(self, prop, current_value, value):
+        mode = self.module.params["create_only_mismatch"]
+        if mode == "ignore":
+            return
+        msg = (
+            f"Property {prop} can only be set when the dataset is created, "
+            f"current value {current_value!r} differs from requested value {value!r}"
+        )
+        if mode == "fail":
+            self.module.fail_json(msg=msg)
+        self.module.warn(msg)
+
     def set_properties_if_changed(self):
         diff = {"before": {"extra_zfs_properties": {}}, "after": {"extra_zfs_properties": {}}}
         current_properties = self.list_properties()
@@ -240,10 +263,7 @@ class Zfs:
                 continue
             current_value = self.get_property(prop, current_properties)
             if normalize_value(prop, current_value) != normalize_value(prop, value):
-                self.module.warn(
-                    f"Property {prop} can only be set when the dataset is created, "
-                    f"current value {current_value!r} differs from requested value {value!r}"
-                )
+                self.handle_create_only_mismatch(prop, current_value, value)
         for prop, value in settable_properties.items():
             current_value = self.get_property(prop, current_properties)
             if normalize_value(prop, current_value) != normalize_value(prop, value):
@@ -309,6 +329,7 @@ def main():
             state=dict(type="str", required=True, choices=["absent", "present"]),
             origin=dict(type="str"),
             extra_zfs_properties=dict(type="dict", default={}),
+            create_only_mismatch=dict(type="str", choices=["fail", "warn", "ignore"], default="fail"),
         ),
         supports_check_mode=True,
     )
