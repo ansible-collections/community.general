@@ -4,132 +4,65 @@
 
 from __future__ import annotations
 
-import json
+import os
 from unittest.mock import PropertyMock
 
-import pytest
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
 from ansible_collections.community.general.plugins.modules import onepassword_info
 
 from .uthelper import RunCommandMock, TestCaseMock, UTHelper
 
-ITEM_JSON = json.dumps(
-    {
-        "fields": [
-            {"id": "password", "label": "password", "value": "secret123"},
-        ]
-    }
-)
+
+def _to_text(value):
+    if isinstance(value, bytes):
+        return to_text(value)
+    if isinstance(value, list):
+        return [_to_text(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _to_text(v) for k, v in value.items()}
+    return value
+
+
+class OnePassRunCommandMock(RunCommandMock):
+    """run_command() is called with encoding=None and some args as bytes: compare the calls as text."""
+
+    def setup(self, mocker):
+        for spec in self.mock_specs:
+            spec["out"] = to_bytes(spec["out"])
+        super().setup(mocker)
+
+    def check(self, test_case, results):
+        call_args_list = [(_to_text(c[0][0]), _to_text(c[1])) for c in self.mock_run_cmd.call_args_list]
+        expected_call_args_list = [(spec["command"], spec.get("environ", {})) for spec in self.mock_specs]
+
+        assert self.mock_run_cmd.call_count == len(self.mock_specs), (
+            f"{self.mock_run_cmd.call_count} != {len(self.mock_specs)}"
+        )
+        assert call_args_list == expected_call_args_list
 
 
 class OnePasswordConfigMock(TestCaseMock):
     name = "onepassword_config"
 
     def setup(self, mocker):
+        config_file_path = self.mock_specs.get("config_file_path")
         mocker.patch.object(
             OnePasswordConfig,
             "config_file_path",
             new_callable=PropertyMock,
-            return_value=self.mock_specs.get("config_file_path"),
+            return_value=config_file_path,
+        )
+        config_file_exists = self.mock_specs.get("config_file_exists", True)
+        real_isfile = os.path.isfile
+        mocker.patch(
+            "os.path.isfile",
+            side_effect=lambda path: config_file_exists if path == config_file_path else real_isfile(path),
         )
 
     def check(self, test_case, results):
         pass
 
 
-UTHelper.from_module(onepassword_info, __name__, mocks=[RunCommandMock, OnePasswordConfigMock])
-
-
-def _patch_bin_path(mocker):
-    mocker.patch(
-        "ansible.module_utils.basic.AnsibleModule.get_bin_path",
-        lambda self_, path, *args, **kwargs: f"/testbin/{path}",
-    )
-
-
-def _patch_run_command(mocker, responses):
-    mocker.patch(
-        "ansible.module_utils.basic.AnsibleModule.run_command",
-        side_effect=lambda cmd, **kwargs: next(responses),
-    )
-
-
-def test_get_token_signin(mocker, capfd):
-    master_password = "masterpass"
-    with set_module_args(
-        {
-            "search_terms": [{"name": "My Item"}],
-            "auto_login": {"subdomain": "mycompany", "master_password": master_password},
-        }
-    ):
-        _patch_bin_path(mocker)
-        mocker.patch.object(
-            OnePasswordConfig,
-            "config_file_path",
-            new_callable=PropertyMock,
-            return_value="/home/user/.op/config",
-        )
-        mocker.patch(
-            "ansible_collections.community.general.plugins.modules.onepassword_info.os.path.isfile",
-            return_value=True,
-        )
-        _patch_run_command(
-            mocker,
-            iter(
-                [
-                    (0, "", ""),  # account list → out empty, not logged in
-                    (0, "mytoken\n", ""),  # signin --raw --account mycompany
-                    (0, ITEM_JSON, ""),  # item get --format json My Item --session=mytoken
-                ]
-            ),
-        )
-
-        with pytest.raises(SystemExit):
-            onepassword_info.main()
-
-    out, dummy = capfd.readouterr()
-    result = json.loads(out)
-    assert not result.get("failed"), result.get("msg")
-    assert result["onepassword"]["My Item"]["password"] == "secret123"
-
-
-def test_full_login(mocker, capfd):
-    master_password = "masterpass"
-    with set_module_args(
-        {
-            "search_terms": [{"name": "My Item"}],
-            "auto_login": {
-                "subdomain": "mycompany",
-                "username": "user@example.com",
-                "secret_key": "mysecretkey",
-                "master_password": master_password,
-            },
-        }
-    ):
-        _patch_bin_path(mocker)
-        mocker.patch.object(
-            OnePasswordConfig,
-            "config_file_path",
-            new_callable=PropertyMock,
-            return_value=None,
-        )
-        _patch_run_command(
-            mocker,
-            iter(
-                [
-                    (0, "", ""),  # account list → not logged in
-                    (0, "mytoken\n", ""),  # account add --raw --signin → token
-                    (0, ITEM_JSON, ""),  # item get --format json My Item --session=mytoken
-                ]
-            ),
-        )
-
-        with pytest.raises(SystemExit):
-            onepassword_info.main()
-
-    out, dummy = capfd.readouterr()
-    result = json.loads(out)
-    assert not result.get("failed"), result.get("msg")
-    assert result["onepassword"]["My Item"]["password"] == "secret123"
+UTHelper.from_module(onepassword_info, __name__, mocks=[OnePassRunCommandMock, OnePasswordConfigMock])

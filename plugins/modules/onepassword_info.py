@@ -42,7 +42,8 @@ options:
       field:
         type: str
         description:
-          - The name of the field to search for within this item (optional, defaults to V(password)).
+          - The name of the field to search for within this item (optional, defaults to V(password), or V(document) if the
+            item has an attachment).
       section:
         type: str
         description:
@@ -122,6 +123,7 @@ EXAMPLES = r"""
         field: Custom field name       # optional, defaults to 'password'
         section: Custom section name   # optional, defaults to 'None'
         vault: Name of the vault       # optional, only necessary if there is more than 1 Vault available
+      - name: A 1Password item with document attachment
   delegate_to: localhost
   register: my_1password_item
   no_log: true                         # Don't want to log the secrets to the console!
@@ -145,56 +147,72 @@ onepassword:
       Custom field name: the value of this field
     "My Other 1Password item":
       password: the value of this field
+    "A 1Password item with document attachment":
+      document: the contents of the document attached to this item
 """
 
 
+import errno
 import json
 import os
+import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes
+from ansible.module_utils.common.text.converters import to_native
 
-from ansible_collections.community.general.plugins.module_utils._onepassword import (
-    OnePasswordConfig,
-    onepassword_runner,
-)
+from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
+from ansible_collections.community.general.plugins.module_utils._onepassword_cli import OnePassCLIv2, OnePasswordError
 
 
 class OnePasswordInfo:
     def __init__(self, module):
         self.module = module
-        self.cli_path = self.module.params.get("cli_path")
-        self.auto_login = self.module.params.get("auto_login")
+        self.cli_path = self.module.params["cli_path"]
+        self.auto_login = self.module.params["auto_login"]
         self.logged_in = False
         self.token = None
 
-        terms = self.module.params.get("search_terms")
+        terms = self.module.params["search_terms"]
         self.terms = self.parse_search_terms(terms)
 
         self._config = OnePasswordConfig()
-        self._runner = onepassword_runner(self.module, self.cli_path)
 
-    def _parse_field(self, data_json, item_id, field_name, section_title=None):
+        auto_login = self.auto_login or dict.fromkeys(["subdomain", "username", "secret_key", "master_password"])
+        self._cli = OnePassCLIv2(
+            subdomain=auto_login["subdomain"],
+            username=auto_login["username"],
+            secret_key=auto_login["secret_key"],
+            master_password=auto_login["master_password"],
+            cli_path=self.cli_path,
+            run_command=self.run_command,
+        )
+
+    def run_command(self, command, command_input=None, environment_update=None):
+        rc, out, err = self.module.run_command(
+            command,
+            data=command_input,
+            check_rc=False,
+            binary_data=True,
+            encoding=None,
+            environ_update=environment_update,
+        )
+        return rc, out, to_native(err)
+
+    def parse_field(self, data_json, item_id, field_name, section_title=None):
         data = json.loads(data_json)
-        field_name_lower = field_name.lower()
 
-        for field in data.get("fields", []):
-            if section_title is None:
-                if field.get(field_name_lower):
-                    return {field_name: field.get(field_name_lower)}
-                if field.get("label", "").lower() == field_name_lower:
-                    return {field_name: field.get("value", "")}
-                if field.get("id", "").lower() == field_name_lower:
-                    return {field_name: field.get("value", "")}
-            else:
-                section = field.get("section", {})
-                current_section = section.get("label", section.get("id", "")).lower()
-                if section_title.lower() == current_section:
-                    if field.get("label", "").lower() == field_name_lower:
-                        return {field_name: field.get("value", "")}
-                    if field.get("id", "").lower() == field_name_lower:
-                        return {field_name: field.get("value", "")}
+        if data.get("category") == "DOCUMENT":
+            # This is actually a document, let's fetch the document data instead!
+            document = self._cli.get_document(data["title"], token=self.token)
+            return {"document": document[1].strip()}
 
+        else:
+            # This is not a document, let's try to find the requested field
+            value = self._cli._find_field(data_json, field_name, section_title)
+            if value is not None:
+                return {field_name: value}
+
+        # We will get here if the field could not be found in any section and the item wasn't a document to be downloaded.
         optional_section_title = "" if section_title is None else f" in the section '{section_title}'"
         self.module.fail_json(
             msg=f"Unable to find an item in 1Password named '{item_id}' with the field '{field_name}'{optional_section_title}."
@@ -219,80 +237,85 @@ class OnePasswordInfo:
         return processed_terms
 
     def get_raw(self, item_id, vault=None):
-        with self._runner("_item_get item_id vault session") as ctx:
-            rc, out, err = ctx.run(item_id=item_id, vault=vault, session=self.token)
-        if rc != 0:
-            if "not found" in err.lower():
+        try:
+            rc, output, dummy = self._cli.get_raw(item_id, vault, self.token)
+            return output
+
+        except Exception as e:
+            if re.search(".*isn't an item.*", f"{e}"):
                 self.module.fail_json(msg=f"Unable to find an item in 1Password named '{item_id}'.")
-            self.module.fail_json(
-                msg=f"Unexpected error attempting to find an item in 1Password named '{item_id}': {err}"
-            )
-        return out
+            else:
+                self.module.fail_json(
+                    msg=f"Unexpected error attempting to find an item in 1Password named '{item_id}': {e}"
+                )
 
     def get_field(self, item_id, field, section=None, vault=None):
         output = self.get_raw(item_id, vault)
-        return self._parse_field(output, item_id, field, section) if output else ""
+        return self.parse_field(output, item_id, field, section) if output != "" else ""
 
     def full_login(self):
-        if self.auto_login is None:
+        if self.auto_login is not None:
+            if None in [
+                self.auto_login["subdomain"],
+                self.auto_login["username"],
+                self.auto_login["secret_key"],
+                self.auto_login["master_password"],
+            ]:
+                self.module.fail_json(
+                    msg="Unable to perform initial sign in to 1Password. "
+                    "subdomain, username, secret_key, and master_password are required to perform initial sign in."
+                )
+
+            try:
+                rc, out, err = self._cli.full_signin()
+                self.token = out.strip()
+            except OnePasswordError as e:
+                self.module.fail_json(msg=f"Failed to perform initial sign in to 1Password: {e}")
+        else:
             self.module.fail_json(
                 msg=f"Unable to perform an initial sign in to 1Password. Please run '{self.cli_path} signin' "
                 "or define credentials in 'auto_login'. See the module documentation for details."
             )
 
-        if None in [
-            self.auto_login.get("subdomain"),
-            self.auto_login.get("username"),
-            self.auto_login.get("secret_key"),
-            self.auto_login.get("master_password"),
-        ]:
-            self.module.fail_json(
-                msg="Unable to perform initial sign in to 1Password. "
-                "subdomain, username, secret_key, and master_password are required to perform initial sign in."
-            )
-
-        subdomain = self.auto_login["subdomain"]
-        with self._runner(
-            "_account_add address email",
-            data=to_bytes(self.auto_login["master_password"]),
-            environ_update={"OP_SECRET_KEY": self.auto_login["secret_key"]},
-        ) as ctx:
-            rc, out, err = ctx.run(
-                address=f"{subdomain}.1password.com",
-                email=self.auto_login["username"],
-            )
-        if rc != 0:
-            self.module.fail_json(msg=f"Failed to perform initial sign in to 1Password: {err}")
-        self.token = out.strip()
-
     def get_token(self):
-        config_path = self._config.config_file_path
-        if config_path and os.path.isfile(config_path) and self.auto_login is not None:
-            if not self.auto_login.get("master_password"):
-                self.module.fail_json(msg="Unable to sign in to 1Password. 'auto_login.master_password' is required.")
+        # If the config file exists, assume an initial signin has taken place and try basic sign in
+        if os.path.isfile(self._config.config_file_path):
+            if self.auto_login is not None:
+                # Since we are not currently signed in, master_password is required at a minimum
+                if not self.auto_login["master_password"]:
+                    self.module.fail_json(
+                        msg="Unable to sign in to 1Password. 'auto_login.master_password' is required."
+                    )
 
-            with self._runner("_signin account", data=to_bytes(self.auto_login["master_password"])) as ctx:
-                rc, out, err = ctx.run(account=self.auto_login.get("subdomain"))
-            if rc == 0:
-                self.token = out.strip()
-                return
+                # Try signing in using the master_password and a subdomain if one is provided
+                try:
+                    rc, out, err = self._cli.signin()
+                    self.token = out.strip()
 
-        self.full_login()
+                except OnePasswordError:
+                    self.full_login()
+
+            else:
+                self.full_login()
+
+        else:
+            # Attempt a full sign in since there appears to be no existing sign in
+            self.full_login()
 
     def assert_logged_in(self):
-        subdomain = self.auto_login.get("subdomain") if self.auto_login else None
-        account = f"{subdomain}.1password.com" if subdomain else None
-
-        with self._runner("_account_list account") as ctx:
-            rc, out, err = ctx.run(account=account)
-        if rc == 0 and out.strip():
-            with self._runner("_account_get account") as ctx:
-                rc, out, err = ctx.run(account=account)
-            if rc == 0:
+        try:
+            if self._cli.assert_logged_in():
                 self.logged_in = True
-
-        if not self.logged_in:
+            if not self.logged_in:
+                self.get_token()
+        except OnePasswordError:
             self.get_token()
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                self.module.fail_json(
+                    msg=f"1Password CLI tool '{self.cli_path}' not installed in path on control machine"
+                )
+            raise e
 
     def run(self):
         result = {}
@@ -303,9 +326,12 @@ class OnePasswordInfo:
             value = self.get_field(term["name"], term["field"], term["section"], term["vault"])
 
             if term["name"] in result:
-                # Two search terms for the same item — merge the field dicts.
+                # If we already have a result for this key, we have to append this result dictionary
+                # to the existing one. This is only applicable when there is a single item
+                # in 1Password which has two different fields, and we want to retrieve both of them.
                 result[term["name"]].update(value)
             else:
+                # If this is the first result for this key, simply set it.
                 result[term["name"]] = value
 
         return result
@@ -328,6 +354,7 @@ def main():
         ),
         supports_check_mode=True,
     )
+    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     results = {"onepassword": OnePasswordInfo(module).run()}
 
