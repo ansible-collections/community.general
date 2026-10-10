@@ -14,9 +14,8 @@ module: onepassword_info
 author:
   - Ryan Conway (@Rylon)
 requirements:
-  - C(op) 1Password command line utility. See U(https://support.1password.com/command-line/)
+  - C(op) 1Password command line utility version 2 or later. See U(https://support.1password.com/command-line/)
 notes:
-  - Tested with C(op) version 0.5.5.
   - Based on the P(community.general.onepassword#lookup) lookup plugin by Scott Buchanan <sbuchanan@ri.pn>.
 short_description: Gather items from 1Password
 description:
@@ -159,78 +158,63 @@ import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.text.converters import to_bytes, to_native
+from ansible.module_utils.common.text.converters import to_native
 
 from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
-
-
-class AnsibleModuleError(Exception):
-    def __init__(self, results):
-        self.results = results
-
-    def __repr__(self):
-        return self.results
+from ansible_collections.community.general.plugins.module_utils._onepassword_cli import OnePassCLIv2, OnePasswordError
 
 
 class OnePasswordInfo:
-    def __init__(self):
-        self.cli_path = module.params.get("cli_path")
-        self.auto_login = module.params.get("auto_login")
+    def __init__(self, module):
+        self.module = module
+        self.cli_path = self.module.params["cli_path"]
+        self.auto_login = self.module.params["auto_login"]
         self.logged_in = False
         self.token = None
 
-        terms = module.params.get("search_terms")
+        terms = self.module.params["search_terms"]
         self.terms = self.parse_search_terms(terms)
 
         self._config = OnePasswordConfig()
 
-    def _run(self, args, expected_rc=0, command_input=None, ignore_errors=False):
-        if self.token:
-            # Adds the session token to all commands if we're logged in.
-            args += [to_bytes("--session=") + self.token]
+        auto_login = self.auto_login or dict.fromkeys(["subdomain", "username", "secret_key", "master_password"])
+        self._cli = OnePassCLIv2(
+            subdomain=auto_login["subdomain"],
+            username=auto_login["username"],
+            secret_key=auto_login["secret_key"],
+            master_password=auto_login["master_password"],
+            cli_path=self.cli_path,
+            run_command=self.run_command,
+        )
 
-        command = [self.cli_path] + args
-        rc, out, err = module.run_command(command, data=command_input, check_rc=False, binary_data=True, encoding=None)
-        if not ignore_errors and rc != expected_rc:
-            raise AnsibleModuleError(to_native(err))
-        return rc, out, err
+    def run_command(self, command, command_input=None, environment_update=None):
+        rc, out, err = self.module.run_command(
+            command,
+            data=command_input,
+            check_rc=False,
+            binary_data=True,
+            encoding=None,
+            environ_update=environment_update,
+        )
+        return rc, out, to_native(err)
 
-    def _parse_field(self, data_json, item_id, field_name, section_title=None):
+    def parse_field(self, data_json, item_id, field_name, section_title=None):
         data = json.loads(data_json)
 
-        if "documentAttributes" in data["details"]:
+        if data.get("category") == "DOCUMENT":
             # This is actually a document, let's fetch the document data instead!
-            document = self._run(["get", "document", data["overview"]["title"]])
+            document = self._cli.get_document(data["title"], token=self.token)
             return {"document": document[1].strip()}
 
         else:
             # This is not a document, let's try to find the requested field
-
-            # Some types of 1Password items have a 'password' field directly alongside the 'fields' attribute,
-            # not inside it, so we need to check there first.
-            if field_name in data["details"]:
-                return {field_name: data["details"][field_name]}
-
-            # Otherwise we continue looking inside the 'fields' attribute for the specified field.
-            else:
-                if section_title is None:
-                    for field_data in data["details"].get("fields", []):
-                        if field_data.get("name", "").lower() == field_name.lower():
-                            return {field_name: field_data.get("value", "")}
-
-                # Not found it yet, so now lets see if there are any sections defined
-                # and search through those for the field. If a section was given, we skip
-                # any non-matching sections, otherwise we search them all until we find the field.
-                for section_data in data["details"].get("sections", []):
-                    if section_title is not None and section_title.lower() != section_data["title"].lower():
-                        continue
-                    for field_data in section_data.get("fields", []):
-                        if field_data.get("t", "").lower() == field_name.lower():
-                            return {field_name: field_data.get("v", "")}
+            value = self._cli._find_field(data_json, field_name, section_title)
+            if value is not None:
+                return {field_name: value}
 
         # We will get here if the field could not be found in any section and the item wasn't a document to be downloaded.
         optional_section_title = "" if section_title is None else f" in the section '{section_title}'"
-        module.fail_json(
+        self.module.fail_json(
             msg=f"Unable to find an item in 1Password named '{item_id}' with the field '{field_name}'{optional_section_title}."
         )
 
@@ -242,7 +226,7 @@ class OnePasswordInfo:
                 term = {"name": term}
 
             if "name" not in term:
-                module.fail_json(msg=f"Missing required 'name' field from search term, got: '{term}'")
+                self.module.fail_json(msg=f"Missing required 'name' field from search term, got: '{term}'")
 
             term["field"] = term.get("field", "password")
             term["section"] = term.get("section")
@@ -254,50 +238,41 @@ class OnePasswordInfo:
 
     def get_raw(self, item_id, vault=None):
         try:
-            args = ["get", "item", item_id]
-            if vault is not None:
-                args += [f"--vault={vault}"]
-            rc, output, dummy = self._run(args)
+            rc, output, dummy = self._cli.get_raw(item_id, vault, self.token)
             return output
 
         except Exception as e:
-            if re.search(".*not found.*", f"{e}"):
-                module.fail_json(msg=f"Unable to find an item in 1Password named '{item_id}'.")
+            if re.search(".*isn't an item.*", f"{e}"):
+                self.module.fail_json(msg=f"Unable to find an item in 1Password named '{item_id}'.")
             else:
-                module.fail_json(msg=f"Unexpected error attempting to find an item in 1Password named '{item_id}': {e}")
+                self.module.fail_json(
+                    msg=f"Unexpected error attempting to find an item in 1Password named '{item_id}': {e}"
+                )
 
     def get_field(self, item_id, field, section=None, vault=None):
         output = self.get_raw(item_id, vault)
-        return self._parse_field(output, item_id, field, section) if output != "" else ""
+        return self.parse_field(output, item_id, field, section) if output != "" else ""
 
     def full_login(self):
         if self.auto_login is not None:
             if None in [
-                self.auto_login.get("subdomain"),
-                self.auto_login.get("username"),
-                self.auto_login.get("secret_key"),
-                self.auto_login.get("master_password"),
+                self.auto_login["subdomain"],
+                self.auto_login["username"],
+                self.auto_login["secret_key"],
+                self.auto_login["master_password"],
             ]:
-                module.fail_json(
+                self.module.fail_json(
                     msg="Unable to perform initial sign in to 1Password. "
                     "subdomain, username, secret_key, and master_password are required to perform initial sign in."
                 )
 
-            args = [
-                "signin",
-                f"{self.auto_login['subdomain']}.1password.com",
-                to_bytes(self.auto_login["username"]),
-                to_bytes(self.auto_login["secret_key"]),
-                "--output=raw",
-            ]
-
             try:
-                rc, out, err = self._run(args, command_input=to_bytes(self.auto_login["master_password"]))
+                rc, out, err = self._cli.full_signin()
                 self.token = out.strip()
-            except AnsibleModuleError as e:
-                module.fail_json(msg=f"Failed to perform initial sign in to 1Password: {e}")
+            except OnePasswordError as e:
+                self.module.fail_json(msg=f"Failed to perform initial sign in to 1Password: {e}")
         else:
-            module.fail_json(
+            self.module.fail_json(
                 msg=f"Unable to perform an initial sign in to 1Password. Please run '{self.cli_path} signin' "
                 "or define credentials in 'auto_login'. See the module documentation for details."
             )
@@ -307,20 +282,17 @@ class OnePasswordInfo:
         if os.path.isfile(self._config.config_file_path):
             if self.auto_login is not None:
                 # Since we are not currently signed in, master_password is required at a minimum
-                if not self.auto_login.get("master_password"):
-                    module.fail_json(msg="Unable to sign in to 1Password. 'auto_login.master_password' is required.")
+                if not self.auto_login["master_password"]:
+                    self.module.fail_json(
+                        msg="Unable to sign in to 1Password. 'auto_login.master_password' is required."
+                    )
 
                 # Try signing in using the master_password and a subdomain if one is provided
                 try:
-                    args = ["signin", "--output=raw"]
-
-                    if self.auto_login.get("subdomain"):
-                        args = ["signin", self.auto_login["subdomain"], "--output=raw"]
-
-                    rc, out, err = self._run(args, command_input=to_bytes(self.auto_login["master_password"]))
+                    rc, out, err = self._cli.signin()
                     self.token = out.strip()
 
-                except AnsibleModuleError:
+                except OnePasswordError:
                     self.full_login()
 
             else:
@@ -332,14 +304,17 @@ class OnePasswordInfo:
 
     def assert_logged_in(self):
         try:
-            rc, out, err = self._run(["get", "account"], ignore_errors=True)
-            if rc == 0:
+            if self._cli.assert_logged_in():
                 self.logged_in = True
             if not self.logged_in:
                 self.get_token()
+        except OnePasswordError:
+            self.get_token()
         except OSError as e:
             if e.errno == errno.ENOENT:
-                module.fail_json(msg=f"1Password CLI tool '{self.cli_path}' not installed in path on control machine")
+                self.module.fail_json(
+                    msg=f"1Password CLI tool '{self.cli_path}' not installed in path on control machine"
+                )
             raise e
 
     def run(self):
@@ -363,7 +338,6 @@ class OnePasswordInfo:
 
 
 def main():
-    global module
     module = AnsibleModule(
         argument_spec=dict(
             cli_path=dict(type="path", default="op"),
@@ -382,7 +356,7 @@ def main():
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    results = {"onepassword": OnePasswordInfo().run()}
+    results = {"onepassword": OnePasswordInfo(module).run()}
 
     module.exit_json(changed=False, **results)
 

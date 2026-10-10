@@ -9,11 +9,12 @@ import json
 import operator
 
 import pytest
-from ansible.errors import AnsibleLookupError, AnsibleOptionsError
+from ansible.errors import AnsibleOptionsError
 from ansible.plugins.loader import lookup_loader
 
-from ansible_collections.community.general.plugins.lookup.onepassword import (
+from ansible_collections.community.general.plugins.module_utils._onepassword_cli import (
     OnePassCLIv2,
+    OnePasswordError,
 )
 
 from .onepassword_common import MOCK_ENTRIES
@@ -101,9 +102,9 @@ def test_op_correct_cli_class(fake_op, version, version_class):
 
 
 def test_op_unsupported_cli_version(fake_op):
-    with pytest.raises(AnsibleLookupError, match="is unsupported"):
+    with pytest.raises(OnePasswordError, match="is unsupported"):
         fake_op("1.17.2")
-    with pytest.raises(AnsibleLookupError, match="is unsupported"):
+    with pytest.raises(OnePasswordError, match="is unsupported"):
         fake_op("99.77.77")
 
 
@@ -133,10 +134,10 @@ def test_op_set_token_with_config(op_fixture, mocker, request):
 def test_op_set_token_with_config_missing_args(op_fixture, message, request, mocker):
     op = request.getfixturevalue(op_fixture)
     mocker.patch("os.path.isfile", return_value=True)
-    mocker.patch.object(op._cli, "signin", return_value=(99, "", ""), side_effect=AnsibleLookupError(message))
+    mocker.patch.object(op._cli, "signin", return_value=(99, "", ""), side_effect=OnePasswordError(message))
     mocker.patch.object(op._cli, "full_signin", return_value=(0, "", ""))
 
-    with pytest.raises(AnsibleLookupError, match=message):
+    with pytest.raises(OnePasswordError, match=message):
         op.set_token()
 
     op._cli.full_signin.assert_not_called()
@@ -147,7 +148,7 @@ def test_op_set_token_with_config_full_signin(op_fixture, request, mocker):
     op = request.getfixturevalue(op_fixture)
     mocker.patch("os.path.isfile", return_value=True)
     mocker.patch.object(
-        op._cli, "signin", return_value=(99, "", ""), side_effect=AnsibleLookupError("Raised intentionally")
+        op._cli, "signin", return_value=(99, "", ""), side_effect=OnePasswordError("Raised intentionally")
     )
     mocker.patch.object(op._cli, "full_signin", return_value=(0, "", ""))
 
@@ -232,12 +233,15 @@ def test_op_get_secret_reference_decodes_bytes(mocker, op_fixture, request):
     ),
 )
 def test_op_lookup(mocker, cli_class, vault, queries, kwargs, output, expected):
-    mocker.patch("ansible_collections.community.general.plugins.lookup.onepassword.OnePass._get_cli_class", cli_class)
     mocker.patch(
-        "ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True
+        "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePass._get_cli_class", cli_class
     )
     mocker.patch(
-        "ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run",
+        "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePass.assert_logged_in",
+        return_value=True,
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePassCLIBase._run",
         return_value=(0, json.dumps(output), ""),
     )
 
@@ -259,10 +263,11 @@ def test_op_doc(mocker):
     document_contents = "Document Contents\n"
 
     mocker.patch(
-        "ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True
+        "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePass.assert_logged_in",
+        return_value=True,
     )
     mocker.patch(
-        "ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run",
+        "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePassCLIBase._run",
         return_value=(0, document_contents, ""),
     )
 
@@ -287,7 +292,8 @@ def test_op_connect_partial_args(plugin, connect_host, connect_token, mocker):
     op_lookup = lookup_loader.get(plugin)
 
     mocker.patch(
-        "ansible_collections.community.general.plugins.lookup.onepassword.OnePass._get_cli_class", OnePassCLIv2
+        "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePass._get_cli_class",
+        OnePassCLIv2,
     )
 
     with pytest.raises(AnsibleOptionsError):
