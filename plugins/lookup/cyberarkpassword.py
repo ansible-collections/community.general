@@ -70,6 +70,8 @@ _result:
     password:
       description:
         - The actual value stored.
+        - B(Note) on ansible-core 2.22+, this value will be registered as a secret.
+          See R(Masking secrets in Ansible output, secret_masking) for more information.
     passprops:
       description: Properties assigned to the entry.
       type: dictionary
@@ -85,6 +87,8 @@ from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
+
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 
 display = Display()
 
@@ -162,6 +166,8 @@ class CyberarkPassword:
                 else:
                     result_dict[output_names[i]] = to_native(output_values[i])
 
+            mark_values_as_secrets(result_dict.get("password"))
+
         except subprocess.CalledProcessError as e:
             raise AnsibleError(e.output) from e
         except OSError as e:
@@ -191,4 +197,4 @@ class LookupModule(LookupBase):
         else:
             cyberark_conn = CyberarkPassword(**terms)
             result = cyberark_conn.get()
-            return result
+            return mark_values_as_secrets(result)
