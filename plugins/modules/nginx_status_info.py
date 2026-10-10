@@ -98,7 +98,8 @@ from ansible.module_utils.urls import fetch_url
 
 
 class NginxStatusInfo:
-    def __init__(self):
+    def __init__(self, module):
+        self.module = module
         self.url = module.params.get("url")
         self.timeout = module.params.get("timeout")
 
@@ -113,9 +114,11 @@ class NginxStatusInfo:
             "waiting": None,
             "data": None,
         }
-        (response, info) = fetch_url(module=module, url=self.url, force=True, timeout=self.timeout)
+        (response, info) = fetch_url(module=self.module, url=self.url, force=True, timeout=self.timeout)
         if not response:
-            module.fail_json(msg=f"No valid or no response from url {self.url} within {self.timeout} seconds (timeout)")
+            self.module.fail_json(
+                msg=f"No valid or no response from url {self.url} within {self.timeout} seconds (timeout)"
+            )
 
         data = to_text(response.read(), errors="surrogate_or_strict")
         if not data:
@@ -139,7 +142,6 @@ class NginxStatusInfo:
 
 
 def main():
-    global module
     module = AnsibleModule(
         argument_spec=dict(
             url=dict(type="str", required=True),
@@ -148,7 +150,7 @@ def main():
         supports_check_mode=True,
     )
 
-    nginx_status_info = NginxStatusInfo().run()
+    nginx_status_info = NginxStatusInfo(module).run()
     module.exit_json(changed=False, **nginx_status_info)
 
 
