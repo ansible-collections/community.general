@@ -6,14 +6,14 @@ from __future__ import annotations
 
 import pytest
 
-from ansible_collections.community.general.plugins.lookup.onepassword import OnePass
+from ansible_collections.community.general.plugins.module_utils._onepassword_cli import OnePass
 
 
 @pytest.fixture
 def fake_op(mocker):
     def _fake_op(version):
         mocker.patch(
-            "ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase.get_current_version",
+            "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePassCLIBase.get_current_version",
             return_value=version,
         )
         op = OnePass()

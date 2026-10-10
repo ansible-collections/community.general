@@ -21,10 +21,11 @@ from .onepassword_common import SSH_KEY_MOCK_ENTRIES
 )
 def test_ssh_key(mocker, vault, queries, kwargs, output, expected):
     mocker.patch(
-        "ansible_collections.community.general.plugins.lookup.onepassword.OnePass.assert_logged_in", return_value=True
+        "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePass.assert_logged_in",
+        return_value=True,
     )
     mocker.patch(
-        "ansible_collections.community.general.plugins.lookup.onepassword.OnePassCLIBase._run",
+        "ansible_collections.community.general.plugins.module_utils._onepassword_cli.OnePassCLIBase._run",
         return_value=(0, json.dumps(output), ""),
     )
 
