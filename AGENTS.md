@@ -307,6 +307,12 @@ approval before committing or pushing it.
 - PR title should use single backticks for terms like commands, variables, functions, etc. E.g. "xfconf: use command `xfconf-query`"
 - PR title may have a prefix indicating it is a work in progress. E.g. "[WIP] xfconf: use command `xfconf-query`"
 - If the PR fixes issues, add one line with `Fixes #<issue-number>` for each issue being solved to the PR description
+- Do not place GitHub closing keywords (`close`, `fix`, `resolve` and their variants) right before an issue reference
+  unless the PR fixes that issue: GitHub links the issue even if the sentence negates it (e.g. "does not close #1234").
+  Write "issue #1234" instead.
+- Bugfixes and security fixes may be backported to older stable branches; new features are not.
+  The classification of the PR determines that.
+- When the PR is ready for review, mark it as ready (not draft) and remove any `[WIP]` prefix from the title.
 - When a fix is speculative or lacks test coverage, use hedged language in the PR description (e.g. "may address" rather than "this fixes").
 - Keep PR descriptions concise; do not explain implementation choices or reproduce information already visible in the diff or commit messages.
 
