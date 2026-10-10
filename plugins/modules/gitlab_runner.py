@@ -419,6 +419,17 @@ class GitLabRunner:
         return runner.delete()
 
 
+def supports_paused(module, server_version):
+    # the paused attribute for runners is available since 14.8
+    if server_version == "unknown":
+        # python-gitlab reports "unknown" when it cannot read the server version
+        module.warn(
+            "Could not read the GitLab server version; assuming it is 14.8 or newer and setting the paused attribute."
+        )
+        return True
+    return LooseVersion(server_version) >= LooseVersion("14.8.0")
+
+
 def main():
     argument_spec = basic_auth_argument_spec()
     argument_spec.update(auth_argument_spec())
@@ -518,8 +529,7 @@ def main():
             "group": group,
             "project": project,
         }
-        if LooseVersion(gitlab_runner._gitlab.version()[0]) >= LooseVersion("14.8.0"):
-            # the paused attribute for runners is available since 14.8
+        if supports_paused(module, gitlab_runner._gitlab.version()[0]):
             runner_values["paused"] = runner_paused
         if gitlab_runner.create_or_update_runner(runner_description, runner_values):
             module.exit_json(
