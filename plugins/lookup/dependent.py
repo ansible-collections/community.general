@@ -141,9 +141,6 @@ class LookupModule(LookupBase):
         ``variables`` are the variables to use.
         """
         templar.available_variables = variables or {}
-        open_br = "{{"
-        close_br = "}}"
-        quoted_expression = f"{open_br}{expression}{close_br}"
         return templar.evaluate_expression(_make_safe(expression))
 
     def __process(self, result, terms, index, current, templar, variables):
