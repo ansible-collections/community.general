@@ -130,12 +130,7 @@ def create_zone_domain(args=None, zone_exists=None, zone_id=None, payload=None):
     api_method = "dns.zone_domain_list"
     _has_failed, _msg, response = memset_api_call(api_key=args["api_key"], api_method=api_method)
 
-    for zone_domain in response.json():
-        if zone_domain["domain"] == args["domain"]:
-            # zone domain already exists, nothing to change.
-            has_changed = False
-            break
-    else:
+    if not check_zone_domain(data=response, domain=args["domain"]):
         # we need to create the domain
         api_method = "dns.zone_domain_create"
         payload["domain"] = args["domain"]
