@@ -24,7 +24,7 @@
 - If a deprecation is needed, ingest https://github.com/russoz-ansible/ansible-contrib-unofficial/blob/main/deprecations.md for more information on how to implement the deprecations.
 - Always refer to modules and plugins by their FQCN.
 - Use `version_added` to record in which version something new became available:
-  - Always read `galaxy.yml` and use that version string directly — it holds the next version for a feature release.
+  - Always read `galaxy.yml` from current `main` and use that version string directly — it holds the next version for a feature release.
   - New module or plugin: set `version_added` at the top level of `DOCUMENTATION`.
   - New option or suboption in an existing module or plugin: set `version_added` in that option's documentation.
     Options that come together with a new module or plugin do not need it.
@@ -109,7 +109,7 @@ Instead:
   - Use `X | None` instead of `t.Optional[X]`.
   - Do not use `t.Any` for objects from third-party libraries, it disables type checking for them.
   - In filter and test plugins, the input can be anything the user passes: type it as `t.Any` and validate it.
-- When handling user-provided data structures, use `collections.abc.Mapping` and
+- When handling user-provided data structures, use `collections.abc.Mapping`, `collections.abc.Sequence`, and
   `ansible.module_utils.common.collections.is_sequence` instead of checking for `dict` and `list`.
 - Compile regular expressions once, outside of loops, and use the compiled object inside the loop.
 - Do not place code or constants (other than conditional imports) before the imports. Imports come after
