@@ -73,11 +73,11 @@ from ansible.module_utils.urls import fetch_url
 class IpifyFacts:
     def __init__(self, module: AnsibleModule) -> None:
         self.module = module
-self.api_url: str = module.params.get("api_url")
-self.timeout: int = module.params.get("timeout")
+        self.api_url: str = module.params.get("api_url")
+        self.timeout: int = module.params.get("timeout")
 
-def run(self) -> None:
-result: dict[str, str | None] = {"ipify_public_ip": None}
+    def run(self) -> dict[str, str | None]:
+        result: dict[str, str | None] = {"ipify_public_ip": None}
         (response, info) = fetch_url(
             module=self.module, url=f"{self.api_url}?format=json", force=True, timeout=self.timeout
         )
