@@ -1,0 +1,4 @@
+bugfixes:
+  - gitlab_project - fix ``'bool' object has no attribute 'attributes'``
+    (https://github.com/ansible-collections/community.general/issues/12902,
+    https://github.com/ansible-collections/community.general/pull/12903).
