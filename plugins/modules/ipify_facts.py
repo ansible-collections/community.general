@@ -71,16 +71,19 @@ from ansible.module_utils.urls import fetch_url
 
 
 class IpifyFacts:
-    def __init__(self):
+    def __init__(self, module):
+        self.module = module
         self.api_url = module.params.get("api_url")
         self.timeout = module.params.get("timeout")
 
     def run(self):
         result = {"ipify_public_ip": None}
-        (response, info) = fetch_url(module=module, url=f"{self.api_url}?format=json", force=True, timeout=self.timeout)
+        (response, info) = fetch_url(
+            module=self.module, url=f"{self.api_url}?format=json", force=True, timeout=self.timeout
+        )
 
         if not response:
-            module.fail_json(
+            self.module.fail_json(
                 msg=f"No valid or no response from url {self.api_url} within {self.timeout} seconds (timeout)"
             )
 
@@ -90,7 +93,6 @@ class IpifyFacts:
 
 
 def main():
-    global module
     module = AnsibleModule(
         argument_spec=dict(
             api_url=dict(type="str", default="https://api.ipify.org/"),
@@ -100,7 +102,7 @@ def main():
         supports_check_mode=True,
     )
 
-    ipify_facts = IpifyFacts().run()
+    ipify_facts = IpifyFacts(module).run()
     ipify_facts_result = dict(changed=False, ansible_facts=ipify_facts)
     module.exit_json(**ipify_facts_result)
 
