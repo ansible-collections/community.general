@@ -1,0 +1,2 @@
+bugfixes:
+  - modules using ``CmdRunner`` - environment variables set for a single command are no longer passed to subsequent commands (https://github.com/ansible-collections/community.general/issues/12904, https://github.com/ansible-collections/community.general/pull/12905).
