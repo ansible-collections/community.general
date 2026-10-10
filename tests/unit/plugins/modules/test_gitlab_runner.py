@@ -7,7 +7,7 @@ from __future__ import annotations
 import gitlab
 import pytest
 
-from ansible_collections.community.general.plugins.modules.gitlab_runner import GitLabRunner
+from ansible_collections.community.general.plugins.modules.gitlab_runner import GitLabRunner, supports_paused
 
 
 def _dummy(x):
@@ -149,3 +149,19 @@ class TestGitlabRunner(GitlabModuleTestCase):
         rvalue = self.module_util_all.delete_runner()
 
         self.assertEqual(rvalue, None)
+
+
+@pytest.mark.parametrize(
+    "server_version, expected, warns",
+    [
+        ("14.7.0", False, False),
+        ("14.8.0", True, False),
+        ("17.11.2-ee", True, False),
+        # python-gitlab returns "unknown" when the version endpoint cannot be read
+        ("unknown", True, True),
+    ],
+)
+def test_supports_paused(server_version, expected, warns):
+    module = FakeAnsibleModule()
+    assert supports_paused(module, server_version) is expected
+    assert module.warn.called is warns
