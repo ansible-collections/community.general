@@ -201,16 +201,11 @@ def delete_zone(args=None, zone_exists=None, payload=None):
     if zone_exists:
         api_method = "dns.zone_list"
         _has_failed, _msg, response = memset_api_call(api_key=args["api_key"], api_method=api_method, payload=payload)
-        counter = 0
-        for zone in response.json():
-            if zone["nickname"] == args["name"]:
-                counter += 1
-        if counter == 1:
-            for zone in response.json():
-                if zone["nickname"] == args["name"]:
-                    zone_id = zone["id"]
-                    domain_count = len(zone["domains"])
-                    record_count = len(zone["records"])
+        is_unique, _msg, _counter, zone_id = get_zone_id(zone_name=args["name"], current_zones=response.json())
+        if is_unique:
+            zone = next(zone for zone in response.json() if zone["id"] == zone_id)
+            domain_count = len(zone["domains"])
+            record_count = len(zone["records"])
             if (domain_count > 0 or record_count > 0) and args["force"] is False:
                 # we need to fail out if force was not explicitly set.
                 stderr = "Zone contains domains or records and force was not used."
