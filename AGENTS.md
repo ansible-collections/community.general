@@ -171,6 +171,24 @@ Instead:
   `before_header` and `after_header` to the paths, the same way `ansible.builtin.copy` does.
 
 
+## Validating input and designing behavior
+
+- Express constraints between options in the argument spec (`required_if`, `required_together`, `required_one_of`,
+  `required_by`, `mutually_exclusive`). Only check in code what the argument spec cannot express.
+- Reject contradictory or meaningless combinations of options. Do not silently pick one of them or ignore the other.
+- Never silently transform, discard, or ignore user input:
+  - If the input cannot be applied as given, fail with a clear message.
+  - If a lenient behavior is useful, make it configurable (e.g. `fail`, `warn`, `ignore`) with failing as the default.
+  - If an operation requires an existing object (e.g. archiving a project), fail when it does not exist.
+- When the module has to make an assumption (e.g. the server version cannot be determined), emit a warning with `module.warn()`.
+- When wrapping a CLI tool or an API, pass on its warnings and errors instead of re-implementing its checks.
+- Prefer backward compatible, additive changes, such as a new choice value or a new alias, over changing defaults
+  or deprecating options.
+- Prefer `choices` with descriptive strings over booleans when the meaning of `true`/`false` is not obvious.
+- Keep messages neutral and accurate, e.g. "Project not found" instead of "Project deleted or does not exist".
+- Do not add options or safeguards that nobody asked for. They can be added later when there is an actual need.
+
+
 ## Writing changelog fragments
 
 Changelog Fragments:
