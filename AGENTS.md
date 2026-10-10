@@ -109,6 +109,37 @@ Instead:
   - Use `X | None` instead of `t.Optional[X]`.
   - Do not use `t.Any` for objects from third-party libraries, it disables type checking for them.
   - In filter and test plugins, the input can be anything the user passes: type it as `t.Any` and validate it.
+  - In modules, type the argument spec and the return values with the helper types from
+    `plugins/module_utils/_typing.py`:
+    - Import them, and define the types built from them, inside an `if t.TYPE_CHECKING:  # pragma: no cover` block.
+      They are only used in annotations, which are not evaluated at runtime (`from __future__ import annotations`).
+    - Build the argument spec in a function `get_argument_spec() -> ArgumentSpecT`, and pass its result to `AnsibleModule()`.
+    - Type the result dictionary as a `TypedDict` that combines the `ModuleReturn*` types for the standard
+      return values (`changed`, `msg`, `rc`, `stdout`, `stderr`, `backup_file`, `diff`) with the module-specific ones.
+      The `*Req` variants make the key required.
+    ```python
+    if t.TYPE_CHECKING:  # pragma: no cover
+        from ansible_collections.community.general.plugins.module_utils._typing import (
+            ArgumentSpecT,
+            ModuleReturnBackupFile,
+            ModuleReturnChangedReq,
+            ModuleReturnDiff,
+        )
+
+        class ResultDict(ModuleReturnChangedReq, ModuleReturnBackupFile, ModuleReturnDiff[str]):
+            config_file: str
+            config_content: str | None
+            enabled_state: bool
+
+
+    def get_argument_spec() -> ArgumentSpecT:
+        return dict(
+            name=dict(type="str", required=True, aliases=["config_name"]),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
+            config_dir=dict(type="path", default="/etc/logrotate.d"),
+            paths=dict(type="list", elements="path"),
+        )
+    ```
 - When handling user-provided data structures, use `collections.abc.Mapping`, `collections.abc.Sequence`, and
   `ansible.module_utils.common.collections.is_sequence` instead of checking for `dict` and `list`.
 - Compile regular expressions once, outside of loops, and use the compiled object inside the loop.
