@@ -1,0 +1,2 @@
+minor_changes:
+  - copr - improve the error message when the ``dnf`` Python library is missing on systems where dnf5 is the default package manager (https://github.com/ansible-collections/community.general/issues/12501, https://github.com/ansible-collections/community.general/pull/12913).
