@@ -131,13 +131,25 @@ Instead:
   - Do not split a sentence over two list items.
   - Keep information about the same subject in the same paragraph.
 - Do not list the possible values in the `description` when the option has `choices`, they are rendered automatically.
-  To explain the values, make `choices` a dictionary mapping each value to its description:
+- When documenting what each choice does, prefer making `choices` a dictionary that maps each value to its
+  description, instead of explaining the values in the option's `description`. Each value's description can be
+  a string or a list of paragraphs. Use:
   ```yaml
+  description:
+    - The mode of the node.
   choices:
     normal: Utilizes this node as much as possible.
     exclusive:
       - Only builds jobs with label expressions matching this node.
       - Additional paragraph.
+  ```
+  instead of:
+  ```yaml
+  description:
+    - The mode of the node.
+    - If V(normal), utilizes this node as much as possible.
+    - If V(exclusive), only builds jobs with label expressions matching this node.
+  choices: [normal, exclusive]
   ```
 - Values of `state` describe the resulting state (`present`, `absent`, `built`, `initialized`), not the command run to reach it (`build`, `init`).
 - Describe boolean options by what happens when they are V(true).
