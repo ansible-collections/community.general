@@ -103,7 +103,12 @@ Instead:
   supported on each side, and do not use language or standard library features newer than that
   (e.g. `str.removesuffix()` requires Python 3.9).
 - Access module parameters with `module.params["name"]`, not `module.params.get("name")`:
-  every option declared in the argument spec is always present.
+  every option declared in the argument spec is always present, set to `None` when it has no value and no default.
+  - `module.params.get("name", <fallback>)` is misleading, since the fallback is never used.
+    Declare a `default` in the argument spec instead.
+  - The same applies to the suboptions of a `dict` option, when that option is set.
+  - When working on a module that still uses `.get()`, use `[]` in the code being added or changed.
+  - Unit tests that mock `module.params` must provide all options of the argument spec.
 - Type hints:
   - Use `import typing as t`, not `from typing import ...`.
   - Use `X | None` instead of `t.Optional[X]`.
