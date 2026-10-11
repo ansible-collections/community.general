@@ -1,0 +1,2 @@
+minor_changes:
+  - version_sort filter plugin - add ``style`` option to choose the version comparison strategy (https://github.com/ansible-collections/community.general/issues/4451, https://github.com/ansible-collections/community.general/pull/12657).
