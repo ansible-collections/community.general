@@ -139,3 +139,41 @@ def test_install_by_name_does_not_query_file(run_command, tmp_path, monkeypatch,
         ["/testbin/pkg", "update"],
         ["/testbin/pkg", "info", "-g", "-e", name],
     ]
+
+
+def test_run_pkgng_closes_stdin_by_default(run_command):
+    run_command.side_effect = [
+        (0, "1.18.4", ""),  # pkg -v
+        (0, "", ""),  # pkg update
+        (0, "", ""),  # pkg info
+    ]
+
+    with set_module_args({"name": "zsh"}):
+        with pytest.raises(AnsibleExitJson):
+            pkgng.main()
+
+    # Verify that run_pkgng commands pass data="\n" to close stdin
+    update_call = run_command.call_args_list[1]
+    info_call = run_command.call_args_list[2]
+    assert update_call.kwargs.get("data") == "\n"
+    assert info_call.kwargs.get("data") == "\n"
+
+
+def test_annotation_preserves_custom_data(run_command):
+    run_command.side_effect = [
+        (0, "1.18.4", ""),  # pkg -v
+        (0, "", ""),  # pkg update
+        (0, "", ""),  # pkg info -g -e zsh (already installed)
+        (0, "", ""),  # pkg info -A zsh (no annotation)
+        (0, "", ""),  # pkg annotate -y -A zsh testtag
+    ]
+
+    with set_module_args({"name": "zsh", "annotation": ["+testtag=myvalue"]}):
+        with pytest.raises(AnsibleExitJson):
+            pkgng.main()
+
+    # The annotate command should preserve data="myvalue" and binary_data=True
+    annotate_call = run_command.call_args_list[4]
+    assert annotate_call.kwargs.get("data") == "myvalue"
+    assert annotate_call.kwargs.get("binary_data") is True
+

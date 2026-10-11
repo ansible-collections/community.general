@@ -1,0 +1,2 @@
+bugfixes:
+  - "pkgng - close stdin of pkg(8) by providing newline data by default so interactive prompts pick default answers and fail rather than hanging waiting on input (https://github.com/ansible-collections/community.general/issues/12896)."

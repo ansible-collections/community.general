@@ -528,6 +528,10 @@ def main():
         # to module.run_command, then merge its values into pkgng_env
         pkgng_env.update(kwargs.pop("environ_update", dict()))
 
+        # Close stdin of pkg(8) by providing newline data so interactive prompts pick default answers
+        # (e.g. [y/N] on OS version mismatch) and fail rather than hanging indefinitely waiting on input.
+        kwargs.setdefault("data", "\n")
+
         return module.run_command(cmd + list(args), environ_update=pkgng_env, **kwargs)
 
     if pkgs == ["*"] and p["state"] == "latest":
