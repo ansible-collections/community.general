@@ -397,18 +397,18 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: FreeBSD 15.0 + group 1
-              test: ansible-test-integration-2.21-freebsd-15.0-azp-posix-1
-            - name: FreeBSD 15.0 + group 2
-              test: ansible-test-integration-2.21-freebsd-15.0-azp-posix-2
-            - name: FreeBSD 15.0 + group 3
-              test: ansible-test-integration-2.21-freebsd-15.0-azp-posix-3
             - name: RHEL 10.1 + group 1
               test: ansible-test-integration-2.21-rhel-10.1-azp-posix-1
             - name: RHEL 10.1 + group 2
               test: ansible-test-integration-2.21-rhel-10.1-azp-posix-2
             - name: RHEL 10.1 + group 3
               test: ansible-test-integration-2.21-rhel-10.1-azp-posix-3
+            - name: RHEL 9.7 + group 1
+              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-1
+            - name: RHEL 9.7 + group 2
+              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-2
+            - name: RHEL 9.7 + group 3
+              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-3
 
   - stage: remote_2_22
     displayName: Remote 2.22
