@@ -19,20 +19,18 @@ class TestApkQueryLatest(unittest.TestCase):
 
     @mock.patch("ansible_collections.community.general.plugins.modules.apk.AnsibleModule")
     def test_not_latest(self, mock_module):
-        apk.APK_PATH = [""]
         for module_name in self.module_names:
             command_output = f"{module_name}-2.0.0-r1 < 3.0.0-r2 "
             mock_module.run_command.return_value = (0, command_output, None)
-            command_result = apk.query_latest(mock_module, module_name)
+            command_result = apk.query_latest(mock_module, [""], module_name)
             self.assertFalse(command_result)
 
     @mock.patch("ansible_collections.community.general.plugins.modules.apk.AnsibleModule")
     def test_latest(self, mock_module):
-        apk.APK_PATH = [""]
         for module_name in self.module_names:
             command_output = f"{module_name}-2.0.0-r1 = 2.0.0-r1 "
             mock_module.run_command.return_value = (0, command_output, None)
-            command_result = apk.query_latest(mock_module, module_name)
+            command_result = apk.query_latest(mock_module, [""], module_name)
             self.assertTrue(command_result)
 
 
@@ -74,9 +72,8 @@ class TestApkUpgradePackages(unittest.TestCase):
         module.run_command.return_value = (rc, stdout, "")
         module.exit_json.side_effect = SystemExit
         module.fail_json.side_effect = SystemExit
-        apk.APK_PATH = [""]
         with self.assertRaises(SystemExit):
-            apk.upgrade_packages(module, available=False)
+            apk.upgrade_packages(module, [""], available=False)
         return module
 
     def test_nothing_to_upgrade(self):
