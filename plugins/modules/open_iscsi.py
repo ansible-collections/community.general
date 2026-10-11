@@ -150,7 +150,6 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 
 ISCSIADM = "iscsiadm"
-iscsiadm_cmd = None
 
 
 def format_portal(portal, port):
@@ -166,7 +165,7 @@ def compare_nodelists(l1, l2):
     return l1 == l2
 
 
-def iscsi_get_cached_nodes(module, portal=None):
+def iscsi_get_cached_nodes(module, iscsiadm_cmd, portal=None):
     cmd = [iscsiadm_cmd, "--mode", "node"]
     rc, out, err = module.run_command(cmd)
 
@@ -196,12 +195,12 @@ def iscsi_get_cached_nodes(module, portal=None):
     return nodes
 
 
-def iscsi_discover(module, portal, port):
+def iscsi_discover(module, iscsiadm_cmd, portal, port):
     cmd = [iscsiadm_cmd, "--mode", "discovery", "--type", "sendtargets", "--portal", format_portal(portal, port)]
     module.run_command(cmd, check_rc=True)
 
 
-def iscsi_rescan(module, target=None):
+def iscsi_rescan(module, iscsiadm_cmd, target=None):
     if target is None:
         cmd = [iscsiadm_cmd, "--mode", "session", "--rescan"]
     else:
@@ -210,7 +209,7 @@ def iscsi_rescan(module, target=None):
     return out
 
 
-def target_loggedon(module, target, portal=None, port=None):
+def target_loggedon(module, iscsiadm_cmd, target, portal=None, port=None):
     cmd = [iscsiadm_cmd, "--mode", "session"]
     rc, out, err = module.run_command(cmd)
 
@@ -228,7 +227,7 @@ def target_loggedon(module, target, portal=None, port=None):
         module.fail_json(cmd=cmd, rc=rc, msg=err)
 
 
-def target_login(module, target, check_rc, portal=None, port=None):
+def target_login(module, iscsiadm_cmd, target, check_rc, portal=None, port=None):
     node_auth = module.params["node_auth"]
     node_user = module.params["node_user"]
     node_pass = module.params["node_pass"]
@@ -282,7 +281,7 @@ def target_login(module, target, check_rc, portal=None, port=None):
     return rc
 
 
-def target_logout(module, target):
+def target_logout(module, iscsiadm_cmd, target):
     cmd = [iscsiadm_cmd, "--mode", "node", "--targetname", target, "--logout"]
     module.run_command(cmd, check_rc=True)
 
@@ -303,7 +302,7 @@ def target_device_node(target):
     return devdisks
 
 
-def target_isauto(module, target, portal=None, port=None):
+def target_isauto(module, iscsiadm_cmd, target, portal=None, port=None):
     cmd = [iscsiadm_cmd, "--mode", "node", "--targetname", target]
 
     if portal is not None and port is not None:
@@ -319,7 +318,7 @@ def target_isauto(module, target, portal=None, port=None):
     return False
 
 
-def target_setauto(module, target, portal=None, port=None):
+def target_setauto(module, iscsiadm_cmd, target, portal=None, port=None):
     cmd = [
         iscsiadm_cmd,
         "--mode",
@@ -340,7 +339,7 @@ def target_setauto(module, target, portal=None, port=None):
     module.run_command(cmd, check_rc=True)
 
 
-def target_setmanual(module, target, portal=None, port=None):
+def target_setmanual(module, iscsiadm_cmd, target, portal=None, port=None):
     cmd = [
         iscsiadm_cmd,
         "--mode",
@@ -392,7 +391,6 @@ def main():
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    global iscsiadm_cmd
     iscsiadm_cmd = module.get_bin_path("iscsiadm", required=True)
 
     # parameters
@@ -414,7 +412,7 @@ def main():
 
     check = module.check_mode
 
-    cached = iscsi_get_cached_nodes(module, portal)
+    cached = iscsi_get_cached_nodes(module, iscsiadm_cmd, portal)
 
     # return json dict
     result = {"changed": False}
@@ -425,8 +423,8 @@ def main():
         if check:
             nodes = cached
         else:
-            iscsi_discover(module, portal, port)
-            nodes = iscsi_get_cached_nodes(module, portal)
+            iscsi_discover(module, iscsiadm_cmd, portal, port)
+            nodes = iscsi_get_cached_nodes(module, iscsiadm_cmd, portal)
         if not compare_nodelists(cached, nodes):
             result["changed"] |= True
             result["cache_updated"] = True
@@ -457,19 +455,19 @@ def main():
         if login_to_all_nodes:
             result["devicenodes"] = []
             for index_target in nodes:
-                loggedon = target_loggedon(module, index_target, portal, port)
+                loggedon = target_loggedon(module, iscsiadm_cmd, index_target, portal, port)
                 if (login and loggedon) or (not login and not loggedon):
                     result["changed"] |= False
                     if login:
                         result["devicenodes"] += target_device_node(index_target)
                 elif not check:
                     if login:
-                        login_result = target_login(module, index_target, check_rc, portal, port)
+                        login_result = target_login(module, iscsiadm_cmd, index_target, check_rc, portal, port)
                         # give udev some time
                         time.sleep(1)
                         result["devicenodes"] += target_device_node(index_target)
                     else:
-                        target_logout(module, index_target)
+                        target_logout(module, iscsiadm_cmd, index_target)
                     # Check if there are multiple targets on a single portal and
                     # do not mark the task changed if host could not login to one of them
                     if len(nodes) > 1 and login_result == 24:
@@ -482,19 +480,19 @@ def main():
                     result["changed"] |= True
                     result["connection_changed"] = True
         else:
-            loggedon = target_loggedon(module, target, portal, port)
+            loggedon = target_loggedon(module, iscsiadm_cmd, target, portal, port)
             if (login and loggedon) or (not login and not loggedon):
                 result["changed"] |= False
                 if login:
                     result["devicenodes"] = target_device_node(target)
             elif not check:
                 if login:
-                    target_login(module, target, portal, port)
+                    target_login(module, iscsiadm_cmd, target, portal, port)
                     # give udev some time
                     time.sleep(1)
                     result["devicenodes"] = target_device_node(target)
                 else:
-                    target_logout(module, target)
+                    target_logout(module, iscsiadm_cmd, target)
                 result["changed"] |= True
                 result["connection_changed"] = True
             else:
@@ -502,15 +500,15 @@ def main():
                 result["connection_changed"] = True
 
     if automatic is not None and not login_to_all_nodes:
-        isauto = target_isauto(module, target)
+        isauto = target_isauto(module, iscsiadm_cmd, target)
         if (automatic and isauto) or (not automatic and not isauto):
             result["changed"] |= False
             result["automatic_changed"] = False
         elif not check:
             if automatic:
-                target_setauto(module, target)
+                target_setauto(module, iscsiadm_cmd, target)
             else:
-                target_setmanual(module, target)
+                target_setmanual(module, iscsiadm_cmd, target)
             result["changed"] |= True
             result["automatic_changed"] = True
         else:
@@ -518,15 +516,15 @@ def main():
             result["automatic_changed"] = True
 
     if automatic_portal is not None and not login_to_all_nodes:
-        isauto = target_isauto(module, target, portal, port)
+        isauto = target_isauto(module, iscsiadm_cmd, target, portal, port)
         if (automatic_portal and isauto) or (not automatic_portal and not isauto):
             result["changed"] |= False
             result["automatic_portal_changed"] = False
         elif not check:
             if automatic_portal:
-                target_setauto(module, target, portal, port)
+                target_setauto(module, iscsiadm_cmd, target, portal, port)
             else:
-                target_setmanual(module, target, portal, port)
+                target_setmanual(module, iscsiadm_cmd, target, portal, port)
             result["changed"] |= True
             result["automatic_portal_changed"] = True
         else:
@@ -535,7 +533,7 @@ def main():
 
     if rescan is not False:
         result["changed"] = True
-        result["sessions"] = iscsi_rescan(module, target)
+        result["sessions"] = iscsi_rescan(module, iscsiadm_cmd, target)
 
     module.exit_json(**result)
 
