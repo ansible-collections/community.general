@@ -99,3 +99,23 @@
     that:
       - thinvol_idempotent is success
       - thinvol_idempotent is not changed
+
+- name: Assert thin pool with custom metadata size creation is idempotent
+  ansible.builtin.assert:
+    that:
+      - thinpool_metadata_idempotent is not changed
+
+- name: Use pool_metadata_size together with lv
+  community.general.lvol:
+    vg: testvg2
+    lv: testthinvol2
+    thinpool: testthinpool4
+    size: 4m
+    pool_metadata_size: 4m
+  register: thinpool_metadata_with_lv
+  ignore_errors: true
+
+- name: Assert pool_metadata_size cannot be used with lv
+  ansible.builtin.assert:
+    that:
+      - thinpool_metadata_with_lv is failed

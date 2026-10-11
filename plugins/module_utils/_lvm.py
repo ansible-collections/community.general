@@ -395,7 +395,7 @@ def lvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
 
     Suggested args order (normal LV): test yes lv size_L opts vg pvs
     Suggested args order (snapshot):  test yes size_L is_snapshot lv opts vg
-    Suggested args order (thin pool): test yes size_L opts thin vg pvs
+    Suggested args order (thin pool): test yes size_L opts pool_metadata_size thin vg pvs
     Suggested args order (thin vol):  test yes lv size_V opts thin vg
 
     Note: C(vg) must appear after all option args and before C(pvs).
@@ -431,6 +431,7 @@ def lvcreate_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             opts=cmd_runner_fmt.as_list(),
             vg=cmd_runner_fmt.as_list(),
             pvs=cmd_runner_fmt.as_list(),
+            pool_metadata_size=cmd_runner_fmt.as_opt_val("--poolmetadatasize"),
         ),
         **kwargs,
     )
