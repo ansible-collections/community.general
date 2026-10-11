@@ -36,7 +36,7 @@
     ```
   - Do not add or change `version_added` for things that already existed.
   - Once that version is released, the value is stale. After rebasing, or when a release happened while
-    the PR was open, read `galaxy.yml` again and update every `version_added` (and description note) added by the PR.
+    the PR was open, read `galaxy.yml` from the updated `main` again and update every `version_added` (and description note) added by the PR.
 
 ## Licensing and Copyright
 
