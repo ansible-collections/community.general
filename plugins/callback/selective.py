@@ -42,7 +42,6 @@ from ansible import constants as C
 from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.callback import CallbackBase
 
-DONT_COLORIZE = False
 COLORS = {
     "normal": "\033[0m",
     "ok": f"\x1b[{C.COLOR_CODES[C.COLOR_OK]}m",  # type: ignore
@@ -65,14 +64,6 @@ def dict_diff(prv, nxt):
     return result
 
 
-def colorize(msg, color):
-    """Given a string add necessary codes to format the string."""
-    if DONT_COLORIZE:
-        return msg
-    else:
-        return f"{COLORS[color]}{msg}{COLORS['endc']}"
-
-
 class CallbackModule(CallbackBase):
     """selective.py callback plugin."""
 
@@ -86,12 +77,19 @@ class CallbackModule(CallbackBase):
         self.last_skipped = False
         self.last_task_name = None
         self.printed_last_task = False
+        self.dont_colorize = False
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
-        global DONT_COLORIZE
-        DONT_COLORIZE = self.get_option("nocolor")
+        self.dont_colorize = self.get_option("nocolor")
+
+    def colorize(self, msg, color):
+        """Given a string add necessary codes to format the string."""
+        if self.dont_colorize:
+            return msg
+        else:
+            return f"{COLORS[color]}{msg}{COLORS['endc']}"
 
     def _print_task(self, task_name=None):
         if task_name is None:
@@ -103,7 +101,7 @@ class CallbackModule(CallbackBase):
             if self.last_skipped:
                 self._display.display("")
             line = f"# {task_name} "
-            msg = colorize(f"{line}{'*' * (line_length - len(line))}", "bold")
+            msg = self.colorize(f"{line}{'*' * (line_length - len(line))}", "bold")
             self._display.display(msg)
 
     def _indent_text(self, text, indent_level):
@@ -127,28 +125,28 @@ class CallbackModule(CallbackBase):
             except AttributeError:
                 diff = dict_diff(diff["before"], diff["after"])
         if diff:
-            diff = colorize(str(diff), "changed")
+            diff = self.colorize(str(diff), "changed")
             self._display.display(self._indent_text(diff, indent_level + 4))
 
     def _print_host_or_item(self, host_or_item, changed, msg, diff, is_host, error, stdout, stderr):
         if is_host:
             indent_level = 0
-            name = colorize(host_or_item.name, "not_so_bold")
+            name = self.colorize(host_or_item.name, "not_so_bold")
         else:
             indent_level = 4
             if isinstance(host_or_item, dict):
                 if "key" in host_or_item.keys():
                     host_or_item = host_or_item["key"]
-            name = colorize(to_text(host_or_item), "bold")
+            name = self.colorize(to_text(host_or_item), "bold")
 
         if error:
             color = "failed"
-            change_string = colorize("FAILED!!!", color)
+            change_string = self.colorize("FAILED!!!", color)
         else:
             color = "changed" if changed else "ok"
-            change_string = colorize(f"changed={changed}", color)
+            change_string = self.colorize(f"changed={changed}", color)
 
-        msg = colorize(msg, color)
+        msg = self.colorize(msg, color)
 
         line_length = 120
         spaces = " " * (40 - len(name) - indent_level)
@@ -164,10 +162,10 @@ class CallbackModule(CallbackBase):
         if diff:
             self._print_diff(diff, indent_level)
         if stdout:
-            stdout = colorize(stdout, "failed")
+            stdout = self.colorize(stdout, "failed")
             self._display.display(self._indent_text(stdout, indent_level + 4))
         if stderr:
-            stderr = colorize(stderr, "failed")
+            stderr = self.colorize(stderr, "failed")
             self._display.display(self._indent_text(stderr, indent_level + 4))
 
     def v2_playbook_on_play_start(self, play):
@@ -243,7 +241,7 @@ class CallbackModule(CallbackBase):
                 f"{host.ljust(max_len)} : ok={s['ok']}\tchanged={s['changed']}\tfailed={s['failures']}\t"
                 f"unreachable={s['unreachable']}\trescued={s['rescued']}\tignored={s['ignored']}"
             )
-            self._display.display(colorize(msg, color))
+            self._display.display(self.colorize(msg, color))
 
     def v2_runner_on_skipped(self, result, **kwargs):
         """Run when a task is skipped."""
@@ -254,7 +252,9 @@ class CallbackModule(CallbackBase):
             line_length = 120
             spaces = " " * (31 - len(result._host.name) - 4)
 
-            line = f"  * {colorize(result._host.name, 'not_so_bold')}{spaces}- {colorize('skipped', 'skipped')}"
+            line = (
+                f"  * {self.colorize(result._host.name, 'not_so_bold')}{spaces}- {self.colorize('skipped', 'skipped')}"
+            )
 
             reason = result._result.get("skipped_reason", "") or result._result.get("skip_reason", "")
             if len(reason) < 50:

@@ -1,0 +1,2 @@
+minor_changes:
+  - selective callback plugin - refactor code to remove use of ``global`` (https://github.com/ansible-collections/community.general/pull/12923).
