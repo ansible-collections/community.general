@@ -70,8 +70,8 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-def activate(module):
-    cmd = f"{AWALL_PATH} activate --force"
+def activate(module, awall_path):
+    cmd = f"{awall_path} activate --force"
     rc, stdout, stderr = module.run_command(cmd)
     if rc == 0:
         return True
@@ -79,49 +79,49 @@ def activate(module):
         module.fail_json(msg="could not activate new rules", stdout=stdout, stderr=stderr)
 
 
-def is_policy_enabled(module, name):
-    cmd = f"{AWALL_PATH} list"
+def is_policy_enabled(module, awall_path, name):
+    cmd = f"{awall_path} list"
     rc, stdout, stderr = module.run_command(cmd)
     return bool(re.search(rf"^{name}\s+enabled", stdout, re.MULTILINE))
 
 
-def enable_policy(module, names, act):
+def enable_policy(module, awall_path, names, act):
     policies = []
     for name in names:
-        if not is_policy_enabled(module, name):
+        if not is_policy_enabled(module, awall_path, name):
             policies.append(name)
     if not policies:
         module.exit_json(changed=False, msg="policy(ies) already enabled")
     names = " ".join(policies)
     if module.check_mode:
-        cmd = f"{AWALL_PATH} list"
+        cmd = f"{awall_path} list"
     else:
-        cmd = f"{AWALL_PATH} enable {names}"
+        cmd = f"{awall_path} enable {names}"
     rc, stdout, stderr = module.run_command(cmd)
     if rc != 0:
         module.fail_json(msg=f"failed to enable {names}", stdout=stdout, stderr=stderr)
     if act and not module.check_mode:
-        activate(module)
+        activate(module, awall_path)
     module.exit_json(changed=True, msg=f"enabled awall policy(ies): {names}")
 
 
-def disable_policy(module, names, act):
+def disable_policy(module, awall_path, names, act):
     policies = []
     for name in names:
-        if is_policy_enabled(module, name):
+        if is_policy_enabled(module, awall_path, name):
             policies.append(name)
     if not policies:
         module.exit_json(changed=False, msg="policy(ies) already disabled")
     names = " ".join(policies)
     if module.check_mode:
-        cmd = f"{AWALL_PATH} list"
+        cmd = f"{awall_path} list"
     else:
-        cmd = f"{AWALL_PATH} disable {names}"
+        cmd = f"{awall_path} disable {names}"
     rc, stdout, stderr = module.run_command(cmd)
     if rc != 0:
         module.fail_json(msg=f"failed to disable {names}", stdout=stdout, stderr=stderr)
     if act and not module.check_mode:
-        activate(module)
+        activate(module, awall_path)
     module.exit_json(changed=True, msg=f"disabled awall policy(ies): {names}")
 
 
@@ -137,20 +137,19 @@ def main():
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    global AWALL_PATH
-    AWALL_PATH = module.get_bin_path("awall", required=True)
+    awall_path = module.get_bin_path("awall", required=True)
 
     p = module.params
 
     if p["name"]:
         if p["state"] == "enabled":
-            enable_policy(module, p["name"], p["activate"])
+            enable_policy(module, awall_path, p["name"], p["activate"])
         elif p["state"] == "disabled":
-            disable_policy(module, p["name"], p["activate"])
+            disable_policy(module, awall_path, p["name"], p["activate"])
 
     if p["activate"]:
         if not module.check_mode:
-            activate(module)
+            activate(module, awall_path)
         module.exit_json(changed=True, msg="activated awall rules")
 
     module.fail_json(msg="no action defined")
