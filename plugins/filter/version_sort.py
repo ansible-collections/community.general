@@ -140,7 +140,7 @@ def version_sort(value: t.Any, reverse: t.Any = False, *, style: t.Any = "loose"
     items = _validate_value(value)
     if not isinstance(reverse, bool):
         raise AnsibleFilterError(f"reverse must be a boolean, got {type(reverse).__name__}")
-    if style not in _SORT_KEYS:
+    if not isinstance(style, str) or style not in _SORT_KEYS:
         raise AnsibleFilterError(f"style must be one of {', '.join(_SORT_KEYS)}, got {style!r}")
     return sorted(items, key=_SORT_KEYS[style], reverse=reverse)
 
