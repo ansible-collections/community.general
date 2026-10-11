@@ -1,0 +1,2 @@
+minor_changes:
+  - awall - refactor code to remove use of ``global`` (https://github.com/ansible-collections/community.general/pull/12926).
