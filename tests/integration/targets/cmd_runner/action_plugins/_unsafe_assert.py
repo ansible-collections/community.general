@@ -5,15 +5,8 @@
 from __future__ import annotations
 
 from ansible.errors import AnsibleError
-from ansible.playbook.conditional import Conditional
 from ansible.plugins.action import ActionBase
-
-try:
-    from ansible.utils.datatag import trust_value as _trust_value  # type: ignore[import-not-found]
-except ImportError:
-
-    def _trust_value(input):
-        return input
+from ansible.template import trust_as_template as _trust_value
 
 
 class ActionModule(ActionBase):
@@ -45,13 +38,8 @@ class ActionModule(ActionBase):
         result["_ansible_verbose_always"] = True
 
         for that in thats:
-            if hasattr(self._templar, "evaluate_conditional"):
-                trusted_that = _trust_value(that) if _trust_value else that
-                test_result = self._templar.evaluate_conditional(conditional=trusted_that)
-            else:
-                cond = Conditional(loader=self._loader)
-                cond.when = [str(self._make_safe(that))]
-                test_result = cond.evaluate_conditional(templar=self._templar, all_vars=task_vars)
+            trusted_that = _trust_value(that)
+            test_result = self._templar.evaluate_conditional(conditional=trusted_that)
             if not test_result:
                 result["failed"] = True
                 result["evaluated_to"] = test_result
