@@ -23,8 +23,20 @@
   the current version. Depending on the situation, this target may be pushed for the (X+3).0.0 version.
 - If a deprecation is needed, ingest https://github.com/russoz-ansible/ansible-contrib-unofficial/blob/main/deprecations.md for more information on how to implement the deprecations.
 - Always refer to modules and plugins by their FQCN.
-- When setting `version_added` on a new parameter or plugin, always read `galaxy.yml` and use
-  that version string directly — it holds the next version for a feature release.
+- Use `version_added` to record in which version something new became available:
+  - Always read `galaxy.yml` from current `main` and use that version string directly — it holds the next version for a feature release.
+  - New module or plugin: set `version_added` at the top level of `DOCUMENTATION`.
+  - New option or suboption in an existing module or plugin: set `version_added` in that option's documentation.
+    Options that come together with a new module or plugin do not need it.
+  - New choice value or new alias for an existing option: there is no `version_added` field for these,
+    so add a paragraph to the option's `description` instead, for example:
+    ```yaml
+    - The value V(all) has been added in community.general 13.5.0.
+    - The O(client_id) alias has been added in community.general 13.5.0.
+    ```
+  - Do not add or change `version_added` for things that already existed.
+  - Once that version is released, the value is stale. After rebasing, or when a release happened while
+    the PR was open, read `galaxy.yml` from the updated `main` again and update every `version_added` (and description note) added by the PR.
 
 ## Licensing and Copyright
 
@@ -82,6 +94,147 @@ Instead:
 
 - Default: plan removal at `(X+2).0.0` from the current major version
 - May be pushed to `(X+3).0.0` depending on the situation
+
+
+## Writing plugin code
+
+- Modules and module utils run on the target nodes, other plugins run on the controller.
+  Check https://github.com/ansible-collections/community.general/issues/11482 for the lowest Python version
+  supported on each side, and do not use language or standard library features newer than that
+  (e.g. `str.removesuffix()` requires Python 3.9).
+- Access module parameters with `module.params["name"]`, not `module.params.get("name")`:
+  every option declared in the argument spec is always present, set to `None` when it has no value and no default.
+  - `module.params.get("name", <fallback>)` is misleading, since the fallback is never used.
+    Declare a `default` in the argument spec instead.
+  - The same applies to the suboptions of a `dict` option, when that option is set.
+  - When working on a module that still uses `.get()`, use `[]` in the code being added or changed.
+  - Unit tests that mock `module.params` must provide all options of the argument spec.
+- Type hints:
+  - Use `import typing as t`, not `from typing import ...`.
+  - Use `X | None` instead of `t.Optional[X]`.
+  - Do not use `t.Any` for objects from third-party libraries, it disables type checking for them.
+  - In filter and test plugins, the input can be anything the user passes: type it as `t.Any` and validate it.
+  - In modules, type the argument spec and the return values with the helper types from
+    `plugins/module_utils/_typing.py`:
+    - Import them, and define the types built from them, inside an `if t.TYPE_CHECKING:  # pragma: no cover` block.
+      They are only used in annotations, which are not evaluated at runtime (`from __future__ import annotations`).
+    - Build the argument spec in a function `get_argument_spec() -> ArgumentSpecT`, and pass its result to `AnsibleModule()`.
+    - Type the result dictionary as a `TypedDict` that combines the `ModuleReturn*` types for the standard
+      return values (`changed`, `msg`, `rc`, `stdout`, `stderr`, `backup_file`, `diff`) with the module-specific ones.
+      The `*Req` variants make the key required.
+    ```python
+    if t.TYPE_CHECKING:  # pragma: no cover
+        from ansible_collections.community.general.plugins.module_utils._typing import (
+            ArgumentSpecT,
+            ModuleReturnBackupFile,
+            ModuleReturnChangedReq,
+            ModuleReturnDiff,
+        )
+
+        class ResultDict(ModuleReturnChangedReq, ModuleReturnBackupFile, ModuleReturnDiff[str]):
+            config_file: str
+            config_content: str | None
+            enabled_state: bool
+
+
+    def get_argument_spec() -> ArgumentSpecT:
+        return dict(
+            name=dict(type="str", required=True, aliases=["config_name"]),
+            state=dict(type="str", choices=["present", "absent"], default="present"),
+            config_dir=dict(type="path", default="/etc/logrotate.d"),
+            paths=dict(type="list", elements="path"),
+        )
+    ```
+- When handling user-provided data structures, use `collections.abc.Mapping`, `collections.abc.Sequence`, and
+  `ansible.module_utils.common.collections.is_sequence` instead of checking for `dict` and `list`.
+- Compile regular expressions once, outside of loops, and use the compiled object inside the loop.
+- Do not place code or constants (other than conditional imports) before the imports. Imports come after
+  the `DOCUMENTATION`, `EXAMPLES`, and `RETURN` strings.
+- Do not use names starting with `_` for variables or methods in module files.
+- Avoid redundant code, for example:
+  - Conversions to a type the value already has (`str()` on a string, `bool()` on a boolean, `str(e)` inside an f-string).
+  - `if changed == True:` instead of `if changed:`.
+  - `x if x is not None else ""` where `x or ""` does the same.
+  - Comments that only restate the code.
+- Extract code that is repeated (e.g. building the same URL in several places) into a function.
+
+
+## Writing plugin documentation
+
+- Use semantic markup: `O()` for options, `V()` for values, `RV()` for return values, `C()` for code, commands, and paths.
+  See https://docs.ansible.com/projects/ansible/latest/dev_guide/ansible_markup.html.
+- Each `description` is a list of paragraphs:
+  - Do not split a sentence over two list items.
+  - Keep information about the same subject in the same paragraph.
+- Do not list the possible values in the `description` when the option has `choices`, they are rendered automatically.
+- When documenting what each choice does, prefer making `choices` a dictionary that maps each value to its
+  description, instead of explaining the values in the option's `description`. Each value's description can be
+  a string or a list of paragraphs. Use:
+  ```yaml
+  description:
+    - The mode of the node.
+  choices:
+    normal: Utilizes this node as much as possible.
+    exclusive:
+      - Only builds jobs with label expressions matching this node.
+      - Additional paragraph.
+  ```
+  instead of:
+  ```yaml
+  description:
+    - The mode of the node.
+    - If V(normal), utilizes this node as much as possible.
+    - If V(exclusive), only builds jobs with label expressions matching this node.
+  choices: [normal, exclusive]
+  ```
+- Values of `state` describe the resulting state (`present`, `absent`, `built`, `initialized`), not the command run to reach it (`build`, `init`).
+- Describe boolean options by what happens when they are V(true).
+- Do not add aliases to options unless strictly necessary.
+- In new features, use the current terminology of the tool or service being managed, not legacy names.
+- State explicitly any behavior that is not obvious for users who are not Python programmers, for example:
+  - Comparing values with equality treats `0` and `false` (and `1` and `true`) as equal.
+  - `re.match()` only matches at the beginning of the string.
+  - A list value must be passed nested inside another list when the option takes a list of values.
+- Attributes:
+  - Add `community.general._attributes` to `extends_documentation_fragment`.
+  - Under each attribute set `support` and, when needed, `details`. Do not set `description`, it comes from the doc fragment.
+  - Use `details` to explain limitations; it is usually not needed for `support: full`.
+- Keep lines in `EXAMPLES` short: move long values into `vars:` or use YAML folded scalars.
+- Separate the `DOCUMENTATION`, `EXAMPLES`, and `RETURN` strings with a blank line.
+
+
+## Check mode, diff mode, and idempotency
+
+- In check mode the module must not change anything, but it must report the same `changed` value a real run would.
+  Do not return a fixed `changed` value in check mode.
+- Determine `changed` by comparing the requested state with the current state of the system or service.
+  Do not report `changed=true` just because an action was performed: many APIs and commands are idempotent
+  and do not tell whether anything changed.
+- An attribute (`check_mode`, `diff_mode`) may only declare `support: full` if every code path honors it.
+  Otherwise declare `support: partial` and explain the limitation in `details`.
+  New states and options added to a module that declares `full` support must honor it as well.
+- Normalize values before comparing them, so that equivalent values do not produce a change on every run
+  (e.g. `None` versus `""`, human-readable sizes versus bytes).
+- In diff mode, return `diff` with `before` and `after`. When the content of a file is compared, also set
+  `before_header` and `after_header` to the paths, the same way `ansible.builtin.copy` does.
+
+
+## Validating input and designing behavior
+
+- Express constraints between options in the argument spec (`required_if`, `required_together`, `required_one_of`,
+  `required_by`, `mutually_exclusive`). Only check in code what the argument spec cannot express.
+- Reject contradictory or meaningless combinations of options. Do not silently pick one of them or ignore the other.
+- Never silently transform, discard, or ignore user input:
+  - If the input cannot be applied as given, fail with a clear message.
+  - If a lenient behavior is useful, make it configurable (e.g. `fail`, `warn`, `ignore`) with failing as the default.
+  - If an operation requires an existing object (e.g. archiving a project), fail when it does not exist.
+- When the module has to make an assumption (e.g. the server version cannot be determined), emit a warning with `module.warn()`.
+- When wrapping a CLI tool or an API, pass on its warnings and errors instead of re-implementing its checks.
+- Prefer backward compatible, additive changes, such as a new choice value or a new alias, over changing defaults
+  or deprecating options.
+- Prefer `choices` with descriptive strings over booleans when the meaning of `true`/`false` is not obvious.
+- Keep messages neutral and accurate, e.g. "Project not found" instead of "Project deleted or does not exist".
+- Do not add options or safeguards that nobody asked for. They can be added later when there is an actual need.
 
 
 ## Writing changelog fragments
@@ -202,6 +355,12 @@ approval before committing or pushing it.
 - PR title should use single backticks for terms like commands, variables, functions, etc. E.g. "xfconf: use command `xfconf-query`"
 - PR title may have a prefix indicating it is a work in progress. E.g. "[WIP] xfconf: use command `xfconf-query`"
 - If the PR fixes issues, add one line with `Fixes #<issue-number>` for each issue being solved to the PR description
+- Do not place GitHub closing keywords (`close`, `fix`, `resolve` and their variants) right before an issue reference
+  unless the PR fixes that issue: GitHub links the issue even if the sentence negates it (e.g. "does not close #1234").
+  Write "issue #1234" instead.
+- Bugfixes and security fixes may be backported to older stable branches; new features are not.
+  The classification of the PR determines that.
+- When the PR is ready for review, mark it as ready (not draft) and remove any `[WIP]` prefix from the title.
 - When a fix is speculative or lacks test coverage, use hedged language in the PR description (e.g. "may address" rather than "this fixes").
 - Keep PR descriptions concise; do not explain implementation choices or reproduce information already visible in the diff or commit messages.
 
@@ -243,6 +402,11 @@ approval before committing or pushing it.
   - NOT assert Ansible features, e.g. if two parameters are marked in the argument spec as
     mutually exclusive, there is no need to write a test to verify that they cannot be used together.
     It is a given, and `ansible-core` has plenty of tests for those.
+  - NOT assert static data, such as the contents of the argument spec.
+  - Assert negative outcomes where relevant, i.e. that something was _not_ done
+    (e.g. no command executed in check mode, only the expected values registered as secrets).
+- Do not add `if __name__ == "__main__":` blocks to test files.
+- Do not patch `sys.modules` to inject mocks. Import the module normally and patch symbols with `mocker`.
 
 ## Writing integration tests
 
@@ -261,10 +425,31 @@ approval before committing or pushing it.
   - Use local alternatives as possible, e.g. docker images (use `setup_docker`)
   - Be implemented in a "black-box" style: we provide inputs and assert the outputs, not interested in the internal details
   - Assert idempotency, i.e. run the same command twice and assert the second time bears no change
+    - One repeated run is enough to verify idempotency
+    - Also test changing an attribute of an object that already exists in the requested state
+  - Assert only the values the test changed, not entire configurations or outputs
+  - Test error paths with a regular task using `ignore_errors: true` and `register`, then assert that the result
+    `is failed` and that its `msg` contains the expected error. Do not write and execute separate playbooks for that.
+  - Use FQCNs everywhere, including lookups and filters (e.g. `lookup('ansible.builtin.template', ...)`)
+  - Use distinct, descriptive names for registered variables
+  - Not depend on variables that can only be set on the command line - CI cannot set them
+  - Keep resource usage (disk images, downloads) as small as possible, CI VMs have limited resources
+- For targets that only work on some platforms:
+  - Add `skip/<platform>` entries (e.g. `skip/macos`, `skip/freebsd`, `skip/alpine`) to `aliases`
+  - Also skip unsupported systems at the start of the tasks, before installing packages or doing any other setup work,
+    since the aliases do not cover every environment CI uses (e.g. `skip/alpine` does not skip the Alpine container)
+  - Do not add precondition assertions or messages explaining why something is skipped, they only add noise
 - For modules with larget sets of functions, break the tests into smaller files and use `include_tasks`
 
 ## Use of AI for contributions
 
 **Please note that using AI is accepted but you MUST comply with the [Ansible Community Policy for AI-Assisted Contributions](https://docs.ansible.com/projects/ansible/devel/community/ai_policy.html)**!
 
-The main point is being transparent about it. Add a `Co-authored:` tag in the issues and PR descriptions, as well as in the commit texts.
+The main points are:
+
+- Be transparent: disclose the use of AI when a significant part of the contribution is taken from the AI output
+  without significant changes. Grammar, spelling, and style corrections do not need disclosure.
+  - In commits, add a trailer `Assisted-by: <model>`, e.g. `Assisted-by: Claude Opus 5.5`.
+  - In issues, PR descriptions, and comments, add a short note stating that AI was used.
+- Contributions assisted by AI must follow the project's standards and guidelines, including this file.
+- The contributor is fully accountable for the contribution, with or without AI assistance.
