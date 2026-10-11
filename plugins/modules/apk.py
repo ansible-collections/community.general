@@ -185,8 +185,8 @@ def parse_for_packages(stdout):
     return packages
 
 
-def update_package_db(module, exit):
-    cmd = APK_PATH + ["update"]
+def update_package_db(module, apk_path, exit):
+    cmd = apk_path + ["update"]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     if rc != 0:
         module.fail_json(msg="could not update package db", stdout=stdout, stderr=stderr)
@@ -208,29 +208,29 @@ def query_toplevel(module, name, world):
     return False
 
 
-def query_package(module, name):
-    cmd = APK_PATH + ["-v", "info", "--installed", name]
+def query_package(module, apk_path, name):
+    cmd = apk_path + ["-v", "info", "--installed", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     return rc == 0
 
 
-def query_latest(module, name):
-    cmd = APK_PATH + ["version", name]
+def query_latest(module, apk_path, name):
+    cmd = apk_path + ["version", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     search_pattern = rf"({re.escape(name)})-[\d\.\w]+-[\d\w]+\s+(.)\s+[\d\.\w]+-[\d\w]+\s+"
     match = re.search(search_pattern, stdout)
     return not (match and match.group(2) == "<")
 
 
-def query_virtual(module, name):
-    cmd = APK_PATH + ["-v", "info", "--description", name]
+def query_virtual(module, apk_path, name):
+    cmd = apk_path + ["-v", "info", "--description", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     search_pattern = rf"^{re.escape(name)}: virtual meta package"
     return bool(re.search(search_pattern, stdout))
 
 
-def get_dependencies(module, name):
-    cmd = APK_PATH + ["-v", "info", "--depends", name]
+def get_dependencies(module, apk_path, name):
+    cmd = apk_path + ["-v", "info", "--depends", name]
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     dependencies = stdout.split()
     if len(dependencies) > 1:
@@ -239,11 +239,11 @@ def get_dependencies(module, name):
         return []
 
 
-def upgrade_packages(module, available):
+def upgrade_packages(module, apk_path, available):
     if module.check_mode:
-        cmd = APK_PATH + ["upgrade", "--simulate"]
+        cmd = apk_path + ["upgrade", "--simulate"]
     else:
-        cmd = APK_PATH + ["upgrade"]
+        cmd = apk_path + ["upgrade"]
     if available:
         cmd.append("--available")
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
@@ -260,22 +260,22 @@ def upgrade_packages(module, available):
     module.exit_json(changed=False, msg="packages already upgraded", stdout=stdout, stderr=stderr, packages=packagelist)
 
 
-def install_packages(module, names, state, world):
+def install_packages(module, apk_path, names, state, world):
     upgrade = False
     to_install = []
     to_upgrade = []
     for name in names:
         # Check if virtual package
-        if query_virtual(module, name):
+        if query_virtual(module, apk_path, name):
             # Get virtual package dependencies
-            dependencies = get_dependencies(module, name)
+            dependencies = get_dependencies(module, apk_path, name)
             for dependency in dependencies:
-                if state == "latest" and not query_latest(module, dependency):
+                if state == "latest" and not query_latest(module, apk_path, dependency):
                     to_upgrade.append(dependency)
         else:
             if not query_toplevel(module, name, world):
                 to_install.append(name)
-            elif state == "latest" and not query_latest(module, name):
+            elif state == "latest" and not query_latest(module, apk_path, name):
                 to_upgrade.append(name)
     if to_upgrade:
         upgrade = True
@@ -284,14 +284,14 @@ def install_packages(module, names, state, world):
     packages = to_install + to_upgrade
     if upgrade:
         if module.check_mode:
-            cmd = APK_PATH + ["add", "--upgrade", "--simulate"] + packages
+            cmd = apk_path + ["add", "--upgrade", "--simulate"] + packages
         else:
-            cmd = APK_PATH + ["add", "--upgrade"] + packages
+            cmd = apk_path + ["add", "--upgrade"] + packages
     else:
         if module.check_mode:
-            cmd = APK_PATH + ["add", "--simulate"] + packages
+            cmd = apk_path + ["add", "--simulate"] + packages
         else:
-            cmd = APK_PATH + ["add"] + packages
+            cmd = apk_path + ["add"] + packages
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     packagelist = parse_for_packages(stdout)
     if rc != 0:
@@ -301,23 +301,23 @@ def install_packages(module, names, state, world):
     )
 
 
-def remove_packages(module, names):
+def remove_packages(module, apk_path, names):
     installed = []
     for name in names:
-        if query_package(module, name):
+        if query_package(module, apk_path, name):
             installed.append(name)
     if not installed:
         module.exit_json(changed=False, msg="package(s) already removed")
     names = installed
     if module.check_mode:
-        cmd = APK_PATH + ["del", "--purge", "--simulate"] + names
+        cmd = apk_path + ["del", "--purge", "--simulate"] + names
     else:
-        cmd = APK_PATH + ["del", "--purge"] + names
+        cmd = apk_path + ["del", "--purge"] + names
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     packagelist = parse_for_packages(stdout)
     # Check to see if packages are still present because of dependencies
     for name in installed:
-        if query_package(module, name):
+        if query_package(module, apk_path, name):
             rc = 1
             break
     if rc != 0:
@@ -351,8 +351,7 @@ def main():
     # Set LANG env since we parse stdout
     module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
-    global APK_PATH
-    APK_PATH = [module.get_bin_path("apk", required=True)]
+    apk_path = [module.get_bin_path("apk", required=True)]
 
     p = module.params
 
@@ -360,12 +359,12 @@ def main():
         module.fail_json(msg="Package name(s) cannot be empty or whitespace-only")
 
     if p["no_cache"]:
-        APK_PATH.append("--no-cache")
+        apk_path.append("--no-cache")
 
-    # add repositories to the APK_PATH
+    # add repositories to the apk_path
     if p["repository"]:
         for r in p["repository"]:
-            APK_PATH.extend(["--repository", r, "--repositories-file", "/dev/null"])
+            apk_path.extend(["--repository", r, "--repositories-file", "/dev/null"])
 
     # normalize the state parameter
     if p["state"] in ["present", "installed"]:
@@ -374,15 +373,15 @@ def main():
         p["state"] = "absent"
 
     if p["update_cache"]:
-        update_package_db(module, not p["name"] and not p["upgrade"])
+        update_package_db(module, apk_path, not p["name"] and not p["upgrade"])
 
     if p["upgrade"]:
-        upgrade_packages(module, p["available"])
+        upgrade_packages(module, apk_path, p["available"])
 
     if p["state"] in ["present", "latest"]:
-        install_packages(module, p["name"], p["state"], p["world"])
+        install_packages(module, apk_path, p["name"], p["state"], p["world"])
     elif p["state"] == "absent":
-        remove_packages(module, p["name"])
+        remove_packages(module, apk_path, p["name"])
 
 
 if __name__ == "__main__":
