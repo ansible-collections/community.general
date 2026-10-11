@@ -1,0 +1,2 @@
+bugfixes:
+  - "terraform - report ``changed=true`` for ``state=planned`` when pending changes are detected in the generated plan, even when diff mode is disabled (https://github.com/ansible-collections/community.general/issues/12558)."
