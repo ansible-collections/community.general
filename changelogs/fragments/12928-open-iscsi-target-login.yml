@@ -1,0 +1,2 @@
+bugfixes:
+  - open_iscsi - fix login to a single target ignoring login failures and the ``portal`` option (https://github.com/ansible-collections/community.general/pull/12928).
