@@ -341,12 +341,11 @@ class Zpool:
 
         vdevs = []
         current = None
+        role = None
         in_config = False
 
         def flush_current(current):
             if current:
-                if current.get("role") is None:
-                    current.pop("role", None)
                 vdevs.append(current)
             return None
 
@@ -368,35 +367,28 @@ class Zpool:
             if device in ("logs", "cache", "spares", "special", "dedup"):
                 current = flush_current(current)
                 role = "spare" if device == "spares" else device.rstrip("s")
-                current = {"role": role, "type": None, "disks": []}
                 continue
 
             match_group = re.match(r"^(mirror|raidz\d?)-\d+$", device)
             if match_group:
-                if current and current.get("type") is not None:
-                    current = flush_current(current)
-                kind = match_group.group(1)
-                role = current.get("role") if current and current.get("type") is None else None
-                current = {"role": role, "type": kind, "disks": []}
+                current = flush_current(current)
+                current = {"type": match_group.group(1), "disks": []}
+                if role:
+                    current["role"] = role
                 continue
 
             if device.startswith("/"):
                 base_device = self.base_device(device)
                 if current:
-                    if current.get("type") is None:
-                        entry = {"type": "stripe", "disks": [base_device]}
-                        if current.get("role"):
-                            entry["role"] = current["role"]
-                        vdevs.append(entry)
-                        current = None
-                    else:
-                        current["disks"].append(base_device)
+                    current["disks"].append(base_device)
                 else:
-                    vdevs.append({"type": "stripe", "disks": [base_device]})
+                    entry = {"type": "stripe", "disks": [base_device]}
+                    if role:
+                        entry["role"] = role
+                    vdevs.append(entry)
                 continue
 
-        if current and current.get("type") is not None:
-            current = flush_current(current)
+        flush_current(current)
 
         return vdevs
 
