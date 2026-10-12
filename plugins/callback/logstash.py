@@ -78,6 +78,7 @@ options:
       Password for HTTP Basic authentication. This option is used only with C(protocol=http) or C(protocol=https),
       and must be set together with C(username). Use HTTPS to protect credentials and events in transit.
     type: str
+    secret: true
     env:
       - name: LOGSTASH_PASSWORD
     ini:
