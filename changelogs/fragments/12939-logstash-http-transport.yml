@@ -1,0 +1,2 @@
+minor_changes:
+  - logstash callback plugin - add support for sending events over HTTP(S), with Basic authentication and TLS client certificate options (https://github.com/ansible-collections/community.general/issues/12897, https://github.com/ansible-collections/community.general/pull/12939).
