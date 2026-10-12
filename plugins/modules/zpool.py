@@ -392,19 +392,29 @@ class Zpool:
 
         return vdevs
 
-    def normalize_vdevs(self, vdevs):
-        alias = {"raidz": "raidz1"}
-        normalized = []
+    def split_stripes(self, vdevs):
+        split = []
         for vdev in vdevs:
-            normalized_type = alias.get(vdev.get("type", "stripe"), vdev.get("type", "stripe"))
-            entry = {
-                "type": normalized_type,
-                "disks": sorted(vdev["disks"]),
-            }
-            role = vdev.get("role")
-            if role is not None:
-                entry["role"] = role
-            normalized.append(entry)
+            if vdev.get("type", "stripe") == "stripe":
+                split.extend(dict(vdev, disks=[disk]) for disk in vdev["disks"])
+            else:
+                split.append(vdev)
+        return split
+
+    def normalize_vdev(self, vdev):
+        alias = {"raidz": "raidz1"}
+        vdev_type = vdev.get("type", "stripe")
+        entry = {
+            "type": alias.get(vdev_type, vdev_type),
+            "disks": sorted(vdev["disks"]),
+        }
+        role = vdev.get("role")
+        if role is not None:
+            entry["role"] = role
+        return entry
+
+    def normalize_vdevs(self, vdevs):
+        normalized = [self.normalize_vdev(vdev) for vdev in self.split_stripes(vdevs)]
         return sorted(normalized, key=lambda x: (x.get("role", ""), x["type"], x["disks"]))
 
     def diff_layout(self):
@@ -426,9 +436,8 @@ class Zpool:
 
         diff = self.diff_layout()
         before_vdevs = diff["before"]["vdevs"]
-        after_vdevs = diff["after"]["vdevs"]
 
-        to_add = [vdev for vdev in after_vdevs if vdev not in before_vdevs]
+        to_add = [vdev for vdev in self.split_stripes(self.vdevs) if self.normalize_vdev(vdev) not in before_vdevs]
         if not to_add:
             return {}
 
