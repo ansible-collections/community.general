@@ -32,6 +32,9 @@ options:
   project_path:
     description:
       - The path to the root of the Terraform directory with the C(vars.tf)/C(main.tf)/etc to use.
+      - Since community.general 14.0.0, relative paths without a C(/), such as V(myproject), are accepted.
+      - A relative path is resolved against the current working directory of the module on the target host, which might not
+        be the directory you expect. Use an absolute path when in doubt.
     type: path
     required: true
   plugin_paths:
@@ -294,7 +297,7 @@ def get_version(module, bin_path):
 
 
 def preflight_validation(module, bin_path, project_path, version, variables_args=None, plan_file=None, no_color=True):
-    if project_path is None or "/" not in project_path:
+    if not project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
         module.fail_json(
@@ -531,6 +534,9 @@ def main():
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
     project_path = module.params.get("project_path")
+    if project_path:
+        # Resolve relative paths so error messages and the cwd of every terraform call point at the same location.
+        project_path = os.path.abspath(project_path)
     bin_path = module.params.get("binary_path")
     plugin_paths = module.params.get("plugin_paths")
     workspace = module.params.get("workspace")
