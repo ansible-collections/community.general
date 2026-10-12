@@ -17,7 +17,7 @@ requirements:
   - logstash (Python library)
 options:
   server:
-    description: Address of the Logstash server. Used with all C(protocol) choices.
+    description: Address of the Logstash server. Used with all O(protocol) choices.
     type: str
     env:
       - name: LOGSTASH_SERVER
