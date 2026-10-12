@@ -212,7 +212,7 @@ def test_http_protocol_configures_basic_auth_and_tls():
         "client_cert": "/etc/pki/client.pem",
         "client_key": "/etc/pki/client.key",
         "timeout": 4,
-        "retries": 1,
+        "retries": 10,
         "type": "ansible",
         "pre_command": None,
         "format_version": "v1",
@@ -230,7 +230,8 @@ def test_http_protocol_configures_basic_auth_and_tls():
     assert handler.client_cert == "/etc/pki/client.pem"
     assert handler.client_key == "/etc/pki/client.key"
     assert handler.timeout == 4
-    assert handler.retries == 1
+    # retries is not restricted to a fixed set of choices, higher values are accepted
+    assert handler.retries == 10
     formatter_class.assert_called_once_with(message_type="ansible")
     logstash_mock.TCPLogstashHandler.assert_not_called()
     assert callback.disabled is False
@@ -331,6 +332,33 @@ def test_http_protocol_rejects_non_positive_timeout():
         "client_key": None,
         "timeout": 0,
         "retries": 3,
+        "type": "ansible",
+        "pre_command": None,
+        "format_version": "v1",
+    }
+
+    callback, logger, logstash_mock, formatter_class = _configure_callback(options)
+
+    assert callback.disabled is True
+    logger.addHandler.assert_not_called()
+    logstash_mock.TCPLogstashHandler.assert_not_called()
+    formatter_class.assert_not_called()
+
+
+def test_http_protocol_rejects_negative_retries():
+    options = {
+        "server": "logstash.example.com",
+        "port": 8080,
+        "protocol": "https",
+        "http_path": "/",
+        "username": None,
+        "password": None,
+        "validate_certs": True,
+        "ca_path": None,
+        "client_cert": None,
+        "client_key": None,
+        "timeout": 10,
+        "retries": -1,
         "type": "ansible",
         "pre_command": None,
         "format_version": "v1",

@@ -134,10 +134,11 @@ options:
         key: timeout
     version_added: '14.0.0'
   retries:
-    description: Number of retries for HTTP 429 responses. This option is used only with C(protocol=http) or C(protocol=https).
+    description: >-
+      Number of retries for HTTP 429 (Too Many Requests) responses. Uses exponential backoff with jitter between attempts. This
+      option is used only with C(protocol=http) or C(protocol=https).
     type: int
     default: 3
-    choices: [0, 1, 2, 3, 4, 5]
     env:
       - name: LOGSTASH_RETRIES
     ini:
@@ -431,6 +432,9 @@ class CallbackModule(CallbackBase):
             if self.ls_timeout <= 0:
                 self.disabled = True
                 self._display.warning("Logstash HTTP timeout must be greater than zero.")
+            if self.ls_retries < 0:
+                self.disabled = True
+                self._display.warning("Logstash HTTP retries must be zero or greater.")
             if self.ls_protocol != "https" and (self.ls_ca_path or self.ls_client_cert or self.ls_client_key):
                 self.disabled = True
                 self._display.warning("Logstash TLS certificate options can only be used with HTTPS.")
