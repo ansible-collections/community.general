@@ -22,9 +22,6 @@ if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
 
 
-VXOS_VERSION = None
-
-
 def get_version(iocs_json) -> tuple[int, ...]:
     if not iocs_json:
         raise Exception("Invalid IOC json")
@@ -41,7 +38,6 @@ def get_version(iocs_json) -> tuple[int, ...]:
 
 def get_array(module: AnsibleModule):
     """Return storage array object or fail"""
-    global VXOS_VERSION
     array = module.params["array"]
     user = module.params.get("user", None)
     password = module.params.get("password", None)
@@ -60,7 +56,7 @@ def get_array(module: AnsibleModule):
         )
     try:
         if system.test_connection():
-            VXOS_VERSION = get_version(system.iocs())
+            get_version(system.iocs())
             return system
         else:
             module.fail_json(msg="Test connection to array failed.")
