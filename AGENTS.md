@@ -28,6 +28,10 @@
   - New module or plugin: set `version_added` at the top level of `DOCUMENTATION`.
   - New option or suboption in an existing module or plugin: set `version_added` in that option's documentation.
     Options that come together with a new module or plugin do not need it.
+  - New option or suboption in a doc fragment: do not set `version_added` in the doc fragment itself.
+    Instead, in each module or plugin using the fragment that existed before that version, add only
+    `version_added` for that option under `options` (see the `token` option in `consul_session.py`).
+    Keys set there replace the same keys from the fragment, all other keys are kept.
   - New choice value or new alias for an existing option: there is no `version_added` field for these,
     so add a paragraph to the option's `description` instead, for example:
     ```yaml
