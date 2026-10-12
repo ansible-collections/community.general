@@ -489,7 +489,7 @@ def main():
                     result["devicenodes"] = target_device_node(target)
             elif not check:
                 if login:
-                    target_login(module, target, portal, port)
+                    target_login(module, target, check_rc, portal, port)
                     # give udev some time
                     time.sleep(1)
                     result["devicenodes"] = target_device_node(target)
