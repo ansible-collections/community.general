@@ -530,6 +530,8 @@ files:
     maintainers: russoz
   $module_utils/_systemd.py:
     maintainers: NomakCooper
+  $module_utils/_typing.py:
+    maintainers: felixfontein
   $module_utils/_utm_utils.py:
     labels: utm_utils
     maintainers: $team_e_spirit
