@@ -132,8 +132,8 @@ PACKET_API_TOKEN_ENV_VAR = "PACKET_API_TOKEN"
 
 def act_on_project(target_state, module, packet_conn):
     result_dict = {"changed": False}
-    given_id = module.params.get("id")
-    given_name = module.params.get("name")
+    given_id = module.params["id"]
+    given_name = module.params["name"]
     if given_id:
         matching_projects = [p for p in packet_conn.list_projects() if given_id == p.id]
     else:
@@ -141,9 +141,9 @@ def act_on_project(target_state, module, packet_conn):
 
     if target_state == "present":
         if len(matching_projects) == 0:
-            org_id = module.params.get("org_id")
-            custom_data = module.params.get("custom_data")
-            payment_method = module.params.get("payment_method")
+            org_id = module.params["org_id"]
+            custom_data = module.params["custom_data"]
+            payment_method = module.params["payment_method"]
 
             if not org_id:
                 params = {"name": given_name, "payment_method_id": payment_method, "customdata": custom_data}
@@ -202,15 +202,15 @@ def main():
     if not HAS_PACKET_SDK:
         module.fail_json(msg="packet required for this module")
 
-    if not module.params.get("auth_token"):
+    if not module.params["auth_token"]:
         _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
-    auth_token = module.params.get("auth_token")
+    auth_token = module.params["auth_token"]
 
     packet_conn = packet.Manager(auth_token=auth_token)
 
-    state = module.params.get("state")
+    state = module.params["state"]
 
     if state in ["present", "absent"]:
         if module.check_mode:

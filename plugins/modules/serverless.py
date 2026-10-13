@@ -131,7 +131,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def read_serverless_config(module):
-    path = module.params.get("service_path")
+    path = module.params["service_path"]
     full_path = os.path.join(path, "serverless.yml")
 
     try:
@@ -170,14 +170,14 @@ def main():
     if not HAS_YAML:
         module.fail_json(msg="yaml is required for this module")
 
-    service_path = module.params.get("service_path")
-    state = module.params.get("state")
-    region = module.params.get("region")
-    stage = module.params.get("stage")
-    deploy = module.params.get("deploy", True)
-    force = module.params.get("force", False)
-    verbose = module.params.get("verbose", False)
-    serverless_bin_path = module.params.get("serverless_bin_path")
+    service_path = module.params["service_path"]
+    state = module.params["state"]
+    region = module.params["region"]
+    stage = module.params["stage"]
+    deploy = module.params["deploy"]
+    force = module.params["force"]
+    verbose = module.params["verbose"]
+    serverless_bin_path = module.params["serverless_bin_path"]
 
     if serverless_bin_path is not None:
         command = f"{serverless_bin_path} "
