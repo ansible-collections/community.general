@@ -78,10 +78,10 @@ class EjabberdUser:
 
     def __init__(self, module):
         self.module = module
-        self.state = module.params.get("state")
-        self.host = module.params.get("host")
-        self.user = module.params.get("username")
-        self.pwd = module.params.get("password")
+        self.state = module.params["state"]
+        self.host = module.params["host"]
+        self.user = module.params["username"]
+        self.pwd = module.params["password"]
         self.runner = CmdRunner(
             module,
             command="ejabberdctl",

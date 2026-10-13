@@ -120,9 +120,9 @@ def main():
     # required args
     mapping = False
     try:
-        mapped_hosts = xcli_client.cmd.vol_mapping_list(vol=module.params.get("vol")).as_list
+        mapped_hosts = xcli_client.cmd.vol_mapping_list(vol=module.params["vol"]).as_list
         for host in mapped_hosts:
-            if host["host"] == module.params.get("host", ""):
+            if host["host"] == module.params["host"]:
                 mapping = True
     except Exception:
         pass

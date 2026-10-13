@@ -134,7 +134,7 @@ def main():
     try:
         github_conn = github.Github(
             module.params["user"],
-            module.params.get("password") or module.params.get("token"),
+            module.params["password"] or module.params["token"],
             base_url=module.params["github_url"],
         )
     except github.GithubException as err:

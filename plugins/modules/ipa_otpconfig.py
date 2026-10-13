@@ -118,10 +118,10 @@ def get_otpconfig_diff(client, ipa_config, module_config):
 
 def ensure(module, client):
     module_otpconfig = get_otpconfig_dict(
-        ipatokentotpauthwindow=module.params.get("ipatokentotpauthwindow"),
-        ipatokentotpsyncwindow=module.params.get("ipatokentotpsyncwindow"),
-        ipatokenhotpauthwindow=module.params.get("ipatokenhotpauthwindow"),
-        ipatokenhotpsyncwindow=module.params.get("ipatokenhotpsyncwindow"),
+        ipatokentotpauthwindow=module.params["ipatokentotpauthwindow"],
+        ipatokentotpsyncwindow=module.params["ipatokentotpsyncwindow"],
+        ipatokenhotpauthwindow=module.params["ipatokenhotpauthwindow"],
+        ipatokenhotpsyncwindow=module.params["ipatokenhotpsyncwindow"],
     )
     ipa_otpconfig = client.otpconfig_show()
     diff = get_otpconfig_diff(client, ipa_otpconfig, module_otpconfig)

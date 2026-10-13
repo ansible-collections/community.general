@@ -177,7 +177,7 @@ def main():
 
     try:
         resource = None
-        if module.params.get("id"):
+        if module.params["id"]:
             resource = read_resource(config)
             if module.params["state"] == "present":
                 check_resource_option(resource, module)
@@ -215,10 +215,10 @@ def main():
 
 def user_input_parameters(module):
     return {
-        "enterprise_project_id": module.params.get("enterprise_project_id"),
-        "name": module.params.get("name"),
-        "vpc_id": module.params.get("vpc_id"),
-        "id": module.params.get("id"),
+        "enterprise_project_id": module.params["enterprise_project_id"],
+        "name": module.params["name"],
+        "vpc_id": module.params["vpc_id"],
+        "id": module.params["id"],
     }
 
 

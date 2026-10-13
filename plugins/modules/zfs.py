@@ -196,7 +196,7 @@ class Zfs:
             self.changed = True
             return
         extra_zfs_properties = self.extra_zfs_properties
-        origin = self.module.params.get("origin")
+        origin = self.module.params["origin"]
         cmd = [self.zfs_cmd]
 
         if "@" in self.name:
@@ -335,10 +335,10 @@ def main():
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    state = module.params.get("state")
-    name = module.params.get("name")
+    state = module.params["state"]
+    name = module.params["name"]
 
-    if module.params.get("origin") and "@" in name:
+    if module.params["origin"] and "@" in name:
         module.fail_json(msg="cannot specify origin when operating on a snapshot")
 
     # Reverse the boolification of zfs properties

@@ -204,7 +204,7 @@ def main():
                 changed = True
 
             result = read_resource(config)
-            result["id"] = module.params.get("id")
+            result["id"] = module.params["id"]
         else:
             if resource:
                 if not module.check_mode:
@@ -221,10 +221,10 @@ def main():
 
 def user_input_parameters(module):
     return {
-        "description": module.params.get("description"),
-        "local_vpc_id": module.params.get("local_vpc_id"),
-        "name": module.params.get("name"),
-        "peering_vpc": module.params.get("peering_vpc"),
+        "description": module.params["description"],
+        "local_vpc_id": module.params["local_vpc_id"],
+        "name": module.params["name"],
+        "peering_vpc": module.params["peering_vpc"],
     }
 
 

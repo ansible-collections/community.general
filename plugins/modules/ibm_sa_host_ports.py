@@ -104,15 +104,15 @@ def main():
     # required args
     ports = []
     try:
-        ports = xcli_client.cmd.host_list_ports(host=module.params.get("host")).as_list
+        ports = xcli_client.cmd.host_list_ports(host=module.params["host"]).as_list
     except Exception:
         pass
     state = module.params["state"]
     port_exists = False
     ports = [port.get("port_name") for port in ports]
 
-    fc_ports = module.params.get("fcaddress") if module.params.get("fcaddress") else []
-    iscsi_ports = module.params.get("iscsi_name") if module.params.get("iscsi_name") else []
+    fc_ports = module.params["fcaddress"] if module.params["fcaddress"] else []
+    iscsi_ports = module.params["iscsi_name"] if module.params["iscsi_name"] else []
     for port in ports:
         if port in iscsi_ports or port in fc_ports:
             port_exists = True

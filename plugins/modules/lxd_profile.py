@@ -238,12 +238,12 @@ class LXDProfileManagement:
         self.project = self.module.params["project"]
         self._build_config()
         self.state = self.module.params["state"]
-        self.new_name = self.module.params.get("new_name", None)
+        self.new_name = self.module.params["new_name"]
 
-        self.key_file = self.module.params.get("client_key")
+        self.key_file = self.module.params["client_key"]
         if self.key_file is None:
             self.key_file = f"{os.environ['HOME']}/.config/lxc/client.key"
-        self.cert_file = self.module.params.get("client_cert")
+        self.cert_file = self.module.params["client_cert"]
         if self.cert_file is None:
             self.cert_file = f"{os.environ['HOME']}/.config/lxc/client.crt"
         self.debug = self.module._verbosity >= 4
@@ -262,13 +262,13 @@ class LXDProfileManagement:
             self.client = LXDClient(self.url, key_file=self.key_file, cert_file=self.cert_file, debug=self.debug)
         except LXDClientException as e:
             self.module.fail_json(msg=e.msg)
-        self.trust_password = self.module.params.get("trust_password", None)
+        self.trust_password = self.module.params["trust_password"]
         self.actions = []
 
     def _build_config(self):
         self.config = {}
         for attr in CONFIG_PARAMS:
-            param_val = self.module.params.get(attr, None)
+            param_val = self.module.params[attr]
             if param_val is not None:
                 self.config[attr] = param_val
 

@@ -80,12 +80,12 @@ def send_msg(module):
     failed = list()
     responses = dict()
     msg = {
-        "api_key": module.params.get("api_key"),
-        "api_secret": module.params.get("api_secret"),
-        "from": module.params.get("src"),
-        "text": module.params.get("msg"),
+        "api_key": module.params["api_key"],
+        "api_secret": module.params["api_secret"],
+        "from": module.params["src"],
+        "text": module.params["msg"],
     }
-    for number in module.params.get("dest"):
+    for number in module.params["dest"]:
         msg["to"] = number
         url = f"{NEXMO_API}?{urlencode(msg)}"
 

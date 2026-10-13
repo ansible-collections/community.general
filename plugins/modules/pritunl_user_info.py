@@ -101,9 +101,9 @@ from ansible_collections.community.general.plugins.module_utils._pritunl_api imp
 
 
 def get_pritunl_user(module):
-    user_name = module.params.get("user_name")
-    user_type = module.params.get("user_type")
-    org_name = module.params.get("organization")
+    user_name = module.params["user_name"]
+    user_type = module.params["user_type"]
+    org_name = module.params["organization"]
 
     org_obj_list = []
 
