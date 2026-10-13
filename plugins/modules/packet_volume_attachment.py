@@ -201,11 +201,11 @@ def get_attached_dev_ids(volume_dict):
 
 def act_on_volume_attachment(target_state, module, packet_conn):
     return_dict = {"changed": False}
-    volspec = module.params.get("volume")
-    devspec = module.params.get("device")
+    volspec = module.params["volume"]
+    devspec = module.params["device"]
     if devspec is None and target_state == "present":
         raise Exception("If you want to attach a volume, you must specify a device.")
-    project_id = module.params.get("project_id")
+    project_id = module.params["project_id"]
     volumes_api_method = f"projects/{project_id}/storage"
     volumes = packet_conn.call_api(volumes_api_method, params={"include": "facility,attachments.device"})["volumes"]
     v_match = get_volume_selector(volspec)
@@ -261,15 +261,15 @@ def main():
     if not HAS_PACKET_SDK:
         module.fail_json(msg="packet required for this module")
 
-    if not module.params.get("auth_token"):
+    if not module.params["auth_token"]:
         _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
-    auth_token = module.params.get("auth_token")
+    auth_token = module.params["auth_token"]
 
     packet_conn = packet.Manager(auth_token=auth_token)
 
-    state = module.params.get("state")
+    state = module.params["state"]
 
     if state in STATES:
         if module.check_mode:

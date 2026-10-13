@@ -191,12 +191,12 @@ class GithubDeployKey:
         self.name = module.params["name"]
         self.key = module.params["key"]
         self.state = module.params["state"]
-        self.read_only = module.params.get("read_only", True)
-        self.force = module.params.get("force", False)
-        self.username = module.params.get("username", None)
-        self.password = module.params.get("password", None)
-        self.token = module.params.get("token", None)
-        self.otp = module.params.get("otp", None)
+        self.read_only = module.params["read_only"]
+        self.force = module.params["force"]
+        self.username = module.params["username"]
+        self.password = module.params["password"]
+        self.token = module.params["token"]
+        self.otp = module.params["otp"]
 
     @property
     def url(self):

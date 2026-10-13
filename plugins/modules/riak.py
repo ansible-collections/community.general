@@ -108,12 +108,12 @@ def main():
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    command = module.params.get("command")
-    http_conn = module.params.get("http_conn")
-    target_node = module.params.get("target_node")
-    wait_for_handoffs = module.params.get("wait_for_handoffs")
-    wait_for_ring = module.params.get("wait_for_ring")
-    wait_for_service = module.params.get("wait_for_service")
+    command = module.params["command"]
+    http_conn = module.params["http_conn"]
+    target_node = module.params["target_node"]
+    wait_for_handoffs = module.params["wait_for_handoffs"]
+    wait_for_ring = module.params["wait_for_ring"]
+    wait_for_service = module.params["wait_for_service"]
 
     # make sure riak commands are on the path
     riak_bin = module.get_bin_path("riak")

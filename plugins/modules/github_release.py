@@ -159,12 +159,12 @@ def main():
     password = module.params["password"]
     login_token = module.params["token"]
     action = module.params["action"]
-    tag = module.params.get("tag")
-    target = module.params.get("target")
-    name = module.params.get("name")
-    body = module.params.get("body")
-    draft = module.params.get("draft")
-    prerelease = module.params.get("prerelease")
+    tag = module.params["tag"]
+    target = module.params["target"]
+    name = module.params["name"]
+    body = module.params["body"]
+    draft = module.params["draft"]
+    prerelease = module.params["prerelease"]
 
     # login to github
     try:

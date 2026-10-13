@@ -311,20 +311,20 @@ def main():
     if not HAS_PYCDLIB:
         module.fail_json(missing_required_lib("pycdlib"), exception=PYCDLIB_IMP_ERR)
 
-    src_file_list = module.params.get("src_files")
+    src_file_list = module.params["src_files"]
     if src_file_list and len(src_file_list) == 0:
         module.fail_json(msg="Please specify source file and/or directory list using src_files parameter.")
     for src_file in src_file_list:
         if not os.path.exists(src_file):
             module.fail_json(msg=f"Specified source file/directory path does not exist on local machine, {src_file}")
 
-    boot_options = module.params.get("boot_options")
+    boot_options = module.params["boot_options"]
     if boot_options:
         boot_file = boot_options["boot_file"]
         if not os.path.exists(boot_file):
             module.fail_json(msg=f"Specified boot file path does not exist on local machine, {boot_file}")
 
-    dest_iso = module.params.get("dest_iso")
+    dest_iso = module.params["dest_iso"]
     if dest_iso and len(dest_iso) == 0:
         module.fail_json(msg="Please specify the absolute path of the new created ISO file using dest_iso parameter.")
 
@@ -336,12 +336,12 @@ def main():
         except OSError as err:
             module.fail_json(msg=f"Exception caught when creating folder {dest_iso_dir}, with error {err}")
 
-    volume_id = module.params.get("vol_ident")
+    volume_id = module.params["vol_ident"]
     if volume_id is None:
         volume_id = ""
-    inter_level = module.params.get("interchange_level")
-    rock_ridge = module.params.get("rock_ridge")
-    use_joliet = module.params.get("joliet")
+    inter_level = module.params["interchange_level"]
+    rock_ridge = module.params["rock_ridge"]
+    use_joliet = module.params["joliet"]
     use_udf = None
     if module.params["udf"]:
         use_udf = "2.60"
