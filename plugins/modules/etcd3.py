@@ -180,7 +180,7 @@ def run_module():
     if module.params["ca_cert"] is None and module.params["client_cert"] is not None:
         module.fail_json(msg="The 'ca_cert' parameter must be defined when 'client_cert' and 'client_key' are present.")
 
-    result["key"] = module.params.get("key")
+    result["key"] = module.params["key"]
     module.params["cert_cert"] = module.params.pop("client_cert")
     module.params["cert_key"] = module.params.pop("client_key")
 

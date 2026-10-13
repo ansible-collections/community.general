@@ -198,7 +198,7 @@ def check_image_id(compute_api, image_id):
     response = compute_api.get(path=f"images/{image_id}")
 
     if not response.ok:
-        msg = f"Error in getting image {image_id} on {compute_api.module.params.get('api_url')} : {response.json}"
+        msg = f"Error in getting image {image_id} on {compute_api.module.params['api_url']} : {response.json}"
         compute_api.module.fail_json(msg=msg)
 
 

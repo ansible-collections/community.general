@@ -689,7 +689,7 @@ def main():
         changed = False
         msg = get_slack_message(module, domain, token, channel, message_id)
         for key in ("icon_url", "icon_emoji", "link_names", "color", "attachments", "blocks"):
-            if msg.get(key) != module.params.get(key):
+            if msg.get(key) != module.params[key]:
                 changed = True
                 break
         # if check mode is active, we shouldn't do anything regardless.

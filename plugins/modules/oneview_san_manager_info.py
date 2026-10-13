@@ -99,7 +99,7 @@ class SanManagerInfoModule(OneViewModuleBase):
         self.resource_client = self.oneview_client.san_managers
 
     def execute_module(self):
-        if self.module.params.get("provider_display_name"):
+        if self.module.params["provider_display_name"]:
             provider_display_name = self.module.params["provider_display_name"]
             san_manager = self.oneview_client.san_managers.get_by_provider_display_name(provider_display_name)
             if san_manager:

@@ -98,7 +98,7 @@ def main():
 
     xcli_client = connect_ssl(module)
     # required args
-    volume = xcli_client.cmd.vol_list(vol=module.params.get("vol")).as_single_element
+    volume = xcli_client.cmd.vol_list(vol=module.params["vol"]).as_single_element
     state = module.params["state"]
 
     state_changed = False

@@ -87,7 +87,7 @@ def main():
     )
 
     influx = AnsibleInfluxDBWrite(module)
-    data_points = module.params.get("data_points")
+    data_points = module.params["data_points"]
     influx.write_data_point(data_points)
     module.exit_json(changed=True)
 

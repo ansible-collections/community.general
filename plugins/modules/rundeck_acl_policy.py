@@ -127,7 +127,7 @@ from ansible_collections.community.general.plugins.module_utils._rundeck import 
 class RundeckACLManager:
     def __init__(self, module):
         self.module = module
-        if module.params.get("project"):
+        if module.params["project"]:
             self.endpoint = f"project/{self.module.params['project']}/acl/{self.module.params['name']}.aclpolicy"
         else:
             self.endpoint = f"system/acl/{self.module.params['name']}.aclpolicy"

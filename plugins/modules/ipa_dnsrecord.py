@@ -338,7 +338,7 @@ def get_dnsrecord_diff(client, ipa_dnsrecord, module_dnsrecord):
 def ensure(module, client):
     zone_name = module.params["zone_name"]
     record_name = module.params["record_name"]
-    record_ttl = module.params.get("record_ttl")
+    record_ttl = module.params["record_ttl"]
     state = module.params["state"]
     exclusive = module.params["exclusive"]
 

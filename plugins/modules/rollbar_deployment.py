@@ -118,7 +118,7 @@ def main():
     if module.params["comment"]:
         params["comment"] = module.params["comment"]
 
-    url = module.params.get("url")
+    url = module.params["url"]
 
     try:
         data = urlencode(params)

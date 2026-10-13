@@ -89,7 +89,7 @@ def main():
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     influx = AnsibleInfluxDBRead(module)
-    query = module.params.get("query")
+    query = module.params["query"]
     results = influx.read_by_query(query)
     module.exit_json(changed=True, query_results=results)
 

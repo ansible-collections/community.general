@@ -176,7 +176,7 @@ def main():
             module.fail_json(msg=f"Invalid Command '{cmd}'. Valid Commands = {CATEGORY_COMMANDS_ALL[category]}")
 
     # Build root URI(s)
-    if module.params.get("baseuri") is not None:
+    if module.params["baseuri"] is not None:
         root_uris = [f"https://{module.params['baseuri']}"]
     else:
         root_uris = [f"https://{iom}" for iom in module.params["ioms"]]
