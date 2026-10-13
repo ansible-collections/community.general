@@ -1,0 +1,57 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Prepares the system to use ZFS and creates file-backed block devices
+# (loop devices on Linux, memory disks on FreeBSD) for the tests.
+# On supported platforms, has_zfs is set to true and the device paths
+# are returned in the setup_zfs_devices fact.
+
+- name: Make sure we have the distribution facts
+  ansible.builtin.setup:
+    gather_subset: distribution
+  when: ansible_facts.distribution is not defined
+
+- name: Check whether ZFS is supported on this platform
+  ansible.builtin.set_fact:
+    has_zfs: "{{ ansible_facts.distribution in ['Ubuntu', 'FreeBSD'] }}"
+
+- name: Prepare ZFS and the test devices
+  when: has_zfs
+  block:
+    - name: Load distribution specific variables
+      ansible.builtin.include_vars: "{{ ansible_facts.distribution }}.yml"
+
+    - name: Include distribution specific tasks
+      ansible.builtin.include_tasks: "{{ ansible_facts.distribution }}.yml"
+
+    - name: Create directory for the backing files
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: .zfs
+      register: setup_zfs_tmp_dir
+      notify: Remove ZFS backing files
+
+    - name: Create backing files
+      community.general.filesize:
+        path: "{{ setup_zfs_tmp_dir.path }}/disk{{ item }}.img"
+        size: "{{ setup_zfs_device_size }}"
+        sparse: true
+      loop: "{{ range(setup_zfs_device_count | int) | list }}"
+
+    - name: Attach backing files as block devices
+      ansible.builtin.command:
+        cmd: "{{ setup_zfs_attach_cmd }} {{ setup_zfs_tmp_dir.path }}/disk{{ item }}.img"
+      loop: "{{ range(setup_zfs_device_count | int) | list }}"
+      register: setup_zfs_attach
+      notify: Detach ZFS devices
+
+    - name: Record the devices available for the tests
+      ansible.builtin.set_fact:
+        setup_zfs_devices: "{{ setup_zfs_attach.results | map(attribute='stdout') | map('regex_replace', '^(?!/)', '/dev/') | list }}"
