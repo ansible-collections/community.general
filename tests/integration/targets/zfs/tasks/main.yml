@@ -1,0 +1,162 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Run tests on a scratch pool
+  when: has_zfs
+  block:
+    - name: Create the test pool
+      ansible.builtin.command:
+        cmd: "zpool create -f -m none {{ zfs_pool }} {{ setup_zfs_devices[0] }}"
+
+    - name: Create a filesystem (check mode)
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs"
+        state: present
+        extra_zfs_properties:
+          compression: lz4
+      check_mode: true
+      register: fs_create_check
+
+    - name: List datasets after check mode
+      ansible.builtin.command:
+        cmd: "zfs list -H -o name -t all -r {{ zfs_pool }}"
+      register: fs_list_check
+      changed_when: false
+
+    - name: Create a filesystem
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs"
+        state: present
+        extra_zfs_properties:
+          compression: lz4
+      register: fs_create
+
+    - name: Create a filesystem (idempotency)
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs"
+        state: present
+        extra_zfs_properties:
+          compression: lz4
+      register: fs_create_again
+
+    - name: Get the filesystem compression
+      ansible.builtin.command:
+        cmd: "zfs get -H -o value compression {{ zfs_pool }}/fs"
+      register: fs_compression
+      changed_when: false
+
+    - name: Assert filesystem creation
+      ansible.builtin.assert:
+        that:
+          - fs_create_check is changed
+          - (zfs_pool ~ '/fs') not in fs_list_check.stdout_lines
+          - fs_create is changed
+          - fs_create_again is not changed
+          - fs_compression.stdout == 'lz4'
+
+    - name: Change a filesystem property
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs"
+        state: present
+        extra_zfs_properties:
+          compression: "off"
+      register: fs_change
+
+    - name: Change a filesystem property (idempotency)
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs"
+        state: present
+        extra_zfs_properties:
+          compression: "off"
+      register: fs_change_again
+
+    - name: Get the filesystem compression
+      ansible.builtin.command:
+        cmd: "zfs get -H -o value compression {{ zfs_pool }}/fs"
+      register: fs_compression
+      changed_when: false
+
+    - name: Assert property change
+      ansible.builtin.assert:
+        that:
+          - fs_change is changed
+          - fs_change_again is not changed
+          - fs_compression.stdout == 'off'
+
+    - name: Create a snapshot
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs@snap"
+        state: present
+      register: snap_create
+
+    - name: Create a snapshot (idempotency)
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs@snap"
+        state: present
+      register: snap_create_again
+
+    - name: Clone the snapshot
+      community.general.zfs:
+        name: "{{ zfs_pool }}/clone"
+        state: present
+        origin: "{{ zfs_pool }}/fs@snap"
+      register: clone_create
+
+    - name: Clone the snapshot (idempotency)
+      community.general.zfs:
+        name: "{{ zfs_pool }}/clone"
+        state: present
+        origin: "{{ zfs_pool }}/fs@snap"
+      register: clone_create_again
+
+    - name: Get the clone origin
+      ansible.builtin.command:
+        cmd: "zfs get -H -o value origin {{ zfs_pool }}/clone"
+      register: clone_origin
+      changed_when: false
+
+    - name: Assert snapshot and clone creation
+      ansible.builtin.assert:
+        that:
+          - snap_create is changed
+          - snap_create_again is not changed
+          - clone_create is changed
+          - clone_create_again is not changed
+          - clone_origin.stdout == (zfs_pool ~ '/fs@snap')
+
+    - name: Destroy the filesystem, its snapshot and the clone
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs"
+        state: absent
+      register: fs_destroy
+
+    - name: Destroy the filesystem (idempotency)
+      community.general.zfs:
+        name: "{{ zfs_pool }}/fs"
+        state: absent
+      register: fs_destroy_again
+
+    - name: List datasets after destroy
+      ansible.builtin.command:
+        cmd: "zfs list -H -o name -t all -r {{ zfs_pool }}"
+      register: fs_list_destroy
+      changed_when: false
+
+    - name: Assert filesystem destruction
+      ansible.builtin.assert:
+        that:
+          - fs_destroy is changed
+          - fs_destroy_again is not changed
+          - fs_list_destroy.stdout_lines == [zfs_pool]
+
+  always:
+    - name: Destroy the test pool
+      ansible.builtin.command:
+        cmd: "zpool destroy -f {{ zfs_pool }}"

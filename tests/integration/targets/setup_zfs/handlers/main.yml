@@ -1,0 +1,17 @@
+---
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Handlers run in the order they are listed: devices must be detached
+# before their backing files are removed.
+
+- name: Detach ZFS devices
+  ansible.builtin.command:
+    cmd: "{{ setup_zfs_detach_cmd }} {{ item }}"
+  loop: "{{ setup_zfs_devices }}"
+
+- name: Remove ZFS backing files
+  ansible.builtin.file:
+    path: "{{ setup_zfs_tmp_dir.path }}"
+    state: absent
