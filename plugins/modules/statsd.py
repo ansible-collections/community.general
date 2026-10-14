@@ -138,15 +138,15 @@ def main():
     if not HAS_STATSD:
         module.fail_json(msg=missing_required_lib("statsd"))
 
-    host = module.params.get("host")
-    port = module.params.get("port")
-    protocol = module.params.get("protocol")
-    timeout = module.params.get("timeout")
-    metric = module.params.get("metric")
-    metric_type = module.params.get("metric_type")
-    metric_prefix = module.params.get("metric_prefix")
-    value = module.params.get("value")
-    delta = module.params.get("delta")
+    host = module.params["host"]
+    port = module.params["port"]
+    protocol = module.params["protocol"]
+    timeout = module.params["timeout"]
+    metric = module.params["metric"]
+    metric_type = module.params["metric_type"]
+    metric_prefix = module.params["metric_prefix"]
+    value = module.params["value"]
+    delta = module.params["delta"]
 
     if protocol == "udp":
         client = udp_statsd_client(host=host, port=port, prefix=metric_prefix, maxudpsize=512, ipv6=False)

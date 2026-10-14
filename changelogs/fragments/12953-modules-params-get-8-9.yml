@@ -1,0 +1,11 @@
+minor_changes:
+  - hwc_vpc_eip - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - hwc_vpc_port - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - hwc_vpc_subnet - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - ipa_user - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - jenkins_job_info - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - jenkins_job - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - packet_project - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - serverless - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - statsd - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).
+  - zfs_delegate_admin - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12953).

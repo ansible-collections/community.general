@@ -301,7 +301,7 @@ def main():
                 changed = True
 
             result = read_resource(config)
-            result["id"] = module.params.get("id")
+            result["id"] = module.params["id"]
         else:
             if resource:
                 if not module.check_mode:
@@ -318,13 +318,13 @@ def main():
 
 def user_input_parameters(module):
     return {
-        "dedicated_bandwidth": module.params.get("dedicated_bandwidth"),
-        "enterprise_project_id": module.params.get("enterprise_project_id"),
-        "ip_version": module.params.get("ip_version"),
-        "ipv4_address": module.params.get("ipv4_address"),
-        "port_id": module.params.get("port_id"),
-        "shared_bandwidth_id": module.params.get("shared_bandwidth_id"),
-        "type": module.params.get("type"),
+        "dedicated_bandwidth": module.params["dedicated_bandwidth"],
+        "enterprise_project_id": module.params["enterprise_project_id"],
+        "ip_version": module.params["ip_version"],
+        "ipv4_address": module.params["ipv4_address"],
+        "port_id": module.params["port_id"],
+        "shared_bandwidth_id": module.params["shared_bandwidth_id"],
+        "type": module.params["type"],
     }
 
 

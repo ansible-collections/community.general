@@ -172,14 +172,14 @@ class JenkinsJob:
     def __init__(self, module):
         self.module = module
 
-        self.config = module.params.get("config")
-        self.name = module.params.get("name")
-        self.password = module.params.get("password")
-        self.state = module.params.get("state")
-        self.enabled = module.params.get("enabled")
-        self.token = module.params.get("token")
-        self.user = module.params.get("user")
-        self.jenkins_url = module.params.get("url")
+        self.config = module.params["config"]
+        self.name = module.params["name"]
+        self.password = module.params["password"]
+        self.state = module.params["state"]
+        self.enabled = module.params["enabled"]
+        self.token = module.params["token"]
+        self.user = module.params["user"]
+        self.jenkins_url = module.params["url"]
         self.server = self.get_jenkins_connection()
 
         self.result = {
@@ -362,7 +362,7 @@ def main():
     test_dependencies(module)
     jenkins_job = JenkinsJob(module)
 
-    if module.params.get("state") == "present":
+    if module.params["state"] == "present":
         jenkins_job.present_job()
     else:
         jenkins_job.absent_job()
