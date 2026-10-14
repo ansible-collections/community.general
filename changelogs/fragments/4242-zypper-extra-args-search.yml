@@ -1,2 +1,0 @@
-bugfixes:
-  - zypper - do not pass ``extra_args`` to the ``zypper search`` command used to determine the installed packages (https://github.com/ansible-collections/community.general/issues/4242).
