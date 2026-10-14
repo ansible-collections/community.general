@@ -43,9 +43,12 @@ def test_split_name_version_with_prefix(name, expected):
 
 
 @pytest.fixture(autouse=True)
-def no_transactional_updates(mocker):
-    # keep the command line deterministic regardless of the host filesystem
-    mocker.patch.object(zypper, "transactional_updates", return_value=False)
+def transactional_updates(mocker, request):
+    # keep the command line deterministic regardless of the host filesystem;
+    # test cases with an id starting with "transactional_" run as on a transactional system
+    mocker.patch.object(
+        zypper, "transactional_updates", return_value=request.node.name.startswith("test_transactional_")
+    )
 
 
 UTHelper.from_module(zypper, __name__, mocks=[RunCommandMock])
