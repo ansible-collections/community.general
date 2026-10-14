@@ -171,19 +171,19 @@ def main():
     if not HAS_PAHOMQTT:
         module.fail_json(msg=missing_required_lib("paho-mqtt"), exception=PAHOMQTT_IMP_ERR)
 
-    server = module.params.get("server", "localhost")
-    port = module.params.get("port", 1883)
-    topic = module.params.get("topic")
-    payload = module.params.get("payload")
-    client_id = module.params.get("client_id", "")
-    qos = int(module.params.get("qos", 0))
-    retain = module.params.get("retain")
-    username = module.params.get("username", None)
-    password = module.params.get("password", None)
-    ca_certs = module.params.get("ca_cert", None)
-    certfile = module.params.get("client_cert", None)
-    keyfile = module.params.get("client_key", None)
-    tls_version = module.params.get("tls_version", None)
+    server = module.params["server"]
+    port = module.params["port"]
+    topic = module.params["topic"]
+    payload = module.params["payload"]
+    client_id = module.params["client_id"]
+    qos = int(module.params["qos"])
+    retain = module.params["retain"]
+    username = module.params["username"]
+    password = module.params["password"]
+    ca_certs = module.params["ca_cert"]
+    certfile = module.params["client_cert"]
+    keyfile = module.params["client_key"]
+    tls_version = module.params["tls_version"]
 
     if client_id is None:
         client_id = f"{socket.getfqdn()}_{os.getpid()}"

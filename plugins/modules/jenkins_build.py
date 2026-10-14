@@ -163,16 +163,16 @@ class JenkinsBuild:
     def __init__(self, module):
         self.module = module
 
-        self.name = module.params.get("name")
-        self.password = module.params.get("password")
-        self.args = module.params.get("args")
-        self.state = module.params.get("state")
-        self.token = module.params.get("token")
-        self.user = module.params.get("user")
-        self.jenkins_url = module.params.get("url")
-        self.build_number = module.params.get("build_number")
-        self.detach = module.params.get("detach")
-        self.time_between_checks = module.params.get("time_between_checks")
+        self.name = module.params["name"]
+        self.password = module.params["password"]
+        self.args = module.params["args"]
+        self.state = module.params["state"]
+        self.token = module.params["token"]
+        self.user = module.params["user"]
+        self.jenkins_url = module.params["url"]
+        self.build_number = module.params["build_number"]
+        self.detach = module.params["detach"]
+        self.time_between_checks = module.params["time_between_checks"]
         self.server = self.get_jenkins_connection()
 
         self.result = {
@@ -316,9 +316,9 @@ def main():
     test_dependencies(module)
     jenkins_build = JenkinsBuild(module)
 
-    if module.params.get("state") == "present":
+    if module.params["state"] == "present":
         jenkins_build.present_build()
-    elif module.params.get("state") == "stopped":
+    elif module.params["state"] == "stopped":
         jenkins_build.stopped_build()
     else:
         jenkins_build.absent_build()

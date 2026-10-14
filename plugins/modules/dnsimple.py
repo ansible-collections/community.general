@@ -336,18 +336,18 @@ def main():
     if not HAS_DNSIMPLE:
         module.fail_json(msg=missing_required_lib("dnsimple"), exception=DNSIMPLE_IMP_ERR[0])
 
-    account_email = module.params.get("account_email")
-    account_api_token = module.params.get("account_api_token")
-    domain = module.params.get("domain")
-    record = module.params.get("record")
-    record_ids = module.params.get("record_ids")
-    record_type = module.params.get("type")
-    ttl = module.params.get("ttl")
-    value = module.params.get("value")
-    priority = module.params.get("priority")
-    state = module.params.get("state")
-    is_solo = module.params.get("solo")
-    sandbox = module.params.get("sandbox")
+    account_email = module.params["account_email"]
+    account_api_token = module.params["account_api_token"]
+    domain = module.params["domain"]
+    record = module.params["record"]
+    record_ids = module.params["record_ids"]
+    record_type = module.params["type"]
+    ttl = module.params["ttl"]
+    value = module.params["value"]
+    priority = module.params["priority"]
+    state = module.params["state"]
+    is_solo = module.params["solo"]
+    sandbox = module.params["sandbox"]
 
     DNSIMPLE_MAJOR_VERSION = LooseVersion(dnsimple_version).version[0]
 

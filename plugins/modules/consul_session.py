@@ -120,7 +120,7 @@ from ansible_collections.community.general.plugins.module_utils._consul import A
 
 
 def execute(module, consul_module):
-    state = module.params.get("state")
+    state = module.params["state"]
 
     if state in ["info", "list", "node"]:
         lookup_sessions(module, consul_module)
@@ -143,9 +143,9 @@ def get_session_info(consul_module, session_id, datacenter):
 
 
 def lookup_sessions(module, consul_module):
-    datacenter = module.params.get("datacenter")
+    datacenter = module.params["datacenter"]
 
-    state = module.params.get("state")
+    state = module.params["state"]
     try:
         if state == "list":
             sessions_list = list_sessions(consul_module, datacenter)
@@ -154,11 +154,11 @@ def lookup_sessions(module, consul_module):
                 sessions_list = sessions_list[1]
             module.exit_json(changed=True, sessions=sessions_list)
         elif state == "node":
-            node = module.params.get("node")
+            node = module.params["node"]
             sessions = list_sessions_for_node(consul_module, node, datacenter)
             module.exit_json(changed=True, node=node, sessions=sessions)
         elif state == "info":
-            session_id = module.params.get("id")
+            session_id = module.params["id"]
 
             session_by_id = get_session_info(consul_module, session_id, datacenter)
             module.exit_json(changed=True, session_id=session_id, sessions=session_by_id)
@@ -182,13 +182,13 @@ def create_session(consul_module, name, behavior, ttl, node, lock_delay, datacen
 
 
 def update_session(module, consul_module):
-    name = module.params.get("name")
-    delay = module.params.get("delay")
-    checks = module.params.get("checks")
-    datacenter = module.params.get("datacenter")
-    node = module.params.get("node")
-    behavior = module.params.get("behavior")
-    ttl = module.params.get("ttl")
+    name = module.params["name"]
+    delay = module.params["delay"]
+    checks = module.params["checks"]
+    datacenter = module.params["datacenter"]
+    node = module.params["node"]
+    behavior = module.params["behavior"]
+    ttl = module.params["ttl"]
 
     try:
         session = create_session(
@@ -220,7 +220,7 @@ def destroy_session(consul_module, session_id):
 
 
 def remove_session(module, consul_module):
-    session_id = module.params.get("id")
+    session_id = module.params["id"]
 
     try:
         destroy_session(consul_module, session_id)
