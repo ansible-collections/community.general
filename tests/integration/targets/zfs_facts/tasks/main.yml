@@ -1,0 +1,79 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Run tests on a scratch pool
+  when: has_zfs
+  vars:
+    fs: "{{ zfs_facts_pool }}/fs"
+  block:
+    - name: Create the test pool
+      ansible.builtin.command:
+        cmd: "zpool create -f -m none {{ zfs_facts_pool }} {{ setup_zfs_devices[0] }}"
+
+    - name: Create the test datasets
+      ansible.builtin.command:
+        cmd: "{{ item }}"
+      loop:
+        - "zfs create -p {{ fs }}/child"
+        - "zfs snapshot {{ fs }}@snap"
+
+    - name: Gather facts for a single dataset
+      community.general.zfs_facts:
+        name: "{{ fs }}"
+      register: facts_single
+
+    - name: Gather facts recursively
+      community.general.zfs_facts:
+        name: "{{ fs }}"
+        recurse: true
+      register: facts_recurse
+
+    - name: Gather facts recursively, filesystems only
+      community.general.zfs_facts:
+        name: "{{ fs }}"
+        recurse: true
+        type: filesystem
+      register: facts_recurse_fs
+
+    - name: Gather selected properties in parsable format
+      community.general.zfs_facts:
+        name: "{{ fs }}"
+        properties: used,compression
+        parsable: true
+      register: facts_parsable
+
+    - name: Gather facts for a missing dataset
+      community.general.zfs_facts:
+        name: "{{ zfs_facts_pool }}/missing"
+      register: facts_missing
+      ignore_errors: true
+
+    - name: Assert gathered facts
+      vars:
+        single: "{{ facts_single.ansible_facts.ansible_zfs_datasets }}"
+        parsable: "{{ facts_parsable.ansible_facts.ansible_zfs_datasets[0] }}"
+      ansible.builtin.assert:
+        that:
+          - facts_single is not changed
+          - single | length == 1
+          - single[0].name == fs
+          - single[0].type == 'filesystem'
+          - facts_recurse.ansible_facts.ansible_zfs_datasets | map(attribute='name') | sort == [fs, fs ~ '/child', fs ~ '@snap'] | sort
+          - facts_recurse_fs.ansible_facts.ansible_zfs_datasets | map(attribute='name') | sort == [fs, fs ~ '/child'] | sort
+          - facts_parsable.parsable
+          - parsable.keys() | sort == ['compression', 'name', 'used']
+          - parsable.used is match('^[0-9]+$')
+          - facts_missing is failed
+          - "'does not exist' in facts_missing.msg"
+
+  always:
+    - name: Destroy the test pool
+      ansible.builtin.command:
+        cmd: "zpool destroy -f {{ zfs_facts_pool }}"
