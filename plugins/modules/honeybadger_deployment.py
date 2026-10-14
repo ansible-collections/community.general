@@ -108,7 +108,7 @@ def main():
 
     params["api_key"] = module.params["token"]
 
-    url = module.params.get("url")
+    url = module.params["url"]
 
     # If we're in check mode, just exit pretending like we succeeded
     if module.check_mode:

@@ -85,7 +85,7 @@ USER_AGENT = "ansible-ipinfoio-module/0.0.1"
 class IpinfoioFacts:
     def __init__(self, module):
         self.url = "https://ipinfo.io/json"
-        self.timeout = module.params.get("timeout")
+        self.timeout = module.params["timeout"]
         self.module = module
 
     def get_geo_data(self):

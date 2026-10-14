@@ -107,7 +107,7 @@ class AlertaInterface:
         self.alerta_url = module.params["alerta_url"]
         self.headers = {"Content-Type": "application/json"}
 
-        if module.params.get("api_key", None):
+        if module.params["api_key"]:
             self.headers["Authorization"] = f"Key {module.params['api_key']}"
         else:
             self.headers["Authorization"] = basic_auth_header(

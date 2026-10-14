@@ -314,7 +314,7 @@ def ensure(module, client):
     elif state == "absent":
         if ipa_host:
             changed = True
-            update_dns = module.params.get("update_dns", False)
+            update_dns = module.params["update_dns"]
             if not module.check_mode:
                 client.host_del(name=name, update_dns=update_dns)
 

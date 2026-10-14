@@ -171,7 +171,7 @@ def main():
     host = module.params["host"]
     login = module.params["login"]
     password = module.params["password"]
-    ssl_version = getattr(hpilo.ssl, f"PROTOCOL_{module.params.get('ssl_version').upper().replace('V', 'v')}")
+    ssl_version = getattr(hpilo.ssl, f"PROTOCOL_{module.params['ssl_version'].upper().replace('V', 'v')}")
 
     ilo = hpilo.Ilo(host, login=login, password=password, ssl_version=ssl_version)
 

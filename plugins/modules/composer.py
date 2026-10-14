@@ -315,7 +315,7 @@ def main():
     }
 
     for param, option in option_params.items():
-        if module.params.get(param) and option in available_options:
+        if module.params[param] and option in available_options:
             option = f"--{option}"
             options.append(option)
 

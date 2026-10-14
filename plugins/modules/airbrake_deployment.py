@@ -138,7 +138,7 @@ def main():
         params["version"] = module.params["version"]
 
     # Build deploy url
-    url = f"{module.params.get('url')}{module.params['project_id']}/deploys?key={module.params['project_key']}"
+    url = f"{module.params['url']}{module.params['project_id']}/deploys?key={module.params['project_key']}"
     json_body = module.jsonify(params)
 
     # Build header
