@@ -118,8 +118,8 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def get_bundler_executable(module):
-    if module.params.get("executable"):
-        result = module.params.get("executable").split(" ")
+    if module.params["executable"]:
+        result = module.params["executable"].split(" ")
     else:
         result = [module.get_bin_path("bundle", True)]
     return result
@@ -145,17 +145,17 @@ def main():
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    state = module.params.get("state")
-    chdir = module.params.get("chdir")
-    exclude_groups = module.params.get("exclude_groups")
-    clean = module.params.get("clean")
-    gemfile = module.params.get("gemfile")
-    local = module.params.get("local")
-    deployment_mode = module.params.get("deployment_mode")
-    user_install = module.params.get("user_install")
-    gem_path = module.params.get("gem_path")
-    binstub_directory = module.params.get("binstub_directory")
-    extra_args = module.params.get("extra_args")
+    state = module.params["state"]
+    chdir = module.params["chdir"]
+    exclude_groups = module.params["exclude_groups"]
+    clean = module.params["clean"]
+    gemfile = module.params["gemfile"]
+    local = module.params["local"]
+    deployment_mode = module.params["deployment_mode"]
+    user_install = module.params["user_install"]
+    gem_path = module.params["gem_path"]
+    binstub_directory = module.params["binstub_directory"]
+    extra_args = module.params["extra_args"]
 
     cmd = get_bundler_executable(module)
 
