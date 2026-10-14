@@ -1,0 +1,6 @@
+minor_changes:
+  - hwc_evs_disk - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12968).
+  - ipa_config - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12968).
+  - ipa_otptoken - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12968).
+  - java_cert - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12968).
+  - packet_sshkey - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12968).
