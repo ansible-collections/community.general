@@ -1,0 +1,10 @@
+---
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# ZFS utilities are part of the FreeBSD base system.
+- name: Load the ZFS kernel module
+  ansible.builtin.command:
+    cmd: kldload -n zfs
+  changed_when: false
