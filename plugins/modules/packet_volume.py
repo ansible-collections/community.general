@@ -197,16 +197,16 @@ def is_valid_uuid(myuuid):
 
 
 def get_volume_selector(module):
-    if module.params.get("id"):
-        i = module.params.get("id")
+    if module.params["id"]:
+        i = module.params["id"]
         if not is_valid_uuid(i):
             raise Exception(f"Volume ID '{i}' is not a valid UUID")
         return lambda v: v["id"] == i
-    elif module.params.get("name"):
-        n = module.params.get("name")
+    elif module.params["name"]:
+        n = module.params["name"]
         return lambda v: v["name"] == n
-    elif module.params.get("description"):
-        d = module.params.get("description")
+    elif module.params["description"]:
+        d = module.params["description"]
         return lambda v: v["description"] == d
 
 
@@ -220,7 +220,7 @@ def get_or_fail(params, key):
 def act_on_volume(target_state, module, packet_conn):
     return_dict = {"changed": False}
     s = get_volume_selector(module)
-    project_id = module.params.get("project_id")
+    project_id = module.params["project_id"]
     api_method = f"projects/{project_id}/storage"
     all_volumes = packet_conn.call_api(api_method, "GET")["volumes"]
     matching_volumes = [v for v in all_volumes if s(v)]
@@ -234,7 +234,7 @@ def act_on_volume(target_state, module, packet_conn):
                 "facility": get_or_fail(module.params, "facility"),
                 "locked": get_or_fail(module.params, "locked"),
                 "billing_cycle": get_or_fail(module.params, "billing_cycle"),
-                "snapshot_policies": module.params.get("snapshot_policy"),
+                "snapshot_policies": module.params["snapshot_policy"],
             }
 
             new_volume_data = packet_conn.call_api(api_method, "POST", params)
@@ -289,15 +289,15 @@ def main():
     if not HAS_PACKET_SDK:
         module.fail_json(msg="packet required for this module")
 
-    if not module.params.get("auth_token"):
+    if not module.params["auth_token"]:
         _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
-    auth_token = module.params.get("auth_token")
+    auth_token = module.params["auth_token"]
 
     packet_conn = packet.Manager(auth_token=auth_token)
 
-    state = module.params.get("state")
+    state = module.params["state"]
 
     if state in VOLUME_STATES:
         if module.check_mode:

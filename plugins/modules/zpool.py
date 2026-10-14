@@ -546,19 +546,19 @@ def main():
         supports_check_mode=True,
     )
 
-    name = module.params.get("name")
-    state = module.params.get("state")
-    disable_new_features = module.params.get("disable_new_features")
-    force = module.params.get("force")
-    pool_properties = module.params.get("pool_properties")
-    filesystem_properties = module.params.get("filesystem_properties")
-    mountpoint = module.params.get("mountpoint")
-    altroot = module.params.get("altroot")
-    temp_name = module.params.get("temp_name")
-    vdevs = module.params.get("vdevs")
+    name = module.params["name"]
+    state = module.params["state"]
+    disable_new_features = module.params["disable_new_features"]
+    force = module.params["force"]
+    pool_properties = module.params["pool_properties"]
+    filesystem_properties = module.params["filesystem_properties"]
+    mountpoint = module.params["mountpoint"]
+    altroot = module.params["altroot"]
+    temp_name = module.params["temp_name"]
+    vdevs = module.params["vdevs"]
 
     for property_key in ("pool_properties", "filesystem_properties"):
-        for key, value in list(module.params.get(property_key, {}).items()):
+        for key, value in list(module.params[property_key].items()):
             if isinstance(value, bool):
                 module.params[property_key][key] = "on" if value else "off"
 

@@ -219,10 +219,10 @@ def main():
             expect = user_input_parameters(module)
             if are_different_dicts(expect, current):
                 raise Exception(
-                    f"Cannot change option from ({current}) to ({expect}) for an existing security group({module.params.get('id')})."
+                    f"Cannot change option from ({current}) to ({expect}) for an existing security group({module.params['id']})."
                 )
             result = read_resource(config)
-            result["id"] = module.params.get("id")
+            result["id"] = module.params["id"]
         else:
             if resource:
                 if not module.check_mode:
@@ -239,15 +239,15 @@ def main():
 
 def user_input_parameters(module):
     return {
-        "description": module.params.get("description"),
-        "direction": module.params.get("direction"),
-        "ethertype": module.params.get("ethertype"),
-        "port_range_max": module.params.get("port_range_max"),
-        "port_range_min": module.params.get("port_range_min"),
-        "protocol": module.params.get("protocol"),
-        "remote_group_id": module.params.get("remote_group_id"),
-        "remote_ip_prefix": module.params.get("remote_ip_prefix"),
-        "security_group_id": module.params.get("security_group_id"),
+        "description": module.params["description"],
+        "direction": module.params["direction"],
+        "ethertype": module.params["ethertype"],
+        "port_range_max": module.params["port_range_max"],
+        "port_range_min": module.params["port_range_min"],
+        "protocol": module.params["protocol"],
+        "remote_group_id": module.params["remote_group_id"],
+        "remote_ip_prefix": module.params["remote_ip_prefix"],
+        "security_group_id": module.params["security_group_id"],
     }
 
 
