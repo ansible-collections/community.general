@@ -118,12 +118,12 @@ class JenkinsBuildInfo:
     def __init__(self, module):
         self.module = module
 
-        self.name = module.params.get("name")
-        self.password = module.params.get("password")
-        self.token = module.params.get("token")
-        self.user = module.params.get("user")
-        self.jenkins_url = module.params.get("url")
-        self.build_number = module.params.get("build_number")
+        self.name = module.params["name"]
+        self.password = module.params["password"]
+        self.token = module.params["token"]
+        self.user = module.params["user"]
+        self.jenkins_url = module.params["url"]
+        self.build_number = module.params["build_number"]
         self.server = self.get_jenkins_connection()
 
         self.result = {

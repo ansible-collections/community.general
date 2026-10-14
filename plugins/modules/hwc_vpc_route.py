@@ -151,7 +151,7 @@ def main():
 
     try:
         resource = None
-        if module.params.get("id"):
+        if module.params["id"]:
             resource = get_resource_by_id(config)
             if module.params["state"] == "present":
                 opts = user_input_parameters(module)
@@ -193,11 +193,11 @@ def main():
 
 def user_input_parameters(module):
     return {
-        "destination": module.params.get("destination"),
-        "next_hop": module.params.get("next_hop"),
-        "type": module.params.get("type"),
-        "vpc_id": module.params.get("vpc_id"),
-        "id": module.params.get("id"),
+        "destination": module.params["destination"],
+        "next_hop": module.params["next_hop"],
+        "type": module.params["type"],
+        "vpc_id": module.params["vpc_id"],
+        "id": module.params["id"],
     }
 
 

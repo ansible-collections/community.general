@@ -179,12 +179,12 @@ def main():
         supports_check_mode=True,
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
-    path = module.params.get("path")
-    namespace = module.params.get("namespace")
-    key = module.params.get("key")
-    value = module.params.get("value")
-    state = module.params.get("state")
-    follow = module.params.get("follow")
+    path = module.params["path"]
+    namespace = module.params["namespace"]
+    key = module.params["key"]
+    value = module.params["value"]
+    state = module.params["state"]
+    follow = module.params["follow"]
 
     if not os.path.exists(path):
         module.fail_json(msg="path not found or not accessible!")

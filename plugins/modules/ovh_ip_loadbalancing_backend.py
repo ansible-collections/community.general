@@ -161,12 +161,12 @@ def main():
         module.fail_json(msg="ovh-api python module is required to run this module")
 
     # Get parameters
-    name = module.params.get("name")
-    state = module.params.get("state")
-    backend = module.params.get("backend")
-    weight = module.params.get("weight")
-    probe = module.params.get("probe")
-    timeout = module.params.get("timeout")
+    name = module.params["name"]
+    state = module.params["state"]
+    backend = module.params["backend"]
+    weight = module.params["weight"]
+    probe = module.params["probe"]
+    timeout = module.params["timeout"]
 
     # Connect to OVH API
     client = getOvhClient(module)

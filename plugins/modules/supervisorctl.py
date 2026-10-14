@@ -160,13 +160,13 @@ def main():
         is_group = True
         name = name.rstrip(":")
     state = module.params["state"]
-    stop_before_removing = module.params.get("stop_before_removing")
-    config = module.params.get("config")
-    server_url = module.params.get("server_url")
-    username = module.params.get("username")
-    password = module.params.get("password")
-    supervisorctl_path = module.params.get("supervisorctl_path")
-    signal = module.params.get("signal")
+    stop_before_removing = module.params["stop_before_removing"]
+    config = module.params["config"]
+    server_url = module.params["server_url"]
+    username = module.params["username"]
+    password = module.params["password"]
+    supervisorctl_path = module.params["supervisorctl_path"]
+    signal = module.params["signal"]
 
     # we check error message for a pattern, so we need to make sure that's in C locale
     module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")

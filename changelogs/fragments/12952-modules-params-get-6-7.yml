@@ -1,0 +1,15 @@
+minor_changes:
+  - github_deploy_key - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - github_release - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - hwc_network_vpc - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - hwc_smn_topic - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - hwc_vpc_route - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - iso_create - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - jenkins_build_info - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - ovh_ip_loadbalancing_backend - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - ovh_monthly_billing - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - packet_volume_attachment - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - riak - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - scaleway_database_backup - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - supervisorctl - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
+  - xattr - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12952).
