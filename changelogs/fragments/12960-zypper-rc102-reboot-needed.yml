@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper - do not fail when zypper returns ``102`` (reboot needed) after a successful run, for example when applying patches with ``--with-interactive`` (https://github.com/ansible-collections/community.general/issues/12960).
