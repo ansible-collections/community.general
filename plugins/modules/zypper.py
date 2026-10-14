@@ -685,7 +685,9 @@ def main():
         del retvals["stdout"]
         del retvals["stderr"]
 
-    module.exit_json(name=name, state=state, update_cache=update_cache, **retvals)
+    # rc 102 (ZYPPER_EXIT_INF_REBOOT_NEEDED) is a success. Set failed explicitly,
+    # otherwise ansible-core treats the non-zero rc as a failure.
+    module.exit_json(name=name, state=state, update_cache=update_cache, failed=False, **retvals)
 
 
 if __name__ == "__main__":

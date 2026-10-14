@@ -459,10 +459,31 @@ test_cases:
       state: latest
     output:
       changed: true
+      failed: false
       rc: 102
     mocks:
       run_command:
         - command: *update_all
+          environ: *env
+          rc: 102
+          out: *xml_upgrade_vim
+          err: ''
+
+  - id: patch_with_interactive_reboot_needed_rc_102_not_failed
+    input:
+      name: '*'
+      state: latest
+      type: patch
+      extra_args: --with-interactive
+    output:
+      changed: true
+      failed: false
+      rc: 102
+    mocks:
+      run_command:
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, patch,
+             --auto-agree-with-licenses, --no-recommends, --with-interactive]
           environ: *env
           rc: 102
           out: *xml_upgrade_vim
