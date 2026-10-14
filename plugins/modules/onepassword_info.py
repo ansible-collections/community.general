@@ -162,6 +162,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_bytes, to_native
 
 from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 
 
 class AnsibleModuleError(Exception):
@@ -354,10 +355,10 @@ class OnePasswordInfo:
                 # If we already have a result for this key, we have to append this result dictionary
                 # to the existing one. This is only applicable when there is a single item
                 # in 1Password which has two different fields, and we want to retrieve both of them.
-                result[term["name"]].update(value)
+                result[term["name"]].update(mark_values_as_secrets(value))
             else:
                 # If this is the first result for this key, simply set it.
-                result[term["name"]] = value
+                result[term["name"]] = mark_values_as_secrets(value)
 
         return result
 

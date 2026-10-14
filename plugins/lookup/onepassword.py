@@ -87,6 +87,7 @@ from ansible.module_utils.common.text.converters import to_bytes, to_text
 from ansible.plugins.lookup import LookupBase
 
 from ansible_collections.community.general.plugins.module_utils._onepassword import OnePasswordConfig
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
@@ -616,8 +617,8 @@ class LookupModule(LookupBase):
         values = []
         for term in terms:
             if term.startswith("op://"):
-                values.append(op.get_secret_reference(term))
+                values.append(mark_values_as_secrets(op.get_secret_reference(term)))
             else:
-                values.append(op.get_field(term, field, section, vault))
+                values.append(mark_values_as_secrets(op.get_field(term, field, section, vault)))
 
         return values

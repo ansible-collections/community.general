@@ -43,6 +43,7 @@ _raw:
 from ansible.plugins.lookup import LookupBase
 
 from ansible_collections.community.general.plugins.lookup.onepassword import OnePass, OnePassCLIv2
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 
@@ -84,6 +85,6 @@ class LookupModule(LookupBase):
 
         values = []
         for term in terms:
-            values.append(op.get_raw(term, vault))
+            values.append(mark_values_as_secrets(op.get_raw(term, vault)))
 
         return values
