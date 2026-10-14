@@ -17,6 +17,15 @@ anchors:
     [/testbin/zypper, --non-interactive, --xmlout, --quiet, update, --type, package,
      --auto-agree-with-licenses, --no-recommends]
 
+  tu_search_wget: &tu_search_wget
+    [/testbin/transactional-update, --continue, --drop-if-no-change, --quiet, run,
+     /testbin/zypper, --non-interactive, --xmlout, --quiet, --disable-repositories, search,
+     --type, package, --match-exact, --details, --installed-only, wget]
+  tu_install_wget: &tu_install_wget
+    [/testbin/transactional-update, --continue, --drop-if-no-change, --quiet, run,
+     /testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+     --auto-agree-with-licenses, --no-recommends, '--', +wget]
+
   # ----- reused zypper --xmlout payloads -----
   xml_search_not_installed: &xml_search_not_installed |
     <?xml version='1.0'?>
@@ -74,6 +83,25 @@ anchors:
     <?xml version='1.0'?>
     <stream>
     <message type="error">Package 'nonexistent-pkg' not found.</message>
+    </stream>
+  xml_search_no_match: &xml_search_no_match |
+    <?xml version='1.0'?>
+    <stream>
+    <message type="info">No matching items found.</message>
+    </stream>
+  xml_install_wget: &xml_install_wget |
+    <?xml version='1.0'?>
+    <stream>
+    <install-summary download-size="400000" space-usage-diff="900000">
+    <to-install>
+    <solvable type="package" name="wget" edition="1.25.0-1.1" arch="x86_64"/>
+    </to-install>
+    </install-summary>
+    </stream>
+  xml_no_provider_wget: &xml_no_provider_wget |
+    <?xml version='1.0'?>
+    <stream>
+    <message type="error">No provider of &apos;+wget&apos; found.</message>
     </stream>
   xml_generic_error: &xml_generic_error |
     <?xml version='1.0'?>
@@ -547,4 +575,71 @@ test_cases:
           environ: *env
           rc: 8
           out: *xml_locked_error
+          err: ''
+
+  # ---------------------------------------------------------------- transactional-update
+  - id: transactional_install_package
+    input:
+      name: wget
+      state: present
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        # transactional-update before 5.5.0 returns 0 although the search found nothing (zypper rc 104)
+        - command: *tu_search_wget
+          environ: *env
+          rc: 0
+          out: *xml_search_no_match
+          err: ''
+        - command: *tu_install_wget
+          environ: *env
+          rc: 0
+          out: *xml_install_wget
+          err: ''
+
+  # https://github.com/ansible-collections/community.general/issues/9011
+  - id: transactional_install_error_with_rc_0
+    input:
+      name: wget
+      state: present
+    output:
+      failed: true
+      rc: 0
+      msg: "Zypper run command reported errors: No provider of '+wget' found."
+    mocks:
+      run_command:
+        - command: *tu_search_wget
+          environ: *env
+          rc: 0
+          out: *xml_search_no_match
+          err: ''
+        # transactional-update before 5.5.0 does not pass on the zypper exit code 104
+        - command: *tu_install_wget
+          environ: *env
+          rc: 0
+          out: *xml_no_provider_wget
+          err: ''
+
+  - id: transactional_install_error_with_rc_104
+    input:
+      name: wget
+      state: present
+    output:
+      failed: true
+      rc: 104
+      msg: "No provider of '+wget' found."
+    mocks:
+      run_command:
+        # transactional-update 5.5.0 and later pass on the zypper exit code
+        - command: *tu_search_wget
+          environ: *env
+          rc: 104
+          out: *xml_search_no_match
+          err: ''
+        - command: *tu_install_wget
+          environ: *env
+          rc: 104
+          out: *xml_no_provider_wget
           err: ''

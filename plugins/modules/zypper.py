@@ -349,6 +349,18 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
     except xml.parsers.expat.ExpatError as exc:
         m.fail_json(msg=f"Failed to parse zypper xml output: {exc}", rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
 
+    if rc == 0 and os.path.basename(cmd[0]) == "transactional-update":
+        # transactional-update before 5.5.0 returns 0 even when the command it runs fails
+        errors = get_error_messages(dom)
+        if errors:
+            m.fail_json(
+                msg=f"Zypper run command reported errors: {' '.join(errors)}",
+                rc=rc,
+                stdout=stdout,
+                stderr=stderr,
+                cmd=cmd,
+            )
+
     if rc == 104:
         # exit code 104 is ZYPPER_EXIT_INF_CAP_NOT_FOUND (no packages found)
         if fail_not_found:
@@ -409,6 +421,14 @@ def get_simple_errors(dom):
     for x in message_xml_tags:
         simple_errors.append(x.firstChild.data)
     return " \n".join(simple_errors)
+
+
+def get_error_messages(dom):
+    return [
+        x.firstChild.data
+        for x in dom.getElementsByTagName("message")
+        if x.getAttribute("type") == "error" and x.firstChild
+    ]
 
 
 def get_cmd(m, subcommand):

@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper - fail when ``zypper`` reports errors while run through ``transactional-update`` versions that return success regardless (https://github.com/ansible-collections/community.general/issues/9011).
