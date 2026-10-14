@@ -207,8 +207,8 @@ def main() -> None:
     deps.validate(module)
 
     action = module.params["action"]
-    domain = module.params.get("domain")
-    server_type = module.params.get("server_type")
+    domain = module.params["domain"]
+    server_type = module.params["server_type"]
 
     sssd = SSSDHandler()
     result: dict[str, t.Any] = {}

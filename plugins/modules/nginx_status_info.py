@@ -100,8 +100,8 @@ from ansible.module_utils.urls import fetch_url
 class NginxStatusInfo:
     def __init__(self, module):
         self.module = module
-        self.url = module.params.get("url")
-        self.timeout = module.params.get("timeout")
+        self.url = module.params["url"]
+        self.timeout = module.params["timeout"]
 
     def run(self):
         result = {

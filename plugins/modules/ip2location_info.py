@@ -121,8 +121,8 @@ USER_AGENT = "ansible-ip2location-info-module/0.0.1"
 class Ip2LocationInfo:
     def __init__(self, module: AnsibleModule) -> None:
         self.url = "https://api.ip2location.io/"
-        self.timeout = module.params.get("timeout")
-        self.ip = module.params.get("ip")
+        self.timeout = module.params["timeout"]
+        self.ip = module.params["ip"]
         self.module = module
 
     def get_geo_data(self) -> dict[str, t.Any]:

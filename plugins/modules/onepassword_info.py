@@ -174,12 +174,12 @@ class AnsibleModuleError(Exception):
 
 class OnePasswordInfo:
     def __init__(self):
-        self.cli_path = module.params.get("cli_path")
-        self.auto_login = module.params.get("auto_login")
+        self.cli_path = module.params["cli_path"]
+        self.auto_login = module.params["auto_login"]
         self.logged_in = False
         self.token = None
 
-        terms = module.params.get("search_terms")
+        terms = module.params["search_terms"]
         self.terms = self.parse_search_terms(terms)
 
         self._config = OnePasswordConfig()

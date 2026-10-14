@@ -178,11 +178,11 @@ def main():
         module.fail_json(msg="ovh-api python module is required to run this module ")
 
     # Get parameters
-    name = module.params.get("name")
-    service = module.params.get("service")
-    timeout = module.params.get("timeout")
-    wait_completion = module.params.get("wait_completion")
-    wait_task_completion = module.params.get("wait_task_completion")
+    name = module.params["name"]
+    service = module.params["service"]
+    timeout = module.params["timeout"]
+    wait_completion = module.params["wait_completion"]
+    wait_task_completion = module.params["wait_task_completion"]
 
     # Connect to OVH API
     client = getOvhClient(module)

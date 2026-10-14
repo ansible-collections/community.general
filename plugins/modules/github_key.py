@@ -266,8 +266,8 @@ def main():
     name = module.params["name"]
     state = module.params["state"]
     force = module.params["force"]
-    pubkey = module.params.get("pubkey")
-    api_url = module.params.get("api_url")
+    pubkey = module.params["pubkey"]
+    api_url = module.params["api_url"]
 
     if pubkey:
         pubkey_parts = pubkey.split(" ")
