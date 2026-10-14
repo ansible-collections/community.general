@@ -142,21 +142,21 @@ def load_key_string(key_str):
 
 
 def get_sshkey_selector(module):
-    key_id = module.params.get("id")
+    key_id = module.params["id"]
     if key_id:
         if not is_valid_uuid(key_id):
             raise Exception(f"sshkey ID {key_id} is not valid UUID")
     selecting_fields = ["label", "fingerprint", "id", "key"]
     select_dict = {}
     for f in selecting_fields:
-        if module.params.get(f) is not None:
-            select_dict[f] = module.params.get(f)
+        if module.params[f] is not None:
+            select_dict[f] = module.params[f]
 
-    if module.params.get("key_file"):
-        with open(module.params.get("key_file")) as _file:
+    if module.params["key_file"]:
+        with open(module.params["key_file"]) as _file:
             loaded_key = load_key_string(_file.read())
         select_dict["key"] = loaded_key["key"]
-        if module.params.get("label") is None:
+        if module.params["label"] is None:
             if loaded_key.get("label"):
                 select_dict["label"] = loaded_key["label"]
 
@@ -181,13 +181,13 @@ def act_on_sshkeys(target_state, module, packet_conn):
             # there is no key matching the fields from module call
             # => create the key, label and
             newkey = {}
-            if module.params.get("key_file"):
-                with open(module.params.get("key_file")) as f:
+            if module.params["key_file"]:
+                with open(module.params["key_file"]) as f:
                     newkey = load_key_string(f.read())
-            if module.params.get("key"):
-                newkey = load_key_string(module.params.get("key"))
-            if module.params.get("label"):
-                newkey["label"] = module.params.get("label")
+            if module.params["key"]:
+                newkey = load_key_string(module.params["key"])
+            if module.params["label"]:
+                newkey["label"] = module.params["label"]
             for param in ("label", "key"):
                 if param not in newkey:
                     _msg = (
@@ -238,15 +238,15 @@ def main():
     if not HAS_PACKET_SDK:
         module.fail_json(msg="packet required for this module")
 
-    if not module.params.get("auth_token"):
+    if not module.params["auth_token"]:
         _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
-    auth_token = module.params.get("auth_token")
+    auth_token = module.params["auth_token"]
 
     packet_conn = packet.Manager(auth_token=auth_token)
 
-    state = module.params.get("state")
+    state = module.params["state"]
 
     if state in ["present", "absent"]:
         try:
