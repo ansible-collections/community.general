@@ -337,7 +337,7 @@ def main():
 
     try:
         _init(config)
-        is_exist = module.params.get("id")
+        is_exist = module.params["id"]
 
         result = None
         changed = False
@@ -364,7 +364,7 @@ def main():
 
                 changed = True
 
-            result["id"] = module.params.get("id")
+            result["id"] = module.params["id"]
         else:
             result = dict()
             if is_exist:
@@ -382,7 +382,7 @@ def main():
 
 def _init(config):
     module = config.module
-    if module.params.get("id"):
+    if module.params["id"]:
         return
 
     v = search_resource(config)
@@ -396,19 +396,19 @@ def _init(config):
 
 def user_input_parameters(module):
     return {
-        "availability_zone": module.params.get("availability_zone"),
-        "backup_id": module.params.get("backup_id"),
-        "description": module.params.get("description"),
-        "enable_full_clone": module.params.get("enable_full_clone"),
-        "enable_scsi": module.params.get("enable_scsi"),
-        "enable_share": module.params.get("enable_share"),
-        "encryption_id": module.params.get("encryption_id"),
-        "enterprise_project_id": module.params.get("enterprise_project_id"),
-        "image_id": module.params.get("image_id"),
-        "name": module.params.get("name"),
-        "size": module.params.get("size"),
-        "snapshot_id": module.params.get("snapshot_id"),
-        "volume_type": module.params.get("volume_type"),
+        "availability_zone": module.params["availability_zone"],
+        "backup_id": module.params["backup_id"],
+        "description": module.params["description"],
+        "enable_full_clone": module.params["enable_full_clone"],
+        "enable_scsi": module.params["enable_scsi"],
+        "enable_share": module.params["enable_share"],
+        "encryption_id": module.params["encryption_id"],
+        "enterprise_project_id": module.params["enterprise_project_id"],
+        "image_id": module.params["image_id"],
+        "name": module.params["name"],
+        "size": module.params["size"],
+        "snapshot_id": module.params["snapshot_id"],
+        "volume_type": module.params["volume_type"],
     }
 
 
@@ -507,7 +507,7 @@ def search_resource(config):
     module = config.module
     client = config.client(get_region(module), "volumev3", "project")
     opts = user_input_parameters(module)
-    name = module.params.get("name")
+    name = module.params["name"]
     query_link = _build_query_link(opts)
     link = f"os-vendor-volumes/detail{query_link}"
 

@@ -306,22 +306,22 @@ def get_config_diff(client, ipa_config, module_config):
 
 def ensure(module, client):
     module_config = get_config_dict(
-        ipaconfigstring=module.params.get("ipaconfigstring"),
-        ipadefaultloginshell=module.params.get("ipadefaultloginshell"),
-        ipadefaultemaildomain=module.params.get("ipadefaultemaildomain"),
-        ipadefaultprimarygroup=module.params.get("ipadefaultprimarygroup"),
-        ipagroupobjectclasses=module.params.get("ipagroupobjectclasses"),
-        ipagroupsearchfields=module.params.get("ipagroupsearchfields"),
-        ipahomesrootdir=module.params.get("ipahomesrootdir"),
-        ipakrbauthzdata=module.params.get("ipakrbauthzdata"),
-        ipamaxusernamelength=module.params.get("ipamaxusernamelength"),
-        ipapwdexpadvnotify=module.params.get("ipapwdexpadvnotify"),
-        ipasearchrecordslimit=module.params.get("ipasearchrecordslimit"),
-        ipasearchtimelimit=module.params.get("ipasearchtimelimit"),
-        ipaselinuxusermaporder=module.params.get("ipaselinuxusermaporder"),
-        ipauserauthtype=module.params.get("ipauserauthtype"),
-        ipausersearchfields=module.params.get("ipausersearchfields"),
-        ipauserobjectclasses=module.params.get("ipauserobjectclasses"),
+        ipaconfigstring=module.params["ipaconfigstring"],
+        ipadefaultloginshell=module.params["ipadefaultloginshell"],
+        ipadefaultemaildomain=module.params["ipadefaultemaildomain"],
+        ipadefaultprimarygroup=module.params["ipadefaultprimarygroup"],
+        ipagroupobjectclasses=module.params["ipagroupobjectclasses"],
+        ipagroupsearchfields=module.params["ipagroupsearchfields"],
+        ipahomesrootdir=module.params["ipahomesrootdir"],
+        ipakrbauthzdata=module.params["ipakrbauthzdata"],
+        ipamaxusernamelength=module.params["ipamaxusernamelength"],
+        ipapwdexpadvnotify=module.params["ipapwdexpadvnotify"],
+        ipasearchrecordslimit=module.params["ipasearchrecordslimit"],
+        ipasearchtimelimit=module.params["ipasearchtimelimit"],
+        ipaselinuxusermaporder=module.params["ipaselinuxusermaporder"],
+        ipauserauthtype=module.params["ipauserauthtype"],
+        ipausersearchfields=module.params["ipausersearchfields"],
+        ipauserobjectclasses=module.params["ipauserobjectclasses"],
     )
     ipa_config = client.config_show()
     diff = get_config_diff(client, ipa_config, module_config)
