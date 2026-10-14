@@ -358,6 +358,69 @@ test_cases:
           out: *xml_search_not_installed
           err: ''
 
+  # ---------------------------------------------------------------- extra_args
+  # https://github.com/ansible-collections/community.general/issues/4242
+  - id: install_extra_args_not_passed_to_search
+    input:
+      name: nmap
+      state: present
+      extra_args: --allow-unsigned-rpm
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+             --auto-agree-with-licenses, --no-recommends, --allow-unsigned-rpm, '--', +nmap]
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
+  - id: install_extra_args_already_present
+    input:
+      name: nmap
+      state: present
+      extra_args: --allow-unsigned-rpm
+    output:
+      changed: false
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 0
+          out: *xml_search_nmap_installed
+          err: ''
+
+  - id: remove_extra_args_not_passed_to_search
+    input:
+      name: nmap
+      state: absent
+      extra_args: --details
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 0
+          out: *xml_search_nmap_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, remove, --type, package, --details, nmap]
+          environ: *env
+          rc: 0
+          out: *xml_remove_nmap
+          err: ''
+
   # ---------------------------------------------------------------- update / dist-upgrade
   - id: update_all_packages
     input:

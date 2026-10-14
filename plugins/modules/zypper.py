@@ -128,6 +128,7 @@ options:
     description:
       - Add additional options to C(zypper) command.
       - Options should be supplied in a single line as if given in the command line.
+      - These options are not passed to the C(zypper search) command the module uses to determine which packages are installed.
     type: str
   allow_vendor_change:
     type: bool
@@ -462,7 +463,7 @@ def get_cmd(m, subcommand):
             cmd.append("--clean-deps")
     if subcommand == "dist-upgrade" and m.params["allow_vendor_change"]:
         cmd.append("--allow-vendor-change")
-    if m.params["extra_args"]:
+    if m.params["extra_args"] and subcommand != "search":
         args_list = m.params["extra_args"].split(" ")
         cmd.extend(args_list)
 
