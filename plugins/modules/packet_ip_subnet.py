@@ -182,22 +182,22 @@ def is_valid_uuid(myuuid):
 
 
 def get_existing_devices(module, packet_conn):
-    project_id = module.params.get("project_id")
+    project_id = module.params["project_id"]
     if not is_valid_uuid(project_id):
         raise Exception(f"Project ID {project_id} does not seem to be valid")
 
-    per_page = module.params.get("device_count")
+    per_page = module.params["device_count"]
     return packet_conn.list_devices(project_id, params={"per_page": per_page})
 
 
 def get_specified_device_identifiers(module):
-    if module.params.get("device_id"):
-        _d_id = module.params.get("device_id")
+    if module.params["device_id"]:
+        _d_id = module.params["device_id"]
         if not is_valid_uuid(_d_id):
             raise Exception(f"Device ID '{_d_id}' does not seem to be valid")
         return {"device_id": _d_id, "hostname": None}
-    elif module.params.get("hostname"):
-        _hn = module.params.get("hostname")
+    elif module.params["hostname"]:
+        _hn = module.params["hostname"]
         if not is_valid_hostname(_hn):
             raise Exception(f"Hostname '{_hn}' does not seem to be valid")
         return {"hostname": _hn, "device_id": None}
@@ -218,7 +218,7 @@ def parse_subnet_cidr(cidr):
 
 def act_on_assignment(target_state, module, packet_conn):
     return_dict = {"changed": False}
-    specified_cidr = module.params.get("cidr")
+    specified_cidr = module.params["cidr"]
     address, prefixlen = parse_subnet_cidr(specified_cidr)
 
     specified_identifier = get_specified_device_identifiers(module)
@@ -291,15 +291,15 @@ def main():
     if not HAS_PACKET_SDK:
         module.fail_json(msg="packet required for this module")
 
-    if not module.params.get("auth_token"):
+    if not module.params["auth_token"]:
         _fail_msg = f"if Packet API token is not in environment variable {PACKET_API_TOKEN_ENV_VAR}, the auth_token parameter is required"
         module.fail_json(msg=_fail_msg)
 
-    auth_token = module.params.get("auth_token")
+    auth_token = module.params["auth_token"]
 
     packet_conn = packet.Manager(auth_token=auth_token)
 
-    state = module.params.get("state")
+    state = module.params["state"]
 
     try:
         module.exit_json(**act_on_assignment(state, module, packet_conn))

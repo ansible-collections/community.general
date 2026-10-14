@@ -156,9 +156,9 @@ def delete(resource):
 
 def get_ip():
     try:
-        device_ip = gethostbyname(module.params.get("device"))
+        device_ip = gethostbyname(module.params["device"])
     except gaierror:
-        module.fail_json(msg=f"failed to resolve device ip address for '{module.params.get('device')}'")
+        module.fail_json(msg=f"failed to resolve device ip address for '{module.params['device']}'")
 
     return device_ip
 
@@ -166,8 +166,8 @@ def get_ip():
 def get_device(device_ip):
     """Query OneClick for the device using the IP Address"""
     resource = "/models"
-    landscape_min = f"0x{int(module.params.get('landscape'), 16):x}"
-    landscape_max = f"0x{int(module.params.get('landscape'), 16) + 0x100000:x}"
+    landscape_min = f"0x{int(module.params['landscape'], 16):x}"
+    landscape_max = f"0x{int(module.params['landscape'], 16) + 0x100000:x}"
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
         <rs:model-request throttlesize="5"
@@ -243,14 +243,14 @@ def add_device():
         module.exit_json(changed=False, device=device)
 
     if module.check_mode:
-        device = dict(model_handle=None, address=device_ip, landscape=f"0x{int(module.params.get('landscape'), 16):x}")
+        device = dict(model_handle=None, address=device_ip, landscape=f"0x{int(module.params['landscape'], 16):x}")
         module.exit_json(changed=True, device=device)
 
-    resource = f"model?ipaddress={device_ip}&commstring={module.params.get('community')}"
-    resource += f"&landscapeid={module.params.get('landscape')}"
+    resource = f"model?ipaddress={device_ip}&commstring={module.params['community']}"
+    resource += f"&landscapeid={module.params['landscape']}"
 
-    if module.params.get("agentport", None):
-        resource += f"&agentport={module.params.get('agentport', 161)}"
+    if module.params["agentport"]:
+        resource += f"&agentport={module.params['agentport']}"
 
     result = post(resource)
     root = ET.fromstring(result)
@@ -317,7 +317,7 @@ def main():
         supports_check_mode=True,
     )
 
-    if module.params.get("state") == "present":
+    if module.params["state"] == "present":
         add_device()
     else:
         remove_device()
