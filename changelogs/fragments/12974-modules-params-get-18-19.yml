@@ -1,0 +1,4 @@
+minor_changes:
+  - hwc_ecs_instance - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12974).
+  - mail - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12974).
+  - pagerduty_alert - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12974).
