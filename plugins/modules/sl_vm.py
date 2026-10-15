@@ -340,46 +340,46 @@ NIC_SPEEDS = [10, 100, 1000]
 
 def create_virtual_instance(module):
     instances = vsManager.list_instances(
-        hostname=module.params.get("hostname"),
-        domain=module.params.get("domain"),
-        datacenter=module.params.get("datacenter"),
+        hostname=module.params["hostname"],
+        domain=module.params["domain"],
+        datacenter=module.params["datacenter"],
     )
 
     if instances:
         return False, None
 
     # Check if OS or Image Template is provided (Can't be both, defaults to OS)
-    if module.params.get("os_code") is not None and module.params.get("os_code") != "":
+    if module.params["os_code"] is not None and module.params["os_code"] != "":
         module.params["image_id"] = ""
-    elif module.params.get("image_id") is not None and module.params.get("image_id") != "":
+    elif module.params["image_id"] is not None and module.params["image_id"] != "":
         module.params["os_code"] = ""
         module.params["disks"] = []  # Blank out disks since it will use the template
     else:
         return False, None
 
-    tags = module.params.get("tags")
+    tags = module.params["tags"]
     if isinstance(tags, list):
-        tags = ",".join(map(str, module.params.get("tags")))
+        tags = ",".join(map(str, module.params["tags"]))
 
     instance = vsManager.create_instance(
-        hostname=module.params.get("hostname"),
-        domain=module.params.get("domain"),
-        cpus=module.params.get("cpus"),
-        memory=module.params.get("memory"),
-        flavor=module.params.get("flavor"),
-        hourly=module.params.get("hourly"),
-        datacenter=module.params.get("datacenter"),
-        os_code=module.params.get("os_code"),
-        image_id=module.params.get("image_id"),
-        local_disk=module.params.get("local_disk"),
-        disks=module.params.get("disks"),
-        ssh_keys=module.params.get("ssh_keys"),
-        nic_speed=module.params.get("nic_speed"),
-        private=module.params.get("private"),
-        public_vlan=module.params.get("public_vlan"),
-        private_vlan=module.params.get("private_vlan"),
-        dedicated=module.params.get("dedicated"),
-        post_uri=module.params.get("post_uri"),
+        hostname=module.params["hostname"],
+        domain=module.params["domain"],
+        cpus=module.params["cpus"],
+        memory=module.params["memory"],
+        flavor=module.params["flavor"],
+        hourly=module.params["hourly"],
+        datacenter=module.params["datacenter"],
+        os_code=module.params["os_code"],
+        image_id=module.params["image_id"],
+        local_disk=module.params["local_disk"],
+        disks=module.params["disks"],
+        ssh_keys=module.params["ssh_keys"],
+        nic_speed=module.params["nic_speed"],
+        private=module.params["private"],
+        public_vlan=module.params["public_vlan"],
+        private_vlan=module.params["private_vlan"],
+        dedicated=module.params["dedicated"],
+        post_uri=module.params["post_uri"],
         tags=tags,
     )
 
@@ -392,7 +392,7 @@ def create_virtual_instance(module):
 def wait_for_instance(module, id):
     instance = None
     completed = False
-    wait_timeout = time.time() + module.params.get("wait_time")
+    wait_timeout = time.time() + module.params["wait_time"]
     while not completed and wait_timeout > time.time():
         try:
             completed = vsManager.wait_for_ready(id, 10, 2)
@@ -406,21 +406,21 @@ def wait_for_instance(module, id):
 
 def cancel_instance(module):
     canceled = True
-    if module.params.get("instance_id") is None and (
-        module.params.get("tags") or module.params.get("hostname") or module.params.get("domain")
+    if module.params["instance_id"] is None and (
+        module.params["tags"] or module.params["hostname"] or module.params["domain"]
     ):
-        tags = module.params.get("tags")
+        tags = module.params["tags"]
         if isinstance(tags, str):
-            tags = [module.params.get("tags")]
+            tags = [module.params["tags"]]
         instances = vsManager.list_instances(
-            tags=tags, hostname=module.params.get("hostname"), domain=module.params.get("domain")
+            tags=tags, hostname=module.params["hostname"], domain=module.params["domain"]
         )
         for instance in instances:
             try:
                 vsManager.cancel_instance(instance["id"])
             except Exception:
                 canceled = False
-    elif module.params.get("instance_id") and module.params.get("instance_id") != 0:
+    elif module.params["instance_id"] and module.params["instance_id"] != 0:
         try:
             vsManager.cancel_instance(instance["id"])
         except Exception:
@@ -463,12 +463,12 @@ def main():
     if not HAS_SL:
         module.fail_json(msg="softlayer python library required for this module")
 
-    if module.params.get("state") == "absent":
+    if module.params["state"] == "absent":
         (changed, instance) = cancel_instance(module)
 
-    elif module.params.get("state") == "present":
+    elif module.params["state"] == "present":
         (changed, instance) = create_virtual_instance(module)
-        if module.params.get("wait") is True and instance:
+        if module.params["wait"] is True and instance:
             (changed, instance) = wait_for_instance(module, instance["id"])
 
     module.exit_json(changed=changed, instance=json.loads(json.dumps(instance, default=lambda o: o.__dict__)))
