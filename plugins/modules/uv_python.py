@@ -351,63 +351,29 @@ def main():
         supports_check_mode=True,
     )
 
-    result = dict(
-        changed=False,
-        stdout="",
-        stderr="",
-        rc=0,
-        python_versions=[],
-        python_paths=[],
-        failed=False,
-    )
     state = module.params["state"]
-    exec_result = {}
     uv = UV(module)
 
     if state == "present":
-        exec_result = dict(
-            zip(
-                [
-                    "changed",
-                    "stdout",
-                    "stderr",
-                    "rc",
-                    "python_versions",
-                    "python_paths",
-                ],
-                uv.install_python(),
-            )
-        )
+        uv_results = uv.install_python()
     elif state == "absent":
-        exec_result = dict(
-            zip(
-                [
-                    "changed",
-                    "stdout",
-                    "stderr",
-                    "rc",
-                    "python_versions",
-                    "python_paths",
-                ],
-                uv.uninstall_python(),
-            )
-        )
+        uv_results = uv.uninstall_python()
     elif state == "latest":
-        exec_result = dict(
-            zip(
-                [
-                    "changed",
-                    "stdout",
-                    "stderr",
-                    "rc",
-                    "python_versions",
-                    "python_paths",
-                ],
-                uv.upgrade_python(),
-            )
-        )
+        uv_results = uv.upgrade_python()
 
-    result.update(exec_result)
+    result = dict(
+        zip(
+            [
+                "changed",
+                "stdout",
+                "stderr",
+                "rc",
+                "python_versions",
+                "python_paths",
+            ],
+            uv_results,
+        )
+    )
 
     module.exit_json(**result)
 
