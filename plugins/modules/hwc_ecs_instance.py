@@ -556,7 +556,7 @@ def main():
 
                 changed = True
 
-            result["id"] = module.params.get("id")
+            result["id"] = module.params["id"]
         else:
             result = dict()
             if is_exist:
@@ -588,24 +588,24 @@ def _init(config):
 
 def user_input_parameters(module):
     return {
-        "admin_pass": module.params.get("admin_pass"),
-        "availability_zone": module.params.get("availability_zone"),
-        "data_volumes": module.params.get("data_volumes"),
-        "description": module.params.get("description"),
-        "eip_id": module.params.get("eip_id"),
-        "enable_auto_recovery": module.params.get("enable_auto_recovery"),
-        "enterprise_project_id": module.params.get("enterprise_project_id"),
-        "flavor_name": module.params.get("flavor_name"),
-        "image_id": module.params.get("image_id"),
-        "name": module.params.get("name"),
-        "nics": module.params.get("nics"),
-        "root_volume": module.params.get("root_volume"),
-        "security_groups": module.params.get("security_groups"),
-        "server_metadata": module.params.get("server_metadata"),
-        "server_tags": module.params.get("server_tags"),
-        "ssh_key_name": module.params.get("ssh_key_name"),
-        "user_data": module.params.get("user_data"),
-        "vpc_id": module.params.get("vpc_id"),
+        "admin_pass": module.params["admin_pass"],
+        "availability_zone": module.params["availability_zone"],
+        "data_volumes": module.params["data_volumes"],
+        "description": module.params["description"],
+        "eip_id": module.params["eip_id"],
+        "enable_auto_recovery": module.params["enable_auto_recovery"],
+        "enterprise_project_id": module.params["enterprise_project_id"],
+        "flavor_name": module.params["flavor_name"],
+        "image_id": module.params["image_id"],
+        "name": module.params["name"],
+        "nics": module.params["nics"],
+        "root_volume": module.params["root_volume"],
+        "security_groups": module.params["security_groups"],
+        "server_metadata": module.params["server_metadata"],
+        "server_tags": module.params["server_tags"],
+        "ssh_key_name": module.params["ssh_key_name"],
+        "user_data": module.params["user_data"],
+        "vpc_id": module.params["vpc_id"],
     }
 
 
