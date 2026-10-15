@@ -78,7 +78,7 @@ def is_valid_ip_addr(ip_addr: str) -> bool:
     """Validates given string as IPv4 address for given string.
 
     Args:
-        ip_addr (str): string to validate as IPv4 address.
+        ip_addr: string to validate as IPv4 address.
 
     Returns:
         bool: True if string is valid IPv4 address, else False.
@@ -104,7 +104,7 @@ def is_valid_ip_netmask(ip_netmask: str) -> bool:
     """Validates given string as IPv4 netmask.
 
     Args:
-        ip_netmask (str): string to validate as IPv4 netmask.
+        ip_netmask: string to validate as IPv4 netmask.
 
     Returns:
         bool: True if string is valid IPv4 netmask, else False.
@@ -136,7 +136,7 @@ def is_valid_ip_prefix(ip_prefix: str) -> bool:
     """Validates given string as IPv4 prefix.
 
     Args:
-        ip_prefix (str): string to validate as IPv4 prefix.
+        ip_prefix: string to validate as IPv4 prefix.
 
     Returns:
         bool: True if string is valid IPv4 prefix, else False.
@@ -153,8 +153,8 @@ def ip_prefix_to_netmask(ip_prefix: str, skip_check: bool = False) -> str:
     """Converts IPv4 prefix to netmask.
 
     Args:
-        ip_prefix (str): IPv4 prefix to convert.
-        skip_check (bool): Skip validation of IPv4 prefix
+        ip_prefix: IPv4 prefix to convert.
+        skip_check: Skip validation of IPv4 prefix
             (default: False). Use if you are sure IPv4 prefix is valid.
 
     Returns:
@@ -176,8 +176,8 @@ def ip_netmask_to_prefix(ip_netmask: str, skip_check: bool = False) -> str:
     """Converts IPv4 netmask to prefix.
 
     Args:
-        ip_netmask (str): IPv4 netmask to convert.
-        skip_check (bool): Skip validation of IPv4 netmask
+        ip_netmask: IPv4 netmask to convert.
+        skip_check: Skip validation of IPv4 netmask
             (default: False). Use if you are sure IPv4 netmask is valid.
 
     Returns:
@@ -199,7 +199,7 @@ def is_valid_ip6_addr(ip6_addr: str) -> bool:
     """Validates given string as IPv6 address.
 
     Args:
-        ip6_addr (str): string to validate as IPv6 address.
+        ip6_addr: string to validate as IPv6 address.
 
     Returns:
         bool: True if string is valid IPv6 address, else False.
@@ -233,7 +233,7 @@ def is_valid_ip6_prefix(ip6_prefix: str) -> bool:
     """Validates given string as IPv6 prefix.
 
     Args:
-        ip6_prefix (str): string to validate as IPv6 prefix.
+        ip6_prefix: string to validate as IPv6 prefix.
 
     Returns:
         bool: True if string is valid IPv6 prefix, else False.
