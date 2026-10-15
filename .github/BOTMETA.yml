@@ -491,6 +491,9 @@ files:
     maintainers: $team_wdc
   $module_utils/_onepassword.py:
     maintainers: samdoran
+  $module_utils/_onepassword_cli.py:
+    labels: onepassword
+    maintainers: azenk russoz samdoran
   $module_utils/_oneview.py:
     maintainers: adriane-cardozo fgbulsoni tmiotto
   $module_utils/_online.py:

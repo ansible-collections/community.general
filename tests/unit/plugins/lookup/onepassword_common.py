@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import os
 
-from ansible_collections.community.general.plugins.lookup.onepassword import (
+from ansible_collections.community.general.plugins.module_utils._onepassword_cli import (
     OnePassCLIv2,
 )
 
