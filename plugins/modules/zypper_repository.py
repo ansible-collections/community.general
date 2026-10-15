@@ -131,6 +131,7 @@ import traceback
 XML_IMP_ERR = None
 try:
     from xml.dom.minidom import parseString as parseXML
+    from xml.parsers.expat import ExpatError
 
     HAS_XML = True
 except ImportError:
@@ -144,6 +145,9 @@ from ansible.module_utils.common.text.converters import to_text
 from ansible.module_utils.urls import fetch_url
 
 from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
+
+# zypper substitutes $releasever with /product/version from this file
+BASEPRODUCT_FILE = "/etc/products.d/baseproduct"
 
 REPO_OPTS = ["alias", "name", "priority", "enabled", "autorefresh", "gpgcheck"]
 
@@ -185,6 +189,21 @@ def _parse_repos(module):
         module.fail_json(msg=f'Failed to execute "{" ".join(cmd)}"', rc=rc, stdout=stdout, stderr=stderr)
 
 
+def get_releasever(module):
+    """Return the value zypper substitutes for $releasever."""
+    try:
+        with open(BASEPRODUCT_FILE, "rb") as f:
+            product = parseXML(f.read()).documentElement
+        for node in product.childNodes:
+            if node.nodeName == "version" and node.firstChild:
+                return node.firstChild.data.strip()
+    except (OSError, ExpatError):
+        pass
+    cmd = ["rpm", "-q", "--qf", "%{version}", "-f", "/etc/os-release"]
+    rc, stdout, stderr = module.run_command(cmd, check_rc=True)
+    return stdout
+
+
 def _repo_changes(module, realrepo, repocmp):
     "Check whether the 2 given repos have different settings."
     for k in repocmp:
@@ -197,10 +216,9 @@ def _repo_changes(module, realrepo, repocmp):
             valnew = v or ""
             if k == "url":
                 if "$releasever" in valold or "$releasever" in valnew:
-                    cmd = ["rpm", "-q", "--qf", "%{version}", "-f", "/etc/os-release"]
-                    rc, stdout, stderr = module.run_command(cmd, check_rc=True)
-                    valnew = valnew.replace("$releasever", stdout)
-                    valold = valold.replace("$releasever", stdout)
+                    releasever = get_releasever(module)
+                    valnew = valnew.replace("$releasever", releasever)
+                    valold = valold.replace("$releasever", releasever)
                 if "$basearch" in valold or "$basearch" in valnew:
                     cmd = ["rpm", "-q", "--qf", "%{arch}", "-f", "/etc/os-release"]
                     rc, stdout, stderr = module.run_command(cmd, check_rc=True)
