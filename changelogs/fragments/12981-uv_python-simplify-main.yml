@@ -1,0 +1,2 @@
+minor_changes:
+  - uv_python - simplify result handling in the module code (https://github.com/ansible-collections/community.general/pull/12981).
