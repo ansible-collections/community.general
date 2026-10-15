@@ -1,0 +1,3 @@
+minor_changes:
+  - packet_device - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12975).
+  - terraform - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12975).
