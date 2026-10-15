@@ -123,6 +123,7 @@ test_cases:
     output:
       changed: true
       rc: 0
+      reboot_required: false
       name: [nmap]
       state: present
     mocks:
@@ -507,6 +508,7 @@ test_cases:
       changed: true
       failed: false
       rc: 102
+      reboot_required: true
     mocks:
       run_command:
         - command: *update_all
@@ -525,6 +527,7 @@ test_cases:
       changed: true
       failed: false
       rc: 102
+      reboot_required: true
     mocks:
       run_command:
         - command:
