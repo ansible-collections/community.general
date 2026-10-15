@@ -117,9 +117,6 @@ test_cases:
         - *iscsiadm-session-active
 
   - id: login_needed
-    # Note: target_login() is called as target_login(module, target, portal, port)
-    # where portal=None is passed as check_rc — a known bug at line 484.
-    # The login command therefore has check_rc=None and no --portal flag appended.
     input:
       login: true
       target: *target
@@ -135,7 +132,31 @@ test_cases:
         - *iscsiadm-node-cached
         - *iscsiadm-session-empty
         - command: [/testbin/iscsiadm, --mode, node, --targetname, *target, --login]
-          environ: {check_rc: null}
+          environ: {check_rc: true}
+          rc: 0
+          out: ''
+          err: ''
+
+  - id: login_needed_with_portal
+    input:
+      login: true
+      target: *target
+      portal: 10.1.2.3
+    output:
+      changed: true
+      connection_changed: true
+      devicenodes: []
+    mocks:
+      socket_getaddrinfo:
+        return: 10.1.2.3
+      glob_glob:
+        return: []
+      time_sleep: true
+      run_command:
+        - *iscsiadm-node-cached
+        - *iscsiadm-session-empty
+        - command: [/testbin/iscsiadm, --mode, node, --targetname, *target, --login, --portal, "10.1.2.3:3260"]
+          environ: {check_rc: true}
           rc: 0
           out: ''
           err: ''
