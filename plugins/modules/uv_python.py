@@ -232,9 +232,9 @@ class UV:
         Execute a uv python subcommand.
         Args:
           python_version: Python version specifier (e.g. "3.12", "3.12.3").
-          command (str): uv python subcommand (e.g. "install", "uninstall", "find").
+          command: uv python subcommand (e.g. "install", "uninstall", "find").
           *args: Additional positional arguments passed to the command.
-          check_rc (bool): Whether to fail if the command exits with non-zero return code.
+          check_rc: Whether to fail if the command exits with non-zero return code.
         """
         cmd = [
             self.bin_path,
@@ -255,7 +255,7 @@ class UV:
         if inside a virtualenv otherwise it returns latest installed patch version.
         Args:
           *args: Additional positional arguments passed to _exec.
-          check_rc (bool): Whether to fail if the command exits with non-zero return code.
+          check_rc: Whether to fail if the command exits with non-zero return code.
         """
         rc, out, err = self._exec(self.python_version_str, "find", *args, check_rc=check_rc)
         if rc == 0:
@@ -268,7 +268,7 @@ class UV:
         Official documentation https://docs.astral.sh/uv/reference/cli/#uv-python-list
         Args:
           *args: Additional positional arguments passed to _exec.
-          check_rc (bool): Whether to fail if the command exits with non-zero return code.
+          check_rc: Whether to fail if the command exits with non-zero return code.
         """
         rc, out, err = self._exec(
             self.python_version_str,
