@@ -96,9 +96,9 @@ def onepassword_errors():
     try:
         yield
     except OnePasswordOptionsError as e:
-        raise AnsibleOptionsError(str(e)) from None
+        raise AnsibleOptionsError(str(e)) from e
     except OnePasswordError as e:
-        raise AnsibleLookupError(str(e)) from None
+        raise AnsibleLookupError(str(e)) from e
 
 
 def run_command(command, command_input=None, environment_update=None):
