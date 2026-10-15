@@ -264,6 +264,16 @@ EXAMPLES = r"""
     skip_post_errors: true
 """
 
+RETURN = r"""
+reboot_required:
+  description:
+    - Whether zypper reported that a reboot is needed (return code V(102)).
+  returned: success
+  type: bool
+  sample: false
+  version_added: 14.0.0
+"""
+
 import os.path
 import re
 import xml
@@ -690,6 +700,7 @@ def main():
             packages_changed, retvals = package_present(module, name, state == "latest")
 
     retvals["changed"] = retvals["rc"] in [0, 102] and bool(packages_changed)
+    retvals["reboot_required"] = retvals["rc"] == 102
 
     if module._diff:
         set_diff(module, retvals, packages_changed)
@@ -701,8 +712,7 @@ def main():
         del retvals["stdout"]
         del retvals["stderr"]
 
-    # rc 102 (ZYPPER_EXIT_INF_REBOOT_NEEDED) is a success. Set failed explicitly,
-    # otherwise ansible-core treats the non-zero rc as a failure.
+    # must force failed=False for 102 case
     module.exit_json(name=name, state=state, update_cache=update_cache, failed=False, **retvals)
 
 
