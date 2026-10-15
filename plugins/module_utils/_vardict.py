@@ -63,12 +63,12 @@ class _Variable:
         """Set the metadata for the variable
 
         Args:
-            output (bool, optional): flag indicating whether the variable should be in the output of the module. Defaults to None.
-            diff (bool, optional): flag indicating whether to generate diff mode output for this variable. Defaults to None.
-            change (bool, optional): flag indicating whether to track if changes happened to this variable. Defaults to None.
-            fact (bool, optional): flag indicating whether the variable should be exposed as a fact of the module. Defaults to None.
-            initial_value (any, optional): initial value of the variable, to be used with `change`. Defaults to NOTHING.
-            verbosity (int, optional): level of verbosity in which this variable is reported by the module as `output`, `fact` or `diff`. Defaults to None.
+            output: flag indicating whether the variable should be in the output of the module. Defaults to None.
+            diff: flag indicating whether to generate diff mode output for this variable. Defaults to None.
+            change: flag indicating whether to track if changes happened to this variable. Defaults to None.
+            fact: flag indicating whether the variable should be exposed as a fact of the module. Defaults to None.
+            initial_value: initial value of the variable, to be used with `change`. Defaults to NOTHING.
+            verbosity: level of verbosity in which this variable is reported by the module as `output`, `fact` or `diff`. Defaults to None.
         """
         if output is not None:
             self.output = output
@@ -169,7 +169,7 @@ class VarDict:
         """Set the metadata for the variable
 
         Args:
-            name (str): name of the variable having its metadata changed
+            name: name of the variable having its metadata changed
             output (bool, optional): flag indicating whether the variable should be in the output of the module. Defaults to None.
             diff (bool, optional): flag indicating whether to generate diff mode output for this variable. Defaults to None.
             change (bool, optional): flag indicating whether to track if changes happened to this variable. Defaults to None.
@@ -188,7 +188,7 @@ class VarDict:
         For details on the accepted metada see the documentation for method `set_meta`.
 
         Args:
-            name (str): name of the variable being changed
+            name: name of the variable being changed
             value (any): the value of the variable, it can be of any type
 
         Raises:
