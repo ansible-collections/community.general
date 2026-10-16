@@ -189,15 +189,15 @@ class Svc:
             if m:
                 self.duration = m.group(1)
 
-            if re.search(" up ", out):
+            if " up " in out:
                 self.state = "start"
-            elif re.search(" down ", out):
+            elif " down " in out:
                 self.state = "stopp"
             else:
                 self.state = "unknown"
                 return
 
-            if re.search(" want ", out):
+            if " want " in out:
                 self.state += "ing"
             else:
                 self.state += "ed"

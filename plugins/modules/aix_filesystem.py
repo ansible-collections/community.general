@@ -169,7 +169,6 @@ EXAMPLES = r"""
 """
 
 
-import re
 from os.path import ismount
 
 from ansible.module_utils.basic import AnsibleModule
@@ -186,7 +185,7 @@ def _fs_exists(module, filesystem):
     lsfs_cmd = module.get_bin_path("lsfs", True)
     rc, lsfs_out, err = module.run_command([lsfs_cmd, "-l", filesystem])
     if rc == 1:
-        if re.findall("No record matching", err):
+        if "No record matching" in err:
             return False
 
         else:
@@ -254,14 +253,14 @@ def resize_fs(module, filesystem, size):
             changed = False
             return changed, chfs_out
         elif rc != 0:
-            if re.findall("Maximum allocation for logical", err):
+            if "Maximum allocation for logical" in err:
                 changed = False
                 return changed, err
             else:
                 module.fail_json(msg=f"Failed to run chfs. Error message: {err}")
 
         else:
-            if re.findall("The filesystem size is already", chfs_out):
+            if "The filesystem size is already" in chfs_out:
                 changed = False
             else:
                 changed = True

@@ -1,0 +1,8 @@
+minor_changes:
+  - aix_filesystem - use string operations instead of regular expressions for plain-string patterns (https://github.com/ansible-collections/community.general/pull/12996).
+  - homebrew_cask - use string operations instead of regular expressions for plain-string patterns (https://github.com/ansible-collections/community.general/pull/12996).
+  - hwc_network_vpc - use string operations instead of regular expressions for plain-string patterns (https://github.com/ansible-collections/community.general/pull/12996).
+  - icinga2_feature - use string operations instead of regular expressions for plain-string patterns (https://github.com/ansible-collections/community.general/pull/12996).
+  - macports - use string operations instead of regular expressions for plain-string patterns (https://github.com/ansible-collections/community.general/pull/12996).
+  - openbsd_pkg - use string operations instead of regular expressions for plain-string patterns (https://github.com/ansible-collections/community.general/pull/12996).
+  - svc - use string operations instead of regular expressions for plain-string patterns (https://github.com/ansible-collections/community.general/pull/12996).

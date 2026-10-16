@@ -439,7 +439,7 @@ def parse_package_name(names, pkg_spec, module):
         module.debug(f"parse_package_name(): parsing name: {name}")
         # Do some initial matches so we can base the more advanced regex on that.
         version_match = re.search("-[0-9]", name)
-        versionless_match = re.search("--", name)
+        versionless_match = "--" in name
 
         # Stop if someone is giving us a name that both has a version and is
         # version-less at the same time.

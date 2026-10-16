@@ -101,7 +101,7 @@ class Icinga2FeatureHelper:
                     msg=f"Failed to {feature_enable_str} feature {self.feature_name}. icinga2 command returned {out}"
                 )
 
-            if re.search("already enabled", out) is None:
+            if "already enabled" not in out:
                 change_applied = True
         else:
             if rc == 0:
