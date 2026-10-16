@@ -103,6 +103,17 @@ nox -Re ansible-test-units-devel-3.14 -- tests/unit/plugins/modules/net_tools/te
 
 If you replace `-Re` with `-e`, then the virtual environments will be re-created. The `-R` re-uses them (if they already exist).
 
+### Periodic integration tests
+
+Some integration test targets are marked as `unsupported` because they are too slow or need too many resources to run in CI.
+Those that can run without credentials or special hardware are also tagged with the `periodic` alias, and should be run every once in a while:
+
+```.bash
+nox -Re ansible-test-integration-periodic
+```
+
+Additional options for `ansible-test` can be passed after `--`.
+
 ## Run basic sanity, unit or integration tests locally (with ansible-test)
 
 Instead of using antsibull-nox, you can also run sanity and unit tests with ansible-test directly.

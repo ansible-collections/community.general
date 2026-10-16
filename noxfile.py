@@ -57,6 +57,28 @@ def ansible_output(session: nox.Session) -> None:
     session.run("antsibull-docs", "ansible-output", *args, *session.posargs)
 
 
+# Integration tests for targets that are marked as `unsupported` because they are too slow or
+# resource-hungry for regular CI, but that can still run without credentials or special hardware.
+# These targets are tagged with the `periodic` alias. This session is not registered for CI.
+antsibull_nox.add_ansible_test_session(
+    name="ansible-test-integration-periodic",
+    description="Run integration tests for the unsupported targets tagged as periodic",
+    ansible_test_params=[
+        "integration",
+        "-v",
+        "--docker",
+        "ubuntu",
+        "--display-traceback",
+        "error",
+        "--allow-unsupported",
+        "periodic/",
+    ],
+    extra_deps_files=["tests/integration/requirements.yml"],
+    ansible_core_version="devel",
+    default=False,
+)
+
+
 @nox.session(name="update-azp-config", python=False)
 def update_azp_config(session: nox.Session) -> None:
     command = [

@@ -4,6 +4,7 @@
 
 azp/posix/1
 destructive
+periodic
 skip/macos
 skip/freebsd
 unsupported
