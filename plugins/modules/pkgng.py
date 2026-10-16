@@ -528,6 +528,12 @@ def main():
         # to module.run_command, then merge its values into pkgng_env
         pkgng_env.update(kwargs.pop("environ_update", dict()))
 
+        # pkg(8) still asks interactive questions that BATCH=yes does not cover,
+        # such as the one about an OS version mismatch. Feed it a newline so the
+        # question gets its default answer, and rely on run_command closing stdin
+        # afterwards, instead of letting the task block forever on the prompt.
+        kwargs.setdefault("data", "\n")
+
         return module.run_command(cmd + list(args), environ_update=pkgng_env, **kwargs)
 
     if pkgs == ["*"] and p["state"] == "latest":
