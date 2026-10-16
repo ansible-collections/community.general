@@ -117,6 +117,7 @@ def remove_packages(module, packages):
         pkg_delete_path = f"{pkg_delete_path} delete -y"
 
     # Using a for loop in case of error, we can report the package that failed
+    digits_re = re.compile("[0-9]")
     for package in packages:
         # Query the package first, to see if we even need to remove
         if not query_package(module, package):
@@ -128,7 +129,7 @@ def remove_packages(module, packages):
         )
 
         if query_package(module, package):
-            name_without_digits = re.sub("[0-9]", "", package)
+            name_without_digits = digits_re.sub("", package)
             # TODO: convert run_comand() argument to list!
             rc, out, err = module.run_command(
                 f"{pkg_delete_path} `{pkg_glob_path} {shlex_quote(name_without_digits)}`", use_unsafe_shell=True

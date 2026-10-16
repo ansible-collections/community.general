@@ -257,7 +257,7 @@ def main():
             nf.write(line)
             continue
 
-        newline = re.sub(space_pattern, " ", line).strip()
+        newline = space_pattern.sub(" ", line).strip()
         if not newline:
             nf.write(line)
             continue

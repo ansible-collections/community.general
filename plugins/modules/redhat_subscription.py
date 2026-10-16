@@ -331,8 +331,9 @@ class Rhsm:
         # non-configuration parameters and replace '_' with '.'.  For example,
         # 'server_hostname' becomes '--server.hostname'.
         options = []
+        config_option_re = re.compile(r"^(server|rhsm)_")
         for k, v in sorted(kwargs.items()):
-            if re.search(r"^(server|rhsm)_", k) and v is not None:
+            if config_option_re.search(k) and v is not None:
                 options.append(f"--{k.replace('_', '.', 1)}={v}")
 
         # When there is nothing to configure, then it is not necessary

@@ -274,11 +274,12 @@ class Npm:
     def list_outdated(self):
         outdated = list()
         data = self._exec(["outdated"], True, False)
+        # node.js v0.10.22 changed the `npm outdated` module separator
+        # from "@" to " ". Split on both for backwards compatibility.
+        separator_re = re.compile(r"\s|@")
         for dep in data.splitlines():
             if dep:
-                # node.js v0.10.22 changed the `npm outdated` module separator
-                # from "@" to " ". Split on both for backwards compatibility.
-                pkg, other = re.split(r"\s|@", dep, maxsplit=1)
+                pkg, other = separator_re.split(dep, maxsplit=1)
                 outdated.append(pkg)
 
         return outdated

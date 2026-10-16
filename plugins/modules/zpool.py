@@ -350,6 +350,7 @@ class Zpool:
                 vdevs.append(current)
             return None
 
+        vdev_group_re = re.compile(r"^(mirror|raidz\d?)-\d+$")
         for line in stdout.splitlines():
             if not in_config:
                 if line.strip().startswith("config:"):
@@ -371,7 +372,7 @@ class Zpool:
                 current = {"role": role, "type": None, "disks": []}
                 continue
 
-            match_group = re.match(r"^(mirror|raidz\d?)-\d+$", device)
+            match_group = vdev_group_re.match(device)
             if match_group:
                 if current and current.get("type") is not None:
                     current = flush_current(current)
@@ -459,6 +460,7 @@ class Zpool:
         saw_pool = False
         vdevs = []
         current = None
+        vdev_group_re = re.compile(r"^(mirror|raidz\d?)\-\d+$")
         for line in stdout.splitlines():
             if not in_cfg:
                 if line.strip().startswith("config:"):
@@ -472,7 +474,7 @@ class Zpool:
                 if device == self.name:
                     saw_pool = True
                 continue
-            if re.match(r"^(mirror|raidz\d?)\-\d+$", device) or device in ("cache", "logs", "spares"):
+            if vdev_group_re.match(device) or device in ("cache", "logs", "spares"):
                 if current:
                     vdevs.append(current)
                 vdev_type = (

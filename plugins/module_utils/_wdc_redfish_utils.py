@@ -224,15 +224,15 @@ class WdcRedfishUtils(RedfishUtils):
 
         # Bundle is for MM or DP G1
         tf = tarfile.open(bundle_temp_filename)
-        pattern_pkg = r"oobm-(.+)\.pkg"
-        pattern_bin = r"(.*\.bin)"
+        pattern_pkg = re.compile(r"oobm-(.+)\.pkg")
+        pattern_bin = re.compile(r"(.*\.bin)")
         bundle_version = None
         is_multi_tenant = None
         for filename in tf.getnames():
-            match_pkg = re.match(pattern_pkg, filename)
+            match_pkg = pattern_pkg.match(filename)
             if match_pkg is not None:
                 bundle_version = match_pkg.group(1)
-            match_bin = re.match(pattern_bin, filename)
+            match_bin = pattern_bin.match(filename)
             if match_bin is not None:
                 bin_filename = match_bin.group(1)
                 bin_file = tf.extractfile(bin_filename)

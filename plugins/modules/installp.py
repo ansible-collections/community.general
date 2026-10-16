@@ -119,8 +119,10 @@ def _check_new_pkg(module, package, repository_path):
 
         else:
             pkg_info = {}
-            for line in package_result.splitlines():
-                if re.findall(package, line):
+            lines = package_result.splitlines()
+            package_re = re.compile(package) if lines else None
+            for line in lines:
+                if package_re.findall(line):
                     pkg_name = line.split()[0].strip()
                     pkg_version = line.split()[1].strip()
                     pkg_info[pkg_name] = pkg_version

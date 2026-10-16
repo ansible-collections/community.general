@@ -77,7 +77,7 @@ def parse_lsusb(module, lsusb_path):
     regex = re.compile(r"^Bus (\d{3}) Device (\d{3}): ID ([0-9a-f]{4}:[0-9a-f]{4}) (.*)$")
     usb_devices = []
     for line in stdout.splitlines():
-        match = re.match(regex, line)
+        match = regex.match(line)
         if not match:
             module.fail_json(msg=f"failed to parse unknown lsusb output {line}", stdout=stdout, stderr=stderr)
         current_device = {"bus": match.group(1), "device": match.group(2), "id": match.group(3), "name": match.group(4)}

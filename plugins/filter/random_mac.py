@@ -59,11 +59,12 @@ def random_mac(value, seed=None):
         raise AnsibleFilterError(f"Invalid value ({value}) for random_mac: 5 colon(:) separated items max")
 
     err = ""
+    hexa_byte_re = re.compile("[a-f0-9]{2}")
     for mac in mac_items:
         if not mac:
             err += ",empty item"
             continue
-        if not re.match("[a-f0-9]{2}", mac):
+        if not hexa_byte_re.match(mac):
             err += f",{mac} not hexa byte"
     err = err.strip(",")
 

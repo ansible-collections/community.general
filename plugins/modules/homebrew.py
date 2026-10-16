@@ -515,9 +515,8 @@ class Homebrew:
         )
         if rc == 0:
             if out and isinstance(out, str):
-                already_updated = any(
-                    re.search(r"Already up-to-date.", s.strip(), re.IGNORECASE) for s in out.split("\n") if s
-                )
+                already_updated_re = re.compile(r"Already up-to-date.", re.IGNORECASE)
+                already_updated = any(already_updated_re.search(s.strip()) for s in out.split("\n") if s)
                 if not already_updated:
                     self.changed = True
                     self.message = "Homebrew updated successfully."

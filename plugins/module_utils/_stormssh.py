@@ -38,6 +38,7 @@ class StormConfig(SSHConfig):
             "host": ["*"],
             "config": {},
         }
+        proxy_re = re.compile(r"^(proxycommand)\s*=*\s*(.*)", re.I)
         for line in file_obj:
             line = line.rstrip("\n").lstrip()
             if line == "":
@@ -67,7 +68,6 @@ class StormConfig(SSHConfig):
             if "=" in line:
                 # Ensure ProxyCommand gets properly split
                 if line.lower().strip().startswith("proxycommand"):
-                    proxy_re = re.compile(r"^(proxycommand)\s*=*\s*(.*)", re.I)
                     match = proxy_re.match(line)
                     key, value = match.group(1).lower(), match.group(2)
                 else:
@@ -167,8 +167,9 @@ class ConfigParser:
         return self
 
     def update_host(self, host, options, use_regex=False):
+        host_re = re.compile(host) if use_regex else None
         for index, host_entry in enumerate(self.config_data):
-            if host_entry.get("host") == host or (use_regex and re.match(host, host_entry.get("host"))):
+            if host_entry.get("host") == host or (host_re and host_re.match(host_entry.get("host"))):
                 if "deleted_fields" in options:
                     deleted_fields = options.pop("deleted_fields")
                     for deleted_field in deleted_fields:
