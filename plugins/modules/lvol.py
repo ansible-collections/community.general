@@ -80,6 +80,12 @@ options:
     type: str
     description:
       - The thin pool volume name. When you want to create a thin provisioned volume, specify a thin pool volume name.
+  pool_metadata_size:
+    type: str
+    description:
+      - The size of the thin pool metadata volume, according to lvcreate (--poolmetadatasize), by default in megabytes.
+      - Only used when creating a thin pool.
+      - It is not used when the thin pool already exists.       
   shrink:
     description:
       - Shrink if current size is higher than size requested.
@@ -314,9 +320,12 @@ def main():
             pvs=dict(type="list", elements="str"),
             resizefs=dict(type="bool", default=False),
             thinpool=dict(type="str"),
+            pool_metadata_size=dict(type="str"),
         ),
         supports_check_mode=True,
         required_one_of=(["lv", "thinpool"],),
+        required_by={"pool_metadata_size": "thinpool"},
+        mutually_exclusive=[["pool_metadata_size", "lv"]],
     )
 
     # Determine if the "--yes" option should be used
@@ -341,6 +350,7 @@ def main():
     size_operator = None
     snapshot = module.params["snapshot"]
     pvs = module.params["pvs"] or []
+    pool_metadata_size = module.params["pool_metadata_size"]
 
     if size:
         # LVEXTEND(8)/LVREDUCE(8) -l, -L options: Check for relative value for resizing
@@ -512,6 +522,7 @@ def main():
                                 yes=use_yes,
                                 size_l=size_value,
                                 opts=opts,
+                                pool_metadata_size=pool_metadata_size,
                                 vg=[f"{vg}/{thinpool}"],
                                 pvs=pvs,
                             )
@@ -522,6 +533,7 @@ def main():
                                 yes=use_yes,
                                 size_L=size_value,
                                 opts=opts,
+                                pool_metadata_size=pool_metadata_size,
                                 vg=[f"{vg}/{thinpool}"],
                                 pvs=pvs,
                             )
