@@ -7,7 +7,13 @@ import json
 import os
 
 import pytest
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
+from ansible.module_utils import basic
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    exit_json,
+    fail_json,
+    set_module_args,
+)
 
 from ansible_collections.community.general.plugins.modules import terraform
 
@@ -87,3 +93,40 @@ def test_main_resolves_relative_project_path(tmp_path, monkeypatch):
             terraform.main()
 
     assert seen["project_path"] == os.path.join(os.getcwd(), "project")
+
+
+@pytest.mark.parametrize("plan_rc,expected_changed", [(2, True), (0, False)])
+def test_terraform_state_planned_changed(mocker, tmp_path, plan_rc, expected_changed):
+    mocker.patch.multiple(
+        basic.AnsibleModule,
+        exit_json=exit_json,
+        fail_json=fail_json,
+    )
+    bin_file = tmp_path / "terraform"
+    bin_file.touch()
+    project_dir = tmp_path / "project"
+    project_dir.mkdir()
+    plan_file = str(tmp_path / "test.tfplan")
+
+    run_command = mocker.patch.object(basic.AnsibleModule, "run_command")
+    run_command.side_effect = [
+        (0, json.dumps({"terraform_version": "1.5.0"}), ""),  # terraform version -json
+        (0, "* default\n", ""),  # terraform workspace list
+        (0, "", ""),  # terraform validate
+        (plan_rc, "Plan output", ""),  # terraform plan -detailed-exitcode
+        (0, "{}", ""),  # terraform output -json
+    ]
+
+    with set_module_args(
+        {
+            "project_path": str(project_dir),
+            "binary_path": str(bin_file),
+            "state": "planned",
+            "plan_file": plan_file,
+        }
+    ):
+        with pytest.raises(AnsibleExitJson) as exc:
+            terraform.main()
+
+    result = exc.value.args[0]
+    assert result["changed"] is expected_changed
