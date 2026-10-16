@@ -1,0 +1,11 @@
+minor_changes:
+  - _alicloud_ecs module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _hwc_utils module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _ipa module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _online module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _opennebula module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _pritunl_api module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _redfish_utils module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _scaleway module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _utm_utils module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).
+  - _vexata module utils - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12984).

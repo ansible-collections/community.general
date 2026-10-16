@@ -212,7 +212,7 @@ def ecs_connect(module: AnsibleModule):
     """Return an ecs connection"""
     ecs_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             ecs = connect_to_acs(footmark.ecs, region, **ecs_params)
@@ -226,7 +226,7 @@ def slb_connect(module: AnsibleModule):
     """Return an slb connection"""
     slb_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             slb = connect_to_acs(footmark.slb, region, **slb_params)
@@ -240,7 +240,7 @@ def dns_connect(module: AnsibleModule):
     """Return an dns connection"""
     dns_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             dns = connect_to_acs(footmark.dns, region, **dns_params)
@@ -254,7 +254,7 @@ def vpc_connect(module: AnsibleModule):
     """Return an vpc connection"""
     vpc_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             vpc = connect_to_acs(footmark.vpc, region, **vpc_params)
@@ -268,7 +268,7 @@ def rds_connect(module: AnsibleModule):
     """Return an rds connection"""
     rds_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             rds = connect_to_acs(footmark.rds, region, **rds_params)
@@ -282,7 +282,7 @@ def ess_connect(module: AnsibleModule):
     """Return an ess connection"""
     ess_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             ess = connect_to_acs(footmark.ess, region, **ess_params)
@@ -296,7 +296,7 @@ def sts_connect(module: AnsibleModule):
     """Return an sts connection"""
     sts_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             sts = connect_to_acs(footmark.sts, region, **sts_params)
@@ -310,7 +310,7 @@ def ram_connect(module: AnsibleModule):
     """Return an ram connection"""
     ram_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             ram = connect_to_acs(footmark.ram, region, **ram_params)
@@ -324,7 +324,7 @@ def market_connect(module: AnsibleModule):
     """Return an market connection"""
     market_params = get_profile(module.params)
     # If we have a region specified, connect to its endpoint.
-    region = module.params.get("alicloud_region")
+    region = module.params["alicloud_region"]
     if region:
         try:
             market = connect_to_acs(footmark.market, region, **market_params)

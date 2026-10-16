@@ -55,7 +55,7 @@ class IPAClient:
         self.protocol = protocol
         self.module = module
         self.headers = None
-        self.timeout = module.params.get("ipa_timeout")
+        self.timeout = module.params["ipa_timeout"]
         self.use_gssapi = False
 
     def get_base_url(self) -> str:

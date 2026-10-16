@@ -44,6 +44,7 @@ def test_combine_headers_returns_only_default2():
             "utm_port": 1234,
             "utm_token": "utm_token",
             "name": "FakeName",
+            "headers": None,
         }
     )
     result = UTM(module, "endpoint", [])._combine_headers()
