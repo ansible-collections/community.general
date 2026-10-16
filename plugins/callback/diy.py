@@ -32,7 +32,7 @@ notes:
   - 'B(Condition) for all C(msg) options: if value V(is not None and not omit and length is greater than 0), then the option
     is being used with output. B(Effect): render value as template and output.'
   - 'The literal strings V(None) and V(omit) do not select the unused state. INI and environment values are text, so
-    C(playbook_on_include_msg = None) prints the word V(None). Documentation shows C(= None) only because the option is unset.'
+    C(playbook_on_include_msg = None) in ansible.cfg prints the word V(None). '
   - 'Leave the option unset to keep the default callback output. An empty value suppresses output instead.'
   - 'Valid color values: V(black), V(bright gray), V(blue), V(white), V(green), V(bright blue), V(cyan), V(bright green),
     V(red), V(bright cyan), V(purple), V(bright red), V(yellow), V(bright purple), V(dark gray), V(bright yellow), V(magenta),

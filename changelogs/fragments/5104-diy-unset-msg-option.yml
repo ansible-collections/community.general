@@ -1,2 +1,0 @@
-bugfixes:
-  - diy callback - document that the literal strings ``None`` and ``omit`` are printed, and that an unset option keeps the default callback output (https://github.com/ansible-collections/community.general/issues/5104).
