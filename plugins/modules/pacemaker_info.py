@@ -14,6 +14,8 @@ author:
 version_added: 11.2.0
 description:
   - Gather information about a Pacemaker cluster.
+requirements:
+  - pcs >= 0.11.6
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.info_module
@@ -78,16 +80,14 @@ class PacemakerInfo(ModuleHelper):
 
     def __init_module__(self):
         self.runner = pacemaker_runner(self.module)
-        with self.runner("version") as ctx:
-            rc, out, err = ctx.run()
-            self.vars.version = out.strip()
+        self.vars.version = self.runner.raw_version
 
     def _process_command_output(self, cli_action=""):
         def process(rc, out, err):
             if rc != 0:
                 self.do_raise(f"pcs {cli_action} config failed with error (rc={rc}): {err}")
-            out = json.loads(out)
-            return None if out == "" else out
+            parsed = json.loads(out) if out else None
+            return parsed if parsed else None
 
         return process
 

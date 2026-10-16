@@ -5,6 +5,10 @@
 ---
 anchors:
   environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  property_config_no_maintenance: &prop-no-maint >
+    {"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null, "nvpairs": []}]}
+  property_config_maintenance_true: &prop-maint-true >
+    {"nvsets": [{"id": "cib-bootstrap-options", "options": {}, "rule": null, "nvpairs": [{"id": "cib-bootstrap-options-maintenance-mode", "name": "maintenance-mode", "value": "true"}]}]}
 test_cases:
   - id: test_missing_input
     input: {}
@@ -30,30 +34,20 @@ test_cases:
           rc: 1
           out: ""
           err: "Error: resource or tag id 'virtual-ip' not found"
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]"]
           environ: *env-def
           rc: 0
           out: "Assumed agent name 'ocf:heartbeat:IPaddr2' (deduced from 'IPAddr2')"
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
@@ -108,30 +102,20 @@ test_cases:
           rc: 1
           out: ""
           err: "Error: resource or tag id 'virtual-ip' not found"
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, create, virtual-ip, ocf:heartbeat:IPaddr2, "ip=[192.168.2.1]", op, start, timeout=1200, op, stop, timeout=1200, op, monitor, timeout=1200, meta, test_meta1=123, meta, test_meta2=456, --group, test_group, clone, test_clone, test_clone_meta1=789]
           environ: *env-def
           rc: 0
           out: "Assumed agent name 'ocf:heartbeat:IPaddr2'"
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
@@ -162,30 +146,20 @@ test_cases:
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]"]
           environ: *env-def
           rc: 1
           out: ""
           err: "Error: 'virtual-ip' already exists\n"
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
@@ -216,83 +190,20 @@ test_cases:
           rc: 1
           out: ""
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
           rc: 0
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
-            maintenance-mode=true
+          out: *prop-maint-true
           err: ""
         - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]"]
           environ: *env-def
           rc: 0
           out: ""
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
           rc: 0
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
-            maintenance-mode=true
-          err: ""
-        - command: [/testbin/pcs, resource, status, virtual-ip]
-          environ: *env-def
-          rc: 0
-          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped"
-          err: ""
-  - id: test_present_minimal_input_resource_maintenance_mode_version_change
-    input:
-      state: present
-      name: virtual-ip
-      resource_type:
-        resource_name: IPaddr2
-      resource_option:
-        - "ip=[192.168.2.1]"
-    output:
-      changed: true
-      previous_value: null
-      value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped"
-    mocks:
-      run_command:
-        - command: [/testbin/pcs, resource, status, virtual-ip]
-          environ: *env-def
-          rc: 1
-          out: ""
-          err: ""
-        - command: [/testbin/pcs, property, config]
-          environ: *env-def
-          rc: 0
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure: corosync
-            cluster-name: hacluster
-            dc-version: 2.1.9-1.fc41-7188dbf
-            have-watchdog: false
-            maintenance-mode: true
-          err: ""
-        - command: [/testbin/pcs, resource, create, virtual-ip, IPaddr2, "ip=[192.168.2.1]"]
-          environ: *env-def
-          rc: 0
-          out: ""
-          err: ""
-        - command: [/testbin/pcs, property, config]
-          environ: *env-def
-          rc: 0
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure: corosync
-            cluster-name: hacluster
-            dc-version: 2.1.9-1.fc41-7188dbf
-            have-watchdog: false
-            maintenance-mode: true
+          out: *prop-maint-true
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
@@ -314,15 +225,10 @@ test_cases:
           rc: 1
           out: ""
           err: "Error: resource or tag id 'virtual-ip' not found"
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, remove, virtual-ip]
           environ: *env-def
@@ -349,15 +255,10 @@ test_cases:
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, remove, virtual-ip]
           environ: *env-def
@@ -384,16 +285,10 @@ test_cases:
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
           rc: 0
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
-            maintenance-mode=true
+          out: *prop-maint-true
           err: ""
         - command: [/testbin/pcs, resource, remove, virtual-ip, --force]
           environ: *env-def
@@ -580,15 +475,15 @@ test_cases:
           rc: 1
           out: ""
           err: "Error: resource or tag id 'virtual-ip' not found"
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, resource, config, virtual-ip, --output-format=json]
           environ: *env-def
           rc: 1
-          out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+          out: ""
+          err: "Error: unable to find resource: virtual-ip"
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, clone, virtual-ip]
           environ: *env-def
@@ -615,30 +510,184 @@ test_cases:
           rc: 0
           out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, resource, config, virtual-ip, --output-format=json]
           environ: *env-def
-          rc: 1
+          rc: 0
           out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+            {"primitives": [{"id": "virtual-ip", "agent_name": {"standard": "ocf", "provider": "heartbeat", "type": "IPaddr2"},
+            "description": null, "operations": [], "meta_attributes": [], "instance_attributes": [], "utilization": []}],
+            "clones": [], "groups": [], "bundles": []}
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, clone, virtual-ip, test_clone, meta, test_clone_meta1=789]
           environ: *env-def
           rc: 0
           out: ""
           err: ""
-        - command: [/testbin/pcs, property, config]
+        - command: [/testbin/pcs, property, config, --output-format=json]
           environ: *env-def
-          rc: 1
+          rc: 0
+          out: *prop-no-maint
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+  - id: test_clone_resource_already_cloned
+    input:
+      state: cloned
+      name: virtual-ip
+    output:
+      changed: false
+      previous_value: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, config, virtual-ip, --output-format=json]
+          environ: *env-def
+          rc: 0
           out: |
-            Cluster Properties: cib-bootstrap-options
-            cluster-infrastructure=corosync
-            cluster-name=hacluster
-            dc-version=2.1.9-1.fc41-7188dbf
-            have-watchdog=false
+            {"primitives": [{"id": "virtual-ip", "agent_name": {"standard": "ocf", "provider": "heartbeat", "type": "IPaddr2"},
+            "description": null, "operations": [], "meta_attributes": [], "instance_attributes": [], "utilization": []}],
+            "clones": [{"id": "virtual-ip-clone", "description": null, "member_id": "virtual-ip",
+            "meta_attributes": [], "instance_attributes": []}], "groups": [], "bundles": []}
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+  - id: test_clone_group_already_cloned
+    input:
+      state: cloned
+      name: locking
+    output:
+      changed: false
+      previous_value: "  * Clone Set: locking-clone [locking]:\n    * Started: [ md-nds-smb01 md-nds-smb02 md-nds-smb03 ]"
+      value: "  * Clone Set: locking-clone [locking]:\n    * Started: [ md-nds-smb01 md-nds-smb02 md-nds-smb03 ]"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, locking]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: locking-clone [locking]:\n    * Started: [ md-nds-smb01 md-nds-smb02 md-nds-smb03 ]"
+          err: ""
+        - command: [/testbin/pcs, resource, config, locking, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: |
+            {"primitives": [], "clones": [{"id": "locking-clone", "description": null,
+            "member_id": "locking", "meta_attributes": [], "instance_attributes": []}],
+            "groups": [{"id": "locking", "description": null, "member_ids": ["dlm", "clvmd"],
+            "meta_attributes": [], "instance_attributes": []}], "bundles": []}
+          err: ""
+        - command: [/testbin/pcs, resource, status, locking]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: locking-clone [locking]:\n    * Started: [ md-nds-smb01 md-nds-smb02 md-nds-smb03 ]"
+          err: ""
+  - id: test_clone_when_other_resource_is_cloned
+    # Defensive: another resource in the cluster is cloned but our target is not.
+    # The pre-check must NOT short-circuit just because clones[] is non-empty.
+    input:
+      state: cloned
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, config, virtual-ip, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: |
+            {"primitives": [{"id": "virtual-ip", "agent_name": {"standard": "ocf", "provider": "heartbeat", "type": "IPaddr2"},
+            "description": null, "operations": [], "meta_attributes": [], "instance_attributes": [], "utilization": []}],
+            "clones": [{"id": "other-clone", "description": null, "member_id": "other",
+            "meta_attributes": [], "instance_attributes": []}], "groups": [], "bundles": []}
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
+          err: ""
+        - command: [/testbin/pcs, resource, clone, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+  - id: test_clone_when_resource_config_returns_invalid_json
+    # Defensive: pcs resource config returns garbage. The pre-check must NOT crash
+    # and must fall through to attempting the clone, letting pcs report the real error.
+    input:
+      state: cloned
+      name: virtual-ip
+    output:
+      changed: true
+      previous_value: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+      value: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started"
+          err: ""
+        - command: [/testbin/pcs, resource, config, virtual-ip, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: "not-valid-json"
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
+          err: ""
+        - command: [/testbin/pcs, resource, clone, virtual-ip]
+          environ: *env-def
+          rc: 0
+          out: ""
+          err: ""
+        - command: [/testbin/pcs, property, config, --output-format=json]
+          environ: *env-def
+          rc: 0
+          out: *prop-no-maint
           err: ""
         - command: [/testbin/pcs, resource, status, virtual-ip]
           environ: *env-def
