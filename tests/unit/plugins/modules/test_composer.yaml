@@ -43,6 +43,25 @@ test_cases:
           out: ''
           err: ''
 
+  - id: install_apcu_autoloader
+    input:
+      command: install
+      working_dir: "/var/www/foo"
+      apcu_autoloader: true
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "help", "install", "--no-interaction", "--format=json"]
+          rc: 0
+          out: |
+            {"definition": {"options": ["apcu-autoloader"]}}
+          err: ''
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "install", "--apcu-autoloader"]
+          rc: 0
+          out: ''
+          err: ''
+
   - id: create_project_runs
     input:
       command: create-project
