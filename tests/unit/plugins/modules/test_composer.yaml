@@ -122,3 +122,22 @@ test_cases:
           rc: 0
           out: ''
           err: ''
+
+  - id: dump_autoload_apcu
+    input:
+      command: dump-autoload
+      working_dir: "/var/www/foo"
+      apcu_autoloader: true
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "help", "dump-autoload", "--no-interaction", "--format=json"]
+          rc: 0
+          out: |
+            {"definition": {"options": ["apcu"]}}
+          err: ''
+        - command: ["/testbin/php", "/testbin/composer", "--working-dir=/var/www/foo", "dump-autoload", "--apcu"]
+          rc: 0
+          out: ''
+          err: ''
