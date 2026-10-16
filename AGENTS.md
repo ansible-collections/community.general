@@ -409,7 +409,7 @@ approval before committing or pushing it.
   - NOT assert static data, such as the contents of the argument spec.
   - Assert negative outcomes where relevant, i.e. that something was _not_ done
     (e.g. no command executed in check mode, only the expected values registered as secrets).
-- Do not add `if __name__ == "__main__":` blocks to test files.
+- Do not add `if __name__ == "__main__":` blocks to unit test scripts.
 - Do not patch `sys.modules` to inject mocks. Import the module normally and patch symbols with `mocker`.
 
 ## Writing integration tests
