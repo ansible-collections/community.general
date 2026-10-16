@@ -21,11 +21,6 @@ options:
     type: str
     env:
       - name: LOGSTASH_SERVER
-        deprecated:
-          why: E(LOGSTASH_SERVER) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
-          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_SERVER) instead.
-          version: '16.0.0'
-          collection_name: community.general
       - name: ANSIBLE_CALLBACK_LOGSTASH_SERVER
         version_added: '14.0.0'
     ini:
@@ -41,11 +36,6 @@ options:
     type: int
     env:
       - name: LOGSTASH_PORT
-        deprecated:
-          why: E(LOGSTASH_PORT) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
-          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_PORT) instead.
-          version: '16.0.0'
-          collection_name: community.general
       - name: ANSIBLE_CALLBACK_LOGSTASH_PORT
         version_added: '14.0.0'
     ini:
@@ -191,11 +181,6 @@ options:
     type: str
     env:
       - name: LOGSTASH_TYPE
-        deprecated:
-          why: E(LOGSTASH_TYPE) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
-          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_TYPE) instead.
-          version: '16.0.0'
-          collection_name: community.general
       - name: ANSIBLE_CALLBACK_LOGSTASH_TYPE
         version_added: '14.0.0'
     ini:
@@ -215,11 +200,6 @@ options:
         key: pre_command
     env:
       - name: LOGSTASH_PRE_COMMAND
-        deprecated:
-          why: E(LOGSTASH_PRE_COMMAND) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
-          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_PRE_COMMAND) instead.
-          version: '16.0.0'
-          collection_name: community.general
       - name: ANSIBLE_CALLBACK_LOGSTASH_PRE_COMMAND
         version_added: '14.0.0'
     vars:
@@ -234,11 +214,6 @@ options:
         key: format_version
     env:
       - name: LOGSTASH_FORMAT_VERSION
-        deprecated:
-          why: E(LOGSTASH_FORMAT_VERSION) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
-          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_FORMAT_VERSION) instead.
-          version: '16.0.0'
-          collection_name: community.general
       - name: ANSIBLE_CALLBACK_LOGSTASH_FORMAT_VERSION
         version_added: '14.0.0'
     vars:
