@@ -2404,9 +2404,10 @@ class Nmcli:
 
     def get_route_params(self, raw_values):
         routes_params = []
+        route_param_re = re.compile(r"([\w-]*)\s?=\s?([^\s,}]*)")
         for raw_value in raw_values:
             route_params = {}
-            for parameter, value in re.findall(r"([\w-]*)\s?=\s?([^\s,}]*)", raw_value):
+            for parameter, value in route_param_re.findall(raw_value):
                 if parameter == "nh":
                     route_params["next_hop"] = value
                 elif parameter == "mt":
@@ -2634,6 +2635,8 @@ class Nmcli:
         diff_before = dict()
         diff_after = dict()
 
+        wake_on_wlan_re = re.compile("0x([0-9A-Fa-f]+)")
+        vpn_data_sep_re = re.compile(r"\s*=\s*")
         for key, value in options.items():
             # We can't just do `if not value` because then if there's a value
             # of 0 specified as an integer it'll be interpreted as empty when
@@ -2644,7 +2647,7 @@ class Nmcli:
             if key in conn_info:
                 current_value = conn_info[key]
                 if key == "802-11-wireless.wake-on-wlan" and current_value is not None:
-                    match = re.match("0x([0-9A-Fa-f]+)", current_value)
+                    match = wake_on_wlan_re.match(current_value)
                     if match:
                         current_value = str(int(match.group(1), 16))
                 if key in ("ipv4.routes", "ipv6.routes") and current_value is not None:
@@ -2665,7 +2668,7 @@ class Nmcli:
                 if key == "vpn.data":
                     if current_value:
                         current_value = sorted(
-                            re.sub(r"\s*=\s*", "=", part.strip(), count=1) for part in current_value.split(",")
+                            vpn_data_sep_re.sub("=", part.strip(), count=1) for part in current_value.split(",")
                         )
                     value = sorted(part.strip() for part in value.split(","))
             else:

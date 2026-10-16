@@ -370,11 +370,12 @@ class BtrfsFilesystem:
     def get_nearest_subvolume(self, subvolume: str) -> BtrfsSubvolume:
         """Return the identified subvolume if existing, else the closest matching parent"""
         subvolumes_by_path = self.__get_subvolumes_by_path()
+        last_component_re = re.compile(r"/[^/]+$")
         while len(subvolume) > 1:
             if subvolume in subvolumes_by_path:
                 return BtrfsSubvolume(self, subvolumes_by_path[subvolume]["id"])
             else:
-                subvolume = re.sub(r"/[^/]+$", "", subvolume)
+                subvolume = last_component_re.sub("", subvolume)
 
         return BtrfsSubvolume(self, 5)
 

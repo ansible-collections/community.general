@@ -109,8 +109,10 @@ def main():
     # pkg(5) FRMIs include a comma before the release number, but
     # AnsibleModule will have split this into multiple items for us.
     # Try to spot where this has happened and fix it.
+    release_re = re.compile(r"^\d+(?:\.\d+)*")
+    version_re = re.compile(r"@[^,]*$")
     for fragment in params["name"]:
-        if re.search(r"^\d+(?:\.\d+)*", fragment) and packages and re.search(r"@[^,]*$", packages[-1]):
+        if release_re.search(fragment) and packages and version_re.search(packages[-1]):
             packages[-1] += f",{fragment}"
         else:
             packages.append(fragment)

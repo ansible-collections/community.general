@@ -193,9 +193,11 @@ def _parse_ip4(ip4):
     iocage_ip4_dict["msg"] = ""
 
     items = ip4.split(",")
+    ip4_re = re.compile("^\\w+\\|(?:\\d{1,3}\\.){3}\\d{1,3}.*$")
+    ip4_split_re = re.compile("\\||/")
     for item in items:
-        if re.match("^\\w+\\|(?:\\d{1,3}\\.){3}\\d{1,3}.*$", item):
-            i = re.split("\\||/", item)
+        if ip4_re.match(item):
+            i = ip4_split_re.split(item)
             if len(i) == 3:
                 iocage_ip4_dict["ip4"].append({"ifc": i[0], "ip": i[1], "mask": i[2]})
             else:

@@ -538,9 +538,10 @@ class LogrotateConfig:
             if self.params["shred"] is False:
                 self.module.fail_json(msg="'shred_cycles' requires 'shred=true'")
 
+        size_re = re.compile(r"^\d+[kMG]?$", re.I)
         for size_param in ["size", "min_size", "max_size"]:
             if self.params[size_param]:
-                if not re.match(r"^\d+[kMG]?$", self.params[size_param], re.I):
+                if not size_re.match(self.params[size_param]):
                     self.module.fail_json(
                         msg=f"'{size_param}' must be in format 'number[k|M|G]' (for example '100M', '1G')"
                     )

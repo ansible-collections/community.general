@@ -606,10 +606,11 @@ class SmartOSTimezone(Timezone):
         is requested, or if the TZ field is not set we fail.
         """
         if key == "name":
+            tz_re = re.compile("^TZ=(.*)$")
             try:
                 with open("/etc/default/init") as f:
                     for line in f:
-                        m = re.match("^TZ=(.*)$", line.strip())
+                        m = tz_re.match(line.strip())
                         if m:
                             return m.groups()[0]
             except Exception:

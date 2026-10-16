@@ -69,8 +69,9 @@ def to_time_unit(human_time, unit="ms", **kwargs):
         raise AnsibleFilterError(f"to_time_unit() got unknown keyword arguments: {', '.join(kwargs.keys())}")
 
     result = 0
+    time_re = re.compile(r"(-?\d+)(\w+)")
     for h_time_string in human_time.split():
-        res = re.match(r"(-?\d+)(\w+)", h_time_string)
+        res = time_re.match(h_time_string)
         if not res:
             raise AnsibleFilterError(f"to_time_unit() can not interpret following string: {human_time}")
 

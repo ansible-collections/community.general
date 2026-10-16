@@ -36,8 +36,9 @@ def main():
     jobs = {}
     count = 0
 
+    coverage_re = re.compile("^Coverage (?P<attempt>[0-9]+) (?P<label>.+)$")
     for name in os.listdir(source_directory):
-        match = re.search("^Coverage (?P<attempt>[0-9]+) (?P<label>.+)$", name)
+        match = coverage_re.search(name)
         label = match.group("label")
         attempt = int(match.group("attempt"))
         jobs[label] = max(attempt, jobs.get(label, 0))

@@ -111,10 +111,9 @@ def selfupdate(module, port_path):
     rc, out, err = module.run_command([port_path, "-v", "selfupdate"])
 
     if rc == 0:
+        ports_parsed_re = re.compile(r"Total number of ports parsed:\s+[^0]")
         updated = any(
-            re.search(r"Total number of ports parsed:\s+[^0]", s.strip()) or "Installing new Macports release" in s
-            for s in out.split("\n")
-            if s
+            ports_parsed_re.search(s.strip()) or "Installing new Macports release" in s for s in out.split("\n") if s
         )
         if updated:
             changed = True

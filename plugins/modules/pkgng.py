@@ -405,12 +405,13 @@ def annotate_packages(module, run_pkgng, packages, annotations):
 
     operation = {"+": annotation_add, "-": annotation_delete, ":": annotation_modify}
 
+    # Note to future maintainers: A dash (-) in a regex character class ([-+:] below)
+    # must appear as the first character in the class, or it will be interpreted
+    # as a range of characters.
+    annotation_re = re.compile(r"(?P<operation>[-+:])(?P<tag>[^=]+)(=(?P<value>.+))?")
     for package in packages:
         for annotation_string in annotations:
-            # Note to future maintainers: A dash (-) in a regex character class ([-+:] below)
-            # must appear as the first character in the class, or it will be interpreted
-            # as a range of characters.
-            annotation = re.match(r"(?P<operation>[-+:])(?P<tag>[^=]+)(=(?P<value>.+))?", annotation_string)
+            annotation = annotation_re.match(annotation_string)
 
             if annotation is None:
                 module.fail_json(msg=f"failed to annotate {package}, invalid annotate string: {annotation_string}")
