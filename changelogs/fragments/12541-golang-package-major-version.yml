@@ -1,0 +1,2 @@
+bugfixes:
+  - "golang_package - correctly resolve binary name for packages ending with major version suffixes (e.g. ``/v2``) to prevent false change detection and repeated reinstalls (https://github.com/ansible-collections/community.general/issues/12541)."
