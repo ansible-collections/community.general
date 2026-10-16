@@ -67,7 +67,7 @@ antsibull_nox.add_ansible_test_session(
         "integration",
         "-v",
         "--docker",
-        "ubuntu2404",
+        "ubuntu",
         "--display-traceback",
         "error",
         "--allow-unsupported",
