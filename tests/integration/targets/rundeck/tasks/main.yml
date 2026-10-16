@@ -155,6 +155,7 @@
     job_id: "{{ rundeck_job_id }}"
     job_options:
       sleep: "5"
+    wait_execution_delay: 1
     wait_execution_timeout: 2
     abort_on_timeout: true
   ignore_errors: true
