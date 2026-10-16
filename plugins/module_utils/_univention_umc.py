@@ -40,8 +40,6 @@ Provides the following functions for working with an UCS server.
 Any other module is not part of the "official" API and may change at any time.
 """
 
-import re
-
 __all__ = [
     "base_dn",
     "config_registry",
@@ -94,7 +92,7 @@ def uldap():
             secret_file = open("/etc/machine.secret")
             bind_dn = config_registry()["ldap/hostdn"]
         pwd_line = secret_file.readline()
-        pwd = re.sub("\n", "", pwd_line)
+        pwd = pwd_line.replace("\n", "")
 
         import univention.admin.uldap
 

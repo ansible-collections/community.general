@@ -112,8 +112,7 @@ def selfupdate(module, port_path):
 
     if rc == 0:
         updated = any(
-            re.search(r"Total number of ports parsed:\s+[^0]", s.strip())
-            or re.search(r"Installing new Macports release", s.strip())
+            re.search(r"Total number of ports parsed:\s+[^0]", s.strip()) or "Installing new Macports release" in s
             for s in out.split("\n")
             if s
         )

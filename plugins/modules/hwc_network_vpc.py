@@ -283,8 +283,8 @@ def get_id_by_name(config):
     link = "vpcs"
     query_link = "?marker={marker}&limit=10"
     link += query_link
-    not_format_keys = re.findall("={marker}", link)
-    none_values = re.findall("=None", link)
+    not_format_keys = "={marker}" in link
+    none_values = "=None" in link
 
     if not (not_format_keys or none_values):
         r = None
