@@ -1,0 +1,35 @@
+minor_changes:
+  - aix_lvol - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - cronvar - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - dpkg_divert - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - gem - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - github_deploy_key - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - homebrew - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - homebrew_cask - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - hpilo_info - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - installp - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - iocage inventory plugin - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - iptables_state - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - irc - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - ldap_attrs - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - logrotate - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - lxd inventory plugin - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - macports - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - nmcli - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - npm - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - openbsd_pkg - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - osx_defaults - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - pam_limits - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - parted - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - pkg5 - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - pkgin - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - pkgng - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - portage - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - portinstall - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - random_mac filter plugin - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - redhat_subscription - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - timezone - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - to_time_unit filter plugin - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - ufw - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - usb_facts - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
+  - zpool - compile regular expressions once outside of loops (https://github.com/ansible-collections/community.general/pull/12999).
