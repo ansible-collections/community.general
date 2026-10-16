@@ -7,7 +7,13 @@ import json
 import os
 
 import pytest
-from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
+from ansible.module_utils import basic
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
+    AnsibleExitJson,
+    exit_json,
+    fail_json,
+    set_module_args,
+)
 
 from ansible_collections.community.general.plugins.modules import terraform
 
@@ -91,13 +97,6 @@ def test_main_resolves_relative_project_path(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize("plan_rc,expected_changed", [(2, True), (0, False)])
 def test_terraform_state_planned_changed(mocker, tmp_path, plan_rc, expected_changed):
-    from ansible.module_utils import basic
-    from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
-        AnsibleExitJson,
-        exit_json,
-        fail_json,
-    )
-
     mocker.patch.multiple(
         basic.AnsibleModule,
         exit_json=exit_json,
