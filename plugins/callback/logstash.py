@@ -21,20 +21,40 @@ options:
     type: str
     env:
       - name: LOGSTASH_SERVER
+        deprecated:
+          why: E(LOGSTASH_SERVER) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
+          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_SERVER) instead.
+          version: '16.0.0'
+          collection_name: community.general
+      - name: ANSIBLE_CALLBACK_LOGSTASH_SERVER
+        version_added: '14.0.0'
     ini:
       - section: callback_logstash
         key: server
         version_added: 1.0.0
+    vars:
+      - name: ansible_callback_logstash_server
+        version_added: '14.0.0'
     default: localhost
   port:
     description: Port on which Logstash is listening. Used with all O(protocol) choices.
     type: int
     env:
       - name: LOGSTASH_PORT
+        deprecated:
+          why: E(LOGSTASH_PORT) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
+          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_PORT) instead.
+          version: '16.0.0'
+          collection_name: community.general
+      - name: ANSIBLE_CALLBACK_LOGSTASH_PORT
+        version_added: '14.0.0'
     ini:
       - section: callback_logstash
         key: port
         version_added: 1.0.0
+    vars:
+      - name: ansible_callback_logstash_port
+        version_added: '14.0.0'
     default: 5000
   protocol:
     description: Transport protocol to use when sending events to Logstash.
@@ -44,10 +64,12 @@ options:
       - http
       - https
     env:
-      - name: LOGSTASH_PROTOCOL
+      - name: ANSIBLE_CALLBACK_LOGSTASH_PROTOCOL
     ini:
       - section: callback_logstash
         key: protocol
+    vars:
+      - name: ansible_callback_logstash_protocol
     default: tcp
     version_added: '14.0.0'
   http_path:
@@ -56,10 +78,12 @@ options:
       O(protocol=http) or O(protocol=https).
     type: str
     env:
-      - name: LOGSTASH_HTTP_PATH
+      - name: ANSIBLE_CALLBACK_LOGSTASH_HTTP_PATH
     ini:
       - section: callback_logstash
         key: http_path
+    vars:
+      - name: ansible_callback_logstash_http_path
     default: /
     version_added: '14.0.0'
   username:
@@ -68,10 +92,12 @@ options:
       and must be set together with O(password).
     type: str
     env:
-      - name: LOGSTASH_USERNAME
+      - name: ANSIBLE_CALLBACK_LOGSTASH_USERNAME
     ini:
       - section: callback_logstash
         key: username
+    vars:
+      - name: ansible_callback_logstash_username
     version_added: '14.0.0'
   password:
     description: >-
@@ -80,38 +106,46 @@ options:
     type: str
     secret: true
     env:
-      - name: LOGSTASH_PASSWORD
+      - name: ANSIBLE_CALLBACK_LOGSTASH_PASSWORD
     ini:
       - section: callback_logstash
         key: password
+    vars:
+      - name: ansible_callback_logstash_password
     version_added: '14.0.0'
   validate_certs:
     description: Whether to validate the TLS certificate of the Logstash server. This option is used only with O(protocol=https).
     type: bool
     default: true
     env:
-      - name: LOGSTASH_VALIDATE_CERTS
+      - name: ANSIBLE_CALLBACK_LOGSTASH_VALIDATE_CERTS
     ini:
       - section: callback_logstash
         key: validate_certs
+    vars:
+      - name: ansible_callback_logstash_validate_certs
     version_added: '14.0.0'
   ca_path:
     description: PEM-formatted file containing the CA certificate used to validate the Logstash server. This option is used only with O(protocol=https).
     type: path
     env:
-      - name: LOGSTASH_CA_PATH
+      - name: ANSIBLE_CALLBACK_LOGSTASH_CA_PATH
     ini:
       - section: callback_logstash
         key: ca_path
+    vars:
+      - name: ansible_callback_logstash_ca_path
     version_added: '14.0.0'
   client_cert:
     description: PEM-formatted certificate chain file for TLS client authentication. This option is used only with O(protocol=https).
     type: path
     env:
-      - name: LOGSTASH_CLIENT_CERT
+      - name: ANSIBLE_CALLBACK_LOGSTASH_CLIENT_CERT
     ini:
       - section: callback_logstash
         key: client_cert
+    vars:
+      - name: ansible_callback_logstash_client_cert
     version_added: '14.0.0'
   client_key:
     description: >-
@@ -119,20 +153,24 @@ options:
       This option is used only with O(protocol=https).
     type: path
     env:
-      - name: LOGSTASH_CLIENT_KEY
+      - name: ANSIBLE_CALLBACK_LOGSTASH_CLIENT_KEY
     ini:
       - section: callback_logstash
         key: client_key
+    vars:
+      - name: ansible_callback_logstash_client_key
     version_added: '14.0.0'
   timeout:
     description: Maximum time in seconds to wait for an HTTP request to complete. This option is used only with O(protocol=http) or O(protocol=https).
     type: int
     default: 10
     env:
-      - name: LOGSTASH_TIMEOUT
+      - name: ANSIBLE_CALLBACK_LOGSTASH_TIMEOUT
     ini:
       - section: callback_logstash
         key: timeout
+    vars:
+      - name: ansible_callback_logstash_timeout
     version_added: '14.0.0'
   retries:
     description: >-
@@ -141,20 +179,32 @@ options:
     type: int
     default: 3
     env:
-      - name: LOGSTASH_RETRIES
+      - name: ANSIBLE_CALLBACK_LOGSTASH_RETRIES
     ini:
       - section: callback_logstash
         key: retries
+    vars:
+      - name: ansible_callback_logstash_retries
     version_added: '14.0.0'
   type:
     description: Message type. Used with all O(protocol) choices.
     type: str
     env:
       - name: LOGSTASH_TYPE
+        deprecated:
+          why: E(LOGSTASH_TYPE) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
+          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_TYPE) instead.
+          version: '16.0.0'
+          collection_name: community.general
+      - name: ANSIBLE_CALLBACK_LOGSTASH_TYPE
+        version_added: '14.0.0'
     ini:
       - section: callback_logstash
         key: type
         version_added: 1.0.0
+    vars:
+      - name: ansible_callback_logstash_type
+        version_added: '14.0.0'
     default: ansible
   pre_command:
     description: Executes command before run and adds its result to the C(ansible_pre_command_output) Logstash field. Used with all O(protocol) choices.
@@ -165,6 +215,16 @@ options:
         key: pre_command
     env:
       - name: LOGSTASH_PRE_COMMAND
+        deprecated:
+          why: E(LOGSTASH_PRE_COMMAND) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
+          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_PRE_COMMAND) instead.
+          version: '16.0.0'
+          collection_name: community.general
+      - name: ANSIBLE_CALLBACK_LOGSTASH_PRE_COMMAND
+        version_added: '14.0.0'
+    vars:
+      - name: ansible_callback_logstash_pre_command
+        version_added: '14.0.0'
   format_version:
     description: Logging format. Used with all O(protocol) choices.
     type: str
@@ -174,6 +234,16 @@ options:
         key: format_version
     env:
       - name: LOGSTASH_FORMAT_VERSION
+        deprecated:
+          why: E(LOGSTASH_FORMAT_VERSION) does not follow the recommended C(ANSIBLE_) environment variable naming convention.
+          alternative: Use E(ANSIBLE_CALLBACK_LOGSTASH_FORMAT_VERSION) instead.
+          version: '16.0.0'
+          collection_name: community.general
+      - name: ANSIBLE_CALLBACK_LOGSTASH_FORMAT_VERSION
+        version_added: '14.0.0'
+    vars:
+      - name: ansible_callback_logstash_format_version
+        version_added: '14.0.0'
     default: v1
     choices:
       - v1
@@ -213,8 +283,8 @@ Logstash HTTP input configuration:
     input {
     http {
       port => 8080
-      user => "${LOGSTASH_USERNAME}"
-      password => "${LOGSTASH_PASSWORD}"
+      user => "${LOGSTASH_HTTP_USER}"
+      password => "${LOGSTASH_HTTP_PASSWORD}"
       ssl_enabled => true
       ssl_certificate => "/etc/logstash/server.crt"
       ssl_key => "/etc/logstash/server.pkcs8.key"

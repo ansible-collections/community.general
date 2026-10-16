@@ -1,2 +1,5 @@
 minor_changes:
   - logstash callback plugin - add support for sending events over HTTP(S), with Basic authentication and TLS client certificate options (https://github.com/ansible-collections/community.general/issues/12897, https://github.com/ansible-collections/community.general/pull/12939).
+  - logstash callback plugin - add C(ANSIBLE_CALLBACK_LOGSTASH) prefixed environment variables and Ansible variables for all options, including the ones that already existed (https://github.com/ansible-collections/community.general/pull/12939).
+deprecated_features:
+  - logstash callback plugin - the E(LOGSTASH_SERVER), E(LOGSTASH_PORT), E(LOGSTASH_TYPE), E(LOGSTASH_PRE_COMMAND), and E(LOGSTASH_FORMAT_VERSION) environment variables are deprecated in favor of their C(ANSIBLE_CALLBACK_LOGSTASH) prefixed equivalents and will be removed in community.general 16.0.0 (https://github.com/ansible-collections/community.general/pull/12939).
