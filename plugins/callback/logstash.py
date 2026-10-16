@@ -256,14 +256,14 @@ Logstash HTTP input configuration:
 
 11-input-http.conf: |-
     input {
-    http {
-      port => 8080
-      user => "${LOGSTASH_HTTP_USER}"
-      password => "${LOGSTASH_HTTP_PASSWORD}"
-      ssl_enabled => true
-      ssl_certificate => "/etc/logstash/server.crt"
-      ssl_key => "/etc/logstash/server.pkcs8.key"
-    }
+      http {
+        port => 8080
+        user => "${LOGSTASH_HTTP_USER}"
+        password => "${LOGSTASH_HTTP_PASSWORD}"
+        ssl_enabled => true
+        ssl_certificate => "/etc/logstash/server.crt"
+        ssl_key => "/etc/logstash/server.pkcs8.key"
+      }
     }
 
 11-input-tcp.conf: |-
@@ -288,6 +288,7 @@ import uuid
 from urllib.error import HTTPError
 
 from ansible import context
+from ansible.errors import AnsibleError
 from ansible.module_utils.urls import open_url
 from ansible.utils.display import Display
 
@@ -473,20 +474,15 @@ class CallbackModule(CallbackBase):
 
         if self.ls_protocol != "tcp":
             if bool(self.ls_username) != bool(self.ls_password):
-                self.disabled = True
-                self._display.warning("Both Logstash HTTP username and password must be configured.")
+                raise AnsibleError("Both Logstash HTTP username and password must be configured.")
             if self.ls_timeout <= 0:
-                self.disabled = True
-                self._display.warning("Logstash HTTP timeout must be greater than zero.")
+                raise AnsibleError("Logstash HTTP timeout must be greater than zero.")
             if self.ls_retries < 0:
-                self.disabled = True
-                self._display.warning("Logstash HTTP retries must be zero or greater.")
+                raise AnsibleError("Logstash HTTP retries must be zero or greater.")
             if self.ls_protocol != "https" and (self.ls_ca_path or self.ls_client_cert or self.ls_client_key):
-                self.disabled = True
-                self._display.warning("Logstash TLS certificate options can only be used with HTTPS.")
+                raise AnsibleError("Logstash TLS certificate options can only be used with HTTPS.")
             if self.ls_client_key and not self.ls_client_cert:
-                self.disabled = True
-                self._display.warning("Logstash client_key requires client_cert.")
+                raise AnsibleError("Logstash client_key requires client_cert.")
 
         self._init_plugin()
 

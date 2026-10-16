@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 from urllib.error import HTTPError
 
 import pytest
+from ansible.errors import AnsibleError
 from ansible.plugins.callback import CallbackBase
 
 from ansible_collections.community.general.plugins.callback import logstash as logstash_callback
@@ -276,22 +277,18 @@ def test_http_protocol_requires_both_credentials():
         "format_version": "v1",
     }
 
-    callback, logger, logstash_mock, formatter_class = _configure_callback(options)
-
-    assert callback.disabled is True
-    logger.addHandler.assert_not_called()
-    logstash_mock.TCPLogstashHandler.assert_not_called()
-    formatter_class.assert_not_called()
+    with pytest.raises(AnsibleError, match="Both Logstash HTTP username and password must be configured."):
+        _configure_callback(options)
 
 
 @pytest.mark.parametrize(
-    ("protocol", "ca_path", "client_cert", "client_key"),
+    ("protocol", "ca_path", "client_cert", "client_key", "message"),
     [
-        ("http", "/etc/pki/ca.pem", None, None),
-        ("https", None, None, "/etc/pki/client.key"),
+        ("http", "/etc/pki/ca.pem", None, None, "Logstash TLS certificate options can only be used with HTTPS."),
+        ("https", None, None, "/etc/pki/client.key", "Logstash client_key requires client_cert."),
     ],
 )
-def test_http_protocol_rejects_invalid_tls_options(protocol, ca_path, client_cert, client_key):
+def test_http_protocol_rejects_invalid_tls_options(protocol, ca_path, client_cert, client_key, message):
     options = {
         "server": "logstash.example.com",
         "port": 8080,
@@ -310,12 +307,8 @@ def test_http_protocol_rejects_invalid_tls_options(protocol, ca_path, client_cer
         "format_version": "v1",
     }
 
-    callback, logger, logstash_mock, formatter_class = _configure_callback(options)
-
-    assert callback.disabled is True
-    logger.addHandler.assert_not_called()
-    logstash_mock.TCPLogstashHandler.assert_not_called()
-    formatter_class.assert_not_called()
+    with pytest.raises(AnsibleError, match=message):
+        _configure_callback(options)
 
 
 def test_http_protocol_rejects_non_positive_timeout():
@@ -337,12 +330,8 @@ def test_http_protocol_rejects_non_positive_timeout():
         "format_version": "v1",
     }
 
-    callback, logger, logstash_mock, formatter_class = _configure_callback(options)
-
-    assert callback.disabled is True
-    logger.addHandler.assert_not_called()
-    logstash_mock.TCPLogstashHandler.assert_not_called()
-    formatter_class.assert_not_called()
+    with pytest.raises(AnsibleError, match="Logstash HTTP timeout must be greater than zero."):
+        _configure_callback(options)
 
 
 def test_http_protocol_rejects_negative_retries():
@@ -364,9 +353,5 @@ def test_http_protocol_rejects_negative_retries():
         "format_version": "v1",
     }
 
-    callback, logger, logstash_mock, formatter_class = _configure_callback(options)
-
-    assert callback.disabled is True
-    logger.addHandler.assert_not_called()
-    logstash_mock.TCPLogstashHandler.assert_not_called()
-    formatter_class.assert_not_called()
+    with pytest.raises(AnsibleError, match="Logstash HTTP retries must be zero or greater."):
+        _configure_callback(options)
