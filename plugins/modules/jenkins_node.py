@@ -460,7 +460,7 @@ def main():
 
     jenkins_node = JenkinsNode(module)
 
-    state = module.params.get("state")
+    state = module.params["state"]
     if state == "enabled":
         jenkins_node.enabled_node()
     elif state == "disabled":

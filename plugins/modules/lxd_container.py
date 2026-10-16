@@ -460,10 +460,10 @@ class LXDContainerManagement:
 
         self.type = self.module.params["type"]
 
-        self.key_file = self.module.params.get("client_key")
+        self.key_file = self.module.params["client_key"]
         if self.key_file is None:
             self.key_file = f"{os.environ['HOME']}/.config/lxc/client.key"
-        self.cert_file = self.module.params.get("client_cert")
+        self.cert_file = self.module.params["client_cert"]
         if self.cert_file is None:
             self.cert_file = f"{os.environ['HOME']}/.config/lxc/client.crt"
         self.debug = self.module._verbosity >= 4
@@ -494,7 +494,7 @@ class LXDContainerManagement:
             elif self.type == "virtual-machine":
                 self.api_endpoint = "/1.0/virtual-machines"
 
-        self.trust_password = self.module.params.get("trust_password", None)
+        self.trust_password = self.module.params["trust_password"]
         self.actions = []
         self.diff = {"before": {}, "after": {}}
         self.old_instance_json = {}
@@ -503,7 +503,7 @@ class LXDContainerManagement:
     def _build_config(self):
         self.config = {}
         for attr in CONFIG_PARAMS:
-            param_val = self.module.params.get(attr, None)
+            param_val = self.module.params[attr]
             if param_val is not None:
                 self.config[attr] = param_val
 
@@ -726,7 +726,7 @@ class LXDContainerManagement:
         try:
             if self.trust_password is not None:
                 self.client.authenticate(self.trust_password)
-            self.ignore_volatile_options = self.module.params.get("ignore_volatile_options")
+            self.ignore_volatile_options = self.module.params["ignore_volatile_options"]
 
             self.old_instance_json = self._get_instance_json()
             self.old_sections = {

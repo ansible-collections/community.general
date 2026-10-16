@@ -155,11 +155,11 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 def get_jenkins_connection(module):
     url = module.params["url"]
-    username = module.params.get("user")
-    password = module.params.get("password")
-    token = module.params.get("token")
+    username = module.params["user"]
+    password = module.params["password"]
+    token = module.params["token"]
 
-    validate_certs = module.params.get("validate_certs")
+    validate_certs = module.params["validate_certs"]
     if not validate_certs:
         ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -206,9 +206,9 @@ def filter_jobs_by_color(jobs, color):
 def get_jobs(module):
     jenkins_conn = get_jenkins_connection(module)
     jobs = []
-    if module.params.get("name"):
+    if module.params["name"]:
         try:
-            job_info = jenkins_conn.get_job_info(module.params.get("name"))
+            job_info = jenkins_conn.get_job_info(module.params["name"])
         except jenkins.NotFoundException:
             pass
         else:
@@ -223,8 +223,8 @@ def get_jobs(module):
 
     else:
         all_jobs = jenkins_conn.get_all_jobs()
-        if module.params.get("glob"):
-            jobs.extend(j for j in all_jobs if fnmatch.fnmatch(j["fullname"], module.params.get("glob")))
+        if module.params["glob"]:
+            jobs.extend(j for j in all_jobs if fnmatch.fnmatch(j["fullname"], module.params["glob"]))
         else:
             jobs = all_jobs
         # python-jenkins includes the internal Jenkins class used for each job

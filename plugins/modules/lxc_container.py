@@ -744,7 +744,7 @@ class LxcContainerManagement:
                     "--logfile",
                     os.path.join(log_path, f"lxc-{self.container_name}.log"),
                     "--logpriority",
-                    self.module.params.get("container_log_level").upper(),
+                    self.module.params["container_log_level"].upper(),
                 ]
             )
 

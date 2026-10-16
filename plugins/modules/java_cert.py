@@ -514,24 +514,24 @@ def main():
     )
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    url = module.params.get("cert_url")
-    path = module.params.get("cert_path")
-    content = module.params.get("cert_content")
-    port = module.params.get("cert_port")
+    url = module.params["cert_url"]
+    path = module.params["cert_path"]
+    content = module.params["cert_content"]
+    port = module.params["cert_port"]
 
-    pkcs12_path = module.params.get("pkcs12_path")
-    pkcs12_pass = module.params.get("pkcs12_password", "")
-    pkcs12_alias = module.params.get("pkcs12_alias", "1")
+    pkcs12_path = module.params["pkcs12_path"]
+    pkcs12_pass = module.params["pkcs12_password"]
+    pkcs12_alias = module.params["pkcs12_alias"]
 
-    cert_alias = module.params.get("cert_alias") or url
-    trust_cacert = module.params.get("trust_cacert")
+    cert_alias = module.params["cert_alias"] or url
+    trust_cacert = module.params["trust_cacert"]
 
-    keystore_path = module.params.get("keystore_path")
-    keystore_pass = module.params.get("keystore_pass")
-    keystore_create = module.params.get("keystore_create")
-    keystore_type = module.params.get("keystore_type")
-    executable = module.params.get("executable")
-    state = module.params.get("state")
+    keystore_path = module.params["keystore_path"]
+    keystore_pass = module.params["keystore_pass"]
+    keystore_create = module.params["keystore_create"]
+    keystore_type = module.params["keystore_type"]
+    executable = module.params["executable"]
+    state = module.params["state"]
 
     # openssl dependency resolution
     openssl_bin = module.get_bin_path("openssl", True)

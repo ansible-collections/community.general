@@ -241,20 +241,20 @@ def ensure(module, client):
     name = module.params["group"]
 
     module_pwpolicy = get_pwpolicy_dict(
-        maxpwdlife=module.params.get("maxpwdlife"),
-        minpwdlife=module.params.get("minpwdlife"),
-        historylength=module.params.get("historylength"),
-        minclasses=module.params.get("minclasses"),
-        minlength=module.params.get("minlength"),
-        priority=module.params.get("priority"),
-        maxfailcount=module.params.get("maxfailcount"),
-        failinterval=module.params.get("failinterval"),
-        lockouttime=module.params.get("lockouttime"),
-        gracelimit=module.params.get("gracelimit"),
-        maxrepeat=module.params.get("maxrepeat"),
-        maxsequence=module.params.get("maxsequence"),
-        dictcheck=module.params.get("dictcheck"),
-        usercheck=module.params.get("usercheck"),
+        maxpwdlife=module.params["maxpwdlife"],
+        minpwdlife=module.params["minpwdlife"],
+        historylength=module.params["historylength"],
+        minclasses=module.params["minclasses"],
+        minlength=module.params["minlength"],
+        priority=module.params["priority"],
+        maxfailcount=module.params["maxfailcount"],
+        failinterval=module.params["failinterval"],
+        lockouttime=module.params["lockouttime"],
+        gracelimit=module.params["gracelimit"],
+        maxrepeat=module.params["maxrepeat"],
+        maxsequence=module.params["maxsequence"],
+        dictcheck=module.params["dictcheck"],
+        usercheck=module.params["usercheck"],
     )
 
     ipa_pwpolicy = client.pwpolicy_find(name=name)

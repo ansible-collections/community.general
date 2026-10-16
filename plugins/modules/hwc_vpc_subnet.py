@@ -194,7 +194,7 @@ def main():
 
     try:
         resource = None
-        if module.params.get("id"):
+        if module.params["id"]:
             resource = True
         else:
             v = search_resource(config)
@@ -221,7 +221,7 @@ def main():
                 changed = True
 
             result = read_resource(config)
-            result["id"] = module.params.get("id")
+            result["id"] = module.params["id"]
         else:
             if resource:
                 if not module.check_mode:
@@ -238,13 +238,13 @@ def main():
 
 def user_input_parameters(module):
     return {
-        "availability_zone": module.params.get("availability_zone"),
-        "cidr": module.params.get("cidr"),
-        "dhcp_enable": module.params.get("dhcp_enable"),
-        "dns_address": module.params.get("dns_address"),
-        "gateway_ip": module.params.get("gateway_ip"),
-        "name": module.params.get("name"),
-        "vpc_id": module.params.get("vpc_id"),
+        "availability_zone": module.params["availability_zone"],
+        "cidr": module.params["cidr"],
+        "dhcp_enable": module.params["dhcp_enable"],
+        "dns_address": module.params["dns_address"],
+        "gateway_ip": module.params["gateway_ip"],
+        "name": module.params["name"],
+        "vpc_id": module.params["vpc_id"],
     }
 
 

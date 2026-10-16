@@ -12,6 +12,8 @@ from unittest.mock import Mock, mock_open, patch
 
 from ansible_collections.community.general.plugins.modules import logrotate
 
+from .utils import get_default_params
+
 
 class TestLogrotateConfig(unittest.TestCase):
     """Unit tests for the logrotate_config module."""
@@ -36,54 +38,7 @@ class TestLogrotateConfig(unittest.TestCase):
         self.mock_ansible_basic.AnsibleModule.reset_mock()
         self.mock_module = Mock()
         # The following is taken from the module's argument spec
-        self.mock_module.params = {
-            "name": None,
-            "state": "present",
-            "config_dir": "/etc/logrotate.d",
-            "paths": None,
-            "rotation_period": None,
-            "rotate_count": None,
-            "compress": None,
-            "compress_options": None,
-            "compression_method": None,
-            "delay_compress": None,
-            "no_delay_compress": None,
-            "shred": None,
-            "shred_cycles": None,
-            "missing_ok": None,
-            "not_if_empty": None,
-            "create": None,
-            "copy_truncate": None,
-            "copy": None,
-            "rename_copy": None,
-            "size": None,
-            "min_size": None,
-            "max_size": None,
-            "max_age": None,
-            "date_ext": None,
-            "date_yesterday": None,
-            "date_format": None,
-            "shared_scripts": None,
-            "pre_rotate": None,
-            "post_rotate": None,
-            "first_action": None,
-            "last_action": None,
-            "pre_remove": None,
-            "su": None,
-            "old_dir": None,
-            "create_old_dir": None,
-            "no_old_dir": None,
-            "extension": None,
-            "mail": None,
-            "mail_first": None,
-            "mail_last": None,
-            "include": None,
-            "taboo_ext": None,
-            "enabled": None,
-            "start": None,
-            "syslog": None,
-            "backup": True,
-        }
+        self.mock_module.params = get_default_params(logrotate.get_argument_spec())
         self.mock_module.fail_json = Mock(side_effect=Exception("fail_json called"))
         self.mock_module.exit_json = Mock()
         self.mock_module.check_mode = False

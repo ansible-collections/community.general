@@ -263,7 +263,7 @@ def main():
                 changed = True
 
             result = read_resource(config)
-            result["id"] = module.params.get("id")
+            result["id"] = module.params["id"]
         else:
             if resource:
                 if not module.check_mode:
@@ -280,13 +280,13 @@ def main():
 
 def user_input_parameters(module):
     return {
-        "admin_state_up": module.params.get("admin_state_up"),
-        "allowed_address_pairs": module.params.get("allowed_address_pairs"),
-        "extra_dhcp_opts": module.params.get("extra_dhcp_opts"),
-        "ip_address": module.params.get("ip_address"),
-        "name": module.params.get("name"),
-        "security_groups": module.params.get("security_groups"),
-        "subnet_id": module.params.get("subnet_id"),
+        "admin_state_up": module.params["admin_state_up"],
+        "allowed_address_pairs": module.params["allowed_address_pairs"],
+        "extra_dhcp_opts": module.params["extra_dhcp_opts"],
+        "ip_address": module.params["ip_address"],
+        "name": module.params["name"],
+        "security_groups": module.params["security_groups"],
+        "subnet_id": module.params["subnet_id"],
     }
 
 

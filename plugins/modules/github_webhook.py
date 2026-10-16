@@ -150,7 +150,7 @@ def _create_hook_config(module):
         "insecure_ssl": "1" if module.params["insecure_ssl"] else "0",
     }
 
-    secret = module.params.get("secret")
+    secret = module.params["secret"]
     if secret:
         hook_config["secret"] = secret
 
@@ -214,7 +214,7 @@ def main():
     try:
         github_conn = github.Github(
             module.params["user"],
-            module.params.get("password") or module.params.get("token"),
+            module.params["password"] or module.params["token"],
             base_url=module.params["github_url"],
         )
     except github.GithubException as err:

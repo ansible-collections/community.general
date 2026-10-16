@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper - add ``reboot_required`` return value (https://github.com/ansible-collections/community.general/issues/12960, https://github.com/ansible-collections/community.general/pull/12977).

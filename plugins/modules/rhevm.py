@@ -358,11 +358,11 @@ class RHEVConn:
     def __init__(self, module):
         self.module = module
 
-        user = module.params.get("user")
-        password = module.params.get("password")
-        server = module.params.get("server")
-        port = module.params.get("port")
-        insecure_api = module.params.get("insecure_api")
+        user = module.params["user"]
+        password = module.params["password"]
+        server = module.params["server"]
+        port = module.params["port"]
+        insecure_api = module.params["insecure_api"]
 
         url = f"https://{server}:{port}"
 
@@ -1260,13 +1260,13 @@ def setMsg(message: str) -> None:
 def core(module):
     r = RHEV(module)
 
-    state = module.params.get("state")
+    state = module.params["state"]
 
     if state == "ping":
         r.test()
         return RHEV_SUCCESS, {"ping": "pong"}
     elif state == "info":
-        name = module.params.get("name")
+        name = module.params["name"]
         if not name:
             setMsg("`name` is a required argument.")
             return RHEV_FAILED, msg
@@ -1274,24 +1274,24 @@ def core(module):
         return RHEV_SUCCESS, {"changed": changed, "msg": msg, "vm": vminfo}
     elif state == "present":
         created = False
-        name = module.params.get("name")
+        name = module.params["name"]
         if not name:
             setMsg("`name` is a required argument.")
             return RHEV_FAILED, msg
-        actiontype = module.params.get("type")
+        actiontype = module.params["type"]
         if actiontype == "server" or actiontype == "desktop":
             vminfo = r.getVM(name)
             if vminfo:
                 setMsg("VM exists")
             else:
                 # Create VM
-                cluster = module.params.get("cluster")
+                cluster = module.params["cluster"]
                 if cluster is None:
                     setMsg("cluster is a required argument.")
                     setFailed()
-                template = module.params.get("image")
+                template = module.params["image"]
                 if template:
-                    disks = module.params.get("disks")
+                    disks = module.params["disks"]
                     if disks is None:
                         setMsg("disks is a required argument.")
                         setFailed()
@@ -1299,7 +1299,7 @@ def core(module):
                     if r.createVMimage(name, cluster, template, disks) is False:
                         return RHEV_FAILED, vminfo
                 else:
-                    os = module.params.get("osver")
+                    os = module.params["osver"]
                     if os is None:
                         setMsg("osver is a required argument.")
                         setFailed()
@@ -1310,9 +1310,9 @@ def core(module):
 
             # Set MEMORY and MEMORY POLICY
             vminfo = r.getVM(name)
-            memory = module.params.get("vmmem")
+            memory = module.params["vmmem"]
             if memory is not None:
-                memory_policy = module.params.get("mempol")
+                memory_policy = module.params["mempol"]
                 if memory_policy == 0:
                     memory_policy = memory
                 mem_pol_nok = True
@@ -1343,7 +1343,7 @@ def core(module):
                 checkFail()
 
             # Set CPU
-            cpu = module.params.get("vmcpu")
+            cpu = module.params["vmcpu"]
             if int(vminfo["cpu_cores"]) == cpu:
                 setMsg("Number of CPUs is correct")
             else:
@@ -1351,7 +1351,7 @@ def core(module):
                     return RHEV_FAILED, msg
 
             # Set CPU SHARE
-            cpu_share = module.params.get("cpu_share")
+            cpu_share = module.params["cpu_share"]
             if cpu_share is not None:
                 if int(vminfo["cpu_shares"]) == cpu_share:
                     setMsg("CPU share is correct.")
@@ -1360,29 +1360,29 @@ def core(module):
                         return RHEV_FAILED, msg
 
             # Set DISKS
-            disks = module.params.get("disks")
+            disks = module.params["disks"]
             if disks is not None:
                 if r.setDisks(vminfo["name"], disks) is False:
                     return RHEV_FAILED, msg
 
             # Set NETWORKS
-            ifaces = module.params.get("ifaces", None)
+            ifaces = module.params["ifaces"]
             if ifaces is not None:
                 if r.setNetworks(vminfo["name"], ifaces) is False:
                     return RHEV_FAILED, msg
 
             # Set Delete Protection
-            del_prot = module.params.get("del_prot")
+            del_prot = module.params["del_prot"]
             if r.setDeleteProtection(vminfo["name"], del_prot) is False:
                 return RHEV_FAILED, msg
 
             # Set Boot Order
-            boot_order = module.params.get("boot_order")
+            boot_order = module.params["boot_order"]
             if r.setBootOrder(vminfo["name"], boot_order) is False:
                 return RHEV_FAILED, msg
 
             # Set VM Host
-            vmhost = module.params.get("vmhost")
+            vmhost = module.params["vmhost"]
             if vmhost:
                 if r.setVMHost(vminfo["name"], vmhost) is False:
                     return RHEV_FAILED, msg
@@ -1392,11 +1392,11 @@ def core(module):
             return RHEV_SUCCESS, {"changed": changed, "msg": msg, "vm": vminfo}
 
         if actiontype == "host":
-            cluster = module.params.get("cluster")
+            cluster = module.params["cluster"]
             if cluster is None:
                 setMsg("cluster is a required argument.")
                 setFailed()
-            ifaces = module.params.get("ifaces")
+            ifaces = module.params["ifaces"]
             if ifaces is None:
                 setMsg("ifaces is a required argument.")
                 setFailed()
@@ -1405,18 +1405,18 @@ def core(module):
             return RHEV_SUCCESS, {"changed": changed, "msg": msg}
 
     elif state == "absent":
-        name = module.params.get("name")
+        name = module.params["name"]
         if not name:
             setMsg("`name` is a required argument.")
             return RHEV_FAILED, msg
-        actiontype = module.params.get("type")
+        actiontype = module.params["type"]
         if actiontype == "server" or actiontype == "desktop":
             vminfo = r.getVM(name)
             if vminfo:
                 setMsg("VM exists")
 
                 # Set Delete Protection
-                del_prot = module.params.get("del_prot")
+                del_prot = module.params["del_prot"]
                 if r.setDeleteProtection(vminfo["name"], del_prot) is False:
                     return RHEV_FAILED, msg
 
@@ -1430,19 +1430,19 @@ def core(module):
             return RHEV_SUCCESS, {"changed": changed, "msg": msg, "vm": vminfo}
 
     elif state == "up" or state == "down" or state == "restarted":
-        name = module.params.get("name")
+        name = module.params["name"]
         if not name:
             setMsg("`name` is a required argument.")
             return RHEV_FAILED, msg
-        timeout = module.params.get("timeout")
+        timeout = module.params["timeout"]
         if r.setPower(name, state, timeout) is False:
             return RHEV_FAILED, msg
         vminfo = r.getVM(name)
         return RHEV_SUCCESS, {"changed": changed, "msg": msg, "vm": vminfo}
 
     elif state == "cd":
-        name = module.params.get("name")
-        cd_drive = module.params.get("cd_drive")
+        name = module.params["name"]
+        cd_drive = module.params["cd_drive"]
         if r.setCD(name, cd_drive) is False:
             return RHEV_FAILED, msg
         return RHEV_SUCCESS, {"changed": changed, "msg": msg}

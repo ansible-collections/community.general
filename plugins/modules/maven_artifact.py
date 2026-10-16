@@ -522,18 +522,18 @@ class MavenDownloader:
             key_name = parsed_url.path[1:]
             client = boto3.client(
                 "s3",
-                aws_access_key_id=self.module.params.get("username", ""),
-                aws_secret_access_key=self.module.params.get("password", ""),
+                aws_access_key_id=self.module.params["username"],
+                aws_secret_access_key=self.module.params["password"],
             )
             url_to_use = client.generate_presigned_url(
                 "get_object", Params={"Bucket": bucket_name, "Key": key_name}, ExpiresIn=10
             )
 
-        req_timeout = self.module.params.get("timeout")
+        req_timeout = self.module.params["timeout"]
 
         # Hack to add parameters in the way that fetch_url expects
-        self.module.params["url_username"] = self.module.params.get("username", "")
-        self.module.params["url_password"] = self.module.params.get("password", "")
+        self.module.params["url_username"] = self.module.params["username"]
+        self.module.params["url_password"] = self.module.params["password"]
         self.module.params["http_agent"] = self.user_agent
 
         kwargs = {}

@@ -128,6 +128,7 @@ options:
     description:
       - Add additional options to C(zypper) command.
       - Options should be supplied in a single line as if given in the command line.
+      - These options are not passed to the C(zypper search) command the module uses to determine which packages are installed.
     type: str
   allow_vendor_change:
     type: bool
@@ -263,6 +264,16 @@ EXAMPLES = r"""
     skip_post_errors: true
 """
 
+RETURN = r"""
+reboot_required:
+  description:
+    - Whether zypper reported that a reboot is needed (return code V(102)).
+  returned: success
+  type: bool
+  sample: false
+  version_added: 14.0.0
+"""
+
 import os.path
 import re
 import xml
@@ -349,6 +360,18 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
     except xml.parsers.expat.ExpatError as exc:
         m.fail_json(msg=f"Failed to parse zypper xml output: {exc}", rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
 
+    if rc == 0 and os.path.basename(cmd[0]) == "transactional-update":
+        # transactional-update before 5.5.0 returns 0 even when the command it runs fails
+        errors = get_error_messages(dom)
+        if errors:
+            m.fail_json(
+                msg=f"Zypper run command reported errors: {' '.join(errors)}",
+                rc=rc,
+                stdout=stdout,
+                stderr=stderr,
+                cmd=cmd,
+            )
+
     if rc == 104:
         # exit code 104 is ZYPPER_EXIT_INF_CAP_NOT_FOUND (no packages found)
         if fail_not_found:
@@ -411,6 +434,14 @@ def get_simple_errors(dom):
     return " \n".join(simple_errors)
 
 
+def get_error_messages(dom):
+    return [
+        x.firstChild.data
+        for x in dom.getElementsByTagName("message")
+        if x.getAttribute("type") == "error" and x.firstChild
+    ]
+
+
 def get_cmd(m, subcommand):
     "puts together the basic zypper command arguments with those passed to the module"
     is_install = subcommand in ["install", "update", "patch", "dist-upgrade"]
@@ -462,7 +493,7 @@ def get_cmd(m, subcommand):
             cmd.append("--clean-deps")
     if subcommand == "dist-upgrade" and m.params["allow_vendor_change"]:
         cmd.append("--allow-vendor-change")
-    if m.params["extra_args"]:
+    if m.params["extra_args"] and subcommand != "search":
         args_list = m.params["extra_args"].split(" ")
         cmd.extend(args_list)
 
@@ -669,6 +700,7 @@ def main():
             packages_changed, retvals = package_present(module, name, state == "latest")
 
     retvals["changed"] = retvals["rc"] in [0, 102] and bool(packages_changed)
+    retvals["reboot_required"] = retvals["rc"] == 102
 
     if module._diff:
         set_diff(module, retvals, packages_changed)
@@ -680,7 +712,8 @@ def main():
         del retvals["stdout"]
         del retvals["stderr"]
 
-    module.exit_json(name=name, state=state, update_cache=update_cache, **retvals)
+    # must force failed=False for 102 case
+    module.exit_json(name=name, state=state, update_cache=update_cache, failed=False, **retvals)
 
 
 if __name__ == "__main__":

@@ -147,7 +147,7 @@ class NetworkSetInfoModule(OneViewModuleBase):
         )
 
     def execute_module(self):
-        name = self.module.params.get("name")
+        name = self.module.params["name"]
 
         if "withoutEthernet" in self.options:
             filter_by_name = f"\"'name'='{name}'\"" if name else ""

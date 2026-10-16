@@ -121,11 +121,11 @@ def main():
         ),
     )
 
-    dsn = module.params.get("dsn")
-    query = module.params.get("query")
-    params = module.params.get("params")
-    commit = module.params.get("commit")
-    autocommit = module.params.get("autocommit")
+    dsn = module.params["dsn"]
+    query = module.params["query"]
+    params = module.params["params"]
+    commit = module.params["commit"]
+    autocommit = module.params["autocommit"]
 
     if not HAS_PYODBC:
         module.fail_json(msg=missing_required_lib("pyodbc"))

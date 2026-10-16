@@ -174,7 +174,7 @@ def main():
     timeout = module.params["timeout"]
 
     base_uri = f"https://{module.params['baseuri']}"
-    proxy_slot_number = module.params.get("proxy_slot_number")
+    proxy_slot_number = module.params["proxy_slot_number"]
     ocapi_utils = OcapiUtils(creds, base_uri, proxy_slot_number, timeout, module)
 
     # Check that Category is valid
@@ -188,7 +188,7 @@ def main():
     # Organize by Categories / Commands
     if category == "Jobs":
         if command == "JobStatus":
-            if module.params.get("job_name") is None:
+            if module.params["job_name"] is None:
                 module.fail_json(msg="job_name required for JobStatus command.")
             job_uri = urljoin(base_uri, f"Jobs/{module.params['job_name']}")
             result = ocapi_utils.get_job_status(job_uri)

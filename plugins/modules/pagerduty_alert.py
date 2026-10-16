@@ -331,29 +331,29 @@ def main():
     )
 
     name = module.params["name"]
-    service_id = module.params.get("service_id")
-    integration_key = module.params.get("integration_key")
-    service_key = module.params.get("service_key")
-    api_key = module.params.get("api_key")
-    state = module.params.get("state")
-    client = module.params.get("client")
-    client_url = module.params.get("client_url")
-    desc = module.params.get("desc")
-    incident_key = module.params.get("incident_key")
+    service_id = module.params["service_id"]
+    integration_key = module.params["integration_key"]
+    service_key = module.params["service_key"]
+    api_key = module.params["api_key"]
+    state = module.params["state"]
+    client = module.params["client"]
+    client_url = module.params["client_url"]
+    desc = module.params["desc"]
+    incident_key = module.params["incident_key"]
     payload = {
         "summary": desc,
-        "source": module.params.get("source"),
+        "source": module.params["source"],
         "timestamp": datetime.now().isoformat(),
-        "severity": module.params.get("severity"),
-        "component": module.params.get("component"),
-        "class": module.params.get("incident_class"),
-        "custom_details": module.params.get("custom_details"),
+        "severity": module.params["severity"],
+        "component": module.params["component"],
+        "class": module.params["incident_class"],
+        "custom_details": module.params["custom_details"],
     }
     link = {}
-    if module.params.get("link_url"):
-        link["href"] = module.params.get("link_url")
-        if module.params.get("link_text"):
-            link["text"] = module.params.get("link_text")
+    if module.params["link_url"]:
+        link["href"] = module.params["link_url"]
+        if module.params["link_text"]:
+            link["text"] = module.params["link_text"]
     if integration_key is None:
         integration_key = service_key
         module.warn('"service_key" is obsolete parameter and will be removed. Please, use "integration_key" instead')
@@ -365,7 +365,7 @@ def main():
     }
 
     event_type = state_event_dict[state]
-    if module.params.get("api_version") == "v1":
+    if module.params["api_version"] == "v1":
         out, changed = check(module, name, state, service_id, integration_key, api_key, incident_key)
         if not module.check_mode and changed is True:
             out = send_event_v1(module, integration_key, event_type, desc, incident_key, client, client_url)

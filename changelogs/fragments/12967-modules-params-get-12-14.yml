@@ -1,0 +1,7 @@
+minor_changes:
+  - bundler - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12967).
+  - consul_session - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12967).
+  - dnsimple - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12967).
+  - ipa_pwpolicy - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12967).
+  - jenkins_build - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12967).
+  - mqtt - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12967).

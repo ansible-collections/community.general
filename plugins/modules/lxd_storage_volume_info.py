@@ -214,7 +214,6 @@ class LXDStorageVolumeInfo:
         """Gather information about LXD storage volumes.
 
         :param module: Processed Ansible Module.
-        :type module: AnsibleModule
         """
         self.module = module
         self.pool = self.module.params["pool"]
@@ -258,7 +257,6 @@ class LXDStorageVolumeInfo:
         """Build failure parameters from LXDClientException and fail.
 
         :param exception: The LXDClientException instance
-        :type exception: LXDClientException
         """
         fail_params = {}
         if self.client.debug and "logs" in exception.kwargs:
@@ -288,7 +286,6 @@ class LXDStorageVolumeInfo:
         """Get list of all volumes in the storage pool.
 
         :param recursion: API recursion level (0 for URLs only, 1 for full objects)
-        :type recursion: int
         :return: List of volume URLs (recursion=0) or volume objects (recursion=1)
         :rtype: list
         """

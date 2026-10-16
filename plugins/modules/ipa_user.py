@@ -334,9 +334,9 @@ def ensure(module, client):
     nsaccountlock = state == "disabled"
 
     module_user = get_user_dict(
-        displayname=module.params.get("displayname"),
-        krbpasswordexpiration=module.params.get("krbpasswordexpiration"),
-        givenname=module.params.get("givenname"),
+        displayname=module.params["displayname"],
+        krbpasswordexpiration=module.params["krbpasswordexpiration"],
+        givenname=module.params["givenname"],
         loginshell=module.params["loginshell"],
         mail=module.params["mail"],
         sn=module.params["sn"],
@@ -345,13 +345,13 @@ def ensure(module, client):
         telephonenumber=module.params["telephonenumber"],
         title=module.params["title"],
         userpassword=module.params["password"],
-        gidnumber=module.params.get("gidnumber"),
-        uidnumber=module.params.get("uidnumber"),
-        homedirectory=module.params.get("homedirectory"),
-        userauthtype=module.params.get("userauthtype"),
+        gidnumber=module.params["gidnumber"],
+        uidnumber=module.params["uidnumber"],
+        homedirectory=module.params["homedirectory"],
+        userauthtype=module.params["userauthtype"],
     )
 
-    update_password = module.params.get("update_password")
+    update_password = module.params["update_password"]
     ipa_user = client.user_find(name=name)
 
     changed = False

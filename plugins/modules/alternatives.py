@@ -169,7 +169,7 @@ class AlternativesModule:
 
     @property
     def mode_present(self):
-        return self.module.params.get("state") in [
+        return self.module.params["state"] in [
             AlternativeState.PRESENT,
             AlternativeState.SELECTED,
             AlternativeState.AUTO,
@@ -177,11 +177,11 @@ class AlternativesModule:
 
     @property
     def mode_selected(self):
-        return self.module.params.get("state") == AlternativeState.SELECTED
+        return self.module.params["state"] == AlternativeState.SELECTED
 
     @property
     def mode_auto(self):
-        return self.module.params.get("state") == AlternativeState.AUTO
+        return self.module.params["state"] == AlternativeState.AUTO
 
     def run(self):
         self.parse()
@@ -305,30 +305,30 @@ class AlternativesModule:
 
     @property
     def name(self):
-        return self.module.params.get("name")
+        return self.module.params["name"]
 
     @property
     def path(self):
-        return self.module.params.get("path")
+        return self.module.params["path"]
 
     @property
     def family(self):
-        return self.module.params.get("family")
+        return self.module.params["family"]
 
     @property
     def link(self):
-        return self.module.params.get("link") or self.current_link
+        return self.module.params["link"] or self.current_link
 
     @property
     def priority(self):
-        if self.module.params.get("priority") is not None:
-            return self.module.params.get("priority")
+        if self.module.params["priority"] is not None:
+            return self.module.params["priority"]
         return self.current_alternatives.get(self.path, {}).get("priority", 50)
 
     @property
     def subcommands(self):
-        if self.module.params.get("subcommands") is not None:
-            return self.module.params.get("subcommands")
+        if self.module.params["subcommands"] is not None:
+            return self.module.params["subcommands"]
         elif self.path in self.current_alternatives and self.current_alternatives[self.path].get("subcommands"):
             return self.current_alternatives[self.path].get("subcommands")
         return None

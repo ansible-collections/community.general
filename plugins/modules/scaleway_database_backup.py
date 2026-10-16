@@ -193,7 +193,7 @@ def wait_to_complete_state_transition(module, account_api, backup=None):
     while now() < end:
         module.debug("We are going to wait for the backup to finish its transition")
 
-        response = account_api.get(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}")
+        response = account_api.get(f"/rdb/v1/regions/{module.params['region']}/backups/{backup['id']}")
         if not response.ok:
             module.fail_json(msg=f"Error getting backup [{response.status_code}: {response.json}]")
             break
@@ -230,7 +230,7 @@ def present_strategy(module, account_api, backup):
         if expiration_date is not None:
             payload["expires_at"] = expiration_date
 
-        response = account_api.patch(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}", payload)
+        response = account_api.patch(f"/rdb/v1/regions/{module.params['region']}/backups/{backup['id']}", payload)
         if response.ok:
             result = wait_to_complete_state_transition(module, account_api, response.json)
             module.exit_json(changed=True, metadata=result)
@@ -244,7 +244,7 @@ def present_strategy(module, account_api, backup):
     if expiration_date is not None:
         payload["expires_at"] = expiration_date
 
-    response = account_api.post(f"/rdb/v1/regions/{module.params.get('region')}/backups", payload)
+    response = account_api.post(f"/rdb/v1/regions/{module.params['region']}/backups", payload)
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
@@ -260,7 +260,7 @@ def absent_strategy(module, account_api, backup):
     if module.check_mode:
         module.exit_json(changed=True)
 
-    response = account_api.delete(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}")
+    response = account_api.delete(f"/rdb/v1/regions/{module.params['region']}/backups/{backup['id']}")
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
         module.exit_json(changed=True, metadata=result)
@@ -279,7 +279,7 @@ def exported_strategy(module, account_api, backup):
         module.exit_json(changed=True)
 
     backup = wait_to_complete_state_transition(module, account_api, backup)
-    response = account_api.post(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}/export", {})
+    response = account_api.post(f"/rdb/v1/regions/{module.params['region']}/backups/{backup['id']}/export", {})
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
@@ -301,9 +301,7 @@ def restored_strategy(module, account_api, backup):
     backup = wait_to_complete_state_transition(module, account_api, backup)
 
     payload = {"database_name": database_name, "instance_id": instance_id}
-    response = account_api.post(
-        f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup['id']}/restore", payload
-    )
+    response = account_api.post(f"/rdb/v1/regions/{module.params['region']}/backups/{backup['id']}/restore", payload)
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
@@ -329,7 +327,7 @@ def core(module):
     if backup_id is None:
         backup_by_id = None
     else:
-        response = account_api.get(f"/rdb/v1/regions/{module.params.get('region')}/backups/{backup_id}")
+        response = account_api.get(f"/rdb/v1/regions/{module.params['region']}/backups/{backup_id}")
         status_code = response.status_code
         backup_json = response.json
         backup_by_id = None

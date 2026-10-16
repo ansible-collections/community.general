@@ -206,7 +206,7 @@ def main():
     timeout = module.params["timeout"]
 
     base_uri = f"https://{module.params['baseuri']}"
-    proxy_slot_number = module.params.get("proxy_slot_number")
+    proxy_slot_number = module.params["proxy_slot_number"]
     ocapi_utils = OcapiUtils(creds, base_uri, proxy_slot_number, timeout, module)
 
     # Check that Category is valid
@@ -228,7 +228,7 @@ def main():
             result = ocapi_utils.manage_system_power(command)
     elif category == "Update":
         if command == "FWUpload":
-            update_image_path = module.params.get("update_image_path")
+            update_image_path = module.params["update_image_path"]
             if update_image_path is None:
                 module.fail_json(msg="Missing update_image_path.")
             result = ocapi_utils.upload_firmware_image(update_image_path)
@@ -238,7 +238,7 @@ def main():
             result = ocapi_utils.activate_firmware_image()
     elif category == "Jobs":
         if command == "DeleteJob":
-            job_name = module.params.get("job_name")
+            job_name = module.params["job_name"]
             if job_name is None:
                 module.fail_json("Missing job_name")
             job_uri = urljoin(base_uri, f"Jobs/{job_name}")

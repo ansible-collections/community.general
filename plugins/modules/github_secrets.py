@@ -201,7 +201,7 @@ def upsert_secret(
         "key_id": key_id,
     }
 
-    if not repository and module.params.get("visibility"):
+    if not repository and module.params["visibility"]:
         payload["visibility"] = module.params["visibility"]
 
     if module.check_mode:
@@ -311,7 +311,7 @@ def main() -> None:
     environment: str | None = module.params["environment"]
     key: str = module.params["key"]
     value: str = module.params["value"]
-    visibility: str = module.params.get("visibility")
+    visibility: str = module.params["visibility"]
     state: str = module.params["state"]
     api_url: str = module.params["api_url"]
     token: str = module.params["token"]

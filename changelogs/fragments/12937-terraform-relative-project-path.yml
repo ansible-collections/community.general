@@ -1,0 +1,2 @@
+bugfixes:
+  - terraform - allow ``project_path`` to be a relative path without a ``/``, such as ``myproject`` (https://github.com/ansible-collections/community.general/issues/6463, https://github.com/ansible-collections/community.general/pull/12937).

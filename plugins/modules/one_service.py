@@ -718,9 +718,9 @@ def get_service_id_by_name(module, auth, service_name):
 
 
 def get_connection_info(module):
-    url = module.params.get("api_url")
-    username = module.params.get("api_username")
-    password = module.params.get("api_password")
+    url = module.params["api_url"]
+    username = module.params["api_username"]
+    password = module.params["api_password"]
 
     if not url:
         url = os.environ.get("ONEFLOW_URL")

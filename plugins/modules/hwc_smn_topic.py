@@ -134,7 +134,7 @@ def main():
 
     state = module.params["state"]
 
-    if not module.params.get("id"):
+    if not module.params["id"]:
         module.params["id"] = get_resource_id(config)
 
     fetch = None
@@ -250,7 +250,7 @@ def get_resource_id(config):
     link += query_link
 
     p = {"offset": 0}
-    v = module.params.get("name")
+    v = module.params["name"]
     ids = set()
     while True:
         r = None
@@ -281,11 +281,11 @@ def self_link(module):
 def create_resource_opts(module):
     params = dict()
 
-    v = module.params.get("display_name")
+    v = module.params["display_name"]
     if not is_empty_value(v):
         params["display_name"] = v
 
-    v = module.params.get("name")
+    v = module.params["name"]
     if not is_empty_value(v):
         params["name"] = v
 
@@ -295,7 +295,7 @@ def create_resource_opts(module):
 def update_resource_opts(module):
     params = dict()
 
-    v = module.params.get("display_name")
+    v = module.params["display_name"]
     if not is_empty_value(v):
         params["display_name"] = v
 
@@ -304,7 +304,7 @@ def update_resource_opts(module):
 
 def _get_resource_editable_properties(module):
     return {
-        "display_name": module.params.get("display_name"),
+        "display_name": module.params["display_name"],
     }
 
 

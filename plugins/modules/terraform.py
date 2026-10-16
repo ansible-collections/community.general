@@ -32,6 +32,9 @@ options:
   project_path:
     description:
       - The path to the root of the Terraform directory with the C(vars.tf)/C(main.tf)/etc to use.
+      - Since community.general 14.0.0, relative paths without a C(/), such as V(myproject), are accepted.
+      - A relative path is resolved against the current working directory of the module on the target host, which might not
+        be the directory you expect. Use an absolute path when in doubt.
     type: path
     required: true
   plugin_paths:
@@ -294,7 +297,7 @@ def get_version(module, bin_path):
 
 
 def preflight_validation(module, bin_path, project_path, version, variables_args=None, plan_file=None, no_color=True):
-    if project_path is None or "/" not in project_path:
+    if not project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
         module.fail_json(
@@ -530,25 +533,28 @@ def main():
 
     module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
 
-    project_path = module.params.get("project_path")
-    bin_path = module.params.get("binary_path")
-    plugin_paths = module.params.get("plugin_paths")
-    workspace = module.params.get("workspace")
-    purge_workspace = module.params.get("purge_workspace")
-    state = module.params.get("state")
-    variables = module.params.get("variables") or {}
-    complex_vars = module.params.get("complex_vars")
-    variables_files = module.params.get("variables_files")
-    plan_file = module.params.get("plan_file")
-    state_file = module.params.get("state_file")
-    force_init = module.params.get("force_init")
-    backend_config = module.params.get("backend_config")
-    backend_config_files = module.params.get("backend_config_files")
-    init_reconfigure = module.params.get("init_reconfigure")
-    overwrite_init = module.params.get("overwrite_init")
-    check_destroy = module.params.get("check_destroy")
-    provider_upgrade = module.params.get("provider_upgrade")
-    no_color = module.params.get("no_color")
+    project_path = module.params["project_path"]
+    if project_path:
+        # Resolve relative paths so error messages and the cwd of every terraform call point at the same location.
+        project_path = os.path.abspath(project_path)
+    bin_path = module.params["binary_path"]
+    plugin_paths = module.params["plugin_paths"]
+    workspace = module.params["workspace"]
+    purge_workspace = module.params["purge_workspace"]
+    state = module.params["state"]
+    variables = module.params["variables"] or {}
+    complex_vars = module.params["complex_vars"]
+    variables_files = module.params["variables_files"]
+    plan_file = module.params["plan_file"]
+    state_file = module.params["state_file"]
+    force_init = module.params["force_init"]
+    backend_config = module.params["backend_config"]
+    backend_config_files = module.params["backend_config_files"]
+    init_reconfigure = module.params["init_reconfigure"]
+    overwrite_init = module.params["overwrite_init"]
+    check_destroy = module.params["check_destroy"]
+    provider_upgrade = module.params["provider_upgrade"]
+    no_color = module.params["no_color"]
 
     if bin_path is not None:
         command = [bin_path]
@@ -599,8 +605,8 @@ def main():
     elif state == "absent":
         command.extend(DESTROY_ARGS)
 
-    if state == "present" and module.params.get("parallelism") is not None:
-        command.append(f"-parallelism={module.params.get('parallelism')}")
+    if state == "present" and module.params["parallelism"] is not None:
+        command.append(f"-parallelism={module.params['parallelism']}")
 
     def format_args(vars):
         if vars is None:
@@ -671,15 +677,15 @@ def main():
 
     preflight_validation(module, command[0], project_path, checked_version, variables_args, plan_file, no_color)
 
-    if module.params.get("lock") is not None:
-        if module.params.get("lock"):
+    if module.params["lock"] is not None:
+        if module.params["lock"]:
             command.append("-lock=true")
         else:
             command.append("-lock=false")
-    if module.params.get("lock_timeout") is not None:
-        command.append(f"-lock-timeout={module.params.get('lock_timeout')}s")
+    if module.params["lock_timeout"] is not None:
+        command.append(f"-lock-timeout={module.params['lock_timeout']}s")
 
-    for t in module.params.get("targets") or []:
+    for t in module.params["targets"] or []:
         command.extend(["-target", t])
 
     # we aren't sure if this plan will result in changes, so assume yes
@@ -701,7 +707,7 @@ def main():
             project_path,
             variables_args,
             state_file,
-            module.params.get("targets"),
+            module.params["targets"],
             state,
             APPLY_ARGS,
             plan_file,
@@ -725,7 +731,7 @@ def main():
                 project_path,
                 variables_args,
                 state_file,
-                module.params.get("targets"),
+                module.params["targets"],
                 state,
                 plan_absent_args,
                 plan_file,

@@ -471,14 +471,18 @@ import typing as t
 
 from ansible.module_utils.basic import AnsibleModule
 
+if t.TYPE_CHECKING:  # pragma: no cover
+    from ansible_collections.community.general.plugins.module_utils._typing import (
+        ArgumentSpecT,
+        ModuleReturnBackupFile,
+        ModuleReturnChangedReq,
+        ModuleReturnDiff,
+    )
 
-class ResultDict(t.TypedDict):
-    changed: bool
-    config_file: str
-    config_content: str | None
-    enabled_state: bool
-    backup_file: t.NotRequired[str | None]
-    diff: t.NotRequired[t.Any | None]
+    class ResultDict(ModuleReturnChangedReq, ModuleReturnBackupFile, ModuleReturnDiff[str]):
+        config_file: str
+        config_content: str | None
+        enabled_state: bool
 
 
 class LogrotateConfig:
@@ -915,63 +919,67 @@ class LogrotateConfig:
         return self.result
 
 
+def get_argument_spec() -> ArgumentSpecT:
+    return dict(
+        name=dict(type="str", required=True, aliases=["config_name"]),
+        state=dict(type="str", choices=["present", "absent"], default="present"),
+        config_dir=dict(type="path", default="/etc/logrotate.d"),
+        paths=dict(type="list", elements="path"),
+        rotation_period=dict(
+            type="str",
+            choices=["hourly", "daily", "weekly", "monthly", "yearly"],
+        ),
+        rotate_count=dict(type="int"),
+        compress=dict(type="bool"),
+        compress_options=dict(type="str"),
+        compression_method=dict(
+            type="str",
+            choices=["gzip", "bzip2", "xz", "zstd", "lzma", "lz4"],
+        ),
+        delay_compress=dict(type="bool"),
+        no_delay_compress=dict(type="bool"),
+        shred=dict(type="bool"),
+        shred_cycles=dict(type="int"),
+        missing_ok=dict(type="bool"),
+        not_if_empty=dict(type="bool"),
+        create=dict(type="str"),
+        copy_truncate=dict(type="bool"),
+        copy=dict(type="bool"),
+        rename_copy=dict(type="bool"),
+        size=dict(type="str"),
+        min_size=dict(type="str"),
+        max_size=dict(type="str"),
+        max_age=dict(type="int"),
+        date_ext=dict(type="bool"),
+        date_yesterday=dict(type="bool"),
+        date_format=dict(type="str"),
+        shared_scripts=dict(type="bool"),
+        pre_rotate=dict(type="list", elements="str"),
+        post_rotate=dict(type="list", elements="str"),
+        first_action=dict(type="list", elements="str"),
+        last_action=dict(type="list", elements="str"),
+        pre_remove=dict(type="list", elements="str"),
+        su=dict(type="str"),
+        old_dir=dict(type="path"),
+        create_old_dir=dict(type="bool"),
+        no_old_dir=dict(type="bool"),
+        extension=dict(type="str"),
+        mail=dict(type="str"),
+        mail_first=dict(type="bool"),
+        mail_last=dict(type="bool"),
+        include=dict(type="path"),
+        taboo_ext=dict(type="list", elements="str"),
+        enabled=dict(type="bool"),
+        start=dict(type="int"),
+        syslog=dict(type="bool"),
+        backup=dict(type="bool", default=True),
+    )
+
+
 def main() -> None:
     """Main function."""
     module = AnsibleModule(
-        argument_spec=dict(
-            name=dict(type="str", required=True, aliases=["config_name"]),
-            state=dict(type="str", choices=["present", "absent"], default="present"),
-            config_dir=dict(type="path", default="/etc/logrotate.d"),
-            paths=dict(type="list", elements="path"),
-            rotation_period=dict(
-                type="str",
-                choices=["hourly", "daily", "weekly", "monthly", "yearly"],
-            ),
-            rotate_count=dict(type="int"),
-            compress=dict(type="bool"),
-            compress_options=dict(type="str"),
-            compression_method=dict(
-                type="str",
-                choices=["gzip", "bzip2", "xz", "zstd", "lzma", "lz4"],
-            ),
-            delay_compress=dict(type="bool"),
-            no_delay_compress=dict(type="bool"),
-            shred=dict(type="bool"),
-            shred_cycles=dict(type="int"),
-            missing_ok=dict(type="bool"),
-            not_if_empty=dict(type="bool"),
-            create=dict(type="str"),
-            copy_truncate=dict(type="bool"),
-            copy=dict(type="bool"),
-            rename_copy=dict(type="bool"),
-            size=dict(type="str"),
-            min_size=dict(type="str"),
-            max_size=dict(type="str"),
-            max_age=dict(type="int"),
-            date_ext=dict(type="bool"),
-            date_yesterday=dict(type="bool"),
-            date_format=dict(type="str"),
-            shared_scripts=dict(type="bool"),
-            pre_rotate=dict(type="list", elements="str"),
-            post_rotate=dict(type="list", elements="str"),
-            first_action=dict(type="list", elements="str"),
-            last_action=dict(type="list", elements="str"),
-            pre_remove=dict(type="list", elements="str"),
-            su=dict(type="str"),
-            old_dir=dict(type="path"),
-            create_old_dir=dict(type="bool"),
-            no_old_dir=dict(type="bool"),
-            extension=dict(type="str"),
-            mail=dict(type="str"),
-            mail_first=dict(type="bool"),
-            mail_last=dict(type="bool"),
-            include=dict(type="path"),
-            taboo_ext=dict(type="list", elements="str"),
-            enabled=dict(type="bool"),
-            start=dict(type="int"),
-            syslog=dict(type="bool"),
-            backup=dict(type="bool", default=True),
-        ),
+        argument_spec=get_argument_spec(),
         mutually_exclusive=[
             ["delay_compress", "no_delay_compress"],
             ["old_dir", "no_old_dir"],

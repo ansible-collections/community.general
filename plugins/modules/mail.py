@@ -302,24 +302,24 @@ def main():
         required_together=[["password", "username"]],
     )
 
-    username = module.params.get("username")
-    password = module.params.get("password")
-    host = module.params.get("host")
-    port = module.params.get("port")
-    local_hostname = module.params.get("ehlohost")
-    sender = module.params.get("sender")
-    recipients = module.params.get("to")
-    copies = module.params.get("cc")
-    blindcopies = module.params.get("bcc")
-    subject = module.params.get("subject")
-    body = module.params.get("body")
-    attach_files = module.params.get("attach")
-    inline_images = module.params.get("inline")
-    headers = module.params.get("headers")
-    charset = module.params.get("charset")
-    subtype = module.params.get("subtype")
-    secure = module.params.get("secure")
-    timeout = module.params.get("timeout")
+    username = module.params["username"]
+    password = module.params["password"]
+    host = module.params["host"]
+    port = module.params["port"]
+    local_hostname = module.params["ehlohost"]
+    sender = module.params["sender"]
+    recipients = module.params["to"]
+    copies = module.params["cc"]
+    blindcopies = module.params["bcc"]
+    subject = module.params["subject"]
+    body = module.params["body"]
+    attach_files = module.params["attach"]
+    inline_images = module.params["inline"]
+    headers = module.params["headers"]
+    charset = module.params["charset"]
+    subtype = module.params["subtype"]
+    secure = module.params["secure"]
+    timeout = module.params["timeout"]
     message_id_domain = module.params["message_id_domain"]
 
     code = 0

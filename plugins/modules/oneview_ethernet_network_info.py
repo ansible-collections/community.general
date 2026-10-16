@@ -130,7 +130,7 @@ class EthernetNetworkInfoModule(OneViewModuleBase):
         if self.module.params["name"]:
             ethernet_networks = self.resource_client.get_by("name", self.module.params["name"])
 
-            if self.module.params.get("options") and ethernet_networks:
+            if self.module.params["options"] and ethernet_networks:
                 info = self.__gather_optional_info(ethernet_networks[0])
         else:
             ethernet_networks = self.resource_client.get_all(**self.facts_params)

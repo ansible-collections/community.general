@@ -105,12 +105,12 @@ def main():
     )
 
     # Get parameters
-    project_id = module.params.get("project_id")
-    instance_id = module.params.get("instance_id")
-    endpoint = module.params.get("endpoint")
-    application_key = module.params.get("application_key")
-    application_secret = module.params.get("application_secret")
-    consumer_key = module.params.get("consumer_key")
+    project_id = module.params["project_id"]
+    instance_id = module.params["instance_id"]
+    endpoint = module.params["endpoint"]
+    application_key = module.params["application_key"]
+    application_secret = module.params["application_secret"]
+    consumer_key = module.params["consumer_key"]
     instance = ""
     ovh_billing_status = ""
 

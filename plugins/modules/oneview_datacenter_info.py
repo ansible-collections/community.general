@@ -133,7 +133,7 @@ class DatacenterInfoModule(OneViewModuleBase):
         client = self.oneview_client.datacenters
         info = {}
 
-        if self.module.params.get("name"):
+        if self.module.params["name"]:
             datacenters = client.get_by("name", self.module.params["name"])
 
             if self.options and "visualContent" in self.options:

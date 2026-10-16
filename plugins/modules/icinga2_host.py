@@ -154,7 +154,7 @@ class icinga2_api:
             "Accept": "application/json",
             "X-HTTP-Method-Override": method,
         }
-        url = f"{self.module.params.get('url')}/{path}"
+        url = f"{self.module.params['url']}/{path}"
         rsp, info = fetch_url(
             module=self.module,
             url=url,

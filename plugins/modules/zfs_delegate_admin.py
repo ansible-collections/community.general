@@ -119,12 +119,12 @@ from ansible.module_utils.basic import AnsibleModule
 class ZfsDelegateAdmin:
     def __init__(self, module):
         self.module = module
-        self.name = module.params.get("name")
-        self.state = module.params.get("state")
-        self.users = module.params.get("users")
-        self.groups = module.params.get("groups")
-        self.everyone = module.params.get("everyone")
-        self.perms = module.params.get("permissions")
+        self.name = module.params["name"]
+        self.state = module.params["state"]
+        self.users = module.params["users"]
+        self.groups = module.params["groups"]
+        self.everyone = module.params["everyone"]
+        self.perms = module.params["permissions"]
         self.scope = None
         self.changed = False
         self.initial_perms = None
@@ -138,11 +138,11 @@ class ZfsDelegateAdmin:
         """Validate params and set up for run."""
         if self.state == "absent":
             self.subcommand = "unallow"
-            if module.params.get("recursive"):
+            if module.params["recursive"]:
                 self.recursive_opt = ["-r"]
 
-        local = module.params.get("local")
-        descendents = module.params.get("descendents")
+        local = module.params["local"]
+        descendents = module.params["descendents"]
         if (local and descendents) or (not local and not descendents):
             self.scope = "ld"
         elif local:

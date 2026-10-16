@@ -141,11 +141,11 @@ def main():
             expect = user_input_parameters(module)
             if are_different_dicts(expect, current):
                 raise Exception(
-                    f"Cannot change option from ({current}) to ({expect})of an existing resource.({module.params.get('id')})"
+                    f"Cannot change option from ({current}) to ({expect})of an existing resource.({module.params['id']})"
                 )
 
             result = read_resource(config)
-            result["id"] = module.params.get("id")
+            result["id"] = module.params["id"]
         else:
             if resource:
                 if not module.check_mode:
@@ -162,8 +162,8 @@ def main():
 
 def user_input_parameters(module):
     return {
-        "ip_address": module.params.get("ip_address"),
-        "subnet_id": module.params.get("subnet_id"),
+        "ip_address": module.params["ip_address"],
+        "subnet_id": module.params["subnet_id"],
     }
 
 

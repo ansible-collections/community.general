@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # SPDX-FileCopyrightText: 2025 Felix Fontein <felix@fontein.de>
 
+version = 1
+
 [collection_sources]
 "ansible.posix" = "git+https://github.com/ansible-collections/ansible.posix.git,main"
 "community.crypto" = "git+https://github.com/ansible-collections/community.crypto.git,main"

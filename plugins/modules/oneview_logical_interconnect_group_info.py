@@ -106,7 +106,7 @@ class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
         )
 
     def execute_module(self):
-        if self.module.params.get("name"):
+        if self.module.params["name"]:
             ligs = self.oneview_client.logical_interconnect_groups.get_by("name", self.module.params["name"])
         else:
             ligs = self.oneview_client.logical_interconnect_groups.get_all(**self.facts_params)

@@ -239,17 +239,17 @@ def main():
     if not HAS_NCDNSAPI:
         module.fail_json(msg=missing_required_lib("nc-dnsapi"), exception=NCDNSAPI_IMP_ERR)
 
-    api_key = module.params.get("api_key")
-    api_password = module.params.get("api_password")
-    customer_id = module.params.get("customer_id")
-    domain = module.params.get("domain")
-    record_type = module.params.get("type")
-    record = module.params.get("record")
-    value = module.params.get("value")
-    priority = module.params.get("priority")
-    solo = module.params.get("solo")
-    state = module.params.get("state")
-    timeout = module.params.get("timeout")
+    api_key = module.params["api_key"]
+    api_password = module.params["api_password"]
+    customer_id = module.params["customer_id"]
+    domain = module.params["domain"]
+    record_type = module.params["type"]
+    record = module.params["record"]
+    value = module.params["value"]
+    priority = module.params["priority"]
+    solo = module.params["solo"]
+    state = module.params["state"]
+    timeout = module.params["timeout"]
 
     if record_type == "MX" and not priority:
         module.fail_json(msg="record type MX required the 'priority' argument")

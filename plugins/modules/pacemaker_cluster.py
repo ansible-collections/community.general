@@ -128,7 +128,7 @@ class PacemakerCluster(StateModuleHelper):
         if not status or "not currently running" in status:
             return False
 
-        node_name = self.runner.module.params.get("name")
+        node_name = self.runner.module.params["name"]
         if node_name:
             for line in status.splitlines():
                 if line.strip().startswith(f"* Node {node_name}:") and "(offline)" in line.lower():

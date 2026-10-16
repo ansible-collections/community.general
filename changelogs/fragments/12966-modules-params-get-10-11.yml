@@ -1,0 +1,9 @@
+minor_changes:
+  - alternatives - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12966).
+  - hwc_vpc_security_group_rule - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12966).
+  - netcup_dns - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12966).
+  - packet_ip_subnet - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12966).
+  - packet_volume - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12966).
+  - pritunl_user - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12966).
+  - spectrum_device - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12966).
+  - zpool - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12966).
