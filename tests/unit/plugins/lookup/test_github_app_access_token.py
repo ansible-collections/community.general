@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import json
-import sys
 import types
 import unittest
 from unittest.mock import (
@@ -46,12 +45,14 @@ class TestLookupModule(unittest.TestCase):
         pyjwt = types.ModuleType("jwt")
         pyjwt.encode = MagicMock(return_value=ENCODE_RESULT)
         with (
-            patch.dict(sys.modules, {"jwt": pyjwt}),
             patch.multiple(
                 "ansible_collections.community.general.plugins.lookup.github_app_access_token",
+                create=True,
                 open=mock_open(read_data="foo_bar"),
                 open_url=MagicMock(return_value=MockResponse()),
+                jwt=pyjwt,
                 HAS_JWT=True,
+                HAS_PYTHON_JWT=False,
                 HAS_CRYPTOGRAPHY=True,
                 serialization=serialization(),
             ),
@@ -66,12 +67,14 @@ class TestLookupModule(unittest.TestCase):
         pyjwt = types.ModuleType("jwt")
         pyjwt.encode = MagicMock(return_value=ENCODE_RESULT)
         with (
-            patch.dict(sys.modules, {"jwt": pyjwt}),
             patch.multiple(
                 "ansible_collections.community.general.plugins.lookup.github_app_access_token",
+                create=True,
                 open=mock_open(read_data="foo_bar"),
                 open_url=MagicMock(return_value=MockResponse()),
+                jwt=pyjwt,
                 HAS_JWT=True,
+                HAS_PYTHON_JWT=False,
                 HAS_CRYPTOGRAPHY=True,
                 serialization=serialization(),
             ),
@@ -85,17 +88,16 @@ class TestLookupModule(unittest.TestCase):
             )
 
     def test_get_token_with_python_jwt(self):
-        python_jwt = types.ModuleType("jwt")
-        python_jwt.JWT = MagicMock()
-        python_jwt.jwk_from_pem = MagicMock(return_value="private_key")
-        python_jwt.jwt_instance = MockJWT()
         with (
-            patch.dict(sys.modules, {"jwt": python_jwt}),
             patch.multiple(
                 "ansible_collections.community.general.plugins.lookup.github_app_access_token",
+                create=True,
                 open=mock_open(read_data="foo_bar"),
                 open_url=MagicMock(return_value=MockResponse()),
                 HAS_JWT=True,
+                HAS_PYTHON_JWT=True,
+                jwk_from_pem=MagicMock(return_value="private_key"),
+                jwt_instance=MockJWT(),
             ),
         ):
             lookup = lookup_loader.get("community.general.github_app_access_token")
@@ -105,17 +107,16 @@ class TestLookupModule(unittest.TestCase):
             )
 
     def test_get_token_with_fact_with_python_jwt(self):
-        python_jwt = types.ModuleType("jwt")
-        python_jwt.JWT = MagicMock()
-        python_jwt.jwk_from_pem = MagicMock(return_value="private_key")
-        python_jwt.jwt_instance = MockJWT()
         with (
-            patch.dict(sys.modules, {"jwt": python_jwt}),
             patch.multiple(
                 "ansible_collections.community.general.plugins.lookup.github_app_access_token",
+                create=True,
                 open=mock_open(read_data="foo_bar"),
                 open_url=MagicMock(return_value=MockResponse()),
                 HAS_JWT=True,
+                HAS_PYTHON_JWT=True,
+                jwk_from_pem=MagicMock(return_value="private_key"),
+                jwt_instance=MockJWT(),
             ),
         ):
             lookup = lookup_loader.get("community.general.github_app_access_token")
@@ -132,12 +133,14 @@ def test_get_token_with_client_id_alias(mocker):
     encode_mock = MagicMock(return_value=ENCODE_RESULT)
     pyjwt.encode = encode_mock
     module = "ansible_collections.community.general.plugins.lookup.github_app_access_token"
-    mocker.patch.dict(sys.modules, {"jwt": pyjwt})
     mocker.patch.multiple(
         module,
+        create=True,
         open=mock_open(read_data="foo_bar"),
         open_url=MagicMock(return_value=MockResponse()),
+        jwt=pyjwt,
         HAS_JWT=True,
+        HAS_PYTHON_JWT=False,
         HAS_CRYPTOGRAPHY=True,
         serialization=serialization(),
     )

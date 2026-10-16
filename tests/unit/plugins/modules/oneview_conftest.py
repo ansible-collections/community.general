@@ -10,15 +10,12 @@ import pytest
 
 from .oneview_module_loader import ONEVIEW_MODULE_UTILS_PATH
 
-# This import must come *after* the oneview_module_loader import!
-from hpOneView.oneview_client import OneViewClient  # isort: skip
-
 
 @pytest.fixture
-def mock_ov_client():
-    patcher_json_file = patch.object(OneViewClient, "from_json_file")
-    client = patcher_json_file.start()
-    return client.return_value
+def mock_ov_client(mocker):
+    mocker.patch(f"{ONEVIEW_MODULE_UTILS_PATH}.HAS_HPE_ONEVIEW", True)
+    oneview_client_class = mocker.patch(f"{ONEVIEW_MODULE_UTILS_PATH}.OneViewClient", create=True)
+    return oneview_client_class.from_json_file.return_value
 
 
 @pytest.fixture
