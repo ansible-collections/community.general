@@ -298,7 +298,7 @@ def main():
         "no_dev": "no-dev",
         "no_scripts": "no-scripts",
         "no_plugins": "no-plugins",
-        "apcu_autoloader": "acpu-autoloader",
+        "apcu_autoloader": "apcu-autoloader",
         "optimize_autoloader": "optimize-autoloader",
         "classmap_authoritative": "classmap-authoritative",
         "ignore_platform_reqs": "ignore-platform-reqs",
