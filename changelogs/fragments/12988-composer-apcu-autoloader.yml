@@ -1,0 +1,2 @@
+bugfixes:
+  - composer - fix ``apcu_autoloader`` never passing ``--apcu-autoloader`` to composer, because the option was mapped to the misspelled ``acpu-autoloader`` (https://github.com/ansible-collections/community.general/pull/12988).
