@@ -76,10 +76,10 @@ class RedfishUtils:
         self.resource_id = resource_id
         self.data_modification = data_modification
         self.strip_etag_quotes = strip_etag_quotes
-        self.ciphers = ciphers if ciphers is not None else module.params.get("ciphers")
+        self.ciphers = ciphers if ciphers is not None else module.params["ciphers"]
         self._vendor = None
-        self.validate_certs = module.params.get("validate_certs", False)
-        self.ca_path = module.params.get("ca_path")
+        self.validate_certs = module.params["validate_certs"]
+        self.ca_path = module.params["ca_path"]
 
     def _auth_params(self, headers: dict[str, str]) -> tuple[str | None, str | None, bool]:
         """
