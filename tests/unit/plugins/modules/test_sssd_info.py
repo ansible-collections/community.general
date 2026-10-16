@@ -4,9 +4,10 @@
 
 from __future__ import annotations
 
-import sys
 import unittest
 from unittest.mock import Mock, patch
+
+from ansible_collections.community.general.plugins.modules import sssd_info
 
 
 class TestSssdInfo(unittest.TestCase):
@@ -14,7 +15,7 @@ class TestSssdInfo(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Mock dbus module before importing the module."""
+        """Create the dbus module mock."""
         # Mock the entire dbus module
         cls.mock_dbus = Mock()
         cls.mock_dbus.SystemBus = Mock()
@@ -32,20 +33,14 @@ class TestSssdInfo(unittest.TestCase):
         cls.mock_dbus.exceptions = Mock()
         cls.mock_dbus.exceptions.DBusException = MockDBusException
 
-        # Mock the dbus module in sys.modules
-        sys.modules["dbus"] = cls.mock_dbus
-
-    @classmethod
-    def tearDownClass(cls):
-        """Clean up after all tests."""
-        # Remove the mocked dbus module
-        if "dbus" in sys.modules and sys.modules["dbus"] == cls.mock_dbus:
-            del sys.modules["dbus"]
-
     def setUp(self):
         """Set up test fixtures."""
-        # Ensure the mocked dbus is in sys.modules
-        sys.modules["dbus"] = self.mock_dbus
+        dbus_patcher = patch.object(sssd_info, "dbus", self.mock_dbus, create=True)
+        dbus_patcher.start()
+        self.addCleanup(dbus_patcher.stop)
+        deps_patcher = patch.object(sssd_info.deps, "validate")
+        deps_patcher.start()
+        self.addCleanup(deps_patcher.stop)
 
         # Reset all mocks
         self.mock_dbus.reset_mock()
@@ -73,11 +68,6 @@ class TestSssdInfo(unittest.TestCase):
 
         self.mock_dbus.Interface.side_effect = interface_side_effect
 
-    def tearDown(self):
-        """Clean up after test."""
-        # Restore the mocked dbus module in sys.modules
-        sys.modules["dbus"] = self.mock_dbus
-
     def test_domain_list_success(self):
         """Test successful retrieval of domain list."""
         # Mock the ListDomains response
@@ -85,9 +75,6 @@ class TestSssdInfo(unittest.TestCase):
             "/org/freedesktop/sssd/infopipe/Domains/ipa_2eexample_2ecom",
             "/org/freedesktop/sssd/infopipe/Domains/ad_2eexample_2ecom",
         ]
-
-        # Import the module (dbus is already mocked in sys.modules)
-        from ansible_collections.community.general.plugins.modules import sssd_info
 
         # Mock AnsibleModule
         with patch.object(sssd_info, "AnsibleModule") as mock_module_class:
@@ -119,9 +106,6 @@ class TestSssdInfo(unittest.TestCase):
         # Setup mock chain for domain object
         self.mock_bus.get_object.return_value = self.mock_domain_obj
 
-        # Import the module
-        from ansible_collections.community.general.plugins.modules import sssd_info
-
         # Mock AnsibleModule
         with patch.object(sssd_info, "AnsibleModule") as mock_module_class:
             mock_module = Mock()
@@ -152,9 +136,6 @@ class TestSssdInfo(unittest.TestCase):
         # Setup mock chain for domain object
         self.mock_bus.get_object.return_value = self.mock_domain_obj
 
-        # Import the module
-        from ansible_collections.community.general.plugins.modules import sssd_info
-
         # Mock AnsibleModule
         with patch.object(sssd_info, "AnsibleModule") as mock_module_class:
             mock_module = Mock()
@@ -180,8 +161,6 @@ class TestSssdInfo(unittest.TestCase):
     def test_domain_not_found(self):
         """Test error when domain is not found."""
         # Mock DBusException for domain not found
-        from ansible_collections.community.general.plugins.modules import sssd_info
-
         # Mock AnsibleModule
         with patch.object(sssd_info, "AnsibleModule") as mock_module_class:
             mock_module = Mock()

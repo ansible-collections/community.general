@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import sys
 from io import StringIO
 from unittest import mock
 
@@ -13,14 +12,16 @@ from ansible.errors import AnsibleError
 from ansible.playbook.play_context import PlayContext
 from ansible.plugins.loader import connection_loader
 
+from ansible_collections.community.general.plugins.connection import lxc as lxc_plugin_module
+
 
 @pytest.fixture(autouse=True)
-def lxc(request):
-    """Fixture to import/load the lxc plugin module.
+def lxc(request, mocker):
+    """Fixture to return the lxc plugin module.
 
     The fixture parameter is used to determine the presence of liblxc.
-    When true (default), a mocked liblxc module is injected. If False,
-    no liblxc will be present.
+    When true (default), a mocked liblxc module is patched into the plugin.
+    If False, no liblxc will be present.
     """
     liblxc_present = getattr(request, "param", True)
 
@@ -39,18 +40,10 @@ def lxc(request):
     liblxc_module_mock = mock.MagicMock()
     liblxc_module_mock.Container = ContainerMock
 
-    with mock.patch.dict("sys.modules"):
-        if liblxc_present:
-            sys.modules["lxc"] = liblxc_module_mock
-        elif "lxc" in sys.modules:
-            del sys.modules["lxc"]
+    mocker.patch.object(lxc_plugin_module, "HAS_LIBLXC", liblxc_present)
+    mocker.patch.object(lxc_plugin_module, "_lxc", liblxc_module_mock if liblxc_present else None, create=True)
 
-        from ansible_collections.community.general.plugins.connection import lxc as lxc_plugin_module
-
-        assert liblxc_present == lxc_plugin_module.HAS_LIBLXC
-        assert bool(getattr(lxc_plugin_module, "_lxc", None)) == liblxc_present
-
-        yield lxc_plugin_module
+    return lxc_plugin_module
 
 
 class TestLXCConnectionClass:
