@@ -81,10 +81,12 @@ options:
   state:
     description:
       - Installation state of the named Node.js library.
-      - If V(absent) is selected, a name option must be provided.
     type: str
     default: present
-    choices: ["present", "absent", "latest"]
+    choices:
+      present: The library is installed if it is missing.
+      absent: The library is removed if it is installed. O(name) must be provided.
+      latest: The library is installed or updated to its latest version.
 requirements:
   - Pnpm executable present in E(PATH).
 """
