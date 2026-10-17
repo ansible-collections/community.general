@@ -1,0 +1,10 @@
+---
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+setup_gitlab_image: gitlab/gitlab-ce:latest
+setup_gitlab_container_name: ansible-test-gitlab
+setup_gitlab_port: 8929
+setup_gitlab_root_password: Ans1ble-Test-Pa55w0rd
+setup_gitlab_api_token: glpat-ansible-test-token-0123
