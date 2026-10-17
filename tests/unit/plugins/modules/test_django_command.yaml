@@ -50,3 +50,20 @@ test_cases:
           rc: 1
           out: "whatever\n"
           err: ''
+  - id: skip_checks_ignored
+    input:
+      command: migrate
+      skip_checks: true
+      settings: whatever.settings
+    mocks:
+      run_command:
+        - command: [/testbin/python, -m, django, --version]
+          environ: *env-def
+          rc: 0
+          out: "5.1.2\n"
+          err: ''
+        - command: [/testbin/python, -m, django, migrate, --no-color, --settings=whatever.settings]
+          environ: *env-def
+          rc: 0
+          out: "whatever\n"
+          err: ''

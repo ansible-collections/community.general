@@ -16,6 +16,7 @@ description:
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._django
+  - community.general._django.skip_checks
   - community.general._django.database
   - community.general._django.data
 attributes:
@@ -110,9 +111,10 @@ class DjangoDumpData(DjangoModuleHelper):
     )
     django_admin_cmd = "dumpdata"
     django_admin_arg_order = (
-        "all format indent excludes database_dash natural_foreign natural_primary primary_keys fixture apps_models"
+        "skip_checks all format indent excludes database_dash natural_foreign natural_primary primary_keys "
+        "fixture apps_models"
     )
-    _django_args = ["data", "database_dash"]
+    _django_args = ["data", "database_dash", "skip_checks"]
 
     def __init_module__(self):
         self.vars.set("database_dash", self.vars.database, output=False)

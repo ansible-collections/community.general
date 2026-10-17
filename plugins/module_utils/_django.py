@@ -29,6 +29,8 @@ django_std_args = dict(
     pythonpath=dict(type="path"),
     traceback=dict(type="bool"),
     verbosity=dict(type="int", choices=[0, 1, 2, 3]),
+)
+_skip_checks = dict(
     skip_checks=dict(type="bool"),
 )
 _database_dash = dict(
@@ -77,6 +79,7 @@ _django_std_arg_fmts: dict[str, ArgFormatter] = dict(
 # keys can be used in _django_args
 _args_menu = dict(
     std=(django_std_args, _django_std_arg_fmts),
+    skip_checks=(_skip_checks, {}),
     database_dash=(_database_dash, {}),
     data=(_data, {}),
 )
@@ -97,7 +100,6 @@ class _DjangoRunner(PythonRunner):
             "pythonpath",
             "traceback",
             "verbosity",
-            "skip_checks",
         ) + self._prepare_args_order(self.default_args_order)
         return super().__call__(
             args_order, output_process, check_mode_skip=check_mode_skip, check_mode_return=check_mode_return, **kwargs

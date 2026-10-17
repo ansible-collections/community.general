@@ -1,0 +1,4 @@
+deprecated_features:
+  - django_check - the ``skip_checks`` option is ignored and deprecated, it will be removed in community.general 16.0.0 (https://github.com/ansible-collections/community.general/pull/13001).
+  - django_command - the ``skip_checks`` option is ignored and deprecated, it will be removed in community.general 16.0.0 (https://github.com/ansible-collections/community.general/pull/13001).
+  - django_createcachetable - the ``skip_checks`` option is ignored and deprecated, it will be removed in community.general 16.0.0 (https://github.com/ansible-collections/community.general/pull/13001).
