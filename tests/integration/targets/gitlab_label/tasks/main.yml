@@ -460,4 +460,5 @@
         validate_certs: true
         api_token: "{{ gitlab_api_token }}"
         name: "{{ gitlab_project_group }}"
+        force_delete: true
         state: absent
