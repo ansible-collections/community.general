@@ -135,14 +135,15 @@ options:
     default: plain
   secure:
     description:
-      - If V(always), the connection only sends email if the connection is Encrypted. If the server does not accept the encrypted
-        connection it fails.
-      - If V(try), the connection attempts to setup a secure SSL/TLS session, before trying to send.
-      - If V(never), the connection does not attempt to setup a secure SSL/TLS session, before sending.
-      - If V(starttls), the connection tries to upgrade to a secure SSL/TLS connection, before sending. If it is unable to
-        do so it fails.
+      - Whether and how to secure the connection to the mail server.
     type: str
-    choices: [always, never, starttls, try]
+    choices:
+      always: The connection only sends email if the connection is Encrypted. If the server does not accept the encrypted
+        connection it fails.
+      never: The connection does not attempt to setup a secure SSL/TLS session, before sending.
+      starttls: The connection tries to upgrade to a secure SSL/TLS connection, before sending. If it is unable to do so it
+        fails.
+      try: The connection attempts to setup a secure SSL/TLS session, before trying to send.
     default: try
   timeout:
     description:

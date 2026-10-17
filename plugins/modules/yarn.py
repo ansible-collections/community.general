@@ -69,9 +69,11 @@ options:
     type: str
     description:
       - Installation state of the named Node.js library.
-      - If V(absent) is selected, a O(name) option must be provided.
     default: present
-    choices: ["present", "absent", "latest"]
+    choices:
+      present: The library is installed if it is missing.
+      absent: The library is removed if it is installed. A O(name) option must be provided.
+      latest: The library is installed or updated to its latest version.
 requirements:
   - Yarn Classic installed in bin path (typically C(/usr/local/bin))
 """

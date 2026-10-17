@@ -55,10 +55,12 @@ options:
   method:
     type: str
     default: auto
-    choices: [auto, rfc4525, legacy]
+    choices:
+      auto: The module determines automatically the method to use.
+      rfc4525: Forces the use of the ModifyIncrement extension defined in RFC4525.
+      legacy: Forces the use of the legacy two-phase method.
     description:
-      - If V(auto), the module determines automatically the method to use.
-      - If V(rfc4525) or V(legacy) force to use the corresponding method.
+      - The method used to increment the attribute value.
 extends_documentation_fragment:
   - community.general._ldap.documentation
   - community.general._attributes

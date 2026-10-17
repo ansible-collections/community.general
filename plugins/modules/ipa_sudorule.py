@@ -75,9 +75,8 @@ options:
   hostcategory:
     description:
       - Host category the rule applies to.
-      - If V(all) is passed one must omit O(host) and O(hostgroup).
-      - Option O(host) and O(hostgroup) must be omitted to assign V(all).
-    choices: ['all']
+    choices:
+      all: The rule applies to all hosts. Options O(host) and O(hostgroup) must be omitted.
     type: str
   hostgroup:
     description:
