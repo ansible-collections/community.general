@@ -1,0 +1,29 @@
+---
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+setup_gitlab_api_url: "http://localhost:{{ setup_gitlab_port }}"
+
+# Settings for a memory-constrained environment, see https://docs.gitlab.com/omnibus/settings/memory_constrained_envs/
+# The monitoring allowlist is needed because the health checks reach the container from the Docker network, not from 127.0.0.1.
+setup_gitlab_omnibus_config: |
+  external_url '{{ setup_gitlab_api_url }}'
+  gitlab_rails['initial_root_password'] = '{{ setup_gitlab_root_password }}'
+  gitlab_rails['monitoring_whitelist'] = ['0.0.0.0/0', '::/0']
+  gitlab_rails['usage_ping_enabled'] = false
+  puma['worker_processes'] = 0
+  sidekiq['concurrency'] = 5
+  prometheus_monitoring['enable'] = false
+  registry['enable'] = false
+  gitlab_kas['enable'] = false
+
+setup_gitlab_create_token_script: |
+  unless PersonalAccessToken.find_by_token('{{ setup_gitlab_api_token }}')
+    token = User.find_by_username('root').personal_access_tokens.create!(
+      scopes: ['api', 'sudo', 'admin_mode'], name: 'ansible-test', expires_at: 30.days.from_now
+    )
+    token.set_token('{{ setup_gitlab_api_token }}')
+    token.save!
+    puts 'created'
+  end
