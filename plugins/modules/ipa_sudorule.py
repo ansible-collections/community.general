@@ -27,6 +27,7 @@ options:
   cmdcategory:
     description:
       - Command category the rule applies to.
+      - If omitted, the command category of the rule is not managed. If set to V(all), the rule applies to all commands.
     choices: ['all']
     type: str
   cmd:
