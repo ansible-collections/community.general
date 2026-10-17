@@ -36,10 +36,6 @@ options:
       - Specifies the amount of notification and debug information in the output of C(django-admin).
     type: int
     choices: [0, 1, 2, 3]
-  skip_checks:
-    description:
-      - Skips running system checks prior to running the command.
-    type: bool
 
 
 notes:
@@ -50,6 +46,23 @@ seealso:
       Refer to this documentation for the builtin commands and options of C(django-admin). Please make sure that you select
       the right version of Django in the version selector on that page.
     link: https://docs.djangoproject.com/en/5.0/ref/django-admin/
+"""
+
+    SKIP_CHECKS = r"""
+options:
+  skip_checks:
+    description:
+      - Skips running system checks prior to running the command.
+    type: bool
+"""
+
+    DEPRECATED_SKIP_CHECKS = r"""
+options:
+  skip_checks:
+    description:
+      - This option is ignored, because the underlying C(django-admin) command does not support it.
+      - This option has been deprecated and will be removed in community.general 16.0.0.
+    type: bool
 """
 
     DATABASE = r"""

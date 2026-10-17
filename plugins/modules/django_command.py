@@ -16,6 +16,7 @@ description:
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._django
+  - community.general._django.deprecated_skip_checks
 attributes:
   check_mode:
     support: none
@@ -72,6 +73,7 @@ class DjangoCommand(DjangoModuleHelper):
         argument_spec=dict(
             command=dict(type="str", required=True),
             extra_args=dict(type="list", elements="str"),
+            skip_checks=dict(type="bool", removed_in_version="16.0.0", removed_from_collection="community.general"),
         ),
         supports_check_mode=False,
     )
