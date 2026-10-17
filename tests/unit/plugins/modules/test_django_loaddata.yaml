@@ -32,3 +32,31 @@ test_cases:
           rc: 0
           out: "whatever\n"
           err: ''
+  - id: command_skip_checks
+    input:
+      settings: whatever.settings
+      skip_checks: true
+      fixtures: /tmp/mydata.json
+    mocks:
+      run_command:
+        - command: [/testbin/python, -m, django, --version]
+          environ: *env-def
+          rc: 0
+          out: "5.1.2\n"
+          err: ''
+        - command:
+            - /testbin/python
+            - -m
+            - django
+            - loaddata
+            - --no-color
+            - --settings=whatever.settings
+            - --skip-checks
+            - --database=default
+            - --format
+            - json
+            - /tmp/mydata.json
+          environ: *env-def
+          rc: 0
+          out: "whatever\n"
+          err: ''

@@ -16,6 +16,7 @@ description:
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._django
+  - community.general._django.skip_checks
   - community.general._django.database
   - community.general._django.data
 attributes:
@@ -75,8 +76,8 @@ class DjangoLoadData(DjangoModuleHelper):
         supports_check_mode=False,
     )
     django_admin_cmd = "loaddata"
-    django_admin_arg_order = "database_dash ignore_non_existent app format excludes fixtures"
-    _django_args = ["data", "database_dash"]
+    django_admin_arg_order = "skip_checks database_dash ignore_non_existent app format excludes fixtures"
+    _django_args = ["data", "database_dash", "skip_checks"]
 
     def __init_module__(self):
         self.vars.set("database_dash", self.vars.database, output=False)

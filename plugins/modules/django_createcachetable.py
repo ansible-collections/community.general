@@ -16,6 +16,7 @@ description:
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._django
+  - community.general._django.deprecated_skip_checks
   - community.general._django.database
 attributes:
   check_mode:
@@ -55,6 +56,9 @@ from ansible_collections.community.general.plugins.module_utils._django import D
 
 class DjangoCreateCacheTable(DjangoModuleHelper):
     module = dict(
+        argument_spec=dict(
+            skip_checks=dict(type="bool", removed_in_version="16.0.0", removed_from_collection="community.general"),
+        ),
         supports_check_mode=True,
     )
     django_admin_cmd = "createcachetable"
