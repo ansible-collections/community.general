@@ -85,7 +85,7 @@ options:
     default: present
     choices:
       present: The library is installed if it is missing.
-      absent: The library is removed if it is installed. A name option must be provided.
+      absent: The library is removed if it is installed. O(name) must be provided.
       latest: The library is installed or updated to its latest version.
 requirements:
   - Pnpm executable present in E(PATH).

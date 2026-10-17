@@ -138,7 +138,7 @@ options:
       - Whether and how to secure the connection to the mail server.
     type: str
     choices:
-      always: The connection only sends email if the connection is Encrypted. If the server does not accept the encrypted
+      always: The connection only sends email if the connection is encrypted. If the server does not accept the encrypted
         connection it fails.
       never: The connection does not attempt to setup a secure SSL/TLS session, before sending.
       starttls: The connection tries to upgrade to a secure SSL/TLS connection, before sending. If it is unable to do so it
