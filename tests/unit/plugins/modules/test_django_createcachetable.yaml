@@ -32,7 +32,7 @@ test_cases:
           rc: 0
           out: "5.1.2\n"
           err: ''
-        - command: [/testbin/python, -m, django, createcachetable, --no-color, --settings=whatever.settings, --noinput, --database=default]
+        - command: [/testbin/python, -m, django, createcachetable, --no-color, --settings=whatever.settings, --database=default]
           environ: *env-def
           rc: 0
           out: "whatever\n"
