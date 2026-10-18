@@ -59,10 +59,10 @@ def ansible_output(session: nox.Session) -> None:
 
 # Integration tests for targets that are marked as `unsupported` because they are too slow or
 # resource-hungry for regular CI, but that can still run without credentials or special hardware.
-# These targets are tagged with the `periodic` alias. This session is not registered for CI.
+# These targets are tagged with the `heavy` alias. This session is not registered for CI.
 antsibull_nox.add_ansible_test_session(
-    name="ansible-test-integration-periodic",
-    description="Run integration tests for the unsupported targets tagged as periodic",
+    name="ansible-test-integration-heavy",
+    description="Run integration tests for the unsupported targets tagged as heavy",
     ansible_test_params=[
         "integration",
         "-v",
@@ -71,7 +71,7 @@ antsibull_nox.add_ansible_test_session(
         "--display-traceback",
         "error",
         "--allow-unsupported",
-        "periodic/",
+        "heavy/",
     ],
     extra_deps_files=["tests/integration/requirements.yml"],
     ansible_core_version="devel",
