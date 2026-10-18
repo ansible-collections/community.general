@@ -83,9 +83,10 @@ options:
   pool_metadata_size:
     type: str
     description:
-      - The size of the thin pool metadata volume, according to lvcreate (--poolmetadatasize), by default in megabytes.
+      - The size of the thin pool metadata volume, according to lvcreate(8) C(--poolmetadatasize), by default in megabytes.
       - Only used when creating a thin pool.
-      - It is not used when the thin pool already exists.       
+      - It is not used when the thin pool already exists.
+    version_added: 14.0.0
   shrink:
     description:
       - Shrink if current size is higher than size requested.
@@ -350,7 +351,6 @@ def main():
     size_operator = None
     snapshot = module.params["snapshot"]
     pvs = module.params["pvs"] or []
-    pool_metadata_size = module.params["pool_metadata_size"]
 
     if size:
         # LVEXTEND(8)/LVREDUCE(8) -l, -L options: Check for relative value for resizing
@@ -516,24 +516,22 @@ def main():
                         )
                 else:
                     if size_opt == "l":
-                        with lvcreate("test yes size_l opts thin vg pvs") as ctx:
+                        with lvcreate("test yes size_l opts pool_metadata_size thin vg pvs") as ctx:
                             rc, dummy, err = ctx.run(
                                 test=module.check_mode,
                                 yes=use_yes,
                                 size_l=size_value,
                                 opts=opts,
-                                pool_metadata_size=pool_metadata_size,
                                 vg=[f"{vg}/{thinpool}"],
                                 pvs=pvs,
                             )
                     else:
-                        with lvcreate("test yes size_L opts thin vg pvs") as ctx:
+                        with lvcreate("test yes size_L opts pool_metadata_size thin vg pvs") as ctx:
                             rc, dummy, err = ctx.run(
                                 test=module.check_mode,
                                 yes=use_yes,
                                 size_L=size_value,
                                 opts=opts,
-                                pool_metadata_size=pool_metadata_size,
                                 vg=[f"{vg}/{thinpool}"],
                                 pvs=pvs,
                             )
