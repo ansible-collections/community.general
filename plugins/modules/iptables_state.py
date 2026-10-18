@@ -339,8 +339,9 @@ def parse_per_table_state(module: AnsibleModule, all_states_dump) -> dict[str, l
     tables: dict[str, list[str]] = {}
     current_table = ""
     current_list: list[str] = []
+    table_re = re.compile(r"^[*](filter|mangle|nat|raw|security)$")
     for line in lines:
-        if re.match(r"^[*](filter|mangle|nat|raw|security)$", line):
+        if table_re.match(line):
             current_table = line[1:]
             continue
         if line == "COMMIT":

@@ -177,7 +177,7 @@ id:
   sample: 24381901
 """
 
-from re import findall
+import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
@@ -218,6 +218,7 @@ class GithubDeployKey:
             return None
 
     def paginate(self, url):
+        link_re = re.compile(r'<([^>]+)>;\s*rel="(\w+)"')
         while url:
             resp, info = fetch_url(self.module, url, headers=self.headers, method="GET")
 
@@ -225,7 +226,7 @@ class GithubDeployKey:
                 yield self.module.from_json(resp.read())
 
                 links = {}
-                for x, y in findall(r'<([^>]+)>;\s*rel="(\w+)"', info.get("link", "")):
+                for x, y in link_re.findall(info.get("link", "")):
                     links[y] = x
 
                 url = links.get("next")

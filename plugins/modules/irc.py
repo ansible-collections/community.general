@@ -259,11 +259,12 @@ def send_msg(
     irc.send(to_bytes(f"USER {nick} {nick} {nick} :ansible IRC\r\n"))
     motd = ""
     start = time.time()
+    welcome_re = re.compile(r"^:\S+ 00[1-4] (?P<nick>\S+) :", flags=re.M)
     while True:
         motd += to_native(irc.recv(1024))
         # The server might send back a shorter nick than we specified (due to NICKLEN),
         #  so grab that and use it from now on (assuming we find the 00[1-4] response).
-        match = re.search(r"^:\S+ 00[1-4] (?P<nick>\S+) :", motd, flags=re.M)
+        match = welcome_re.search(motd)
         if match:
             nick = match.group("nick")
             break

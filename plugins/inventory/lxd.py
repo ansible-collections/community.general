@@ -829,9 +829,10 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.add_group(group_name)
 
         regex_pattern = self.groupby[group_name].get("attribute")
+        regex = re.compile(regex_pattern) if self.inventory.hosts else None
 
         for instance_name in self.inventory.hosts:
-            result = re.search(regex_pattern, instance_name)
+            result = regex.search(instance_name)
             if result:
                 self.inventory.add_child(group_name, instance_name)
 

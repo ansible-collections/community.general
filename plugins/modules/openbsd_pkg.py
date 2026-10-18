@@ -435,10 +435,17 @@ def parse_package_name(names, pkg_spec, module):
     # Initialize empty list of package_latest() leftovers.
     pkg_spec["package_latest_leftovers"] = []
 
+    version_re = re.compile("-[0-9]")
+    version_name_re = re.compile(
+        "^(?P<stem>[^%]+)-(?P<version>[0-9][^-]*)(?P<flavor_separator>-)?(?P<flavor>[a-z].*)?(%(?P<branch>.+))?$"
+    )
+    versionless_name_re = re.compile("^(?P<stem>[^%]+)--(?P<flavor>[a-z].*)?(%(?P<branch>.+))?$")
+    stem_name_re = re.compile("^(?P<stem>[^%]+)(%(?P<branch>.+))?$")
+    trailing_dash_re = re.compile("-$")
     for name in names:
         module.debug(f"parse_package_name(): parsing name: {name}")
         # Do some initial matches so we can base the more advanced regex on that.
-        version_match = re.search("-[0-9]", name)
+        version_match = version_re.search(name)
         versionless_match = "--" in name
 
         # Stop if someone is giving us a name that both has a version and is
@@ -451,10 +458,7 @@ def parse_package_name(names, pkg_spec, module):
 
         # If name includes a version.
         if version_match:
-            match = re.search(
-                "^(?P<stem>[^%]+)-(?P<version>[0-9][^-]*)(?P<flavor_separator>-)?(?P<flavor>[a-z].*)?(%(?P<branch>.+))?$",
-                name,
-            )
+            match = version_name_re.search(name)
             if match:
                 pkg_spec[name]["stem"] = match.group("stem")
                 pkg_spec[name]["version_separator"] = "-"
@@ -473,7 +477,7 @@ def parse_package_name(names, pkg_spec, module):
 
         # If name includes no version but is version-less ("--").
         elif versionless_match:
-            match = re.search("^(?P<stem>[^%]+)--(?P<flavor>[a-z].*)?(%(?P<branch>.+))?$", name)
+            match = versionless_name_re.search(name)
             if match:
                 pkg_spec[name]["stem"] = match.group("stem")
                 pkg_spec[name]["version_separator"] = "-"
@@ -493,7 +497,7 @@ def parse_package_name(names, pkg_spec, module):
         # stem, possibly with a branch (%branchname) tacked on at the
         # end.
         else:
-            match = re.search("^(?P<stem>[^%]+)(%(?P<branch>.+))?$", name)
+            match = stem_name_re.search(name)
             if match:
                 pkg_spec[name]["stem"] = match.group("stem")
                 pkg_spec[name]["version_separator"] = None
@@ -520,7 +524,7 @@ def parse_package_name(names, pkg_spec, module):
         # Sanity check that there are no trailing dashes in flavor.
         # Try to stop strange stuff early so we can be strict later.
         if pkg_spec[name]["flavor"]:
-            match = re.search("-$", pkg_spec[name]["flavor"])
+            match = trailing_dash_re.search(pkg_spec[name]["flavor"])
             if match:
                 module.fail_json(msg=f"trailing dash in flavor: {pkg_spec[name]['flavor']}")
 

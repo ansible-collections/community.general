@@ -233,8 +233,9 @@ class LdapAttrs(LdapGeneric):
         ordered_values = []
 
         if isinstance(values, list):
+            index_prefix_re = re.compile(r"^\{\d+\}")
             for index, value in enumerate(values):
-                cleaned_value = re.sub(r"^\{\d+\}", "", value)
+                cleaned_value = index_prefix_re.sub("", value)
                 ordered_values.append(f"{{{index!s}}}{cleaned_value}")
 
         return ordered_values

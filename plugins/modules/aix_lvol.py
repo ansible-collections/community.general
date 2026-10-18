@@ -162,21 +162,25 @@ def round_ppsize(x, base=16):
 def parse_lv(data):
     name = None
 
+    lv_vg_re = re.compile(r"LOGICAL VOLUME:\s+(\w+)\s+VOLUME GROUP:\s+(\w+)")
+    lps_re = re.compile(r"LPs:\s+(\d+).*PPs")
+    pp_size_re = re.compile(r"PP SIZE:\s+(\d+)")
+    policy_re = re.compile(r"INTER-POLICY:\s+(\w+)")
     for line in data.splitlines():
-        match = re.search(r"LOGICAL VOLUME:\s+(\w+)\s+VOLUME GROUP:\s+(\w+)", line)
+        match = lv_vg_re.search(line)
         if match is not None:
             name = match.group(1)
             vg = match.group(2)
             continue
-        match = re.search(r"LPs:\s+(\d+).*PPs", line)
+        match = lps_re.search(line)
         if match is not None:
             lps = int(match.group(1))
             continue
-        match = re.search(r"PP SIZE:\s+(\d+)", line)
+        match = pp_size_re.search(line)
         if match is not None:
             pp_size = int(match.group(1))
             continue
-        match = re.search(r"INTER-POLICY:\s+(\w+)", line)
+        match = policy_re.search(line)
         if match is not None:
             policy = match.group(1)
             continue
@@ -190,23 +194,27 @@ def parse_lv(data):
 
 
 def parse_vg(data):
+    vg_re = re.compile(r"VOLUME GROUP:\s+(\w+)")
+    total_pp_re = re.compile(r"TOTAL PP.*\((\d+)")
+    pp_size_re = re.compile(r"PP SIZE:\s+(\d+)")
+    free_pp_re = re.compile(r"FREE PP.*\((\d+)")
     for line in data.splitlines():
-        match = re.search(r"VOLUME GROUP:\s+(\w+)", line)
+        match = vg_re.search(line)
         if match is not None:
             name = match.group(1)
             continue
 
-        match = re.search(r"TOTAL PP.*\((\d+)", line)
+        match = total_pp_re.search(line)
         if match is not None:
             size = int(match.group(1))
             continue
 
-        match = re.search(r"PP SIZE:\s+(\d+)", line)
+        match = pp_size_re.search(line)
         if match is not None:
             pp_size = int(match.group(1))
             continue
 
-        match = re.search(r"FREE PP.*\((\d+)", line)
+        match = free_pp_re.search(line)
         if match is not None:
             free = int(match.group(1))
             continue

@@ -433,11 +433,13 @@ def emerge_packages(module, packages):
         )
 
     changed = True
+    emerging_re = re.compile(r"(?:>+) Emerging (?:binary )?\(1 of")
+    would_emerge_re = re.compile(r"\[(binary|ebuild)")
     for line in out.splitlines():
-        if re.match(r"(?:>+) Emerging (?:binary )?\(1 of", line):
+        if emerging_re.match(line):
             msg = "Packages installed."
             break
-        elif module.check_mode and re.match(r"\[(binary|ebuild)", line):
+        elif module.check_mode and would_emerge_re.match(line):
             msg = "Packages would be installed."
             break
     else:

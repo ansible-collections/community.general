@@ -140,11 +140,12 @@ class MockBitwarden(Bitwarden):
                     organization_to_filter = None
 
                 items = []
+                search_re = re.compile(search_value) if search_value else None
                 for item in MOCK_RECORDS:
                     if item.get("object") != "item":
                         continue
 
-                    if search_value and not re.search(search_value, item.get("name")):
+                    if search_re and not search_re.search(item.get("name")):
                         continue
                     if collection_to_filter and collection_to_filter not in item.get("collectionIds", []):
                         continue
@@ -169,11 +170,12 @@ class MockBitwarden(Bitwarden):
                     organization_to_filter = None
 
                 collections = []
+                search_re = re.compile(search_value) if search_value else None
                 for item in MOCK_RECORDS:
                     if item.get("object") != "collection":
                         continue
 
-                    if search_value and not re.search(search_value, item.get("name")):
+                    if search_re and not search_re.search(item.get("name")):
                         continue
                     if collection_to_filter and collection_to_filter not in item.get("collectionIds", []):
                         continue

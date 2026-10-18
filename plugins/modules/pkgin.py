@@ -157,6 +157,7 @@ def query_package(module, name):
         # through each line to see if we have a match.
         packages = out.split("\n")
 
+        pkgname_re = re.compile(r"^(.*?)\-[0-9][0-9.]*(nb[0-9]+)*", re.M)
         for package in packages:
             # Break up line at spaces.  The first part will be the package with its
             # version (e.g. 'gcc47-libs-4.7.2nb4'), and the second will be the state
@@ -176,7 +177,7 @@ def query_package(module, name):
 
             # Search for package, stripping version
             # (results in sth like 'gcc47-libs' or 'emacs24-nox11')
-            pkg_search_obj = re.search(r"^(.*?)\-[0-9][0-9.]*(nb[0-9]+)*", pkgname_with_version, re.M)
+            pkg_search_obj = pkgname_re.search(pkgname_with_version)
 
             # Do not proceed unless we have a match
             if not pkg_search_obj:

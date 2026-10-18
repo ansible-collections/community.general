@@ -154,8 +154,9 @@ def get_rubygems_path(module: AnsibleModule) -> list[str]:
 def get_user_install_dir(module: AnsibleModule) -> str | None:
     cmd = get_rubygems_path(module)
     rc, out, err = module.run_command(cmd + ["environment"], check_rc=True)
+    user_install_dir_re = re.compile(r"USER INSTALLATION DIRECTORY:\s*(.+)")
     for line in out.splitlines():
-        match = re.search(r"USER INSTALLATION DIRECTORY:\s*(.+)", line)
+        match = user_install_dir_re.search(line)
         if match:
             return match.group(1).strip()
     return None

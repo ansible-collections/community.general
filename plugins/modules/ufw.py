@@ -454,6 +454,12 @@ def main():
 
     changed = False
 
+    logging_re = re.compile(r"Logging: (on|off)(?: \(([a-z]+)\))?")
+    default_re = re.compile(
+        r"Default: (deny|allow|reject) \(incoming\), (deny|allow|reject) \(outgoing\), (deny|allow|reject|disabled) \(routed\)"
+    )
+    numbered_line_re = re.compile(R"^\[ *([0-9]+)\] ")
+
     # Execute filter
     for command, value in commands.items():
         cmd = [[ufw_bin], [module.check_mode, "--dry-run"]]
@@ -473,7 +479,7 @@ def main():
                 execute(cmd + [["-f"], [states[value]]])
 
         elif command == "logging":
-            extract = re.search(r"Logging: (on|off)(?: \(([a-z]+)\))?", pre_state)
+            extract = logging_re.search(pre_state)
             if extract:
                 current_level = extract.group(2)
                 current_on_off_value = extract.group(1)
@@ -495,8 +501,7 @@ def main():
                 module.fail_json(
                     msg='For default, direction must be one of "outgoing", "incoming" and "routed", or direction must not be specified.'
                 )
-            regexp = r"Default: (deny|allow|reject) \(incoming\), (deny|allow|reject) \(outgoing\), (deny|allow|reject|disabled) \(routed\)"
-            extract = re.search(regexp, pre_state)
+            extract = default_re.search(pre_state)
             if extract is not None:
                 current_default_values = {}
                 current_default_values["incoming"] = extract.group(1)
@@ -533,7 +538,6 @@ def main():
                     insert_to = params["insert"]
                 else:
                     (dummy, numbered_state, dummy) = module.run_command([ufw_bin, "status", "numbered"])
-                    numbered_line_re = re.compile(R"^\[ *([0-9]+)\] ")
                     lines = [
                         (numbered_line_re.match(line), bool("(v6)" in line or ipv6_regexp.search(line)))
                         for line in numbered_state.splitlines()

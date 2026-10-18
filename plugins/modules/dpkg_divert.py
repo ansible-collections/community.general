@@ -188,7 +188,8 @@ def main():
 
     # Option --listpackage is needed and comes with 1.15.0
     rc, stdout, stderr = module.run_command([DPKG_DIVERT, "--version"], check_rc=True)
-    [current_version] = [x for x in stdout.splitlines()[0].split() if re.match("^[0-9]+[.][0-9]", x)]
+    version_re = re.compile("^[0-9]+[.][0-9]")
+    [current_version] = [x for x in stdout.splitlines()[0].split() if version_re.match(x)]
     if LooseVersion(current_version) < LooseVersion("1.15.0"):
         module.fail_json(msg="Unsupported dpkg version (<1.15.0).")
     no_rename_is_supported = LooseVersion(current_version) >= LooseVersion("1.19.1")
