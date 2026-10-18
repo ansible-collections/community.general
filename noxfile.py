@@ -57,12 +57,12 @@ def ansible_output(session: nox.Session) -> None:
     session.run("antsibull-docs", "ansible-output", *args, *session.posargs)
 
 
-# Integration tests for targets that are marked as `unsupported` because they are too slow or
+# Integration tests for targets that do not have the regular `azp/...` targets because they are too slow or
 # resource-hungry for regular CI, but that can still run without credentials or special hardware.
 # These targets are tagged with the `heavy` alias. This session is not registered for CI.
 antsibull_nox.add_ansible_test_session(
     name="ansible-test-integration-heavy",
-    description="Run integration tests for the unsupported targets tagged as heavy",
+    description="Run integration tests for the non-CI targets tagged as heavy",
     ansible_test_params=[
         "integration",
         "-v",
@@ -70,7 +70,6 @@ antsibull_nox.add_ansible_test_session(
         "ubuntu",
         "--display-traceback",
         "error",
-        "--allow-unsupported",
         "heavy/",
     ],
     extra_deps_files=["tests/integration/requirements.yml"],
