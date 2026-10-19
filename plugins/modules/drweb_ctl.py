@@ -21,7 +21,7 @@ extends_documentation_fragment:
   - community.general._attributes
 attributes:
   check_mode:
-    description:
+    details:
       - Read-only commands do not make changes and are skipped in check mode.
       - C(cfset) checks the current configuration value and reports whether
         a change would be required.
