@@ -238,44 +238,41 @@ ansible.cfg: |
       pre_command = git rev-parse HEAD
       type = ansible
 
-  HTTP(S) configuration with Basic authentication:
-
-    Store the password in the callback's environment variable or a secrets manager, not in the configuration file.
-
-    [defaults]
+ansible.cfg (HTTPS with Basic authentication): |
+  # Store the password in ANSIBLE_CALLBACK_LOGSTASH_PASSWORD or a secrets manager, not in this file
+  [defaults]
       callbacks_enabled = community.general.logstash
 
-    [callback_logstash]
+  [callback_logstash]
       protocol = https
       server = logstash.example.com
       port = 8080
       http_path = /
       username = ansible
 
-Logstash HTTP input configuration:
-
 11-input-http.conf: |-
-    input {
-      http {
-        port => 8080
-        user => "${LOGSTASH_HTTP_USER}"
-        password => "${LOGSTASH_HTTP_PASSWORD}"
-        ssl_enabled => true
-        ssl_certificate => "/etc/logstash/server.crt"
-        ssl_key => "/etc/logstash/server.pkcs8.key"
-      }
+  # Enable Logstash HTTP Input
+  input {
+    http {
+      port => 8080
+      user => "${LOGSTASH_HTTP_USER}"
+      password => "${LOGSTASH_HTTP_PASSWORD}"
+      ssl_enabled => true
+      ssl_certificate => "/etc/logstash/server.crt"
+      ssl_key => "/etc/logstash/server.pkcs8.key"
     }
+  }
 
 11-input-tcp.conf: |-
   # Enable Logstash TCP Input
   input {
-          tcp {
-              port => 5000
-              codec => json
-              add_field => { "[@metadata][beat]" => "notify" }
-              add_field => { "[@metadata][type]" => "ansible" }
-          }
-      }
+    tcp {
+      port => 5000
+      codec => json
+      add_field => { "[@metadata][beat]" => "notify" }
+      add_field => { "[@metadata][type]" => "ansible" }
+    }
+  }
 """
 
 import json
@@ -340,9 +337,8 @@ class LogstashHTTPHandler(logging.Handler):
     def emit(self, record):
         try:
             data = self.formatter.format(record)
-        except Exception:
-            self._display.warning("Could not format event for Logstash HTTP delivery.")
-            return
+        except Exception as error:
+            raise AnsibleError("Could not format event for Logstash HTTP delivery.") from error
         kwargs = {
             "data": data,
             "headers": {"Content-Type": "application/json"},
@@ -367,18 +363,19 @@ class LogstashHTTPHandler(logging.Handler):
 
         status = None
         for attempt in range(self.retries + 1):
+            response = None
             try:
-                response = open_url(self.url, **kwargs)
-            except HTTPError as error:
-                status = error.code
-                error.close()
-            except Exception:
-                self._display.warning("Could not send event to Logstash over HTTP.")
-                return
-            else:
                 try:
+                    response = open_url(self.url, **kwargs)
+                except HTTPError as error:
+                    response = error
+                    status = error.code
+                except Exception as error:
+                    raise AnsibleError("Could not send event to Logstash over HTTP.") from error
+                else:
                     status = response.getcode()
-                finally:
+            finally:
+                if response is not None:
                     response.close()
 
             if status in (200, 201, 202, 204):
@@ -387,7 +384,7 @@ class LogstashHTTPHandler(logging.Handler):
                 break
             time.sleep(0.5 * 2**attempt + random.uniform(0, 0.25))
 
-        self._display.warning(f"Logstash HTTP request failed with status code {status}.")
+        raise AnsibleError(f"Logstash HTTP request failed with status code {status}.")
 
 
 class CallbackModule(CallbackBase):

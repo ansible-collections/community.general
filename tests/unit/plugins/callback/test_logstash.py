@@ -163,7 +163,7 @@ def test_http_handler_retries_too_many_requests():
 def test_http_handler_does_not_retry_authentication_failures():
     formatter = Mock()
     formatter.format.return_value = b"{}"
-    error = HTTPError("https://logstash.example.com/", 401, "unauthorized", None, None)
+    error = HTTPError("https://logstash.example.com/", 401, "unauthorized", None, Mock())
     display = Mock()
     handler = LogstashHTTPHandler(
         url="https://logstash.example.com/",
@@ -177,14 +177,16 @@ def test_http_handler_does_not_retry_authentication_failures():
         "ansible_collections.community.general.plugins.callback.logstash.open_url",
         side_effect=error,
     ) as open_url:
-        handler.emit(logging.makeLogRecord({"msg": "ansible ok", "args": ()}))
+        with pytest.raises(AnsibleError, match="Logstash HTTP request failed with status code 401") as exc_info:
+            handler.emit(logging.makeLogRecord({"msg": "ansible ok", "args": ()}))
 
     open_url.assert_called_once()
-    display.warning.assert_called_once_with("Logstash HTTP request failed with status code 401.")
-    assert "secret" not in str(display.warning.call_args)
+    display.warning.assert_not_called()
+    assert "secret" not in str(exc_info.value)
+    error.fp.close.assert_called_once_with()
 
 
-def test_http_handler_network_error_is_non_fatal():
+def test_http_handler_network_error_raises_error():
     formatter = Mock()
     formatter.format.return_value = b"{}"
     display = Mock()
@@ -194,10 +196,23 @@ def test_http_handler_network_error_is_non_fatal():
         "ansible_collections.community.general.plugins.callback.logstash.open_url",
         side_effect=OSError("connection failed"),
     ) as open_url:
-        handler.emit(logging.makeLogRecord({"msg": "ansible ok", "args": ()}))
+        with pytest.raises(AnsibleError, match="Could not send event to Logstash over HTTP"):
+            handler.emit(logging.makeLogRecord({"msg": "ansible ok", "args": ()}))
 
     open_url.assert_called_once()
-    display.warning.assert_called_once_with("Could not send event to Logstash over HTTP.")
+    display.warning.assert_not_called()
+
+
+def test_http_handler_format_error_raises_error():
+    formatter = Mock()
+    formatter.format.side_effect = ValueError("invalid event")
+    display = Mock()
+    handler = LogstashHTTPHandler(url="https://logstash.example.com/", formatter=formatter, display=display)
+
+    with pytest.raises(AnsibleError, match="Could not format event for Logstash HTTP delivery"):
+        handler.emit(logging.makeLogRecord({"msg": "ansible ok", "args": ()}))
+
+    display.warning.assert_not_called()
 
 
 def test_http_protocol_configures_basic_auth_and_tls():
