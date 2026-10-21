@@ -257,12 +257,12 @@ stages:
               test: ansible-test-integration-2.20-macos-15.3-azp-posix-2
             - name: macOS 15.3 + group 3
               test: ansible-test-integration-2.20-macos-15.3-azp-posix-3
-            - name: RHEL 10.1 + group 1
-              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-1
-            - name: RHEL 10.1 + group 2
-              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-2
-            - name: RHEL 10.1 + group 3
-              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-3
+            - name: RHEL 10.2 + group 1
+              test: ansible-test-integration-2.20-rhel-10.2-azp-posix-1
+            - name: RHEL 10.2 + group 2
+              test: ansible-test-integration-2.20-rhel-10.2-azp-posix-2
+            - name: RHEL 10.2 + group 3
+              test: ansible-test-integration-2.20-rhel-10.2-azp-posix-3
 
   - stage: remote_2_21
     displayName: Remote 2.21
@@ -281,18 +281,18 @@ stages:
               test: ansible-test-integration-2.21-macos-26.3-azp-posix-2
             - name: macOS 26.3 + group 3
               test: ansible-test-integration-2.21-macos-26.3-azp-posix-3
-            - name: RHEL 10.1 + group 1
-              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-1
-            - name: RHEL 10.1 + group 2
-              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-2
-            - name: RHEL 10.1 + group 3
-              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-3
-            - name: RHEL 9.7 + group 1
-              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-1
-            - name: RHEL 9.7 + group 2
-              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-2
-            - name: RHEL 9.7 + group 3
-              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-3
+            - name: RHEL 10.2 + group 1
+              test: ansible-test-integration-2.21-rhel-10.2-azp-posix-1
+            - name: RHEL 10.2 + group 2
+              test: ansible-test-integration-2.21-rhel-10.2-azp-posix-2
+            - name: RHEL 10.2 + group 3
+              test: ansible-test-integration-2.21-rhel-10.2-azp-posix-3
+            - name: RHEL 9.8 + group 1
+              test: ansible-test-integration-2.21-rhel-9.8-azp-posix-1
+            - name: RHEL 9.8 + group 2
+              test: ansible-test-integration-2.21-rhel-9.8-azp-posix-2
+            - name: RHEL 9.8 + group 3
+              test: ansible-test-integration-2.21-rhel-9.8-azp-posix-3
             - name: Ubuntu 22.04 + extra VMs
               test: ansible-test-integration-2.21-ubuntu-22.04-azp-posix-vm
             - name: Ubuntu 24.04 + extra VMs
