@@ -337,12 +337,12 @@ stages:
               test: ansible-test-integration-2.20-macos-15.3-azp-posix-2
             - name: macOS 15.3 + group 3
               test: ansible-test-integration-2.20-macos-15.3-azp-posix-3
-            - name: RHEL 10.1 + group 1
-              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-1
-            - name: RHEL 10.1 + group 2
-              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-2
-            - name: RHEL 10.1 + group 3
-              test: ansible-test-integration-2.20-rhel-10.1-azp-posix-3
+            - name: RHEL 10.2 + group 1
+              test: ansible-test-integration-2.20-rhel-10.2-azp-posix-1
+            - name: RHEL 10.2 + group 2
+              test: ansible-test-integration-2.20-rhel-10.2-azp-posix-2
+            - name: RHEL 10.2 + group 3
+              test: ansible-test-integration-2.20-rhel-10.2-azp-posix-3
 
   - stage: remote_2_21
     displayName: Remote 2.21
@@ -353,18 +353,12 @@ stages:
       - template: templates/matrix.yml
         parameters:
           targets:
-            - name: RHEL 10.1 + group 1
-              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-1
-            - name: RHEL 10.1 + group 2
-              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-2
-            - name: RHEL 10.1 + group 3
-              test: ansible-test-integration-2.21-rhel-10.1-azp-posix-3
-            - name: RHEL 9.7 + group 1
-              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-1
-            - name: RHEL 9.7 + group 2
-              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-2
-            - name: RHEL 9.7 + group 3
-              test: ansible-test-integration-2.21-rhel-9.7-azp-posix-3
+            - name: RHEL 9.8 + group 1
+              test: ansible-test-integration-2.21-rhel-9.8-azp-posix-1
+            - name: RHEL 9.8 + group 2
+              test: ansible-test-integration-2.21-rhel-9.8-azp-posix-2
+            - name: RHEL 9.8 + group 3
+              test: ansible-test-integration-2.21-rhel-9.8-azp-posix-3
 
   - stage: remote_2_22
     displayName: Remote 2.22
