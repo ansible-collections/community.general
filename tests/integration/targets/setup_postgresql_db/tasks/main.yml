@@ -98,6 +98,13 @@
   command: /sbin/service postgresql initdb
   when: ansible_facts.os_family == "RedHat" and ansible_facts.service_mgr != "systemd"
 
+- name: Fix postgres user (Archlinux)
+  ansible.builtin.user:
+    name: postgres
+    state: present
+    expires: -1  # never
+  when: ansible_facts.os_family == "Archlinux"
+
 - name: Initialize postgres (Archlinux)
   command: su - postgres -c "initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'"
   args:
