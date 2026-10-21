@@ -219,7 +219,6 @@ ansible_core = "2.19"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 remote = [
     "rhel/10.1",
-    # "freebsd/14.2",
 ]
 
 # Ansible-core 2.20:
@@ -244,8 +243,8 @@ ansible_core = "2.20"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 remote = [
     "macos/15.3",
-    "rhel/10.1",
-    # "freebsd/14.3",
+    "rhel/10.2",
+    # "freebsd/14.5",
 ]
 
 # Ansible-core 2.21:
@@ -275,9 +274,9 @@ ansible_core = "2.21"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 remote = [
     # "macos/26.3",
-    "rhel/10.1",
-    "rhel/9.7",
-    # "freebsd/15.0",
+    # "rhel/10.2",
+    "rhel/9.8",
+    # "freebsd/15.1",
 ]
 
 # Ansible-core 2.22:
