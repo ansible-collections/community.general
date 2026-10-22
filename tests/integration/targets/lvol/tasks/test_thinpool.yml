@@ -109,7 +109,7 @@
   register: thinpool_metadata_create
 
 - name: Get thin pool metadata size
-  ansible.builtin.command: lvs --noheadings --nosuffix --units m -o lv_metadata_size testvg2/testthinpool4
+  ansible.builtin.command: lvs --noheadings --nosuffix --units b -o lv_metadata_size testvg2/testthinpool4
   register: thinpool_metadata_lvs
   changed_when: false
 
@@ -118,22 +118,28 @@
     that:
       - thinpool_metadata_create is success
       - thinpool_metadata_create is changed
-      - thinpool_metadata_lvs.stdout | trim | float == 8.0
+      - thinpool_metadata_lvs.stdout | trim | int == 8388608
 
-- name: Create thin pool with custom metadata size - idempotency
+- name: Change metadata size on existing thin pool - must be ignored
   community.general.lvol:
     vg: testvg2
     thinpool: testthinpool4
     size: 4m
-    pool_metadata_size: 8m
+    pool_metadata_size: 16m
     shrink: false
-  register: thinpool_metadata_idempotent
+  register: thinpool_metadata_changed
 
-- name: Assert thin pool with custom metadata size creation is idempotent
+- name: Get thin pool metadata size after attempted change
+  ansible.builtin.command: lvs --noheadings --nosuffix --units b -o lv_metadata_size testvg2/testthinpool4
+  register: thinpool_metadata_lvs_after
+  changed_when: false
+
+- name: Assert metadata size of existing thin pool is unchanged
   ansible.builtin.assert:
     that:
-      - thinpool_metadata_idempotent is success
-      - thinpool_metadata_idempotent is not changed
+      - thinpool_metadata_changed is success
+      - thinpool_metadata_changed is not changed
+      - thinpool_metadata_lvs_after.stdout | trim | int == 8388608
 
 - name: Use pool_metadata_size together with lv
   community.general.lvol:
