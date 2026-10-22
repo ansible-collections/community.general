@@ -4,4 +4,4 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 keytool_package_names:
-  - java-11-openjdk-headless
+  - java-21-openjdk-headless
