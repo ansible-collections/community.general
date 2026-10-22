@@ -144,6 +144,7 @@ retry_on_error = "in-ci"
 "quay.io/ansible-community/test-image:debian-bookworm" = "Debian 12"
 "quay.io/ansible-community/test-image:debian-13-trixie" = "Debian 13"
 "quay.io/ansible-community/test-image:archlinux" = "Arch Linux"
+"quay.io/ansible-community/test-image:opensuse-leap-16.0" = "OpenSuSE Leap 16.0"
 "quay.io/ansible-community/test-image:opensuse-tumbleweed" = "OpenSuSE Tumbleweed"
 
 ##################################################################################################
@@ -290,6 +291,12 @@ ansible_core = "devel"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 python_version = "3.13"
 docker = "quay.io/ansible-community/test-image:debian-13-trixie"
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
+python_version = "3.13"
+docker = "quay.io/ansible-community/test-image:opensuse-leap-16.0"
 
 [[sessions.ansible_test_integration.groups.sessions]]
 ansible_core = "devel"
