@@ -103,6 +103,17 @@ nox -Re ansible-test-units-devel-3.14 -- tests/unit/plugins/modules/net_tools/te
 
 If you replace `-Re` with `-e`, then the virtual environments will be re-created. The `-R` re-uses them (if they already exist).
 
+### Heavy integration tests
+
+Some integration test targets are not part of the regular `azp/posix/N` or `azp/generic/1` CI targets because they are too slow or need too many resources to run in CI.
+Those that can run without credentials or special hardware are also tagged with the `heavy` alias, and should be run every once in a while:
+
+```.bash
+nox -Re ansible-test-integration-heavy
+```
+
+Additional options for `ansible-test` can be passed after `--`.
+
 ## Run basic sanity, unit or integration tests locally (with ansible-test)
 
 Instead of using antsibull-nox, you can also run sanity and unit tests with ansible-test directly.
