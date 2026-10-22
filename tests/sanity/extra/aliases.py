@@ -17,7 +17,7 @@ def main():
     with open(".azure-pipelines/azure-pipelines.yml", "rb") as f:
         azp = yaml.safe_load(f)
 
-    allowed_targets = {"azp/generic/1"}
+    allowed_targets = {"azp/generic/1", "heavy"}
     for stage in azp["stages"]:
         if stage["stage"].startswith(("sanity", "unit", "Summary")):
             continue
@@ -49,7 +49,7 @@ def main():
                     skip = True
                 if line in ("destructive",):
                     continue
-                if "/" not in line:
+                if "/" not in line and line not in ("heavy",):
                     continue
                 targets.append(line)
         if skip:
