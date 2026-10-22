@@ -163,7 +163,10 @@
 #     auto_import_keys: true
 #     state: "present"
 
-- when: ansible_facts.distribution == 'openSUSE Leap'
+# Leap 16 needs https://github.com/ansible-collections/community.general/pull/13017 for the idempotency check
+- when:
+    - ansible_facts.distribution == 'openSUSE Leap'
+    - ansible_facts.distribution_major_version is version('16', '<')
   block:
     - name: add a repo by releasever
       community.general.zypper_repository:
