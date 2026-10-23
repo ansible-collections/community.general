@@ -31,6 +31,9 @@ options:
   state:
     description:
       - Indicate desired state for cluster STONITH.
+      - V(present) and V(absent) are B(configuration) states. They mutate the CIB and do not wait for the STONITH device to reach a runtime state.
+      - V(enabled) and V(disabled) are B(runtime) states. They change the STONITH device's target-role
+        and (when O(wait) is set) poll C(pcs stonith status) until it reaches a started or stopped state respectively.
     choices: [present, absent, enabled, disabled]
     default: present
     type: str
@@ -92,9 +95,13 @@ options:
     default: false
   wait:
     description:
-      - Timeout period for polling the STONITH creation.
+      - Timeout period (seconds) for polling the STONITH device's runtime state after O(state=enabled) or O(state=disabled).
+      - Ignored on O(state=present) and O(state=absent); setting it on those states emits a warning.
+      - When O(state=enabled), the module polls until the device reports V(Started).
+      - When O(state=disabled), the module polls until the device reports V(Stopped).
+      - The previous default of V(300) applied to O(state=present); it is now unset by default so
+        that configuration states remain fast and only runtime states honour the poll budget.
     type: int
-    default: 300
 """
 
 EXAMPLES = """
@@ -109,6 +116,15 @@ EXAMPLES = """
       - operation_action: monitor
         operation_options:
           - "interval=30s"
+
+# state=present only ensures the STONITH device is defined in the CIB.
+# Runtime start is delegated to a follow-up state=enabled task so that
+# a missed start is reported as a runtime failure, not a config failure.
+- name: Enable virtual-stonith and wait until it is Started
+  community.general.pacemaker_stonith:
+    state: enabled
+    name: virtual-stonith
+    wait: 60
 """
 
 RETURN = """
@@ -125,7 +141,19 @@ value:
 """
 
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
-from ansible_collections.community.general.plugins.module_utils._pacemaker import pacemaker_runner, wait_for_resource
+from ansible_collections.community.general.plugins.module_utils._pacemaker import (
+    _DEFAULT_RESOURCE_READY_STATES,
+    _STOPPED_READY_STATES,
+    pacemaker_runner,
+    wait_for_resource,
+)
+
+# Fallback poll budget used only when the caller sets state=enabled or state=disabled
+# without an explicit wait. Matches the pre-fix default so runtime waits stay bounded.
+_DEFAULT_RUNTIME_WAIT_SECONDS = 300
+
+# States for which the wait parameter is meaningful (runtime state assertion).
+_RUNTIME_STATES = frozenset({"enabled", "disabled"})
 
 
 class PacemakerStonith(StateModuleHelper):
@@ -153,7 +181,7 @@ class PacemakerStonith(StateModuleHelper):
                 ),
             ),
             agent_validation=dict(type="bool", default=False),
-            wait=dict(type="int", default=300),
+            wait=dict(type="int"),
         ),
         required_if=[("state", "present", ["stonith_type", "stonith_options"])],
         supports_check_mode=True,
@@ -163,6 +191,25 @@ class PacemakerStonith(StateModuleHelper):
         self.runner = pacemaker_runner(self.module)
         self.vars.set("previous_value", self._get()["out"])
         self.vars.set("value", self.vars.previous_value, change=True, diff=True)
+        self._warn_if_wait_ignored()
+
+    def _warn_if_wait_ignored(self):
+        """Warn when ``wait`` is set on a state that does not perform runtime polling.
+
+        ``wait`` is only meaningful for O(state=enabled) and O(state=disabled). On
+        configuration-only states (present, absent) the parameter has no effect;
+        emitting a warning surfaces the mismatch to callers upgrading from the previous
+        API where O(state=present) also blocked until the STONITH device reached ``Started``.
+        """
+        if self.vars.wait is None:
+            return
+        if self.vars.state not in _RUNTIME_STATES:
+            self.module.warn(
+                f"The 'wait' parameter has no effect on state={self.vars.state!r}; "
+                "runtime state assertions moved to state=enabled/disabled in community.general 13.4.0. "
+                "Set state=enabled to poll until the device is Started, "
+                "or state=disabled to poll until the device is Stopped."
+            )
 
     def __quit_module__(self):
         self.vars.set("value", self._get()["out"])
@@ -205,6 +252,9 @@ class PacemakerStonith(StateModuleHelper):
             ctx.run(cli_action="stonith")
 
     def state_present(self):
+        # Configuration state: create the STONITH device in the CIB. Runtime state is not
+        # asserted here — callers wanting to block until the device is running should follow
+        # with state=enabled.
         with self.runner(
             "cli_action state name resource_type resource_option resource_operation resource_meta resource_argument agent_validation",
             output_process=self._process_command_output(True, "already exists"),
@@ -218,20 +268,36 @@ class PacemakerStonith(StateModuleHelper):
                 resource_meta=self.vars.stonith_metas,
                 resource_argument=self.vars.stonith_argument,
             )
-        if not self.module.check_mode and self.vars.wait:
-            wait_for_resource(self.runner, "stonith", self.vars.name, self.vars.wait)
 
     def state_enabled(self):
+        # Runtime state: set target-role=Started and (if wait requested) poll until running.
         with self.runner(
             "cli_action state name", output_process=self._process_command_output(True, "Starting"), check_mode_skip=True
         ) as ctx:
             ctx.run(cli_action="stonith")
+        self._wait_for_runtime_state(_DEFAULT_RESOURCE_READY_STATES)
 
     def state_disabled(self):
+        # Runtime state: set target-role=Stopped and (if wait requested) poll until stopped.
         with self.runner(
             "cli_action state name", output_process=self._process_command_output(True, "Stopped"), check_mode_skip=True
         ) as ctx:
             ctx.run(cli_action="stonith")
+        self._wait_for_runtime_state(_STOPPED_READY_STATES)
+
+    def _wait_for_runtime_state(self, ready_states):
+        """Poll the STONITH device until it reaches one of *ready_states* or the wait budget expires.
+
+        Skipped in check mode (no state change was actually issued). An unset ``wait`` falls
+        back to ``_DEFAULT_RUNTIME_WAIT_SECONDS`` so ``state=enabled`` still blocks by default
+        the way an operator expects — configuration states now short-circuit instead.
+        """
+        if self.module.check_mode:
+            return
+        wait = self.vars.wait if self.vars.wait is not None else _DEFAULT_RUNTIME_WAIT_SECONDS
+        if wait <= 0:
+            return
+        wait_for_resource(self.runner, "stonith", self.vars.name, wait, ready_states=ready_states)
 
 
 def main():
