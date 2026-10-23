@@ -287,6 +287,12 @@ stages:
               test: ansible-test-integration-2.22-fedora44-azp-posix-2
             - name: Fedora 44 + group 3
               test: ansible-test-integration-2.22-fedora44-azp-posix-3
+            - name: OpenSuSE Leap 16.0 + py3.13 + group 1
+              test: ansible-test-integration-2.22-opensuse-leap-16.0-3.13-azp-posix-1
+            - name: OpenSuSE Leap 16.0 + py3.13 + group 2
+              test: ansible-test-integration-2.22-opensuse-leap-16.0-3.13-azp-posix-2
+            - name: OpenSuSE Leap 16.0 + py3.13 + group 3
+              test: ansible-test-integration-2.22-opensuse-leap-16.0-3.13-azp-posix-3
             - name: OpenSuSE Tumbleweed + py3.13 + group 1
               test: ansible-test-integration-2.22-opensuse-tumbleweed-3.13-azp-posix-1
             - name: OpenSuSE Tumbleweed + py3.13 + group 2
