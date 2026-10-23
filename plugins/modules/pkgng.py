@@ -532,6 +532,10 @@ def main():
         # such as the one about an OS version mismatch. Feed it a newline so the
         # question gets its default answer, and rely on run_command closing stdin
         # afterwards, instead of letting the task block forever on the prompt.
+        # run_command has no parameter that only closes stdin, and it ignores
+        # data="", so a newline is the smallest input that gets stdin wired up
+        # and closed. pear and xbps in this collection already feed defaults
+        # this way.
         kwargs.setdefault("data", "\n")
 
         return module.run_command(cmd + list(args), environ_update=pkgng_env, **kwargs)
