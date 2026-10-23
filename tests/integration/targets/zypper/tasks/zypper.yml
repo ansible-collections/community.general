@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: get hello package version
-  ansible.builtin.shell: zypper --xmlout se -svx hello | grep 'name="hello"' | grep 'repository="Main Repository"' | sed 's/.*edition="\([^ ]*\)".*/\1/'
+  ansible.builtin.shell: zypper --xmlout se -svx hello | grep 'name="hello"' | grep -E 'repository="(Main Repository|repo-oss [(][0-9.]+[)])"' | sed 's/.*edition="\([^ ]*\)".*/\1/'
   register: hello_version
   when: ansible_facts.distribution == 'openSUSE Leap'
 
@@ -457,22 +457,29 @@
       - zypper_rm is failed
       - zypper_rm.msg.startswith('Can not remove via URL.')
 
-- name: remove pattern update_test
+# Leap 16 has no update_test pattern
+- name: set test pattern
+  ansible.builtin.set_fact:
+    zypper_test_pattern: >-
+      {{ 'sw_management' if ansible_facts.distribution == 'openSUSE Leap'
+         and ansible_facts.distribution_major_version is version('16', '>=') else 'update_test' }}
+
+- name: remove test pattern
   community.general.zypper:
-    name: update_test
+    name: "{{ zypper_test_pattern }}"
     type: pattern
     state: absent
 
-- name: install pattern update_test
+- name: install test pattern
   community.general.zypper:
-    name: update_test
+    name: "{{ zypper_test_pattern }}"
     type: pattern
     state: present
   register: zypper_install_pattern1
 
-- name: install pattern update_test again
+- name: install test pattern again
   community.general.zypper:
-    name: update_test
+    name: "{{ zypper_test_pattern }}"
     type: pattern
     state: present
   register: zypper_install_pattern2
