@@ -139,3 +139,40 @@ def test_install_by_name_does_not_query_file(run_command, tmp_path, monkeypatch,
         ["/testbin/pkg", "update"],
         ["/testbin/pkg", "info", "-g", "-e", name],
     ]
+
+
+def test_pkg_is_run_with_stdin_fed_and_closed(run_command):
+    run_command.side_effect = [
+        (0, "1.18.4", ""),  # pkg -v
+        (0, "", ""),  # pkg update
+        (0, "", ""),  # pkg info (package already installed)
+    ]
+
+    with set_module_args({"name": PACKAGE_NAME}):
+        with pytest.raises(AnsibleExitJson):
+            pkgng.main()
+
+    # Every pkg invocation gets something on stdin, which run_command closes
+    # right after writing it, so an interactive question takes its default
+    # answer instead of blocking the task forever.
+    assert [call.kwargs.get("data") for call in run_command.call_args_list[1:]] == ["\n", "\n"]
+
+
+def test_annotate_keeps_its_own_stdin_payload(run_command):
+    run_command.side_effect = [
+        (0, "1.18.4", ""),  # pkg -v
+        (0, "", ""),  # pkg update
+        (0, "", ""),  # pkg info (package already installed)
+        (0, "", ""),  # pkg info -A (annotation not present yet)
+        (0, "", ""),  # pkg annotate
+    ]
+
+    with set_module_args({"name": PACKAGE_NAME, "annotation": "+vendor=acme"}):
+        with pytest.raises(AnsibleExitJson):
+            pkgng.main()
+
+    # The default stdin must not displace the annotation value, which pkg reads
+    # from stdin as well.
+    annotate_call = run_command.call_args_list[-1]
+    assert "annotate" in annotate_call.args[0]
+    assert annotate_call.kwargs["data"] == "acme"
