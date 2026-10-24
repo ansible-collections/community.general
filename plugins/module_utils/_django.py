@@ -121,6 +121,7 @@ class DjangoModuleHelper(ModuleHelper):
     django_admin_arg_order: tuple[str, ...] | str = ()
     _django_args: list[str] = []
     _check_mode_arg: str = ""
+    _check_mode_skip: bool = False
 
     def __init__(self) -> None:
         self.module["argument_spec"], self.arg_formats = self._build_args(
@@ -159,7 +160,7 @@ class DjangoModuleHelper(ModuleHelper):
         rc, out, err = runner.bare_context("version").run()
         self.vars.version = out.strip()
 
-        with runner() as ctx:
+        with runner(check_mode_skip=self._check_mode_skip) as ctx:
             results = ctx.run(**run_params)
             self.vars.stdout = ctx.results_out
             self.vars.stderr = ctx.results_err

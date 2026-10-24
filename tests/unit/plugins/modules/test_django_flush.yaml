@@ -1,0 +1,77 @@
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+test_cases:
+  - id: command_success
+    input:
+      settings: whatever.settings
+    output:
+      changed: true
+      version: 5.1.2
+    mocks:
+      run_command:
+        - command: [/testbin/python, -m, django, --version]
+          environ: *env-def
+          rc: 0
+          out: "5.1.2\n"
+          err: ''
+        - command: [/testbin/python, -m, django, flush, --no-color, --settings=whatever.settings, --noinput, --database=default]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: check_mode
+    flags:
+      check: true
+    input:
+      settings: whatever.settings
+    output:
+      changed: true
+      version: 5.1.2
+    mocks:
+      run_command:
+        - command: [/testbin/python, -m, django, --version]
+          environ: *env-def
+          rc: 0
+          out: "5.1.2\n"
+          err: ''
+  - id: other_database_skip_checks
+    input:
+      settings: whatever.settings
+      database: otherdb
+      skip_checks: true
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/python, -m, django, --version]
+          environ: *env-def
+          rc: 0
+          out: "5.1.2\n"
+          err: ''
+        - command: [/testbin/python, -m, django, flush, --no-color, --settings=whatever.settings, --skip-checks, --noinput, --database=otherdb]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: command_fail
+    input:
+      settings: whatever.settings
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - command: [/testbin/python, -m, django, --version]
+          environ: *env-def
+          rc: 0
+          out: "5.1.2\n"
+          err: ''
+        - command: [/testbin/python, -m, django, flush, --no-color, --settings=whatever.settings, --noinput, --database=default]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: "CommandError: Database whatever couldn't be flushed.\n"
