@@ -37,12 +37,14 @@ attributes:
 options:
   state:
     type: str
-    choices: [present, absent, exact]
+    choices:
+      present: All given attribute values are added if they are missing.
+      absent: All given attribute values are removed if present.
+      exact: The set of attribute values is forced to exactly those provided and no others.
+        If the attribute value is empty, all values for this attribute are removed.
     default: present
     description:
-      - The state of the attribute values. If V(present), all given attribute values are added if they are missing. If V(absent),
-        all given attribute values are removed if present. If V(exact), the set of attribute values is forced to exactly those
-        provided and no others. If O(state=exact) and the attribute value is empty, all values for this attribute are removed.
+      - The state of the attribute values.
       - For V(present) and V(absent), when handling text attributes, all value comparisons are performed on the
         server for maximum accuracy. If the server cannot evaluate the equality filter because the attribute has no EQUALITY
         matching rule (for example, certain C(olcTLS*) attributes on older OpenLDAP versions), the module falls back to

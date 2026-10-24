@@ -27,7 +27,9 @@ options:
   cmdcategory:
     description:
       - Command category the rule applies to.
-    choices: ['all']
+      - If omitted, the command category of the rule is not managed.
+    choices:
+      all: The rule applies to all commands.
     type: str
   cmd:
     description:
@@ -75,9 +77,9 @@ options:
   hostcategory:
     description:
       - Host category the rule applies to.
-      - If V(all) is passed one must omit O(host) and O(hostgroup).
-      - Option O(host) and O(hostgroup) must be omitted to assign V(all).
-    choices: ['all']
+      - If omitted, the host category of the rule is not managed.
+    choices:
+      all: The rule applies to all hosts. Options O(host) and O(hostgroup) must be omitted.
     type: str
   hostgroup:
     description:
@@ -96,12 +98,16 @@ options:
   runasusercategory:
     description:
       - RunAs User category the rule applies to.
-    choices: ['all']
+      - If omitted, the RunAs User category of the rule is not managed.
+    choices:
+      all: Commands can be run as any user.
     type: str
   runasgroupcategory:
     description:
       - RunAs Group category the rule applies to.
-    choices: ['all']
+      - If omitted, the RunAs Group category of the rule is not managed.
+    choices:
+      all: Commands can be run as any group.
     type: str
   sudoopt:
     description:
@@ -118,7 +124,9 @@ options:
   usercategory:
     description:
       - User category the rule applies to.
-    choices: ['all']
+      - If omitted, the user category of the rule is not managed.
+    choices:
+      all: The rule applies to all users.
     type: str
   usergroup:
     description:
