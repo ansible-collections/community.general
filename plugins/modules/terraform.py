@@ -720,6 +720,8 @@ def main():
             )
         if state != "planned":
             command.append(plan_file)
+        else:
+            changed = needs_application
 
     result_diff = dict()
     if module._diff or module.check_mode:
