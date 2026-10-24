@@ -340,7 +340,7 @@ class Zpool:
                 self.changed = True
         return {"before": {"filesystem_properties": before}, "after": {"filesystem_properties": after}}
 
-    def resolve_device(self, device):
+    def resolve_device(self, device: str) -> str:
         path = Path(device)
         if not path.is_absolute():
             candidates = (Path(search_path, device) for search_path in DEVICE_SEARCH_PATHS)
@@ -349,7 +349,7 @@ class Zpool:
                 return device
         return str(path.resolve())
 
-    def strip_partition(self, device):
+    def strip_partition(self, device: str) -> str:
         path = Path(device)
         for pattern in PARTITION_PATTERNS:
             match = pattern.match(path.name)
@@ -357,7 +357,7 @@ class Zpool:
                 return str(path.with_name(match.group(1)))
         return device
 
-    def base_device(self, device):
+    def base_device(self, device: str) -> str:
         if not device.startswith("/dev/") or device in self.desired_devices:
             return device
         return self.strip_partition(device)
