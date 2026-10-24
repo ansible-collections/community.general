@@ -6,11 +6,10 @@ from __future__ import annotations
 
 import pytest
 
+from ansible_collections.community.general.plugins.modules.oneview_datacenter_info import DatacenterInfoModule
+
 from .hpe_test_utils import FactsParamsTest
 from .oneview_conftest import mock_ansible_module, mock_ov_client  # noqa: F401, pylint: disable=unused-import
-
-# This import must come *after* the oneview_module_loader / hpe_test_utils import!
-from ansible_collections.community.general.plugins.modules.oneview_datacenter_info import DatacenterInfoModule  # isort: skip
 
 PARAMS_GET_CONNECTED = dict(config="config.json", name="MyDatacenter", options=["visualContent"])
 

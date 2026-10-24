@@ -8,12 +8,13 @@ from __future__ import annotations
 import importlib
 import json
 import os
-import sys
 from unittest.mock import MagicMock
 
 import pytest
 
 from .FakeAnsibleModule import FakeAnsibleModule
+
+XENSERVER_MODULE_UTILS_PATH = "ansible_collections.community.general.plugins.module_utils._xenserver"
 
 
 @pytest.fixture
@@ -33,22 +34,17 @@ def fake_ansible_module(request):
 
 
 @pytest.fixture(autouse=True)
-def XenAPI():
+def XenAPI(mocker):
     """Imports and returns fake XenAPI module."""
 
     # Import of fake XenAPI module is wrapped by fixture so that it does not
     # affect other unit tests which could potentially also use XenAPI module.
-
-    # First we use importlib.import_module() to import the module and assign
-    # it to a local symbol.
     fake_xenapi = importlib.import_module(
         "ansible_collections.community.general.tests.unit.plugins.module_utils._xenserver.FakeXenAPI"
     )
 
-    # Now we populate Python module cache with imported fake module using the
-    # original module name (XenAPI). That way, any 'import XenAPI' statement
-    # will just load already imported fake module from the cache.
-    sys.modules["XenAPI"] = fake_xenapi
+    mocker.patch(f"{XENSERVER_MODULE_UTILS_PATH}.HAS_XENAPI", True)
+    mocker.patch(f"{XENSERVER_MODULE_UTILS_PATH}.XenAPI", fake_xenapi, create=True)
 
     return fake_xenapi
 
@@ -57,10 +53,6 @@ def XenAPI():
 def xenserver(XenAPI):
     """Imports and returns xenserver module util."""
 
-    # Since we are wrapping fake XenAPI module inside a fixture, all modules
-    # that depend on it have to be imported inside a test function. To make
-    # this easier to handle and remove some code repetition, we wrap the import
-    # of xenserver module util with a fixture.
     from ansible_collections.community.general.plugins.module_utils import _xenserver as xenserver
 
     return xenserver

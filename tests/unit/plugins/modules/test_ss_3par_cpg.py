@@ -4,15 +4,19 @@
 
 from __future__ import annotations
 
-import sys
 from unittest import mock
 
-sys.modules["hpe3par_sdk"] = mock.Mock()
-sys.modules["hpe3par_sdk.client"] = mock.Mock()
-sys.modules["hpe3parclient"] = mock.Mock()
-sys.modules["hpe3parclient.exceptions"] = mock.Mock()
+import pytest
+
 from ansible_collections.community.general.plugins.module_utils import _hpe3par as hpe3par
 from ansible_collections.community.general.plugins.modules import ss_3par_cpg
+
+
+@pytest.fixture(autouse=True)
+def hpe3par_libs(mocker):
+    mocker.patch.object(ss_3par_cpg, "HAS_3PARCLIENT", True)
+    mocker.patch.object(ss_3par_cpg, "client", create=True)
+    mocker.patch.object(ss_3par_cpg, "exceptions", create=True)
 
 
 @mock.patch("ansible_collections.community.general.plugins.modules.ss_3par_cpg.client")
