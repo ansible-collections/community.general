@@ -32,17 +32,12 @@ options:
   state:
     description:
       - Takes the host to the desired lifecycle state.
-      - If V(absent) the host is deleted from the cluster.
-      - If V(present) the host is created in the cluster (includes V(enabled), V(disabled) and V(offline) states).
-      - If V(enabled) the host is fully operational.
-      - V(disabled), for example to perform maintenance operations.
-      - V(offline), host is totally offline.
     choices:
-      - absent
-      - present
-      - enabled
-      - disabled
-      - offline
+      absent: The host is deleted from the cluster.
+      present: The host is created in the cluster (includes V(enabled), V(disabled) and V(offline) states).
+      enabled: The host is fully operational.
+      disabled: The host is disabled, for example to perform maintenance operations.
+      offline: The host is totally offline.
     default: present
     type: str
   im_mad_name:
