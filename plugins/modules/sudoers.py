@@ -99,12 +99,13 @@ options:
     version_added: 13.1.0
   validation:
     description:
-      - If V(absent), the sudoers rule is added without validation.
-      - If V(detect) and C(visudo) is available, then the sudoers rule is validated by C(visudo).
-      - If V(required), C(visudo) must be available to validate the sudoers rule.
+      - Whether the sudoers rule is validated by C(visudo).
     type: str
     default: detect
-    choices: [absent, detect, required]
+    choices:
+      absent: The sudoers rule is added without validation.
+      detect: If C(visudo) is available, then the sudoers rule is validated by C(visudo).
+      required: C(visudo) must be available to validate the sudoers rule.
     version_added: 5.2.0
 """
 
