@@ -90,6 +90,8 @@ options:
       - Resize the underlying filesystem together with the logical volume.
       - Supported for C(ext2), C(ext3), C(ext4), C(reiserfs) and C(XFS) filesystems. Attempts to resize other filesystem types
         result in failure.
+      - The filesystem is only resized when the module resizes the logical volume. If the logical volume already has the
+        requested size, the filesystem is not resized, even when it is smaller than the logical volume.
     type: bool
     default: false
 notes:
