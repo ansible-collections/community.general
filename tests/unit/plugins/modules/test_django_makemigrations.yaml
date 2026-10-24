@@ -1,0 +1,129 @@
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+  version: &version
+    command: [/testbin/python, -m, django, --version]
+    environ: *env-def
+    rc: 0
+    out: "5.1.2\n"
+    err: ''
+test_cases:
+  - id: no_changes
+    input:
+      settings: whatever.settings
+    output:
+      changed: false
+      migrations: []
+      version: 5.1.2
+    mocks:
+      run_command:
+        - *version
+        - command: [/testbin/python, -m, django, makemigrations, --no-color, --settings=whatever.settings, --noinput, --scriptable]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: "No changes detected\n"
+  - id: named_migrations_for_apps
+    input:
+      settings: whatever.settings
+      verbosity: 2
+      skip_checks: true
+      no_header: true
+      name: add_discount_fields
+      apps: [blog, shop]
+    output:
+      changed: true
+      migrations:
+        - blog/migrations/0002_add_discount_fields.py
+        - shop/migrations/0005_add_discount_fields.py
+    mocks:
+      run_command:
+        - *version
+        - command:
+            - /testbin/python
+            - -m
+            - django
+            - makemigrations
+            - --no-color
+            - --settings=whatever.settings
+            - --verbosity
+            - '2'
+            - --skip-checks
+            - --noinput
+            - --scriptable
+            - --no-header
+            - --name
+            - add_discount_fields
+            - blog
+            - shop
+          environ: *env-def
+          rc: 0
+          out: "blog/migrations/0002_add_discount_fields.py\nshop/migrations/0005_add_discount_fields.py\n"
+          err: ''
+  - id: check_mode_missing_migrations
+    flags:
+      check: true
+    input:
+      settings: whatever.settings
+    output:
+      changed: true
+      migrations:
+        - blog/migrations/0002_auto_20261018_1200.py
+    mocks:
+      run_command:
+        - *version
+        - command: [/testbin/python, -m, django, makemigrations, --no-color, --settings=whatever.settings, --noinput, --scriptable, --dry-run]
+          environ: *env-def
+          rc: 0
+          out: "blog/migrations/0002_auto_20261018_1200.py\n"
+          err: ''
+  - id: empty_migration
+    input:
+      settings: whatever.settings
+      empty: true
+      apps: [blog]
+    output:
+      changed: true
+      migrations:
+        - blog/migrations/0003_auto_20261018_1200.py
+    mocks:
+      run_command:
+        - *version
+        - command: [/testbin/python, -m, django, makemigrations, --no-color, --settings=whatever.settings, --noinput, --scriptable, --empty, blog]
+          environ: *env-def
+          rc: 0
+          out: "blog/migrations/0003_auto_20261018_1200.py\n"
+          err: ''
+  - id: update_latest_migration
+    input:
+      settings: whatever.settings
+      update: true
+    output:
+      changed: true
+      migrations:
+        - blog/migrations/0002_auto_20261018_1200.py
+    mocks:
+      run_command:
+        - *version
+        - command: [/testbin/python, -m, django, makemigrations, --no-color, --settings=whatever.settings, --noinput, --scriptable, --update]
+          environ: *env-def
+          rc: 0
+          out: "blog/migrations/0002_auto_20261018_1200.py\n"
+          err: "Deleted blog/migrations/0002_auto_20261017_0900.py\n"
+  - id: non_nullable_field_fails
+    input:
+      settings: whatever.settings
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - *version
+        - command: [/testbin/python, -m, django, makemigrations, --no-color, --settings=whatever.settings, --noinput, --scriptable]
+          environ: *env-def
+          rc: 3
+          out: ''
+          err: "It is impossible to add a non-nullable field 'discount' to product without specifying a default.\n"
