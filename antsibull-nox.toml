@@ -24,6 +24,26 @@ vcs = "git"
 development_branch = "main"
 stable_branches = [ "stable-*" ]
 
+[releaser]
+type = "zuul+github"
+zuul_base_url = "https://gateway-cloud-softwarefactory.apps.ocp.cloud.ci.centos.org/zuul/"
+zuul_tenant = "ansible"
+zuul_project_name = "ansible-collections/community.general"
+github_org = "ansible-collections"
+github_repo = "community.general"
+github_release_title = "{version}"
+github_release_body = "See {repository_url}/blob/{branch}/CHANGELOG.md for all changes."
+git_release_branch = "main"
+git_tag_format = "{version}"
+git_sign_commits = true
+git_sign_tags = true
+git_release_commit_message = "Release {version}."
+git_release_tag_message = "{version}"
+git_prepare_commit_message = "Prepare {version}."
+git_sign_other_commits = false
+git_post_release_bump = "next-bugfix"
+git_post_release_commit_message = "The next release will be {new-version}."
+
 [sessions]
 
 [sessions.lint]
