@@ -8,12 +8,11 @@ import unittest
 from copy import deepcopy
 from unittest import mock
 
-from .hpe_test_utils import OneViewBaseTestCase
-
-# This import must come *after* the oneview_module_loader / hpe_test_utils import!
-from ansible_collections.community.general.plugins.modules.oneview_logical_interconnect_group import (  # isort: skip
+from ansible_collections.community.general.plugins.modules.oneview_logical_interconnect_group import (
     LogicalInterconnectGroupModule,
 )
+
+from .hpe_test_utils import OneViewBaseTestCase
 
 FAKE_MSG_ERROR = "Fake message error"
 

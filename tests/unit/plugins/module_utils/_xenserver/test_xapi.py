@@ -70,7 +70,7 @@ testcase_module_remote_conn_scheme = {
 )
 def test_xapi_connect_local_session(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests that connection to localhost uses XenAPI.xapi_local() function."""
-    mocker.patch("XenAPI.xapi_local")
+    mocker.patch.object(XenAPI, "xapi_local")
 
     xenserver.XAPI.connect(fake_ansible_module)
 
@@ -134,7 +134,7 @@ def test_xapi_connect_login_failure(mocker, fake_ansible_module, XenAPI, xenserv
 )
 def test_xapi_connect_remote_scheme(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests that explicit scheme in hostname param is preserved."""
-    mocker.patch("XenAPI.Session")
+    mocker.patch.object(XenAPI, "Session")
 
     xenserver.XAPI.connect(fake_ansible_module)
 
@@ -152,7 +152,7 @@ def test_xapi_connect_remote_scheme(mocker, fake_ansible_module, XenAPI, xenserv
 )
 def test_xapi_connect_remote_no_scheme(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests that proper scheme is prepended to hostname without scheme."""
-    mocker.patch("XenAPI.Session")
+    mocker.patch.object(XenAPI, "Session")
 
     xenserver.XAPI.connect(fake_ansible_module)
 
@@ -164,7 +164,7 @@ def test_xapi_connect_remote_no_scheme(mocker, fake_ansible_module, XenAPI, xens
 
 def test_xapi_connect_support_ignore_ssl(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests proper handling of ignore_ssl support."""
-    mocked_session = mocker.patch("XenAPI.Session")
+    mocked_session = mocker.patch.object(XenAPI, "Session")
     mocked_session.side_effect = TypeError()
 
     with pytest.raises(TypeError):
@@ -186,7 +186,7 @@ def test_xapi_connect_no_disconnect_atexit(mocker, fake_ansible_module, XenAPI, 
 
 def test_xapi_connect_singleton(mocker, fake_ansible_module, XenAPI, xenserver):
     """Tests if XAPI.connect() returns singleton."""
-    mocker.patch("XenAPI.Session")
+    mocker.patch.object(XenAPI, "Session")
 
     xapi_session1 = xenserver.XAPI.connect(fake_ansible_module)
     xapi_session2 = xenserver.XAPI.connect(fake_ansible_module)
