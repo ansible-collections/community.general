@@ -54,8 +54,6 @@
     - 'not (ansible_facts.distribution in ["Alpine"] and item.0.key == "bcachefs")'
     # btrfs packages not available on RHEL/CentOS/Fedora
     - 'not (ansible_facts.os_family == "RedHat" and item.0.key == "btrfs")'
-    # btrfs-progs cannot be installed on ArchLinux
-    - 'not (item.0.key == "btrfs" and ansible_facts.distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
     # f2fs-tools package not available with RHEL/CentOS on CI
     - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key == "f2fs")'
     # reiserfs not available with RHEL/CentOS/Fedora/Alpine/Arch Liux
@@ -70,8 +68,6 @@
     - 'not (item.0.key == "lvm" and ansible_facts.virtualization_type in ["podman", "docker", "container", "containerd"])'
     # vfat resizing fails on Debian (but not Ubuntu)
     - 'not (item.0.key == "vfat" and ansible_facts.distribution == "Debian")'  # TODO: figure out why it fails, fix it!
-    # vfat resizing fails on ArchLinux
-    - 'not (item.0.key == "vfat" and ansible_facts.distribution == "Archlinux")'  # TODO: figure out why it fails, fix it!
     # vfat resizing fails on Ubuntu 22.04
     - 'not (item.0.key == "vfat" and ansible_facts.distribution == "Ubuntu" and (ansible_facts.distribution_major_version | int == 22))'
       # TODO: figure out why it fails, fix it!
