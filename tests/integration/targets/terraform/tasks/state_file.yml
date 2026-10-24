@@ -1,0 +1,70 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Resources that are tracked in a custom state file must be changed and
+# destroyed through that state file, not through the default terraform.tfstate.
+
+- name: Create terraform project directory (state_file)
+  ansible.builtin.file:
+    path: "{{ terraform_project_dir }}/state_file"
+    state: directory
+    mode: "0755"
+
+- name: Copy terraform files to work space (state_file)
+  ansible.builtin.copy:
+    src: state_file/main.tf
+    dest: "{{ terraform_project_dir }}/state_file/main.tf"
+    mode: "0644"
+
+- name: Create the first resource in a custom state file with the Terraform CLI
+  ansible.builtin.shell: >-
+    {{ terraform_binary_path }} init -input=false &&
+    {{ terraform_binary_path }} apply -input=false -auto-approve -state=custom.tfstate
+  args:
+    chdir: "{{ terraform_project_dir }}/state_file"
+
+- name: Add the second resource using the custom state file
+  community.general.terraform:
+    project_path: "{{ terraform_project_dir }}/state_file"
+    binary_path: "{{ terraform_binary_path }}"
+    state_file: "{{ terraform_project_dir }}/state_file/custom.tfstate"
+    variables:
+      second: "true"
+    state: present
+  register: state_file_present
+
+- name: List the resources in the custom state file after state=present
+  ansible.builtin.command: "{{ terraform_binary_path }} state list -state=custom.tfstate"
+  args:
+    chdir: "{{ terraform_project_dir }}/state_file"
+  register: state_file_present_list
+  changed_when: false
+
+- ansible.builtin.assert:
+    that:
+      - state_file_present is changed
+      - state_file_present_list.stdout_lines | sort == ['null_resource.first', 'null_resource.second[0]']
+
+- name: Destroy the resources using the custom state file
+  community.general.terraform:
+    project_path: "{{ terraform_project_dir }}/state_file"
+    binary_path: "{{ terraform_binary_path }}"
+    state_file: "{{ terraform_project_dir }}/state_file/custom.tfstate"
+    variables:
+      second: "true"
+    state: absent
+  register: state_file_absent
+
+- name: List the resources in the custom state file after state=absent
+  ansible.builtin.command: "{{ terraform_binary_path }} state list -state=custom.tfstate"
+  args:
+    chdir: "{{ terraform_project_dir }}/state_file"
+  register: state_file_absent_list
+  changed_when: false
+
+- ansible.builtin.assert:
+    that:
+      - state_file_absent is changed
+      - state_file_absent_list.stdout_lines == []
