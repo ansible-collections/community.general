@@ -153,7 +153,7 @@ options:
       download: The checksum is downloaded and verified only after artifact download. This is the default.
       change:
         - The checksum is downloaded and verified if the destination already exist, to verify if they
-          are identical. This was the behaviour before 2.6. Since it downloads the checksum before (maybe) downloading the artifact,
+          are identical. Since it downloads the checksum before (maybe) downloading the artifact,
           and since some repository software, when acting as a proxy/cache, return a 404 error if the artifact has not been
           cached yet, it may fail unexpectedly. If you still need it, you should consider using V(always) instead - if you deal
           with a checksum, it is better to use it to verify integrity after download.
