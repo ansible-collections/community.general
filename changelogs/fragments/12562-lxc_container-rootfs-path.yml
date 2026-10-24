@@ -1,0 +1,2 @@
+bugfixes:
+  - lxc_container - fix archiving containers on LXC 2.1 and newer, which failed with ``KeyError`` because the module read the removed ``lxc.rootfs`` config key instead of ``lxc.rootfs.path`` (https://github.com/ansible-collections/community.general/issues/12562, https://github.com/ansible-collections/community.general/pull/12982).
