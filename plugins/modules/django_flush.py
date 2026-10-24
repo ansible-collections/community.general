@@ -21,7 +21,7 @@ extends_documentation_fragment:
   - community.general._django.database
 attributes:
   check_mode:
-    support: none
+    support: full
   diff_mode:
     support: none
 notes:
@@ -61,11 +61,12 @@ from ansible_collections.community.general.plugins.module_utils._django import D
 
 class DjangoFlush(DjangoModuleHelper):
     module = dict(
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
     django_admin_cmd = "flush"
     django_admin_arg_order = "skip_checks noinput database_dash"
     _django_args = ["database_dash", "skip_checks"]
+    _check_mode_skip = True
 
     def __init_module__(self):
         self.vars.set("database_dash", self.vars.database, output=False)

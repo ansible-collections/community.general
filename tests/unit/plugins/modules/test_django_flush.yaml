@@ -24,6 +24,21 @@ test_cases:
           rc: 0
           out: ''
           err: ''
+  - id: check_mode
+    flags:
+      check: true
+    input:
+      settings: whatever.settings
+    output:
+      changed: true
+      version: 5.1.2
+    mocks:
+      run_command:
+        - command: [/testbin/python, -m, django, --version]
+          environ: *env-def
+          rc: 0
+          out: "5.1.2\n"
+          err: ''
   - id: other_database_skip_checks
     input:
       settings: whatever.settings
