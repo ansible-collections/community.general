@@ -195,6 +195,15 @@ class GitlabInstanceVariables:
         return True
 
 
+def filter_instance_variables(gitlab_keys):
+    # GitLab 19.1 and newer return ``hidden`` for instance variables, but the API cannot set it,
+    # so leave it out of the comparison with the requested variables.
+    existing_variables = filter_returned_variables(gitlab_keys)
+    for item in existing_variables:
+        item.pop("hidden", None)
+    return existing_variables
+
+
 def compare(requested_variables, existing_variables, state):
     # we need to do this, because it was determined in a previous version - more or less buggy
     # basically it is not necessary and might results in more/other bugs!
@@ -232,7 +241,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
     gitlab_keys = this_gitlab.list_all_instance_variables()
     before = [x.attributes for x in gitlab_keys]
 
-    existing_variables = filter_returned_variables(gitlab_keys)
+    existing_variables = filter_instance_variables(gitlab_keys)
 
     for item in requested_variables:
         item["key"] = item.pop("name")
@@ -263,7 +272,7 @@ def native_python_main(this_gitlab, purge, requested_variables, state, module):
         if purge:
             # refetch and filter
             gitlab_keys = this_gitlab.list_all_instance_variables()
-            existing_variables = filter_returned_variables(gitlab_keys)
+            existing_variables = filter_instance_variables(gitlab_keys)
 
             remove = [x for x in existing_variables if x not in requested_variables]
             for item in remove:
