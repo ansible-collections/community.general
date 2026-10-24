@@ -34,7 +34,6 @@
     - ansible_facts.os_family != 'Suse'
     - ansible_facts.system != "FreeBSD"
     - not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version is version('8', '>='))
-    - ansible_facts.os_family != 'Archlinux'  # TODO
 
 - name: "Install util-linux-extra"
   ansible.builtin.package:
@@ -172,5 +171,5 @@
     # using the entire block device.
     force_creation: "{{ e2fsprogs_version is version('1.43', '<') }}"
     # Earlier versions have a segfault bug
-    # Also there's an assertion bug on Ubuntu
-    resize_vfat: "{{ fatresize_version|default('0.0') is version('1.0.4', '>=') and ansible_facts.distribution != 'Ubuntu' }}"
+    # Also there's an assertion bug on Ubuntu and Arch Linux
+    resize_vfat: "{{ fatresize_version|default('0.0') is version('1.0.4', '>=') and ansible_facts.distribution not in ['Ubuntu', 'Archlinux'] }}"
