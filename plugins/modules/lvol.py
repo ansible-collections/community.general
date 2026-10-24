@@ -80,6 +80,13 @@ options:
     type: str
     description:
       - The thin pool volume name. When you want to create a thin provisioned volume, specify a thin pool volume name.
+  pool_metadata_size:
+    type: str
+    description:
+      - The size of the thin pool metadata volume, according to lvcreate(8) C(--poolmetadatasize), by default in megabytes.
+      - Only used when creating a thin pool.
+      - It is not used when the thin pool already exists.
+    version_added: 14.0.0
   shrink:
     description:
       - Shrink if current size is higher than size requested.
@@ -314,9 +321,12 @@ def main():
             pvs=dict(type="list", elements="str"),
             resizefs=dict(type="bool", default=False),
             thinpool=dict(type="str"),
+            pool_metadata_size=dict(type="str"),
         ),
         supports_check_mode=True,
         required_one_of=(["lv", "thinpool"],),
+        required_by={"pool_metadata_size": "thinpool"},
+        mutually_exclusive=[["pool_metadata_size", "lv"]],
     )
 
     # Determine if the "--yes" option should be used
@@ -506,7 +516,7 @@ def main():
                         )
                 else:
                     if size_opt == "l":
-                        with lvcreate("test yes size_l opts thin vg pvs") as ctx:
+                        with lvcreate("test yes size_l opts pool_metadata_size thin vg pvs") as ctx:
                             rc, dummy, err = ctx.run(
                                 test=module.check_mode,
                                 yes=use_yes,
@@ -516,7 +526,7 @@ def main():
                                 pvs=pvs,
                             )
                     else:
-                        with lvcreate("test yes size_L opts thin vg pvs") as ctx:
+                        with lvcreate("test yes size_L opts pool_metadata_size thin vg pvs") as ctx:
                             rc, dummy, err = ctx.run(
                                 test=module.check_mode,
                                 yes=use_yes,
