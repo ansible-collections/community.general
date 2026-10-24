@@ -41,18 +41,18 @@ options:
     default: ''
   persistent:
     type: str
-    choices: [disabled, absent, present]
+    choices:
+      disabled: Does not touch anything and leaves C(/etc/modules-load.d/) and C(/etc/modprobe.d/) as it is.
+      absent: Comments out module name from C(/etc/modules-load.d/) and comments out params from C(/etc/modprobe.d/)
+        so the module is not loaded on next reboot.
+      present: Adds module name to C(/etc/modules-load.d/) and params to C(/etc/modprobe.d/) so the module is loaded
+        on next reboot.
     default: disabled
     version_added: 7.0.0
     description:
       - Persistency between reboots for configured module.
       - This option creates files in C(/etc/modules-load.d/) and C(/etc/modprobe.d/) that make your module configuration persistent
         during reboots.
-      - If V(present), adds module name to C(/etc/modules-load.d/) and params to C(/etc/modprobe.d/) so the module is loaded
-        on next reboot.
-      - If V(absent), comments out module name from C(/etc/modules-load.d/) and comments out params from C(/etc/modprobe.d/)
-        so the module is not loaded on next reboot.
-      - If V(disabled), does not touch anything and leaves C(/etc/modules-load.d/) and C(/etc/modprobe.d/) as it is.
       - Note that it is usually a better idea to rely on the automatic module loading by PCI IDs, USB IDs, DMI IDs or similar
         triggers encoded in the kernel modules themselves instead of configuration like this.
       - In fact, most modern kernel modules are prepared for automatic loading already.

@@ -134,9 +134,10 @@ options:
   sync:
     description:
       - Sync package repositories first.
-      - If V(yes), perform C(emerge --sync).
-      - If V(web), perform C(emerge-webrsync).
-    choices: ["web", "yes", "no"]
+    choices:
+      web: Perform C(emerge-webrsync).
+      "yes": Perform C(emerge --sync).
+      "no": Do not sync package repositories.
     type: str
 
   getbinpkgonly:

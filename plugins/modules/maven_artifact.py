@@ -145,27 +145,31 @@ options:
   verify_checksum:
     type: str
     description:
-      - If V(never), the checksum is never downloaded and verified.
-      - If V(download), the checksum is downloaded and verified only after artifact download. This is the default.
-      - If V(change), the checksum is downloaded and verified if the destination already exist, to verify if they
-        are identical. This was the behaviour before 2.6. Since it downloads the checksum before (maybe) downloading the artifact,
-        and since some repository software, when acting as a proxy/cache, return a 404 error if the artifact has not been
-        cached yet, it may fail unexpectedly. If you still need it, you should consider using V(always) instead - if you deal
-        with a checksum, it is better to use it to verify integrity after download.
-      - V(always) combines V(download) and V(change).
+      - When the checksum of the artifact is downloaded and verified.
       - The checksum algorithm is selected with O(checksum_alg).
     default: 'download'
-    choices: ['never', 'download', 'change', 'always']
+    choices:
+      never: The checksum is never downloaded and verified.
+      download: The checksum is downloaded and verified only after artifact download. This is the default.
+      change:
+        - The checksum is downloaded and verified if the destination already exist, to verify if they
+          are identical. Since it downloads the checksum before (maybe) downloading the artifact,
+          and since some repository software, when acting as a proxy/cache, return a 404 error if the artifact has not been
+          cached yet, it may fail unexpectedly. If you still need it, you should consider using V(always) instead - if you deal
+          with a checksum, it is better to use it to verify integrity after download.
+      always: Combines V(download) and V(change).
   checksum_alg:
     type: str
     description:
-      - If V(md5), checksums use the MD5 algorithm. This is the default.
-      - If V(sha1), checksums use the SHA1 algorithm. This can be used on systems configured to use FIPS-compliant algorithms,
-        since MD5 is blocked on such systems.
-      - If V(sha256) or V(sha512), checksums use the SHA-256 or SHA-512 algorithm, respectively.
-        These choices were added in community.general 13.5.0.
+      - The algorithm used for checksums.
+      - The values V(sha256) and V(sha512) have been added in community.general 13.5.0.
     default: 'md5'
-    choices: ['md5', 'sha1', 'sha256', 'sha512']
+    choices:
+      md5: Checksums use the MD5 algorithm. This is the default.
+      sha1: Checksums use the SHA1 algorithm. This can be used on systems configured to use FIPS-compliant algorithms,
+        since MD5 is blocked on such systems.
+      sha256: Checksums use the SHA-256 algorithm.
+      sha512: Checksums use the SHA-512 algorithm.
     version_added: 3.2.0
   unredirected_headers:
     type: list
