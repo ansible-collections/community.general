@@ -12,9 +12,6 @@ import pytest
 
 from .oneview_module_loader import ONEVIEW_MODULE_UTILS_PATH
 
-# This import must come *after* the oneview_module_loader import!
-from hpOneView.oneview_client import OneViewClient  # isort: skip
-
 
 class OneViewBaseTest:
     @pytest.fixture(autouse=True)
@@ -99,10 +96,14 @@ class OneViewBaseTestCase:
         """
         self.testing_class = testing_class
 
+        patcher_has_oneview = patch(f"{ONEVIEW_MODULE_UTILS_PATH}.HAS_HPE_ONEVIEW", True)
+        test_case.addCleanup(patcher_has_oneview.stop)
+        patcher_has_oneview.start()
+
         # Define OneView Client Mock (FILE)
-        patcher_json_file = patch.object(OneViewClient, "from_json_file")
-        test_case.addCleanup(patcher_json_file.stop)
-        self.mock_ov_client_from_json_file = patcher_json_file.start()
+        patcher_ov_client = patch(f"{ONEVIEW_MODULE_UTILS_PATH}.OneViewClient", create=True)
+        test_case.addCleanup(patcher_ov_client.stop)
+        self.mock_ov_client_from_json_file = patcher_ov_client.start().from_json_file
 
         # Define OneView Client Mock
         self.mock_ov_client = self.mock_ov_client_from_json_file.return_value
