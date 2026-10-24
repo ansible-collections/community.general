@@ -1291,8 +1291,12 @@ class LxcContainerManagement:
             # Set the name of the working dir, temp + container_name
             work_dir = os.path.join(temp_dir, self.container_name)
 
-            # LXC container rootfs
-            lxc_rootfs = self.container.get_config_item("lxc.rootfs")
+            # LXC container rootfs. LXC 2.1 renamed "lxc.rootfs" to "lxc.rootfs.path"
+            # and LXC 3.0 removed the old key, so try the new key first.
+            try:
+                lxc_rootfs = self.container.get_config_item("lxc.rootfs.path")
+            except KeyError:
+                lxc_rootfs = self.container.get_config_item("lxc.rootfs")
 
             # Test if the containers rootfs is a block device
             block_backed = lxc_rootfs.startswith(os.path.join(os.sep, "dev"))
