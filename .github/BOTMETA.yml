@@ -677,6 +677,8 @@ files:
     maintainers: russoz
   $modules/django_dumpdata.py:
     maintainers: russoz
+  $modules/django_flush.py:
+    maintainers: russoz
   $modules/django_loaddata.py:
     maintainers: russoz
   $modules/django_makemigrations.py:
