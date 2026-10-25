@@ -104,3 +104,28 @@ def test_addmodify_repo_gpgcheck_flags(addrepo_module, repodata, version, flag, 
     assert flag in cmd
     assert len([c for c in cmd if c.startswith("--gpgcheck") or c == "--no-gpgcheck"]) == 1
     assert addrepo_module.warn.called is warned
+
+
+SERVICES_XML = """<?xml version="1.0"?>
+<stream>
+<service-list>
+<service alias="SLES" name="SLES" enabled="1"><repo alias="SLES-Pool" name="Pool" enabled="1"/></service>
+<repo alias="standalone" name="Standalone" enabled="1"/>
+</service-list>
+</stream>
+"""
+
+
+def test_get_service_repo_aliases_only_nested(addrepo_module):
+    addrepo_module.run_command.return_value = (0, SERVICES_XML, "")
+
+    assert zypper_repository.get_service_repo_aliases(addrepo_module) == {"SLES-Pool"}
+
+
+def test_get_service_repo_aliases_fails_on_bad_xml(addrepo_module):
+    addrepo_module.run_command.return_value = (0, "not xml", "")
+    addrepo_module.fail_json.side_effect = SystemExit
+
+    with pytest.raises(SystemExit):
+        zypper_repository.get_service_repo_aliases(addrepo_module)
+    assert "Failed to parse" in addrepo_module.fail_json.call_args[1]["msg"]

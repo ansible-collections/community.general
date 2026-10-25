@@ -57,6 +57,14 @@ options:
       - Cannot be combined with O(disable_gpg_check=true) or with C(gpgcheck=0) in a C(.repo) file.
     type: bool
     version_added: 14.0.0
+  remove_others:
+    description:
+      - Remove every other repository after the repository in O(repo) has been added or confirmed.
+      - Repositories that belong to a service are kept, because the service would add them again on its next refresh.
+      - Requires O(state=present).
+    type: bool
+    default: false
+    version_added: 14.1.0
   autorefresh:
     description:
       - Enable autorefresh of the repository.
@@ -132,6 +140,22 @@ EXAMPLES = r"""
     name: my_ci_repo
     state: present
     runrefresh: true
+
+- name: Keep only one repository
+  community.general.zypper_repository:
+    repo: 'http://my_internal_ci_repo/repo'
+    name: my_ci_repo
+    state: present
+    remove_others: true
+"""
+
+RETURN = r"""
+removed_repos:
+  description: Aliases of the repositories removed by O(remove_others).
+  type: list
+  elements: str
+  returned: when O(remove_others=true) and the task changed something
+  version_added: 14.1.0
 """
 
 import configparser
@@ -211,6 +235,22 @@ def get_releasever(module):
     cmd = ["rpm", "-q", "--qf", "%{version}", "-f", "/etc/os-release"]
     rc, stdout, stderr = module.run_command(cmd, check_rc=True)
     return stdout
+
+
+def get_service_repo_aliases(module):
+    "Aliases of repositories that are managed by a service (zypper services --with-repos)."
+    cmd = _get_cmd(module, "--xmlout", "services", "--with-repos")
+    rc, stdout, stderr = module.run_command(cmd, check_rc=True)
+    try:
+        dom = parseXML(stdout)
+    except ExpatError as exc:
+        module.fail_json(msg=f"Failed to parse zypper xml output: {exc}", cmd=cmd, stdout=stdout, stderr=stderr)
+    # standalone repositories are listed too, only those nested in a <service> belong to one
+    return {
+        repo.getAttribute("alias")
+        for service in dom.getElementsByTagName("service")
+        for repo in service.getElementsByTagName("repo")
+    }
 
 
 def _repo_changes(module, realrepo, repocmp):
@@ -366,6 +406,7 @@ def main():
             description=dict(),
             disable_gpg_check=dict(type="bool"),
             allow_unsigned_metadata=dict(type="bool"),
+            remove_others=dict(type="bool", default=False),
             autorefresh=dict(type="bool", aliases=["refresh"]),
             priority=dict(type="int"),
             enabled=dict(type="bool"),
@@ -383,6 +424,10 @@ def main():
     overwrite_multiple = module.params["overwrite_multiple"]
     auto_import_keys = module.params["auto_import_keys"]
     runrefresh = module.params["runrefresh"]
+    remove_others = module.params["remove_others"]
+
+    if remove_others and state != "present":
+        module.fail_json(msg="remove_others=true cannot be combined with state=absent.")
 
     zypper_version = get_zypper_version(module)
 
@@ -405,6 +450,17 @@ def main():
 
     def exit_unchanged():
         module.exit_json(changed=False, repodata=repodata, state=state)
+
+    def remove_other_repos():
+        "Removes every repository except the one managed by this task; returns the removed aliases."
+        removed = []
+        keep = get_service_repo_aliases(module)
+        keep.add(repodata["alias"])
+        for other in _parse_repos(module):
+            if other["alias"] not in keep:
+                remove_repo(module, other["alias"])
+                removed.append(other["alias"])
+        return removed
 
     # Check run-time module parameters
     if repo == "*" or alias == "*":
@@ -513,6 +569,10 @@ def main():
         if exists and not mod:
             if runrefresh:
                 runrefreshrepo(module, auto_import_keys, shortname)
+            if remove_others:
+                removed = remove_other_repos()
+                if removed:
+                    module.exit_json(changed=True, repodata=repodata, state=state, removed_repos=removed)
             exit_unchanged()
         rc, stdout, stderr = addmodify_repo(module, repodata, old_repos, zypper_version)
         if rc == 0 and (runrefresh or auto_import_keys):
@@ -523,6 +583,8 @@ def main():
         rc, stdout, stderr = remove_repo(module, shortname)
 
     if rc == 0:
+        if state == "present" and remove_others:
+            module.exit_json(changed=True, repodata=repodata, state=state, removed_repos=remove_other_repos())
         module.exit_json(changed=True, repodata=repodata, state=state)
     else:
         module.fail_json(
