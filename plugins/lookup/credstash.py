@@ -79,11 +79,11 @@ EXAMPLES = r"""
 
     - name: "Test credstash lookup plugin -- get the password with a context passed as a variable"
       ansible.builtin.debug:
-        msg: "{{ lookup('community.general.credstash', 'some-password', context=context) }}"
+        msg: "{{ lookup('community.general.credstash', 'some-password', **context) }}"
 
     - name: "Test credstash lookup plugin -- get the password with a context defined here"
       ansible.builtin.debug:
-        msg: "{{ lookup('community.general.credstash', 'some-password', context=dict(app='my_app', environment='production')) }}"
+        msg: "{{ lookup('community.general.credstash', 'some-password', app='my_app', environment='production') }}"
 """
 
 RETURN = r"""
