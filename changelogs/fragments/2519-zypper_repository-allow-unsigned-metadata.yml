@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper_repository - add ``allow_unsigned_metadata`` option to accept unsigned repository metadata while keeping the package GPG check (``--gpgcheck-allow-unsigned-repo``) (https://github.com/ansible-collections/community.general/issues/2519).

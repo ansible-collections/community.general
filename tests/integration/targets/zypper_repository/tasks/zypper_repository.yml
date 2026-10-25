@@ -311,3 +311,105 @@
           - "added_by_repo_local_file is changed"
           - "get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.rc == 0"
           - "'/systemsmanagement:/Uyuni:/Utils/' in get_repository_details_from_zypper_for_systemsmanagement_Uyuni_Utils.stdout"
+
+# allow_unsigned_metadata
+- name: add a repo that allows unsigned metadata
+  community.general.zypper_repository:
+    name: unsignedmeta
+    repo: "{{ os_repository_url_extra }}"
+    allow_unsigned_metadata: true
+    state: present
+  register: unsigned_add
+
+- name: add a repo that allows unsigned metadata again
+  community.general.zypper_repository:
+    name: unsignedmeta
+    repo: "{{ os_repository_url_extra }}"
+    allow_unsigned_metadata: true
+    state: present
+  register: unsigned_add_again
+
+- name: read the repository settings
+  ansible.builtin.command: zypper --xmlout lr unsignedmeta
+  changed_when: false
+  register: unsigned_lr
+
+- name: require signed metadata again
+  community.general.zypper_repository:
+    name: unsignedmeta
+    repo: "{{ os_repository_url_extra }}"
+    allow_unsigned_metadata: false
+    state: present
+  register: unsigned_strict
+
+- name: read the repository settings again
+  ansible.builtin.command: zypper --xmlout lr unsignedmeta
+  changed_when: false
+  register: unsigned_lr_strict
+
+- name: verify allow_unsigned_metadata
+  ansible.builtin.assert:
+    that:
+      - unsigned_add is changed
+      - unsigned_add_again is not changed
+      - "'raw_repo_gpgcheck=\"0\"' in unsigned_lr.stdout"
+      - "'gpgcheck=\"1\"' in unsigned_lr.stdout"
+      - unsigned_strict is changed
+      - "'raw_repo_gpgcheck' not in unsigned_lr_strict.stdout"
+
+- name: remove the unsigned metadata repo
+  community.general.zypper_repository:
+    name: unsignedmeta
+    state: absent
+
+- name: write a .repo file with repo_gpgcheck=0
+  ansible.builtin.copy:
+    dest: "{{ remote_tmp_dir }}/unsignedmeta.repo"
+    content: |
+      [unsignedmetafile]
+      name=unsignedmetafile
+      baseurl={{ os_repository_url_extra }}
+      enabled=1
+      gpgcheck=1
+      repo_gpgcheck=0
+
+- name: add the repo from the .repo file
+  community.general.zypper_repository:
+    repo: "{{ remote_tmp_dir }}/unsignedmeta.repo"
+    state: present
+  register: unsigned_file
+
+- name: add the repo from the .repo file again
+  community.general.zypper_repository:
+    repo: "{{ remote_tmp_dir }}/unsignedmeta.repo"
+    state: present
+  register: unsigned_file_again
+
+- name: read the repository settings from the .repo file
+  ansible.builtin.command: zypper --xmlout lr unsignedmetafile
+  changed_when: false
+  register: unsigned_lr_file
+
+- name: combine allow_unsigned_metadata with disable_gpg_check
+  community.general.zypper_repository:
+    name: unsignedmetafile
+    repo: "{{ os_repository_url_extra }}"
+    allow_unsigned_metadata: true
+    disable_gpg_check: true
+    state: present
+  register: unsigned_conflict
+  ignore_errors: true
+
+- name: verify allow_unsigned_metadata from a .repo file and the rejected combination
+  ansible.builtin.assert:
+    that:
+      - unsigned_file is changed
+      - unsigned_file_again is not changed
+      - "'raw_repo_gpgcheck=\"0\"' in unsigned_lr_file.stdout"
+      - unsigned_conflict is failed
+      - "'cannot be combined' in unsigned_conflict.msg"
+
+- name: remove the .repo file repo
+  community.general.zypper_repository:
+    name: unsignedmetafile
+    state: absent
