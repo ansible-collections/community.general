@@ -1,0 +1,2 @@
+bugfixes:
+  - log_plays callback plugin - change type of the ``log_folder`` option from ``str`` to ``path`` (https://github.com/ansible-collections/community.general/issues/5389, https://github.com/ansible-collections/community.general/pull/13047).
