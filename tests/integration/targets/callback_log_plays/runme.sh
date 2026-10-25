@@ -17,3 +17,10 @@ export ANSIBLE_LOG_FOLDER="logit.file"
 touch "${ANSIBLE_LOG_FOLDER}"
 ansible-playbook ping_log.yml -v "$@" 2>&1| grep -E "(Failure using method \(v2_runner_on_ok\) in callback plugin|Callback dispatch 'v2_runner_on_ok' failed for plugin)"
 [[ ! -f "${ANSIBLE_LOG_FOLDER}/localhost" ]]
+
+# a folder starting with ~ should be expanded
+TEST_HOME="$(mktemp -d)"
+# shellcheck disable=SC2088
+HOME="${TEST_HOME}" ANSIBLE_LOG_FOLDER="~/logit" ansible-playbook ping_log.yml -v "$@"
+[[ -f "${TEST_HOME}/logit/localhost" ]]
+rm -rf "${TEST_HOME}"
