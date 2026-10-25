@@ -344,9 +344,10 @@ class Zpool:
         path = Path(device)
         if not path.is_absolute():
             candidates = (Path(search_path, device) for search_path in DEVICE_SEARCH_PATHS)
-            path = next((candidate for candidate in candidates if candidate.exists()), None)
-            if path is None:
+            found = next((candidate for candidate in candidates if candidate.exists()), None)
+            if found is None:
                 return device
+            path = found
         return str(path.resolve())
 
     def strip_partition(self, device: str) -> str:
