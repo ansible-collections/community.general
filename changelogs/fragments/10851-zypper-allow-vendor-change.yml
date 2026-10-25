@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper - ``allow_vendor_change`` now also applies to the ``install``, ``update`` and ``patch`` commands, not only to ``dist-upgrade`` (https://github.com/ansible-collections/community.general/issues/10851).

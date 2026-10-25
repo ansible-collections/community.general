@@ -286,6 +286,47 @@ test_cases:
           out: *xml_install_nmap
           err: ''
 
+  - id: install_allow_vendor_change
+    input:
+      name: nmap
+      state: present
+      allow_vendor_change: true
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, install, --type, package,
+             --auto-agree-with-licenses, --no-recommends, --allow-vendor-change, '--', +nmap]
+          environ: *env
+          rc: 0
+          out: *xml_install_nmap
+          err: ''
+
+  - id: update_all_allow_vendor_change
+    input:
+      name: '*'
+      state: latest
+      allow_vendor_change: true
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, update, --type, package,
+             --auto-agree-with-licenses, --no-recommends, --allow-vendor-change]
+          environ: *env
+          rc: 0
+          out: *xml_upgrade_vim
+          err: ''
+
   - id: install_recommends_true
     input:
       name: nmap
