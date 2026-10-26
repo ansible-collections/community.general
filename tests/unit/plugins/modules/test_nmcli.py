@@ -5605,3 +5605,182 @@ def test_vrf_connection_unchanged(mocked_vrf_connection_unchanged, capfd):
     results = json.loads(out)
     assert not results.get("failed")
     assert not results["changed"]
+
+
+TESTCASE_ETHERNET_ROUTE_TABLE = [
+    {
+        "type": "ethernet",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "ethernet_non_existant",
+        "ip4": "10.10.10.10/24",
+        "gw4": "10.10.10.1",
+        "route_table4": 100,
+        "ip6": "2001:db8::10/64",
+        "route_table6": 200,
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_ETHERNET_ROUTE_TABLE_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv4.route-table:                       100
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::10/64
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+ipv6.route-table:                       200
+"""
+
+TESTCASE_ETHERNET_ROUTE_TABLE_DEFAULT_SHOW_OUTPUT = TESTCASE_ETHERNET_ROUTE_TABLE_SHOW_OUTPUT.replace(
+    "ipv4.route-table:                       100", "ipv4.route-table:                       0"
+).replace("ipv6.route-table:                       200", "ipv6.route-table:                       0")
+
+TESTCASE_ETHERNET_ROUTE_TABLE_RESET = [
+    {
+        "type": "ethernet",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "ethernet_non_existant",
+        "ip4": "10.10.10.10/24",
+        "gw4": "10.10.10.1",
+        "route_table4": 0,
+        "ip6": "2001:db8::10/64",
+        "route_table6": 200,
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+
+@pytest.fixture
+def mocked_ethernet_connection_route_table_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_ETHERNET_ROUTE_TABLE_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_route_table_default(mocker):
+    mocker_set(
+        mocker,
+        connection_exists=True,
+        execute_return=None,
+        execute_side_effect=(
+            (0, TESTCASE_ETHERNET_ROUTE_TABLE_DEFAULT_SHOW_OUTPUT, ""),
+            (0, "", ""),
+        ),
+    )
+
+
+@pytest.fixture
+def mocked_ethernet_connection_route_table_set(mocker):
+    mocker_set(
+        mocker,
+        connection_exists=True,
+        execute_return=None,
+        execute_side_effect=(
+            (0, TESTCASE_ETHERNET_ROUTE_TABLE_SHOW_OUTPUT, ""),
+            (0, "", ""),
+        ),
+    )
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_ROUTE_TABLE, indirect=["patch_ansible_module"])
+def test_ethernet_connection_route_table_create(mocked_generic_connection_create, capfd):
+    """
+    Test : Create ethernet connection with IPv4 and IPv6 routing tables
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][0] == "/usr/bin/nmcli"
+    assert add_args[0][1] == "con"
+    assert add_args[0][2] == "add"
+
+    add_args_text = [to_text(x) for x in add_args[0]]
+    idx = add_args_text.index("ipv4.route-table")
+    assert add_args_text[idx + 1] == "100"
+    idx = add_args_text.index("ipv6.route-table")
+    assert add_args_text[idx + 1] == "200"
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_ROUTE_TABLE, indirect=["patch_ansible_module"])
+def test_ethernet_connection_route_table_unchanged(mocked_ethernet_connection_route_table_unchanged, capfd):
+    """
+    Test : Ethernet connection with IPv4 and IPv6 routing tables unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_ROUTE_TABLE, indirect=["patch_ansible_module"])
+def test_ethernet_connection_route_table_modify(mocked_ethernet_connection_route_table_default, capfd):
+    """
+    Test : Set IPv4 and IPv6 routing tables on an existing ethernet connection
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    modify_args, modify_kw = arg_list[1]
+
+    assert modify_args[0][0] == "/usr/bin/nmcli"
+    assert modify_args[0][1] == "con"
+    assert modify_args[0][2] == "modify"
+    assert modify_args[0][3] == "non_existent_nw_device"
+
+    modify_args_text = [to_text(x) for x in modify_args[0]]
+    idx = modify_args_text.index("ipv4.route-table")
+    assert modify_args_text[idx + 1] == "100"
+    idx = modify_args_text.index("ipv6.route-table")
+    assert modify_args_text[idx + 1] == "200"
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_ROUTE_TABLE_RESET, indirect=["patch_ansible_module"])
+def test_ethernet_connection_route_table_reset(mocked_ethernet_connection_route_table_set, capfd):
+    """
+    Test : Reset the IPv4 routing table of an existing ethernet connection to 0
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    modify_args, modify_kw = arg_list[1]
+
+    assert modify_args[0][2] == "modify"
+
+    modify_args_text = [to_text(x) for x in modify_args[0]]
+    idx = modify_args_text.index("ipv4.route-table")
+    assert modify_args_text[idx + 1] == "0"
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
