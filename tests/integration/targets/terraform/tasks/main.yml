@@ -65,3 +65,6 @@
 
 - name: Test Complex Variables
   ansible.builtin.include_tasks: complex_variables.yml
+
+- name: Test state_file
+  ansible.builtin.include_tasks: state_file.yml
