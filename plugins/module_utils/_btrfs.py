@@ -216,7 +216,7 @@ class BtrfsSubvolume:
             parent = self.__filesystem.get_subvolume_by_id(self.parent)
             parent_path = parent.get_mounted_path() if parent else None
             if parent_path is not None:
-                return f"{parent_path}{os.path.sep}{self.name}"
+                return f"{parent_path}{os.path.sep}{parent.get_child_relative_path(self.path)}"
         return None
 
     def get_mountpoints(self) -> list[str]:
