@@ -688,7 +688,7 @@ def main():
 
     if state == "absent":
         command.extend(variables_args)
-        command.extend(_state_args(module, state_file))
+        command.extend(_state_args(state_file))
     elif state == "present" and plan_file:
         if any([os.path.isfile(f"{project_path}/{plan_file}"), os.path.isfile(plan_file)]):
             command.append(plan_file)
@@ -713,7 +713,7 @@ def main():
             )
         if state != "planned":
             # The plan was built from state_file, so the apply must use the same state.
-            command.extend(_state_args(module, state_file))
+            command.extend(_state_args(state_file))
             command.append(plan_file)
 
     result_diff = dict()
