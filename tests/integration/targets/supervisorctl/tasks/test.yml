@@ -14,5 +14,7 @@
 
     - ansible.builtin.import_tasks: test_start.yml
     - ansible.builtin.import_tasks: test_stop.yml
+    - ansible.builtin.import_tasks: test_wait.yml
+      when: credentials.username == ''
   always:
     - ansible.builtin.import_tasks: stop_supervisord.yml
