@@ -89,3 +89,17 @@
     subject: Test mail 6 (smtp + body + ehlohost)
     body: Test body 6
     secure: never
+
+- name: Send a test-mail with secure=always to a port with no listener
+  community.general.mail:
+    port: 10027
+    subject: Test mail 8 (tls required, connection refused)
+    secure: always
+  ignore_errors: true
+  register: tls_required_refused
+
+- name: Assert no unencrypted connection is attempted with secure=always
+  ansible.builtin.assert:
+    that:
+      - tls_required_refused is failed
+      - tls_required_refused.msg is search('Unable to start an encrypted session')
