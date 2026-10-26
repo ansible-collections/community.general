@@ -575,12 +575,6 @@ def _extract_extra_fields(extra_fields: list[dict]) -> dict[str, str]:
 
 
 def _extract_section_fields(sections: list[dict]) -> dict[str, str]:
-    """Return a flat ``{field_name: value}`` dict from a pass-cli sections list.
-
-    Each section has the shape::
-
-        {"section_name": "name", "section_fields": [<extra_fields entries>]}
-    """
     result: dict[str, str] = {}
     for section in sections:
         result.update(_extract_extra_fields(section.get("section_fields", [])))
