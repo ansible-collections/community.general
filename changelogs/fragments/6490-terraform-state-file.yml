@@ -1,0 +1,2 @@
+bugfixes:
+  - terraform - pass ``state_file`` to the ``apply`` and ``destroy`` commands, not only to ``plan`` (https://github.com/ansible-collections/community.general/issues/6490, https://github.com/ansible-collections/community.general/pull/12997).
