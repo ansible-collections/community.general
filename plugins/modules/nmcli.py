@@ -209,7 +209,7 @@ options:
       table:
         description:
           - The table to add this route to.
-          - The default depends on O(route_table4).
+          - If not set, the route goes to the table set with O(route_table4), or to the C(main) table when that is not set either.
         type: int
       cwnd:
         description:
@@ -344,7 +344,7 @@ options:
       table:
         description:
           - The table to add this route to.
-          - The default depends on O(route_table6).
+          - If not set, the route goes to the table set with O(route_table6), or to the C(main) table when that is not set either.
         type: int
       cwnd:
         description:

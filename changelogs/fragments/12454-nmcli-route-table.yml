@@ -1,2 +1,2 @@
 minor_changes:
-  - nmcli - add ``route_table4`` and ``route_table6`` options to set the routing table of a connection (``ipv4.route-table`` and ``ipv6.route-table``) (https://github.com/ansible-collections/community.general/issues/12454, https://github.com/ansible-collections/community.general/pull/13052).
+  - nmcli - add ``route_table4`` and ``route_table6`` options to set the routing table of a connection (https://github.com/ansible-collections/community.general/issues/12454, https://github.com/ansible-collections/community.general/pull/13052).
