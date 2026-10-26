@@ -11,6 +11,7 @@ import unittest
 from subprocess import TimeoutExpired
 from unittest.mock import MagicMock, patch
 
+import pytest
 from ansible.errors import AnsibleLookupError, AnsibleOptionsError
 
 from ansible_collections.community.general.plugins.lookup.proton_pass import (
@@ -240,6 +241,52 @@ class TestParseFields(unittest.TestCase):
             _parse_fields(MOCK_TRASHED_ITEM, "old_item")
         self.assertIn("trash", str(ctx.exception).lower())
         self.assertIn("old_item", str(ctx.exception))
+
+
+# Shape emitted by pass-cli: sections live inside the item type object.
+SECTIONS = [
+    {
+        "section_name": "Credentials",
+        "section_fields": [
+            {"name": "api_token", "content": {"Hidden": "token_value"}},
+            {"name": "endpoint", "content": {"Text": "https://api.example.com"}},
+        ],
+    },
+    {
+        "section_name": "Backup",
+        "section_fields": [{"name": "backup_secret", "content": {"Hidden": "backup_value"}}],
+    },
+]
+
+
+@pytest.mark.parametrize(
+    "type_key, type_data",
+    [
+        ("Custom", {"sections": SECTIONS}),
+        ("SshKey", {"private_key": "fake-private", "public_key": "fake-public", "sections": SECTIONS}),
+        ("Wifi", {"ssid": "HomeNetwork", "password": "wifipass123", "security": "WPA2", "sections": SECTIONS}),
+        ("Identity", {"full_name": "John Doe", "extra_sections": SECTIONS}),
+    ],
+)
+def test_section_fields_are_merged(type_key, type_data):
+    fields = _parse_fields(_make_item(type_key, type_data), "sectioned_item")
+    assert fields["api_token"] == "token_value"
+    assert fields["endpoint"] == "https://api.example.com"
+    assert fields["backup_secret"] == "backup_value"
+
+
+def test_section_fields_kept_alongside_standard_fields():
+    item = _make_item("SshKey", {"private_key": "fake-private", "public_key": "fake-public", "sections": SECTIONS})
+    fields = _parse_fields(item, "deploy_key")
+    assert fields["private_key"] == "fake-private"
+    assert fields["public_key"] == "fake-public"
+    assert fields["api_token"] == "token_value"
+
+
+def test_custom_item_with_empty_sections_raises():
+    item = _make_item("Custom", {"sections": [{"section_name": "Empty", "section_fields": []}]})
+    with pytest.raises(AnsibleLookupError, match="no fields extracted"):
+        _parse_fields(item, "empty_custom")
 
 
 # ---------------------------------------------------------------------------

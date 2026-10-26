@@ -1,0 +1,2 @@
+minor_changes:
+  - proton_pass lookup plugin - return fields inside custom sections of Custom, SSH Key, Wi-Fi, and Identity items (https://github.com/ansible-collections/community.general/issues/12711, https://github.com/ansible-collections/community.general/pull/13051).

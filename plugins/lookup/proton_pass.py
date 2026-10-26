@@ -49,8 +49,9 @@ notes:
   - In Proton Pass, create one item per host. Add every secret as an extra B(hidden)
     field whose name exactly matches the key your playbooks reference (for example
     C(api_token), C(gpg_keyphrase)).
-  - Sections (C(extra_sections)) are supported — fields nested inside a section
-    are merged into the same flat dict as top-level extra fields.
+  - Custom sections are supported — fields nested inside a section of a B(Custom),
+    B(SSH Key), B(Wi-Fi), or B(Identity) item are merged into the same flat dict
+    as top-level extra fields.
 options:
   _terms:
     description:
@@ -489,10 +490,12 @@ def _extract_typed_fields(type_key: str, type_data: dict) -> dict[str, str | lis
         fields.update(_extract_scalar_fields(type_data, _CREDIT_CARD_FIELDS))
     elif tk == "wifi":
         fields.update(_extract_scalar_fields(type_data, _WIFI_FIELDS))
+        fields.update(_extract_section_fields(type_data.get("sections", [])))
     elif tk == "sshkey":
         fields.update(_extract_scalar_fields(type_data, _SSH_KEY_FIELDS))
-        for section in type_data.get("sections", []):
-            fields.update(_extract_extra_fields(section.get("extra_fields", [])))
+        fields.update(_extract_section_fields(type_data.get("sections", [])))
+    elif tk == "custom":
+        fields.update(_extract_section_fields(type_data.get("sections", [])))
     elif tk == "identity":
         fields.update(_extract_scalar_fields(type_data, _IDENTITY_FIELDS))
         for sub_key in (
@@ -502,8 +505,7 @@ def _extract_typed_fields(type_key: str, type_data: dict) -> dict[str, str | lis
             "extra_work_details",
         ):
             fields.update(_extract_extra_fields(type_data.get(sub_key, [])))
-        for section in type_data.get("extra_sections", []):
-            fields.update(_extract_extra_fields(section.get("extra_fields", [])))
+        fields.update(_extract_section_fields(type_data.get("extra_sections", [])))
     elif tk == "alias":
         for alias_key in ("aliased_email", "aliased_address"):
             val = type_data.get(alias_key)
@@ -569,6 +571,13 @@ def _extract_extra_fields(extra_fields: list[dict]) -> dict[str, str]:
         if isinstance(content, dict):
             raw_value = next((v for v in content.values() if v is not None), "")
             result[name] = str(raw_value)
+    return result
+
+
+def _extract_section_fields(sections: list[dict]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for section in sections:
+        result.update(_extract_extra_fields(section.get("section_fields", [])))
     return result
 
 
