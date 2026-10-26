@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_instance_variable - ignore the ``hidden`` attribute that GitLab 19.1 and newer return for instance variables when comparing them with the requested variables. Before, ``purge=true`` deleted every instance variable, including the ones the task had just created, and every run reported a change (https://github.com/ansible-collections/community.general/issues/12349, https://github.com/ansible-collections/community.general/pull/13029).
