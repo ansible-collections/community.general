@@ -1567,6 +1567,9 @@ files:
     ignore: dirtyharrycallahan robinro
     labels: zypper
     maintainers: $team_suse
+  $modules/zypper_info.py:
+    labels: zypper
+    maintainers: $team_suse
   $modules/zypper_repository.py:
     ignore: matze
     labels: zypper

@@ -1,0 +1,171 @@
+# Copyright (c) 2026, Harshvardhan Sharma <harshvardhan.sharma@suse.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env {check_rc: false}
+
+  lu_package: &lu_package
+    [/testbin/zypper, --non-interactive, --xmlout, --quiet, list-updates, --type, package]
+  lu_package_all: &lu_package_all
+    [/testbin/zypper, --non-interactive, --xmlout, --quiet, list-updates, --type, package, --all]
+  lu_patch: &lu_patch
+    [/testbin/zypper, --non-interactive, --xmlout, --quiet, list-updates, --type, patch]
+
+  xml_no_updates: &xml_no_updates |
+    <?xml version='1.0'?>
+    <stream>
+    <update-status version="0.6">
+    <update-list>
+    </update-list>
+    </update-status>
+    </stream>
+  xml_package_updates: &xml_package_updates |
+    <?xml version='1.0'?>
+    <stream>
+    <update-status version="0.6">
+    <update-list>
+    <update kind="package" name="openssl-3" edition="3.2.4-150700.3.6.1" arch="x86_64" edition-old="3.2.4-150700.3.3.1">
+    <summary>Secure Sockets and Transport Layer Security</summary>
+    <description>OpenSSL is a software library.</description>
+    <license></license>
+    <source url="https://updates.suse.com/SUSE/Updates/SLE-Module-Basesystem/15-SP7/x86_64/update/" alias="SLE-Module-Basesystem15-SP7-Updates"/>
+    </update>
+    <update kind="package" name="empty" edition="2-0" arch="noarch" edition-old="1-0">
+    <summary>Empty RPM</summary>
+    <description>Empty RPM</description>
+    <license></license>
+    </update>
+    </update-list>
+    </update-status>
+    </stream>
+  xml_patch_updates: &xml_patch_updates |
+    <?xml version='1.0'?>
+    <stream>
+    <update-status version="0.6">
+    <update-list>
+    <update kind="patch" name="SUSE-SLE-Module-Basesystem-15-SP7-2026-1234" edition="1" arch="noarch" status="needed" category="security" severity="important" pkgmanager="false" restart="true" interactive="false">
+    <summary>Security update for the Linux Kernel</summary>
+    <description>This update fixes CVE-2026-1234.</description>
+    <license></license>
+    <source url="https://updates.suse.com/SUSE/Updates/SLE-Module-Basesystem/15-SP7/x86_64/update/" alias="SLE-Module-Basesystem15-SP7-Updates"/>
+    <issue-date>1761000000</issue-date>
+    <issue-list>
+    <issue type="cve" id="CVE-2026-1234"><title>CVE-2026-1234</title><href>https://www.suse.com/security/cve/CVE-2026-1234/</href></issue>
+    <issue type="bugzilla" id="1234567"><title>VUL-0: CVE-2026-1234</title><href>https://bugzilla.suse.com/show_bug.cgi?id=1234567</href></issue>
+    </issue-list>
+    </update>
+    </update-list>
+    </update-status>
+    </stream>
+
+test_cases:
+  - id: no_updates
+    input: {}
+    output:
+      changed: false
+      updates: []
+    mocks:
+      run_command:
+        - command: *lu_package
+          environ: *env
+          rc: 0
+          out: *xml_no_updates
+          err: ''
+
+  - id: package_updates
+    input: {}
+    output:
+      changed: false
+      updates:
+        - name: openssl-3
+          kind: package
+          edition: 3.2.4-150700.3.6.1
+          edition_old: 3.2.4-150700.3.3.1
+          arch: x86_64
+          summary: Secure Sockets and Transport Layer Security
+          repository: SLE-Module-Basesystem15-SP7-Updates
+        - name: empty
+          kind: package
+          edition: 2-0
+          edition_old: 1-0
+          arch: noarch
+          summary: Empty RPM
+    mocks:
+      run_command:
+        - command: *lu_package
+          environ: *env
+          rc: 0
+          out: *xml_package_updates
+          err: ''
+
+  - id: package_updates_all
+    input:
+      all: true
+    output:
+      changed: false
+      updates: []
+    mocks:
+      run_command:
+        - command: *lu_package_all
+          environ: *env
+          rc: 0
+          out: *xml_no_updates
+          err: ''
+
+  - id: patch_updates
+    input:
+      type: patch
+    output:
+      changed: false
+      updates:
+        - name: SUSE-SLE-Module-Basesystem-15-SP7-2026-1234
+          kind: patch
+          edition: '1'
+          arch: noarch
+          summary: Security update for the Linux Kernel
+          repository: SLE-Module-Basesystem15-SP7-Updates
+          status: needed
+          category: security
+          severity: important
+          interactive: false
+          restart: true
+          pkgmanager: false
+          issues:
+            - {type: cve, id: CVE-2026-1234}
+            - {type: bugzilla, id: '1234567'}
+    mocks:
+      run_command:
+        - command: *lu_patch
+          environ: *env
+          rc: 0
+          out: *xml_patch_updates
+          err: ''
+
+  - id: no_repositories
+    input: {}
+    output:
+      changed: false
+      updates: []
+    mocks:
+      run_command:
+        - command: *lu_package
+          environ: *env
+          rc: 6
+          out: ''
+          err: 'Warning: No repositories defined.'
+
+  - id: zypper_error
+    input: {}
+    output:
+      failed: true
+      rc: 4
+      msg: 'Failed to execute "/testbin/zypper --non-interactive --xmlout --quiet list-updates --type package"'
+    mocks:
+      run_command:
+        - command: *lu_package
+          environ: *env
+          rc: 4
+          out: ''
+          err: 'System management is locked by the application with pid 1234 (zypper).'
