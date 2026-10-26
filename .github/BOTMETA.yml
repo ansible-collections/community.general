@@ -598,7 +598,7 @@ files:
   $modules/drweb_ctl:
     maintainers: a-gabidullin
   $modules/drweb_info:
-    maintainers: a-gabidullin    
+    maintainers: a-gabidullin
   $modules/easy_install.py:
     maintainers: mattupstate
   $modules/ejabberd_user.py:
