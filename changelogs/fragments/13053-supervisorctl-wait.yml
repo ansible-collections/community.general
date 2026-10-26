@@ -1,0 +1,2 @@
+minor_changes:
+  - supervisorctl - add ``wait`` option to wait for programs to reach the ``RUNNING`` state (https://github.com/ansible-collections/community.general/issues/5599, https://github.com/ansible-collections/community.general/pull/13053).
