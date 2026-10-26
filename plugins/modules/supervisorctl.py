@@ -62,6 +62,19 @@ options:
     type: path
     description:
       - Path to C(supervisorctl) executable.
+  wait:
+    type: bool
+    description:
+      - When O(state=started) or O(state=restarted), wait while the programs are in the C(STARTING) or C(BACKOFF) states,
+        and fail if any of them does not reach the C(RUNNING) state.
+      - This includes programs that were already in the C(STARTING) or C(BACKOFF) states, for example after being added
+        with O(state=present) and C(autostart=true).
+      - When a program fails to start but C(supervisord) is still retrying it (see C(startretries) in the C(supervisord)
+        configuration), the module keeps waiting instead of failing.
+      - Depending on the C(startsecs) and C(startretries) settings of the programs, the wait may take a long time.
+      - This option is ignored in check mode.
+    default: false
+    version_added: 14.0.0
 notes:
   - When O(state=present), the module calls C(supervisorctl reread) then C(supervisorctl add) if the program/group does not
     exist.
@@ -109,10 +122,17 @@ EXAMPLES = r"""
   community.general.supervisorctl:
     name: all
     state: restarted
+
+- name: Start my_app and fail unless it reaches the RUNNING state
+  community.general.supervisorctl:
+    name: my_app
+    state: started
+    wait: true
 """
 
 
 import os
+import time
 
 from ansible.module_utils.basic import AnsibleModule, is_executable
 
@@ -146,6 +166,7 @@ def main():
         ),
         stop_before_removing=dict(type="bool", default=False),
         signal=dict(type="str"),
+        wait=dict(type="bool", default=False),
     )
 
     module = AnsibleModule(
@@ -167,6 +188,7 @@ def main():
     password = module.params["password"]
     supervisorctl_path = module.params["supervisorctl_path"]
     signal = module.params["signal"]
+    wait = module.params["wait"] and state in ("started", "restarted") and not module.check_mode
 
     # we check error message for a pattern, so we need to make sure that's in C locale
     module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
@@ -225,6 +247,22 @@ def main():
             matched.append((process_name, status))
         return matched
 
+    def wait_for_running(processes, action_output=""):
+        process_names = [process_name for process_name, status in processes]
+        while True:
+            statuses = [(p, s) for p, s in get_matched_processes() if p in process_names]
+            if not any(s in ("STARTING", "BACKOFF") for p, s in statuses):
+                break
+            time.sleep(1)
+        not_running = [f"{p} ({s})" for p, s in statuses if s != "RUNNING"]
+        if not_running:
+            module.fail_json(
+                msg=f"Failed to reach the RUNNING state: {', '.join(not_running)}",
+                name=name,
+                state=state,
+                stdout=action_output,
+            )
+
     def take_action_on_processes(processes, status_filter, action, expected_result, exit_module=True):
         to_take_action_on = []
         for process_name, status in processes:
@@ -234,16 +272,23 @@ def main():
         if len(to_take_action_on) == 0:
             if not exit_module:
                 return
+            if wait:
+                wait_for_running(processes)
             module.exit_json(changed=False, name=name, state=state)
         if module.check_mode:
             if not exit_module:
                 return
             module.exit_json(changed=True)
+        action_outputs = []
         for process_name in to_take_action_on:
-            rc, out, err = run_supervisorctl(action, process_name, check_rc=True)
-            if f"{process_name}: {expected_result}" not in out:
+            # with wait, a failed start is judged by the state reached after supervisord's retries
+            rc, out, err = run_supervisorctl(action, process_name, check_rc=not wait)
+            if not wait and f"{process_name}: {expected_result}" not in out:
                 module.fail_json(msg=out)
+            action_outputs.append(out)
 
+        if wait:
+            wait_for_running(processes, "".join(action_outputs))
         if exit_module:
             module.exit_json(changed=True, name=name, state=state, affected=to_take_action_on)
 
@@ -258,11 +303,15 @@ def main():
         }
         to_act_on = [p for p, s in processes if status_filters[state](s)]
         if not to_act_on:
+            if wait:
+                wait_for_running(processes)
             module.exit_json(changed=False, name=name, state=state)
         if module.check_mode:
             module.exit_json(changed=True)
         actions = {"started": "start", "stopped": "stop", "restarted": "restart"}
-        run_supervisorctl(actions[state], "all", check_rc=True)
+        rc, out, err = run_supervisorctl(actions[state], "all", check_rc=not wait)
+        if wait:
+            wait_for_running(processes, out)
         module.exit_json(changed=True, name=name, state=state, affected=to_act_on)
 
     if state == "restarted":

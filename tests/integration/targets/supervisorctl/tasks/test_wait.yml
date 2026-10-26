@@ -1,0 +1,81 @@
+---
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: copy program that fails to start twice
+  ansible.builtin.copy:
+    src: fails_twice.sh
+    dest: '{{ remote_dir }}/fails_twice.sh'
+    mode: '0755'
+
+- name: start program that never reaches RUNNING, with wait
+  community.general.supervisorctl:
+    name: always_fails
+    state: started
+    wait: true
+    config: '{{ remote_dir }}/supervisord.conf'
+  register: wait_always_fails
+  ignore_errors: true
+
+- name: check that waiting for a program that never reaches RUNNING fails
+  ansible.builtin.assert:
+    that:
+      - wait_always_fails is failed
+      - "'always_fails (FATAL)' in wait_always_fails.msg"
+
+- name: start program that reaches RUNNING after supervisord retries, with wait
+  community.general.supervisorctl:
+    name: fails_twice
+    state: started
+    wait: true
+    config: '{{ remote_dir }}/supervisord.conf'
+  register: wait_fails_twice
+
+- name: start program that is already RUNNING, with wait
+  community.general.supervisorctl:
+    name: fails_twice
+    state: started
+    wait: true
+    config: '{{ remote_dir }}/supervisord.conf'
+  register: wait_fails_twice_again
+
+- name: check that waiting covers supervisord retries
+  ansible.builtin.assert:
+    that:
+      - wait_fails_twice is changed
+      - wait_fails_twice_again is not changed
+
+- name: stop program and reset its attempt counter
+  community.general.supervisorctl:
+    name: fails_twice
+    state: stopped
+    config: '{{ remote_dir }}/supervisord.conf'
+
+- name: reset attempt counter
+  ansible.builtin.file:
+    path: '{{ remote_dir }}/fails_twice.count'
+    state: absent
+
+- name: start program outside of the module, without waiting
+  ansible.builtin.command: 'supervisorctl -c {{ remote_dir }}/supervisord.conf start fails_twice'
+  async: 30
+  poll: 0
+  changed_when: false
+
+- name: wait for program started elsewhere
+  community.general.supervisorctl:
+    name: fails_twice
+    state: started
+    wait: true
+    config: '{{ remote_dir }}/supervisord.conf'
+
+- name: get program status
+  ansible.builtin.command: 'supervisorctl -c {{ remote_dir }}/supervisord.conf status fails_twice'
+  register: fails_twice_status
+  changed_when: false
+
+- name: check that the module waited for the program to reach RUNNING
+  ansible.builtin.assert:
+    that:
+      - "'RUNNING' in fails_twice_status.stdout"
