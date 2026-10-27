@@ -7,6 +7,11 @@
 ## test setting timezone, idempotency and checkmode
 ##
 
+- name: check whether /etc/timezone exists
+  ansible.builtin.stat:
+    path: /etc/timezone
+  register: etc_timezone_stat
+
 - name: set timezone to Australia/Brisbane (checkmode)
   timezone:
     name: Australia/Brisbane
@@ -35,7 +40,7 @@
 - name: ensure that checkmode didn't update the timezone in the config file
   command: egrep '^Etc/UTC' {{ timezone_config_file }}
   when:
-    - ansible_facts.service_mgr != 'systemd'
+    - ansible_facts.service_mgr != 'systemd' or etc_timezone_stat.stat.exists
     - ansible_facts.os_family == 'Debian'
 
 - name: set timezone to Australia/Brisbane
@@ -63,7 +68,7 @@
 - name: ensure that the timezone is updated in the config file
   command: egrep '^Australia/Brisbane' {{ timezone_config_file }}
   when:
-    - ansible_facts.service_mgr != 'systemd'
+    - ansible_facts.service_mgr != 'systemd' or etc_timezone_stat.stat.exists
     - ansible_facts.os_family == 'Debian'
 
 - name: set timezone to Australia/Brisbane again
