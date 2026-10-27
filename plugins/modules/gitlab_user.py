@@ -579,7 +579,11 @@ class GitLabUser:
 
     def find_user(self, username):
         return next(
-            (user for user in self._gitlab.users.list(search=username, **list_all_kwargs) if user.username == username),
+            (
+                user
+                for user in self._gitlab.users.list(username=username, **list_all_kwargs)
+                if user.username.lower() == username.lower()
+            ),
             None,
         )
 
@@ -595,13 +599,8 @@ class GitLabUser:
             return True
         return False
 
-    """
-    @param username Username of the user
-    """
-
-    def is_active(self, username):
-        user = self.find_user(username)
-        return user.attributes["state"] == "active"
+    def is_active(self):
+        return self.user_object.attributes["state"] == "active"
 
     def delete_user(self):
         if self._module.check_mode:
@@ -617,7 +616,10 @@ class GitLabUser:
 
         user = self.user_object
 
-        return user.block()
+        try:
+            return user.block()
+        except gitlab.exceptions.GitlabBlockError as e:
+            self._module.fail_json(msg=f"Failed to block user: {e}")
 
     def unblock_user(self):
         if self._module.check_mode:
@@ -625,7 +627,10 @@ class GitLabUser:
 
         user = self.user_object
 
-        return user.unblock()
+        try:
+            return user.unblock()
+        except gitlab.exceptions.GitlabUnblockError as e:
+            self._module.fail_json(msg=f"Failed to unblock user: {e}")
 
 
 def sanitize_arguments(arguments):
@@ -703,7 +708,7 @@ def main():
     gitlab_user = GitLabUser(module, gitlab_instance)
     user_exists = gitlab_user.exists_user(user_username)
     if user_exists:
-        user_is_active = gitlab_user.is_active(user_username)
+        user_is_active = gitlab_user.is_active()
     else:
         user_is_active = False
 
@@ -714,19 +719,22 @@ def main():
         else:
             module.exit_json(changed=False, msg="User deleted or does not exists")
 
+    if state in ("blocked", "unblocked") and not user_exists:
+        module.exit_json(changed=False, msg=f"User {user_username} not found")
+
     if state == "blocked":
-        if user_exists and user_is_active:
+        if user_is_active:
             gitlab_user.block_user()
             module.exit_json(changed=True, msg=f"Successfully blocked user {user_username}")
         else:
-            module.exit_json(changed=False, msg="User already blocked or does not exists")
+            module.exit_json(changed=False, msg=f"User {user_username} is not active")
 
     if state == "unblocked":
-        if user_exists and not user_is_active:
+        if not user_is_active:
             gitlab_user.unblock_user()
             module.exit_json(changed=True, msg=f"Successfully unblocked user {user_username}")
         else:
-            module.exit_json(changed=False, msg="User is not blocked or does not exists")
+            module.exit_json(changed=False, msg=f"User {user_username} is already active")
 
     if state == "present":
         if gitlab_user.create_or_update_user(
