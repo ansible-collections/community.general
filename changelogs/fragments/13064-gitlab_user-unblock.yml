@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_user - fix lookup of existing users whose username contains uppercase letters (https://github.com/ansible-collections/community.general/issues/5999, https://github.com/ansible-collections/community.general/pull/13064).
