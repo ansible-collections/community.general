@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: zypper_info
+module: zypper_updates_info
 author: "Harshvardhan Sharma (@HVSharma12)"
 version_added: 14.0.0
 short_description: List available Zypper updates
@@ -48,11 +48,11 @@ notes:
 
 EXAMPLES = r"""
 - name: List package updates
-  community.general.zypper_info:
+  community.general.zypper_updates_info:
   register: result
 
 - name: List needed patches
-  community.general.zypper_info:
+  community.general.zypper_updates_info:
     type: patch
   register: patches
 

@@ -4,8 +4,8 @@
 
 from __future__ import annotations
 
-from ansible_collections.community.general.plugins.modules import zypper_info
+from ansible_collections.community.general.plugins.modules import zypper_updates_info
 
 from .uthelper import RunCommandMock, UTHelper
 
-UTHelper.from_module(zypper_info, __name__, mocks=[RunCommandMock])
+UTHelper.from_module(zypper_updates_info, __name__, mocks=[RunCommandMock])
