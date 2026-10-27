@@ -45,6 +45,7 @@ def python_gitlab_version_match_requirement():
 
 
 deleted_user_key_ids: list[str] = []
+user_state_changes: list[str] = []
 created_user_keys: list[dict[str, t.Any]] = []
 
 
@@ -63,6 +64,18 @@ def resp_find_user(url, request):
         '"username": "jack_smith", "name": "Jack Smith", "state": "blocked",'
         '"avatar_url": "http://gravatar.com/../e32131cd8.jpeg",'
         '"web_url": "http://localhost:3000/jack_smith"}]'
+    )
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path="/api/v4/users", method="get")
+def resp_find_user_mixed_case(url, request):
+    headers = {"content-type": "application/json"}
+    content = (
+        '[{"id": 1, "username": "John_Smith", "name": "John Smith", "state": "blocked",'
+        '"avatar_url": "http://localhost:3000/uploads/user/avatar/1/cd8.jpeg",'
+        '"web_url": "http://localhost:3000/John_Smith"}]'
     )
     content = content.encode("utf-8")
     return response(200, content, headers, None, 5, request)
@@ -120,6 +133,23 @@ def resp_delete_missing_user(url, request):
     content = "{}"
     content = content.encode("utf-8")
     return response(404, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path=r"/api/v4/users/[0-9]+/(un)?block", method="post")
+def resp_change_user_state(url, request):
+    user_state_changes.append(url.path)
+    headers = {"content-type": "application/json"}
+    content = "true"
+    content = content.encode("utf-8")
+    return response(201, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path=r"/api/v4/users/[0-9]+/unblock", method="post")
+def resp_unblock_user_forbidden(url, request):
+    headers = {"content-type": "application/json"}
+    content = '{"message": "403 Forbidden - LDAP blocked users cannot be unblocked by the API"}'
+    content = content.encode("utf-8")
+    return response(403, content, headers, None, 5, request)
 
 
 """

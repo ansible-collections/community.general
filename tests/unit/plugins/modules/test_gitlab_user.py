@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+from unittest.mock import Mock
+
 import pytest
 
 from ansible_collections.community.general.plugins.modules.gitlab_user import GitLabUser
@@ -25,17 +27,21 @@ try:
         created_user_keys,
         deleted_user_key_ids,
         resp_add_member,
+        resp_change_user_state,
         resp_create_user,
         resp_create_user_keys,
         resp_delete_user,
         resp_delete_user_key,
         resp_find_user,
+        resp_find_user_mixed_case,
         resp_get_group,
         resp_get_member,
         resp_get_user,
         resp_get_user_duplicate_keys,
         resp_get_user_keys,
+        resp_unblock_user_forbidden,
         resp_update_member,
+        user_state_changes,
     )
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load gitlab module required for testing"))
@@ -43,7 +49,11 @@ except ImportError:
     GitlabModuleTestCase = object  # type: ignore
     created_user_keys = []
     deleted_user_key_ids = []
+    user_state_changes = []
     resp_find_user = _dummy
+    resp_find_user_mixed_case = _dummy
+    resp_change_user_state = _dummy
+    resp_unblock_user_forbidden = _dummy
     resp_get_user = _dummy
     resp_get_user_keys = _dummy
     resp_create_user_keys = _dummy
@@ -88,6 +98,64 @@ class TestGitlabUser(GitlabModuleTestCase):
         self.assertEqual(type(user), User)
         self.assertEqual(user.name, "John Smith")
         self.assertEqual(user.id, 1)
+
+    @with_httmock(resp_find_user_mixed_case)
+    def test_find_user_mixed_case(self):
+        user = self.moduleUtil.find_user("john_smith")
+
+        self.assertEqual(type(user), User)
+        self.assertEqual(user.username, "John_Smith")
+
+    @with_httmock(resp_find_user)
+    def test_is_active(self):
+        self.moduleUtil.exists_user("john_smith")
+        self.assertEqual(self.moduleUtil.is_active(), True)
+
+        self.moduleUtil.exists_user("jack_smith")
+        self.assertEqual(self.moduleUtil.is_active(), False)
+
+    @with_httmock(resp_find_user)
+    @with_httmock(resp_change_user_state)
+    def test_block_user(self):
+        user_state_changes.clear()
+        self.moduleUtil.exists_user("john_smith")
+        rvalue = self.moduleUtil.block_user()
+
+        self.assertEqual(rvalue, True)
+        self.assertEqual(user_state_changes, ["/api/v4/users/1/block"])
+
+    @with_httmock(resp_find_user)
+    @with_httmock(resp_change_user_state)
+    def test_unblock_user(self):
+        user_state_changes.clear()
+        self.moduleUtil.exists_user("jack_smith")
+        rvalue = self.moduleUtil.unblock_user()
+
+        self.assertEqual(rvalue, True)
+        self.assertEqual(user_state_changes, ["/api/v4/users/2/unblock"])
+
+    @with_httmock(resp_find_user)
+    @with_httmock(resp_change_user_state)
+    def test_block_unblock_user_check_mode(self):
+        user_state_changes.clear()
+        self.mock_module.check_mode = True
+
+        self.moduleUtil.exists_user("john_smith")
+        self.assertEqual(self.moduleUtil.block_user(), True)
+        self.moduleUtil.exists_user("jack_smith")
+        self.assertEqual(self.moduleUtil.unblock_user(), True)
+
+        self.assertEqual(user_state_changes, [])
+
+    @with_httmock(resp_find_user)
+    @with_httmock(resp_unblock_user_forbidden)
+    def test_unblock_user_forbidden(self):
+        self.mock_module.fail_json = Mock()
+        self.moduleUtil.exists_user("jack_smith")
+        self.moduleUtil.unblock_user()
+
+        self.mock_module.fail_json.assert_called_once()
+        self.assertIn("Failed to unblock user", self.mock_module.fail_json.call_args.kwargs["msg"])
 
     @with_httmock(resp_create_user)
     def test_create_user(self):
