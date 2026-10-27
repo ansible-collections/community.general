@@ -116,10 +116,10 @@ class XAttrInfo(ModuleHelper):
         supports_check_mode=True,
     )
 
-    def __init_module__(self) -> None:
+    def __init_module__(self):
         self.runner = getfattr_runner(self.module)
 
-    def __run__(self) -> None:
+    def __run__(self):
         if self.vars.key is None:
             match = f"^{re.escape(self.vars.namespace)}\\." if self.vars.namespace else "-"
             with self.runner("absolute_names follow dump match path") as ctx:
