@@ -2216,6 +2216,10 @@ class Nmcli:
         # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
+            if setting_type is list and isinstance(value, str):
+                # Accept comma-separated strings for list settings, as Ansible does for list options.
+                value = [part.strip() for part in value.split(",")]
+                options[setting] = value
             convert_func = None
             if setting_type is bool:
                 # Convert all bool options to yes/no.
