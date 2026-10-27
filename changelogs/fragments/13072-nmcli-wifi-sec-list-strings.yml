@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - fix list suboptions of ``wifi`` and ``wifi_sec`` being sent to nmcli one character at a time when given as a string (https://github.com/ansible-collections/community.general/issues/7500, https://github.com/ansible-collections/community.general/pull/13072).
