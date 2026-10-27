@@ -1,0 +1,2 @@
+bugfixes:
+  - diy callback plugin - no longer emits deprecation warnings about ``v2_on_any`` with ansible-core 2.19 and later (https://github.com/ansible-collections/community.general/issues/10545, https://github.com/ansible-collections/community.general/pull/13093).
