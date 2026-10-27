@@ -70,7 +70,6 @@
 - name: Run tests
   when:
     - not (ansible_facts.os_family == 'Alpine')  # TODO
-    - not (ansible_facts.distribution == 'Archlinux')  # TODO
   block:
     - name: set timezone to Etc/UTC
       community.general.timezone:
