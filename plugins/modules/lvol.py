@@ -83,7 +83,9 @@ options:
   pool_metadata_size:
     type: str
     description:
-      - The size of the thin pool metadata volume, according to lvcreate(8) C(--poolmetadatasize), by default in megabytes.
+      - The size of the thin pool metadata volume, according to lvcreate(8) C(--poolmetadatasize), by default in megabytes or
+        optionally with one of [bBsSkKmMgGtTpPeE] units, for example V(8m), V(512k), or V(1g).
+      - Units are always powers of two regardless of capitalization, so V(1g) and V(1G) both mean 1 GiB.
       - Only used when creating a thin pool.
       - It is not used when the thin pool already exists.
     version_added: 14.0.0
@@ -230,6 +232,13 @@ EXAMPLES = r"""
     vg: firefly
     thinpool: testpool
     size: 512g
+
+- name: Create a thin pool of 512g with a 1g metadata volume
+  community.general.lvol:
+    vg: firefly
+    thinpool: testpool
+    size: 512g
+    pool_metadata_size: 1g
 
 - name: Create a thin volume of 128g
   community.general.lvol:
