@@ -1,2 +1,0 @@
-bugfixes:
-  - zypper - ``state=absent`` no longer silently ignores names containing the wildcards ``*`` or ``?``; they are now matched against the installed packages and removed like ``zypper remove`` does (https://github.com/ansible-collections/community.general/issues/3138).
