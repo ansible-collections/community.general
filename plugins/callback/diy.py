@@ -822,10 +822,13 @@ class CallbackModule(Default):
         yield
         sys.stdout = saved_stdout
 
-    def _get_output_specification(self, loader, variables):
+    def _get_output_specification(self, loader, variables, callback_type=None):
         _ret = {}
-        _calling_method = sys._getframe(1).f_code.co_name
-        _callback_type = _calling_method[3:] if _calling_method[:3] == "v2_" else _calling_method
+        if callback_type is None:
+            _calling_method = sys._getframe(1).f_code.co_name
+            _callback_type = _calling_method[3:] if _calling_method[:3] == "v2_" else _calling_method
+        else:
+            _callback_type = callback_type
         _callback_options = ["msg", "msg_color"]
 
         for option in _callback_options:
@@ -848,12 +851,23 @@ class CallbackModule(Default):
 
     def _template(self, loader, template, variables):
         _templar = Templar(loader=loader, variables=variables)
-        return _templar.template(template, preserve_trailing_newlines=True, convert_data=False, escape_backslashes=True)
+        return _templar.template(template, preserve_trailing_newlines=True, escape_backslashes=True)
 
     def _output(self, spec, stderr=False):
         _msg = to_text(spec["msg"])
         if len(_msg) > 0:
             self._display.display(msg=_msg, color=spec["msg_color"], stderr=stderr)
+
+    def _on_any(self):
+        # Output for on_any_msg. ansible-core deprecated v2_on_any, so instead of
+        # implementing it, every event method calls this after its own output,
+        # which is the order ansible-core called v2_on_any in.
+        self._diy_spec = self._get_output_specification(
+            loader=self._diy_loader, variables=self._diy_spec["vars"], callback_type="on_any"
+        )
+
+        if self._using_diy(spec=self._diy_spec):
+            self._output(spec=self._diy_spec)
 
     def _get_vars(
         self,
@@ -1131,16 +1145,6 @@ class CallbackModule(Default):
 
         return _ret
 
-    def v2_on_any(self, *args, **kwargs):
-        self._diy_spec = self._get_output_specification(loader=self._diy_loader, variables=self._diy_spec["vars"])
-
-        if self._using_diy(spec=self._diy_spec):
-            self._output(spec=self._diy_spec)
-
-        if self._parent_has_callback():
-            with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super().v2_on_any(*args, **kwargs)
-
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
@@ -1155,6 +1159,8 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_on_failed(result, ignore_errors)
+
+        self._on_any()
 
     def v2_runner_on_ok(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1171,6 +1177,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_on_ok(result)
 
+        self._on_any()
+
     def v2_runner_on_skipped(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
@@ -1185,6 +1193,8 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_on_skipped(result)
+
+        self._on_any()
 
     def v2_runner_on_unreachable(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1201,17 +1211,19 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_on_unreachable(result)
 
+        self._on_any()
+
     # not implemented as the call to this is not implemented yet
     def v2_runner_on_async_poll(self, result):
-        pass
+        self._on_any()
 
     # not implemented as the call to this is not implemented yet
     def v2_runner_on_async_ok(self, result):
-        pass
+        self._on_any()
 
     # not implemented as the call to this is not implemented yet
     def v2_runner_on_async_failed(self, result):
-        pass
+        self._on_any()
 
     def v2_runner_item_on_ok(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1232,6 +1244,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_item_on_ok(result)
 
+        self._on_any()
+
     def v2_runner_item_on_failed(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
@@ -1250,6 +1264,8 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_item_on_failed(result)
+
+        self._on_any()
 
     def v2_runner_item_on_skipped(self, result):
         self._diy_spec = self._get_output_specification(
@@ -1270,6 +1286,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_item_on_skipped(result)
 
+        self._on_any()
+
     def v2_runner_retry(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
@@ -1284,6 +1302,8 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_retry(result)
+
+        self._on_any()
 
     def v2_runner_on_start(self, host, task):
         self._diy_host = host
@@ -1303,6 +1323,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_runner_on_start(host, task)
 
+        self._on_any()
+
     def v2_playbook_on_start(self, playbook):
         self._diy_playbook = playbook
         self._diy_loader = self._diy_playbook.get_loader()
@@ -1317,6 +1339,8 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_start(playbook)
+
+        self._on_any()
 
     def v2_playbook_on_notify(self, handler, host):
         self._diy_handler = handler
@@ -1336,6 +1360,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_notify(handler, host)
 
+        self._on_any()
+
     def v2_playbook_on_no_hosts_matched(self):
         self._diy_spec = self._get_output_specification(loader=self._diy_loader, variables=self._diy_spec["vars"])
 
@@ -1346,6 +1372,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_no_hosts_matched()
 
+        self._on_any()
+
     def v2_playbook_on_no_hosts_remaining(self):
         self._diy_spec = self._get_output_specification(loader=self._diy_loader, variables=self._diy_spec["vars"])
 
@@ -1355,6 +1383,8 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_no_hosts_remaining()
+
+        self._on_any()
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self._diy_task = task
@@ -1371,9 +1401,11 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_task_start(task, is_conditional)
 
+        self._on_any()
+
     # not implemented as the call to this is not implemented yet
     def v2_playbook_on_cleanup_task_start(self, task):
-        pass
+        self._on_any()
 
     def v2_playbook_on_handler_task_start(self, task):
         self._diy_task = task
@@ -1389,6 +1421,8 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_handler_task_start(task)
+
+        self._on_any()
 
     def v2_playbook_on_vars_prompt(
         self,
@@ -1413,13 +1447,15 @@ class CallbackModule(Default):
                     varname, private, prompt, encrypt, confirm, salt_size, salt, default, unsafe
                 )
 
+        self._on_any()
+
     # not implemented as the call to this is not implemented yet
     def v2_playbook_on_import_for_host(self, result, imported_file):
-        pass
+        self._on_any()
 
     # not implemented as the call to this is not implemented yet
     def v2_playbook_on_not_import_for_host(self, result, missing_file):
-        pass
+        self._on_any()
 
     def v2_playbook_on_play_start(self, play):
         self._diy_play = play
@@ -1435,6 +1471,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_play_start(play)
 
+        self._on_any()
+
     def v2_playbook_on_stats(self, stats):
         self._diy_stats = stats
 
@@ -1449,6 +1487,8 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_stats(stats)
+
+        self._on_any()
 
     def v2_playbook_on_include(self, included_file):
         self._diy_included_file = included_file
@@ -1470,6 +1510,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_playbook_on_include(included_file)
 
+        self._on_any()
+
     def v2_on_file_diff(self, result):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
@@ -1484,3 +1526,5 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super().v2_on_file_diff(result)
+
+        self._on_any()
