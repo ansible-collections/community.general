@@ -1,0 +1,2 @@
+bugfixes:
+  - ini_file - do not add an option without value when ``allow_no_value=true`` and the requested values already exist (https://github.com/ansible-collections/community.general/issues/9296, https://github.com/ansible-collections/community.general/pull/13089).
