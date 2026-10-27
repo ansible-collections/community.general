@@ -20,6 +20,13 @@ options:
   displayname:
     description: Display name.
     type: str
+  enable_on_present:
+    description:
+      - When O(state=present), enable the user if it is disabled.
+      - If V(false), O(state=present) does not change whether an existing user is enabled or disabled.
+    type: bool
+    default: true
+    version_added: 14.0.0
   update_password:
     description:
       - Set password for a user.
@@ -67,7 +74,13 @@ options:
   state:
     description: State to ensure.
     default: "present"
-    choices: ["absent", "disabled", "enabled", "present"]
+    choices:
+      absent: The user does not exist.
+      disabled: The user exists and is disabled.
+      enabled: The user exists and is enabled.
+      present:
+        - The user exists.
+        - Whether an existing disabled user is enabled depends on O(enable_on_present).
     type: str
   telephonenumber:
     description:
@@ -215,7 +228,7 @@ def get_user_dict(
     krbpasswordexpiration=None,
     loginshell=None,
     mail=None,
-    nsaccountlock=False,
+    nsaccountlock=None,
     sn=None,
     sshpubkey=None,
     telephonenumber=None,
@@ -237,7 +250,8 @@ def get_user_dict(
         user["loginshell"] = loginshell
     if mail is not None:
         user["mail"] = mail
-    user["nsaccountlock"] = nsaccountlock
+    if nsaccountlock is not None:
+        user["nsaccountlock"] = nsaccountlock
     if sn is not None:
         user["sn"] = sn
     if sshpubkey is not None:
@@ -332,7 +346,9 @@ def get_ssh_key_fingerprint(ssh_key, hash_algo="sha256"):
 def ensure(module, client):
     state = module.params["state"]
     name = module.params["uid"]
-    nsaccountlock = state == "disabled"
+    nsaccountlock = None
+    if state in ["enabled", "disabled"] or module.params["enable_on_present"]:
+        nsaccountlock = state == "disabled"
 
     module_user = get_user_dict(
         displayname=module.params["displayname"],
@@ -385,6 +401,7 @@ def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(
         displayname=dict(type="str"),
+        enable_on_present=dict(type="bool", default=True),
         givenname=dict(type="str"),
         update_password=dict(type="str", default="always", choices=["always", "on_create"], no_log=False),
         krbpasswordexpiration=dict(type="str", no_log=False),

@@ -89,18 +89,47 @@ def test_present_enables_disabled_user(capfd, post_json):
     ]
 
 
-def test_present_creates_user(capfd, post_json):
+def test_present_does_not_enable_disabled_user(capfd, post_json):
     result = run_module(
         capfd,
         post_json,
-        {"state": "present", "givenname": "Pinky", "sn": "Acme"},
+        {"state": "present", "enable_on_present": False, "loginshell": "/bin/zsh"},
+        ipa_user_entry(nsaccountlock=True),
+    )
+
+    assert result["changed"] is True
+    assert write_calls(post_json) == [{"method": "user_mod", "name": "pinky", "item": {"loginshell": "/bin/zsh"}}]
+
+
+def test_present_disabled_user_unchanged(capfd, post_json):
+    result = run_module(
+        capfd,
+        post_json,
+        {"state": "present", "enable_on_present": False, "loginshell": "/bin/bash"},
+        ipa_user_entry(nsaccountlock=True),
+    )
+
+    assert result["changed"] is False
+    assert write_calls(post_json) == []
+
+
+@pytest.mark.parametrize(
+    "enable_on_present, expected_item",
+    [
+        (True, {"givenname": "Pinky", "nsaccountlock": False, "sn": "Acme"}),
+        (False, {"givenname": "Pinky", "sn": "Acme"}),
+    ],
+)
+def test_present_creates_user(capfd, post_json, enable_on_present, expected_item):
+    result = run_module(
+        capfd,
+        post_json,
+        {"state": "present", "enable_on_present": enable_on_present, "givenname": "Pinky", "sn": "Acme"},
         {},
     )
 
     assert result["changed"] is True
-    assert write_calls(post_json) == [
-        {"method": "user_add", "name": "pinky", "item": {"givenname": "Pinky", "nsaccountlock": False, "sn": "Acme"}}
-    ]
+    assert write_calls(post_json) == [{"method": "user_add", "name": "pinky", "item": expected_item}]
 
 
 @pytest.mark.parametrize(
