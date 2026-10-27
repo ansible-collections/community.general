@@ -10,93 +10,82 @@
 
 # TODO: Our current implementation does not handle SMTP authentication
 
-- when:
-    # TODO: https://github.com/ansible-collections/community.general/issues/4656
-    - ansible_facts.python.version.major != 3 or ansible_facts.python.version.minor < 12
-  block:
+- name: Install test smtpserver
+  ansible.builtin.copy:
+    src: '{{ item }}'
+    dest: '{{ remote_tmp_dir }}/{{ item }}'
+  loop:
+    - smtpserver.py
+    - smtpserver.crt
+    - smtpserver.key
 
-    - name: Install test smtpserver
-      ansible.builtin.copy:
-        src: '{{ item }}'
-        dest: '{{ remote_tmp_dir }}/{{ item }}'
-      loop:
-        - smtpserver.py
-        - smtpserver.crt
-        - smtpserver.key
+# FIXME: Verify the mail after it was send would be nice
+#        This would require either dumping the content, or registering async task output
+- name: Start test smtpserver
+  ansible.builtin.command: '{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
+  async: 45
+  poll: 0
+  register: smtpserver
 
-    # FIXME: Verify the mail after it was send would be nice
-    #        This would require either dumping the content, or registering async task output
-    - name: Start test smtpserver
-      ansible.builtin.command: '{{ ansible_facts.python.executable }} {{ remote_tmp_dir }}/smtpserver.py 10025:10465'
-      async: 45
-      poll: 0
-      register: smtpserver
+- name: Wait for test smtpserver
+  ansible.builtin.wait_for:
+    port: '{{ item }}'
+    timeout: 10
+  loop:
+    - 10025
+    - 10465
 
-    - name: Send a basic test-mail
-      community.general.mail:
-        port: 10025
-        subject: Test mail 1 (smtp)
-        secure: never
+- name: Send a basic test-mail
+  community.general.mail:
+    port: 10025
+    subject: Test mail 1 (smtp)
+    secure: never
 
-    - name: Send a test-mail with body and specific recipient
-      community.general.mail:
-        port: 10025
-        from: ansible@localhost
-        to: root@localhost
-        subject: Test mail 2 (smtp + body)
-        body: Test body 2
-        secure: never
+- name: Send a test-mail with body and specific recipient
+  community.general.mail:
+    port: 10025
+    from: ansible@localhost
+    to: root@localhost
+    subject: Test mail 2 (smtp + body)
+    body: Test body 2
+    secure: never
 
-    - name: Send a test-mail with attachment
-      community.general.mail:
-        port: 10025
-        from: ansible@localhost
-        to: root@localhost
-        subject: Test mail 3 (smtp + body + attachment)
-        body: Test body 3
-        attach: /etc/group
-        secure: never
+- name: Send a test-mail with attachment
+  community.general.mail:
+    port: 10025
+    from: ansible@localhost
+    to: root@localhost
+    subject: Test mail 3 (smtp + body + attachment)
+    body: Test body 3
+    attach: /etc/group
+    secure: never
 
-    # NOTE: This will fail if smtpd-tls is missing
-    - name: Send a test-mail using starttls
-      community.general.mail:
-        port: 10025
-        from: ansible@localhost
-        to: root@localhost
-        subject: Test mail 4 (smtp + starttls + body + attachment)
-        body: Test body 4
-        attach: /etc/group
-        secure: starttls
-      ignore_errors: true
-      register: starttls_support
+- name: Send a test-mail using starttls
+  community.general.mail:
+    port: 10025
+    from: ansible@localhost
+    to: root@localhost
+    subject: Test mail 4 (smtp + starttls + body + attachment)
+    body: Test body 4
+    attach: /etc/group
+    secure: starttls
 
-    # NOTE: This will fail if smtpd-tls is missing
-    - name: Send a test-mail using TLS
-      community.general.mail:
-        port: 10465
-        from: ansible@localhost
-        to: root@localhost
-        subject: Test mail 5 (smtp + tls + body + attachment)
-        body: Test body 5
-        attach: /etc/group
-        secure: always
-      ignore_errors: true
-      register: tls_support
+- name: Send a test-mail using TLS
+  community.general.mail:
+    port: 10465
+    from: ansible@localhost
+    to: root@localhost
+    subject: Test mail 5 (smtp + tls + body + attachment)
+    body: Test body 5
+    attach: /etc/group
+    secure: always
 
-    - ansible.builtin.fail:
-        msg: Sending mail using starttls failed.
-      when: false and starttls_support is failed and tls_support is succeeded
-
-    - ansible.builtin.fail:
-        msg: Send mail using TLS failed.
-      when: false and tls_support is failed and starttls_support is succeeded
-
-    - name: Send a test-mail with body, specific recipient and specific ehlohost
-      community.general.mail:
-        port: 10025
-        ehlohost: some.domain.tld
-        from: ansible@localhost
-        to: root@localhost
-        subject: Test mail 6 (smtp + body + ehlohost)
-        body: Test body 6
-        secure: never
+- name: Send a test-mail with body, specific recipient and specific ehlohost
+  community.general.mail:
+    port: 10025
+    ehlohost: some.domain.tld
+    from: ansible@localhost
+    to: root@localhost
+    subject: Test mail 6 (smtp + body + ehlohost)
+    body: Test body 6
+    secure: never
