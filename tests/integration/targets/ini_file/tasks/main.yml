@@ -60,3 +60,11 @@
 
     - name: include tasks to test comment doc lines are not deleted
       ansible.builtin.include_tasks: tests/09-comment-doc-lines.yml
+
+    - name: reset output file
+      ansible.builtin.file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: include tasks to test allow_no_value with existing values
+      ansible.builtin.include_tasks: tests/10-allow-no-value.yml

@@ -334,6 +334,8 @@ def do_ini(
     values_unique = []
     [values_unique.append(to_text(value)) for value in values if value not in values_unique and value is not None]
     values = values_unique
+    # values is consumed below as matching lines are found, so keep track of what was requested
+    no_value_requested = not values
 
     diff = dict(
         before="",
@@ -455,7 +457,7 @@ def do_ini(
                         option, changed, section_lines, index, changed_lines, ignore_spaces, newline, msg
                     )
                     values.remove(matched_value)
-                elif not values and allow_no_value:
+                elif no_value_requested and allow_no_value:
                     # replace existing option with no value line(s)
                     newline = f"{option}\n"
                     (changed, msg) = update_section_line(
@@ -508,7 +510,7 @@ def do_ini(
                             section_lines.insert(index, f"{option}\n")
                             msg = "option added"
                             changed = True
-                elif option and not values and allow_no_value and not option_no_value_present:
+                elif option and no_value_requested and allow_no_value and not option_no_value_present:
                     # insert option with no value line(s)
                     section_lines.insert(index, f"{option}\n")
                     msg = "option added"
