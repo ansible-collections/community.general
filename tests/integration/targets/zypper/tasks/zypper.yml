@@ -97,6 +97,40 @@
     that:
       - "zypper_result is not changed"
 
+# UNINSTALL WITH WILDCARD
+- name: uninstall hello with wildcard
+  community.general.zypper:
+    name: hell*
+    state: absent
+  register: zypper_result
+
+- name: check hello with rpm
+  ansible.builtin.command: rpm -q hello
+  failed_when: false
+  register: rpm_result
+
+- name: verify uninstallation of hello with wildcard
+  ansible.builtin.assert:
+    that:
+      - "zypper_result is changed"
+      - "rpm_result.rc == 1"
+
+- name: uninstall hello with wildcard again
+  community.general.zypper:
+    name: hell*
+    state: absent
+  register: zypper_result
+
+- name: verify no change on re-uninstall with wildcard
+  ansible.builtin.assert:
+    that:
+      - "zypper_result is not changed"
+
+- name: install hello for the following tests
+  community.general.zypper:
+    name: hello
+    state: present
+
 # Multiple packages
 - name: uninstall hello and metamail
   community.general.zypper:

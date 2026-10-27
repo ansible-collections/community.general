@@ -428,6 +428,71 @@ test_cases:
           out: *xml_search_not_installed
           err: ''
 
+  # https://github.com/ansible-collections/community.general/issues/3138
+  - id: remove_wildcard_present
+    input:
+      name: nmap*
+      state: absent
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command: &search_nmap_glob
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, --disable-repositories, search,
+             --type, package, --details, --installed-only, nmap*]
+          environ: *env
+          rc: 0
+          out: *xml_search_nmap_installed
+          err: ''
+        - command: [/testbin/zypper, --non-interactive, --xmlout, --quiet, remove, --type, package, nmap*]
+          environ: *env
+          rc: 0
+          out: *xml_remove_nmap
+          err: ''
+
+  - id: remove_wildcard_already_absent
+    input:
+      name: nmap*
+      state: absent
+    output:
+      changed: false
+      rc: 0
+    mocks:
+      run_command:
+        - command: *search_nmap_glob
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+
+  - id: remove_wildcard_and_exact_name
+    input:
+      name: [vim, nmap*]
+      state: absent
+    output:
+      changed: true
+      rc: 0
+    mocks:
+      run_command:
+        - command:
+            [/testbin/zypper, --non-interactive, --xmlout, --quiet, --disable-repositories, search,
+             --type, package, --match-exact, --details, --installed-only, vim]
+          environ: *env
+          rc: 104
+          out: *xml_search_not_installed
+          err: ''
+        - command: *search_nmap_glob
+          environ: *env
+          rc: 0
+          out: *xml_search_nmap_installed
+          err: ''
+        - command: [/testbin/zypper, --non-interactive, --xmlout, --quiet, remove, --type, package, nmap*]
+          environ: *env
+          rc: 0
+          out: *xml_remove_nmap
+          err: ''
+
   # ---------------------------------------------------------------- extra_args
   # https://github.com/ansible-collections/community.general/issues/4242
   - id: install_extra_args_not_passed_to_search

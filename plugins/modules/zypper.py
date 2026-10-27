@@ -43,6 +43,7 @@ options:
         and zypper is allowed to update the package within the version range given.
       - You can also pass a URL or a local path to a rpm file.
       - When using O(state=latest), this can be V(*), which updates all installed packages.
+      - When using O(state=absent), names can contain the wildcards V(*) and V(?).
     required: true
     aliases: ['pkg']
     type: list
@@ -275,6 +276,7 @@ reboot_required:
   version_added: 14.0.0
 """
 
+import fnmatch
 import os.path
 import re
 import xml
@@ -344,13 +346,34 @@ def get_want_state(names, remove=False):
     return packages, urls
 
 
+def is_glob(name):
+    return "*" in name or "?" in name
+
+
 def get_installed_state(m, packages):
     "get installed state of packages"
 
-    cmd = get_cmd(m, "search")
-    cmd.extend(["--match-exact", "--details", "--installed-only"])
-    cmd.extend([p.name for p in packages])
-    return parse_zypper_xml(m, cmd, fail_not_found=False)[0]
+    installed = {}
+    exact = [p.name for p in packages if not is_glob(p.name)]
+    globs = [p.name for p in packages if is_glob(p.name)]
+    if exact:
+        cmd = get_cmd(m, "search")
+        cmd.extend(["--match-exact", "--details", "--installed-only"])
+        cmd.extend(exact)
+        installed.update(parse_zypper_xml(m, cmd, fail_not_found=False)[0])
+    if globs:
+        # --match-exact disables wildcards
+        cmd = get_cmd(m, "search")
+        cmd.extend(["--details", "--installed-only"])
+        cmd.extend(globs)
+        installed.update(parse_zypper_xml(m, cmd, fail_not_found=False)[0])
+    return installed
+
+
+def is_installed(package, installed):
+    if is_glob(package.name):
+        return any(fnmatch.fnmatchcase(name, package.name) for name in installed)
+    return package.name in installed
 
 
 def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
@@ -597,7 +620,7 @@ def package_absent(m, name):
     if m.params["type"] == "patch":
         m.fail_json(msg="Can not remove patches.")
     prerun_state = get_installed_state(m, packages)
-    packages = [p for p in packages if p.name in prerun_state]
+    packages = [p for p in packages if is_installed(p, prerun_state)]
 
     if not packages:
         return None, retvals
