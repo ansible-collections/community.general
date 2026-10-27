@@ -278,6 +278,8 @@ options:
     description:
       - Configuration method to be used for IPv4.
       - If O(ip4) is set, C(ipv4.method) is automatically set to V(manual) and this parameter is not needed.
+      - NetworkManager does not allow IPv4 addresses with V(disabled). To disable IPv4 on a connection that has
+        addresses, also set O(ip4=[]) to remove them.
     type: str
     choices: [auto, link-local, manual, shared, disabled]
     version_added: 2.2.0
@@ -384,6 +386,8 @@ options:
       - Configuration method to be used for IPv6.
       - If O(ip6) is set, C(ipv6.method) is automatically set to V(manual) and this parameter is not needed.
       - V(disabled) was added in community.general 3.3.0.
+      - NetworkManager does not allow IPv6 addresses with V(ignore) or V(disabled). To set one of these methods on
+        a connection that has addresses, also set O(ip6=[]) to remove them.
     type: str
     choices: [ignore, auto, dhcp, link-local, manual, shared, disabled]
     version_added: 2.2.0
@@ -1467,6 +1471,14 @@ EXAMPLES = r"""
         ip6:
           - 2001:db8::cafe
           - 2002:db8::cafe
+        state: present
+
+    - name: Disable IPv6 and remove the existing IPv6 addresses
+      community.general.nmcli:
+        conn_name: my-eth1
+        type: ethernet
+        method6: disabled
+        ip6: []
         state: present
 
     - name: Add VxLan
