@@ -15,7 +15,8 @@ description:
   - It is recommended to restart C(crond) after changing the timezone, otherwise the jobs may run at the wrong time.
   - Several different tools are used depending on the OS/Distribution involved. For Linux it can use C(timedatectl) or edit
     C(/etc/sysconfig/clock) or C(/etc/timezone) and C(hwclock). On SmartOS, C(sm-set-timezone), for macOS, C(systemsetup),
-    for BSD, C(/etc/localtime) is modified. On AIX, C(chtz) is used.
+    for BSD, C(/etc/localtime) is modified. On AIX, C(chtz) is used. When using C(timedatectl), C(/etc/timezone) is also
+    updated if it exists.
   - Make sure that the zoneinfo files are installed with the appropriate OS package, like C(tzdata) (usually always installed,
     when not using a minimal installation like Alpine Linux).
   - Windows and HPUX are not supported, please let us know if you find any other OS/distro in which this fails.
@@ -74,6 +75,7 @@ import platform
 import random
 import re
 import string
+import tempfile
 
 from ansible.module_utils.basic import AnsibleModule, get_distribution
 
@@ -267,6 +269,9 @@ class SystemdTimezone(Timezone):
 
     subcmds = dict(hwclock="set-local-rtc", name="set-timezone")
 
+    # Some distributions (e.g. Debian) still keep this file, but timedatectl does not update it
+    timezone_file = "/etc/timezone"
+
     def __init__(self, module):
         super().__init__(module)
         self.timedatectl = module.get_bin_path("timedatectl", required=True)
@@ -280,6 +285,27 @@ class SystemdTimezone(Timezone):
             self.status[phase] = self.execute(self.timedatectl, "status")
         return self.status[phase]
 
+    def read_timezone_file(self):
+        if not os.path.isfile(self.timezone_file):
+            return None
+        try:
+            with open(self.timezone_file) as file:
+                return file.readline().strip()
+        except OSError:
+            self.abort(f'could not read "{self.timezone_file}"')
+
+    def write_timezone_file(self, value):
+        if not os.path.isfile(self.timezone_file):
+            return
+        try:
+            fd, tmpfile = tempfile.mkstemp(dir=self.module.tmpdir)
+            with os.fdopen(fd, "w") as file:
+                file.write(f"{value}\n")
+        except OSError:
+            self.abort(f'could not write temporary file for "{self.timezone_file}"')
+        self.module.atomic_move(tmpfile, self.timezone_file)
+        self.msg.append(f"updated {self.timezone_file}")
+
     def get(self, key, phase):
         status = self._get_status(phase)
         value = self.regexps[key].search(status).group(1)
@@ -289,6 +315,10 @@ class SystemdTimezone(Timezone):
                 value = "local"
             else:
                 value = "UTC"
+        elif key == "name" and value == self.value["name"]["planned"]:
+            file_value = self.read_timezone_file()
+            if file_value is not None and file_value != value:
+                value = file_value or "n/a"
         return value
 
     def set(self, key, value):
@@ -299,6 +329,8 @@ class SystemdTimezone(Timezone):
             else:
                 value = "no"
         self.execute(self.timedatectl, self.subcmds[key], value, log=True)
+        if key == "name":
+            self.write_timezone_file(value)
 
 
 class NosystemdTimezone(Timezone):
