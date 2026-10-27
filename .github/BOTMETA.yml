@@ -1519,6 +1519,9 @@ files:
   $modules/xattr.py:
     labels: xattr
     maintainers: bcoca
+  $modules/xattr_info.py:
+    labels: xattr
+    maintainers: russoz
   $modules/xbps.py:
     maintainers: dinoocch the-maldridge
   $modules/xcc_:

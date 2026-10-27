@@ -1,0 +1,82 @@
+---
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set another attribute
+  ansible.builtin.command: setfattr -n user.empty {{ test_file }}
+  changed_when: true
+
+- name: Create symlink
+  ansible.builtin.file:
+    src: "{{ test_file }}"
+    path: "{{ test_link }}"
+    state: link
+
+- name: Get all attributes
+  community.general.xattr_info:
+    path: "{{ test_file }}"
+  register: xattr_info_all
+
+- name: Get all attributes in all namespaces
+  community.general.xattr_info:
+    path: "{{ test_file }}"
+    namespace: ""
+  register: xattr_info_all_namespaces
+
+- name: Get all attributes in another namespace
+  community.general.xattr_info:
+    path: "{{ test_file }}"
+    namespace: trusted
+  register: xattr_info_other_namespace
+
+- name: Get specific attribute
+  community.general.xattr_info:
+    path: "{{ test_file }}"
+    key: foo
+  register: xattr_info_key
+
+- name: Get specific attribute with namespace in key
+  community.general.xattr_info:
+    path: "{{ test_file }}"
+    key: user.foo
+  register: xattr_info_key_with_namespace
+
+- name: Get missing attribute
+  community.general.xattr_info:
+    path: "{{ test_file }}"
+    key: missing
+  register: xattr_info_key_missing
+
+- name: Get attributes through symlink
+  community.general.xattr_info:
+    path: "{{ test_link }}"
+  register: xattr_info_follow
+
+- name: Get attributes of symlink itself
+  community.general.xattr_info:
+    path: "{{ test_link }}"
+    follow: false
+  register: xattr_info_no_follow
+
+- name: Get attributes of missing file
+  community.general.xattr_info:
+    path: "{{ remote_tmp_dir }}/does-not-exist"
+  ignore_errors: true
+  register: xattr_info_missing_file
+
+- name: Assert results
+  ansible.builtin.assert:
+    that:
+      - xattr_info_all is not changed
+      - "xattr_info_all.xattr == {'user.foo': 'bar', 'user.empty': ''}"
+      - xattr_info_all_namespaces.xattr['user.foo'] == 'bar'
+      - xattr_info_other_namespace.xattr == {}
+      - "xattr_info_key.xattr == {'user.foo': 'bar'}"
+      - "xattr_info_key_with_namespace.xattr == {'user.foo': 'bar'}"
+      - xattr_info_key_missing is not failed
+      - xattr_info_key_missing.xattr == {}
+      - xattr_info_follow.xattr == xattr_info_all.xattr
+      - xattr_info_no_follow.xattr == {}
+      - xattr_info_missing_file is failed
+      - "'No such file or directory' in xattr_info_missing_file.msg"
