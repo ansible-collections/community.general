@@ -1420,6 +1420,44 @@ TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT = (
 """
 )
 
+TESTCASE_SECURE_WIRELESS_PSK_FLAGS = [
+    {
+        "type": "wifi",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "wireless_non_existant",
+        "ip4": "10.10.10.10/24",
+        "ssid": "Brittany",
+        "wifi_sec": {
+            "key-mgmt": "wpa-psk",
+            "psk": "VERY_SECURE_PASSWORD",
+            "psk-flags": psk_flags,
+        },
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+    for psk_flags in (["1", "2"], [1, 2], "1,2")
+]
+
+TESTCASE_SECURE_WIRELESS_PSK_FLAGS_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              wireless_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+802-11-wireless.ssid:                   Brittany
+802-11-wireless.hidden:                 no
+802-11-wireless-security.key-mgmt:      wpa-psk
+802-11-wireless-security.psk:           VERY_SECURE_PASSWORD
+802-11-wireless-security.psk-flags:     3 (agent-owned, not saved)
+"""
+
 
 TESTCASE_DUMMY_STATIC = [
     {
@@ -2183,6 +2221,26 @@ def mocked_secure_wireless_modify_failure(mocker):
             (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
             (0, "", ""),
             (1, "", ""),
+        ),
+    )
+
+
+@pytest.fixture
+def mocked_secure_wireless_psk_flags_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_SECURE_WIRELESS_PSK_FLAGS_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_secure_wireless_psk_flags_modify(mocker):
+    mocker_set(
+        mocker,
+        connection_exists=True,
+        execute_return=None,
+        execute_side_effect=(
+            (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+            (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+            (0, "", ""),
+            (0, "", ""),
         ),
     )
 
@@ -4372,6 +4430,42 @@ def test_modify_secure_wireless_failure(mocked_secure_wireless_modify_failure, c
     results = json.loads(out)
     assert results.get("failed")
     assert "changed" not in results
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_SECURE_WIRELESS_PSK_FLAGS, indirect=["patch_ansible_module"])
+def test_secure_wireless_psk_flags_unchanged(mocked_secure_wireless_psk_flags_unchanged, capfd):
+    """
+    Test : Secure wireless connection with psk-flags unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_SECURE_WIRELESS_PSK_FLAGS, indirect=["patch_ansible_module"])
+def test_modify_secure_wireless_psk_flags(mocked_secure_wireless_psk_flags_modify, capfd):
+    """
+    Test : Modify psk-flags of secure wireless connection
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    modify_args, modify_kw = arg_list[2]
+    assert modify_args[0][1:4] == ["con", "modify", "non_existent_nw_device"]
+
+    modify_args_text = [to_text(x) for x in modify_args[0]]
+    psk_flags_index = modify_args_text.index("802-11-wireless-security.psk-flags")
+    assert modify_args_text[psk_flags_index + 1] == "3"
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
 
 
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_DUMMY_STATIC, indirect=["patch_ansible_module"])
