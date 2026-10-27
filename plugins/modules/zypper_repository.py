@@ -497,7 +497,7 @@ def main():
 
     if module.params["allow_unsigned_metadata"] and repodata["gpgcheck"] == "0":
         module.fail_json(
-            msg="allow_unsigned_metadata cannot be combined with disabled GPG checking (disable_gpg_check=true or gpgcheck=0 in the .repo file)"
+            msg="allow_unsigned_metadata=true cannot be combined with disabled GPG checking (disable_gpg_check=true or gpgcheck=0 in the .repo file)"
         )
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
