@@ -292,6 +292,7 @@ def get_user_diff(client, ipa_user, module_user):
     if sshpubkey is not None:
         del module_user["sshpubkeyfp"]
         module_user["ipasshpubkey"] = sshpubkey
+        result = ["ipasshpubkey" if key == "sshpubkeyfp" else key for key in result]
     return result
 
 
@@ -367,7 +368,10 @@ def ensure(module, client):
             if len(diff) > 0:
                 changed = True
                 if not module.check_mode:
-                    ipa_user = client.user_mod(name=name, item=module_user)
+                    data = {}
+                    for key in diff:
+                        data[key] = module_user[key]
+                    ipa_user = client.user_mod(name=name, item=data)
     else:
         if ipa_user:
             changed = True
