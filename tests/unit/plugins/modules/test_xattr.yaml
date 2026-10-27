@@ -1,0 +1,278 @@
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ_true: &env-true {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+  environ_false: &env-false {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  out_foo: &out-foo |
+    # file: /tmp
+    user.foo="bar"
+
+  out_all: &out-all |
+    # file: /tmp
+    user.empty=""
+    user.foo="bar"
+
+  err_no_attr: &err-no-attr "/tmp: user.foo: No such attribute\n"
+test_cases:
+  - id: read_all
+    input:
+      path: /tmp
+    output:
+      changed: false
+      msg: returning None
+      xattr:
+        user.empty: ''
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -d, /tmp]
+          environ: *env-false
+          rc: 0
+          out: *out-all
+          err: ''
+  - id: read_key
+    input:
+      path: /tmp
+      key: foo
+    output:
+      changed: false
+      msg: returning user.foo
+      xattr:
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 0
+          out: *out-foo
+          err: ''
+  - id: read_key_trusted_no_follow
+    input:
+      path: /tmp
+      namespace: trusted
+      key: glusterfs.volume-id
+      follow: false
+    output:
+      changed: false
+      xattr:
+        trusted.glusterfs.volume-id: '0x817b94343f164f199e5b573b4ea1f914'
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -h, -n, trusted.glusterfs.volume-id, /tmp]
+          environ: *env-false
+          rc: 0
+          out: |
+            # file: /tmp
+            trusted.glusterfs.volume-id=0x817b94343f164f199e5b573b4ea1f914
+
+          err: ''
+  - id: all
+    input:
+      path: /tmp
+      state: all
+    output:
+      changed: false
+      msg: dumping all
+      xattr:
+        user.empty: ''
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -d, /tmp]
+          environ: *env-false
+          rc: 0
+          out: *out-all
+          err: ''
+  - id: keys
+    input:
+      path: /tmp
+      state: keys
+    output:
+      changed: false
+      msg: returning all keys
+      xattr:
+        user.empty: ''
+        user.foo: ''
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, /tmp]
+          environ: *env-true
+          rc: 0
+          out: |
+            # file: /tmp
+            user.empty
+            user.foo
+
+          err: ''
+  - id: present_new
+    input:
+      path: /tmp
+      key: foo
+      value: bar
+    output:
+      changed: true
+      msg: user.foo set to bar
+      xattr: {}
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 1
+          out: ''
+          err: *err-no-attr
+        - command: [/testbin/setfattr, -n, user.foo, -v, bar, /tmp]
+          environ: *env-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: present_change_no_follow
+    input:
+      path: /tmp
+      key: foo
+      value: baz
+      follow: false
+    output:
+      changed: true
+      msg: user.foo set to baz
+      xattr:
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -h, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 0
+          out: *out-foo
+          err: ''
+        - command: [/testbin/setfattr, -h, -n, user.foo, -v, baz, /tmp]
+          environ: *env-true
+          rc: 0
+          out: ''
+          err: ''
+  - id: present_check_mode
+    flags:
+      check: true
+    input:
+      path: /tmp
+      key: foo
+      value: baz
+    output:
+      changed: true
+      xattr:
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 0
+          out: *out-foo
+          err: ''
+  - id: present_unchanged
+    input:
+      path: /tmp
+      key: user.foo
+      value: bar
+      state: present
+    output:
+      changed: false
+      xattr:
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 0
+          out: *out-foo
+          err: ''
+  - id: present_fail
+    input:
+      path: /tmp
+      key: foo
+      value: bar
+    output:
+      failed: true
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 1
+          out: ''
+          err: *err-no-attr
+        - command: [/testbin/setfattr, -n, user.foo, -v, bar, /tmp]
+          environ: *env-true
+          rc: 1
+          out: ''
+          err: "setfattr: /tmp: Operation not permitted\n"
+  - id: absent
+    input:
+      path: /tmp
+      key: foo
+      state: absent
+    output:
+      changed: true
+      msg: user.foo removed
+      xattr:
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 0
+          out: *out-foo
+          err: ''
+        - command: [/testbin/setfattr, -x, user.foo, /tmp]
+          environ: *env-false
+          rc: 0
+          out: ''
+          err: ''
+  - id: absent_check_mode
+    flags:
+      check: true
+    input:
+      path: /tmp
+      key: foo
+      state: absent
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 0
+          out: *out-foo
+          err: ''
+  - id: absent_missing
+    input:
+      path: /tmp
+      key: foo
+      state: absent
+      follow: false
+    output:
+      changed: false
+      xattr: {}
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -h, -n, user.foo, /tmp]
+          environ: *env-false
+          rc: 1
+          out: ''
+          err: *err-no-attr
+  - id: present_without_key
+    input:
+      path: /tmp
+      state: present
+    output:
+      failed: true
+      msg: present needs a key parameter
+    mocks:
+      run_command: []
+  - id: path_not_found
+    input:
+      path: /tmp/does-not-exist-xattr-test
+    output:
+      failed: true
+      msg: path not found or not accessible!
+    mocks:
+      run_command: []

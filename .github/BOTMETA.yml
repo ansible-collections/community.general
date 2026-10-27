@@ -548,6 +548,9 @@ files:
   $module_utils/_wdc_redfish_utils.py:
     labels: wdc_redfish_utils
     maintainers: $team_wdc
+  $module_utils/_xattr.py:
+    labels: xattr
+    maintainers: russoz
   $module_utils/_xdg_mime.py:
     maintainers: mhalano
   $module_utils/_xenserver.py:
