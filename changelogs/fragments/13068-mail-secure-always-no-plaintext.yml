@@ -1,0 +1,2 @@
+bugfixes:
+  - mail - fail when an encrypted connection cannot be established with ``secure=always``, instead of sending the mail unencrypted (https://github.com/ansible-collections/community.general/pull/13068).

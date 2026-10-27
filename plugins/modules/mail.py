@@ -254,7 +254,6 @@ EXAMPLES = r"""
 import mimetypes
 import os
 import smtplib
-import ssl
 import traceback
 from email import encoders
 from email.header import Header
@@ -334,15 +333,13 @@ def main():
             try:
                 smtp = smtplib.SMTP_SSL(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
                 secure_state = True
-            except ssl.SSLError as e:
+            except Exception as e:
                 if secure == "always":
                     module.fail_json(
                         rc=1,
                         msg=f"Unable to start an encrypted session to {host}:{port}: {e}",
                         exception=traceback.format_exc(),
                     )
-            except Exception:
-                pass
 
         if not secure_state:
             smtp = smtplib.SMTP(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
