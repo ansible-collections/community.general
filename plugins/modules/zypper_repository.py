@@ -47,6 +47,13 @@ options:
       - Needs C(zypper) version >= 1.6.2.
       - When not specified, the value from the C(.repo) file is used if available, otherwise it defaults to V(false).
     type: bool
+  allow_unsigned_metadata:
+    description:
+      - Whether to accept unsigned repository metadata while still checking package signatures.
+      - Adds C(--gpgcheck-allow-unsigned-repo) to C(zypper addrepo); requires zypper 1.13.32 or later.
+      - Cannot be combined with O(disable_gpg_check=true) or with C(gpgcheck=0) in a C(.repo) file.
+    type: bool
+    version_added: 14.0.0
   autorefresh:
     description:
       - Enable autorefresh of the repository.
@@ -149,7 +156,7 @@ from ansible_collections.community.general.plugins.module_utils._version import 
 # zypper substitutes $releasever with /product/version from this file
 BASEPRODUCT_FILE = "/etc/products.d/baseproduct"
 
-REPO_OPTS = ["alias", "name", "priority", "enabled", "autorefresh", "gpgcheck"]
+REPO_OPTS = ["alias", "name", "priority", "enabled", "autorefresh", "gpgcheck", "raw_repo_gpgcheck"]
 
 
 def _get_cmd(module, *args):
@@ -206,6 +213,11 @@ def get_releasever(module):
 
 def _repo_changes(module, realrepo, repocmp):
     "Check whether the 2 given repos have different settings."
+    if "allow_unsigned_metadata" in repocmp:
+        # zypper lr -x reports the explicit setting as raw_repo_gpgcheck="0"; it is absent otherwise
+        if (realrepo.get("raw_repo_gpgcheck") == "0") != repocmp["allow_unsigned_metadata"]:
+            return True
+        repocmp = {k: v for k, v in repocmp.items() if k != "allow_unsigned_metadata"}
     for k in repocmp:
         if repocmp[k] and k not in realrepo:
             return True
@@ -287,10 +299,14 @@ def addmodify_repo(module, repodata, old_repos, zypper_version):
     # https://github.com/openSUSE/zypper/blob/b9b3cb6db76c47dc4c47e26f6a4d2d4a0d12b06d/package/zypper.changes#L2446-L2449
     # the default changed in the past, so don't assume a default here and show warning for old zypper versions
     if zypper_version >= LooseVersion("1.6.2"):
-        if repodata["gpgcheck"] == "1":
-            cmd.append("--gpgcheck")
-        else:
+        if repodata["gpgcheck"] != "1":
             cmd.append("--no-gpgcheck")
+        elif repodata.get("allow_unsigned_metadata") and zypper_version >= LooseVersion("1.13.32"):
+            cmd.append("--gpgcheck-allow-unsigned-repo")
+        else:
+            if repodata.get("allow_unsigned_metadata"):
+                module.warn("allow_unsigned_metadata only available for zypper >= 1.13.32. Ignoring it.")
+            cmd.append("--gpgcheck")
     else:
         module.warn("Enabling/disabling gpgcheck only available for zypper >= 1.6.2. Using zypper default value.")
 
@@ -347,6 +363,7 @@ def main():
             runrefresh=dict(default=False, type="bool"),
             description=dict(),
             disable_gpg_check=dict(type="bool"),
+            allow_unsigned_metadata=dict(type="bool"),
             autorefresh=dict(type="bool", aliases=["refresh"]),
             priority=dict(type="int"),
             enabled=dict(type="bool"),
@@ -379,6 +396,8 @@ def main():
         repodata["enabled"] = "1" if module.params["enabled"] else "0"
     if module.params["disable_gpg_check"] is not None:
         repodata["gpgcheck"] = "0" if module.params["disable_gpg_check"] else "1"
+    if module.params["allow_unsigned_metadata"] is not None:
+        repodata["allow_unsigned_metadata"] = module.params["allow_unsigned_metadata"]
     if module.params["autorefresh"] is not None:
         repodata["autorefresh"] = "1" if module.params["autorefresh"] else "0"
 
@@ -468,11 +487,18 @@ def main():
             for key in ("enabled", "autorefresh", "gpgcheck"):
                 if key not in repodata and key in repofile_items:
                     repodata[key] = repofile_items[key]
+            if "allow_unsigned_metadata" not in repodata and repofile_items.get("repo_gpgcheck") == "0":
+                repodata["allow_unsigned_metadata"] = True
 
     # Apply defaults for any settings not provided by the user or the .repo file
     repodata.setdefault("enabled", "1")
     repodata.setdefault("gpgcheck", "1")
     repodata.setdefault("autorefresh", "1")
+
+    if module.params["allow_unsigned_metadata"] and repodata["gpgcheck"] == "0":
+        module.fail_json(
+            msg="allow_unsigned_metadata=true cannot be combined with disabled GPG checking (disable_gpg_check=true or gpgcheck=0 in the .repo file)"
+        )
 
     exists, mod, old_repos = repo_exists(module, repodata, overwrite_multiple)
 
