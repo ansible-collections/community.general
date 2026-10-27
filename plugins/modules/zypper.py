@@ -134,7 +134,8 @@ options:
     type: bool
     default: false
     description:
-      - Adds C(--allow_vendor_change) option to I(zypper) dist-upgrade command.
+      - Adds the C(--allow-vendor-change) option to the I(zypper) install, update, patch and dist-upgrade commands.
+      - Before community.general 14.0.0 the option was only passed to C(dist-upgrade).
     version_added: '0.2.0'
   replacefiles:
     type: bool
@@ -491,7 +492,7 @@ def get_cmd(m, subcommand):
     if subcommand == "remove":
         if m.params["clean_deps"]:
             cmd.append("--clean-deps")
-    if subcommand == "dist-upgrade" and m.params["allow_vendor_change"]:
+    if is_install and m.params["allow_vendor_change"]:
         cmd.append("--allow-vendor-change")
     if m.params["extra_args"] and subcommand != "search":
         args_list = m.params["extra_args"].split(" ")
