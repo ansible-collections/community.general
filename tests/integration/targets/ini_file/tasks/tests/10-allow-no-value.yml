@@ -1,0 +1,189 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## regression for https://github.com/ansible-collections/community.general/issues/9296
+
+- name: test-allow-no-value 1 - create test file
+  ansible.builtin.copy:
+    content: |
+      [options]
+      #Color
+      ParallelDownloads = 5
+      LocalFileSigLevel = Optional
+
+      [multilib]
+      Include = /etc/pacman.d/mirrorlist
+      #Include = /etc/pacman.d/other
+    dest: "{{ output_file }}"
+
+- name: test-allow-no-value 1 - set options with and without value
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value | default(omit) }}"
+    allow_no_value: true
+  loop: &allow_no_value_items
+    - section: options
+      option: ParallelDownloads
+      value: '5'
+    - section: multilib
+      option: Include
+      value: /etc/pacman.d/mirrorlist
+    - section: options
+      option: Color
+  register: result_allow_no_value_1
+
+- name: test-allow-no-value 1 - set options with and without value again
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value | default(omit) }}"
+    allow_no_value: true
+  loop: *allow_no_value_items
+  register: result_allow_no_value_1_idem
+
+- name: test-allow-no-value 1 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content_allow_no_value_1
+
+- name: test-allow-no-value 1 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected_allow_no_value_1: |
+      [options]
+      Color
+      ParallelDownloads = 5
+      LocalFileSigLevel = Optional
+
+      [multilib]
+      Include = /etc/pacman.d/mirrorlist
+      #Include = /etc/pacman.d/other
+    content_allow_no_value_1: "{{ output_content_allow_no_value_1.content | b64decode }}"
+
+- name: test-allow-no-value 1 - assert existing values are kept and only the option without value is changed
+  ansible.builtin.assert:
+    that:
+      - result_allow_no_value_1.results[0] is not changed
+      - result_allow_no_value_1.results[1] is not changed
+      - result_allow_no_value_1.results[2] is changed
+      - result_allow_no_value_1_idem is not changed
+      - content_allow_no_value_1 == expected_allow_no_value_1
+
+
+- name: test-allow-no-value 2 - set content of a stock pacman.conf
+  ansible.builtin.set_fact:
+    pacman_conf_original: |
+      #
+      # /etc/pacman.conf
+      #
+      # See the pacman.conf(5) manpage for option and repository directives
+
+      #
+      # GENERAL OPTIONS
+      #
+      [options]
+      # The following paths are commented out with their default values listed.
+      # If you wish to use different paths, uncomment and update the paths.
+      #RootDir     = /
+      #DBPath      = /var/lib/pacman/
+      #CacheDir    = /var/cache/pacman/pkg/
+      #LogFile     = /var/log/pacman.log
+      #GPGDir      = /etc/pacman.d/gnupg/
+      #HookDir     = /etc/pacman.d/hooks/
+      HoldPkg     = pacman glibc
+      #XferCommand = /usr/bin/curl -L -C - -f -o %o %u
+      #XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
+      #CleanMethod = KeepInstalled
+      Architecture = auto
+
+      # Pacman won't upgrade packages listed in IgnorePkg and members of IgnoreGroup
+      #IgnorePkg   =
+      #IgnoreGroup =
+
+      #NoUpgrade   =
+      #NoExtract   =
+
+      # Misc options
+      #UseSyslog
+      #Color
+      #NoProgressBar
+      CheckSpace
+      #VerbosePkgLists
+      ParallelDownloads = 5
+
+      # By default, pacman accepts packages signed by keys that its local keyring
+      # trusts (see pacman-key and its man page), as well as unsigned packages.
+      SigLevel    = Required DatabaseOptional
+      LocalFileSigLevel = Optional
+      #RemoteFileSigLevel = Required
+
+      [multilib]
+      Include = /etc/pacman.d/mirrorlist
+
+- name: test-allow-no-value 2 - create test file
+  ansible.builtin.copy:
+    content: "{{ pacman_conf_original }}"
+    dest: "{{ output_file }}"
+
+- name: test-allow-no-value 2 - set options as in the issue (check mode)
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    allow_no_value: true
+  loop: &pacman_conf_items
+    - {section: options, option: ParallelDownloads, value: 5}
+    - {section: multilib, option: Include, value: /etc/pacman.d/mirrorlist}
+    - {section: options, option: Color, value: null}
+  check_mode: true
+  diff: true
+  register: result_allow_no_value_2_check
+
+- name: test-allow-no-value 2 - set options as in the issue
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    allow_no_value: true
+  loop: *pacman_conf_items
+  register: result_allow_no_value_2
+
+- name: test-allow-no-value 2 - set options as in the issue again
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    allow_no_value: true
+  loop: *pacman_conf_items
+  register: result_allow_no_value_2_idem
+
+- name: test-allow-no-value 2 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content_allow_no_value_2
+
+- name: test-allow-no-value 2 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected_allow_no_value_2: "{{ pacman_conf_original | replace('\n#Color\n', '\nColor\n') }}"
+    content_allow_no_value_2: "{{ output_content_allow_no_value_2.content | b64decode }}"
+
+- name: test-allow-no-value 2 - assert only Color is uncommented
+  ansible.builtin.assert:
+    that:
+      - result_allow_no_value_2_check.results[0] is not changed
+      - result_allow_no_value_2_check.results[1] is not changed
+      - result_allow_no_value_2_check.results[2] is changed
+      - result_allow_no_value_2_check.results[2].diff.after == expected_allow_no_value_2
+      - result_allow_no_value_2.results[0] is not changed
+      - result_allow_no_value_2.results[1] is not changed
+      - result_allow_no_value_2.results[2] is changed
+      - result_allow_no_value_2_idem is not changed
+      - content_allow_no_value_2 == expected_allow_no_value_2
+    fail_msg: "{{ result_allow_no_value_2_check.results | map(attribute='diff') | list | to_nice_yaml }}"
