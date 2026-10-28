@@ -15,11 +15,7 @@ version_added: 10.5.0
 description:
   - This module can manage resources in a Pacemaker cluster using the pacemaker CLI.
 requirements:
-  - pcs
-notes:
-  - Clone-idempotency detection uses structured JSON output on C(pcs) >= 0.11.6 and falls back to
-    plaintext parsing of C(pcs resource config <name>) on older versions. Both paths preserve
-    idempotency of clone creation.
+  - pcs >= 0.11.6
 extends_documentation_fragment:
   - community.general._attributes
 attributes:
@@ -154,7 +150,8 @@ cluster_resources:
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     get_pacemaker_maintenance_mode,
-    is_resource_cloned_any,
+    get_pacemaker_resource_config,
+    is_resource_cloned,
     pacemaker_runner,
     wait_for_resource,
 )
@@ -281,10 +278,8 @@ class PacemakerResource(StateModuleHelper):
     def _is_already_cloned(self):
         """Return True if the named resource (or group) is already part of a clone set.
 
-        On ``pcs`` >= 0.11.6 this queries ``pcs resource config <name> --output-format=json``
-        and checks whether any clone object's ``member_id`` matches the requested name.
-        On older ``pcs`` it falls back to matching a ``Clone:`` / ``Clone Set:`` header
-        line in plaintext ``pcs resource config <name>`` output. Both paths avoid the
+        Queries ``pcs resource config <name> --output-format=json`` and checks whether
+        any clone object's ``member_id`` matches the requested name. This avoids the
         previous fragile approach of inspecting pcs stderr for a hard-coded substring,
         which only matched the "resource is already cloned" wording and not the
         "cannot clone a group that has already been cloned" wording.
@@ -292,7 +287,8 @@ class PacemakerResource(StateModuleHelper):
         name = self.vars.name
         if not name:
             return False
-        return is_resource_cloned_any(self.runner, name)
+        config = get_pacemaker_resource_config(self.runner, name)
+        return config is not None and is_resource_cloned(config, name)
 
     def state_enabled(self):
         with self.runner(
