@@ -19,6 +19,7 @@ short_description: Gather facts on processes listening on TCP and UDP ports
 notes:
   - C(ss) returns all processes for each listen address and port.
   - This plugin returns each of them, so multiple entries for the same listen address and port are likely in results.
+  - "To retrieve the PID and name of processes belonging to other users, the module requires root privileges, for example by setting C(become: true)."
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.facts
@@ -113,7 +114,9 @@ ansible_facts:
           type: str
           sample: "mysqld"
         pid:
-          description: The pid of the listening process.
+          description:
+            - The pid of the listening process.
+            - Returns V(0) if the PID cannot be identified, for example, when the module runs without root privileges and the process belongs to another user.
           returned: always
           type: int
           sample: 1223
@@ -166,7 +169,9 @@ ansible_facts:
           type: str
           sample: "rsyslogd"
         pid:
-          description: The pid of the listening process.
+          description:
+            - The pid of the listening process.
+            - Returns V(0) if the PID cannot be identified, for example, when the module runs without root privileges and the process belongs to another user.
           returned: always
           type: int
           sample: 609
