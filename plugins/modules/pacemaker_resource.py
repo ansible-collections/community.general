@@ -148,6 +148,8 @@ cluster_resources:
 from ansible_collections.community.general.plugins.module_utils._module_helper import StateModuleHelper
 from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     get_pacemaker_maintenance_mode,
+    get_pacemaker_resource_config,
+    is_resource_cloned,
     pacemaker_runner,
     wait_for_resource,
 )
@@ -212,8 +214,10 @@ class PacemakerResource(StateModuleHelper):
         self.vars.set("value", self._get()["out"])
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
+        ignore_msgs = (ignore_err_msg,) if isinstance(ignore_err_msg, str) else tuple(ignore_err_msg)
+
         def process(rc, out, err):
-            if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
+            if fail_on_err and rc != 0 and err and not any(msg in err for msg in ignore_msgs):
                 self.do_raise(f"pcs failed with error (rc={rc}): {err}")
             out = out.rstrip()
             return None if out == "" else out
@@ -255,10 +259,14 @@ class PacemakerResource(StateModuleHelper):
             wait_for_resource(self.runner, "resource", self.vars.name, self.vars.wait, ready_states=_READY_STATES)
 
     def state_cloned(self):
+        config = get_pacemaker_resource_config(self.runner, self.vars.name)
+        if config is not None and is_resource_cloned(config, self.vars.name):
+            return
         with self.runner(
             "cli_action state name resource_clone_ids resource_clone_meta",
             output_process=self._process_command_output(
-                not get_pacemaker_maintenance_mode(self.runner), "already a clone resource"
+                not get_pacemaker_maintenance_mode(self.runner),
+                ("already a clone resource", "cannot clone a group that has already been cloned"),
             ),
             check_mode_skip=True,
         ) as ctx:
