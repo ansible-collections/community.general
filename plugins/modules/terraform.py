@@ -723,6 +723,8 @@ def main():
             # The plan was built from state_file, so the apply must use the same state.
             command.extend(_state_args(module, state_file))
             command.append(plan_file)
+        else:
+            changed = needs_application
 
     result_diff = dict()
     if module._diff or module.check_mode:
