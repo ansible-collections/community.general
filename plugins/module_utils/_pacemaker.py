@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import json
 import re
 import time
 import typing as t
@@ -62,30 +61,6 @@ def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
         maint_mode_re = re.compile(r"maintenance-mode.*true", re.IGNORECASE)
         maintenance_mode_output = [line for line in out.splitlines() if maint_mode_re.search(line)]
         return bool(maintenance_mode_output)
-
-
-def get_pacemaker_resource_config(runner: CmdRunner, name: str) -> dict | None:
-    """Return the parsed ``pcs resource config <name> --output-format=json`` output.
-
-    Returns ``None`` when the output cannot be parsed as JSON so callers can fall
-    through and let ``pcs`` report the real error rather than crashing.
-    """
-    with runner("cli_action state name output_format") as ctx:
-        rc, out, err = ctx.run(cli_action="resource", state="config", name=name, output_format="json")
-    try:
-        return json.loads(out)
-    except (TypeError, ValueError):
-        return None
-
-
-def is_resource_cloned(config: dict, name: str) -> bool:
-    """Return ``True`` if *name* appears as a clone ``member_id`` in the resource config.
-
-    Matches both directly-cloned primitives and cloned groups, since ``pcs``
-    represents cloned-group membership the same way
-    (``clones[].member_id == <group_id>``).
-    """
-    return any(clone.get("member_id") == name for clone in config.get("clones", []))
 
 
 _DEFAULT_RESOURCE_READY_STATES = ("Started",)

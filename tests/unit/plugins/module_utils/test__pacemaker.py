@@ -11,8 +11,6 @@ import pytest
 from ansible_collections.community.general.plugins.module_utils import _pacemaker
 from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     _DEFAULT_RESOURCE_READY_STATES,
-    get_pacemaker_resource_config,
-    is_resource_cloned,
     wait_for_resource,
 )
 
@@ -177,55 +175,3 @@ def test_wait_for_resource_empty_output_does_not_match(mocker):
         wait_for_resource(runner, "resource", "any-resource", wait=5)
 
     assert "Timed out waiting 5s" in str(excinfo.value)
-
-
-# ---------------------------------------------------------------------------
-# Clone-detection helpers
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.parametrize(
-    ("config", "name", "expected"),
-    [
-        # Directly-cloned primitive.
-        ({"clones": [{"id": "virtual-ip-clone", "member_id": "virtual-ip"}]}, "virtual-ip", True),
-        # Cloned group (the locking-clone case from issue #12217): pcs reports the
-        # group id as the clone member_id.
-        ({"clones": [{"id": "locking-clone", "member_id": "locking"}]}, "locking", True),
-        # Promotable clone is still represented via member_id.
-        ({"clones": [{"id": "drbd-clone", "member_id": "drbd_data", "promotable": True}]}, "drbd_data", True),
-        # Another resource is cloned but ours is not — must not false-positive.
-        ({"clones": [{"id": "other-clone", "member_id": "other"}]}, "virtual-ip", False),
-        # No clones configured.
-        ({"clones": []}, "virtual-ip", False),
-        # ``clones`` key entirely absent.
-        ({}, "virtual-ip", False),
-    ],
-    ids=[
-        "cloned-primitive",
-        "cloned-group",
-        "promotable-clone",
-        "other-resource-cloned",
-        "empty-clones",
-        "clones-absent",
-    ],
-)
-def test_is_resource_cloned(config, name, expected):
-    assert is_resource_cloned(config, name) is expected
-
-
-def test_get_pacemaker_resource_config_parses_json():
-    """Valid JSON output round-trips into a dict usable by is_resource_cloned."""
-    payload = '{"primitives": [], "clones": [{"member_id": "virtual-ip"}], "groups": [], "bundles": []}'
-    runner = _make_runner([(0, payload, "")])
-
-    config = get_pacemaker_resource_config(runner, "virtual-ip")
-
-    assert is_resource_cloned(config, "virtual-ip") is True
-
-
-def test_get_pacemaker_resource_config_returns_none_on_invalid_json():
-    """Unparseable output must not raise; the caller falls through to let pcs report the error."""
-    runner = _make_runner([(0, "not-valid-json", "")])
-
-    assert get_pacemaker_resource_config(runner, "virtual-ip") is None
