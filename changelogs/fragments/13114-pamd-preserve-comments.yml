@@ -1,0 +1,2 @@
+bugfixes:
+  - pamd - keep comments and empty lines next to rules inserted with ``state=before`` or ``state=after`` (https://github.com/ansible-collections/community.general/issues/9374, https://github.com/ansible-collections/community.general/pull/13114).
