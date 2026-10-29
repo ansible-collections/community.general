@@ -432,6 +432,24 @@
         - >
           'Name may only contain alpha-numeric and underscore characters' != sysrc_name_check.msg
 
+    ##
+    ## sysrc - #13108 Ensure whitespace is honored in value when setting it
+    ##
+    - name: Ensure whitespace is honored in value
+      community.general.sysrc:
+        name: test_flags
+        value: " -t"
+        path: /tmp/13108.conf
+
+    - name: Ensure whitespace is honored in value (idempotent)
+      community.general.sysrc:
+        name: test_flags
+        value: " -t"
+        path: /tmp/13108.conf
+      register: sysrc_13108_check
+      failed_when:
+        - sysrc_13108_check is changed
+
   always:
 
     - name: Restore /etc/rc.conf
