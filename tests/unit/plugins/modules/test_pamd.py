@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import unittest
 
+import pytest
+
 from ansible_collections.community.general.plugins.modules.pamd import (
     PamdComment,
     PamdInclude,
@@ -509,3 +511,62 @@ def test_remove_only_rule():
     assert "pam_systemd.so" not in str(service)
     # Second run should not change anything
     assert service.remove("session", "optional", "pam_systemd.so") == 0
+
+
+@pytest.mark.parametrize(
+    "operation, target_control, target_path, content, expected",
+    [
+        pytest.param(
+            "insert_after",
+            "optional",
+            "pam_systemd.so",
+            "session required pam_unix.so\nsession optional pam_systemd.so\n# end of config\n",
+            [
+                "session    required pam_unix.so",
+                "session    optional pam_systemd.so",
+                "session    optional pam_mkhomedir.so umask=0077",
+                "# end of config",
+            ],
+            id="after-last-rule-before-trailing-comment",
+        ),
+        pytest.param(
+            "insert_after",
+            "required",
+            "pam_permit.so",
+            "session required pam_permit.so\n# comment\n\nsession required pam_unix.so\n",
+            [
+                "session    required pam_permit.so",
+                "session    optional pam_mkhomedir.so umask=0077",
+                "# comment",
+                "",
+                "session    required pam_unix.so",
+            ],
+            id="after-rule-followed-by-comment",
+        ),
+        pytest.param(
+            "insert_before",
+            "required",
+            "pam_unix.so",
+            "session required pam_permit.so\n# comment\n\nsession required pam_unix.so\n",
+            [
+                "session    required pam_permit.so",
+                "# comment",
+                "",
+                "session    optional pam_mkhomedir.so umask=0077",
+                "session    required pam_unix.so",
+            ],
+            id="before-rule-preceded-by-comment",
+        ),
+    ],
+)
+def test_insert_keeps_comments(operation, target_control, target_path, content, expected):
+    service = PamdService(content)
+    insert = getattr(service, operation)
+    new_rule = dict(new_type="session", new_control="optional", new_path="pam_mkhomedir.so", new_args="umask=0077")
+
+    assert insert("session", target_control, target_path, **new_rule) == 1
+    lines = str(service).splitlines()
+    assert lines[1].startswith("# Updated by Ansible")
+    assert lines[:1] + lines[2:] == expected
+    # Second run should not change anything
+    assert insert("session", target_control, target_path, **new_rule) == 0
