@@ -45,6 +45,12 @@
         state: present
       when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version|int >= 37
 
+    - name: setup cloud-init to not probe the cloud platform the tests are running on
+      ansible.builtin.copy:
+        dest: /etc/cloud/cloud.cfg.d/99_ansible_test.cfg
+        content: |
+          datasource_list: [None]
+
     - name: setup run cloud-init
       ansible.builtin.command: cloud-init init --local
 
