@@ -39,3 +39,71 @@
       - set_namespaced_attribute_value is changed
       - comparison is not changed  # identical
   # ansible.builtin.command: diff -u {{ role_path }}/results/test-set-namespaced-attribute-value.xml /tmp/ansible-xml-namespaced-beers.xml
+
+
+- name: Set namespaced '/bus:business/rat:rating/@attr:subjective' to 'false' again
+  community.general.xml:
+    path: /tmp/ansible-xml-namespaced-beers.xml
+    xpath: /bus:business/rat:rating
+    namespaces:
+      bus: http://test.business
+      ber: http://test.beers
+      rat: http://test.rating
+      attr: http://test.attribute
+    attribute: attr:subjective
+    value: 'false'
+  register: set_namespaced_attribute_value_again
+
+- name: Test that setting the same namespaced attribute value is idempotent
+  ansible.builtin.assert:
+    that:
+      - set_namespaced_attribute_value_again is not changed
+
+
+- name: Set namespaced attribute '@attr:origin' on all '/bus:business/ber:beers/ber:beer' elements
+  community.general.xml:
+    path: /tmp/ansible-xml-namespaced-beers.xml
+    xpath: /bus:business/ber:beers/ber:beer
+    namespaces:
+      bus: http://test.business
+      ber: http://test.beers
+      attr: http://test.attribute
+    attribute: attr:origin
+    value: unknown
+  register: set_namespaced_attribute_multiple
+
+- name: Count '/bus:business/ber:beers/ber:beer' elements with '@attr:origin' set
+  community.general.xml:
+    path: /tmp/ansible-xml-namespaced-beers.xml
+    xpath: /bus:business/ber:beers/ber:beer[@attr:origin='unknown']
+    namespaces:
+      bus: http://test.business
+      ber: http://test.beers
+      attr: http://test.attribute
+    count: true
+  register: count_namespaced_attribute_multiple
+
+- name: Test that the namespaced attribute was set on all matching elements
+  ansible.builtin.assert:
+    that:
+      - set_namespaced_attribute_multiple is changed
+      - count_namespaced_attribute_multiple.count == 3
+
+
+- name: Set namespaced attribute with a prefix missing from 'namespaces' - must fail
+  community.general.xml:
+    path: /tmp/ansible-xml-namespaced-beers.xml
+    xpath: /bus:business/rat:rating
+    namespaces:
+      bus: http://test.business
+      rat: http://test.rating
+    attribute: undeclared:subjective
+    value: 'false'
+  register: set_namespaced_attribute_undeclared
+  ignore_errors: true
+
+- name: Test that a missing namespace prefix fails with a clear message
+  ansible.builtin.assert:
+    that:
+      - set_namespaced_attribute_undeclared is failed
+      - "\"Namespace prefix 'undeclared'\" in set_namespaced_attribute_undeclared.msg"

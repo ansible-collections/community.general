@@ -655,6 +655,14 @@ def set_target_inner(module, tree, xpath, namespaces, attribute, value, create_i
             )
         )
 
+    if attribute and ":" in attribute:
+        attr_ns, attr_name = attribute.split(":", 1)
+        if attr_ns not in namespaces:
+            module.fail_json(
+                msg=f"Namespace prefix '{attr_ns}' used in attribute '{attribute}' is not defined in the 'namespaces' parameter"
+            )
+        attribute = f"{{{namespaces[attr_ns]}}}{attr_name}"
+
     for element in tree.xpath(xpath, namespaces=namespaces):
         if not attribute:
             changed = changed or (element.text != value)
@@ -662,10 +670,6 @@ def set_target_inner(module, tree, xpath, namespaces, attribute, value, create_i
                 element.text = value
         else:
             changed = changed or (element.get(attribute) != value)
-            if ":" in attribute:
-                attr_ns, attr_name = attribute.split(":")
-                # attribute = "{{%s}}%s" % (namespaces[attr_ns], attr_name)
-                attribute = f"{{{namespaces[attr_ns]}}}{attr_name}"
             if element.get(attribute) != value:
                 element.set(attribute, value)
 
