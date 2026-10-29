@@ -1,0 +1,4 @@
+bugfixes:
+  - ipa_user - send only changed attributes when modifying a user (https://github.com/ansible-collections/community.general/issues/8296, https://github.com/ansible-collections/community.general/pull/13078).
+minor_changes:
+  - ipa_user - add ``enable_on_present`` option to keep disabled users disabled with ``state=present`` (https://github.com/ansible-collections/community.general/issues/8296, https://github.com/ansible-collections/community.general/pull/13078).
