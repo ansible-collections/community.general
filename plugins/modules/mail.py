@@ -294,12 +294,12 @@ def main():
         if not secure_state:
             smtp = smtplib.SMTP(host=host, port=port, local_hostname=local_hostname, timeout=timeout)
 
-    except smtplib.SMTPException as e:
+    except OSError as e:
         module.fail_json(rc=1, msg=f"Unable to Connect {host}:{port}: {e}", exception=traceback.format_exc())
 
     try:
         smtp.ehlo()
-    except smtplib.SMTPException as e:
+    except OSError as e:
         module.fail_json(rc=1, msg=f"Helo failed for host {host}:{port}: {e}", exception=traceback.format_exc())
 
     if not secure_state and secure in ("starttls", "try"):
