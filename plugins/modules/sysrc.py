@@ -141,9 +141,10 @@ class Sysrc(StateModuleHelper):
             # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=229806
             return None
 
-        if out.startswith(f"{self.vars.path}: "):
+        prefix = f"{self.vars.path}: "
+        if out.startswith(prefix):
             # sysrc -v prints "<file>: <value>"
-            return out[len(self.vars.path) + 2 :].rstrip("\n")
+            return out[len(prefix) :].rstrip("\n")
 
         return None
 
