@@ -20,6 +20,12 @@ description:
     the repository itself, not the running server process.
   - To manage the server process lifecycle use your system's service manager (for
     example C(ansible.builtin.systemd)).
+notes:
+  - Change detection compares the relevant C(kopia server) listing before and after the
+    operation - the user list for O(state=user_present), O(state=user_absent) and
+    O(state=users_listed), and the ACL listing for the C(acl_*) states.
+  - Because C(kopia server users list) does not expose password material, updating the
+    password of an existing user with O(state=user_present) is reported as C(changed=false).
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._kopia
@@ -37,8 +43,8 @@ options:
       user_present: Creates or updates a server user. Requires O(username).
       user_absent: Removes a server user. Requires O(username).
       users_listed: Lists all server users. No additional options required.
-      acl_present: Adds an ACL entry. Requires O(acl_user) and O(acl_access).
-      acl_absent: Removes an ACL entry. Requires O(acl_user).
+      acl_present: Adds an ACL entry. Requires O(acl_user), O(acl_access), and O(acl_target).
+      acl_absent: Removes ACL entries matching O(acl_user) (and O(acl_target) when set). Requires O(acl_user).
       acl_listed: Lists all ACL entries. No additional options required.
       acl_enabled: >-
         Enables ACL enforcement and installs default entries.
@@ -74,8 +80,11 @@ options:
     type: str
   acl_target:
     description:
-      - Manifests targeted by the ACL rule, in C(type:T,key1:value1,...) format.
-      - Optional if O(state=acl_present).
+      - Manifests targeted by the ACL rule, in C(key=value) form, comma-separated for
+        multiple labels (for example V(type=snapshot,username=bob)).
+      - Required if O(state=acl_present).
+      - Optional filter if O(state=acl_absent); when set, only ACL entries matching both
+        O(acl_user) and this target are removed.
     type: str
   acl_no_overwrite:
     description:
@@ -116,11 +125,12 @@ EXAMPLES = r"""
     state: acl_enabled
     config: /etc/kopia/root.config
 
-- name: Add an ACL entry granting full access
+- name: Add an ACL entry granting full access to a user's snapshots
   community.general.kopia_server:
     state: acl_present
     acl_user: alice@backuphost
     acl_access: FULL
+    acl_target: "type=snapshot,username=alice"
     config: /etc/kopia/root.config
 
 - name: Add a targeted ACL entry
@@ -128,10 +138,10 @@ EXAMPLES = r"""
     state: acl_present
     acl_user: bob@backuphost
     acl_access: READ
-    acl_target: "type:snapshot,username:bob"
+    acl_target: "type=snapshot,username=bob"
     config: /etc/kopia/root.config
 
-- name: Delete an ACL entry
+- name: Delete all ACL entries for a user
   community.general.kopia_server:
     state: acl_absent
     acl_user: alice@backuphost
@@ -169,6 +179,19 @@ _STATE_CLI_MAP = {
     "acl_enabled": ("acl", "enable"),
 }
 
+# Maps module states to the read-only probe (an arg-format name) used by _get() for
+# change detection. User states diff the user list; ACL states diff the ACL list, so
+# that ACL changes are detected and acl_listed returns ACL data rather than the user list.
+_STATE_PROBE_FORMAT = {
+    "user_present": "list_users",
+    "user_absent": "list_users",
+    "users_listed": "list_users",
+    "acl_present": "list_acls",
+    "acl_absent": "list_acls",
+    "acl_listed": "list_acls",
+    "acl_enabled": "list_acls",
+}
+
 
 class KopiaServer(StateModuleHelper):
     module = dict(
@@ -199,7 +222,7 @@ class KopiaServer(StateModuleHelper):
         required_if=[
             ("state", "user_present", ["username"]),
             ("state", "user_absent", ["username"]),
-            ("state", "acl_present", ["acl_user", "acl_access"]),
+            ("state", "acl_present", ["acl_user", "acl_access", "acl_target"]),
             ("state", "acl_absent", ["acl_user"]),
         ],
         mutually_exclusive=[
@@ -212,6 +235,7 @@ class KopiaServer(StateModuleHelper):
             self.module,
             extra_formats=dict(
                 list_users=cmd_runner_fmt.as_fixed("server", "users", "list"),
+                list_acls=cmd_runner_fmt.as_fixed("server", "acl", "list"),
                 server_group=cmd_runner_fmt.as_list(),
                 server_subcommand=cmd_runner_fmt.as_list(),
                 username=cmd_runner_fmt.as_list(),
@@ -221,6 +245,8 @@ class KopiaServer(StateModuleHelper):
                 acl_access=cmd_runner_fmt.as_opt_val("--access"),
                 acl_target=cmd_runner_fmt.as_opt_val("--target"),
                 acl_no_overwrite=cmd_runner_fmt.as_bool("--no-overwrite"),
+                acl_id=cmd_runner_fmt.as_list(),
+                acl_delete_confirm=cmd_runner_fmt.as_fixed("--delete"),
             ),
         )
         self.vars.set("previous_value", self._get()["out"])
@@ -230,13 +256,37 @@ class KopiaServer(StateModuleHelper):
         self.vars.set("value", self._get()["out"])
 
     def _get(self):
-        with self.runner("list_users config") as ctx:
+        probe = _STATE_PROBE_FORMAT[self.vars.state]
+        with self.runner(f"{probe} config") as ctx:
             result = ctx.run()
             return dict(
                 rc=result[0],
-                out=(result[1].rstrip() if result[1] else None),
+                out=self._canonicalize(result[1]),
                 err=result[2],
             )
+
+    @staticmethod
+    def _canonicalize(out):
+        """Normalize list output so change detection is stable.
+
+        kopia emits the comma-separated labels of an ACL ``target:`` in
+        non-deterministic order, which would otherwise produce spurious
+        C(changed=true) results when comparing the listing before and after an
+        operation. Sorting the labels yields a canonical form. Returns ``None``
+        for empty output.
+        """
+        if not out:
+            return None
+        lines = []
+        for line in out.rstrip().splitlines():
+            tokens = []
+            for token in line.split():
+                if token.startswith("target:"):
+                    labels = token[len("target:"):].split(",")
+                    token = "target:" + ",".join(sorted(labels))
+                tokens.append(token)
+            lines.append(" ".join(tokens))
+        return "\n".join(lines) or None
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
         def process(rc, out, err):
@@ -247,18 +297,29 @@ class KopiaServer(StateModuleHelper):
 
         return process
 
-    def _run_server_cmd(self, args_order, ignore_err_msg="", check_mode_skip=True, **run_kwargs):
-        group, subcommand = _STATE_CLI_MAP[self.vars.state]
+    def _run_server_cmd(self, args_order, ignore_err_msg="", check_mode_skip=True, subcommand=None, **run_kwargs):
+        group, default_subcommand = _STATE_CLI_MAP[self.vars.state]
         with self.runner(
             args_order,
             output_process=self._process_command_output(True, ignore_err_msg),
             check_mode_skip=check_mode_skip,
         ) as ctx:
-            ctx.run(cli_action="server", server_group=group, server_subcommand=subcommand, **run_kwargs)
+            ctx.run(
+                cli_action="server",
+                server_group=group,
+                server_subcommand=subcommand if subcommand is not None else default_subcommand,
+                **run_kwargs,
+            )
 
     def state_user_present(self):
+        # kopia distinguishes `users add` (create) from `users set` (update existing);
+        # `set` errors on a missing user and `add` errors on an existing one. Pick the
+        # right subcommand based on whether the user already appears in the user list.
+        existing_users = (self.vars.previous_value or "").splitlines()
+        subcommand = "set" if self.vars.username in existing_users else "add"
         self._run_server_cmd(
             "cli_action server_group server_subcommand username user_password user_password_hash config",
+            subcommand=subcommand,
             ignore_err_msg="already exists",
         )
 
@@ -280,10 +341,39 @@ class KopiaServer(StateModuleHelper):
         )
 
     def state_acl_absent(self):
+        # kopia `server acl delete` takes ACL entry IDs, not a --user flag, so resolve the
+        # IDs of entries matching acl_user (and acl_target when given) from the current ACL
+        # listing captured in previous_value, then delete them in a single call. When nothing
+        # matches there is nothing to do, which keeps the operation idempotent.
+        ids = self._matching_acl_ids()
+        if not ids:
+            return
+        # kopia's `acl delete` is a dry run unless `--delete` is passed.
         self._run_server_cmd(
-            "cli_action server_group server_subcommand acl_user config",
-            ignore_err_msg="no such rule",
+            "cli_action server_group server_subcommand acl_delete_confirm acl_id config",
+            acl_id=ids,
+            ignore_err_msg="no such",
         )
+
+    def _matching_acl_ids(self):
+        """Return the IDs of ACL entries in previous_value matching acl_user (+ acl_target)."""
+        wanted_target = None
+        if self.vars.acl_target is not None:
+            wanted_target = ",".join(sorted(self.vars.acl_target.split(",")))
+        ids = []
+        for line in (self.vars.previous_value or "").splitlines():
+            fields = {}
+            for token in line.split():
+                key, sep, val = token.partition(":")
+                if sep:
+                    fields[key] = val
+            if fields.get("user") != self.vars.acl_user:
+                continue
+            if wanted_target is not None and fields.get("target") != wanted_target:
+                continue
+            if "id" in fields:
+                ids.append(fields["id"])
+        return ids
 
     def state_acl_listed(self):
         self._run_server_cmd(
