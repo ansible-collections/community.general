@@ -1,0 +1,2 @@
+bugfixes:
+  - mail - report connection errors such as a refused connection as a module failure instead of a traceback (https://github.com/ansible-collections/community.general/issues/7122, https://github.com/ansible-collections/community.general/pull/13067).
