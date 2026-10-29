@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ---
-anchors:
-  environ: &env-def {}
 test_cases:
   - id: set_new_value
     input:
@@ -15,13 +13,11 @@ test_cases:
     mocks:
       run_command:
         - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
-          environ: *env-def
           rc: 1
           out: ''
           err: |
             sysrc: unknown variable 'test_flags'
         - command: [/testbin/sysrc, -f, /etc/rc.conf, test_flags=-t]
-          environ: *env-def
           rc: 0
           out: |
             test_flags:  -> -t
@@ -35,7 +31,6 @@ test_cases:
     mocks:
       run_command:
         - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
-          environ: *env-def
           rc: 0
           out: |
             /etc/rc.conf: -t
@@ -49,7 +44,6 @@ test_cases:
     mocks:
       run_command:
         - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
-          environ: *env-def
           rc: 0
           out: |
             /etc/rc.conf:  -t
@@ -63,7 +57,6 @@ test_cases:
     mocks:
       run_command:
         - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
-          environ: *env-def
           rc: 0
           out: "/etc/rc.conf: -t \n"
           err: ''
@@ -76,13 +69,11 @@ test_cases:
     mocks:
       run_command:
         - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
-          environ: *env-def
           rc: 0
           out: |
             /etc/rc.conf: -t
           err: ''
         - command: [/testbin/sysrc, -f, /etc/rc.conf, test_flags= -t]
-          environ: *env-def
           rc: 0
           out: |
             test_flags: -t ->  -t
@@ -96,7 +87,6 @@ test_cases:
     mocks:
       run_command:
         - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
-          environ: *env-def
           rc: 0
           out: |
             /etc/rc.conf:  -t

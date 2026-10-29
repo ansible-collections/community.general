@@ -420,6 +420,50 @@
             'k1="v2"' in sysrc_10394_content.stdout_lines
 
     ##
+    ## sysrc - #13108 values with leading or trailing whitespace are idempotent
+    ##
+    - name: Values with leading or trailing whitespace
+      vars:
+        sysrc_13108_values:
+          - name: sysrc_13108_leading
+            value: " -t"
+          - name: sysrc_13108_trailing
+            value: "-t "
+          - name: sysrc_13108_both
+            value: " -t "
+      block:
+
+        - name: Set values with leading or trailing whitespace
+          community.general.sysrc:
+            name: "{{ item.name }}"
+            value: "{{ item.value }}"
+          loop: "{{ sysrc_13108_values }}"
+          register: sysrc_13108_set
+
+        - name: Set values with leading or trailing whitespace (idempotent)
+          community.general.sysrc:
+            name: "{{ item.name }}"
+            value: "{{ item.value }}"
+          loop: "{{ sysrc_13108_values }}"
+          register: sysrc_13108_idempotent
+
+        - name: Get file content
+          ansible.builtin.command: "cat /etc/rc.conf"
+          register: sysrc_13108_content
+
+        - name: Ensure values with leading or trailing whitespace are idempotent
+          ansible.builtin.assert:
+            that:
+              - sysrc_13108_set.results | map(attribute='changed') is all
+              - sysrc_13108_idempotent.results | rejectattr('changed') | list | length == 3
+              - >
+                'sysrc_13108_leading=" -t"' in sysrc_13108_content.stdout_lines
+              - >
+                'sysrc_13108_trailing="-t "' in sysrc_13108_content.stdout_lines
+              - >
+                'sysrc_13108_both=" -t "' in sysrc_13108_content.stdout_lines
+
+    ##
     ## sysrc - additional tests
     ##
     - name: Ensure failure on OID style name since sysrc does not support them

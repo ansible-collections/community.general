@@ -142,8 +142,7 @@ class Sysrc(StateModuleHelper):
             return None
 
         if out.startswith(f"{self.vars.path}: "):
-            # sysrc -v prints "<file>: <value>"; only strip that separator and the trailing
-            # newline, so leading or trailing whitespace that is part of the value is kept
+            # sysrc -v prints "<file>: <value>"
             return out[len(self.vars.path) + 2 :].rstrip("\n")
 
         return None
