@@ -90,6 +90,20 @@
     body: Test body 6
     secure: never
 
+- name: Send a test-mail to a port with no listener
+  community.general.mail:
+    port: 10026
+    subject: Test mail 7 (connection refused)
+    secure: never
+  ignore_errors: true
+  register: connection_refused
+
+- name: Assert connection error is reported as a module failure
+  ansible.builtin.assert:
+    that:
+      - connection_refused is failed
+      - connection_refused.msg is search('Unable to Connect')
+
 - name: Send a test-mail with secure=always to a port with no listener
   community.general.mail:
     port: 10027
