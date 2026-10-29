@@ -1,0 +1,2 @@
+bugfixes:
+  - office_365_connector_card - treat a ``202 Accepted`` response as success, which is what Power Automate (Workflows) webhooks return (https://github.com/ansible-collections/community.general/issues/12374).
