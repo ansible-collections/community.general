@@ -500,3 +500,12 @@ password    required                                     pam_deny.so
         self.assertTrue(self.pamd.remove("session", "required", "pam_unix.so"))
         test_rule = PamdRule("session", "required", "pam_unix.so")
         self.assertNotIn(str(test_rule), str(self.pamd))
+
+
+def test_remove_only_rule():
+    service = PamdService("session optional pam_systemd.so\n")
+
+    assert service.remove("session", "optional", "pam_systemd.so") == 1
+    assert "pam_systemd.so" not in str(service)
+    # Second run should not change anything
+    assert service.remove("session", "optional", "pam_systemd.so") == 0
