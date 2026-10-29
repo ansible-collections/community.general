@@ -1,0 +1,2 @@
+bugfixes:
+  - pamd - fix crash when removing a rule that is the only line in the file with ``state=absent`` (https://github.com/ansible-collections/community.general/pull/13115).
