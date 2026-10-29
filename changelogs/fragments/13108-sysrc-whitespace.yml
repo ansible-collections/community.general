@@ -1,2 +1,2 @@
 bugfixes:
-  - sysrc - keep whitespace during comparison (https://github.com/ansible-collections/community.general/issues/13108)
+  - sysrc - keep whitespace during comparison (https://github.com/ansible-collections/community.general/issues/13108,https://github.com/ansible-collections/community.general/issues/13118)

@@ -142,7 +142,7 @@ class Sysrc(StateModuleHelper):
             return None
 
         if out.startswith(self.vars.path):
-            return out.split(":", 1)[1].rstrip("\n")
+            return out[len(f"{self.vars.path}: "):].rstrip("\n")
 
         return None
 
