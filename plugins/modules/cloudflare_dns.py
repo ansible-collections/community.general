@@ -678,7 +678,7 @@ class CloudflareAPI:
         if record:
             query["name"] = record
         if value:
-            query["content"] = value
+            query["content.exact"] = value
         if query:
             api_call += f"?{urlencode(query)}"
 
