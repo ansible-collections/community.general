@@ -78,6 +78,8 @@ options:
       - The distance can be specified with all the units supported by parted (except compat) and it is case sensitive, for
         example V(10GiB), V(15%).
       - Using negative values may require setting of O(fs_type) (see notes).
+      - This is only used when the partition is created. The start of an existing partition is never changed, even if it
+        differs from O(part_start).
     type: str
     default: 0%
   part_end:
@@ -86,6 +88,8 @@ options:
         Negative numbers specify distance from the end of the disk.
       - The distance can be specified with all the units supported by parted (except compat) and it is case sensitive, for
         example V(10GiB), V(15%).
+      - This is only used when the partition is created, or when O(resize=true). If the partition already exists and
+        O(resize=false), its size is not changed, even if its end differs from O(part_end).
     type: str
     default: 100%
   name:
