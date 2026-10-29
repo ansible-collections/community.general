@@ -141,8 +141,10 @@ class Sysrc(StateModuleHelper):
             # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=229806
             return None
 
-        if out.startswith(self.vars.path):
-            return out.split(":", 1)[1].strip()
+        if out.startswith(f"{self.vars.path}: "):
+            # sysrc -v prints "<file>: <value>"; only strip that separator and the trailing
+            # newline, so leading or trailing whitespace that is part of the value is kept
+            return out[len(self.vars.path) + 2 :].rstrip("\n")
 
         return None
 

@@ -1,0 +1,103 @@
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {}
+test_cases:
+  - id: set_new_value
+    input:
+      name: test_flags
+      value: -t
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: |
+            sysrc: unknown variable 'test_flags'
+        - command: [/testbin/sysrc, -f, /etc/rc.conf, test_flags=-t]
+          environ: *env-def
+          rc: 0
+          out: |
+            test_flags:  -> -t
+          err: ''
+  - id: value_unchanged
+    input:
+      name: test_flags
+      value: -t
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
+          environ: *env-def
+          rc: 0
+          out: |
+            /etc/rc.conf: -t
+          err: ''
+  - id: value_with_leading_whitespace_unchanged
+    input:
+      name: test_flags
+      value: ' -t'
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
+          environ: *env-def
+          rc: 0
+          out: |
+            /etc/rc.conf:  -t
+          err: ''
+  - id: value_with_trailing_whitespace_unchanged
+    input:
+      name: test_flags
+      value: '-t '
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
+          environ: *env-def
+          rc: 0
+          out: "/etc/rc.conf: -t \n"
+          err: ''
+  - id: whitespace_only_differs
+    input:
+      name: test_flags
+      value: ' -t'
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
+          environ: *env-def
+          rc: 0
+          out: |
+            /etc/rc.conf: -t
+          err: ''
+        - command: [/testbin/sysrc, -f, /etc/rc.conf, test_flags= -t]
+          environ: *env-def
+          rc: 0
+          out: |
+            test_flags: -t ->  -t
+          err: ''
+  - id: get_value
+    input:
+      name: test_flags
+    output:
+      changed: false
+      value: ' -t'
+    mocks:
+      run_command:
+        - command: [/testbin/sysrc, -f, /etc/rc.conf, -v, -n, test_flags]
+          environ: *env-def
+          rc: 0
+          out: |
+            /etc/rc.conf:  -t
+          err: ''
