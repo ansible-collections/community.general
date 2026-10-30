@@ -382,6 +382,14 @@ approval before committing or pushing it.
 - When the PR is ready for review, mark it as ready (not draft) and remove any `[WIP]` prefix from the title.
 - When a fix is speculative or lacks test coverage, use hedged language in the PR description (e.g. "may address" rather than "this fixes").
 - Keep PR descriptions concise; do not explain implementation choices or reproduce information already visible in the diff or commit messages.
+  - Do NOT list the tests run locally (sanity, unit, integration, or manual runs) nor their results.
+    They are only relevant to the author; CI runs the tests for the PR.
+    Exception: when integration tests affected by the PR do not run in CI (e.g. the target is marked as `disabled` or
+    `unsupported`), briefly state which of them were run locally and on which platforms.
+  - Code in the PR description MUST be limited to one small snippet demonstrating the change, e.g. a single task.
+    Do NOT include full playbooks, long task lists, or long code blocks in any language.
+    If a longer reproducer or example is useful, post it later in a separate PR comment.
+  - Fence all code blocks with the proper language tag: `yaml` for Ansible code, `python` for Python code, and so on.
 
 ## Tests
 
