@@ -337,6 +337,10 @@ def main():
             module.exit_json(changed=True)
         elif deploy_key.state == "present" and key_id is not None:
             module.exit_json(changed=False)
+        elif deploy_key.state == "absent" and key_id is not None:
+            module.exit_json(changed=True, msg="Deploy key successfully deleted", id=key_id)
+        elif deploy_key.state == "absent":
+            module.exit_json(changed=False, msg="Deploy key does not exist")
 
     # to forcefully modify an existing key, the existing key must be deleted first
     if deploy_key.state == 'absent' or deploy_key.force:
