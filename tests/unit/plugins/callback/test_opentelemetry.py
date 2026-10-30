@@ -251,6 +251,36 @@ class TestOpentelemetry(unittest.TestCase):
                 self.assertEqual(result, tc[1])
 
 
+def test_span_event_carries_the_result_of_its_own_host(mocker):
+    mocker.patch("ansible_collections.community.general.plugins.callback.opentelemetry.Status", create=True)
+    mocker.patch("ansible_collections.community.general.plugins.callback.opentelemetry.StatusCode", create=True)
+    opentelemetry = OpenTelemetrySource(display=None)
+    task = Task()
+    task.action = "myaction"
+    task.no_log = False
+    task._uuid = "myuuid"
+    task.args = {}
+    task.get_name = MagicMock(return_value="mytask")
+    task.get_path = MagicMock(return_value="/mypath")
+    tasks_data = OrderedDict()
+
+    hosts = []
+    for name in ("a", "b", "c"):
+        host = Mock("MockHost")
+        host.name = name
+        host._uuid = f"{name}_uuid"
+        hosts.append(host)
+        opentelemetry.start_task(tasks_data, False, "myplay", task, host)
+    for host in hosts:
+        result = TaskResult(host=host, task=task, return_data={"msg": host.name}, task_fields={"args": {}})
+        opentelemetry.finish_task(tasks_data, "ok", result, f'{{"msg": "{host.name}"}}')
+
+    for host_data in tasks_data["myuuid"].host_data.values():
+        span = MagicMock()
+        opentelemetry.update_span_data(tasks_data["myuuid"], host_data, span, False, True)
+        span.add_event.assert_called_once_with(f'{{"msg": "{host_data.name}"}}', attributes={})
+
+
 def generate_test_data(exception=None, msg=None, stderr=None, failed=False):
     res_data = OrderedDict()
     if exception:

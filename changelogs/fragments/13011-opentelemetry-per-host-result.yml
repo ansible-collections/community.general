@@ -1,0 +1,2 @@
+bugfixes:
+  - opentelemetry callback plugin - each host's span event now carries that host's task result instead of the result of the host that reported last (https://github.com/ansible-collections/community.general/issues/12987, https://github.com/ansible-collections/community.general/pull/13011).
