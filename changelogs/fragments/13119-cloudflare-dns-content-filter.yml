@@ -1,0 +1,2 @@
+bugfixes:
+  - cloudflare_dns - fix failure when looking up records whose value contains a comma (https://github.com/ansible-collections/community.general/issues/10208, https://github.com/ansible-collections/community.general/pull/13119).
