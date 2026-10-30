@@ -11,7 +11,8 @@ import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     AnsibleFailJson,
-    ModuleTestCase,
+    exit_json,
+    fail_json,
     set_module_args,
 )
 
@@ -20,38 +21,49 @@ from ansible_collections.community.general.plugins.modules import office_365_con
 WEBHOOK = "https://example.invalid/webhook"
 
 
-class TestOffice365ConnectorCardModule(ModuleTestCase):
-    def setUp(self):
-        super().setUp()
-        self.module = office_365_connector_card
+@pytest.fixture(autouse=True)
+def patch_module():
+    with patch.multiple(
+        "ansible.module_utils.basic.AnsibleModule",
+        exit_json=exit_json,
+        fail_json=fail_json,
+    ):
+        yield
 
-    def test_without_required_parameters(self):
-        with self.assertRaises(AnsibleFailJson):
-            with set_module_args({}):
-                self.module.main()
 
-    def _run(self, status, msg="OK"):
+@pytest.fixture
+def fetch_url_mock():
+    with patch.object(office_365_connector_card, "fetch_url") as mock:
+        yield mock
+
+
+def run_module(fetch_url_mock, status, msg, expected_exception):
+    fetch_url_mock.return_value = (None, {"status": status, "msg": msg})
+    with pytest.raises(expected_exception) as exc:
         with set_module_args({"webhook": WEBHOOK, "text": "hello"}):
-            with patch.object(office_365_connector_card, "fetch_url") as fetch_url_mock:
-                fetch_url_mock.return_value = (None, {"status": status, "msg": msg})
-                with pytest.raises((AnsibleExitJson, AnsibleFailJson)) as exc:
-                    self.module.main()
-        assert fetch_url_mock.call_count == 1
-        assert fetch_url_mock.call_args[1]["url"] == WEBHOOK
-        assert json.loads(fetch_url_mock.call_args[1]["data"])["text"] == "hello"
-        return exc
+            office_365_connector_card.main()
+    assert fetch_url_mock.call_count == 1
+    assert fetch_url_mock.call_args[1]["url"] == WEBHOOK
+    assert json.loads(fetch_url_mock.call_args[1]["data"])["text"] == "hello"
+    return exc.value.args[0]
 
-    def test_success_200(self):
-        exc = self._run(200)
-        assert exc.type is AnsibleExitJson
-        assert exc.value.args[0]["changed"] is True
 
-    def test_success_202_power_automate(self):
-        exc = self._run(202, "Accepted")
-        assert exc.type is AnsibleExitJson
-        assert exc.value.args[0]["changed"] is True
+def test_without_required_parameters():
+    with pytest.raises(AnsibleFailJson):
+        with set_module_args({}):
+            office_365_connector_card.main()
 
-    def test_failure_status(self):
-        exc = self._run(500, "Internal Server Error")
-        assert exc.type is AnsibleFailJson
-        assert "Internal Server Error" in exc.value.args[0]["msg"]
+
+def test_success_200(fetch_url_mock):
+    result = run_module(fetch_url_mock, 200, "OK", AnsibleExitJson)
+    assert result["changed"] is True
+
+
+def test_success_202_power_automate(fetch_url_mock):
+    result = run_module(fetch_url_mock, 202, "Accepted", AnsibleExitJson)
+    assert result["changed"] is True
+
+
+def test_failure_status(fetch_url_mock):
+    result = run_module(fetch_url_mock, 500, "Internal Server Error", AnsibleFailJson)
+    assert "Internal Server Error" in result["msg"]
