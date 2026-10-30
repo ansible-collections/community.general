@@ -242,7 +242,8 @@ def do_notify_connector_card_webhook(module, webhook, payload):
 
     response, info = fetch_url(module=module, url=webhook, headers=headers, method="POST", data=payload)
 
-    if info["status"] == 200:
+    # Power Automate (Workflows) webhooks answer with 202 Accepted instead of 200
+    if info["status"] in (200, 202):
         module.exit_json(changed=True)
     elif info["status"] == 400 and module.check_mode:
         if info["body"] == OFFICE_365_CARD_EMPTY_PAYLOAD_MSG:
