@@ -61,6 +61,22 @@
         state: present
       environment:
         PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
+      register: pnpm_install_all
+
+    - name: Install all packages from package.json again
+      community.general.pnpm:
+        path: "{{ remote_tmp_dir }}"
+        executable: "{{ pnpm_bin_path }}/pnpm"
+        state: present
+      environment:
+        PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
+      register: pnpm_reinstall_all
+
+    - name: Assert that only the first installation from package.json is changed
+      ansible.builtin.assert:
+        that:
+          - pnpm_install_all is changed
+          - pnpm_reinstall_all is not changed
 
     - name: Install the same package from package.json again
       community.general.pnpm:
@@ -92,8 +108,7 @@
         that:
           - pnpm_install_check.err is defined
           - pnpm_install_check.out is defined
-          - pnpm_install_check.err is none
-          - pnpm_install_check.out is none
+          - pnpm_install_check is not changed
 
     - name: Install package without dependency
       community.general.pnpm:
@@ -287,6 +302,20 @@
         that:
           - pnpm_reinstall is success
           - not (pnpm_reinstall is changed)
+
+    - name: Install all global packages
+      community.general.pnpm:
+        state: present
+        global: true
+      environment:
+        PATH: "{{ pnpm_bin_path }}:{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
+        PNPM_HOME: "{{ pnpm_bin_path }}"
+      register: pnpm_reinstall_all_global
+
+    - name: Assert that there is no change
+      ansible.builtin.assert:
+        that:
+          - pnpm_reinstall_all_global is not changed
 
     - name: Updating package globally, without explicit executable path
       community.general.pnpm:
