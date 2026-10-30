@@ -298,42 +298,35 @@
 ##
 ## pkgng - example - autoremove=yes
 ##
-- name: "Test autoremove=yes"
-  #
-  # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
-  #       only running this on 12.1 or higher
-  #
-  when: ansible_facts.distribution_version is version('12.01', '>=')
-  block:
-    - name: Install GNU autotools
-      community.general.pkgng:
-        name: autotools
-        state: latest
-      register: pkgng_example7_prepare_install
+- name: Install GNU autotools
+  community.general.pkgng:
+    name: autotools
+    state: latest
+  register: pkgng_example7_prepare_install
 
-    - name: Remove GNU autotools and run pkg autoremove
-      community.general.pkgng:
-        name: autotools
-        state: absent
-        autoremove: true
-      register: pkgng_example7
+- name: Remove GNU autotools and run pkg autoremove
+  community.general.pkgng:
+    name: autotools
+    state: absent
+    autoremove: true
+  register: pkgng_example7
 
-    - name: Check if autoremove uninstalled known autotools dependencies
-      community.general.pkgng:
-        name:
-          - autoconf
-          - automake
-          - libtool
-        state: absent
-      check_mode: true
-      register: pkgng_example7_cleanup
+- name: Check if autoremove uninstalled known autotools dependencies
+  community.general.pkgng:
+    name:
+      - autoconf
+      - automake
+      - libtool
+    state: absent
+  check_mode: true
+  register: pkgng_example7_cleanup
 
-    - name: Ensure pkgng autoremove works correctly
-      ansible.builtin.assert:
-        that:
-          - pkgng_example7_prepare_install is changed
-          - "'autoremoved' is in(pkgng_example7.msg)"
-          - pkgng_example7_cleanup is not changed
+- name: Ensure pkgng autoremove works correctly
+  ansible.builtin.assert:
+    that:
+      - pkgng_example7_prepare_install is changed
+      - "'autoremoved' is in(pkgng_example7.msg)"
+      - pkgng_example7_cleanup is not changed
 
 ##
 ## pkgng - example - single annotations
@@ -534,24 +527,6 @@
 ## pkgng - example - Install single package in jail
 ##
 - name: Test within jail
-  # NOTE: FreeBSD 13.5 fails to update the package catalogue for unknown reasons (someone with FreeBSD
-  #       knowledge has to take a look)
-  #
-  # NOTE: FreeBSD 14.0 fails to update the package catalogue for unknown reasons (someone with FreeBSD
-  #       knowledge has to take a look)
-  #
-  # NOTE: FreeBSD 14.1 fails to update the package catalogue for unknown reasons (someone with FreeBSD
-  #       knowledge has to take a look)
-  #
-  # NOTE: FreeBSD 14.2 fails as well (someone with FreeBSD knowledge has to take a look)
-  #
-  # NOTE: FreeBSD 14.3 fails as well (someone with FreeBSD knowledge has to take a look)
-  #
-  # See also
-  # https://github.com/ansible-collections/community.general/issues/5795
-  when: >-
-    (ansible_facts.distribution_version is version('13.6', '>=') and ansible_facts.distribution_version is version('14.0', '<'))
-    or ansible_facts.distribution_version is version('14.4', '>=')
   block:
     - name: Setup testjail
       ansible.builtin.include_tasks: setup-testjail.yml
