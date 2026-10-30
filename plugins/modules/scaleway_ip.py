@@ -108,24 +108,23 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-data:
-  description: This is only present when O(state=present).
-  returned: when O(state=present)
+scaleway_ip:
+  description:
+    - The IP as returned by the Scaleway API when O(state=present).
+    - When O(state=absent), it does not contain the IP details.
+    - In check mode, a dictionary with a C(status) message describing the change that would be made.
+  returned: success
   type: dict
   sample:
     {
-      "ips": [
-        {
-          "organization": "951df375-e094-4d26-97c1-ba548eeb9c42",
-          "reverse": null,
-          "id": "dd9e8df6-6775-4863-b517-e0b0ee3d7477",
-          "server": {
-            "id": "3f1568ca-b1a2-4e98-b6f7-31a0588157f1",
-            "name": "ansible_tuto-1"
-          },
-          "address": "212.47.232.136"
-        }
-      ]
+      "organization": "951df375-e094-4d26-97c1-ba548eeb9c42",
+      "reverse": null,
+      "id": "dd9e8df6-6775-4863-b517-e0b0ee3d7477",
+      "server": {
+        "id": "3f1568ca-b1a2-4e98-b6f7-31a0588157f1",
+        "name": "ansible_tuto-1"
+      },
+      "address": "212.47.232.136"
     }
 """
 
