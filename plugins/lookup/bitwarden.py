@@ -31,7 +31,10 @@ options:
     default: name
     version_added: 5.7.0
   field:
-    description: Field to fetch. Leave unset to fetch whole response.
+    description:
+      - Field to fetch. Leave unset to fetch whole response.
+      - If matching records are found but none of them has this field, the lookup fails.
+        Pass C(errors='ignore') to the lookup to get an empty result instead.
     type: str
   collection_id:
     description:
