@@ -247,11 +247,12 @@ Changelog Fragments:
 
 - MUST be created for modifications in the productive code (mostly code under `plugins/`)
 - MUST NOT be created for:
-  - New modules or new plugins.
+  - New modules or new plugins, including changes to module utils or plugin utils that only affect the new module or plugin.
+    Changes to those utils that affect previously existing modules or plugins MUST be recorded.
   - Changes touching only documentation, comments, and/or tests.
 - MUST be files in `changelogs/fragments` named as `<PR number>-<some description, possibly matching the branch name>.yml`.
 - MUST have a dict as the top-level element, and the keys MUST be one of: minor_changes, breaking_changes, deprecated_features, removed_features, bugfixes.
-- MUST list, under each top-level element, one entry for each file changed in the PR.
+- MUST list, under each top-level element, one entry for each plugin changed in the PR.
 - MUST use the format:
   ```
     - <component spec> - <description> (<URLs>).
@@ -262,25 +263,32 @@ Changelog Fragments:
     - Module utils (`plugins/module_utils`): "<plugin-name> module utils"
     - Plugin utils (`plugins/plugin_utils`): "<plugin-name> plugin utils"
     - All other plugins (`plugins/<PLUGIN_TYPE>/`): "<plugin-name> <PLUGIN_TYPE> plugin"
-    - Plugin filenames starting with `_` are not to be added to the changelog fragment
-  - The description MUST be concise — one sentence stating what changed, from the user's perspective.
+    - Plugin filenames starting with `_` are not to be added to the changelog fragment, except for module utils
+      and plugin utils whose change affects previously existing modules or plugins (e.g. "_ipa module utils")
+  - The description MUST be a **single short sentence** stating what changed, from the user's perspective.
     Do NOT explain why the change was made, how it was implemented, or what Python constructs were used. Do not provide examples of values.
     The audience is end users and operators, not developers; avoid implementation details.
-    Exception: if the mechanism itself is directly relevant to the user (e.g. a new retry behavior
-    that affects timing or side effects), a brief mention is acceptable — but only if it adds real value.
     No need to provide details that can be found in the issue or in the PR.
     That content should be in RST format, so for example symbol names must be enclosed in double back ticks, as in "``symbol``".
     Use American English spelling (e.g. "behavior" not "behaviour", "customize" not "customise").
-    Description must start with lower-case - do not capitalize it.
-  - The URLs - the URL of the current PR and, if the PR fixes one or more issues, the URLs of those issues as well.
-    Preferably the issues before the PR. The URLs must be separated with `, `.
-    Do not create an issue for the PR after creating the PR.
+    Description must start with lower-case - do not capitalize the first word.
+    Acronyms are always written in upper-case, anywhere in the description, including as the first word (e.g. "API", "URL").
+    If the description contains `: `, quote the entire entry to prevent YAML errors.
+  - The URLs - **every entry MUST include the full URL of the PR itself**, no exceptions.
+    An entry without the PR URL is invalid, even if it links one or more issues.
+    If the PR fixes one or more issues, the URLs of those issues MUST be included as well, preferably before the PR URL.
+    The URLs must be separated with `, `. For example:
+    ```yaml
+    bugfixes:
+      - xfconf - fix idempotency for list values (https://github.com/ansible-collections/community.general/issues/1234, https://github.com/ansible-collections/community.general/pull/5678).
+    ```
 - SHOULD NOT mix `bugfixes` with other changes: fixes are backported and no new features should come along
 - SHOULD NOT mix `deprecated_features` with other changes
 
 
 Given the fact that the PR number is required for the file name and for the URLs part of the entry,
 the fragment must be generated (then committed and pushed) after the PR is first created.
+Do not write the fragment before the PR exists, and never leave out the PR URL or use a placeholder for it.
 
 After drafting a changelog fragment, always present it to the user for review and explicit
 approval before committing or pushing it.
@@ -359,6 +367,7 @@ approval before committing or pushing it.
 - PR title should use single backticks for terms like commands, variables, functions, etc. E.g. "xfconf: use command `xfconf-query`"
 - PR title may have a prefix indicating it is a work in progress. E.g. "[WIP] xfconf: use command `xfconf-query`"
 - If the PR fixes issues, add one line with `Fixes #<issue-number>` for each issue being solved to the PR description
+- Do not create an issue for the PR after creating the PR.
 - Do not place GitHub closing keywords (`close`, `fix`, `resolve` and their variants) right before an issue reference
   unless the PR fixes that issue: GitHub links the issue even if the sentence negates it (e.g. "does not close #1234").
   Write "issue #1234" instead.
