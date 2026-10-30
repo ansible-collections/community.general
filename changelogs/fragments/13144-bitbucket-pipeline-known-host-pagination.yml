@@ -1,0 +1,2 @@
+bugfixes:
+  - bitbucket_pipeline_known_host - fix failure when looking up a known host that is not on the first page of results (https://github.com/ansible-collections/community.general/issues/8655, https://github.com/ansible-collections/community.general/pull/13144).
