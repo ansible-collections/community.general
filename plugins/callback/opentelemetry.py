@@ -179,7 +179,6 @@ class TaskData:
         self.start = time_ns()
         self.action = action
         self.args = args
-        self.dump = None
 
     def add_host(self, host: HostData) -> None:
         if host.uuid in self.host_data:
@@ -187,7 +186,7 @@ class TaskData:
                 # concatenate task include output from multiple items
                 host.result = f"{self.host_data[host.uuid].result}\n{host.result}"
             else:
-                self.host_data[host.uuid].update(host.status, host.result)
+                self.host_data[host.uuid].update(host.status, host.result, host.dump)
                 return
 
         self.host_data[host.uuid] = host
@@ -198,17 +197,19 @@ class HostData:
     Data about an individual host.
     """
 
-    def __init__(self, uuid: str, name: str, status: str, result=None) -> None:
+    def __init__(self, uuid: str, name: str, status: str, result=None, dump: str = "") -> None:
         self.uuid = uuid
         self.name = name
         self.status = status
         self.result = result
+        self.dump = dump
         self.finish: int | None = None
         self.start = time_ns()
 
-    def update(self, status: str, result) -> None:
+    def update(self, status: str, result, dump: str) -> None:
         self.status = status
         self.result = result
+        self.dump = dump
         self.finish = time_ns()
 
 
@@ -266,8 +267,7 @@ class OpenTelemetrySource:
 
         task = tasks_data[task_uuid]
 
-        task.dump = dump
-        task.add_host(HostData(host_uuid, host_name, status, result))
+        task.add_host(HostData(host_uuid, host_name, status, result, dump))
 
     def generate_distributed_traces(
         self,
@@ -392,7 +392,7 @@ class OpenTelemetrySource:
         # Send logs
         if not disable_logs:
             # This will avoid populating span attributes to the logs
-            span.add_event(task_data.dump, attributes={} if disable_attributes_in_logs else attributes)
+            span.add_event(host_data.dump, attributes={} if disable_attributes_in_logs else attributes)
         # Close span always
         span.end(end_time=host_data.finish)
 
