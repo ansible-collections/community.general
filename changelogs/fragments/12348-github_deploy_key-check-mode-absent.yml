@@ -1,0 +1,2 @@
+bugfixes:
+  - github_deploy_key - do not delete an existing deploy key when running with ``state=absent`` in check mode (https://github.com/ansible-collections/community.general/issues/12348).
