@@ -66,6 +66,7 @@ def test_absent_check_mode_existing_key_is_not_deleted(fetch_url_mock):
             github_deploy_key.main()
 
     assert exc.value.args[0]["changed"] is True
+    assert exc.value.args[0]["id"] == "42"
     methods = [call.kwargs.get("method") for call in fetch_url_mock.call_args_list]
     assert "DELETE" not in methods
     assert methods == ["GET"]
@@ -79,6 +80,7 @@ def test_absent_check_mode_missing_key(fetch_url_mock):
             github_deploy_key.main()
 
     assert exc.value.args[0]["changed"] is False
+    assert "id" not in exc.value.args[0]
     methods = [call.kwargs.get("method") for call in fetch_url_mock.call_args_list]
     assert "DELETE" not in methods
 
@@ -91,5 +93,6 @@ def test_absent_deletes_existing_key(fetch_url_mock):
             github_deploy_key.main()
 
     assert exc.value.args[0]["changed"] is True
+    assert exc.value.args[0]["id"] == "42"
     assert fetch_url_mock.call_args_list[-1].kwargs["method"] == "DELETE"
     assert fetch_url_mock.call_args_list[-1].args[1].endswith("/repos/ansible/example/keys/42")
