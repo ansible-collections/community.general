@@ -169,6 +169,18 @@ def payload_from_wished_ip(wished_ip):
     return {k: v for k, v in wished_ip.items() if k != "id" and v is not None}
 
 
+def update_ip(api, ip_id, patch_payload, error_msg="Error during IP attributes update"):
+    response = api.patch(path=f"ips/{ip_id}", data=patch_payload)
+
+    if not response.ok:
+        msg = f"{error_msg}: [{response.status_code}: {response.json['message']}]"
+        if response.json.get("details"):
+            msg += f" {response.json['details']}"
+        api.module.fail_json(msg=msg)
+
+    return response.json["ip"]
+
+
 def present_strategy(api, wished_ip):
     changed = False
 
@@ -184,13 +196,25 @@ def present_strategy(api, wished_ip):
         if api.module.check_mode:
             return changed, {"status": "An IP would be created."}
 
-        # Create IP
-        creation_response = api.post("/ips", data=payload_from_wished_ip(wished_ip))
+        # Create IP - the API does not accept reverse on creation, so it is set afterwards
+        creation_payload = payload_from_wished_ip(wished_ip)
+        reverse = creation_payload.pop("reverse", None)
+        creation_response = api.post("/ips", data=creation_payload)
 
         if not creation_response.ok:
             msg = f"Error during ip creation: {creation_response.info['msg']}: '{creation_response.json['message']}' ({creation_response.json})"
             api.module.fail_json(msg=msg)
-        return changed, creation_response.json["ip"]
+
+        created_ip = creation_response.json["ip"]
+        if reverse is None:
+            return changed, created_ip
+
+        return changed, update_ip(
+            api,
+            created_ip["id"],
+            {"reverse": reverse},
+            error_msg=f"IP {created_ip['id']} created, but error during IP attributes update",
+        )
 
     target_ip = ip_lookup[wished_ip["id"]]
     patch_payload = ip_attributes_should_be_changed(api=api, target_ip=target_ip, wished_ip=wished_ip)
@@ -202,14 +226,7 @@ def present_strategy(api, wished_ip):
     if api.module.check_mode:
         return changed, {"status": "IP attributes would be changed."}
 
-    ip_patch_response = api.patch(path=f"ips/{target_ip['id']}", data=patch_payload)
-
-    if not ip_patch_response.ok:
-        api.module.fail_json(
-            msg=f"Error during IP attributes update: [{ip_patch_response.status_code}: {ip_patch_response.json['message']}]"
-        )
-
-    return changed, ip_patch_response.json["ip"]
+    return changed, update_ip(api, target_ip["id"], patch_payload)
 
 
 def absent_strategy(api, wished_ip):
