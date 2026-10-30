@@ -64,6 +64,8 @@ def update_azp_config(session: nox.Session) -> None:
         "update-azp-config",
         "--min-ansible-core",
         "2.19",
+        "--exclude-tags",
+        "heavy",
         "--extra-session",
         '{"group": "Sanity", "title": "Extra sanity tests", "session": "extra-sanity-tests"}',
     ]
