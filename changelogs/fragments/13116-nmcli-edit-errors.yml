@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - fail when the connection editor reports an error instead of reporting a change (https://github.com/ansible-collections/community.general/issues/9091, https://github.com/ansible-collections/community.general/pull/13116).
