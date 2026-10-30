@@ -22,18 +22,10 @@
     name: ezjail
 
 - name: Configure ezjail to use http
-  when: ansible_facts.distribution_version is version('11.01', '>')
   ansible.builtin.lineinfile:
     dest: /usr/local/etc/ezjail.conf
     regexp: ^ezjail_ftphost
     line: ezjail_ftphost=http://ftp.freebsd.org
-
-- name: Configure ezjail to use archive for old freebsd releases
-  when: ansible_facts.distribution_version is version('11.01', '<=')
-  ansible.builtin.lineinfile:
-    dest: /usr/local/etc/ezjail.conf
-    regexp: ^ezjail_ftphost
-    line: ezjail_ftphost=http://ftp-archive.freebsd.org
 
 - name: Start ezjail
   ignore_errors: true
