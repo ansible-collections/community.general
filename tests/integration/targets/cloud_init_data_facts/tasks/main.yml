@@ -24,12 +24,15 @@
   # https://bugs.launchpad.net/ubuntu/+source/ureadahead/+bug/997838
   when:
     - not (ansible_facts.os_family == "Suse")
-    - not (ansible_facts.distribution == 'Archlinux')  # TODO: package seems to be broken, cannot be downloaded from mirrors?
-    - not (ansible_facts.distribution == 'Alpine')  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
-    - not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version|int == 13)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
-    - not (ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version|int >= 43)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
-    - not (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version|int >= 26)  # TODO: not sure what's wrong here, the module doesn't return what the tests expect
   block:
+    - name: setup install cloud-init (Arch Linux)
+      community.general.pacman:
+        name:
+          - cloud-init
+          - udev
+        extra_args: "--overwrite '*'"
+      when: ansible_facts.distribution == 'Archlinux'
+
     - name: setup install cloud-init
       ansible.builtin.package:
         name:
@@ -42,10 +45,14 @@
         state: present
       when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version|int >= 37
 
+    - name: setup cloud-init to not probe the cloud platform the tests are running on
+      ansible.builtin.copy:
+        dest: /etc/cloud/cloud.cfg.d/99_ansible_test.cfg
+        content: |
+          datasource_list: [None]
+
     - name: setup run cloud-init
-      ansible.builtin.service:
-        name: cloud-init-local
-        state: restarted
+      ansible.builtin.command: cloud-init init --local
 
     - name: test gather cloud-init facts in check mode
       community.general.cloud_init_data_facts:
