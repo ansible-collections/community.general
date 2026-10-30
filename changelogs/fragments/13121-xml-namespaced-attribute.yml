@@ -1,0 +1,2 @@
+bugfixes:
+  - xml - fix crash and idempotency of namespaced ``attribute`` values (https://github.com/ansible-collections/community.general/issues/10683, https://github.com/ansible-collections/community.general/pull/13121).
