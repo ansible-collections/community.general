@@ -151,7 +151,7 @@ class Sysrc(StateModuleHelper):
     def _modify(self, op, changed):
         (rc, out, err) = self._sysrc(f"{self.vars.name}{op}={self.vars.delim}{self.vars.value}")
         if out.startswith(f"{self.vars.name}:"):
-            return changed(out.split(" -> ")[1].strip().split(self.vars.delim))
+            return changed(out.split(" -> ", 1)[1].rstrip("\n").split(self.vars.delim))
 
         return False
 
