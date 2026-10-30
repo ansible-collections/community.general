@@ -1,0 +1,97 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# This test represents the behavior described in
+# https://github.com/ansible-collections/community.general/issues/3510:
+# with ignore_configcheck, disabling a module must not be skipped just because
+# apache2ctl -M fails, for a reason unrelated to the module being changed.
+
+- name: enable headers module, recording its original state
+  community.general.apache2_module:
+    name: headers
+    state: present
+  register: headers_first_enable
+
+- name: disable rewrite module, recording its original state
+  community.general.apache2_module:
+    name: rewrite
+    state: absent
+    force: true
+  register: rewrite_first_disable
+
+- name: add a site that requires rewrite, breaking the config for reasons unrelated to headers
+  ansible.builtin.copy:
+    dest: /etc/apache2/sites-enabled/999-3510-broken.conf
+    content: |
+      RewriteEngine On
+    mode: "0644"
+
+- name: confirm the config is indeed broken
+  ansible.builtin.command: apache2ctl -M
+  register: broken_check_3510
+  failed_when: false
+  changed_when: false
+
+- name: sanity check that the injected site really broke the config
+  ansible.builtin.assert:
+    that:
+      - broken_check_3510.rc != 0
+
+- name: disable headers module while the config is broken, in check mode
+  community.general.apache2_module:
+    name: headers
+    state: absent
+    ignore_configcheck: true
+  check_mode: true
+  register: disable_headers_broken_config_check
+
+- name: disable headers module while the config is broken for an unrelated reason
+  community.general.apache2_module:
+    name: headers
+    state: absent
+    ignore_configcheck: true
+  register: disable_headers_broken_config
+
+- name: check whether headers is still enabled
+  ansible.builtin.stat:
+    path: /etc/apache2/mods-enabled/headers.load
+  register: headers_load_after_disable
+
+- name: ensure disabling headers took effect despite the unrelated broken config
+  ansible.builtin.assert:
+    that:
+      - disable_headers_broken_config_check is changed
+      - disable_headers_broken_config is succeeded
+      - disable_headers_broken_config is changed
+      - not headers_load_after_disable.stat.exists
+
+- name: disable headers module again, idempotency check
+  community.general.apache2_module:
+    name: headers
+    state: absent
+    ignore_configcheck: true
+  register: disable_headers_broken_config_again
+
+- name: ensure idempotency holds despite the unrelated broken config
+  ansible.builtin.assert:
+    that:
+      - disable_headers_broken_config_again is succeeded
+      - disable_headers_broken_config_again is not changed
+
+- name: remove the injected broken site
+  ansible.builtin.file:
+    path: /etc/apache2/sites-enabled/999-3510-broken.conf
+    state: absent
+
+- name: restore headers module to its original state
+  community.general.apache2_module:
+    name: headers
+    state: present
+  when: headers_first_enable is not changed
+
+- name: restore rewrite module to its original state
+  community.general.apache2_module:
+    name: rewrite
+    state: present
+  when: rewrite_first_disable is changed

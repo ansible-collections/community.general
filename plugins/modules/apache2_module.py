@@ -19,7 +19,10 @@ extends_documentation_fragment:
   - community.general._attributes
 attributes:
   check_mode:
-    support: full
+    support: partial
+    details:
+      - When O(ignore_configcheck=true) and C(apache2ctl -M) fails, the current state of the module cannot be determined,
+        and check mode always reports a change.
   diff_mode:
     support: none
 options:
@@ -208,8 +211,9 @@ def _set_state(module, state):
     a2mod_binary = {"present": "a2enmod", "absent": "a2dismod"}[state]
     success_msg = f"Module {name} {state_string}"
 
-    currently_enabled, _configcheck_failed = _module_is_enabled(module)
-    if currently_enabled != want_enabled:
+    currently_enabled, initial_configcheck_failed = _module_is_enabled(module)
+    # if apache2ctl -M failed, the current state is unknown and a2mod_binary must run to settle it
+    if initial_configcheck_failed or currently_enabled != want_enabled:
         if module.check_mode:
             module.exit_json(changed=True, result=success_msg)
 
@@ -236,14 +240,15 @@ def _set_state(module, state):
             )
 
         now_enabled, configcheck_failed = _module_is_enabled(module)
-        if now_enabled == want_enabled:
-            module.exit_json(changed=True, result=success_msg)
-        elif configcheck_failed:
-            # apache2ctl -M could not confirm the new state because the configuration
-            # is broken for a reason unrelated to this module. Since a2mod_binary
-            # itself succeeded above, fall back to its own wording to tell whether
-            # this was a real change.
-            changed = f"already {state_string}" not in stdout
+        if configcheck_failed or now_enabled == want_enabled:
+            if initial_configcheck_failed or configcheck_failed:
+                # apache2ctl -M could not confirm the previous or the new state because the
+                # configuration is broken for a reason unrelated to this module. Since
+                # a2mod_binary itself succeeded above, fall back to its own wording to tell
+                # whether this was a real change.
+                changed = f"already {state_string}" not in stdout
+            else:
+                changed = True
             module.exit_json(changed=changed, result=success_msg)
         else:
             msg = (

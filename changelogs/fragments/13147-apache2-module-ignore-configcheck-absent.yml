@@ -1,0 +1,3 @@
+bugfixes:
+  - apache2_module - determine ``changed`` from the output of ``a2enmod``/``a2dismod`` when ``ignore_configcheck=true`` and the Apache configuration check fails (https://github.com/ansible-collections/community.general/issues/3510, https://github.com/ansible-collections/community.general/pull/13147).
+  - apache2_module - fix ``state=absent`` doing nothing when ``ignore_configcheck=true`` and the Apache configuration check fails (https://github.com/ansible-collections/community.general/issues/3510, https://github.com/ansible-collections/community.general/pull/13147).

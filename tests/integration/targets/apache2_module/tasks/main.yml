@@ -41,3 +41,6 @@
 
     - name: include unrelated broken config test
       ansible.builtin.include_tasks: 4592-ignore-configcheck-unrelated-broken-config.yml
+
+    - name: include disable with broken config test
+      ansible.builtin.include_tasks: 3510-ignore-configcheck-disable-broken-config.yml
