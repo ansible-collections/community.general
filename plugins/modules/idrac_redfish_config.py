@@ -162,6 +162,33 @@ from ansible_collections.community.general.plugins.module_utils._redfish_utils i
 
 
 class IdracRedfishUtils(RedfishUtils):
+    def get_attributes_uri(self, command):
+        command_attributes_id_map = {
+            "SetManagerAttributes": self.manager_uri.rstrip("/").split("/")[-1],
+            "SetLifecycleControllerAttributes": "LifecycleController.Embedded.1",
+            "SetSystemAttributes": "System.Embedded.1",
+        }
+        legacy_attributes_uri_map = {
+            "SetManagerAttributes": f"{self.manager_uri}/Attributes",
+            "SetLifecycleControllerAttributes": "/redfish/v1/Managers/LifecycleController.Embedded.1/Attributes",
+            "SetSystemAttributes": "/redfish/v1/Managers/System.Embedded.1/Attributes",
+        }
+
+        response = self.get_request(f"{self.root_uri}{self.manager_uri}")
+        if response["ret"] is False:
+            return response
+        data = response["data"]
+
+        # iDRAC10 only exposes the attributes through the links in the Dell OEM extension of the Manager resource
+        attributes_id = command_attributes_id_map[command]
+        for member in data.get("Links", {}).get("Oem", {}).get("Dell", {}).get("DellAttributes", []):
+            uri = member["@odata.id"]
+            if uri.rstrip("/").split("/")[-1] == attributes_id:
+                return {"ret": True, "uri": uri}
+
+        # Older iDRAC firmware may not provide those links
+        return {"ret": True, "uri": legacy_attributes_uri_map[command]}
+
     def set_manager_attributes(self, command):
         result = {}
         required_arg_spec = {"manager_attributes": {"required": True}}
@@ -173,12 +200,10 @@ class IdracRedfishUtils(RedfishUtils):
             self.module.fail_json(msg=f"{e}")
 
         key = "Attributes"
-        command_manager_attributes_uri_map = {
-            "SetManagerAttributes": self.manager_uri,
-            "SetLifecycleControllerAttributes": "/redfish/v1/Managers/LifecycleController.Embedded.1",
-            "SetSystemAttributes": "/redfish/v1/Managers/System.Embedded.1",
-        }
-        manager_uri = command_manager_attributes_uri_map.get(command, self.manager_uri)
+        response = self.get_attributes_uri(command)
+        if response["ret"] is False:
+            return response
+        attributes_uri = response["uri"]
 
         attributes = self.module.params["manager_attributes"]
 
@@ -187,7 +212,7 @@ class IdracRedfishUtils(RedfishUtils):
         attrs_bad = {}  # Store attrs which were not found in the system
 
         # Search for key entry and extract URI from it
-        response = self.get_request(f"{self.root_uri}{manager_uri}/{key}")
+        response = self.get_request(f"{self.root_uri}{attributes_uri}")
         if response["ret"] is False:
             return response
         result["ret"] = True
@@ -223,7 +248,7 @@ class IdracRedfishUtils(RedfishUtils):
             }
 
         payload = {"Attributes": attrs_to_patch}
-        response = self.patch_request(f"{self.root_uri}{manager_uri}/{key}", payload)
+        response = self.patch_request(f"{self.root_uri}{attributes_uri}", payload)
         if response["ret"] is False:
             return response
 
