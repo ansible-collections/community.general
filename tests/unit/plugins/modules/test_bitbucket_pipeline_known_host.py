@@ -4,12 +4,15 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import pytest
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import (
     AnsibleExitJson,
     ModuleTestCase,
+    exit_json,
+    fail_json,
     set_module_args,
 )
 
@@ -216,3 +219,78 @@ class TestBucketPipelineKnownHostModule(ModuleTestCase):
 
             self.assertEqual(delete_known_host_mock.call_count, 0)
             self.assertEqual(exec_info.exception.args[0]["changed"], True)
+
+
+KNOWN_HOSTS_URL = "https://api.bitbucket.org/2.0/repositories/name/repo/pipelines_config/ssh/known_hosts/"
+INTERNAL_NEXT_URL = (
+    "http://bitbucket-pipelines.prod.public.atl-paas.net/rest/1.0/accounts/acc/repositories/repo/ssh/known_hosts"
+    "?page=2&pagelen=10"
+)
+
+
+def known_host(hostname):
+    return {
+        "type": "pipeline_known_host",
+        "uuid": f"{{{hostname}-uuid}}",
+        "hostname": hostname,
+        "public_key": {"type": "pipeline_ssh_public_key", "key_type": "ssh-rsa", "key": "AAAA"},
+    }
+
+
+@pytest.fixture
+def module_args():
+    return {
+        "user": "ABC",
+        "password": "XXX",
+        "workspace": "name",
+        "repository": "repo",
+        "name": "example.com",
+        "key": "ssh-rsa public",
+        "state": "present",
+    }
+
+
+@pytest.fixture
+def request_mock(mocker):
+    mocker.patch.multiple(AnsibleModule, exit_json=exit_json, fail_json=fail_json)
+    return mocker.patch.object(BitbucketHelper, "request")
+
+
+def test_find_known_host_on_second_page(request_mock, module_args):
+    request_mock.side_effect = [
+        (dict(status=200), {"values": [known_host("other.com")], "page": 1, "next": INTERNAL_NEXT_URL}),
+        (dict(status=200), {"values": [known_host("example.com")], "page": 2}),
+    ]
+
+    with set_module_args(module_args):
+        with pytest.raises(AnsibleExitJson) as exc:
+            bitbucket_pipeline_known_host.main()
+
+    assert exc.value.args[0]["changed"] is False
+    assert request_mock.call_args_list == [
+        call(api_url=f"{KNOWN_HOSTS_URL}?page=1", method="GET"),
+        call(api_url=f"{KNOWN_HOSTS_URL}?page=2", method="GET"),
+    ]
+
+
+def test_create_known_host_absent_from_all_pages(request_mock, module_args):
+    request_mock.side_effect = [
+        (dict(status=200), {"values": [known_host("other.com")], "page": 1, "next": INTERNAL_NEXT_URL}),
+        (dict(status=200), {"values": [known_host("another.com")], "page": 2}),
+        (dict(status=201), {}),
+    ]
+
+    with set_module_args(module_args):
+        with pytest.raises(AnsibleExitJson) as exc:
+            bitbucket_pipeline_known_host.main()
+
+    assert exc.value.args[0]["changed"] is True
+    assert request_mock.call_args_list == [
+        call(api_url=f"{KNOWN_HOSTS_URL}?page=1", method="GET"),
+        call(api_url=f"{KNOWN_HOSTS_URL}?page=2", method="GET"),
+        call(
+            api_url=KNOWN_HOSTS_URL,
+            method="POST",
+            data={"hostname": "example.com", "public_key": {"key_type": "ssh-rsa", "key": "public"}},
+        ),
+    ]

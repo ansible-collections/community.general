@@ -135,17 +135,17 @@ def get_existing_known_host(module, bitbucket):
             },
         }
     """
-    content = {
-        "next": BITBUCKET_API_ENDPOINTS["known-host-list"].format(
-            workspace=module.params["workspace"],
-            repo_slug=module.params["repository"],
-        )
-    }
+    known_hosts_url = BITBUCKET_API_ENDPOINTS["known-host-list"].format(
+        workspace=module.params["workspace"],
+        repo_slug=module.params["repository"],
+    )
 
-    # Look through all response pages in search of hostname we need
-    while "next" in content:
+    # Look through all response pages in search of hostname we need.
+    # The "next" link returned by the API points to an internal host, so the page URLs are built here instead.
+    page = 1
+    while True:
         info, content = bitbucket.request(
-            api_url=content["next"],
+            api_url=f"{known_hosts_url}?page={page}",
             method="GET",
         )
 
@@ -160,7 +160,10 @@ def get_existing_known_host(module, bitbucket):
         if host is not None:
             return host
 
-    return None
+        if "next" not in content:
+            return None
+
+        page += 1
 
 
 def get_host_key(module, hostname):
