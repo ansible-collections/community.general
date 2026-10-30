@@ -1,0 +1,4 @@
+minor_changes:
+  - pacemaker_cluster, pacemaker_resource - maintenance-mode detection and clone-idempotency detection now parse structured ``pcs ... --output-format=json`` output (pcs 0.11.6 or newer) instead of scraping plaintext, with a plaintext fallback retained for older ``pcs`` (https://github.com/ansible-collections/community.general/pull/13111).
+deprecated_features:
+  - pacemaker_cluster, pacemaker_resource - parsing non-JSON ``pcs`` output (``pcs`` older than 0.11.6) is deprecated and the plaintext fallback will be removed in a future release; upgrade ``pcs`` to 0.11.6 or newer (https://github.com/ansible-collections/community.general/pull/13111).
