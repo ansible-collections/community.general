@@ -1320,6 +1320,14 @@ TESTCASE_SECURE_WIRELESS = [
     }
 ]
 
+TESTCASE_SECURE_WIRELESS_EDIT_SAVE_ERROR_OUTPUT = """\
+nmcli> set 802-11-wireless-security.psk VERY_SECURE_PASSWORD
+nmcli> save
+Error: Failed to save 'non_existent_nw_device' (ef1a1d2e-6f92-4670-b114-594bf1c8d69e) connection: \
+802-11-wireless-security.psk: property is invalid
+nmcli> quit
+"""
+
 TESTCASE_SECURE_WIRELESS_LIST_AS_STRING = [
     {
         "type": "wifi",
@@ -2231,6 +2239,34 @@ def mocked_secure_wireless_psk_flags_modify(mocker):
             (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
             (0, "", ""),
             (0, "", ""),
+        ),
+    )
+
+
+@pytest.fixture
+def mocked_secure_wireless_create_edit_failure(mocker):
+    mocker_set(
+        mocker,
+        execute_return=None,
+        execute_side_effect=(
+            (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+            (0, "", ""),
+            (0, TESTCASE_SECURE_WIRELESS_EDIT_SAVE_ERROR_OUTPUT, ""),
+        ),
+    )
+
+
+@pytest.fixture
+def mocked_secure_wireless_modify_edit_failure(mocker):
+    mocker_set(
+        mocker,
+        connection_exists=True,
+        execute_return=None,
+        execute_side_effect=(
+            (0, TESTCASE_DEFAULT_SECURE_WIRELESS_SHOW_OUTPUT, ""),
+            (0, "", ""),
+            (0, "", ""),
+            (0, TESTCASE_SECURE_WIRELESS_EDIT_SAVE_ERROR_OUTPUT, ""),
         ),
     )
 
@@ -4461,6 +4497,48 @@ def test_modify_secure_wireless_psk_flags(mocked_secure_wireless_psk_flags_modif
     results = json.loads(out)
     assert not results.get("failed")
     assert results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_SECURE_WIRELESS, indirect=["patch_ansible_module"])
+def test_create_secure_wireless_edit_failure(mocked_secure_wireless_create_edit_failure, capfd):
+    """
+    Test : Create secure wireless connection w/failure to save secrets in the connection editor
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 3
+    edit_args, edit_kw = nmcli.Nmcli.execute_command.call_args_list[2]
+    assert edit_args[0][:4] == ["/usr/bin/nmcli", "con", "edit", "non_existent_nw_device"]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert results.get("failed")
+    assert results["rc"] == 1
+    assert "802-11-wireless-security.psk: property is invalid" in results["msg"]
+    assert "changed" not in results
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_SECURE_WIRELESS, indirect=["patch_ansible_module"])
+def test_modify_secure_wireless_edit_failure(mocked_secure_wireless_modify_edit_failure, capfd):
+    """
+    Test : Modify secure wireless connection w/failure to save secrets in the connection editor
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 4
+    edit_args, edit_kw = nmcli.Nmcli.execute_command.call_args_list[3]
+    assert edit_args[0][:4] == ["/usr/bin/nmcli", "con", "edit", "non_existent_nw_device"]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert results.get("failed")
+    assert results["rc"] == 1
+    assert "802-11-wireless-security.psk: property is invalid" in results["msg"]
+    assert "changed" not in results
 
 
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_DUMMY_STATIC, indirect=["patch_ansible_module"])
