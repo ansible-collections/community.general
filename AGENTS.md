@@ -252,7 +252,7 @@ Changelog Fragments:
   - Changes touching only documentation, comments, and/or tests.
 - MUST be files in `changelogs/fragments` named as `<PR number>-<some description, possibly matching the branch name>.yml`.
 - MUST have a dict as the top-level element, and the keys MUST be one of: minor_changes, breaking_changes, deprecated_features, removed_features, bugfixes.
-- MUST list, under each top-level element, one entry for each plugin changed in the PR.
+- MUST list, under each top-level element, one entry for each plugin changed or affected by the PR.
 - MUST use the format:
   ```
     - <component spec> - <description> (<URLs>).
@@ -263,8 +263,14 @@ Changelog Fragments:
     - Module utils (`plugins/module_utils`): "<plugin-name> module utils"
     - Plugin utils (`plugins/plugin_utils`): "<plugin-name> plugin utils"
     - All other plugins (`plugins/<PLUGIN_TYPE>/`): "<plugin-name> <PLUGIN_TYPE> plugin"
-    - Plugin filenames starting with `_` are not to be added to the changelog fragment, except for module utils
-      and plugin utils whose change affects previously existing modules or plugins (e.g. "_ipa module utils")
+    - Groups of related modules or plugins may share one entry using a wildcard, with exclusions if needed
+      (e.g. "ldap_* modules", "foo_* modules except foo_bar").
+    - Plugin filenames starting with `_` are generally not to be added to the changelog fragment. When a change in such a file
+      affects previously existing modules or plugins:
+      - If the change is relevant to users of those modules or plugins (e.g. it fixes a bug or changes their behavior),
+        add entries for the affected modules or plugins, using wildcards where possible.
+      - If the change is not visible to users (e.g. a refactoring), add a single entry for the utils file instead
+        (e.g. "_cmd_runner module utils").
   - The description MUST be a **single short sentence** stating what changed, from the user's perspective.
     Do NOT explain why the change was made, how it was implemented, or what Python constructs were used. Do not provide examples of values.
     The audience is end users and operators, not developers; avoid implementation details.
