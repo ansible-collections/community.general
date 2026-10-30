@@ -1,0 +1,2 @@
+bugfixes:
+  - zpool - fix idempotency of ``vdevs`` with short device names, symbolic links, partitions, multi-disk stripes, and role groups (https://github.com/ansible-collections/community.general/issues/10771, https://github.com/ansible-collections/community.general/issues/10744, https://github.com/ansible-collections/community.general/pull/12948).
