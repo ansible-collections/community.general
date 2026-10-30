@@ -212,8 +212,10 @@ class PacemakerResource(StateModuleHelper):
         self.vars.set("value", self._get()["out"])
 
     def _process_command_output(self, fail_on_err, ignore_err_msg=""):
+        ignore_msgs = (ignore_err_msg,) if isinstance(ignore_err_msg, str) else tuple(ignore_err_msg)
+
         def process(rc, out, err):
-            if fail_on_err and rc != 0 and err and ignore_err_msg not in err:
+            if fail_on_err and rc != 0 and err and not any(msg in err for msg in ignore_msgs):
                 self.do_raise(f"pcs failed with error (rc={rc}): {err}")
             out = out.rstrip()
             return None if out == "" else out
@@ -258,7 +260,8 @@ class PacemakerResource(StateModuleHelper):
         with self.runner(
             "cli_action state name resource_clone_ids resource_clone_meta",
             output_process=self._process_command_output(
-                not get_pacemaker_maintenance_mode(self.runner), "already a clone resource"
+                not get_pacemaker_maintenance_mode(self.runner),
+                ("already a clone resource", "cannot clone a group that has already been cloned"),
             ),
             check_mode_skip=True,
         ) as ctx:

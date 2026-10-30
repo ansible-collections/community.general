@@ -1,0 +1,2 @@
+bugfixes:
+  - pacemaker_resource - fix non-idempotent behaviour when ``state=cloned`` is applied to a resource or group that is already part of a clone set (https://github.com/ansible-collections/community.general/issues/12217, https://github.com/ansible-collections/community.general/pull/12288).
