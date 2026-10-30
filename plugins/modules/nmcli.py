@@ -2566,7 +2566,12 @@ class Nmcli:
 
     def edit_connection(self):
         commands = self.edit_commands + ["save", "quit"]
-        return self.execute_edit_commands(commands, arguments=[self.conn_name])
+        rc, out, err = self.execute_edit_commands(commands, arguments=[self.conn_name])
+        # the interactive editor exits with 0 even when a command fails, reporting the error on stdout
+        errors = [line for line in out.splitlines() if line.startswith("Error:")]
+        if rc == 0 and errors:
+            rc, err = 1, "\n".join(errors)
+        return rc, out, err
 
     def show_connection(self):
         cmd = [self.nmcli_bin, "--show-secrets", "con", "show", self.conn_name]
