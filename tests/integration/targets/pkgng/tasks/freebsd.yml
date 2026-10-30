@@ -298,7 +298,6 @@
 ##
 ## pkgng - example - autoremove=yes
 ##
-# Test autoremove=yes
 - name: Install GNU autotools
   community.general.pkgng:
     name: autotools
