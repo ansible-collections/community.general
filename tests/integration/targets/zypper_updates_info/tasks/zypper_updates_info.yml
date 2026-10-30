@@ -1,0 +1,123 @@
+---
+# Copyright (c) 2026, Harshvardhan Sharma <harshvardhan.sharma@suse.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: List package updates
+  community.general.zypper_updates_info:
+  register: zypper_updates_info_packages
+
+- name: List needed patches
+  community.general.zypper_updates_info:
+    type: patch
+  register: zypper_updates_info_patches
+
+- name: Verify the listings
+  ansible.builtin.assert:
+    that:
+      - zypper_updates_info_packages is not changed
+      - zypper_updates_info_packages.updates is sequence
+      - zypper_updates_info_patches is not changed
+      - zypper_updates_info_patches.updates is sequence
+
+- name: Provide an update for a test package
+  block:
+    - name: Install rpmbuild
+      community.general.zypper:
+        name: rpmbuild
+        state: present
+
+    - name: Create the build and repository directories
+      ansible.builtin.file:
+        path: "{{ remote_tmp_dir }}/zypper_updates_info/{{ item }}"
+        state: directory
+      loop:
+        - build
+        - repo
+
+    - name: Copy the spec file
+      ansible.builtin.copy:
+        src: empty.spec
+        dest: "{{ remote_tmp_dir }}/zypper_updates_info/empty.spec"
+
+    - name: Build the two versions of the test package
+      ansible.builtin.command: >-
+        rpmbuild -bb
+        --define "_topdir {{ remote_tmp_dir }}/zypper_updates_info/build"
+        --define "_builddir %{_topdir}"
+        --define "_rpmdir %{_topdir}"
+        --define "_srcrpmdir %{_topdir}"
+        --define "_specdir {{ remote_tmp_dir }}/zypper_updates_info"
+        --define "_sourcedir %{_topdir}"
+        --define "empty_version {{ item }}"
+        {{ remote_tmp_dir }}/zypper_updates_info/empty.spec
+      loop:
+        - 1
+        - 2
+
+    - name: Install the old version
+      community.general.zypper:
+        name: "{{ remote_tmp_dir }}/zypper_updates_info/build/noarch/empty-1-0.noarch.rpm"
+        disable_gpg_check: true
+
+    - name: Put the new version into the repository directory
+      ansible.builtin.copy:
+        src: "{{ remote_tmp_dir }}/zypper_updates_info/build/noarch/empty-2-0.noarch.rpm"
+        dest: "{{ remote_tmp_dir }}/zypper_updates_info/repo/"
+        remote_src: true
+
+    - name: Add the repository
+      community.general.zypper_repository:
+        name: zypper_updates_info_test
+        repo: "dir:{{ remote_tmp_dir }}/zypper_updates_info/repo"
+        disable_gpg_check: true
+        state: present
+
+    - name: List package updates
+      community.general.zypper_updates_info:
+      register: zypper_updates_info_update
+
+    - name: List package updates in check mode
+      community.general.zypper_updates_info:
+      register: zypper_updates_info_update_check
+      check_mode: true
+
+    - name: Verify the update is listed
+      ansible.builtin.assert:
+        that:
+          - zypper_updates_info_update is not changed
+          - empty_update | length == 1
+          - empty_update[0].kind == 'package'
+          - empty_update[0].edition == '2-0'
+          - empty_update[0].edition_old == '1-0'
+          - empty_update[0].arch == 'noarch'
+          - empty_update[0].summary == 'Empty RPM'
+          - empty_update[0].repository == 'zypper_updates_info_test'
+          - zypper_updates_info_update_check.updates == zypper_updates_info_update.updates
+      vars:
+        empty_update: "{{ zypper_updates_info_update.updates | selectattr('name', 'equalto', 'empty') | list }}"
+
+    - name: Install the update
+      community.general.zypper:
+        name: empty
+        state: latest
+
+    - name: List package updates again
+      community.general.zypper_updates_info:
+      register: zypper_updates_info_updated
+
+    - name: Verify the update is no longer listed
+      ansible.builtin.assert:
+        that:
+          - zypper_updates_info_updated.updates | selectattr('name', 'equalto', 'empty') | list | length == 0
+
+  always:
+    - name: Remove the repository
+      community.general.zypper_repository:
+        name: zypper_updates_info_test
+        state: absent
+
+    - name: Remove the test package
+      community.general.zypper:
+        name: empty
+        state: absent
