@@ -97,73 +97,39 @@ import os
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
 
-
-def get_xattr_keys(module, path, follow):
-    cmd = [module.get_bin_path("getfattr", True), "--absolute-names"]
-
-    if not follow:
-        cmd.append("-h")
-    cmd.append(path)
-
-    return _run_xattr(module, cmd)
+from ansible_collections.community.general.plugins.module_utils._xattr import (
+    full_key,
+    getfattr_runner,
+    parse_getfattr,
+    setfattr_runner,
+)
 
 
-def get_xattr(module, path, key, follow):
-    cmd = [module.get_bin_path("getfattr", True), "--absolute-names"]
+def get_xattr_keys(module):
+    return _run_xattr(module, getfattr_runner(module), "absolute_names follow path")
 
-    if not follow:
-        cmd.append("-h")
+
+def get_xattr(module, key):
     if key is None:
-        cmd.append("-d")
-    else:
-        cmd.append("-n")
-        cmd.append(key)
-    cmd.append(path)
-
-    return _run_xattr(module, cmd, False)
+        return _run_xattr(module, getfattr_runner(module), "absolute_names follow dump path", False)
+    return _run_xattr(module, getfattr_runner(module), "absolute_names follow attr_name path", False, attr_name=key)
 
 
-def set_xattr(module, path, key, value, follow):
-    cmd = [module.get_bin_path("setfattr", True)]
-    if not follow:
-        cmd.append("-h")
-    cmd.append("-n")
-    cmd.append(key)
-    cmd.append("-v")
-    cmd.append(value)
-    cmd.append(path)
-
-    return _run_xattr(module, cmd)
+def set_xattr(module, key):
+    return _run_xattr(module, setfattr_runner(module), "follow attr_name value path", attr_name=key)
 
 
-def rm_xattr(module, path, key, follow):
-    cmd = [module.get_bin_path("setfattr", True)]
-    if not follow:
-        cmd.append("-h")
-    cmd.append("-x")
-    cmd.append(key)
-    cmd.append(path)
-
-    return _run_xattr(module, cmd, False)
+def rm_xattr(module, key):
+    return _run_xattr(module, setfattr_runner(module), "follow remove path", False, remove=key)
 
 
-def _run_xattr(module, cmd, check_rc=True):
+def _run_xattr(module, runner, args_order, check_rc=True, **kwargs):
     try:
-        (rc, out, err) = module.run_command(cmd, check_rc=check_rc)
+        (rc, out, err) = runner(args_order, check_rc=check_rc).run(**kwargs)
     except Exception as e:
         module.fail_json(msg=f"{e}!")
 
-    # result = {'raw': out}
-    result = {}
-    for line in out.splitlines():
-        if line.startswith("#") or line == "":
-            pass
-        elif "=" in line:
-            (key, val) = line.split("=", 1)
-            result[key] = val.strip('"')
-        else:
-            result[line] = ""
-    return result
+    return parse_getfattr(out)
 
 
 def main():
@@ -178,13 +144,11 @@ def main():
         ),
         supports_check_mode=True,
     )
-    module.run_command_environ_update = {"LANGUAGE": "C", "LC_ALL": "C"}
     path = module.params["path"]
     namespace = module.params["namespace"]
     key = module.params["key"]
     value = module.params["value"]
     state = module.params["state"]
-    follow = module.params["follow"]
 
     if not os.path.exists(path):
         module.fail_json(msg="path not found or not accessible!")
@@ -197,38 +161,33 @@ def main():
         module.fail_json(msg=f"{state} needs a key parameter")
 
     # Prepend the key with the namespace if defined
-    if (
-        key is not None
-        and namespace is not None
-        and len(namespace) > 0
-        and not (namespace == "user" and key.startswith("user."))
-    ):
-        key = f"{namespace}.{key}"
+    if key is not None:
+        key = full_key(namespace, key)
 
     if state == "present" or value is not None:
-        current = get_xattr(module, path, key, follow)
+        current = get_xattr(module, key)
         if current is None or key not in current or value != current[key]:
             if not module.check_mode:
-                res = set_xattr(module, path, key, value, follow)
+                res = set_xattr(module, key)
             changed = True
         res = current
         msg = f"{key} set to {value}"
     elif state == "absent":
-        current = get_xattr(module, path, key, follow)
+        current = get_xattr(module, key)
         if current is not None and key in current:
             if not module.check_mode:
-                res = rm_xattr(module, path, key, follow)
+                res = rm_xattr(module, key)
             changed = True
         res = current
         msg = f"{key} removed"
     elif state == "keys":
-        res = get_xattr_keys(module, path, follow)
+        res = get_xattr_keys(module)
         msg = "returning all keys"
     elif state == "all":
-        res = get_xattr(module, path, None, follow)
+        res = get_xattr(module, None)
         msg = "dumping all"
     else:
-        res = get_xattr(module, path, key, follow)
+        res = get_xattr(module, key)
         msg = f"returning {key}"
 
     module.exit_json(changed=changed, msg=msg, xattr=res)

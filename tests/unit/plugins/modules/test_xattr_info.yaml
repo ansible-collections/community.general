@@ -1,0 +1,170 @@
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+test_cases:
+  - id: all_user_namespace
+    input:
+      path: /tmp/foo
+    output:
+      changed: false
+      xattr:
+        user.bin: 0sAP8=
+        user.empty: ''
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -d, -m, '^user\.', /tmp/foo]
+          environ: *env-def
+          rc: 0
+          out: |
+            # file: /tmp/foo
+            user.bin=0sAP8=
+            user.empty=""
+            user.foo="bar"
+
+          err: ''
+  - id: all_trusted_namespace_no_follow
+    input:
+      path: /tmp/foo
+      namespace: trusted
+      follow: false
+    output:
+      xattr:
+        trusted.glusterfs.volume-id: '0x817b94343f164f199e5b573b4ea1f914'
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -h, -d, -m, '^trusted\.', /tmp/foo]
+          environ: *env-def
+          rc: 0
+          out: |
+            # file: /tmp/foo
+            trusted.glusterfs.volume-id=0x817b94343f164f199e5b573b4ea1f914
+
+          err: ''
+  - id: all_namespaces
+    input:
+      path: /tmp/foo
+      namespace: ''
+    output:
+      xattr:
+        security.selinux: 'unconfined_u:object_r:user_tmp_t:s0'
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -d, -m, '-', /tmp/foo]
+          environ: *env-def
+          rc: 0
+          out: |
+            # file: /tmp/foo
+            security.selinux="unconfined_u:object_r:user_tmp_t:s0"
+            user.foo="bar"
+
+          err: ''
+  - id: all_none_set
+    input:
+      path: /tmp/foo
+    output:
+      xattr: {}
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -d, -m, '^user\.', /tmp/foo]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+  - id: key
+    input:
+      path: /tmp/foo
+      key: foo
+    output:
+      xattr:
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp/foo]
+          environ: *env-def
+          rc: 0
+          out: |
+            # file: /tmp/foo
+            user.foo="bar"
+
+          err: ''
+  - id: key_with_user_prefix
+    input:
+      path: /tmp/foo
+      key: user.foo
+    output:
+      xattr:
+        user.foo: bar
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp/foo]
+          environ: *env-def
+          rc: 0
+          out: |
+            # file: /tmp/foo
+            user.foo="bar"
+
+          err: ''
+  - id: key_trusted_namespace
+    input:
+      path: /mnt/bricks/brick1
+      namespace: trusted
+      key: glusterfs.volume-id
+    output:
+      xattr:
+        trusted.glusterfs.volume-id: '0x817b94343f164f199e5b573b4ea1f914'
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, trusted.glusterfs.volume-id, /mnt/bricks/brick1]
+          environ: *env-def
+          rc: 0
+          out: |
+            # file: /mnt/bricks/brick1
+            trusted.glusterfs.volume-id=0x817b94343f164f199e5b573b4ea1f914
+
+          err: ''
+  - id: key_not_found
+    input:
+      path: /tmp/foo
+      key: nope
+    output:
+      xattr: {}
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.nope, /tmp/foo]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: "/tmp/foo: user.nope: No such attribute\n"
+  - id: key_path_not_found
+    input:
+      path: /tmp/nonexistent
+      key: foo
+    output:
+      failed: true
+      msg: 'getfattr failed: /tmp/nonexistent: user.foo: No such file or directory'
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -n, user.foo, /tmp/nonexistent]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: "/tmp/nonexistent: user.foo: No such file or directory\n"
+  - id: all_path_not_found
+    input:
+      path: /tmp/nonexistent
+    output:
+      failed: true
+      msg: 'getfattr failed: getfattr: /tmp/nonexistent: No such file or directory'
+    mocks:
+      run_command:
+        - command: [/testbin/getfattr, --absolute-names, -d, -m, '^user\.', /tmp/nonexistent]
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: "getfattr: /tmp/nonexistent: No such file or directory\n"

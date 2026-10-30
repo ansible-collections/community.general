@@ -1,0 +1,21 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Setup
+  ansible.builtin.include_tasks: setup.yml
+
+- name: Check availability of xattr support
+  ansible.builtin.command: setfattr -n user.foo -v bar {{ test_file }}
+  ignore_errors: true
+  register: xattr
+
+- name: Test
+  ansible.builtin.include_tasks: test.yml
+  when: xattr is not failed
