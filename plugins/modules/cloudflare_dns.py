@@ -180,6 +180,14 @@ options:
     type: str
     required: true
     aliases: [domain]
+notes:
+  - The Cloudflare API matches the record content case-insensitively when looking up existing records.
+    For O(type=TXT), a record whose value differs from O(value) only in letter case may be considered as already present,
+    and left unchanged, unless O(solo=true). With O(state=absent), such a record is deleted.
+  - Cloudflare stores O(type=TXT) values longer than 255 characters split into several quoted strings.
+    The module may not find an existing record with such a value, so it may fail or report a change on every run.
+  - The Cloudflare API may not support looking up O(type=SRV) records by their content, in which case the module does not find
+    existing records of that type.
 """
 
 EXAMPLES = r"""
@@ -677,7 +685,7 @@ class CloudflareAPI:
         if record:
             query["name"] = record
         if value:
-            query["content"] = value
+            query["content.exact"] = value
         if query:
             api_call += f"?{urlencode(query)}"
 
