@@ -1,0 +1,3 @@
+---
+breaking_changes:
+  - pacemaker_resource, pacemaker_stonith - runtime validation moved from O(state=present) to O(state=enabled). O(state=present) now only mutates the CIB. Setting O(wait) on O(state=present) emits a deprecation warning and has no effect (https://github.com/ansible-collections/community.general/issues/11574, https://github.com/ansible-collections/community.general/pull/12538).

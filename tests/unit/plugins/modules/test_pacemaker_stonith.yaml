@@ -43,11 +43,6 @@ test_cases:
           rc: 0
           out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
           err: ""
-        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
-          environ: *env-def
-          rc: 0
-          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
-          err: ""
   - id: test_present_minimal_input_stonith_exists
     input:
       state: present
@@ -75,11 +70,6 @@ test_cases:
           rc: 0
           out: ""
           err: "Error: 'virtual-stonith' already exists.\n"
-        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
-          environ: *env-def
-          rc: 0
-          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
-          err: ""
         - command: ["/testbin/pcs", stonith, status, virtual-stonith]
           environ: *env-def
           rc: 0
@@ -161,7 +151,7 @@ test_cases:
     output:
       changed: true
       previous_value: "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)"
-      value: "  * virtual-stonith\t(stonith:fence_virt):\t Starting"
+      value: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
     mocks:
       run_command:
         - command: ["/testbin/pcs", stonith, status, virtual-stonith]
@@ -177,7 +167,12 @@ test_cases:
         - command: ["/testbin/pcs", stonith, status, virtual-stonith]
           environ: *env-def
           rc: 0
-          out: "  * virtual-stonith\t(stonith:fence_virt):\t Starting"
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
+          err: ""
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Started"
           err: ""
   - id: test_disable_minimal_input_stonith_not_exists
     input:
@@ -217,6 +212,11 @@ test_cases:
           environ: *env-def
           rc: 0
           out: ""
+          err: ""
+        - command: ["/testbin/pcs", stonith, status, virtual-stonith]
+          environ: *env-def
+          rc: 0
+          out: "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)"
           err: ""
         - command: ["/testbin/pcs", stonith, status, virtual-stonith]
           environ: *env-def

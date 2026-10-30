@@ -22,7 +22,8 @@ UTHelper.from_module(pacemaker_resource, __name__, mocks=[RunCommandMock])
 
 
 # ---------------------------------------------------------------------------
-# Race condition tests: resource starts after one or more Stopped polls
+# Runtime-state assertion tests: state=enabled/disabled own the wait/poll loop.
+# state=present is a configuration state and must NOT poll status after create.
 # ---------------------------------------------------------------------------
 
 NO_MAINTENANCE_OUT = (
@@ -42,23 +43,124 @@ def patch_bin(mocker):
     mocker.patch("ansible.module_utils.basic.AnsibleModule.get_bin_path", mockie)
 
 
+def _run_module(mp, args):
+    mp.setattr(
+        "ansible.module_utils.basic._ANSIBLE_ARGS",
+        json.dumps({"ANSIBLE_MODULE_ARGS": args}).encode(),
+    )
+    mp.setattr("ansible.module_utils.basic._ANSIBLE_PROFILE", "legacy", raising=False)
+    pacemaker_resource.main()
+
+
+def _warning_msg(w):
+    """Return the message text of an Ansible warning.
+
+    New Ansible wraps warnings as dicts with the text at ``event.msg``;
+    old Ansible returns the plain string.
+    """
+    if isinstance(w, dict):
+        return w.get("event", {}).get("msg", "")
+    return w
+
+
 @pytest.mark.usefixtures("patch_bin")
-def test_present_race_condition_stopped_then_started(mocker, capfd):
-    """Resource reports Stopped on the first poll then Started on the second — must succeed."""
+def test_present_does_not_poll_runtime_state(mocker, capfd):
+    """state=present must be a configuration-only change: no status polling after create.
+
+    Previously state=present blocked until the resource reported Started, conflating a
+    CIB mutation with a runtime assertion. This test locks in the corrected semantics.
+    """
     mocker.patch("ansible_collections.community.general.plugins.module_utils._pacemaker.time.sleep")
 
-    # Sequence of run_command calls:
-    # 1. initial _get(): resource status → not found (rc=1)
-    # 2. state_present: property config → no maintenance
-    # 3. state_present: resource create → rc=0
-    # 4. post-create maintenance check → no maintenance
-    # 5. wait_for_resource poll 1: status → Stopped (not yet running)
-    # 6. wait_for_resource poll 2: status → Started
-    # 7. __quit_module__ _get(): status → Started
+    # Expected call sequence with the fix:
+    # 1. initial _get(): pcs resource status → not found (rc=1)
+    # 2. state_present: pcs property config → no maintenance (guards the create idempotency check)
+    # 3. state_present: pcs resource create → rc=0
+    # 4. __quit_module__ _get(): pcs resource status → whatever the current state is (may still be Stopped)
     run_command_calls = [
         (1, "", "Error: resource or tag id 'virtual-ip' not found"),
         (1, NO_MAINTENANCE_OUT, ""),
         (0, "Assumed agent name 'ocf:heartbeat:IPaddr2'", ""),
+        (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped", ""),
+    ]
+
+    def side_effect(self_, **kwargs):
+        return run_command_calls.pop(0)
+
+    mocker.patch("ansible.module_utils.basic.AnsibleModule.run_command", side_effect=side_effect)
+
+    with pytest.raises(SystemExit):
+        with pytest.MonkeyPatch().context() as mp:
+            _run_module(
+                mp,
+                {
+                    "state": "present",
+                    "name": "virtual-ip",
+                    "resource_type": {"resource_name": "IPaddr2"},
+                    "resource_option": ["ip=192.168.2.1"],
+                },
+            )
+
+    out, _err = capfd.readouterr()
+    result = json.loads(out)
+    assert result["changed"] is True
+    assert result.get("failed") is not True
+    # The whole point of the fix: state=present returns without waiting for Started.
+    # Every mock call was consumed; no leftover status polls were needed.
+    assert run_command_calls == []
+
+
+@pytest.mark.usefixtures("patch_bin")
+def test_present_with_wait_emits_deprecation_warning(mocker, capfd):
+    """Setting wait on state=present must trigger a warning; wait is only meaningful for enabled/disabled."""
+    mocker.patch("ansible_collections.community.general.plugins.module_utils._pacemaker.time.sleep")
+
+    run_command_calls = [
+        (1, "", "Error: resource or tag id 'virtual-ip' not found"),
+        (1, NO_MAINTENANCE_OUT, ""),
+        (0, "Assumed agent name 'ocf:heartbeat:IPaddr2'", ""),
+        (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped", ""),
+    ]
+
+    def side_effect(self_, **kwargs):
+        return run_command_calls.pop(0)
+
+    mocker.patch("ansible.module_utils.basic.AnsibleModule.run_command", side_effect=side_effect)
+
+    with pytest.raises(SystemExit):
+        with pytest.MonkeyPatch().context() as mp:
+            _run_module(
+                mp,
+                {
+                    "state": "present",
+                    "name": "virtual-ip",
+                    "resource_type": {"resource_name": "IPaddr2"},
+                    "resource_option": ["ip=192.168.2.1"],
+                    "wait": 30,
+                },
+            )
+
+    out, _err = capfd.readouterr()
+    result = json.loads(out)
+    warnings = result.get("warnings") or []
+    assert any("'wait' parameter has no effect on state='present'" in _warning_msg(w) for w in warnings), warnings
+
+
+@pytest.mark.usefixtures("patch_bin")
+def test_enabled_race_condition_stopped_then_started(mocker, capfd):
+    """state=enabled must poll pcs resource status until Started/Promoted/Unpromoted is seen."""
+    mocker.patch("ansible_collections.community.general.plugins.module_utils._pacemaker.time.sleep")
+
+    # Sequence:
+    # 1. initial _get(): status → Stopped (already exists, currently disabled)
+    # 2. state_enabled: pcs resource enable → rc=0
+    # 3. _wait_for_runtime_state maintenance check: property config → no maintenance
+    # 4. poll 1: status → Stopped (not yet running)
+    # 5. poll 2: status → Started
+    # 6. __quit_module__ _get(): status → Started
+    run_command_calls = [
+        (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)", ""),
+        (0, "", ""),
         (1, NO_MAINTENANCE_OUT, ""),
         (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped", ""),
         (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started", ""),
@@ -72,22 +174,7 @@ def test_present_race_condition_stopped_then_started(mocker, capfd):
 
     with pytest.raises(SystemExit):
         with pytest.MonkeyPatch().context() as mp:
-            mp.setattr(
-                "ansible.module_utils.basic._ANSIBLE_ARGS",
-                json.dumps(
-                    {
-                        "ANSIBLE_MODULE_ARGS": {
-                            "state": "present",
-                            "name": "virtual-ip",
-                            "resource_type": {"resource_name": "IPaddr2"},
-                            "resource_option": ["ip=192.168.2.1"],
-                            "wait": 30,
-                        }
-                    }
-                ).encode(),
-            )
-            mp.setattr("ansible.module_utils.basic._ANSIBLE_PROFILE", "legacy", raising=False)
-            pacemaker_resource.main()
+            _run_module(mp, {"state": "enabled", "name": "virtual-ip", "wait": 30})
 
     out, _err = capfd.readouterr()
     result = json.loads(out)
@@ -97,11 +184,10 @@ def test_present_race_condition_stopped_then_started(mocker, capfd):
 
 
 @pytest.mark.usefixtures("patch_bin")
-def test_present_wait_timeout_raises(mocker, capfd):
-    """Resource never starts within the wait window — must fail with a timeout message."""
+def test_enabled_wait_timeout_raises(mocker, capfd):
+    """state=enabled must fail with a timeout message when the resource never reaches a running state."""
     mocker.patch("ansible_collections.community.general.plugins.module_utils._pacemaker.time.sleep")
 
-    # Simulate time advancing past the deadline immediately on the first poll
     monotonic_values = iter([0.0, 999.0])
     mocker.patch(
         "ansible_collections.community.general.plugins.module_utils._pacemaker.time.monotonic",
@@ -109,9 +195,8 @@ def test_present_wait_timeout_raises(mocker, capfd):
     )
 
     run_command_calls = [
-        (1, "", "Error: resource or tag id 'virtual-ip' not found"),
-        (1, NO_MAINTENANCE_OUT, ""),
-        (0, "Assumed agent name 'ocf:heartbeat:IPaddr2'", ""),
+        (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)", ""),
+        (0, "", ""),
         (1, NO_MAINTENANCE_OUT, ""),
         (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped", ""),
     ]
@@ -123,25 +208,47 @@ def test_present_wait_timeout_raises(mocker, capfd):
 
     with pytest.raises(SystemExit):
         with pytest.MonkeyPatch().context() as mp:
-            mp.setattr(
-                "ansible.module_utils.basic._ANSIBLE_ARGS",
-                json.dumps(
-                    {
-                        "ANSIBLE_MODULE_ARGS": {
-                            "state": "present",
-                            "name": "virtual-ip",
-                            "resource_type": {"resource_name": "IPaddr2"},
-                            "resource_option": ["ip=192.168.2.1"],
-                            "wait": 10,
-                        }
-                    }
-                ).encode(),
-            )
-            mp.setattr("ansible.module_utils.basic._ANSIBLE_PROFILE", "legacy", raising=False)
-            pacemaker_resource.main()
+            _run_module(mp, {"state": "enabled", "name": "virtual-ip", "wait": 10})
 
     out, _err = capfd.readouterr()
     result = json.loads(out)
     assert result.get("failed") is True
     assert "Timed out" in result["msg"]
     assert "virtual-ip" in result["msg"]
+
+
+@pytest.mark.usefixtures("patch_bin")
+def test_disabled_polls_for_stopped(mocker, capfd):
+    """state=disabled must poll pcs resource status until Stopped is seen."""
+    mocker.patch("ansible_collections.community.general.plugins.module_utils._pacemaker.time.sleep")
+
+    # Sequence:
+    # 1. initial _get(): status → Started (currently running)
+    # 2. state_disabled: pcs resource disable → rc=0
+    # 3. _wait_for_runtime_state maintenance check: property config → no maintenance
+    # 4. poll 1: status → Started (not yet stopped)
+    # 5. poll 2: status → Stopped
+    # 6. __quit_module__ _get(): status → Stopped
+    run_command_calls = [
+        (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started", ""),
+        (0, "", ""),
+        (1, NO_MAINTENANCE_OUT, ""),
+        (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Started", ""),
+        (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)", ""),
+        (0, "  * virtual-ip\t(ocf:heartbeat:IPAddr2):\t Stopped (disabled)", ""),
+    ]
+
+    def side_effect(self_, **kwargs):
+        return run_command_calls.pop(0)
+
+    mocker.patch("ansible.module_utils.basic.AnsibleModule.run_command", side_effect=side_effect)
+
+    with pytest.raises(SystemExit):
+        with pytest.MonkeyPatch().context() as mp:
+            _run_module(mp, {"state": "disabled", "name": "virtual-ip", "wait": 30})
+
+    out, _err = capfd.readouterr()
+    result = json.loads(out)
+    assert result["changed"] is True
+    assert result.get("failed") is not True
+    assert "Stopped" in result["value"]
