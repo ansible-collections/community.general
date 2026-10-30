@@ -36,6 +36,7 @@ options:
     default: present
 notes:
   - Requires yum-plugin-versionlock package on the remote node.
+  - With dnf5, O(state=absent) removes all lock entries of the matching packages, regardless of the version given in O(name).
 requirements:
   - yum
   - yum-versionlock
@@ -86,6 +87,7 @@ state:
   sample: present
 """
 
+import os
 import re
 from fnmatch import fnmatch
 
@@ -100,6 +102,25 @@ NEVRA_RE_DNF = re.compile(
     r"^(?P<exclude>!)?(?P<name>.+)-(?P<epoch>\d+):(?P<version>.+)-"
     r"(?P<release>.+)\.(?P<arch>.+)$"
 )
+# dnf5 lists each entry as a stanza: a "Package name:" line followed by its conditions
+DNF5_EVR_RE = re.compile(r"^evr\s*(?P<comparator>!?=)\s*(?P<evr>\S+)$")
+
+
+def parse_dnf5_list(output):
+    """Convert the stanzas listed by dnf5 into entries in the dnf format"""
+    entries = []
+    name = None
+    for line in output.splitlines():
+        line = line.strip()
+        if line.startswith("Package name:"):
+            name = line.split(":", 1)[1].strip()
+            continue
+        m = DNF5_EVR_RE.match(line)
+        if name and m:
+            evr = m.group("evr") if ":" in m.group("evr") else f"0:{m.group('evr')}"
+            exclude = "!" if m.group("comparator") == "!=" else ""
+            entries.append(f"{exclude}{name}-{evr}.*")
+    return entries
 
 
 class YumVersionLock:
@@ -107,12 +128,15 @@ class YumVersionLock:
         self.module = module
         self.params = module.params
         self.yum_bin = module.get_bin_path("yum", required=True)
+        self.dnf5 = os.path.basename(os.path.realpath(self.yum_bin)) == "dnf5"
 
     def get_versionlock_packages(self):
         """Get an overview of all packages on yum versionlock"""
         rc, out, err = self.module.run_command([self.yum_bin, "versionlock", "list"])
         if rc == 0:
-            return out
+            if self.dnf5:
+                return parse_dnf5_list(out)
+            return out.split()
         elif rc == 1 and "o such command:" in err:
             self.module.fail_json(msg=f"Error: Please install rpm package yum-plugin-versionlock : {err}{out}")
         self.module.fail_json(msg=f"Error: {err}{out}")
@@ -120,9 +144,10 @@ class YumVersionLock:
     def ensure_state(self, packages, command):
         """Ensure packages state"""
         rc, out, err = self.module.run_command([self.yum_bin, "-q", "versionlock", command] + packages)
-        # If no package can be found this will be written on stdout with rc 0
-        if "No package found for" in out:
-            self.module.fail_json(msg=out)
+        # If no package can be found this will be written with rc 0, on stdout (dnf) or stderr (dnf5)
+        for output in (out, err):
+            if "No package found for" in output:
+                self.module.fail_json(msg=output)
         if rc == 0:
             return True
         self.module.fail_json(msg=f"Error: {err}{out}")
@@ -167,7 +192,7 @@ def main():
     if state in ("present",):
         command = "add"
         for single_pkg in packages:
-            if not any(match(pkg, single_pkg) for pkg in versionlock_packages.split()):
+            if not any(match(pkg, single_pkg) for pkg in versionlock_packages):
                 packages_list.append(single_pkg)
         if packages_list:
             if module.check_mode:
@@ -177,7 +202,16 @@ def main():
     elif state in ("absent",):
         command = "delete"
         for single_pkg in packages:
-            if any(match(pkg, single_pkg) for pkg in versionlock_packages.split()):
+            matched = [pkg for pkg in versionlock_packages if match(pkg, single_pkg)]
+            if not matched:
+                continue
+            if yum_v.dnf5:
+                # dnf5 only deletes locks by their exact package name
+                for pkg in matched:
+                    name = NEVRA_RE_DNF.match(pkg).group("name")
+                    if name not in packages_list:
+                        packages_list.append(name)
+            else:
                 packages_list.append(single_pkg)
         if packages_list:
             if module.check_mode:
