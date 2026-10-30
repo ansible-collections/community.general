@@ -1729,6 +1729,7 @@ RETURN = r"""#
 import re
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.collections import is_sequence
 from ansible.module_utils.common.locale import get_best_parsable_locale
 from ansible.module_utils.common.text.converters import to_text
 
@@ -1761,6 +1762,12 @@ class Nmcli:
         "802-11-wireless-security.wep-key1",
         "802-11-wireless-security.wep-key2",
         "802-11-wireless-security.wep-key3",
+    )
+
+    SECRET_FLAGS_SETTINGS = (
+        "802-11-wireless-security.leap-password-flags",
+        "802-11-wireless-security.psk-flags",
+        "802-11-wireless-security.wep-key-flags",
     )
 
     def __init__(self, module):
@@ -2205,6 +2212,8 @@ class Nmcli:
             if setting_type is bool:
                 # Convert all bool options to yes/no.
                 convert_func = self.bool_to_string
+            elif setting in self.SECRET_FLAGS_SETTINGS:
+                convert_func = self.secret_flags_to_string
             if detect_change:
                 if setting in ("vlan.id", "vxlan.id"):
                     # Convert VLAN/VXLAN IDs to text when detecting changes.
@@ -2376,6 +2385,23 @@ class Nmcli:
             return ",".join(lst)
 
     @staticmethod
+    def secret_flags_to_string(flags):
+        if flags is None:
+            return None
+        if isinstance(flags, str):
+            flags = flags.split(",")
+        elif not is_sequence(flags):
+            flags = [flags]
+        flags = [to_text(flag).strip() for flag in flags]
+        if not all(flag.isdigit() for flag in flags):
+            # Flag names are passed on to nmcli as given.
+            return ",".join(flags)
+        combined_flags = 0
+        for flag in flags:
+            combined_flags |= int(flag)
+        return to_text(combined_flags)
+
+    @staticmethod
     def settings_type(setting):
         if setting in {
             "bridge.stp",
@@ -2406,11 +2432,8 @@ class Nmcli:
             "ipv6.routes",
             "ipv6.routing-rules",
             "802-11-wireless-security.group",
-            "802-11-wireless-security.leap-password-flags",
             "802-11-wireless-security.pairwise",
             "802-11-wireless-security.proto",
-            "802-11-wireless-security.psk-flags",
-            "802-11-wireless-security.wep-key-flags",
             "802-11-wireless.mac-address-blacklist",
         }:
             return list
@@ -2578,6 +2601,9 @@ class Nmcli:
                             conn_info[alias_key] = alias_value
                 elif key in ("ipv4.routes", "ipv6.routes"):
                     conn_info[key] = [s.strip() for s in raw_value.split(";")]
+                elif key in self.SECRET_FLAGS_SETTINGS:
+                    # nmcli shows the combined flags followed by their names, for example '3 (agent-owned, not saved)'.
+                    conn_info[key] = raw_value.split(" ", 1)[0]
                 elif key_type is list:
                     conn_info[key] = [s.strip() for s in raw_value.split(",")]
                 else:
