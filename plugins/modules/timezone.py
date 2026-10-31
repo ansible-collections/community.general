@@ -33,6 +33,9 @@ options:
       - Name of the timezone for the system clock.
       - Default is to keep current setting.
       - B(At least one) of O(name) and O(hwclock) are required.
+      - On Debian and Ubuntu without C(timedatectl), C(dpkg-reconfigure) may replace the timezone name with an equivalent
+        one, for example V(UTC) with V(Etc/UTC). Timezones with identical zoneinfo files are considered the same there,
+        so changing between them reports no change.
     type: str
   hwclock:
     description:
@@ -382,9 +385,12 @@ class NosystemdTimezone(Timezone):
         self.conf_files["name"] = "/etc/timezone"
         self.regexps["name"] = re.compile(r"^([^\s]+)", re.MULTILINE)
         self.tzline_format = "%s\n"
+        self.match_equivalent_zones = False
         # Distribution-specific configurations
         if self.module.get_bin_path("dpkg-reconfigure") is not None:
             # Debian/Ubuntu
+            # dpkg-reconfigure may replace the zone name with an equivalent one (e.g. UTC -> Etc/UTC)
+            self.match_equivalent_zones = True
             if "name" in self.value:
                 self.update_timezone = [
                     [self.module.get_bin_path("ln", required=True), "-sf", tzfile, "/etc/localtime"],
@@ -450,6 +456,16 @@ class NosystemdTimezone(Timezone):
             # (e.g., permission error, etc), we should abort.
             return False
         return self.allow_no_file.get(key, False)
+
+    def is_same_zone(self, zone1, zone2):
+        if zone1 == zone2:
+            return True
+        if not self.match_equivalent_zones:
+            return False
+        try:
+            return filecmp.cmp(f"/usr/share/zoneinfo/{zone1}", f"/usr/share/zoneinfo/{zone2}", shallow=False)
+        except OSError:
+            return False
 
     def _edit_file(self, filename, regexp, value, key):
         """Replace the first matched line with given `value`.
@@ -551,7 +567,8 @@ class NosystemdTimezone(Timezone):
                 value = self._get_value_from_config("adjtime", phase)
         elif key == "name":
             value = self._get_value_from_config(key, phase)
-            if value == planned:
+            if self.is_same_zone(value, planned):
+                value = planned
                 # If the planned values is the same as the one in the config file
                 # we need to check if /etc/localtime is also set to the 'planned' zone.
                 if os.path.islink("/etc/localtime"):
@@ -567,7 +584,7 @@ class NosystemdTimezone(Timezone):
                         linktz = re.search(r"(?:/(?:usr/share|etc)/zoneinfo/)(.*)", path, re.MULTILINE)
                         if linktz:
                             valuelink = linktz.group(1)
-                            if valuelink != planned:
+                            if not self.is_same_zone(valuelink, planned):
                                 value = valuelink
                         else:
                             # Set current TZ to 'n/a' if the symlink points to a path
