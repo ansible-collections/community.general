@@ -1,0 +1,2 @@
+bugfixes:
+  - cloudflare_dns - fix detection of existing CAA, SRV, and TLSA records (https://github.com/ansible-collections/community.general/issues/7766, https://github.com/ansible-collections/community.general/issues/7780, https://github.com/ansible-collections/community.general/pull/13170).
