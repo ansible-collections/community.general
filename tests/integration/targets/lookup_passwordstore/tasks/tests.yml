@@ -102,6 +102,36 @@
   loop_control:
     loop_var: backend
 
+- name: Initialise gopass mounted store
+  ansible.builtin.command: gopass init --store mnt --path $HOME/.gopass-mnt-store ansible-test
+  args:
+    creates: "{{ lookup('env','HOME') }}/.gopass-mnt-store"
+
+- name: Create a password in the gopass mount
+  ansible.builtin.set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'mnt/test-pass', length=8, create=true, backend='gopass') }}"
+
+- name: Fetch password from the gopass mount
+  ansible.builtin.set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'mnt/test-pass', backend='gopass') }}"
+
+- name: Verify password from the gopass mount
+  ansible.builtin.assert:
+    that:
+      - readpass == newpass
+
+- name: Try to read the gopass mount as passname
+  ansible.builtin.set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'mnt', backend='gopass') }}"
+  ignore_errors: true
+  register: mount_as_passname
+
+- name: Make sure reading the gopass mount as passname failed
+  ansible.builtin.assert:
+    that:
+      - mount_as_passname is failed
+      - '"passname mnt not found" in mount_as_passname.msg'
+
 - name: Change passwordstore location explicitly
   ansible.builtin.set_fact:
     passwordstore: "{{ lookup('env','HOME') }}/.password-store"
@@ -209,11 +239,15 @@
           if [ "$1" = "--version" ]; then
             exit 2
           fi
+          if [ "$1" = "ls" ]; then
+            echo "folder"
+            exit 0
+          fi
           echo "gopass_ok"
         dest: "{{ gopasspath }}"
         mode: '0755'
 
-    - name: Try to read folder as passname using gopass mock
+    - name: Try to read passname without .gpg file using gopass mock
       ansible.builtin.set_fact:
         newpass: "{{ lookup('community.general.passwordstore', 'folder') }}"
 
