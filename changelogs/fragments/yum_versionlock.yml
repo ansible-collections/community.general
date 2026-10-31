@@ -1,0 +1,2 @@
+deprecated_features:
+  - "yum_versionlock - the module is deprecated and will be removed from community.general 16.0.0. Use ``community.general.dnf_versionlock`` instead (https://github.com/ansible-collections/community.general/pull/13173)."
