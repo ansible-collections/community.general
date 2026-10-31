@@ -149,3 +149,24 @@ def test_systemd_check_mode_does_not_write_timezone_file(timedatectl, tmp_path):
     assert result["changed"] is True
     assert set_timezone_calls(timedatectl) == []
     assert timezone_file.read_text() == "Etc/UTC\n"
+
+
+@pytest.mark.parametrize(
+    "actual, same_file, expected",
+    [
+        pytest.param("Etc/UTC", True, "UTC", id="equivalent"),
+        pytest.param("Europe/London", False, "Europe/London", id="different"),
+    ],
+)
+def test_nosystemd_debian_equivalent_zones(mocker, actual, same_file, expected):
+    mocker.patch.object(timezone.os.path, "isfile", return_value=True)
+    mocker.patch.object(timezone.platform, "system", return_value="Linux")
+    tz = timezone.Timezone(create_module(name="UTC"))
+    mocker.patch.object(tz, "_get_value_from_config", return_value=actual)
+    mocker.patch.object(timezone.os.path, "islink", return_value=True)
+    mocker.patch.object(timezone.os.path, "exists", return_value=True)
+    mocker.patch.object(timezone.os, "readlink", return_value=f"/usr/share/zoneinfo/{actual}")
+    cmp_mock = mocker.patch.object(timezone.filecmp, "cmp", return_value=same_file)
+
+    assert tz.get("name", "after") == expected
+    cmp_mock.assert_called_with(f"/usr/share/zoneinfo/{actual}", "/usr/share/zoneinfo/UTC", shallow=False)
