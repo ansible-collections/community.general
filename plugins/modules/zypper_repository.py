@@ -39,7 +39,8 @@ options:
     type: str
   description:
     description:
-      - A description of the repository.
+      - A description of the repository, passed to zypper as its name.
+      - When not specified, the value from the C(.repo) file is used if available.
     type: str
   disable_gpg_check:
     description:
@@ -481,7 +482,7 @@ def main():
                 auto_import_keys = True
 
             # Map additional values, if available
-            if "name" in repofile_items:
+            if repodata["name"] is None and "name" in repofile_items:
                 repodata["name"] = repofile_items["name"]
             # Use .repo file values only for settings the user did not explicitly provide
             for key in ("enabled", "autorefresh", "gpgcheck"):
