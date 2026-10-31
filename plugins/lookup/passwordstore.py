@@ -312,6 +312,22 @@ class LookupModule(LookupBase):
 
         return self.realpass
 
+    def is_gopass_secret(self):
+        # gopass shows the folder tree when the passname is a folder, so look it up in the listing of its parent folder,
+        # which gopass resolves through its mounts
+        parent = self.passname.rpartition("/")[0]
+        try:
+            listing = to_text(
+                run_backend_cmd(
+                    [self.pass_cmd, "ls", "--flat", "--limit", "0"] + ([parent] if parent else []), env=self.env
+                ),
+                errors="surrogate_or_strict",
+            )
+        except subprocess.CalledProcessError as e:
+            raise AnsibleError(f"exit code {e.returncode} while running {e.cmd}. Error output: {e.output}") from e
+
+        return self.passname in listing.splitlines()
+
     def parse_params(self, term):
         # I went with the "traditional" param followed with space separated KV pairs.
         # Waiting for final implementation of lookup parameter parsing.
@@ -386,9 +402,11 @@ class LookupModule(LookupBase):
                     if ":" in line:
                         name, value = line.split(":", 1)
                         self.passdict[name.strip()] = value.strip()
-            if (
-                self.backend == "gopass"
-                or os.path.isfile(os.path.join(self.paramvals["directory"], f"{self.passname}.gpg"))
+            if self.backend == "gopass":
+                if self.is_gopass_secret():
+                    return True
+            elif (
+                os.path.isfile(os.path.join(self.paramvals["directory"], f"{self.passname}.gpg"))
                 or not self.is_real_pass()
             ):
                 # When using real pass, only accept password as found if there is a .gpg file for it (might be a tree node otherwise)
