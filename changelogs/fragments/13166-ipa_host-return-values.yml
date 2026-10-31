@@ -1,0 +1,2 @@
+minor_changes:
+  - ipa_host - return all attributes of the host, including ``has_keytab`` and ``has_password``, whenever the host exists (https://github.com/ansible-collections/community.general/issues/4929, https://github.com/ansible-collections/community.general/pull/13166).
