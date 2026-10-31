@@ -178,3 +178,77 @@ def test_check_mode_does_not_modify(capfd, post_json):
 
     assert result["changed"] is True
     assert write_calls(post_json) == []
+
+
+def test_password_change_sets_expiration_in_separate_request(capfd, post_json):
+    result = run_module(
+        capfd,
+        post_json,
+        {"state": "present", "password": "n3wpassw0rd", "krbpasswordexpiration": "20300101000000"},
+        ipa_user_entry(),
+    )
+
+    assert result["changed"] is True
+    assert write_calls(post_json) == [
+        {"method": "user_mod", "name": "pinky", "item": {"userpassword": "n3wpassw0rd"}},
+        {"method": "user_mod", "name": "pinky", "item": {"krbpasswordexpiration": "20300101000000Z"}},
+    ]
+
+
+def test_password_change_resends_unchanged_expiration(capfd, post_json):
+    result = run_module(
+        capfd,
+        post_json,
+        {"state": "present", "password": "n3wpassw0rd", "krbpasswordexpiration": "20300101000000"},
+        ipa_user_entry(krbpasswordexpiration=["20300101000000Z"]),
+    )
+
+    assert result["changed"] is True
+    assert write_calls(post_json) == [
+        {"method": "user_mod", "name": "pinky", "item": {"userpassword": "n3wpassw0rd"}},
+        {"method": "user_mod", "name": "pinky", "item": {"krbpasswordexpiration": "20300101000000Z"}},
+    ]
+
+
+def test_expiration_without_password_change_is_one_request(capfd, post_json):
+    result = run_module(
+        capfd,
+        post_json,
+        {
+            "state": "present",
+            "password": "n3wpassw0rd",
+            "update_password": "on_create",
+            "krbpasswordexpiration": "20300101000000",
+        },
+        ipa_user_entry(),
+    )
+
+    assert result["changed"] is True
+    assert write_calls(post_json) == [
+        {"method": "user_mod", "name": "pinky", "item": {"krbpasswordexpiration": "20300101000000Z"}},
+    ]
+
+
+def test_create_with_password_sets_expiration_after_add(capfd, post_json):
+    result = run_module(
+        capfd,
+        post_json,
+        {
+            "state": "present",
+            "givenname": "Pinky",
+            "sn": "Acme",
+            "password": "n3wpassw0rd",
+            "krbpasswordexpiration": "20300101000000",
+        },
+        {},
+    )
+
+    assert result["changed"] is True
+    assert write_calls(post_json) == [
+        {
+            "method": "user_add",
+            "name": "pinky",
+            "item": {"givenname": "Pinky", "nsaccountlock": False, "sn": "Acme", "userpassword": "n3wpassw0rd"},
+        },
+        {"method": "user_mod", "name": "pinky", "item": {"krbpasswordexpiration": "20300101000000Z"}},
+    ]
