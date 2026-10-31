@@ -137,8 +137,34 @@
           - timezone_utc_to_etcutc.diff.after.name == 'Etc/UTC'
 
   when:
-    # FIXME: Due to the bug of the dpkg-reconfigure, those tests failed on non-systemd debian
     - check_dpkg_reconfigure.rc != 0 or check_timedatectl.rc == 0
+
+# On non-systemd Debian, dpkg-reconfigure replaces UTC with Etc/UTC, so both are considered the same
+- block:
+    - name: set timezone to Etc/UTC
+      community.general.timezone:
+        name: Etc/UTC
+
+    - name: set timezone to UTC (checkmode)
+      community.general.timezone:
+        name: UTC
+      check_mode: true
+      register: timezone_etcutc_to_utc_checkmode
+
+    - name: set timezone to UTC
+      community.general.timezone:
+        name: UTC
+      register: timezone_etcutc_to_utc
+
+    - name: check timezone not changed from Etc/UTC to UTC
+      ansible.builtin.assert:
+        that:
+          - timezone_etcutc_to_utc_checkmode is not changed
+          - timezone_etcutc_to_utc is not changed
+
+  when:
+    - check_dpkg_reconfigure.rc == 0
+    - check_timedatectl.rc != 0
 
 ##
 ## no systemd tests for timezone
