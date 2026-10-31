@@ -41,9 +41,9 @@
 
         - name: Lock packages wildcard
           community.general.yum_versionlock:
-            name: "nss*"
+            name: "{{ yum_updates.results | map(attribute='name') | first }}*"
             state: present
-          register: lock_nss_wildcard
+          register: lock_wildcard
 
           # This should fail when it needs user interaction and missing -y is on purpose.
         - name: Update all packages (not really)
@@ -67,15 +67,43 @@
           register: update_all_packages
           when: yum_updates.results | length != 0
 
+        - name: Lock a single package
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | first }}"
+            state: present
+
+        - name: Unlock packages wildcard
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | first }}*"
+            state: absent
+          register: unlock_wildcard
+
+        - name: Unlock packages wildcard again
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | first }}*"
+            state: absent
+          register: unlock_wildcard_again
+
+        - name: Lock a package that does not exist
+          community.general.yum_versionlock:
+            name: this-package-does-not-exist
+            state: present
+          register: lock_missing_package
+          ignore_errors: true
+
         - name: Assert everything is fine
           ansible.builtin.assert:
             that:
               - lock_all_packages is changed
               - lock_all_packages_again is not changed
-              - lock_nss_wildcard is not changed
+              - lock_wildcard is not changed
               - update_all_locked_packages is not changed
               - unlock_all_packages is changed
               - update_all_packages is changed
+              - unlock_wildcard is changed
+              - unlock_wildcard_again is not changed
+              - lock_missing_package is failed
+              - "'No package found for' in lock_missing_package.msg"
       when: yum_updates.results | length != 0
 
     - name: Remove installed packages in case it was not installed

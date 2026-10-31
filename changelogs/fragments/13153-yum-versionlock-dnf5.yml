@@ -1,0 +1,2 @@
+bugfixes:
+  - yum_versionlock - fix handling of existing locks and missing packages when ``yum`` is provided by dnf5 (https://github.com/ansible-collections/community.general/issues/13148, https://github.com/ansible-collections/community.general/pull/13153).
