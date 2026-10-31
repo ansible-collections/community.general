@@ -1,0 +1,2 @@
+minor_changes:
+  - lvol - add ``pool_metadata_size`` option to set the metadata volume size when creating a thin pool (https://github.com/ansible-collections/community.general/issues/10050, https://github.com/ansible-collections/community.general/pull/12936).
