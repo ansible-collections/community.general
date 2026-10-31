@@ -1570,6 +1570,10 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.xenserver_guest_info instead.
+    yum_versionlock:
+      deprecation:
+        removal_version: 16.0.0
+        warning_text: Use community.general.dnf_versionlock instead.
   doc_fragments:
     _gcp:
       redirect: community.google._gcp

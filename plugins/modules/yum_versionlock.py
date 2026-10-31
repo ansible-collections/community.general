@@ -19,6 +19,10 @@ attributes:
     support: full
   diff_mode:
     support: none
+deprecated:
+  removed_in: 16.0.0
+  why: Yum is deprecated.
+  alternative: Use M(community.general.dnf_versionlock) instead.
 options:
   name:
     description:
