@@ -24,7 +24,9 @@ attributes:
 options:
   name:
     description:
-      - A name for the repository. Not required when adding repofiles.
+      - The alias of the repository.
+      - Required when adding a repository by URI. Cannot be used with a C(.repo) file, the alias is taken from the file.
+      - To set the name zypper displays for the repository, use O(description).
     type: str
   repo:
     description:
