@@ -141,15 +141,17 @@ class Sysrc(StateModuleHelper):
             # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=229806
             return None
 
-        if out.startswith(self.vars.path):
-            return out.split(":", 1)[1].strip()
+        prefix = f"{self.vars.path}: "
+        if out.startswith(prefix):
+            # sysrc -v prints "<file>: <value>"
+            return out[len(prefix) :].rstrip("\n")
 
         return None
 
     def _modify(self, op, changed):
         (rc, out, err) = self._sysrc(f"{self.vars.name}{op}={self.vars.delim}{self.vars.value}")
         if out.startswith(f"{self.vars.name}:"):
-            return changed(out.split(" -> ")[1].strip().split(self.vars.delim))
+            return changed(out.split(" -> ", 1)[1].rstrip("\n").split(self.vars.delim))
 
         return False
 
