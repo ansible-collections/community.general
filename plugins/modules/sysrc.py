@@ -136,9 +136,7 @@ class Sysrc(StateModuleHelper):
             return None
 
         (rc, out, err) = self._sysrc("-v", "-n", self.vars.name)
-        if "unknown variable" in err or "unknown variable" in out:
-            # Prior to FreeBSD 11.1 sysrc would write "unknown variable" to stdout and not stderr
-            # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=229806
+        if "unknown variable" in err:
             return None
 
         prefix = f"{self.vars.path}: "

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 DOCUMENTATION = r"""
 module: pkgng
-short_description: Package manager for FreeBSD >= 9.0
+short_description: Package manager for FreeBSD
 description:
   - Manage binary packages for FreeBSD using C(pkgng) which is available in versions after 9.0.
 extends_documentation_fragment:
