@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import time
 import typing as t
@@ -15,6 +16,17 @@ from ansible_collections.community.general.plugins.module_utils._cmd_runner impo
 
 if t.TYPE_CHECKING:
     from ansible.module_utils.basic import AnsibleModule
+
+
+_NON_JSON_PCS_DEPRECATION = (
+    "Parsing non-JSON pcs output (pcs older than 0.11.6) is deprecated. The non-JSON fallback will be "
+    "removed from community.general in a future release; upgrade pcs to 0.11.6 or newer."
+)
+
+
+def _deprecate_non_json_pcs(runner: CmdRunner) -> None:
+    runner.module.deprecate(_NON_JSON_PCS_DEPRECATION, version="17.0.0", collection_name="community.general")
+
 
 
 _state_map = {
@@ -56,11 +68,54 @@ def fmt_resource_argument(value):
 
 
 def get_pacemaker_maintenance_mode(runner: CmdRunner) -> bool:
+    """Return ``True`` if the cluster property ``maintenance-mode`` is set to ``true``.
+
+    Prefers ``pcs property config --output-format=json`` (pcs >= 0.11.6), inspecting the
+    structured nvpairs so the result is independent of ``pcs`` output locale and formatting.
+    On older ``pcs`` without JSON output it falls back to scraping the plaintext property
+    config (and emits a deprecation warning for that fallback).
+    """
+    with runner("cli_action config output_format") as ctx:
+        rc, out, err = ctx.run(cli_action="property", output_format="json")
+    try:
+        data = json.loads(out)
+    except (TypeError, ValueError):
+        data = None
+    if data is not None:
+        for nvset in data.get("nvsets", []):
+            for nvpair in nvset.get("nvpairs", []):
+                if nvpair.get("name") == "maintenance-mode" and nvpair.get("value") == "true":
+                    return True
+        return False
+
+    _deprecate_non_json_pcs(runner)
     with runner("cli_action config") as ctx:
         rc, out, err = ctx.run(cli_action="property")
-        maint_mode_re = re.compile(r"maintenance-mode.*true", re.IGNORECASE)
-        maintenance_mode_output = [line for line in out.splitlines() if maint_mode_re.search(line)]
-        return bool(maintenance_mode_output)
+    maint_mode_re = re.compile(r"maintenance-mode.*true", re.IGNORECASE)
+    return any(maint_mode_re.search(line) for line in out.splitlines())
+
+
+def get_pacemaker_resource_config(runner: CmdRunner, name: str) -> dict | None:
+    """Return parsed ``pcs resource config <name> --output-format=json``.
+
+    Returns ``None`` when JSON output is unavailable (pcs < 0.11.6) or cannot be parsed, so
+    callers can fall back to a version-agnostic path instead of crashing.
+    """
+    with runner("cli_action state name output_format") as ctx:
+        rc, out, err = ctx.run(cli_action="resource", state="config", name=name, output_format="json")
+    try:
+        return json.loads(out)
+    except (TypeError, ValueError):
+        return None
+
+
+def is_resource_cloned(config: dict, name: str) -> bool:
+    """Return ``True`` if *name* appears as a clone ``member_id`` in the resource config.
+
+    Matches both directly-cloned primitives and cloned groups, since ``pcs`` represents
+    cloned-group membership the same way (``clones[].member_id == <group_id>``).
+    """
+    return any(clone.get("member_id") == name for clone in config.get("clones", []))
 
 
 _DEFAULT_RESOURCE_READY_STATES = ("Started",)
