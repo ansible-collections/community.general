@@ -146,10 +146,35 @@ EXAMPLES = r"""
 """
 
 import re
+from pathlib import Path
 
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.community.general.plugins.module_utils._cmd_runner import CmdRunner, cmd_runner_fmt
+
+# Directories searched by zpool for short device names, in the same order
+DEVICE_SEARCH_PATHS = (
+    "/dev/disk/by-vdev",
+    "/dev/mapper",
+    "/dev/disk/by-partlabel",
+    "/dev/disk/by-partuuid",
+    "/dev/disk/by-label",
+    "/dev/disk/by-uuid",
+    "/dev/disk/by-id",
+    "/dev/disk/by-path",
+    "/dev",
+)
+
+# Partition suffixes stripped by zpool from the devices of whole-disk vdevs
+PARTITION_PATTERNS = tuple(
+    re.compile(pattern)
+    for pattern in (
+        r"^(.+?)-part\d+$",
+        r"^(.+\d)p\d+$",
+        r"^([hsv]d[a-zA-Z]+)\d+$",
+        r"^(xvd[a-zA-Z]+)\d+$",
+    )
+)
 
 
 class Zpool:
@@ -176,6 +201,7 @@ class Zpool:
         self.altroot = altroot
         self.temp_name = temp_name
         self.vdevs = vdevs
+        self.desired_devices = {self.resolve_device(disk) for vdev in vdevs or [] for disk in vdev["disks"]}
         self.zpool_cmd = module.get_bin_path("zpool", required=True)
         self.zfs_cmd = module.get_bin_path("zfs", required=True)
         self.changed = False
@@ -314,26 +340,28 @@ class Zpool:
                 self.changed = True
         return {"before": {"filesystem_properties": before}, "after": {"filesystem_properties": after}}
 
-    def base_device(self, device):
-        if not device.startswith("/dev/"):
-            return device
+    def resolve_device(self, device: str) -> str:
+        path = Path(device)
+        if not path.is_absolute():
+            candidates = (Path(search_path, device) for search_path in DEVICE_SEARCH_PATHS)
+            found = next((candidate for candidate in candidates if candidate.exists()), None)
+            if found is None:
+                return device
+            path = found
+        return str(path.resolve())
 
-        # loop devices
-        match = re.match(r"^(/dev/loop\d+)$", device)
-        if match:
-            return match.group(1)
-
-        # nvme drives
-        match = re.match(r"^(.*?)(p\d+)$", device)
-        if match:
-            return match.group(1)
-
-        # sata/scsi drives
-        match = re.match(r"^(/dev/(?:sd|vd)[a-z])\d+$", device)
-        if match:
-            return match.group(1)
-
+    def strip_partition(self, device: str) -> str:
+        path = Path(device)
+        for pattern in PARTITION_PATTERNS:
+            match = pattern.match(path.name)
+            if match:
+                return str(path.with_name(match.group(1)))
         return device
+
+    def base_device(self, device: str) -> str:
+        if not device.startswith("/dev/") or device in self.desired_devices:
+            return device
+        return self.strip_partition(device)
 
     def get_current_layout(self):
         with self.zpool_runner("subcommand full_paths real_paths name", check_rc=True) as ctx:
@@ -341,12 +369,11 @@ class Zpool:
 
         vdevs = []
         current = None
+        role = None
         in_config = False
 
         def flush_current(current):
             if current:
-                if current.get("role") is None:
-                    current.pop("role", None)
                 vdevs.append(current)
             return None
 
@@ -369,56 +396,60 @@ class Zpool:
             if device in ("logs", "cache", "spares", "special", "dedup"):
                 current = flush_current(current)
                 role = "spare" if device == "spares" else device.rstrip("s")
-                current = {"role": role, "type": None, "disks": []}
                 continue
 
             match_group = vdev_group_re.match(device)
             if match_group:
-                if current and current.get("type") is not None:
-                    current = flush_current(current)
-                kind = match_group.group(1)
-                role = current.get("role") if current and current.get("type") is None else None
-                current = {"role": role, "type": kind, "disks": []}
+                current = flush_current(current)
+                current = {"type": match_group.group(1), "disks": []}
+                if role:
+                    current["role"] = role
                 continue
 
             if device.startswith("/"):
                 base_device = self.base_device(device)
                 if current:
-                    if current.get("type") is None:
-                        entry = {"type": "stripe", "disks": [base_device]}
-                        if current.get("role"):
-                            entry["role"] = current["role"]
-                        vdevs.append(entry)
-                        current = None
-                    else:
-                        current["disks"].append(base_device)
+                    current["disks"].append(base_device)
                 else:
-                    vdevs.append({"type": "stripe", "disks": [base_device]})
+                    entry = {"type": "stripe", "disks": [base_device]}
+                    if role:
+                        entry["role"] = role
+                    vdevs.append(entry)
                 continue
 
-        if current and current.get("type") is not None:
-            current = flush_current(current)
+        flush_current(current)
 
         return vdevs
 
-    def normalize_vdevs(self, vdevs):
-        alias = {"raidz": "raidz1"}
-        normalized = []
+    def split_stripes(self, vdevs):
+        split = []
         for vdev in vdevs:
-            normalized_type = alias.get(vdev.get("type", "stripe"), vdev.get("type", "stripe"))
-            entry = {
-                "type": normalized_type,
-                "disks": sorted(vdev["disks"]),
-            }
-            role = vdev.get("role")
-            if role is not None:
-                entry["role"] = role
-            normalized.append(entry)
+            if vdev.get("type", "stripe") == "stripe":
+                split.extend(dict(vdev, disks=[disk]) for disk in vdev["disks"])
+            else:
+                split.append(vdev)
+        return split
+
+    def normalize_vdev(self, vdev, resolve=False):
+        alias = {"raidz": "raidz1"}
+        vdev_type = vdev.get("type", "stripe")
+        disks = [self.resolve_device(disk) for disk in vdev["disks"]] if resolve else vdev["disks"]
+        entry = {
+            "type": alias.get(vdev_type, vdev_type),
+            "disks": sorted(disks),
+        }
+        role = vdev.get("role")
+        if role is not None:
+            entry["role"] = role
+        return entry
+
+    def normalize_vdevs(self, vdevs, resolve=False):
+        normalized = [self.normalize_vdev(vdev, resolve) for vdev in self.split_stripes(vdevs)]
         return sorted(normalized, key=lambda x: (x.get("role", ""), x["type"], x["disks"]))
 
     def diff_layout(self):
         current = self.normalize_vdevs(self.get_current_layout())
-        desired = self.normalize_vdevs(self.vdevs)
+        desired = self.normalize_vdevs(self.vdevs, resolve=True)
 
         before = {"vdevs": current}
         after = {"vdevs": desired}
@@ -435,9 +466,12 @@ class Zpool:
 
         diff = self.diff_layout()
         before_vdevs = diff["before"]["vdevs"]
-        after_vdevs = diff["after"]["vdevs"]
 
-        to_add = [vdev for vdev in after_vdevs if vdev not in before_vdevs]
+        to_add = [
+            vdev
+            for vdev in self.split_stripes(self.vdevs)
+            if self.normalize_vdev(vdev, resolve=True) not in before_vdevs
+        ]
         if not to_add:
             return {}
 
@@ -497,7 +531,7 @@ class Zpool:
     def remove_vdevs(self):
         current = self.list_vdevs_with_names()
         current_disks = {disk for vdev in current for disk in vdev["disks"]}
-        desired_disks = {disk for vdev in self.vdevs for disk in vdev.get("disks", [])}
+        desired_disks = self.desired_devices
         gone = current_disks - desired_disks
         to_remove = [vdev["name"] for vdev in current if any(disk in gone for disk in vdev["disks"])]
         if not to_remove:
