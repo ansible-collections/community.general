@@ -75,9 +75,10 @@ updates:
       returned: always
       sample: openssl-3
     kind:
-      description: The kind of the update.
+      description: The kind of the update, as selected with O(type).
       type: str
       returned: always
+      choices: [package, patch, pattern, product]
       sample: package
     edition:
       description: The version of the update.
@@ -110,17 +111,24 @@ updates:
       returned: when zypper reports it
       sample: SLE-Module-Basesystem15-SP7-Updates
     status:
-      description: The status of the patch.
+      description:
+        - The status of the patch. Without O(all=true), zypper lists only patches with status V(needed), V(optional)
+          or V(unwanted).
       type: str
       returned: when O(type=patch)
+      choices: [needed, optional, unwanted, applied, not-needed, undetermined, retracted]
       sample: needed
     category:
-      description: The category of the patch.
+      description:
+        - The category of the patch, as set by the repository. Commonly used values are V(security), V(recommended),
+          V(optional), V(feature), V(document) and V(yast).
       type: str
       returned: when O(type=patch)
       sample: security
     severity:
-      description: The severity of the patch.
+      description:
+        - The severity of the patch, as set by the repository. Commonly used values are V(critical), V(important),
+          V(moderate), V(low) and V(unspecified).
       type: str
       returned: when O(type=patch)
       sample: important
@@ -144,6 +152,17 @@ updates:
       type: list
       elements: dict
       returned: when O(type=patch)
+      contains:
+        type:
+          description: The kind of the issue, as set by the repository, for example V(cve) or V(bugzilla).
+          type: str
+          returned: always
+          sample: cve
+        id:
+          description: The identifier of the issue.
+          type: str
+          returned: always
+          sample: CVE-2026-1234
       sample: [{"type": "cve", "id": "CVE-2026-1234"}, {"type": "bugzilla", "id": "1234567"}]
 """
 
