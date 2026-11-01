@@ -1,0 +1,257 @@
+# Copyright (c) 2026, Alexei Znamensky (russoz@gmail.com)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: true}
+  environ_norc: &env-norc {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  pool_exists: &pool-exists
+    command: [/testbin/zpool, list, tank]
+    environ: *env-norc
+    rc: 0
+    out: "tank  9.50G   300K  9.50G  -  -  0%  0%  1.00x  ONLINE  -\n"
+    err: ''
+  get_pool_properties: &get-pool-properties
+    command: [/testbin/zpool, get, -H, -o, "property,value", all, tank]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
+  get_filesystem_properties: &get-filesystem-properties
+    command: [/testbin/zfs, get, -H, -o, "property,value", all, tank]
+    environ: *env-def
+    rc: 0
+    out: ''
+    err: ''
+  status_sdb: &status-sdb
+    command: [/testbin/zpool, status, -P, -L, tank]
+    environ: *env-def
+    rc: 0
+    out: |2
+        pool: tank
+       state: ONLINE
+      config:
+
+      	NAME         STATE     READ WRITE CKSUM
+      	tank         ONLINE       0     0     0
+      	  /dev/sdb1  ONLINE       0     0     0
+
+      errors: No known data errors
+    err: ''
+  status_sdb_sdc: &status-sdb-sdc
+    command: [/testbin/zpool, status, -P, -L, tank]
+    environ: *env-def
+    rc: 0
+    out: |2
+        pool: tank
+       state: ONLINE
+      config:
+
+      	NAME         STATE     READ WRITE CKSUM
+      	tank         ONLINE       0     0     0
+      	  /dev/sdb1  ONLINE       0     0     0
+      	  /dev/sdc1  ONLINE       0     0     0
+
+      errors: No known data errors
+    err: ''
+  status_mirror: &status-mirror
+    command: [/testbin/zpool, status, -P, -L, tank]
+    environ: *env-def
+    rc: 0
+    out: |2
+        pool: tank
+       state: ONLINE
+      config:
+
+      	NAME           STATE     READ WRITE CKSUM
+      	tank           ONLINE       0     0     0
+      	  mirror-0     ONLINE       0     0     0
+      	    /dev/sdb1  ONLINE       0     0     0
+      	    /dev/sdc1  ONLINE       0     0     0
+
+      errors: No known data errors
+    err: ''
+  status_partition: &status-partition
+    command: [/testbin/zpool, status, -P, -L, tank]
+    environ: *env-def
+    rc: 0
+    out: |2
+        pool: tank
+       state: ONLINE
+      config:
+
+      	NAME         STATE     READ WRITE CKSUM
+      	tank         ONLINE       0     0     0
+      	  /dev/sdb2  ONLINE       0     0     0
+
+      errors: No known data errors
+    err: ''
+  status_xvd_nvme: &status-xvd-nvme
+    command: [/testbin/zpool, status, -P, -L, tank]
+    environ: *env-def
+    rc: 0
+    out: |2
+        pool: tank
+       state: ONLINE
+      config:
+
+      	NAME              STATE     READ WRITE CKSUM
+      	tank              ONLINE       0     0     0
+      	  /dev/xvdf1      ONLINE       0     0     0
+      	  /dev/nvme0n1p1  ONLINE       0     0     0
+
+      errors: No known data errors
+    err: ''
+  status_roles: &status-roles
+    command: [/testbin/zpool, status, -P, -L, tank]
+    environ: *env-def
+    rc: 0
+    out: |2
+        pool: tank
+       state: ONLINE
+      config:
+
+      	NAME                STATE     READ WRITE CKSUM
+      	tank                ONLINE       0     0     0
+      	  /dev/sdb1         ONLINE       0     0     0
+      	logs
+      	  mirror-1          ONLINE       0     0     0
+      	    /dev/sdc1       ONLINE       0     0     0
+      	    /dev/sdd1       ONLINE       0     0     0
+      	  mirror-2          ONLINE       0     0     0
+      	    /dev/sde1       ONLINE       0     0     0
+      	    /dev/sdf1       ONLINE       0     0     0
+      	cache
+      	  /dev/nvme0n1p1    ONLINE       0     0     0
+      	  /dev/nvme1n1p1    ONLINE       0     0     0
+
+      errors: No known data errors
+    err: ''
+test_cases:
+  - id: bare_device_name_unchanged
+    input:
+      name: tank
+      vdevs:
+        - disks: [sdb]
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *pool-exists
+        - *status-sdb
+        - *status-sdb
+        - *status-sdb
+        - *get-pool-properties
+        - *get-filesystem-properties
+  - id: symlinked_device_unchanged
+    input:
+      name: tank
+      vdevs:
+        - type: mirror
+          disks:
+            - /dev/disk/by-id/ata-DISK_B
+            - /dev/sdc
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *pool-exists
+        - *status-mirror
+        - *status-mirror
+        - *status-mirror
+        - *get-pool-properties
+        - *get-filesystem-properties
+  - id: partition_device_unchanged
+    input:
+      name: tank
+      vdevs:
+        - disks: [/dev/sdb2]
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *pool-exists
+        - *status-partition
+        - *status-partition
+        - *status-partition
+        - *get-pool-properties
+        - *get-filesystem-properties
+  - id: multiple_disks_stripe_unchanged
+    input:
+      name: tank
+      vdevs:
+        - disks: [/dev/xvdf, /dev/nvme0n1]
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *pool-exists
+        - *status-xvd-nvme
+        - *status-xvd-nvme
+        - *status-xvd-nvme
+        - *get-pool-properties
+        - *get-filesystem-properties
+  - id: role_groups_unchanged
+    input:
+      name: tank
+      vdevs:
+        - disks: [/dev/sdb]
+        - role: log
+          type: mirror
+          disks: [/dev/sdc, /dev/sdd]
+        - role: log
+          type: mirror
+          disks: [/dev/sde, /dev/sdf]
+        - role: cache
+          disks: [/dev/nvme0n1, /dev/nvme1n1]
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *pool-exists
+        - *status-roles
+        - *status-roles
+        - *status-roles
+        - *get-pool-properties
+        - *get-filesystem-properties
+  - id: add_disk_with_given_name
+    input:
+      name: tank
+      vdevs:
+        - disks: [sdb, /dev/disk/by-id/ata-DISK_D]
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *pool-exists
+        - *status-sdb
+        - *status-sdb
+        - command: [/testbin/zpool, add, tank, /dev/disk/by-id/ata-DISK_D]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *status-sdb
+        - *get-pool-properties
+        - *get-filesystem-properties
+  - id: remove_disk_not_in_vdevs
+    input:
+      name: tank
+      vdevs:
+        - disks: [/dev/disk/by-id/ata-DISK_B]
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *pool-exists
+        - *status-sdb-sdc
+        - *status-sdb-sdc
+        - *status-sdb-sdc
+        - command: [/testbin/zpool, remove, tank, /dev/sdc]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *get-pool-properties
+        - *get-filesystem-properties
