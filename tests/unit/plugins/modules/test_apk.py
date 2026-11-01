@@ -7,6 +7,8 @@ from __future__ import annotations
 import unittest
 from unittest import mock
 
+import pytest
+
 from ansible_collections.community.general.plugins.modules import apk
 
 
@@ -119,3 +121,29 @@ class TestApkUpgradePackages(unittest.TestCase):
         kwargs = module.exit_json.call_args.kwargs
         self.assertTrue(kwargs["changed"])
         self.assertEqual(kwargs["packages"], ["musl", "busybox"])
+
+
+@pytest.mark.parametrize(
+    "name, expected",
+    [
+        ("bash", True),
+        ("busybox", True),
+        ("vim", False),
+    ],
+)
+def test_query_toplevel(mocker, tmp_path, name, expected):
+    world = tmp_path / "world"
+    world.write_text("bash>=5.0\nbusybox@edge musl\n")
+    module = mocker.Mock()
+    assert apk.query_toplevel(module, name, str(world)) is expected
+    module.fail_json.assert_not_called()
+
+
+def test_query_toplevel_missing_world(mocker, tmp_path):
+    world = tmp_path / "missing"
+    module = mocker.Mock()
+    module.fail_json.side_effect = SystemExit
+    with pytest.raises(SystemExit):
+        apk.query_toplevel(module, "bash", str(world))
+    module.fail_json.assert_called_once()
+    assert module.fail_json.call_args.kwargs["msg"].startswith(f"Cannot read world file {world}: ")
