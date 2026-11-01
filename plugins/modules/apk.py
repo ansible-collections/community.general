@@ -169,6 +169,7 @@ packages:
 """
 
 import re
+import traceback
 
 # Import module snippets.
 from ansible.module_utils.basic import AnsibleModule
@@ -200,12 +201,12 @@ def query_toplevel(module, name, world):
     # world contains a list of top-level packages separated by ' ' or \n
     # packages may contain repository (@) or version (=<>~) separator characters or start with negation !
     regex = re.compile(rf"^{re.escape(name)}([@=<>~].+)?$")
-    with open(world) as f:
-        content = f.read().split()
-        for p in content:
-            if regex.search(p):
-                return True
-    return False
+    try:
+        with open(world) as f:
+            content = f.read().split()
+    except OSError as e:
+        module.fail_json(msg=f"Cannot read world file {world}: {e}", exception=traceback.format_exc())
+    return any(regex.search(p) for p in content)
 
 
 def query_package(module, name):

@@ -226,3 +226,16 @@
         that:
           - result_empty_package_with_update_cache is failed
           - "'Package name(s) cannot be empty or whitespace-only' == result_empty_package_with_update_cache.msg"
+
+    - name: Install package with a missing world file
+      community.general.apk:
+        name: busybox
+        world: /nonexistent/world
+      register: result_missing_world
+      ignore_errors: true
+
+    - name: Assert failure due to missing world file
+      ansible.builtin.assert:
+        that:
+          - result_missing_world is failed
+          - "'Cannot read world file /nonexistent/world' in result_missing_world.msg"
