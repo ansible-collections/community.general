@@ -778,6 +778,7 @@ test_cases:
     output:
       changed: true
       rc: 0
+      reboot_required: true
     mocks:
       run_command:
         # transactional-update before 5.5.0 returns 0 although the search found nothing (zypper rc 104)
@@ -790,6 +791,29 @@ test_cases:
           environ: *env
           rc: 0
           out: *xml_install_wget
+          err: ''
+
+  - id: transactional_package_already_installed
+    input:
+      name: wget
+      state: present
+    output:
+      changed: false
+      reboot_required: false
+    mocks:
+      run_command:
+        - command: *tu_search_wget
+          environ: *env
+          rc: 0
+          out: |
+            <?xml version='1.0'?>
+            <stream>
+            <search-result version="0.0">
+            <solvable-list>
+            <solvable status="installed" name="wget" kind="package" edition="1.21.4-1.1" arch="x86_64" repository="(System Packages)"/>
+            </solvable-list>
+            </search-result>
+            </stream>
           err: ''
 
   # https://github.com/ansible-collections/community.general/issues/9011

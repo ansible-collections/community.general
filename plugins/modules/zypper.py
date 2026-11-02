@@ -269,7 +269,8 @@ EXAMPLES = r"""
 RETURN = r"""
 reboot_required:
   description:
-    - Whether zypper reported that a reboot is needed (return code V(102)).
+    - Whether zypper reported that a reboot is needed (return code V(102)), or the change was made with C(transactional-update)
+      and becomes active only after a reboot.
   returned: success
   type: bool
   sample: false
@@ -724,7 +725,8 @@ def main():
             packages_changed, retvals = package_present(module, name, state == "latest")
 
     retvals["changed"] = retvals["rc"] in [0, 102] and bool(packages_changed)
-    retvals["reboot_required"] = retvals["rc"] == 102
+    # transactional-update stages the change in a new snapshot that only a reboot activates
+    retvals["reboot_required"] = retvals["rc"] == 102 or (retvals["changed"] and transactional_updates())
 
     if module._diff:
         set_diff(module, retvals, packages_changed)
