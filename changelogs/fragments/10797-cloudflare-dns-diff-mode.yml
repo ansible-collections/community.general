@@ -1,2 +1,0 @@
-minor_changes:
-  - cloudflare_dns - add diff mode support (https://github.com/ansible-collections/community.general/issues/10797, https://github.com/ansible-collections/community.general/pull/12817).

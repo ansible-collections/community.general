@@ -1,3 +1,0 @@
-minor_changes:
-  - rhevm - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12976).
-  - sl_vm - update code to follow coding conventions, without changing functionality (https://github.com/ansible-collections/community.general/pull/12976).

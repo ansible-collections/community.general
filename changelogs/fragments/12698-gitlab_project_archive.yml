@@ -1,2 +1,0 @@
-minor_changes:
-  - gitlab_project - added ``archived`` and ``unarchived`` values for ``state`` (https://github.com/ansible-collections/community.general/pull/12698).

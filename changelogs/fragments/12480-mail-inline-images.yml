@@ -1,2 +1,0 @@
-minor_changes:
-  - mail - add the ``inline`` option to embed images in the message body via ``Content-ID``, so an HTML body can reference them with ``cid:...`` instead of an external URL (https://github.com/ansible-collections/community.general/pull/12480).

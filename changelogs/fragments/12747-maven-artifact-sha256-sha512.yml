@@ -1,2 +1,0 @@
-minor_changes:
-  - maven_artifact - add SHA-256 and SHA-512 support to ``checksum_alg`` (https://github.com/ansible-collections/community.general/pull/12747).
