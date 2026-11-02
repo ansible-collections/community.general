@@ -163,6 +163,39 @@ def test_resolve_server_fqdn_unresolvable_fails(mocker, run_module):
 
 
 # ---------------------------------------------------------------------------
+# protocol=tls
+# ---------------------------------------------------------------------------
+
+
+def test_protocol_tls_uses_dns_over_tls(mocker, run_module):
+    """protocol=tls sends every query with dns.query.tls on the given port."""
+    rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
+    tcp_mock = mocker.patch("dns.query.tcp")
+    tls_mock = mocker.patch("dns.query.tls", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
+    result = run_module({**BASE_PARAMS, "protocol": "tls", "port": 853})
+    assert result["changed"] is True
+    assert tcp_mock.call_count == 0
+    assert tls_mock.call_count == 2
+    for call in tls_mock.call_args_list:
+        assert call.args[1] == "10.1.1.1"
+        assert call.kwargs["port"] == 853
+        assert call.kwargs["server_hostname"] is None
+
+
+def test_protocol_tls_verifies_fqdn_server(mocker, run_module):
+    """With an FQDN server, protocol=tls passes the name on for certificate verification."""
+    MockResolver = mocker.patch("dns.resolver.Resolver")
+    MockResolver.return_value.resolve.side_effect = lambda name, rdatatype: (
+        ["192.168.1.1"] if rdatatype == dns.rdatatype.A else (dummy for dummy in ()).throw(dns.resolver.NoAnswer())
+    )
+    rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
+    tls_mock = mocker.patch("dns.query.tls", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
+    result = run_module({**BASE_PARAMS, "server": "ns1.example.org", "protocol": "tls", "port": 853})
+    assert result["changed"] is True
+    assert {call.kwargs["server_hostname"] for call in tls_mock.call_args_list} == {"ns1.example.org"}
+
+
+# ---------------------------------------------------------------------------
 # lookup_zone()
 # ---------------------------------------------------------------------------
 

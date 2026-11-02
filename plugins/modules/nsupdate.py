@@ -92,8 +92,12 @@ options:
   protocol:
     description:
       - Sets the transport protocol (TCP or UDP). TCP is the recommended and a more robust option.
+      - V(tls) sends the queries over DNS over TLS (RFC 7858). DNS over TLS servers usually listen on port 853, so set O(port=853)
+        as well. The server certificate is verified against the system CA certificates. If O(server) is an FQDN, the certificate
+        must also match that name.
+      - V(tls) was added in community.general 14.0.0.
     default: 'tcp'
-    choices: ['tcp', 'udp']
+    choices: ['tcp', 'udp', 'tls']
     type: str
   timeout:
     description:
@@ -156,6 +160,17 @@ EXAMPLES = r"""
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "ns1.example.org"
+    zone: "example.org"
+    record: "ansible"
+    value: "192.168.1.1"
+
+- name: Send the update over DNS over TLS
+  community.general.nsupdate:
+    key_name: "nsupdate"
+    key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
+    server: "ns1.example.org"
+    protocol: tls
+    port: 853
     zone: "example.org"
     record: "ansible"
     value: "192.168.1.1"
@@ -321,6 +336,14 @@ class RecordManager:
             try:
                 if self.module.params["protocol"] == "tcp":
                     return dns.query.tcp(query, server_ip, timeout=timeout, port=self.module.params["port"])
+                elif self.module.params["protocol"] == "tls":
+                    return dns.query.tls(
+                        query,
+                        server_ip,
+                        timeout=timeout,
+                        port=self.module.params["port"],
+                        server_hostname=self.server_fqdn,
+                    )
                 else:
                     return dns.query.udp(query, server_ip, timeout=timeout, port=self.module.params["port"])
             except (OSError, dns.exception.Timeout) as e:
@@ -611,7 +634,7 @@ def main():
             type=dict(default="A", type="str"),
             ttl=dict(default=3600, type="int"),
             value=dict(type="list", elements="str"),
-            protocol=dict(default="tcp", choices=["tcp", "udp"], type="str"),
+            protocol=dict(default="tcp", choices=["tcp", "udp", "tls"], type="str"),
             timeout=dict(default=10, type="float"),
         ),
         supports_check_mode=True,
