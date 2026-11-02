@@ -10,20 +10,16 @@ import glob
 import os
 import sys
 
+import tomllib
 import yaml
 
-try:
-    import tomllib
-except ImportError:
-    import tomli as tomllib
 
-
-def get_heavy_targets():
+def get_heavy_targets() -> tuple[set[str], bool]:
     """Return the heavy/<backend> targets that have sessions in antsibull-nox.toml, and whether errors were found."""
     with open("antsibull-nox.toml", "rb") as f:
         config = tomllib.load(f)
 
-    targets = set()
+    targets: set[str] = set()
     has_errors = False
     for group in config["sessions"]["ansible_test_integration"]["groups"]:
         for session in [group] + group.get("sessions", []):
@@ -45,7 +41,7 @@ def get_heavy_targets():
     return targets, has_errors
 
 
-def main():
+def main() -> int:
     """Main entry point."""
     with open(".azure-pipelines/azure-pipelines.yml", "rb") as f:
         azp = yaml.safe_load(f)
