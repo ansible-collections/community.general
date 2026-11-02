@@ -6,6 +6,23 @@ Community General Release Notes
 
 This changelog describes changes after version 10.0.0.
 
+v11.4.10
+========
+
+Release Summary
+---------------
+
+Final bugfix release.
+
+This is the last community.general 11.x.y release.
+Please upgrade to community.general 12.x.y, 13.x.y, or 14.x.y.
+Thanks a lot to everyone who contributed to a 11.x.y release!
+
+Bugfixes
+--------
+
+- github_deploy_key - do not delete an existing deploy key when running with ``state=absent`` in check mode (https://github.com/ansible-collections/community.general/issues/12348, https://github.com/ansible-collections/community.general/pull/13132).
+
 v11.4.9
 =======
 
