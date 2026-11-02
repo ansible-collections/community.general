@@ -74,7 +74,7 @@ updates:
       type: str
       returned: always
       sample: openssl-3
-    kind:
+    type:
       description: The kind of the update, as selected with O(type).
       type: str
       returned: always
@@ -188,7 +188,7 @@ if t.TYPE_CHECKING:  # pragma: no cover
         updates: list[dict[str, object]]
 
 
-UPDATE_ATTRS = ["name", "kind", "edition", "edition-old", "arch", "arch-old"]
+UPDATE_ATTRS = ["name", "edition", "edition-old", "arch", "arch-old"]
 PATCH_ATTRS = ["status", "category", "severity"]
 PATCH_BOOL_ATTRS = ["interactive", "restart", "pkgmanager"]
 
@@ -201,7 +201,7 @@ def child_text(node: Element, tag: str) -> str:
 
 
 def parse_update(node: Element, kind: str) -> dict[str, object]:
-    update: dict[str, object] = {}
+    update: dict[str, object] = {"type": node.getAttribute("kind")}
     for attr in UPDATE_ATTRS:
         if node.hasAttribute(attr):
             update[attr.replace("-", "_")] = node.getAttribute(attr)

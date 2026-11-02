@@ -80,14 +80,14 @@ test_cases:
       changed: false
       updates:
         - name: openssl-3
-          kind: package
+          type: package
           edition: 3.2.4-150700.3.6.1
           edition_old: 3.2.4-150700.3.3.1
           arch: x86_64
           summary: Secure Sockets and Transport Layer Security
           repository: SLE-Module-Basesystem15-SP7-Updates
         - name: empty
-          kind: package
+          type: package
           edition: 2-0
           edition_old: 1-0
           arch: noarch
@@ -121,7 +121,7 @@ test_cases:
       changed: false
       updates:
         - name: SUSE-SLE-Module-Basesystem-15-SP7-2026-1234
-          kind: patch
+          type: patch
           edition: '1'
           arch: noarch
           summary: Security update for the Linux Kernel

@@ -87,7 +87,7 @@
         that:
           - zypper_updates_info_update is not changed
           - empty_update | length == 1
-          - empty_update[0].kind == 'package'
+          - empty_update[0].type == 'package'
           - empty_update[0].edition == '2-0'
           - empty_update[0].edition_old == '1-0'
           - empty_update[0].arch == 'noarch'
