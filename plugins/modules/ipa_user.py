@@ -43,6 +43,8 @@ options:
       - Date at which the user password expires.
       - In the format YYYYMMddHHmmss.
       - For example V(20180121182022) expires on 21 January 2018 at 18:20:22.
+      - FreeIPA resets the expiration date whenever an administrator sets O(password), so when both are
+        sent the module sets the expiration date in a separate request after the password.
     type: str
   loginshell:
     description: Login shell.
@@ -343,6 +345,17 @@ def get_ssh_key_fingerprint(ssh_key, hash_algo="sha256"):
         return f"{key_fp} {comment} ({key_type})"
 
 
+def split_password_expiration(item):
+    """
+    FreeIPA resets krbpasswordexpiration whenever an administrator sets userpassword, even when both are
+    sent in the same request. Split the expiration date off so it can be sent in a second request.
+    """
+    if "userpassword" in item and "krbpasswordexpiration" in item:
+        item = dict(item)
+        return item, {"krbpasswordexpiration": item.pop("krbpasswordexpiration")}
+    return item, None
+
+
 def ensure(module, client):
     state = module.params["state"]
     name = module.params["uid"]
@@ -376,18 +389,31 @@ def ensure(module, client):
         if not ipa_user:
             changed = True
             if not module.check_mode:
-                ipa_user = client.user_add(name=name, item=module_user)
+                item, expiration = split_password_expiration(module_user)
+                ipa_user = client.user_add(name=name, item=item)
+                if expiration is not None:
+                    ipa_user = client.user_mod(name=name, item=expiration)
         else:
             if update_password == "on_create":
                 module_user.pop("userpassword", None)
             diff = get_user_diff(client, ipa_user, module_user)
+            if (
+                "userpassword" in diff
+                and "krbpasswordexpiration" in module_user
+                and "krbpasswordexpiration" not in diff
+            ):
+                # The password change resets the expiration date, so it has to be set again.
+                diff.append("krbpasswordexpiration")
             if len(diff) > 0:
                 changed = True
                 if not module.check_mode:
                     data = {}
                     for key in diff:
                         data[key] = module_user[key]
+                    data, expiration = split_password_expiration(data)
                     ipa_user = client.user_mod(name=name, item=data)
+                    if expiration is not None:
+                        ipa_user = client.user_mod(name=name, item=expiration)
     else:
         if ipa_user:
             changed = True
