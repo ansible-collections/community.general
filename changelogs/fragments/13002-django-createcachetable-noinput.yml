@@ -1,2 +1,0 @@
-bugfixes:
-  - django_createcachetable - do not pass the unsupported ``--noinput`` option to ``django-admin createcachetable`` (https://github.com/ansible-collections/community.general/pull/13002).

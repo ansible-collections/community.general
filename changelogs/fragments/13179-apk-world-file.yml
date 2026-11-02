@@ -1,2 +1,0 @@
-bugfixes:
-  - apk - fail cleanly when the ``world`` file cannot be read (https://github.com/ansible-collections/community.general/issues/10739, https://github.com/ansible-collections/community.general/pull/13179).

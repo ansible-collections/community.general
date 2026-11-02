@@ -1,2 +1,0 @@
-minor_changes:
-  - "elastic callback plugin - redact sensitive output on ansible-core 2.22+ (https://github.com/ansible-collections/community.general/pull/12829)."
