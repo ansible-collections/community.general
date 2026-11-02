@@ -57,27 +57,6 @@ def ansible_output(session: nox.Session) -> None:
     session.run("antsibull-docs", "ansible-output", *args, *session.posargs)
 
 
-# Integration tests for targets that do not have the regular `azp/...` targets because they are too slow or
-# resource-hungry for regular CI, but that can still run without credentials or special hardware.
-# These targets are tagged with the `heavy` alias. This session is not registered for CI.
-antsibull_nox.add_ansible_test_session(
-    name="ansible-test-integration-heavy",
-    description="Run integration tests for the non-CI targets tagged as heavy",
-    ansible_test_params=[
-        "integration",
-        "-v",
-        "--docker",
-        "ubuntu",
-        "--display-traceback",
-        "error",
-        "heavy/",
-    ],
-    extra_deps_files=["tests/integration/requirements.yml"],
-    ansible_core_version="devel",
-    default=False,
-)
-
-
 @nox.session(name="update-azp-config", python=False)
 def update_azp_config(session: nox.Session) -> None:
     command = [
@@ -85,6 +64,8 @@ def update_azp_config(session: nox.Session) -> None:
         "update-azp-config",
         "--min-ansible-core",
         "2.19",
+        "--exclude-tags",
+        "heavy",
         "--extra-session",
         '{"group": "Sanity", "title": "Extra sanity tests", "session": "extra-sanity-tests"}',
     ]

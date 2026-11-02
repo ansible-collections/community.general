@@ -34,5 +34,6 @@ jobs:
       upload-codecov-schedule: true
       allow-coverage-cd-override: true
       max-ansible-core: "2.18"
+      exclude-tags: remote, no-gha, heavy
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
