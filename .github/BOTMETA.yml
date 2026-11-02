@@ -1580,6 +1580,9 @@ files:
   $modules/zypper_repository_info.py:
     labels: zypper
     maintainers: $team_suse TobiasZeuch181
+  $modules/zypper_updates_info.py:
+    labels: zypper
+    maintainers: $team_suse
   $plugin_utils/_ansible_type.py:
     maintainers: vbotka
   $plugin_utils/_keys_filter.py:
