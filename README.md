@@ -2,8 +2,8 @@
 # Community General Collection
 
 [![Documentation](https://img.shields.io/badge/docs-brightgreen.svg)](https://docs.ansible.com/projects/ansible/devel/collections/community/general/)
-[![AZP CI](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
-[![Nox CI](https://github.com/ansible-collections/community.general/actions/workflows/nox.yml/badge.svg?branch=main)](https://github.com/ansible-collections/community.general/actions)
+[![AZP CI](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=stable-14)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
+[![Nox CI](https://github.com/ansible-collections/community.general/actions/workflows/nox.yml/badge.svg?branch=stable-14)](https://github.com/ansible-collections/community.general/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 [![REUSE status](https://api.reuse.software/badge/github.com/ansible-collections/community.general)](https://api.reuse.software/info/github.com/ansible-collections/community.general)
 
@@ -112,7 +112,7 @@ See [Releasing collections with release branches](https://docs.ansible.com/proje
 
 ## Release notes
 
-See the [changelog](https://github.com/ansible-collections/community.general/blob/main/CHANGELOG.md).
+See the [changelog](https://github.com/ansible-collections/community.general/blob/stable-14/CHANGELOG.md).
 
 ## Roadmap
 
@@ -131,8 +131,8 @@ See [this issue](https://github.com/ansible-collections/community.general/issues
 
 This collection is primarily licensed and distributed as a whole under the GNU General Public License v3.0 or later.
 
-See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.general/blob/main/COPYING) for the full text.
+See [LICENSES/GPL-3.0-or-later.txt](https://github.com/ansible-collections/community.general/blob/stable-14/COPYING) for the full text.
 
-Parts of the collection are licensed under the [BSD 2-Clause license](https://github.com/ansible-collections/community.general/blob/main/LICENSES/BSD-2-Clause.txt) and the [MIT license](https://github.com/ansible-collections/community.general/blob/main/LICENSES/MIT.txt).
+Parts of the collection are licensed under the [BSD 2-Clause license](https://github.com/ansible-collections/community.general/blob/stable-14/LICENSES/BSD-2-Clause.txt) and the [MIT license](https://github.com/ansible-collections/community.general/blob/stable-14/LICENSES/MIT.txt).
 
 All files have a machine readable `SPDX-License-Identifier:` comment denoting its respective license(s) or an equivalent entry in an accompanying `.license` file. Only changelog fragments (which will not be part of a release) are covered by a blanket statement in `REUSE.toml`. This conforms to the [REUSE specification](https://reuse.software/spec/).
