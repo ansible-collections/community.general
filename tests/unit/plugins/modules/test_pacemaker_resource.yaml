@@ -650,3 +650,39 @@ test_cases:
           rc: 0
           out: "  * Clone Set: virtual-ip-clone [virtual-ip]\t(ocf:heartbeat:IPAddr2):\t Started"
           err: ""
+  - id: test_clone_group_already_cloned_is_idempotent
+    input:
+      state: cloned
+      name: locking
+      wait: 0
+    output:
+      changed: false
+      previous_value: "  * Clone Set: locking-clone [locking]"
+      value: "  * Clone Set: locking-clone [locking]"
+    mocks:
+      run_command:
+        - command: [/testbin/pcs, resource, status, locking]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: locking-clone [locking]"
+          err: ""
+        - command: [/testbin/pcs, property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
+        - command: [/testbin/pcs, resource, clone, locking]
+          environ: *env-def
+          rc: 1
+          out: ""
+          err: "Error: cannot clone a group that has already been cloned"
+        - command: [/testbin/pcs, resource, status, locking]
+          environ: *env-def
+          rc: 0
+          out: "  * Clone Set: locking-clone [locking]"
+          err: ""
