@@ -6,6 +6,48 @@ Community General Release Notes
 
 This changelog describes changes after version 11.0.0.
 
+v12.6.7
+=======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- cloudflare_dns - fix failure when looking up records whose value contains a comma (https://github.com/ansible-collections/community.general/issues/10208, https://github.com/ansible-collections/community.general/pull/13119).
+- composer - fix ``apcu_autoloader`` never passing ``--apcu-autoloader`` to composer, because the option was mapped to the misspelled ``acpu-autoloader`` (https://github.com/ansible-collections/community.general/pull/12988).
+- composer - pass ``--apcu`` for ``apcu_autoloader`` to ``dump-autoload``, which has no ``--apcu-autoloader`` flag (https://github.com/ansible-collections/community.general/pull/12989).
+- diy callback plugin - no longer emits deprecation warnings about ``v2_on_any`` with ansible-core 2.19 and later (https://github.com/ansible-collections/community.general/issues/10545, https://github.com/ansible-collections/community.general/pull/13093).
+- django_createcachetable - do not pass the unsupported ``--noinput`` option to ``django-admin createcachetable`` (https://github.com/ansible-collections/community.general/pull/13002).
+- github_deploy_key - do not delete an existing deploy key when running with ``state=absent`` in check mode (https://github.com/ansible-collections/community.general/issues/12348, https://github.com/ansible-collections/community.general/pull/13132).
+- gitlab_instance_variable - ignore the ``hidden`` attribute that GitLab 19.1 and newer return for instance variables when comparing them with the requested variables. Before, ``purge=true`` deleted every instance variable, including the ones the task had just created, and every run reported a change (https://github.com/ansible-collections/community.general/issues/12349, https://github.com/ansible-collections/community.general/pull/13029).
+- gitlab_runner - do not fail with ``'<' not supported between instances of 'str' and 'int'`` when python-gitlab cannot read the GitLab server version. The module now assumes that the server is new enough and emits a warning (https://github.com/ansible-collections/community.general/issues/12707, https://github.com/ansible-collections/community.general/pull/12899).
+- idrac_redfish_config - fix setting attributes on iDRAC10 (https://github.com/ansible-collections/community.general/issues/10232, https://github.com/ansible-collections/community.general/pull/13141).
+- lxc_container - fix archiving containers on LXC 2.1 and newer, which failed with ``KeyError`` because the module read the removed ``lxc.rootfs`` config key instead of ``lxc.rootfs.path`` (https://github.com/ansible-collections/community.general/issues/12562, https://github.com/ansible-collections/community.general/pull/12982).
+- mail - fail when an encrypted connection cannot be established with ``secure=always``, instead of sending the mail unencrypted (https://github.com/ansible-collections/community.general/pull/13068).
+- mail - open only one connection to the SMTP server instead of two (https://github.com/ansible-collections/community.general/pull/13069).
+- mail - report connection errors such as a refused connection as a module failure instead of a traceback (https://github.com/ansible-collections/community.general/issues/7122, https://github.com/ansible-collections/community.general/pull/13067).
+- modules using ``CmdRunner`` - environment variables set for a single command are no longer passed to subsequent commands (https://github.com/ansible-collections/community.general/issues/12904, https://github.com/ansible-collections/community.general/pull/12905).
+- nmcli - fail when the connection editor reports an error instead of reporting a change (https://github.com/ansible-collections/community.general/issues/9091, https://github.com/ansible-collections/community.general/pull/13116).
+- nmcli - fix ``wifi_sec`` flags options always reporting changes and failing with integer values (https://github.com/ansible-collections/community.general/issues/9121, https://github.com/ansible-collections/community.general/pull/13080).
+- nmcli - fix list suboptions of ``wifi`` and ``wifi_sec`` being sent to nmcli one character at a time when given as a string (https://github.com/ansible-collections/community.general/issues/7500, https://github.com/ansible-collections/community.general/pull/13072).
+- open_iscsi - fix login to a single target ignoring login failures and the ``portal`` option (https://github.com/ansible-collections/community.general/pull/12928).
+- pacemaker_resource - fix non-idempotent behaviour when ``state=cloned`` is applied to a resource or group that is already part of a clone set (https://github.com/ansible-collections/community.general/issues/12217, https://github.com/ansible-collections/community.general/pull/12288).
+- pamd - fix crash when removing a rule that is the only line in the file with ``state=absent`` (https://github.com/ansible-collections/community.general/pull/13115).
+- scaleway_ip - fix failure when creating an IP with ``reverse`` set, and show the error details from the API when updating an IP fails (https://github.com/ansible-collections/community.general/issues/11362, https://github.com/ansible-collections/community.general/pull/13140).
+- sysrc - keep leading and trailing whitespace of the current value when comparing it, so setting a value that starts or ends with whitespace is idempotent, and report the correct change status for ``state=value_present`` and ``state=value_absent`` when a list item has leading or trailing whitespace (https://github.com/ansible-collections/community.general/issues/13108, https://github.com/ansible-collections/community.general/pull/13117).
+- terraform - pass ``state_file`` to the ``apply`` and ``destroy`` commands, not only to ``plan`` (https://github.com/ansible-collections/community.general/issues/6490, https://github.com/ansible-collections/community.general/pull/12997).
+- timezone - fix failure when setting timezone aliases on Debian and Ubuntu without systemd (https://github.com/ansible-collections/community.general/issues/7498, https://github.com/ansible-collections/community.general/pull/13169).
+- timezone - update ``/etc/timezone`` when using ``timedatectl`` (https://github.com/ansible-collections/community.general/issues/8784, https://github.com/ansible-collections/community.general/pull/13074).
+- zpool - fix idempotency of ``vdevs`` with short device names, symbolic links, partitions, multi-disk stripes, and role groups (https://github.com/ansible-collections/community.general/issues/10771, https://github.com/ansible-collections/community.general/issues/10744, https://github.com/ansible-collections/community.general/pull/12948).
+- zypper - do not fail when zypper returns ``102`` (reboot needed) after a successful run, for example when applying patches with ``--with-interactive`` (https://github.com/ansible-collections/community.general/issues/12960, https://github.com/ansible-collections/community.general/pull/12965).
+- zypper - do not pass ``extra_args`` to the ``zypper search`` command used to determine the installed packages (https://github.com/ansible-collections/community.general/issues/4242, https://github.com/ansible-collections/community.general/pull/12958).
+- zypper - fail when ``zypper`` reports errors while run through ``transactional-update`` versions that return success regardless (https://github.com/ansible-collections/community.general/issues/9011, https://github.com/ansible-collections/community.general/pull/12957).
+- zypper_repository - fix idempotency when the repository URL contains ``$releasever`` on openSUSE Leap 16.0 (https://github.com/ansible-collections/community.general/pull/13017).
+
 v12.6.6
 =======
 
