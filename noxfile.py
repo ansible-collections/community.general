@@ -84,7 +84,7 @@ def update_azp_config(session: nox.Session) -> None:
         "antsibull-nox",
         "update-azp-config",
         "--min-ansible-core",
-        "2.19",
+        "2.20",
         "--extra-session",
         '{"group": "Sanity", "title": "Extra sanity tests", "session": "extra-sanity-tests"}',
     ]
