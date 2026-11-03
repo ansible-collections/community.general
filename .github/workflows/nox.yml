@@ -33,6 +33,6 @@ jobs:
       upload-codecov-push: false
       upload-codecov-schedule: true
       allow-coverage-cd-override: true
-      max-ansible-core: "2.18"
+      max-ansible-core: "2.19"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
