@@ -246,7 +246,7 @@ def list_updates(module: AnsibleModule, kind: str, list_all: bool) -> list[dict[
     dom = parseXML(stdout)
     if rc == 106:
         messages = [
-            message.firstChild.nodeValue.strip()
+            (message.firstChild.nodeValue or "").strip()
             for message in dom.getElementsByTagName("message")
             if message.getAttribute("type") in ("warning", "error") and message.firstChild
         ]
