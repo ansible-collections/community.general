@@ -6,6 +6,17 @@ from __future__ import annotations
 
 from ansible_collections.community.general.plugins.modules import zypper_updates_info
 
-from .uthelper import RunCommandMock, UTHelper
+from .uthelper import RunCommandMock, TestCaseMock, UTHelper
 
-UTHelper.from_module(zypper_updates_info, __name__, mocks=[RunCommandMock])
+
+class WarningContainsMock(TestCaseMock):
+    name = "warning_contains"
+
+    def setup(self, mocker):
+        pass
+
+    def check(self, test_case, results):
+        assert self.mock_specs["text"] in str(results.get("warnings", []))
+
+
+UTHelper.from_module(zypper_updates_info, __name__, mocks=[RunCommandMock, WarningContainsMock])

@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_updates_info - list the updates from the other repositories and warn instead of failing when zypper skips a repository that cannot be refreshed (https://github.com/ansible-collections/community.general/pull/13191).
