@@ -15,6 +15,9 @@ version_added: 14.0.0
 short_description: List available Zypper updates
 description:
   - List the updates that C(zypper list-updates) reports on SUSE and openSUSE.
+  - When zypper skips repositories because they cannot be refreshed, the module lists the updates from the other
+    repositories and returns the zypper messages about the skipped repositories as warnings. When zypper skips every
+    enabled repository, the module fails.
 extends_documentation_fragment:
   - community.general._attributes
   - community.general._attributes.info_module
@@ -233,13 +236,35 @@ def list_updates(module: AnsibleModule, kind: str, list_all: bool) -> list[dict[
     if list_all:
         cmd.append("--all")
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
+    failure = dict(msg=f'Failed to execute "{" ".join(cmd)}"', rc=rc, stdout=stdout, stderr=stderr)
     # 6 is ZYPPER_EXIT_NO_REPOS
     if rc == 6:
         return []
+    # 106 is ZYPPER_EXIT_INF_REPOS_SKIPPED
+    if rc not in (0, 106):
+        module.fail_json(**failure)
+    dom = parseXML(stdout)
+    if rc == 106:
+        messages = [
+            message.firstChild.nodeValue.strip()
+            for message in dom.getElementsByTagName("message")
+            if message.getAttribute("type") in ("warning", "error") and message.firstChild
+        ]
+        # zypper writes one such warning for each repository it skips
+        skipped = sum(message.startswith("Skipping repository ") for message in messages)
+        if skipped >= count_enabled_repos(module):
+            module.fail_json(**failure)
+        for message in messages:
+            module.warn(message)
+    return [parse_update(node, kind) for node in dom.getElementsByTagName("update")]
+
+
+def count_enabled_repos(module: AnsibleModule) -> int:
+    cmd = [module.get_bin_path("zypper", required=True), "--non-interactive", "--xmlout", "--quiet", "repos"]
+    rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     if rc != 0:
         module.fail_json(msg=f'Failed to execute "{" ".join(cmd)}"', rc=rc, stdout=stdout, stderr=stderr)
-    dom = parseXML(stdout)
-    return [parse_update(node, kind) for node in dom.getElementsByTagName("update")]
+    return sum(repo.getAttribute("enabled") == "1" for repo in parseXML(stdout).getElementsByTagName("repo"))
 
 
 def get_argument_spec() -> ArgumentSpecT:

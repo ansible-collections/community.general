@@ -40,7 +40,7 @@
       ansible.builtin.command: zypper -n ref
 
 - block:
-    - ansible.builtin.include_tasks: 'zypper_repository.yml'
+    - ansible.builtin.include_tasks: 'zypper_repository_info.yml'
   always:
     - name: remove repositories added during test
       community.general.zypper_repository:
