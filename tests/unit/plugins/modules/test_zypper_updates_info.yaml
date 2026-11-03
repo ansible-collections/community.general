@@ -12,6 +12,8 @@ anchors:
     [/testbin/zypper, --non-interactive, --xmlout, --quiet, list-updates, --type, package, --all]
   lu_patch: &lu_patch
     [/testbin/zypper, --non-interactive, --xmlout, --quiet, list-updates, --type, patch]
+  repos: &repos
+    [/testbin/zypper, --non-interactive, --xmlout, --quiet, repos]
 
   xml_no_updates: &xml_no_updates |
     <?xml version='1.0'?>
@@ -58,6 +60,62 @@ anchors:
     </update>
     </update-list>
     </update-status>
+    </stream>
+  xml_repo_skipped: &xml_repo_skipped |
+    <?xml version='1.0'?>
+    <stream>
+    <prompt id="13">
+    <text>File &apos;repomd.xml&apos; from repository &apos;chrome2&apos; is signed with an unknown key &apos;FD533C07C264648F&apos;.
+    Continue?</text>
+    <option value="yes" desc=""/>
+    <option default="1" value="no" desc=""/>
+    </prompt>
+    <message type="error">Repository &apos;chrome2&apos; is invalid.
+    [chrome2|http://dl.google.com/linux/chrome/rpm/stable/x86_64] Failed to retrieve new repository metadata.
+    </message>
+    <message type="warning">Skipping repository &apos;chrome2&apos; because of the above error.</message>
+    <message type="error">Some of the repositories have not been refreshed because of an error.</message>
+    <update-status version="0.6">
+    <update-list>
+    <update kind="package" name="empty" edition="2-0" arch="noarch" edition-old="1-0">
+    <summary>Empty RPM</summary>
+    </update>
+    </update-list>
+    </update-status>
+    </stream>
+  xml_all_skipped: &xml_all_skipped |
+    <?xml version='1.0'?>
+    <stream>
+    <message type="warning">Skipping repository &apos;chrome2&apos; because of the above error.</message>
+    <message type="error">Some of the repositories have not been refreshed because of an error.</message>
+    <update-status version="0.6">
+    <update-list>
+    </update-list>
+    </update-status>
+    </stream>
+  xml_repos_two_enabled: &xml_repos_two_enabled |
+    <?xml version='1.0'?>
+    <stream>
+    <repo-list>
+    <repo alias="chrome2" name="chrome2" type="rpm-md" priority="99" enabled="1" autorefresh="0" gpgcheck="1">
+    <url>http://dl.google.com/linux/chrome/rpm/stable/x86_64</url>
+    </repo>
+    <repo alias="local" name="local" type="plaindir" priority="99" enabled="1" autorefresh="0" gpgcheck="0">
+    <url>dir:/var/tmp/repo</url>
+    </repo>
+    </repo-list>
+    </stream>
+  xml_repos_one_enabled: &xml_repos_one_enabled |
+    <?xml version='1.0'?>
+    <stream>
+    <repo-list>
+    <repo alias="chrome2" name="chrome2" type="rpm-md" priority="99" enabled="1" autorefresh="0" gpgcheck="1">
+    <url>http://dl.google.com/linux/chrome/rpm/stable/x86_64</url>
+    </repo>
+    <repo alias="local" name="local" type="plaindir" priority="99" enabled="0" autorefresh="0" gpgcheck="0">
+    <url>dir:/var/tmp/repo</url>
+    </repo>
+    </repo-list>
     </stream>
 
 test_cases:
@@ -155,6 +213,51 @@ test_cases:
           rc: 6
           out: ''
           err: 'Warning: No repositories defined.'
+
+  - id: repository_skipped
+    input: {}
+    output:
+      changed: false
+      updates:
+        - name: empty
+          type: package
+          edition: 2-0
+          edition_old: 1-0
+          arch: noarch
+          summary: Empty RPM
+    mocks:
+      warning_contains:
+        text: "Skipping repository 'chrome2' because of the above error."
+      run_command:
+        - command: *lu_package
+          environ: *env
+          rc: 106
+          out: *xml_repo_skipped
+          err: ''
+        - command: *repos
+          environ: *env
+          rc: 0
+          out: *xml_repos_two_enabled
+          err: ''
+
+  - id: all_repositories_skipped
+    input: {}
+    output:
+      failed: true
+      rc: 106
+      msg: 'Failed to execute "/testbin/zypper --non-interactive --xmlout --quiet list-updates --type package"'
+    mocks:
+      run_command:
+        - command: *lu_package
+          environ: *env
+          rc: 106
+          out: *xml_all_skipped
+          err: ''
+        - command: *repos
+          environ: *env
+          rc: 0
+          out: *xml_repos_one_enabled
+          err: ''
 
   - id: zypper_error
     input: {}
