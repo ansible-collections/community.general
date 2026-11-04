@@ -282,7 +282,7 @@ class KopiaServer(StateModuleHelper):
             tokens = []
             for token in line.split():
                 if token.startswith("target:"):
-                    labels = token[len("target:"):].split(",")
+                    labels = token[len("target:") :].split(",")
                     token = "target:" + ",".join(sorted(labels))
                 tokens.append(token)
             lines.append(" ".join(tokens))
