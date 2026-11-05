@@ -38,7 +38,10 @@ EXAMPLES = r"""
 
 RETURN = r"""
 _raw:
-  description: Secrets stored.
+  description:
+    - Secrets stored.
+    - B(Note) on ansible-core 2.22+, the values will be registered as secrets.
+      See R(Masking secrets in Ansible output, secret_masking) for more information.
   type: list
   elements: str
 """
@@ -48,6 +51,7 @@ HAS_KEYRING = True
 from ansible.errors import AnsibleError
 from ansible.utils.display import Display
 
+from ansible_collections.community.general.plugins.module_utils._secrets import mark_values_as_secrets
 from ansible_collections.community.general.plugins.plugin_utils._lookup import check_for_wrong_terms
 
 try:
@@ -76,5 +80,5 @@ class LookupModule(LookupBase):
             password = keyring.get_password(servicename, username)
             if password is None:
                 raise AnsibleError(f"servicename: {servicename} for user {username} not found")
-            ret.append(password.rstrip())
+            ret.append(mark_values_as_secrets(password.rstrip()))
         return ret
