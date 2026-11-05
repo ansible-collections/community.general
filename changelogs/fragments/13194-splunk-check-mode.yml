@@ -1,0 +1,2 @@
+bugfixes:
+  - splunk callback plugin - report ``ansible_check_mode`` per task instead of keeping it set to ``true`` for the rest of the run once a single task ran in check mode (https://github.com/ansible-collections/community.general/issues/13194).
