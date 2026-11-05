@@ -1,2 +1,2 @@
 minor_changes:
-  - nsupdate - add ``tls`` to the ``protocol`` option to send queries over DNS over TLS (https://github.com/ansible-collections/community.general/issues/12199, https://github.com/ansible-collections/community.general/pull/13189).
+  - nsupdate - add ``tls`` to the ``protocol`` option to send queries using DNS over TLS (https://github.com/ansible-collections/community.general/issues/12199, https://github.com/ansible-collections/community.general/pull/13189).

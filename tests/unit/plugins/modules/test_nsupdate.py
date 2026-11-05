@@ -172,7 +172,8 @@ def test_protocol_tls_uses_dns_over_tls(mocker, run_module):
     rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
     tcp_mock = mocker.patch("dns.query.tcp")
     tls_mock = mocker.patch("dns.query.tls", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
-    result = run_module({**BASE_PARAMS, "protocol": "tls", "port": 853})
+    params = {k: v for k, v in BASE_PARAMS.items() if k != "port"}
+    result = run_module({**params, "protocol": "tls"})
     assert result["changed"] is True
     assert tcp_mock.call_count == 0
     assert tls_mock.call_count == 2
@@ -180,6 +181,24 @@ def test_protocol_tls_uses_dns_over_tls(mocker, run_module):
         assert call.args[1] == "10.1.1.1"
         assert call.kwargs["port"] == 853
         assert call.kwargs["server_hostname"] is None
+
+
+@pytest.mark.parametrize("protocol, port", [("tcp", 53), ("udp", 53)])
+def test_port_defaults_to_53_without_tls(mocker, run_module, protocol, port):
+    """Without protocol=tls, an omitted port still defaults to 53."""
+    rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
+    query_mock = mocker.patch(f"dns.query.{protocol}", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
+    params = {k: v for k, v in BASE_PARAMS.items() if k != "port"}
+    run_module({**params, "protocol": protocol})
+    assert {call.kwargs["port"] for call in query_mock.call_args_list} == {port}
+
+
+def test_protocol_tls_explicit_port(mocker, run_module):
+    """An explicit port is kept with protocol=tls."""
+    rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
+    tls_mock = mocker.patch("dns.query.tls", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
+    run_module({**BASE_PARAMS, "protocol": "tls", "port": 8853})
+    assert {call.kwargs["port"] for call in tls_mock.call_args_list} == {8853}
 
 
 def test_protocol_tls_verifies_fqdn_server(mocker, run_module):

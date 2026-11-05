@@ -44,7 +44,7 @@ options:
   port:
     description:
       - Use this TCP port when connecting to O(server).
-    default: 53
+      - Defaults to V(853) if O(protocol=tls), and to V(53) otherwise.
     type: int
   key_name:
     description:
@@ -92,9 +92,8 @@ options:
   protocol:
     description:
       - Sets the transport protocol (TCP or UDP). TCP is the recommended and a more robust option.
-      - V(tls) sends the queries over DNS over TLS (RFC 7858). DNS over TLS servers usually listen on port 853, so set O(port=853)
-        as well. The server certificate is verified against the system CA certificates. If O(server) is an FQDN, the certificate
-        must also match that name.
+      - V(tls) sends the queries using DNS over TLS (RFC 7858). The server certificate is verified against the system CA certificates.
+        If O(server) is an FQDN, the certificate must also match that name.
       - V(tls) was added in community.general 14.0.0.
     default: 'tcp'
     choices: ['tcp', 'udp', 'tls']
@@ -170,7 +169,6 @@ EXAMPLES = r"""
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "ns1.example.org"
     protocol: tls
-    port: 853
     zone: "example.org"
     record: "ansible"
     value: "192.168.1.1"
@@ -625,7 +623,7 @@ def main():
         argument_spec=dict(
             state=dict(default="present", choices=["present", "absent"], type="str"),
             server=dict(required=True, type="str"),
-            port=dict(default=53, type="int"),
+            port=dict(type="int"),
             key_name=dict(type="str"),
             key_secret=dict(type="str", no_log=True),
             key_algorithm=dict(default="hmac-md5", choices=tsig_algs, type="str"),
@@ -641,6 +639,9 @@ def main():
     )
 
     deps.validate(module, "dnspython")
+
+    if module.params["port"] is None:
+        module.params["port"] = 853 if module.params["protocol"] == "tls" else 53
 
     if len(module.params["record"]) == 0:
         module.fail_json(msg="record cannot be empty.")
