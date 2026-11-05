@@ -1,0 +1,2 @@
+bugfixes:
+  - pnpm - do not report changes when all packages from ``package.json`` are already installed (https://github.com/ansible-collections/community.general/issues/9938, https://github.com/ansible-collections/community.general/pull/13142).

@@ -27,7 +27,9 @@ options:
   name:
     description:
       - The name of a Node.js library to install.
-      - All packages in C(package.json) are installed if not provided.
+      - All packages in C(package.json) are installed if not provided. In that case, with O(state=present), the module only
+        checks whether each package declared in C(package.json) is installed, so changing the version of an already installed
+        package in C(package.json) does not trigger an installation.
     type: str
   alias:
     description:
@@ -240,6 +242,9 @@ class Pnpm:
 
         data = data[0]
 
+        if self.name is None:
+            return self.missing_from_package_json(data)
+
         for typedep in [
             "dependencies",
             "devDependencies",
@@ -263,6 +268,38 @@ class Pnpm:
                 break
 
         return True
+
+    def missing_from_package_json(self, data):
+        try:
+            with open(os.path.join(self.path, "package.json")) as f:
+                package_json = json.load(f)
+        except (OSError, ValueError) as e:
+            self.module.fail_json(msg=f"Failed to read package.json with error {e}")
+
+        if self.production:
+            typedeps = ["dependencies", "optionalDependencies"]
+        elif self.dev:
+            typedeps = ["devDependencies"]
+        else:
+            typedeps = ["dependencies", "devDependencies", "optionalDependencies"]
+
+        if self.no_optional and "optionalDependencies" in typedeps:
+            typedeps.remove("optionalDependencies")
+
+        declared = set()
+        for typedep in typedeps:
+            declared.update(package_json.get(typedep, {}))
+
+        installed = set()
+        for typedep in [
+            "dependencies",
+            "devDependencies",
+            "optionalDependencies",
+            "unsavedDependencies",
+        ]:
+            installed.update(data.get(typedep, {}))
+
+        return not declared.issubset(installed)
 
     def install(self):
         if self.alias_name_ver is not None:
