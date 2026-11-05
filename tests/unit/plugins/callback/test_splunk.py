@@ -80,3 +80,23 @@ class TestSplunkClient(unittest.TestCase):
         self.assertEqual(sent_data["event"]["timestamp"], "2020-12-01 00:00:00 +0000")
         self.assertEqual(sent_data["event"]["host"], "my-host")
         self.assertEqual(sent_data["event"]["ip_address"], "1.2.3.4")
+
+    @patch("ansible_collections.community.general.plugins.callback.splunk.open_url")
+    def test_check_mode_is_reported_per_event(self, open_url_mock):
+        sent = []
+        for check_mode in (False, True, False, None):
+            args = {} if check_mode is None else {"_ansible_check_mode": check_mode}
+            result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields={"args": args})
+            self.splunk.send_event(
+                url="endpoint",
+                authtoken="token",
+                validate_certs=False,
+                include_milliseconds=False,
+                batch=None,
+                state="OK",
+                result=result,
+                runtime=100,
+            )
+            sent.append(json.loads(open_url_mock.call_args[0][1])["event"]["ansible_check_mode"])
+
+        self.assertEqual(sent, [False, True, False, False])
