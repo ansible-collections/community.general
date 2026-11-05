@@ -354,7 +354,7 @@ class FailedInstallingWithPluginManager(Exception):
 
 
 class JenkinsPlugin:
-    def __init__(self, module):
+    def __init__(self, module, installed_plugins=None, plugin_versions_data=None, crumb=None, cookies=None):
         # To be able to call fail_json
         self.module = module
 
@@ -370,22 +370,25 @@ class JenkinsPlugin:
                 self.params["updates_url_username"], self.params["updates_url_password"]
             )
 
-        # Crumb
-        self.crumb = {}
+        self.crumb = crumb
+        if self.crumb is None:
+            # Crumb
+            self.crumb = {}
 
-        # Authentication for Jenkins calls
-        if self.params.get("url_username") and self.params.get("url_password"):
-            self.crumb["Authorization"] = basic_auth_header(self.params["url_username"], self.params["url_password"])
+            # Authentication for Jenkins calls
+            if self.params.get("url_username") and self.params.get("url_password"):
+                self.crumb["Authorization"] = basic_auth_header(self.params["url_username"], self.params["url_password"])
 
         # Cookie jar for crumb session
-        self.cookies = None
-
-        if self._csrf_enabled():
+        self.cookies = cookies
+        if self.cookies is None and self._csrf_enabled():
             self.cookies = cookiejar.LWPCookieJar()
-            self._get_crumb()
 
         # Get list of installed plugins
+        self.installed_plugins = installed_plugins
         self._get_installed_plugins()
+
+        self.plugin_versions_data = plugin_versions_data
 
     def _csrf_enabled(self):
         csrf_data = self._get_json_data(f"{self.url}/api/json", "CSRF")
@@ -492,26 +495,30 @@ class JenkinsPlugin:
             self.module.fail_json(msg="Required fields not found in the Crum response.", details=crumb_data)
 
     def _get_installed_plugins(self):
-        plugins_data = self._get_json_data(f"{self.url}/pluginManager/api/json?depth=1", "list of plugins")
+        # list may have been passed down from calling JenkinsPlugin instance
+        if self.installed_plugins is None:
+            plugins_data = self._get_json_data(f"{self.url}/pluginManager/api/json?depth=1", "list of plugins")
 
-        # Check if we got valid data
-        if "plugins" not in plugins_data:
-            self.module.fail_json(msg="No valid plugin data found.")
+            # Check if we got valid data
+            if "plugins" not in plugins_data:
+                self.module.fail_json(msg="No valid plugin data found.")
+
+            self.installed_plugins = plugins_data["plugins"]
 
         # Create final list of installed/pined plugins
         self.is_installed = False
         self.is_pinned = False
         self.is_enabled = False
-        self.installed_plugins = plugins_data["plugins"]
 
-        for p in plugins_data["plugins"]:
+        for p in self.installed_plugins:
             if p["shortName"] == self.params["name"]:
                 self.is_installed = True
 
-                if p["pinned"]:
+                # cached entries don't carry metadata, fail gracefully on missing fields
+                if p.get("pinned"):
                     self.is_pinned = True
 
-                if p["enabled"]:
+                if p.get("enabled"):
                     self.is_enabled = True
 
                 break
@@ -529,7 +536,14 @@ class JenkinsPlugin:
                     argument_spec=self.module.argument_spec, supports_check_mode=self.module.check_mode
                 )
                 dep_module.params = dep_params
-                dep_plugin = JenkinsPlugin(dep_module)
+                dep_plugin = JenkinsPlugin(
+                    dep_module,
+                    installed_plugins=self.installed_plugins,
+                    plugin_versions_data=self.plugin_versions_data,
+                    crumb=self.crumb,
+                    cookies=self.cookies,
+                )
+                self.installed_plugins.append({"shortName": dep_name, "version": dep_version})
                 if not dep_plugin.install():
                     self.dependencies_states.append({"name": dep_name, "version": dep_version, "state": "absent"})
                 else:
@@ -663,13 +677,10 @@ class JenkinsPlugin:
                 urls.append(f"{base_url}/{update_segment}/{self.params['name']}.hpi")
         return urls
 
-    def _get_latest_compatible_plugin_version(self, plugin_name=None):
-        if not hasattr(self, "jenkins_version"):
-            self.module.params["force_basic_auth"] = True
-            resp, info = fetch_url(self.module, self.url)
-            raw_version = info.get("x-jenkins")
-            self.jenkins_version = self.parse_version(raw_version)
-        name = plugin_name or self.params["name"]
+    def _get_plugin_versions_data(self):
+        if self.plugin_versions_data is not None:
+            return self.plugin_versions_data
+
         cache_path = f"{self.params['jenkins_home']}/ansible_jenkins_plugin_cache.json"
         plugin_version_urls = []
         for base_url in self.params["updates_url"]:
@@ -685,20 +696,32 @@ class JenkinsPlugin:
             now = time.time()
             if now - file_mtime >= 86400:
                 response = self._get_urls_data(plugin_version_urls, what="plugin-versions.json")
-                plugin_data = json.loads(response.read(), object_pairs_hook=OrderedDict)
+                self.plugin_versions_data = json.loads(response.read(), object_pairs_hook=OrderedDict)
 
                 # Save it to file for next time
                 with open(cache_path, "w") as f:
-                    json.dump(plugin_data, f)
+                    json.dump(self.plugin_versions_data, f)
 
             with open(cache_path) as f:
-                plugin_data = json.load(f)
+                self.plugin_versions_data = json.load(f)
+                return self.plugin_versions_data
 
         except Exception as e:
             if os.path.exists(cache_path):
                 os.remove(cache_path)
             self.module.fail_json(msg="Failed to parse plugin-versions.json", details=f"{e}")
 
+        return self.plugin_versions_data
+
+    def _get_latest_compatible_plugin_version(self, plugin_name=None, resolve_latest_to_version=False):
+        if not hasattr(self, "jenkins_version"):
+            self.module.params["force_basic_auth"] = True
+            resp, info = fetch_url(self.module, self.url)
+            raw_version = info.get("x-jenkins")
+            self.jenkins_version = self.parse_version(raw_version)
+        name = plugin_name or self.params["name"]
+
+        plugin_data = self._get_plugin_versions_data()
         plugin_versions = plugin_data.get("plugins", {}).get(name)
         if not plugin_versions:
             self.module.fail_json(msg=f"Plugin '{name}' not found.")
@@ -708,7 +731,12 @@ class JenkinsPlugin:
         for idx, (version_title, version_info) in enumerate(sorted_versions):
             required_core = version_info.get("requiredCore", "0.0")
             if self.parse_version(required_core) <= self.jenkins_version:
-                return "latest" if idx == 0 else version_title
+                # "latest" means both "the user doesn't care about the version"
+                # and "latest == latest compatible" (allows using plugin manager).
+                # let the caller decide which interpretation they need
+                if idx == 0 and not resolve_latest_to_version:
+                    return "latest"
+                return version_title
 
         self.module.warn(f"No compatible version found for plugin '{name}'. Installing latest version.")
         return "latest"
@@ -734,7 +762,7 @@ class JenkinsPlugin:
         plugin_data = self._download_updates()["dependencies"]
 
         dependencies_info = {
-            dep["name"]: self._get_latest_compatible_plugin_version(dep["name"])
+            dep["name"]: self._get_latest_compatible_plugin_version(dep["name"], resolve_latest_to_version=True)
             for dep in plugin_data
             if not dep.get("optional", False)
         }
