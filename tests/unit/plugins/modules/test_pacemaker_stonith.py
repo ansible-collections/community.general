@@ -148,6 +148,7 @@ def test_enabled_race_condition_stopped_then_started(mocker, capfd):
     run_command_calls = [
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)", ""),
         (0, "", ""),
+        (1, "Cluster Properties: cib-bootstrap-options\nhave-watchdog=false\n", ""),
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Stopped", ""),
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Started", ""),
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Started", ""),
@@ -183,6 +184,7 @@ def test_enabled_wait_timeout_raises(mocker, capfd):
     run_command_calls = [
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)", ""),
         (0, "", ""),
+        (1, "Cluster Properties: cib-bootstrap-options\nhave-watchdog=false\n", ""),
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Stopped", ""),
     ]
 
@@ -216,6 +218,7 @@ def test_disabled_polls_for_stopped(mocker, capfd):
     run_command_calls = [
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Started", ""),
         (0, "", ""),
+        (1, "Cluster Properties: cib-bootstrap-options\nhave-watchdog=false\n", ""),
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Started", ""),
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)", ""),
         (0, "  * virtual-stonith\t(stonith:fence_virt):\t Stopped (disabled)", ""),

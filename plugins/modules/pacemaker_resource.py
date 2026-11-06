@@ -263,7 +263,7 @@ class PacemakerResource(StateModuleHelper):
         if self.vars.state not in _RUNTIME_STATES:
             self.module.warn(
                 f"The 'wait' parameter has no effect on state={self.vars.state!r}; "
-                "runtime state assertions moved to state=enabled/disabled in community.general 13.4.0. "
+                "runtime state assertions moved to state=enabled/disabled in community.general 14.0.0. "
                 "Set state=enabled to poll until the resource is Started/Promoted/Unpromoted, "
                 "or state=disabled to poll until the resource is Stopped."
             )

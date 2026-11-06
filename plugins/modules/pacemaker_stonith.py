@@ -144,6 +144,7 @@ from ansible_collections.community.general.plugins.module_utils._module_helper i
 from ansible_collections.community.general.plugins.module_utils._pacemaker import (
     _DEFAULT_RESOURCE_READY_STATES,
     _STOPPED_READY_STATES,
+    get_pacemaker_maintenance_mode,
     pacemaker_runner,
     wait_for_resource,
 )
@@ -206,7 +207,7 @@ class PacemakerStonith(StateModuleHelper):
         if self.vars.state not in _RUNTIME_STATES:
             self.module.warn(
                 f"The 'wait' parameter has no effect on state={self.vars.state!r}; "
-                "runtime state assertions moved to state=enabled/disabled in community.general 13.4.0. "
+                "runtime state assertions moved to state=enabled/disabled in community.general 14.0.0. "
                 "Set state=enabled to poll until the device is Started, "
                 "or state=disabled to poll until the device is Stopped."
             )
@@ -288,11 +289,14 @@ class PacemakerStonith(StateModuleHelper):
     def _wait_for_runtime_state(self, ready_states):
         """Poll the STONITH device until it reaches one of *ready_states* or the wait budget expires.
 
-        Skipped in check mode (no state change was actually issued). An unset ``wait`` falls
-        back to ``_DEFAULT_RUNTIME_WAIT_SECONDS`` so ``state=enabled`` still blocks by default
-        the way an operator expects — configuration states now short-circuit instead.
+        Skipped in check mode (no state change was actually issued) and when the cluster is in
+        maintenance mode (target-role changes are not acted on, so a poll would only time out).
+        An unset ``wait`` falls back to ``_DEFAULT_RUNTIME_WAIT_SECONDS`` so ``state=enabled`` still
+        blocks by default the way an operator expects — configuration states now short-circuit instead.
         """
         if self.module.check_mode:
+            return
+        if get_pacemaker_maintenance_mode(self.runner):
             return
         wait = self.vars.wait if self.vars.wait is not None else _DEFAULT_RUNTIME_WAIT_SECONDS
         if wait <= 0:

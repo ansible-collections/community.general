@@ -164,6 +164,16 @@ test_cases:
           rc: 0
           out: ""
           err: ""
+        - command: ["/testbin/pcs", property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
+          err: ""
         - command: ["/testbin/pcs", stonith, status, virtual-stonith]
           environ: *env-def
           rc: 0
@@ -212,6 +222,16 @@ test_cases:
           environ: *env-def
           rc: 0
           out: ""
+          err: ""
+        - command: ["/testbin/pcs", property, config]
+          environ: *env-def
+          rc: 1
+          out: |
+            Cluster Properties: cib-bootstrap-options
+            cluster-infrastructure=corosync
+            cluster-name=hacluster
+            dc-version=2.1.9-1.fc41-7188dbf
+            have-watchdog=false
           err: ""
         - command: ["/testbin/pcs", stonith, status, virtual-stonith]
           environ: *env-def
