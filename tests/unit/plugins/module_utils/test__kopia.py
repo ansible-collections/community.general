@@ -46,6 +46,13 @@ def test_state_map_repository_entries():
     assert STATE_MAP["throttled"] == "throttle"
 
 
+def test_state_map_snapshot_entries():
+    assert STATE_MAP["deleted"] == "delete"
+    assert STATE_MAP["expired"] == "expire"
+    assert STATE_MAP["listed"] == "list"
+    assert STATE_MAP["verified"] == "verify"
+
+
 # ---------------------------------------------------------------------------
 # fmt_backend
 # ---------------------------------------------------------------------------
