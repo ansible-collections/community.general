@@ -101,6 +101,7 @@ EXAMPLES = r"""
 
 import json
 import os
+import re
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -169,11 +170,18 @@ class Go:
             return {"path": path, "version": version, "mod_path": mod_path}
         return None
 
+    @staticmethod
+    def _get_binary_name(package):
+        parts = [p for p in package.strip("/").split("/") if p]
+        if len(parts) > 1 and re.match(r"^v[0-9]+$", parts[-1]):
+            return parts[-2]
+        return parts[-1] if parts else ""
+
     def get_installed(self):
         gobin = self._get_gobin()
         installed = {}
         for pkg_name in self.package_names:
-            binary_name = pkg_name.rsplit("/", 1)[-1]
+            binary_name = self._get_binary_name(pkg_name)
             binary_path = os.path.join(gobin, binary_name)
             if not os.path.isfile(binary_path):
                 continue
@@ -198,7 +206,7 @@ class Go:
 
     def is_outdated(self, package):
         gobin = self._get_gobin()
-        binary_name = package.rsplit("/", 1)[-1]
+        binary_name = self._get_binary_name(package)
         binary_path = os.path.join(gobin, binary_name)
         info = self._get_binary_info(binary_path)
         if not info or info["path"] != package:
@@ -229,7 +237,7 @@ class Go:
     def uninstall(self, packages):
         gobin = self._get_gobin()
         for package in packages:
-            binary_name = package.rsplit("/", 1)[-1]
+            binary_name = self._get_binary_name(package)
             binary_path = os.path.join(gobin, binary_name)
             if os.path.isfile(binary_path) and not self.module.check_mode:
                 os.remove(binary_path)
