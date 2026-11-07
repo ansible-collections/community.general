@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper - allow ``update_cache=true`` without ``name`` to only refresh the repositories (https://github.com/ansible-collections/community.general/issues/3570, https://github.com/ansible-collections/community.general/pull/13207).
