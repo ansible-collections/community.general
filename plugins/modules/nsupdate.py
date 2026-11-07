@@ -94,7 +94,7 @@ options:
       - Sets the transport protocol (TCP or UDP). TCP is the recommended and a more robust option.
       - V(tls) sends the queries using DNS over TLS (RFC 7858). The server certificate is verified against the system CA certificates.
         If O(server) is an FQDN, the certificate must also match that name.
-      - V(tls) was added in community.general 14.0.0.
+      - V(tls) was added in community.general 14.1.0.
     default: 'tcp'
     choices: ['tcp', 'udp', 'tls']
     type: str
