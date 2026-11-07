@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_repository - keep the ``description`` option when adding a ``.repo`` file instead of using the name from the file (https://github.com/ansible-collections/community.general/issues/4532, https://github.com/ansible-collections/community.general/pull/13168).
