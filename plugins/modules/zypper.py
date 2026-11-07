@@ -44,7 +44,8 @@ options:
       - You can also pass a URL or a local path to a rpm file.
       - When using O(state=latest), this can be V(*), which updates all installed packages.
       - When using O(state=absent), names can contain the wildcards V(*) and V(?).
-    required: true
+      - Required unless O(update_cache=true). Without O(name), the module only refreshes the repositories and O(state)
+        is not used. This is possible since community.general 14.1.0.
     aliases: ['pkg']
     type: list
     elements: str
@@ -240,6 +241,10 @@ EXAMPLES = r"""
     name: 'nmap'
     state: latest
     replacefiles: true
+
+- name: Refresh repositories only
+  community.general.zypper:
+    update_cache: true
 
 - name: Refresh repositories and update package openssl
   community.general.zypper:
@@ -669,7 +674,7 @@ def transactional_updates():
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, aliases=["pkg"], type="list", elements="str"),
+            name=dict(aliases=["pkg"], type="list", elements="str"),
             state=dict(
                 default="present", choices=["absent", "installed", "latest", "present", "removed", "dist-upgrade"]
             ),
@@ -694,6 +699,7 @@ def main():
             skip_post_errors=dict(default=False, type="bool"),
         ),
         mutually_exclusive=[["disable_recommends", "install_recommends"]],
+        required_if=[("update_cache", False, ["name"])],
         supports_check_mode=True,
     )
 
@@ -703,15 +709,18 @@ def main():
     state = module.params["state"]
     update_cache = module.params["update_cache"]
 
-    # remove empty strings from package list
-    name = [_f for _f in name if _f]
-
     # Refresh repositories
     if update_cache and not module.check_mode:
         retvals = repo_refresh(module)
 
         if retvals["rc"] != 0:
             module.fail_json(msg="Zypper refresh run failed.", **retvals)
+
+    if name is None:
+        module.exit_json(changed=False, update_cache=update_cache, reboot_required=False)
+
+    # remove empty strings from package list
+    name = [_f for _f in name if _f]
 
     # Perform requested action
     if name == ["*"] and state in ["latest", "dist-upgrade"]:

@@ -645,6 +645,31 @@ test_cases:
           err: ''
 
   # ---------------------------------------------------------------- update_cache / refresh
+  - id: refresh_only
+    input:
+      update_cache: true
+    output:
+      changed: false
+      update_cache: true
+    mocks:
+      run_command:
+        - command: [/testbin/zypper, --non-interactive, --xmlout, --quiet, refresh]
+          environ: *env
+          rc: 0
+          out: *xml_refreshed
+          err: ''
+
+  - id: refresh_only_check_mode
+    flags:
+      check: true
+    input:
+      update_cache: true
+    output:
+      changed: false
+      update_cache: true
+    mocks:
+      run_command: []
+
   - id: refresh_then_install
     input:
       name: nmap
