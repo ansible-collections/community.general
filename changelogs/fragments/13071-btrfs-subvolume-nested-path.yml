@@ -1,0 +1,2 @@
+bugfixes:
+  - btrfs module utils - fix path of nested subvolumes when a parent subvolume is inside a directory (https://github.com/ansible-collections/community.general/issues/7454, https://github.com/ansible-collections/community.general/pull/13071).

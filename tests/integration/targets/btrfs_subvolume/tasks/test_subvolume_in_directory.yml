@@ -1,0 +1,91 @@
+---
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create directory 'plaindir' in the top level subvolume
+  block:
+    - name: Create temporary mountpoint for the top level subvolume
+      ansible.builtin.tempfile:
+        state: directory
+      register: toplevel_mountpoint
+    - name: Mount the top level subvolume
+      ansible.posix.mount:
+        src: "{{ btrfs_subvolume_target_device }}"
+        path: "{{ toplevel_mountpoint.path }}"
+        opts: "subvolid=5"
+        fstype: btrfs
+        state: mounted
+    - name: Create directory 'plaindir'
+      ansible.builtin.file:
+        path: "{{ toplevel_mountpoint.path }}/plaindir"
+        state: directory
+  always:
+    - name: Unmount the top level subvolume
+      ansible.posix.mount:
+        path: "{{ toplevel_mountpoint.path }}"
+        state: absent
+
+- name: Create a subvolume named 'plaindir/parent'
+  community.general.btrfs_subvolume:
+    automount: true
+    filesystem_label: "{{ btrfs_subvolume_target_label }}"
+    name: "/plaindir/parent"
+    state: "present"
+
+- name: Create a nested subvolume inside a subvolume within a directory
+  block:
+    - name: Create a subvolume named 'nested' inside 'plaindir/parent'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/plaindir/parent/nested"
+        state: "present"
+      register: create_in_directory
+    - name: Subvolume 'plaindir/parent/nested' created
+      ansible.builtin.assert:
+        that:
+          - create_in_directory is changed
+    - name: Create a subvolume named 'nested' inside 'plaindir/parent' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/plaindir/parent/nested"
+        state: "present"
+      register: create_in_directory_again
+    - name: Subvolume 'plaindir/parent/nested' created (idempotency)
+      ansible.builtin.assert:
+        that:
+          - create_in_directory_again is not changed
+
+- name: Remove a nested subvolume inside a subvolume within a directory
+  block:
+    - name: Remove a subvolume named 'nested' inside 'plaindir/parent'
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/plaindir/parent/nested"
+        state: "absent"
+      register: remove_in_directory
+    - name: Subvolume 'plaindir/parent/nested' removed
+      ansible.builtin.assert:
+        that:
+          - remove_in_directory is changed
+    - name: Remove a subvolume named 'nested' inside 'plaindir/parent' (idempotency)
+      community.general.btrfs_subvolume:
+        automount: true
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        name: "/plaindir/parent/nested"
+        state: "absent"
+      register: remove_in_directory_again
+    - name: Subvolume 'plaindir/parent/nested' removed (idempotency)
+      ansible.builtin.assert:
+        that:
+          - remove_in_directory_again is not changed
+
+- name: Remove subvolume 'plaindir/parent'
+  community.general.btrfs_subvolume:
+    automount: true
+    filesystem_label: "{{ btrfs_subvolume_target_label }}"
+    name: "/plaindir/parent"
+    state: "absent"
