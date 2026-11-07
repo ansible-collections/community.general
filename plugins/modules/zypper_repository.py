@@ -79,7 +79,6 @@ options:
       - Has an effect only if O(state=present). Has no effect on existing (unchanged) repositories or in combination with
         O(state=absent).
       - Implies O(runrefresh).
-      - Only works with C(.repo) files if O(name) is given explicitly.
     type: bool
     default: false
   runrefresh:
