@@ -7,25 +7,23 @@ repos:
     # Ruff version.
     rev: v0.15.9
     hooks:
-      # Modules and module_utils must remain compatible with Python 3.8.
+      - id: ruff-check
+        alias: ruff-check-plugins
+        name: ruff-check (plugins)
+        exclude: ^plugins/(modules|module_utils)/
+        args: [--config, ruff-plugins.toml]
+      - id: ruff-format
+        alias: ruff-format-plugins
+        name: ruff-format (plugins)
+        exclude: ^plugins/(modules|module_utils)/
+        args: [--config, ruff-plugins.toml]
       - id: ruff-check
         alias: ruff-check-modules
         name: ruff-check (modules)
         files: ^plugins/(modules|module_utils)/
         args: [--config, ruff-modules.toml]
-      # Everything else targets Python 3.11 and later.
-      - id: ruff-check
-        alias: ruff-check
-        name: ruff-check (plugins)
-        exclude: ^plugins/(modules|module_utils)/
-        args: [--config, ruff-plugins.toml]
       - id: ruff-format
         alias: ruff-format-modules
         name: ruff-format (modules)
         files: ^plugins/(modules|module_utils)/
         args: [--config, ruff-modules.toml]
-      - id: ruff-format
-        alias: ruff-format
-        name: ruff-format (plugins)
-        exclude: ^plugins/(modules|module_utils)/
-        args: [--config, ruff-plugins.toml]
