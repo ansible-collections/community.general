@@ -657,6 +657,11 @@ def main():
     archive.find_targets()
 
     if not archive.has_targets():
+        if archive.has_unfound_targets():
+            module.fail_json(
+                path=_to_native(b", ".join(archive.not_found)),
+                msg="Error, no source paths were found",
+            )
         if archive.destination_exists():
             archive.destination_state = STATE_ARCHIVED if is_archive(archive.destination) else STATE_COMPRESSED
     elif archive.has_targets() and archive.must_archive:
