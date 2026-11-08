@@ -534,25 +534,12 @@ class PamdService:
             while previous_rule is not None and isinstance(previous_rule, (PamdComment, PamdEmptyLine)):
                 previous_rule = previous_rule.prev
             # Next we'll see if the previous rule matches what we are trying to insert.
-            if previous_rule is not None and not previous_rule.matches(new_type, new_control, new_path):
-                # First set the original previous rule's next to the new_rule
-                previous_rule.next = new_rule
-                # Second, set the new_rule's previous to the original previous
-                new_rule.prev = previous_rule
-                # Third, set the new rule's next to the current rule
-                new_rule.next = current_rule
-                # Fourth, set the current rule's previous to the new_rule
-                current_rule.prev = new_rule
-
-                changes += 1
-
-            # Handle the case where it is the first rule in the list.
-            elif previous_rule is None:
-                # This is the case where the current rule is not only the first rule
-                # but the first line as well.  So we set the head to the new rule
+            # The new rule is placed right before the current rule, keeping any comments
+            # and empty lines between the previous rule and the current one.
+            if previous_rule is None or not previous_rule.matches(new_type, new_control, new_path):
+                # This is the case where the current rule is the first line, so we set the head to the new rule
                 if current_rule.prev is None:
                     self._head = new_rule
-                # This case would occur if the previous line was a comment.
                 else:
                     current_rule.prev.next = new_rule
                 new_rule.prev = current_rule.prev
@@ -581,27 +568,16 @@ class PamdService:
 
             # First we create a new rule
             new_rule = PamdRule(new_type, new_control, new_path, new_args)
-            if next_rule is not None and not next_rule.matches(new_type, new_control, new_path):
-                # If the previous rule doesn't match we'll insert our new rule.
-
-                # Second set the original next rule's previous to the new_rule
-                next_rule.prev = new_rule
-                # Third, set the new_rule's next to the original next rule
-                new_rule.next = next_rule
-                # Fourth, set the new rule's previous to the current rule
+            # If the next rule doesn't match we'll insert our new rule right after the current rule,
+            # keeping any comments and empty lines between the current rule and the next one.
+            if next_rule is None or not next_rule.matches(new_type, new_control, new_path):
+                # This is the case where the current rule is the last line, so we set the tail to the new rule
+                if current_rule.next is None:
+                    self._tail = new_rule
+                else:
+                    current_rule.next.prev = new_rule
+                new_rule.next = current_rule.next
                 new_rule.prev = current_rule
-                # Fifth, set the current rule's next to the new_rule
-                current_rule.next = new_rule
-
-                changes += 1
-
-            # This is the case where the current_rule is the last in the list
-            elif next_rule is None:
-                new_rule.prev = self._tail
-                new_rule.next = None
-                self._tail.next = new_rule
-                self._tail = new_rule
-
                 current_rule.next = new_rule
                 changes += 1
 
