@@ -34,6 +34,20 @@ if t.TYPE_CHECKING:
 MIN_API_VERSION = "2.0"
 
 
+def _has_failed_entries(failed) -> bool:
+    """Whether the ``failed`` field of an IPA API response lists any failed entry.
+
+    For member operations FreeIPA always returns ``failed``, with one list per
+    member type, for example ``{"member": {"user": [], "group": []}}``. The
+    operation only failed if one of these lists is not empty.
+    """
+    if isinstance(failed, dict):
+        return any(_has_failed_entries(value) for value in failed.values())
+    if isinstance(failed, (list, tuple)):
+        return len(failed) > 0
+    return bool(failed)
+
+
 def _env_then_dns_fallback(*args, **kwargs) -> str:
     """Load value from environment or DNS in that order"""
     try:
@@ -166,7 +180,7 @@ class IPAClient:
         if "result" in resp:
             result = resp.get("result")
             failed = result.get("failed")
-            if failed and failed != {"member": {"host": [], "hostgroup": []}}:
+            if _has_failed_entries(failed):
                 self._fail(f"response {method}", failed)
             if "result" in result:
                 result = result.get("result")
