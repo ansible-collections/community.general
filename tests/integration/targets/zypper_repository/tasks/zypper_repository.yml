@@ -413,3 +413,59 @@
   community.general.zypper_repository:
     name: unsignedmetafile
     state: absent
+
+# description with a .repo file
+- name: write a .repo file with a name
+  ansible.builtin.copy:
+    dest: "{{ remote_tmp_dir }}/describedrepo.repo"
+    content: |
+      [describedrepo]
+      name=name from file
+      baseurl={{ os_repository_url_extra }}
+      enabled=1
+      gpgcheck=1
+
+- name: add the repo from the .repo file with a description
+  community.general.zypper_repository:
+    repo: "{{ remote_tmp_dir }}/describedrepo.repo"
+    description: description from task
+    state: present
+  register: described_add
+
+- name: add the repo from the .repo file with a description again
+  community.general.zypper_repository:
+    repo: "{{ remote_tmp_dir }}/describedrepo.repo"
+    description: description from task
+    state: present
+  register: described_add_again
+
+- name: read the repository settings for the described repo
+  ansible.builtin.command: zypper --xmlout lr describedrepo
+  changed_when: false
+  register: described_lr
+
+- name: change the description of the repo from the .repo file
+  community.general.zypper_repository:
+    repo: "{{ remote_tmp_dir }}/describedrepo.repo"
+    description: other description from task
+    state: present
+  register: described_change
+
+- name: read the repository settings for the described repo again
+  ansible.builtin.command: zypper --xmlout lr describedrepo
+  changed_when: false
+  register: described_lr_change
+
+- name: verify description takes precedence over the name in the .repo file
+  ansible.builtin.assert:
+    that:
+      - described_add is changed
+      - described_add_again is not changed
+      - "'name=\"description from task\"' in described_lr.stdout"
+      - described_change is changed
+      - "'name=\"other description from task\"' in described_lr_change.stdout"
+
+- name: remove the described repo
+  community.general.zypper_repository:
+    name: describedrepo
+    state: absent
