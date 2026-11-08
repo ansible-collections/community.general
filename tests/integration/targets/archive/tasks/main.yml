@@ -107,3 +107,10 @@
   loop: "{{ formats }}"
   loop_control:
     loop_var: format
+
+- name: Run dest in path tests
+  ansible.builtin.include_tasks:
+    file: ../tests/dest-in-path.yml
+  loop: "{{ formats }}"
+  loop_control:
+    loop_var: format
