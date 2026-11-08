@@ -1,0 +1,2 @@
+minor_changes:
+  - sysrc - remove case that occurred for FreeBSD 11 and prior (https://github.com/ansible-collections/community.general/pull/13185).
