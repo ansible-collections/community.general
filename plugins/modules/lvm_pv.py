@@ -166,7 +166,7 @@ from ansible_collections.community.general.plugins.module_utils._lvm import (
 _SYSFS = "/sys"
 
 
-def rescan_device(module, device):
+def rescan_device(module: AnsibleModule, device: str) -> bool:
     """Ask the kernel to re-read the size of the disk backing the device.
 
     Returns True if a rescan was triggered, False otherwise. Only SCSI devices (``rescan``)
