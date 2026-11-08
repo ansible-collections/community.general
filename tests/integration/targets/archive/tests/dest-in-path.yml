@@ -1,0 +1,49 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Set paths - dest in path ({{ format }})
+  ansible.builtin.set_fact:
+    dest_in_path_src: "{{ remote_tmp_dir }}/dest_in_path_{{ format }}"
+    dest_in_path_dest: "{{ remote_tmp_dir }}/dest_in_path_{{ format }}/archive.{{ format }}"
+
+- name: Create source directory - dest in path ({{ format }})
+  ansible.builtin.file:
+    path: "{{ dest_in_path_src }}"
+    state: directory
+
+- name: Copy files into source directory - dest in path ({{ format }})
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ dest_in_path_src }}/{{ item }}"
+  loop:
+    - foo.txt
+    - bar.txt
+
+- name: Archive - dest in path ({{ format }})
+  community.general.archive:
+    path: "{{ dest_in_path_src }}"
+    dest: "{{ dest_in_path_dest }}"
+    format: "{{ format }}"
+  register: dest_in_path_first
+
+- name: Archive again - dest in path ({{ format }})
+  community.general.archive:
+    path: "{{ dest_in_path_src }}"
+    dest: "{{ dest_in_path_dest }}"
+    format: "{{ format }}"
+  register: dest_in_path_second
+
+- name: Assert that the archive does not contain itself - dest in path ({{ format }})
+  ansible.builtin.assert:
+    that:
+      - dest_in_path_first is changed
+      - dest_in_path_dest not in dest_in_path_first.archived
+      - dest_in_path_second is not changed
+      - dest_in_path_dest not in dest_in_path_second.archived
+
+- name: Remove source directory - dest in path ({{ format }})
+  ansible.builtin.file:
+    path: "{{ dest_in_path_src }}"
+    state: absent
