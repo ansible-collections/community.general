@@ -32,7 +32,10 @@ extends_documentation_fragment:
   - community.general._attributes
 attributes:
   check_mode:
-    support: full
+    support: partial
+    details:
+      - O(update_cache) is not run in check mode, so without O(name) the task reports no change even when a real run
+        would download repository metadata.
   diff_mode:
     support: full
 options:
@@ -116,7 +119,8 @@ options:
     version_added: '0.2.0'
   update_cache:
     description:
-      - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.
+      - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode. Without O(name), the task
+        reports a change when repository metadata was downloaded.
     default: false
     type: bool
     aliases: ["refresh"]
@@ -382,7 +386,8 @@ def is_installed(package, installed):
     return package.name in installed
 
 
-def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
+def run_zypper_xml(m, cmd):
+    "runs a zypper command and returns its parsed XML output together with rc, stdout and stderr"
     rc, stdout, stderr = m.run_command(cmd, check_rc=False)
 
     try:
@@ -401,6 +406,12 @@ def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
                 stderr=stderr,
                 cmd=cmd,
             )
+
+    return dom, rc, stdout, stderr
+
+
+def parse_zypper_xml(m, cmd, fail_not_found=True, packages=None):
+    dom, rc, stdout, stderr = run_zypper_xml(m, cmd)
 
     if rc == 104:
         # exit code 104 is ZYPPER_EXIT_INF_CAP_NOT_FOUND (no packages found)
@@ -477,16 +488,20 @@ def get_cmd(m, subcommand):
     is_install = subcommand in ["install", "update", "patch", "dist-upgrade"]
     is_refresh = subcommand == "refresh"
     cmd = [m.get_bin_path("zypper", required=True), "--non-interactive", "--xmlout"]
-    if m.params["quiet"]:
+    # --quiet hides the progress that tells whether a refresh downloaded metadata
+    if m.params["quiet"] and not is_refresh:
         cmd.append("--quiet")
     if transactional_updates():
-        cmd = [
+        tu_cmd = [
             m.get_bin_path("transactional-update", required=True),
             "--continue",
             "--drop-if-no-change",
             "--quiet",
-            "run",
-        ] + cmd
+        ]
+        if is_refresh:
+            # the self-update check would refresh the metadata before zypper refresh runs
+            tu_cmd.append("--no-selfupdate")
+        cmd = tu_cmd + ["run"] + cmd
     if m.params["extra_args_precommand"]:
         args_list = m.params["extra_args_precommand"].split()
         cmd.extend(args_list)
@@ -641,14 +656,16 @@ def package_absent(m, name):
 
 def repo_refresh(m):
     "update the repositories"
-    retvals = {"rc": 0, "stdout": "", "stderr": ""}
-
     cmd = get_cmd(m, "refresh")
+    dom, rc, stdout, stderr = run_zypper_xml(m, cmd)
+    if m.params["simple_errors"]:
+        stdout = get_simple_errors(dom) or stdout
+    if rc not in [0, 102, 103, 106, 107]:
+        m.fail_json(msg=f"Zypper run command failed with return code {rc}.", rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
+    # zypper reports this progress only when it downloads metadata
+    downloaded = any(p.getAttribute("id") == "raw-refresh" for p in dom.getElementsByTagName("progress"))
 
-    retvals["cmd"] = cmd
-    result, retvals["rc"], retvals["stdout"], retvals["stderr"] = parse_zypper_xml(m, cmd)
-
-    return retvals
+    return {"cmd": cmd, "rc": rc, "stdout": stdout, "stderr": stderr, "metadata_downloaded": downloaded}
 
 
 def get_fs_type_and_readonly_state(mount_point):
@@ -710,14 +727,16 @@ def main():
     update_cache = module.params["update_cache"]
 
     # Refresh repositories
+    metadata_downloaded = False
     if update_cache and not module.check_mode:
         retvals = repo_refresh(module)
+        metadata_downloaded = retvals.pop("metadata_downloaded")
 
         if retvals["rc"] != 0:
             module.fail_json(msg="Zypper refresh run failed.", **retvals)
 
     if name is None:
-        module.exit_json(changed=False, update_cache=update_cache, reboot_required=False)
+        module.exit_json(changed=metadata_downloaded, update_cache=update_cache, reboot_required=False)
 
     # remove empty strings from package list
     name = [_f for _f in name if _f]
