@@ -52,6 +52,9 @@ options:
       - In the case of V(SRV) record type, this is a service record.
       - In the case of V(MX) record type, this is a mail exchanger record.
       - In the case of V(SSHFP) record type, this is an SSH fingerprint record.
+      - For the V(CNAME), V(DNAME), V(MX), V(NS), V(PTR), and V(SRV) record types, a host name that does not end with a dot
+        is relative to O(zone_name), for example V(mail) in the zone V(example.com) means V(mail.example.com.).
+        A fully qualified domain name must end with a dot, otherwise O(zone_name) is appended to it.
     type: str
   record_values:
     description:
@@ -67,6 +70,9 @@ options:
       - In the case of V(SRV) record type, this is a service record.
       - In the case of V(MX) record type, this is a mail exchanger record.
       - In the case of V(SSHFP) record type, this is an SSH fingerprint record.
+      - For the V(CNAME), V(DNAME), V(MX), V(NS), V(PTR), and V(SRV) record types, a host name that does not end with a dot
+        is relative to O(zone_name), for example V(mail) in the zone V(example.com) means V(mail.example.com.).
+        A fully qualified domain name must end with a dot, otherwise O(zone_name) is appended to it.
     type: list
     elements: str
   record_ttl:
@@ -147,9 +153,9 @@ EXAMPLES = r"""
     ipa_pass: Passw0rd!
     state: present
     zone_name: example.com
-    record_name: _kerberos._udp.example.com
+    record_name: _kerberos._udp
     record_type: 'SRV'
-    record_value: '10 50 88 ipa.example.com'
+    record_value: '10 50 88 ipa.example.com.'
 
 - name: Ensure an MX records are present
   community.general.ipa_dnsrecord:
@@ -160,8 +166,8 @@ EXAMPLES = r"""
     record_name: '@'
     record_type: 'MX'
     record_values:
-      - '1 mailserver-01.example.com'
-      - '2 mailserver-02.example.com'
+      - '1 mailserver-01.example.com.'
+      - '2 mailserver-02.example.com.'
 
 - name: Ensure an SRV record is added without replacing existing ones
   community.general.ipa_dnsrecord:
@@ -190,7 +196,7 @@ EXAMPLES = r"""
     name: subdomain
     zone_name: example.com
     record_type: 'NS'
-    record_value: 'ns1.subdomain.exmaple.com'
+    record_value: 'ns1.subdomain.example.com.'
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: ChangeMe!
