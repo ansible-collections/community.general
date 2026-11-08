@@ -24,7 +24,9 @@ attributes:
 options:
   name:
     description:
-      - A name for the repository. Not required when adding repofiles.
+      - The alias of the repository.
+      - Required when adding a repository by URI. Cannot be used with a C(.repo) file, the alias is taken from the file.
+      - To set the name zypper displays for the repository, use O(description).
     type: str
   repo:
     description:
@@ -39,7 +41,8 @@ options:
     type: str
   description:
     description:
-      - A description of the repository.
+      - A description of the repository, passed to zypper as its name.
+      - When not specified, the value from the C(.repo) file is used if available.
     type: str
   disable_gpg_check:
     description:
@@ -76,7 +79,6 @@ options:
       - Has an effect only if O(state=present). Has no effect on existing (unchanged) repositories or in combination with
         O(state=absent).
       - Implies O(runrefresh).
-      - Only works with C(.repo) files if O(name) is given explicitly.
     type: bool
     default: false
   runrefresh:
@@ -481,7 +483,7 @@ def main():
                 auto_import_keys = True
 
             # Map additional values, if available
-            if "name" in repofile_items:
+            if repodata["name"] is None and "name" in repofile_items:
                 repodata["name"] = repofile_items["name"]
             # Use .repo file values only for settings the user did not explicitly provide
             for key in ("enabled", "autorefresh", "gpgcheck"):
