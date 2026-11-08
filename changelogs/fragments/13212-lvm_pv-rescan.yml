@@ -1,4 +1,4 @@
 bugfixes:
-  - lvm_pv - do not warn on every run with ``resize=true`` when the underlying disk has no rescan attribute, for example virtio-blk disks (https://github.com/ansible-collections/community.general/issues/13212).
-  - lvm_pv - resolve symbolic links such as ``/dev/disk/by-id/...`` before looking up the device in sysfs, so the disk is rescanned before resizing (https://github.com/ansible-collections/community.general/issues/13212).
-  - lvm_pv - determine the parent disk of a partition from sysfs instead of from its name, which fixes rescanning partitions of devices such as ``mmcblk0p1`` (https://github.com/ansible-collections/community.general/issues/13212).
+  - lvm_pv - do not warn on every run with ``resize=true`` when the underlying disk has no rescan attribute, for example virtio-blk disks (https://github.com/ansible-collections/community.general/issues/13212, https://github.com/ansible-collections/community.general/pull/13218).
+  - lvm_pv - resolve symbolic links such as ``/dev/disk/by-id/...`` before looking up the device in sysfs, so the disk is rescanned before resizing (https://github.com/ansible-collections/community.general/issues/13212, https://github.com/ansible-collections/community.general/pull/13218).
+  - lvm_pv - determine the parent disk of a partition from sysfs instead of from its name, which fixes rescanning partitions of devices such as ``mmcblk0p1`` (https://github.com/ansible-collections/community.general/issues/13212, https://github.com/ansible-collections/community.general/pull/13218).
