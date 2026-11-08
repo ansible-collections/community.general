@@ -661,7 +661,9 @@ def repo_refresh(m):
     if m.params["simple_errors"]:
         stdout = get_simple_errors(dom) or stdout
     if rc not in [0, 102, 103, 106, 107]:
-        m.fail_json(msg=f"Zypper run command failed with return code {rc}.", rc=rc, stdout=stdout, stderr=stderr, cmd=cmd)
+        m.fail_json(
+            msg=f"Zypper run command failed with return code {rc}.", rc=rc, stdout=stdout, stderr=stderr, cmd=cmd
+        )
     # zypper reports this progress only when it downloads metadata
     downloaded = any(p.getAttribute("id") == "raw-refresh" for p in dom.getElementsByTagName("progress"))
 
