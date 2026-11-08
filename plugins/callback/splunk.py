@@ -103,7 +103,6 @@ from ansible_collections.community.general.plugins.module_utils._secrets import 
 
 class SplunkHTTPCollectorSource:
     def __init__(self):
-        self.ansible_check_mode = False
         self.ansible_playbook = ""
         self.session = str(uuid.uuid4())
         self.host = socket.gethostname()
@@ -111,8 +110,7 @@ class SplunkHTTPCollectorSource:
         self.user = getpass.getuser()
 
     def send_event(self, url, authtoken, validate_certs, include_milliseconds, batch, state, result, runtime):
-        if result._task_fields["args"].get("_ansible_check_mode") is True:
-            self.ansible_check_mode = True
+        ansible_check_mode = result._task_fields["args"].get("_ansible_check_mode") is True
 
         if result._task._role:
             ansible_role = str(result._task._role)
@@ -140,7 +138,7 @@ class SplunkHTTPCollectorSource:
         data["user"] = self.user
         data["runtime"] = runtime
         data["ansible_version"] = ansible_version
-        data["ansible_check_mode"] = self.ansible_check_mode
+        data["ansible_check_mode"] = ansible_check_mode
         data["ansible_host"] = result._host.name
         data["ansible_playbook"] = self.ansible_playbook
         data["ansible_role"] = ansible_role
