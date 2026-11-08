@@ -1,0 +1,2 @@
+bugfixes:
+  - archive - do not add the destination archive to itself when it is located under one of the archived paths (https://github.com/ansible-collections/community.general/issues/1420, https://github.com/ansible-collections/community.general/pull/13208).

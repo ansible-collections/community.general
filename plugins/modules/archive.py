@@ -43,6 +43,7 @@ options:
       - This is required when O(path) refers to multiple files by either specifying a glob, a directory or multiple paths
         in a list.
       - If the destination archive already exists, it is truncated and overwritten.
+      - If the destination archive is located under one of the paths in O(path), it is not added to itself.
     type: path
   exclude_path:
     description:
@@ -281,6 +282,7 @@ class Archive(metaclass=abc.ABCMeta):
 
         self.changed = False
         self.destination_state = STATE_ABSENT
+        self.destination_stat = None
         self.errors = []
         self.file = None
         self.successes = []
@@ -327,6 +329,8 @@ class Archive(metaclass=abc.ABCMeta):
 
     def add(self, path, archive_name):
         try:
+            if self.is_destination(path):
+                return
             self._add(_to_native_ascii(path), _to_native(archive_name))
             if self.contains(_to_native(archive_name)):
                 self.successes.append(path)
@@ -357,6 +361,8 @@ class Archive(metaclass=abc.ABCMeta):
 
     def add_targets(self):
         self.open()
+        if self.destination_exists():
+            self.destination_stat = os.stat(self.destination)
         try:
             for target in self.targets:
                 if os.path.isdir(target):
@@ -404,6 +410,9 @@ class Archive(metaclass=abc.ABCMeta):
 
     def destination_readable(self):
         return self.destination and os.access(self.destination, os.R_OK)
+
+    def is_destination(self, path):
+        return self.destination_stat is not None and os.path.samestat(os.lstat(path), self.destination_stat)
 
     def destination_size(self):
         return os.path.getsize(self.destination) if self.destination_exists() else 0
