@@ -1,2 +1,2 @@
 bugfixes:
-  - pipx - predict ``changed`` under check mode for ``absent``/``uninstall``, ``inject``, ``uninject``, ``latest``, ``upgrade`` and ``upgrade_all`` instead of always reporting ``changed: false`` when the underlying pipx call is skipped (https://github.com/ansible-collections/community.general/issues/13196).
+  - pipx - predict ``changed`` under check mode for ``absent``/``uninstall``, ``inject``, ``uninject``, ``latest``, ``upgrade`` and ``upgrade_all`` instead of always reporting ``changed=false`` when the underlying pipx call is skipped (https://github.com/ansible-collections/community.general/issues/13196, https://github.com/ansible-collections/community.general/pull/13226).
