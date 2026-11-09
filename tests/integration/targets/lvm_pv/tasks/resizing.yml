@@ -25,3 +25,5 @@
       - resize_result is changed
       - (pv_size_output.stdout | trim | regex_replace('M', '') | float) > 95
       - "'resized' in resize_result.msg"
+      # loop devices have no rescan attribute, which must not cause a warning (https://github.com/ansible-collections/community.general/issues/13212)
+      - resize_result.warnings is not defined or resize_result.warnings | length == 0
