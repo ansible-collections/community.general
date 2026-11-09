@@ -81,9 +81,7 @@ def test_failure_status(fetch_url_mock):
 
 
 def test_success_with_summary_only(fetch_url_mock):
-    result, payload = run_module(
-        fetch_url_mock, 200, "OK", AnsibleExitJson, args={"summary": "Deploy finished"}
-    )
+    result, payload = run_module(fetch_url_mock, 200, "OK", AnsibleExitJson, args={"summary": "Deploy finished"})
     assert result["changed"] is True
     assert payload["summary"] == "Deploy finished"
     assert "text" not in payload
@@ -124,9 +122,7 @@ def test_success_with_actions(fetch_url_mock):
             "targets": [{"os": "default", "uri": "http://example.invalid"}],
         },
     ]
-    result, payload = run_module(
-        fetch_url_mock, 200, "OK", AnsibleExitJson, args={"text": "hello", "actions": actions}
-    )
+    result, payload = run_module(fetch_url_mock, 200, "OK", AnsibleExitJson, args={"text": "hello", "actions": actions})
     assert result["changed"] is True
     assert "potentialAction" in payload
     assert payload["potentialAction"][0]["name"] == "Comment"
