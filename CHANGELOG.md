@@ -2,14 +2,18 @@
 
 **Topics**
 
-- <a href="#v14-0-0">v14\.0\.0</a>
+- <a href="#v14-0-1">v14\.0\.1</a>
     - <a href="#release-summary">Release Summary</a>
     - <a href="#minor-changes">Minor Changes</a>
+    - <a href="#bugfixes">Bugfixes</a>
+- <a href="#v14-0-0">v14\.0\.0</a>
+    - <a href="#release-summary-1">Release Summary</a>
+    - <a href="#minor-changes-1">Minor Changes</a>
     - <a href="#breaking-changes--porting-guide">Breaking Changes / Porting Guide</a>
     - <a href="#deprecated-features">Deprecated Features</a>
     - <a href="#removed-features-previously-deprecated">Removed Features \(previously deprecated\)</a>
     - <a href="#security-fixes">Security Fixes</a>
-    - <a href="#bugfixes">Bugfixes</a>
+    - <a href="#bugfixes-1">Bugfixes</a>
     - <a href="#new-plugins">New Plugins</a>
         - <a href="#callback">Callback</a>
         - <a href="#filter">Filter</a>
@@ -18,15 +22,42 @@
 
 This changelog describes changes after version 13\.0\.0\.
 
-<a id="v14-0-0"></a>
-## v14\.0\.0
+<a id="v14-0-1"></a>
+## v14\.0\.1
 
 <a id="release-summary"></a>
 ### Release Summary
 
-This is release 14\.0\.0 of <code>community\.general</code>\, released on 2026\-11\-02\.
+Bugfix release for inclusion in Ansible 15\.0\.0rc1\.
 
 <a id="minor-changes"></a>
+### Minor Changes
+
+* sysrc \- remove case that occurred for FreeBSD 11 and prior \([https\://github\.com/ansible\-collections/community\.general/pull/13185](https\://github\.com/ansible\-collections/community\.general/pull/13185)\)\.
+
+<a id="bugfixes"></a>
+### Bugfixes
+
+* archive \- do not add the destination archive to itself when it is located under one of the archived paths \([https\://github\.com/ansible\-collections/community\.general/issues/1420](https\://github\.com/ansible\-collections/community\.general/issues/1420)\, [https\://github\.com/ansible\-collections/community\.general/pull/13208](https\://github\.com/ansible\-collections/community\.general/pull/13208)\)\.
+* btrfs module utils \- fix path of nested subvolumes when a parent subvolume is inside a directory \([https\://github\.com/ansible\-collections/community\.general/issues/7454](https\://github\.com/ansible\-collections/community\.general/issues/7454)\, [https\://github\.com/ansible\-collections/community\.general/pull/13071](https\://github\.com/ansible\-collections/community\.general/pull/13071)\)\.
+* ipa module utils \- do not fail a task when the <code>failed</code> field of the API response only contains empty member lists\. This fixes failures on success in <code>ipa\_group</code>\, <code>ipa\_hbacrule</code>\, <code>ipa\_sudorule</code> and other modules that add members \([https\://github\.com/ansible\-collections/community\.general/issues/12294](https\://github\.com/ansible\-collections/community\.general/issues/12294)\, [https\://github\.com/ansible\-collections/community\.general/pull/13188](https\://github\.com/ansible\-collections/community\.general/pull/13188)\)\.
+* lvm\_pv \- determine the parent disk of a partition from sysfs instead of from its name\, which fixes rescanning partitions of devices such as <code>mmcblk0p1</code> \([https\://github\.com/ansible\-collections/community\.general/issues/13212](https\://github\.com/ansible\-collections/community\.general/issues/13212)\, [https\://github\.com/ansible\-collections/community\.general/pull/13218](https\://github\.com/ansible\-collections/community\.general/pull/13218)\)\.
+* lvm\_pv \- do not warn on every run with <code>resize\=true</code> when the underlying disk has no rescan attribute\, for example virtio\-blk disks \([https\://github\.com/ansible\-collections/community\.general/issues/13212](https\://github\.com/ansible\-collections/community\.general/issues/13212)\, [https\://github\.com/ansible\-collections/community\.general/pull/13218](https\://github\.com/ansible\-collections/community\.general/pull/13218)\)\.
+* lvm\_pv \- resolve symbolic links such as <code>/dev/disk/by\-id/\.\.\.</code> before looking up the device in sysfs\, so the disk is rescanned before resizing \([https\://github\.com/ansible\-collections/community\.general/issues/13212](https\://github\.com/ansible\-collections/community\.general/issues/13212)\, [https\://github\.com/ansible\-collections/community\.general/pull/13218](https\://github\.com/ansible\-collections/community\.general/pull/13218)\)\.
+* pamd \- keep comments and empty lines next to rules inserted with <code>state\=before</code> or <code>state\=after</code> \([https\://github\.com/ansible\-collections/community\.general/issues/9374](https\://github\.com/ansible\-collections/community\.general/issues/9374)\, [https\://github\.com/ansible\-collections/community\.general/pull/13114](https\://github\.com/ansible\-collections/community\.general/pull/13114)\)\.
+* splunk callback plugin \- report <code>ansible\_check\_mode</code> per task instead of keeping it set to <code>true</code> for the rest of the run once a single task ran in check mode \([https\://github\.com/ansible\-collections/community\.general/issues/13194](https\://github\.com/ansible\-collections/community\.general/issues/13194)\, [https\://github\.com/ansible\-collections/community\.general/pull/13195](https\://github\.com/ansible\-collections/community\.general/pull/13195)\)\.
+* zypper\_repository \- keep the <code>description</code> option when adding a <code>\.repo</code> file instead of using the name from the file \([https\://github\.com/ansible\-collections/community\.general/issues/4532](https\://github\.com/ansible\-collections/community\.general/issues/4532)\, [https\://github\.com/ansible\-collections/community\.general/pull/13168](https\://github\.com/ansible\-collections/community\.general/pull/13168)\)\.
+* zypper\_updates\_info \- list the updates from the other repositories and warn instead of failing when zypper skips a repository that cannot be refreshed \([https\://github\.com/ansible\-collections/community\.general/pull/13191](https\://github\.com/ansible\-collections/community\.general/pull/13191)\)\.
+
+<a id="v14-0-0"></a>
+## v14\.0\.0
+
+<a id="release-summary-1"></a>
+### Release Summary
+
+This is release 14\.0\.0 of <code>community\.general</code>\, released on 2026\-11\-02\.
+
+<a id="minor-changes-1"></a>
 ### Minor Changes
 
 * The collection now depends on community\.library\_inventory\_filtering\_v1\. This runtime dependency is used by inventory plugins only\, and will be automatically installed by <code>ansible\-galaxy collection install</code>\. If you install community\.general by cloning its repository or extracting its release tarball to a specific location\, you also need to make sure to install community\.library\_inventory\_filtering\_v1 manually if you use one of the affected inventory plugins \([https\://github\.com/ansible\-collections/community\.general/pull/12302](https\://github\.com/ansible\-collections/community\.general/pull/12302)\)\.
@@ -417,7 +448,7 @@ This is release 14\.0\.0 of <code>community\.general</code>\, released on 2026\-
 
 * proton\_pass lookup plugin \- no longer exposes the personal access token in error messages\, verbose output\, or the process list \([https\://github\.com/ansible\-collections/community\.general/issues/12710](https\://github\.com/ansible\-collections/community\.general/issues/12710)\, [https\://github\.com/ansible\-collections/community\.general/pull/12726](https\://github\.com/ansible\-collections/community\.general/pull/12726)\)\.
 
-<a id="bugfixes"></a>
+<a id="bugfixes-1"></a>
 ### Bugfixes
 
 * aix\_devices \- fix <code>chdev</code> command failures being incorrectly reported as successful results\, now properly fails the task when device attribute changes cannot be applied \([https\://github\.com/ansible\-collections/community\.general/pull/12185](https\://github\.com/ansible\-collections/community\.general/pull/12185)\)\.

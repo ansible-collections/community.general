@@ -6,6 +6,33 @@ Community General Release Notes
 
 This changelog describes changes after version 13.0.0.
 
+v14.0.1
+=======
+
+Release Summary
+---------------
+
+Bugfix release for inclusion in Ansible 15.0.0rc1.
+
+Minor Changes
+-------------
+
+- sysrc - remove case that occurred for FreeBSD 11 and prior (https://github.com/ansible-collections/community.general/pull/13185).
+
+Bugfixes
+--------
+
+- archive - do not add the destination archive to itself when it is located under one of the archived paths (https://github.com/ansible-collections/community.general/issues/1420, https://github.com/ansible-collections/community.general/pull/13208).
+- btrfs module utils - fix path of nested subvolumes when a parent subvolume is inside a directory (https://github.com/ansible-collections/community.general/issues/7454, https://github.com/ansible-collections/community.general/pull/13071).
+- ipa module utils - do not fail a task when the ``failed`` field of the API response only contains empty member lists. This fixes failures on success in ``ipa_group``, ``ipa_hbacrule``, ``ipa_sudorule`` and other modules that add members (https://github.com/ansible-collections/community.general/issues/12294, https://github.com/ansible-collections/community.general/pull/13188).
+- lvm_pv - determine the parent disk of a partition from sysfs instead of from its name, which fixes rescanning partitions of devices such as ``mmcblk0p1`` (https://github.com/ansible-collections/community.general/issues/13212, https://github.com/ansible-collections/community.general/pull/13218).
+- lvm_pv - do not warn on every run with ``resize=true`` when the underlying disk has no rescan attribute, for example virtio-blk disks (https://github.com/ansible-collections/community.general/issues/13212, https://github.com/ansible-collections/community.general/pull/13218).
+- lvm_pv - resolve symbolic links such as ``/dev/disk/by-id/...`` before looking up the device in sysfs, so the disk is rescanned before resizing (https://github.com/ansible-collections/community.general/issues/13212, https://github.com/ansible-collections/community.general/pull/13218).
+- pamd - keep comments and empty lines next to rules inserted with ``state=before`` or ``state=after`` (https://github.com/ansible-collections/community.general/issues/9374, https://github.com/ansible-collections/community.general/pull/13114).
+- splunk callback plugin - report ``ansible_check_mode`` per task instead of keeping it set to ``true`` for the rest of the run once a single task ran in check mode (https://github.com/ansible-collections/community.general/issues/13194, https://github.com/ansible-collections/community.general/pull/13195).
+- zypper_repository - keep the ``description`` option when adding a ``.repo`` file instead of using the name from the file (https://github.com/ansible-collections/community.general/issues/4532, https://github.com/ansible-collections/community.general/pull/13168).
+- zypper_updates_info - list the updates from the other repositories and warn instead of failing when zypper skips a repository that cannot be refreshed (https://github.com/ansible-collections/community.general/pull/13191).
+
 v14.0.0
 =======
 

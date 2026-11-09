@@ -1,2 +1,0 @@
-bugfixes:
-  - ipa module utils - do not fail a task when the ``failed`` field of the API response only contains empty member lists. This fixes failures on success in ``ipa_group``, ``ipa_hbacrule``, ``ipa_sudorule`` and other modules that add members (https://github.com/ansible-collections/community.general/issues/12294, https://github.com/ansible-collections/community.general/pull/13188).
