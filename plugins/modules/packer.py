@@ -266,7 +266,7 @@ class PackerModule:
 
         cmd.append(command)
 
-        if command in ["build", "init"]:
+        if command == "init":
             cmd.append(self.template)
 
         if command == "build":
@@ -292,6 +292,9 @@ class PackerModule:
 
             for var_file in self.var_files:
                 cmd.extend(["-var-file", var_file])
+
+        if command in ["build", "validate"]:
+            cmd.append(self.template)
 
         return cmd
 
