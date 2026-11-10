@@ -137,12 +137,12 @@ def remove_packages(module, packages, root):
 
 
 def install_packages(module, pkgspec, root, force=True, no_recommends=True):
-    packages = ""
+    packages = []
     for package in pkgspec:
         if not query_package_provides(module, package, root):
-            packages += f"'{package}' "
+            packages.append(package)
 
-    if len(packages) != 0:
+    if packages:
         if no_recommends:
             no_recommends_yes = ["--no-recommends"]
         else:
@@ -164,9 +164,9 @@ def install_packages(module, pkgspec, root, force=True, no_recommends=True):
 
         # urpmi always have 0 for exit code if --force is used
         if rc:
-            module.fail_json(msg=f"'urpmi {packages}' failed: {err}")
+            module.fail_json(msg=f"'urpmi {' '.join(packages)}' failed: {err}")
         else:
-            module.exit_json(changed=True, msg=f"{packages} present(s)")
+            module.exit_json(changed=True, msg=f"{' '.join(packages)} present(s)")
     else:
         module.exit_json(changed=False)
 
