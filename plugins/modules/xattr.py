@@ -43,28 +43,28 @@ options:
   state:
     description:
       - Defines which state you want to do.
-      - V(read) retrieves the current value for a O(key).
+      - V(read) retrieves the current value for a O(key), default if value is not set.
       - V(present) sets O(path) to O(value), default if value is set.
       - V(all) dumps all data.
       - V(keys) retrieves all keys.
       - V(absent) deletes the key.
+      - The values V(read), V(all), and V(keys) are deprecated and will be removed in community.general 17.0.0.
+        Use M(community.general.xattr_info) to retrieve extended attributes instead.
+        From then on, the default value of O(state) will be V(present).
     type: str
     choices: [absent, all, keys, present, read]
-    default: read
   follow:
     description:
       - If V(true), dereferences symlinks and sets/gets attributes on symlink target, otherwise acts on symlink itself.
     type: bool
     default: true
+seealso:
+  - module: community.general.xattr_info
 author:
   - Brian Coca (@bcoca)
 """
 
 EXAMPLES = r"""
-- name: Obtain the extended attributes of /etc/foo.conf
-  community.general.xattr:
-    path: /etc/foo.conf
-
 - name: Set the key 'user.foo' to value 'bar'
   community.general.xattr:
     path: /etc/foo.conf
@@ -139,7 +139,7 @@ def main():
             namespace=dict(type="str", default="user"),
             key=dict(type="str", no_log=False),
             value=dict(type="str"),
-            state=dict(type="str", default="read", choices=["absent", "all", "keys", "present", "read"]),
+            state=dict(type="str", choices=["absent", "all", "keys", "present", "read"]),
             follow=dict(type="bool", default=True),
         ),
         supports_check_mode=True,
@@ -149,6 +149,23 @@ def main():
     key = module.params["key"]
     value = module.params["value"]
     state = module.params["state"]
+
+    if state is None and value is None:
+        state = "read"
+        module.deprecate(
+            "The default value 'read' of the option 'state' is deprecated and will change to 'present' "
+            "in community.general 17.0.0. Use the community.general.xattr_info module to retrieve "
+            "extended attributes instead.",
+            version="17.0.0",
+            collection_name="community.general",
+        )
+    elif state in ("read", "all", "keys"):
+        module.deprecate(
+            f"The '{state}' state is deprecated and will be removed in community.general 17.0.0. "
+            "Use the community.general.xattr_info module to retrieve extended attributes instead.",
+            version="17.0.0",
+            collection_name="community.general",
+        )
 
     if not os.path.exists(path):
         module.fail_json(msg="path not found or not accessible!")

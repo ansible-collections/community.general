@@ -1,0 +1,2 @@
+deprecated_features:
+  - xattr - the states ``read``, ``all``, and ``keys``, and the default value ``read`` of the ``state`` option, are deprecated and will be removed in community.general 17.0.0; use ``community.general.xattr_info`` instead (https://github.com/ansible-collections/community.general/issues/9317, https://github.com/ansible-collections/community.general/pull/13211).
