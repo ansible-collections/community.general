@@ -822,6 +822,8 @@ class XAPI:
             if not password:
                 password = ""
 
+        cls._xapi_session("transport").user_agent = f"Ansible-community.general-xenserver/{ANSIBLE_VERSION}"
+
         try:
             cls._xapi_session.login_with_password(username, password, ANSIBLE_VERSION, "Ansible")
         except XenAPI.Failure as f:
