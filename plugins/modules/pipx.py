@@ -369,6 +369,11 @@ class PipX(StateModuleHelper):
             self.do_raise(f"Trying to upgrade a non-existent application: {name}")
         if self.vars.force:
             self.changed = True
+        elif self.module.check_mode:
+            # Without contacting package indexes we cannot know if an upgrade
+            # would change anything; prefer a positive prediction over a false
+            # "ok" under check mode (documented as full support).
+            self.changed = True
 
         with self.runner(
             "state global include_injected index_url force editable pip_args name", check_mode_skip=True
@@ -378,6 +383,9 @@ class PipX(StateModuleHelper):
 
     def state_uninstall(self):
         if self.vars.application:
+            # Predict change under check mode: uninstall is skipped, so the
+            # before/after application comparison would otherwise stay equal.
+            self.changed = True
             name = make_installed_name(self.vars.name, self.vars.suffix)
             with self.runner("state global name", check_mode_skip=True) as ctx:
                 ctx.run(name=name)
@@ -400,6 +408,13 @@ class PipX(StateModuleHelper):
             self.do_raise(f"Trying to inject packages into a non-existent application: {name}")
         if self.vars.force:
             self.changed = True
+        else:
+            injected = self.vars.application[name].get("injected") or {}
+            for pkg in self.vars.inject_packages or []:
+                pkg_name = PackageRequirement(self.module, pkg).parsed_name
+                if pkg_name not in injected:
+                    self.changed = True
+                    break
         with self.runner(
             "state global index_url install_apps install_deps force editable pip_args name inject_packages",
             check_mode_skip=True,
@@ -411,6 +426,12 @@ class PipX(StateModuleHelper):
         name = make_installed_name(self.vars.name, self.vars.suffix)
         if not self.vars.application:
             self.do_raise(f"Trying to uninject packages into a non-existent application: {name}")
+        injected = self.vars.application[name].get("injected") or {}
+        for pkg in self.vars.inject_packages or []:
+            pkg_name = PackageRequirement(self.module, pkg).parsed_name
+            if pkg_name in injected:
+                self.changed = True
+                break
         with self.runner("state global name inject_packages", check_mode_skip=True) as ctx:
             ctx.run(name=name)
             self._capture_results(ctx)
@@ -428,6 +449,8 @@ class PipX(StateModuleHelper):
     def state_upgrade_all(self):
         if self.vars.force:
             self.changed = True
+        elif self.module.check_mode:
+            self.changed = True
         with self.runner("state global include_injected force", check_mode_skip=True) as ctx:
             ctx.run()
             self._capture_results(ctx)
@@ -444,6 +467,10 @@ class PipX(StateModuleHelper):
             with self.runner(args_order, check_mode_skip=True) as ctx:
                 ctx.run(state="install", name_source=[self.vars.name, self.vars.source])
                 self._capture_results(ctx)
+        elif self.module.check_mode:
+            # Same as state_upgrade: predict a change when we cannot cheaply
+            # determine whether the installed app (or its injects) is outdated.
+            self.changed = True
 
         with self.runner(
             "state global include_injected index_url force editable pip_args name", check_mode_skip=True
