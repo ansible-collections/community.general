@@ -44,6 +44,20 @@
       - pretest_1 is changed
       - pretest_2 is not changed
 
+- name: Archive - non-existent explicit path
+  community.general.archive:
+    path: "{{ remote_tmp_dir }}/dne.txt"
+    dest: "{{ remote_tmp_dir }}/archive_dne.tar"
+    format: tar
+  register: archive_dne
+  ignore_errors: true
+
+- name: Archive - assert non-existent explicit path fails
+  ansible.builtin.assert:
+    that:
+      - archive_dne is failed
+      - "'no source paths were found' in archive_dne.msg"
+
 # Install dependencies
 - name: Ensure zip is present to create test archive (yum)
   ansible.builtin.dnf:
