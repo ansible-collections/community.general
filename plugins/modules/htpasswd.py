@@ -247,7 +247,7 @@ def main():
             (msg, changed) = absent(path, username, check_mode)
         else:
             module.fail_json(msg=f"Invalid state: {state}")
-            return  # needed to make pylint happy
+            return  # pylint: disable=unreachable  # needed to make pylint happy
 
         (msg, changed) = check_file_attrs(module, changed, msg)
         module.exit_json(msg=msg, changed=changed)
