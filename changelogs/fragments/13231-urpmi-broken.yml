@@ -1,0 +1,2 @@
+bugfixes:
+  - Fix installation of packages with Mageia's urpmi command by changing string usage into list usage (https://github.com/ansible-collections/community.general/pull/13231).
