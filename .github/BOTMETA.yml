@@ -397,8 +397,6 @@ files:
     maintainers: delineaKrehl tylerezimmerman
   $module_utils/:
     labels: module_utils
-  $module_utils/__init__.py:
-    maintainers: felixfontein
   $module_utils/_alicloud_ecs.py:
     maintainers: xiaozhu36
   $module_utils/_android_sdkmanager.py:

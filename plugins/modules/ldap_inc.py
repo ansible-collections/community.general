@@ -202,7 +202,7 @@ def main():
                     )
                     if len(result) != 1:
                         module.fail_json(msg="The entry does not exist or does not contain the specified attribute.")
-                        return
+                        return  # pylint: disable=unreachable
                     try:
                         ret = str(int(result[0][1][mod.attr][0]) + mod.increment)
                         # if the current value first arg in inc_legacy has changed then the modify will fail
@@ -211,7 +211,7 @@ def main():
                     except ldap.NO_SUCH_ATTRIBUTE:
                         if tries == max_tries:
                             module.fail_json(msg=f"The increment could not be applied after {max_tries} tries.")
-                            return
+                            return  # pylint: disable=unreachable
 
         else:
             result = mod.connection.search_ext_s(
