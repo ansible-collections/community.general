@@ -105,6 +105,6 @@ class RedisAnsible:
 
     def _connect(self) -> Redis:
         try:
-            return Redis(**redis_auth_params(self.module))
+            return Redis(db=self.module.params["db"], **redis_auth_params(self.module))
         except Exception as e:
             self.module.fail_json(msg=f"{e}")

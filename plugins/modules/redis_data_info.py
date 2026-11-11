@@ -19,6 +19,12 @@ options:
       - Database key.
     type: str
     required: true
+  db:
+    description:
+      - The Redis database number to use.
+    type: int
+    default: 0
+    version_added: 14.1.0
 
 extends_documentation_fragment:
   - community.general._redis
@@ -79,6 +85,7 @@ def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
         key=dict(type="str", required=True, no_log=False),
+        db=dict(type="int", default=0),
     )
     module_args.update(redis_auth_args)
 

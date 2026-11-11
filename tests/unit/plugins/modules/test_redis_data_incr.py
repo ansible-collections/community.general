@@ -210,3 +210,16 @@ def test_redis_data_incr_check_mode_permissions(capfd, mocker):
     assert json.loads(out)["msg"].startswith("Failed to get value of key: foo with exception:")
     assert "value" not in json.loads(out)
     assert not json.loads(out)["changed"]
+
+
+@pytest.mark.parametrize("db_args, expected_db", [({}, 0), ({"db": 1}, 1)])
+def test_redis_data_incr_db(capfd, mocker, db_args, expected_db):
+    with set_module_args({"login_host": "localhost", "key": "foo", **db_args}):
+        redis_init = mocker.spy(redis.Redis, "__init__")
+        mocker.patch("redis.Redis.incr", return_value=57)
+        with pytest.raises(SystemExit):
+            redis_data_incr.main()
+    out, err = capfd.readouterr()
+    assert not err
+    assert json.loads(out)["value"] == 57.0
+    assert redis_init.call_args.kwargs["db"] == expected_db

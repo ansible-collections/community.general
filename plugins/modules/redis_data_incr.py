@@ -39,7 +39,12 @@ options:
       - Float amount to increment the key by.
       - This only works with keys that contain float values in their string representation.
     type: float
-
+  db:
+    description:
+      - The Redis database number to use.
+    type: int
+    default: 0
+    version_added: 14.1.0
 
 extends_documentation_fragment:
   - community.general._redis.documentation
@@ -98,6 +103,7 @@ def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
         key=dict(type="str", required=True, no_log=False),
+        db=dict(type="int", default=0),
         increment_int=dict(type="int"),
         increment_float=dict(type="float"),
     )

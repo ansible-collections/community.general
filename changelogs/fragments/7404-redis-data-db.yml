@@ -1,0 +1,2 @@
+minor_changes:
+  - redis_data, redis_data_incr, redis_data_info - add ``db`` option to select the Redis database (https://github.com/ansible-collections/community.general/issues/7404).

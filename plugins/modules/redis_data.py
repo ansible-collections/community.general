@@ -52,6 +52,12 @@ options:
     choices:
       - present
       - absent
+  db:
+    description:
+      - The Redis database number to use.
+    type: int
+    default: 0
+    version_added: 14.1.0
 
 extends_documentation_fragment:
   - community.general._redis.documentation
@@ -140,6 +146,7 @@ def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
         key=dict(type="str", required=True, no_log=False),
+        db=dict(type="int", default=0),
         value=dict(type="str"),
         expiration=dict(type="int"),
         non_existing=dict(type="bool"),
