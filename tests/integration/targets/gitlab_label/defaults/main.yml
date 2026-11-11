@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 gitlab_project_name: ansible_test_project
-gitlab_host: ansible_test_host
-gitlab_api_token: ansible_test_api_token
+gitlab_host: "{{ setup_gitlab_api_url }}"
+gitlab_api_token: "{{ setup_gitlab_api_token }}"
 gitlab_project_group: ansible_test_group
 gitlab_branch: ansible_test_branch
 gitlab_first_label: ansible_test_label

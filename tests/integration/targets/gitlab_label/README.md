@@ -6,14 +6,17 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # Gitlab integration tests
 
-1. to run integration tests locally, I've setup a podman pod with both gitlab-ee image and the testing image
-2. gitlab's related information were taken from [here](https://docs.gitlab.com/ee/install/docker.html), about the variable it needs (hostname, ports, volumes); volumes were pre-made before launching the image
-3. image that run integration tests is started with `podman run --rm -it --pod <pod_name> --name <image_name> --network=host --volume <path_to_git_repo>/ansible_community/community.general:<container_path_to>/workspace/ansible_collections/community/general quay.io/ansible/azure-pipelines-test-container:4.0.1`
-4. into the testing image, run
+This target depends on `setup_gitlab`, which installs Docker (through `setup_docker`) and starts a GitLab CE container.
+GitLab needs about 4 GB of RAM, and its first start takes several minutes.
+
+The target is disabled and destructive, so it must be run explicitly, on a VM:
+
 ```sh
-pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
-cd <container_path_to>/workspace/ansible_collections/community/general
-ansible-test integration gitlab_label -vvv
+ansible-test integration gitlab_label --allow-disabled --allow-destructive
 ```
 
-While debugging with `q` package, open a second terminal and run `podman exec -it <image_name> /bin/bash` and inside it do `tail -f /tmp/q` .
+Docker cannot run nested inside the `ansible-test` containers on every system,
+for example inside rootless podman, due to its storage driver.
+
+To run the tests against an existing GitLab instance, set `gitlab_host` and `gitlab_api_token`
+in `tests/integration/integration_config.yml`. The GitLab container is started nonetheless.

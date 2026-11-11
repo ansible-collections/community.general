@@ -1,0 +1,51 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Start GitLab container
+  community.docker.docker_container:
+    name: "{{ setup_gitlab_container_name }}"
+    image: "{{ setup_gitlab_image }}"
+    env:
+      GITLAB_OMNIBUS_CONFIG: "{{ setup_gitlab_omnibus_config }}"
+    ports:
+      - "{{ setup_gitlab_port }}:{{ setup_gitlab_port }}"
+    shm_size: 256M
+    detach: true
+    timeout: 900  # the image has over 4 GB
+
+# The published port accepts connections long before GitLab is up, the first start takes several minutes
+- name: Wait for GitLab to be ready
+  ansible.builtin.uri:
+    url: "{{ setup_gitlab_api_url }}/-/readiness?all=1"
+  register: setup_gitlab_readiness
+  until: setup_gitlab_readiness is succeeded
+  retries: 90
+  delay: 10
+
+- name: Create API token for the root user
+  community.docker.docker_container_exec:
+    container: "{{ setup_gitlab_container_name }}"
+    argv:
+      - gitlab-rails
+      - runner
+      - "{{ setup_gitlab_create_token_script }}"
+  register: setup_gitlab_create_token
+  changed_when: "'created' in setup_gitlab_create_token.stdout"
+
+- name: Check API token
+  ansible.builtin.uri:
+    url: "{{ setup_gitlab_api_url }}/api/v4/user"
+    headers:
+      PRIVATE-TOKEN: "{{ setup_gitlab_api_token }}"
+
+- name: Expose GitLab connection details
+  ansible.builtin.set_fact:
+    setup_gitlab_api_url: "{{ setup_gitlab_api_url }}"
+    setup_gitlab_api_token: "{{ setup_gitlab_api_token }}"
