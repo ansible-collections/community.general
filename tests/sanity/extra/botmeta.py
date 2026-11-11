@@ -233,6 +233,9 @@ class BotmetaCheck:
                     filename = os.path.join(dirpath, file)
                     if os.path.islink(filename):
                         continue
+                    if file == "__init__.py" and os.stat(filename).st_size == 0:
+                        # Skip empty __init__.py files
+                        continue
                     if os.path.isfile(filename):
                         matching_files = []
                         for file, filedata in files.items():
