@@ -23,6 +23,9 @@ STATE_MAP = {
     "disconnected": "disconnect",
     "synced": "sync-to",
     "throttled": "throttle",
+    # kopia_policy
+    "set": "set",
+    "deleted": "delete",
 }
 
 # Maps backend provider names to their CLI parameter definitions.
