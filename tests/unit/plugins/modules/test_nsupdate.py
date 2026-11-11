@@ -190,7 +190,8 @@ def test_port_defaults_to_53_without_tls(mocker, run_module, protocol, port):
     query_mock = mocker.patch(f"dns.query.{protocol}", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
     params = {k: v for k, v in BASE_PARAMS.items() if k != "port"}
     run_module({**params, "protocol": protocol})
-    assert {call.kwargs["port"] for call in query_mock.call_args_list} == {port}
+    for call in query_mock.call_args_list:
+        assert call.kwargs["port"] == port
 
 
 def test_protocol_tls_explicit_port(mocker, run_module):
@@ -198,7 +199,8 @@ def test_protocol_tls_explicit_port(mocker, run_module):
     rcodes = [dns.rcode.NXDOMAIN, dns.rcode.NOERROR]
     tls_mock = mocker.patch("dns.query.tls", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
     run_module({**BASE_PARAMS, "protocol": "tls", "port": 8853})
-    assert {call.kwargs["port"] for call in tls_mock.call_args_list} == {8853}
+    for call in tls_mock.call_args_list:
+        assert call.kwargs["port"] == 8853
 
 
 def test_protocol_tls_verifies_fqdn_server(mocker, run_module):
@@ -211,7 +213,8 @@ def test_protocol_tls_verifies_fqdn_server(mocker, run_module):
     tls_mock = mocker.patch("dns.query.tls", side_effect=lambda q, *a, **kw: route_query(q, rcodes))
     result = run_module({**BASE_PARAMS, "server": "ns1.example.org", "protocol": "tls", "port": 853})
     assert result["changed"] is True
-    assert {call.kwargs["server_hostname"] for call in tls_mock.call_args_list} == {"ns1.example.org"}
+    for call in tls_mock.call_args_list:
+        assert call.kwargs["server_hostname"] == "ns1.example.org"
 
 
 # ---------------------------------------------------------------------------
