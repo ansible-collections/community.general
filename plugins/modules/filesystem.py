@@ -333,8 +333,8 @@ class Ext(Filesystem):
     CHANGE_UUID = "tune2fs"
     CHANGE_UUID_OPTION = "-U"
 
-    def get_fs_size(self, dev):
-        """Get Block count and Block size and return their product."""
+    def _get_fs_info(self, dev):
+        """Return the filesystem block size and count."""
         cmd = self.module.get_bin_path(self.INFO, required=True)
         dummy, out, dummy = self.module.run_command([cmd, "-l", str(dev)], check_rc=True, environ_update=self.LANG_ENV)
 
@@ -349,9 +349,56 @@ class Ext(Filesystem):
         else:
             raise ValueError(repr(out))
 
-        # A partial filesystem block at the end of the device cannot be used.
-        self.GROW_SLACK = block_size - 1
+        return block_size, block_count
+
+    def get_fs_size(self, dev):
+        """Get Block count and Block size and return their product."""
+        block_size, block_count = self._get_fs_info(dev)
         return block_size * block_count
+
+    def grow(self, dev):
+        """Grow the filesystem and report whether its size actually changed."""
+        try:
+            block_size, block_count = self._get_fs_info(dev)
+        except ValueError as err:
+            self.module.warn(f"unable to process {self.INFO} output '{err}'")
+            self.module.fail_json(msg=f"unable to process {self.INFO} output for {dev}")
+
+        fs_size_before = block_size * block_count
+        dev_size = dev.size()
+
+        if self.module.check_mode:
+            will_grow = block_count < dev_size // block_size
+            self.module.exit_json(
+                changed=will_grow,
+                msg=(
+                    f"resizing filesystem {self.fstype} on device {dev}"
+                    if will_grow
+                    else f"{self.fstype} filesystem is using the whole device {dev}"
+                ),
+            )
+        elif fs_size_before >= dev_size:
+            self.module.exit_json(
+                changed=False,
+                msg=f"{self.fstype} filesystem is using the whole device {dev}",
+            )
+
+        out = self.module.run_command(self.grow_cmd(str(dev)), check_rc=True)[1]
+        try:
+            fs_size_after = self.get_fs_size(dev)
+        except ValueError as err:
+            self.module.warn(f"unable to process {self.INFO} output '{err}'")
+            self.module.fail_json(msg=f"unable to process {self.INFO} output for {dev}")
+
+        if fs_size_after < fs_size_before:
+            self.module.fail_json(msg=f"{self.fstype} filesystem shrank while resizing {dev}")
+        if fs_size_after == fs_size_before:
+            self.module.exit_json(
+                changed=False,
+                msg=f"{self.fstype} filesystem has no additional complete blocks available on {dev}",
+            )
+
+        return out
 
 
 class Ext2(Ext):

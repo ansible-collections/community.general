@@ -19,22 +19,32 @@ class ModuleExit(Exception):
 @pytest.mark.parametrize("block_size", [1024, 2048, 4096])
 @pytest.mark.parametrize("extra_blocks", [0, 1])
 @pytest.mark.parametrize("check_mode", [False, True])
-def test_ext_growth_ignores_only_incomplete_blocks(fs_class, block_size, extra_blocks, check_mode):
+def test_ext_growth_reports_only_actual_size_changes(fs_class, block_size, extra_blocks, check_mode):
     module = Mock()
     module.check_mode = check_mode
     module.exit_json.side_effect = ModuleExit
     module.get_bin_path.side_effect = lambda name, **kwargs: name
-    module.run_command.return_value = (0, f"Block count: 100\nBlock size: {block_size}\n", "")
+    info_calls = 0
+
+    def run_command(args, **kwargs):
+        nonlocal info_calls
+        if args[0] == "tune2fs":
+            info_calls += 1
+            block_count = 100 + (extra_blocks if info_calls > 1 else 0)
+            return 0, f"Block count: {block_count}\nBlock size: {block_size}\n", ""
+        return 0, "resize output", ""
+
+    module.run_command.side_effect = run_command
     device = Mock()
     device.size.return_value = (100 + extra_blocks) * block_size + block_size - 1
     fs = fs_class(module)
 
-    if not extra_blocks or check_mode:
+    if check_mode or not extra_blocks:
         with pytest.raises(ModuleExit):
             fs.grow(device)
         assert module.exit_json.call_args.kwargs["changed"] is bool(extra_blocks)
-        assert module.run_command.call_count == 1
+        assert module.run_command.call_count == (1 if check_mode else 3)
     else:
-        fs.grow(device)
-        assert module.run_command.call_count == 2
-        assert module.run_command.call_args.args[0] == ["resize2fs", str(device)]
+        assert fs.grow(device) == "resize output"
+        assert module.run_command.call_count == 3
+        assert module.run_command.call_args_list[1].args[0] == ["resize2fs", str(device)]
