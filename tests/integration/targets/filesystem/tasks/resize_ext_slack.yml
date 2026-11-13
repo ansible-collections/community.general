@@ -1,0 +1,77 @@
+---
+# Copyright (c) 2026 Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Test ext filesystem growth with incomplete trailing blocks
+  vars:
+    ext_slack_image: '{{ remote_tmp_dir }}/ext-slack.img'
+  block:
+    - name: Create a device with an incomplete final filesystem block
+      ansible.builtin.command:
+        argv: [truncate, -s, '16777728', '{{ ext_slack_image }}']
+
+    - name: Create the ext filesystem
+      community.general.filesystem:
+        dev: '{{ ext_slack_image }}'
+        fstype: '{{ ext_slack_fstype }}'
+        opts: '-b {{ ext_slack_block_size }}'
+
+    - name: Check that incomplete trailing blocks do not predict growth
+      community.general.filesystem:
+        dev: '{{ ext_slack_image }}'
+        fstype: '{{ ext_slack_fstype }}'
+        resizefs: true
+      check_mode: true
+      register: ext_slack_preview
+
+    - name: Check that incomplete trailing blocks do not report growth
+      community.general.filesystem:
+        dev: '{{ ext_slack_image }}'
+        fstype: '{{ ext_slack_fstype }}'
+        resizefs: true
+      register: ext_slack_unchanged
+
+    - name: Assert that unusable trailing bytes are ignored
+      ansible.builtin.assert:
+        that:
+          - ext_slack_preview is not changed
+          - ext_slack_unchanged is not changed
+
+    - name: Add usable space while retaining incomplete trailing blocks
+      ansible.builtin.command:
+        argv: [truncate, -s, '17826304', '{{ ext_slack_image }}']
+
+    - name: Preview growth into usable space
+      community.general.filesystem:
+        dev: '{{ ext_slack_image }}'
+        fstype: '{{ ext_slack_fstype }}'
+        resizefs: true
+      check_mode: true
+      register: ext_slack_growth_preview
+
+    - name: Grow into usable space
+      community.general.filesystem:
+        dev: '{{ ext_slack_image }}'
+        fstype: '{{ ext_slack_fstype }}'
+        resizefs: true
+      register: ext_slack_growth
+
+    - name: Repeat growth with incomplete trailing blocks
+      community.general.filesystem:
+        dev: '{{ ext_slack_image }}'
+        fstype: '{{ ext_slack_fstype }}'
+        resizefs: true
+      register: ext_slack_repeat
+
+    - name: Assert growth and idempotence
+      ansible.builtin.assert:
+        that:
+          - ext_slack_growth_preview is changed
+          - ext_slack_growth is changed
+          - ext_slack_repeat is not changed
+  always:
+    - name: Remove the ext filesystem test image
+      ansible.builtin.file:
+        path: '{{ ext_slack_image }}'
+        state: absent
