@@ -9,7 +9,7 @@
   block:
     - name: Create a device with an incomplete final filesystem block
       ansible.builtin.command:
-        argv: [truncate, --size, '16777728', '{{ ext_slack_image }}']
+        argv: [truncate, -s, '16777728', '{{ ext_slack_image }}']
 
     - name: Create the ext filesystem
       community.general.filesystem:
@@ -40,7 +40,7 @@
 
     - name: Add usable space while retaining incomplete trailing blocks
       ansible.builtin.command:
-        argv: [truncate, --size, '17826304', '{{ ext_slack_image }}']
+        argv: [truncate, -s, '17826304', '{{ ext_slack_image }}']
 
     - name: Preview growth into usable space
       community.general.filesystem:
