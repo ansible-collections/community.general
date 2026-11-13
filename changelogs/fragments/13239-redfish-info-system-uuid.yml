@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_info - return the system's ``UUID`` from the ``GetSystemInventory`` command (https://github.com/ansible-collections/community.general/pull/13239).
