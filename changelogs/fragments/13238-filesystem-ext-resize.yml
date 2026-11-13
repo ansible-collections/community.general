@@ -1,0 +1,2 @@
+bugfixes:
+  - filesystem - avoid false positive change detection when resizing ext2, ext3, or ext4 filesystems with unusable trailing space (https://github.com/ansible-collections/community.general/pull/13238).
