@@ -349,6 +349,8 @@ class Ext(Filesystem):
         else:
             raise ValueError(repr(out))
 
+        # A partial filesystem block at the end of the device cannot be used.
+        self.GROW_SLACK = block_size - 1
         return block_size * block_count
 
 
