@@ -20,16 +20,17 @@ extends_documentation_fragment:
   - community.general._attributes
 attributes:
   check_mode:
-    support: full
+    support: partial
+    details:
+      - When O(name) is not provided and O(state=present), check mode only reports a change if a package declared
+        in C(package.json) is not installed. Changes to the versions of installed packages are not detected.
   diff_mode:
     support: none
 options:
   name:
     description:
       - The name of a Node.js library to install.
-      - All packages in C(package.json) are installed if not provided. In that case, with O(state=present), the module only
-        checks whether each package declared in C(package.json) is installed, so changing the version of an already installed
-        package in C(package.json) does not trigger an installation.
+      - All packages in C(package.json) are installed if not provided.
     type: str
   alias:
     description:
@@ -301,6 +302,17 @@ class Pnpm:
 
         return not declared.issubset(installed)
 
+    def current_state(self):
+        lockfile = os.path.join(self.path, "pnpm-lock.yaml")
+        if not os.path.isfile(lockfile):
+            return None
+
+        with open(lockfile) as f:
+            lockfile_content = f.read()
+
+        out, _err = self._exec(["list", "--json"], True, False)
+        return lockfile_content, out
+
     def install(self):
         if self.alias_name_ver is not None:
             return self._exec(["add", self.alias_name_ver])
@@ -446,7 +458,11 @@ def main():
     out = ""
     err = ""
     if state == "present":
-        if pnpm.missing():
+        if name is None and not module.check_mode:
+            before = pnpm.current_state()
+            out, err = pnpm.install()
+            changed = pnpm.current_state() != before
+        elif pnpm.missing():
             changed = True
             out, err = pnpm.install()
     elif state == "latest":

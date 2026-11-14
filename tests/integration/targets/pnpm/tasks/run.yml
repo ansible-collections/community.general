@@ -78,6 +78,34 @@
           - pnpm_install_all is changed
           - pnpm_reinstall_all is not changed
 
+    - name: Change the version of reading-time in package.json
+      ansible.builtin.copy:
+        dest: "{{ remote_tmp_dir }}/package.json"
+        mode: "644"
+        content: |
+          {
+            "name": "ansible-pnpm-testing",
+            "version": "1.0.0",
+            "license": "MIT",
+            "dependencies": {
+              "reading-time": "1.3.0"
+            }
+          }
+
+    - name: Install all packages from the changed package.json
+      community.general.pnpm:
+        path: "{{ remote_tmp_dir }}"
+        executable: "{{ pnpm_bin_path }}/pnpm"
+        state: present
+      environment:
+        PATH: "{{ node_bin_path }}:{{ ansible_facts.env.PATH }}"
+      register: pnpm_install_changed_version
+
+    - name: Assert that the version change is installed
+      ansible.builtin.assert:
+        that:
+          - pnpm_install_changed_version is changed
+
     - name: Install the same package from package.json again
       community.general.pnpm:
         path: "{{ remote_tmp_dir }}"
