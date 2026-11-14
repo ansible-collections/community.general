@@ -3374,6 +3374,7 @@ class RedfishUtils:
             "TrustedModules",
             "Name",
             "Id",
+            "UUID",
         ]
 
         response = self.get_request(self.root_uri + systems_uri)
