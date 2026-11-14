@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 
 import pytest
+import redis
 from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 from redis import __version__
 
@@ -311,3 +312,17 @@ def test_redis_set_key_check_mode(capfd, mocker):
     assert json.loads(out)["msg"] == "Set key: foo"
     assert json.loads(out)["value"] == "baz"
     assert json.loads(out)["old_value"] == "bar"
+
+
+@pytest.mark.parametrize("db_args, expected_db", [({}, 0), ({"db": 1}, 1)])
+def test_redis_data_db(capfd, mocker, db_args, expected_db):
+    with set_module_args({"login_host": "localhost", "key": "foo", "value": "baz", **db_args}):
+        redis_init = mocker.spy(redis.Redis, "__init__")
+        mocker.patch("redis.Redis.get", return_value="bar")
+        mocker.patch("redis.Redis.set", return_value=True)
+        with pytest.raises(SystemExit):
+            redis_data.main()
+    out, err = capfd.readouterr()
+    assert not err
+    assert json.loads(out)["value"] == "baz"
+    assert redis_init.call_args.kwargs["db"] == expected_db
