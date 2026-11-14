@@ -79,6 +79,12 @@ anchors:
     <stream>
     <message type="info">All repositories have been refreshed.</message>
     </stream>
+  xml_metadata_downloaded: &xml_metadata_downloaded |
+    <?xml version='1.0'?>
+    <stream>
+    <progress id="raw-refresh" name="Retrieving repository 'repo-oss' metadata"/>
+    <message type="info">All repositories have been refreshed.</message>
+    </stream>
   xml_not_found_error: &xml_not_found_error |
     <?xml version='1.0'?>
     <stream>
@@ -645,6 +651,60 @@ test_cases:
           err: ''
 
   # ---------------------------------------------------------------- update_cache / refresh
+  - id: refresh_only
+    input:
+      update_cache: true
+    output:
+      changed: false
+      update_cache: true
+    mocks:
+      run_command:
+        - command: [/testbin/zypper, --non-interactive, --xmlout, refresh]
+          environ: *env
+          rc: 0
+          out: *xml_refreshed
+          err: ''
+
+  - id: refresh_only_metadata_downloaded
+    input:
+      update_cache: true
+    output:
+      changed: true
+      update_cache: true
+    mocks:
+      run_command:
+        - command: [/testbin/zypper, --non-interactive, --xmlout, refresh]
+          environ: *env
+          rc: 0
+          out: *xml_metadata_downloaded
+          err: ''
+
+  - id: refresh_only_metadata_downloaded_simple_errors
+    input:
+      update_cache: true
+      simple_errors: true
+    output:
+      changed: true
+      update_cache: true
+    mocks:
+      run_command:
+        - command: [/testbin/zypper, --non-interactive, --xmlout, refresh]
+          environ: *env
+          rc: 0
+          out: *xml_metadata_downloaded
+          err: ''
+
+  - id: refresh_only_check_mode
+    flags:
+      check: true
+    input:
+      update_cache: true
+    output:
+      changed: false
+      update_cache: true
+    mocks:
+      run_command: []
+
   - id: refresh_then_install
     input:
       name: nmap
@@ -656,7 +716,7 @@ test_cases:
       update_cache: true
     mocks:
       run_command:
-        - command: [/testbin/zypper, --non-interactive, --xmlout, --quiet, refresh]
+        - command: [/testbin/zypper, --non-interactive, --xmlout, refresh]
           environ: *env
           rc: 0
           out: *xml_refreshed
@@ -859,4 +919,19 @@ test_cases:
           environ: *env
           rc: 104
           out: *xml_no_provider_wget
+          err: ''
+
+  - id: transactional_refresh_only_metadata_downloaded
+    input:
+      update_cache: true
+    output:
+      changed: true
+      update_cache: true
+    mocks:
+      run_command:
+        - command: [/testbin/transactional-update, --continue, --drop-if-no-change, --quiet, --no-selfupdate, run,
+                    /testbin/zypper, --non-interactive, --xmlout, refresh]
+          environ: *env
+          rc: 0
+          out: *xml_metadata_downloaded
           err: ''
