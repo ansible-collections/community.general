@@ -569,6 +569,32 @@
       - zypper_result_update_cache_check is successful
       - zypper_result_update_cache_check is not changed
 
+- name: drop the repository metadata
+  ansible.builtin.command: zypper --non-interactive clean --metadata --raw-metadata
+  changed_when: true
+
+- name: refresh the repositories without a package name
+  community.general.zypper:
+    update_cache: true
+  register: zypper_result_refresh_only
+
+- name: refresh the repositories without a package name again
+  community.general.zypper:
+    update_cache: true
+  register: zypper_result_refresh_only_again
+
+- name: refresh the repositories without a package name in check mode
+  community.general.zypper:
+    update_cache: true
+  check_mode: true
+  register: zypper_result_refresh_only_check
+
+- ansible.builtin.assert:
+    that:
+      - zypper_result_refresh_only is changed
+      - zypper_result_refresh_only_again is not changed
+      - zypper_result_refresh_only_check is not changed
+
 # - name: ensure no previous netcat package still exists
 #   community.general.zypper:
 #     name:
