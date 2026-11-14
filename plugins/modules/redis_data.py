@@ -55,6 +55,7 @@ options:
 
 extends_documentation_fragment:
   - community.general._redis.documentation
+  - community.general._redis.db
   - community.general._attributes
 
 seealso:
@@ -140,6 +141,7 @@ def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
         key=dict(type="str", required=True, no_log=False),
+        db=dict(type="int", default=0),
         value=dict(type="str"),
         expiration=dict(type="int"),
         non_existing=dict(type="bool"),
