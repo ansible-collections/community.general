@@ -40,9 +40,9 @@ options:
       - This only works with keys that contain float values in their string representation.
     type: float
 
-
 extends_documentation_fragment:
   - community.general._redis.documentation
+  - community.general._redis.db
   - community.general._attributes
 
 seealso:
@@ -98,6 +98,7 @@ def main():
     redis_auth_args = redis_auth_argument_spec()
     module_args = dict(
         key=dict(type="str", required=True, no_log=False),
+        db=dict(type="int", default=0),
         increment_int=dict(type="int"),
         increment_float=dict(type="float"),
     )
