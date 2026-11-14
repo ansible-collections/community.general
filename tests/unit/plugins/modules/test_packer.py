@@ -149,6 +149,24 @@ class TestPackerModule(unittest.TestCase):
         self.assertIn("aws_region=us-west-2", command)
         self.assertIn("instance_type=t2.micro", command)
 
+    def test_build_options_precede_template(self):
+        self._setup_module_params(
+            state="built",
+            variables={"aws_region": "us-west-2"},
+            force=True,
+            only=["null.test"],
+        )
+        self.mock_module.run_command.side_effect = [
+            (0, "Build finished", ""),
+            (0, "Packer v1.9.4", ""),
+        ]
+
+        self._module().apply()
+
+        command = self._command()
+        self.assertEqual(command[-1], self.template_path)
+        self.assertEqual(command[1], "build")
+
     def test_build_with_var_files(self):
         var_file = os.path.join(self.test_dir, "vars.pkrvars.hcl")
         with open(var_file, "w") as f:
@@ -242,6 +260,7 @@ class TestPackerModule(unittest.TestCase):
         self.assertFalse(result["changed"])
         self.assertEqual(result["rc"], 0)
         self.assertEqual(self._command()[1], "validate")
+        self.assertEqual(self._command()[-1], self.template_path)
 
     def test_run_command_uses_check_rc(self):
         self._setup_module_params(state="built")
