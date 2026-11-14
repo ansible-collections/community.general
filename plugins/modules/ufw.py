@@ -570,8 +570,9 @@ def main():
 
                     insert_to = params["insert"] + relative_to
                 if insert_to > last_number:
-                    # ufw does not like it when the insert number is larger than the
-                    # maximal rule number for IPv4/IPv6.
+                    # As far as I can tell from ufw's source, there's no position for "after
+                    # the last rule": "insert N" puts the rule in front of rule N, and a
+                    # larger N is rejected. Leaving "insert" out makes ufw add it at the end.
                     insert_to = None
                 cmd.append([insert_to is not None, f"insert {insert_to}"])
             cmd.append([value])
