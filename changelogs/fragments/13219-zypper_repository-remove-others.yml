@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper_repository - add ``remove_others`` option to remove every other repository once the given one is present (https://github.com/ansible-collections/community.general/issues/7034, https://github.com/ansible-collections/community.general/pull/13219).
