@@ -3,6 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 destructive
-heavy
+heavy/rundeck
 skip/macos
 skip/freebsd
