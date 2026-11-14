@@ -128,6 +128,107 @@ test_cases:
           rc: 0
           out: "zlib-dev - 1.2.11-6 \n" # This output has the extra space at the end, to satisfy the behaviour of Yocto/OpenEmbedded's opkg
           err: ''
+  - id: install_zlibdev_with_version_no_text_after_version
+    input:
+      name: zlib-dev=1.2.11-6
+      state: present
+    output:
+      msg: installed 1 package(s)
+    mocks:
+      run_command:
+        - command: [/testbin/opkg, --version]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/opkg, list-installed, zlib-dev]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/opkg, install, zlib-dev=1.2.11-6]
+          environ: *env-def
+          rc: 0
+          out: |
+            Installing zlib-dev (1.2.11-6) on root
+            Configuring zlib-dev.
+          err: ''
+        - command: [/testbin/opkg, list-installed, zlib-dev]
+          environ: *env-def
+          rc: 0
+          out: |
+            zlib-dev - 1.2.11-6
+          err: ''
+  - id: install_zlibdev_with_version_present
+    input:
+      name: zlib-dev=1.2.11-6
+      state: present
+    output:
+      msg: package(s) already present
+    mocks:
+      run_command:
+        - command: [/testbin/opkg, --version]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/opkg, list-installed, zlib-dev]
+          environ: *env-def
+          rc: 0
+          out: |
+            zlib-dev - 1.2.11-6
+          err: ''
+  - id: install_zlibdev_with_version_present_with_description
+    input:
+      name: zlib-dev=1.2.11-6
+      state: present
+    output:
+      msg: package(s) already present
+    mocks:
+      run_command:
+        - command: [/testbin/opkg, --version]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/opkg, list-installed, zlib-dev]
+          environ: *env-def
+          rc: 0
+          out: |
+            zlib-dev - 1.2.11-6 - Development files for the zlib library
+          err: ''
+  - id: install_zlibdev_with_version_other_version_present
+    input:
+      name: zlib-dev=1.2.1
+      state: present
+    output:
+      msg: installed 1 package(s)
+    mocks:
+      run_command:
+        - command: [/testbin/opkg, --version]
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/opkg, list-installed, zlib-dev]
+          environ: *env-def
+          rc: 0
+          out: |
+            zlib-dev - 1.2.11-6
+          err: ''
+        - command: [/testbin/opkg, install, zlib-dev=1.2.1]
+          environ: *env-def
+          rc: 0
+          out: |
+            Installing zlib-dev (1.2.1) on root
+            Configuring zlib-dev.
+          err: ''
+        - command: [/testbin/opkg, list-installed, zlib-dev]
+          environ: *env-def
+          rc: 0
+          out: |
+            zlib-dev - 1.2.1
+          err: ''
   - id: install_vim_updatecache
     input:
       name: vim-fuller
