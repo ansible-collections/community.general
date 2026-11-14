@@ -1,0 +1,2 @@
+bugfixes:
+  - counter_enabled callback plugin - do not display a task counter that is higher than the task total (https://github.com/ansible-collections/community.general/issues/4053, https://github.com/ansible-collections/community.general/pull/13241).
