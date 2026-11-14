@@ -7,17 +7,46 @@
 from __future__ import annotations
 
 import glob
+import os
 import sys
+import tomllib
 
 import yaml
 
 
-def main():
+def get_heavy_targets() -> tuple[set[str], bool]:
+    """Return the heavy/<backend> targets that have sessions in antsibull-nox.toml, and whether errors were found."""
+    with open("antsibull-nox.toml", "rb") as f:
+        config = tomllib.load(f)
+
+    targets: set[str] = set()
+    has_errors = False
+    for group in config["sessions"]["ansible_test_integration"]["groups"]:
+        for session in [group] + group.get("sessions", []):
+            tags = set(group.get("tags", [])) | set(session.get("tags", []))
+            target = session.get("target", [])
+            for value in [target] if isinstance(target, str) else target:
+                if not value.startswith("heavy/"):
+                    continue
+                target_name = value.rstrip("/")
+                backend = target_name.split("/", 1)[1]
+                if f"heavy-{backend}" not in tags:
+                    print(f'antsibull-nox.toml: session for "{target_name}" has no tag "heavy-{backend}"')
+                    has_errors = True
+                workflow = f".github/workflows/nox-heavy-{backend}.yml"
+                if not os.path.exists(workflow):
+                    print(f'{workflow}: workflow for "{target_name}" not found')
+                    has_errors = True
+                targets.add(target_name)
+    return targets, has_errors
+
+
+def main() -> int:
     """Main entry point."""
     with open(".azure-pipelines/azure-pipelines.yml", "rb") as f:
         azp = yaml.safe_load(f)
 
-    allowed_targets = {"azp/generic/1", "heavy"}
+    allowed_targets = {"azp/generic/1"}
     for stage in azp["stages"]:
         if stage["stage"].startswith(("sanity", "unit", "Summary")):
             continue
@@ -25,10 +54,11 @@ def main():
             for param in job["parameters"]["targets"]:
                 group = param["test"].rsplit("-", 1)[-1]
                 allowed_targets.add(f"azp/posix/{group}")
+    heavy_targets, has_errors = get_heavy_targets()
+    allowed_targets.update(heavy_targets)
 
     paths = glob.glob("tests/integration/targets/*/aliases")
 
-    has_errors = False
     for path in paths:
         targets = []
         skip = False
