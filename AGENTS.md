@@ -318,6 +318,11 @@ approval before committing or pushing it.
   - Always ensure you are branching off the `main` branch
   - Do not use `fix` or any other prefix indicating the type of the branch
   - If there is an issue associated with the branch, prefix the name with `####-` (where #### is the issue number), e.g. if fixing issue 9999 about the xfconf module, name it like `9999-xfconf-something`.
+- Keep the history linear: this repository does not use merge commits.
+  - Pull requests are squashed into a single commit when they are merged into `main`.
+  - To bring a branch up to date with `main`, rebase it onto `main` (e.g. `git rebase main`, `git pull --rebase`).
+    Do not merge `main` into the branch, and do not use the "Update branch" button on GitHub in its merge mode.
+  - After rebasing a branch that was already pushed, push it with `git push --force-with-lease`, never plain `--force`.
 
 ## Github Issues Rules
 
