@@ -88,6 +88,17 @@ options:
     type: bool
     default: true
     version_added: 12.6.0
+  fqdn_values:
+    description:
+      - When V(true), a trailing dot is appended to each value in O(record_value) or O(record_values) that does not end with one,
+        so that host names are treated as fully qualified domain names instead of names relative to O(zone_name).
+      - For the V(MX) and V(SRV) record types, the host name is the last part of the value, so the dot is appended to it.
+      - The values are changed before being compared to the existing records. Existing values without the trailing dot
+        do not match the requested values, so they are replaced when O(exclusive=true), and kept when O(exclusive=false).
+      - Only applies to the V(CNAME), V(DNAME), V(MX), V(NS), V(PTR), and V(SRV) record types, it has no effect on the other ones.
+    type: bool
+    default: false
+    version_added: 14.1.0
   state:
     description: State to ensure.
     default: present
@@ -173,6 +184,16 @@ EXAMPLES = r"""
     record_type: 'SRV'
     record_value: '0 10 2380 etcd-0.cloud.example.com.'
     exclusive: false
+
+- name: Ensure a CNAME record pointing to a fully qualified domain name is present
+  community.general.ipa_dnsrecord:
+    ipa_host: spider.example.com
+    ipa_pass: Passw0rd!
+    zone_name: example.com
+    record_name: www
+    record_type: 'CNAME'
+    record_value: 'web01.example.org'
+    fqdn_values: true
 
 - name: Ensure that dns record is removed
   community.general.ipa_dnsrecord:
@@ -284,6 +305,8 @@ class DNSRecordIPAClient(IPAClient):
         return self._post_json(method="dnsrecord_del", name=zone_name, item=item)
 
 
+FQDN_RECORD_TYPES = ("CNAME", "DNAME", "MX", "NS", "PTR", "SRV")
+
 RECORD_TYPE_KEY = {
     "A": "arecord",
     "AAAA": "aaaarecord",
@@ -347,6 +370,8 @@ def ensure(module, client):
     record_values = module.params["record_values"]
     if module.params["record_value"] is not None:
         record_values = [module.params["record_value"]]
+    if module.params["fqdn_values"] and module.params["record_type"] in FQDN_RECORD_TYPES:
+        record_values = [v if v.endswith(".") else f"{v}." for v in record_values]
 
     module_dnsrecord = dict(
         record_type=module.params["record_type"],
@@ -411,6 +436,7 @@ def main():
         state=dict(type="str", default="present", choices=["present", "absent"]),
         record_ttl=dict(type="int"),
         exclusive=dict(type="bool", default=True),
+        fqdn_values=dict(type="bool", default=False),
     )
 
     module = AnsibleModule(
