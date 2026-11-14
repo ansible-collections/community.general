@@ -469,3 +469,84 @@
   community.general.zypper_repository:
     name: describedrepo
     state: absent
+
+# remove_others
+- name: back up the repository files
+  ansible.builtin.copy:
+    src: /etc/zypp/repos.d/
+    dest: "{{ remote_tmp_dir }}/repos.d.bak/"
+    remote_src: true
+    mode: preserve
+
+- block:
+    - name: create a local directory repository to keep
+      ansible.builtin.file:
+        path: "{{ remote_tmp_dir }}/removeothers1"
+        state: directory
+        mode: "0755"
+
+    - name: add a second test repo
+      community.general.zypper_repository:
+        name: removeothers2
+        repo: "{{ os_repository_url_extra }}"
+        state: present
+
+    - name: add the only repo that may stay, removing the others
+      community.general.zypper_repository:
+        name: removeothers1
+        repo: "dir:{{ remote_tmp_dir }}/removeothers1"
+        remove_others: true
+        state: present
+      register: remove_others_result
+
+    - name: list repositories after remove_others
+      ansible.builtin.command: zypper -x lr
+      changed_when: false
+      register: remove_others_lr
+
+    - name: run remove_others again
+      community.general.zypper_repository:
+        name: removeothers1
+        repo: "dir:{{ remote_tmp_dir }}/removeothers1"
+        remove_others: true
+        state: present
+      register: remove_others_again
+
+    - name: add the second test repo again
+      community.general.zypper_repository:
+        name: removeothers2
+        repo: "{{ os_repository_url_extra }}"
+        state: present
+
+    - name: remove the others while the kept repo is already present
+      community.general.zypper_repository:
+        name: removeothers1
+        repo: "dir:{{ remote_tmp_dir }}/removeothers1"
+        remove_others: true
+        state: present
+      register: remove_others_present
+
+    - name: remove_others is rejected with state=absent
+      community.general.zypper_repository:
+        name: removeothers1
+        remove_others: true
+        state: absent
+      register: remove_others_absent
+      ignore_errors: true
+
+    - name: verify remove_others
+      ansible.builtin.assert:
+        that:
+          - remove_others_absent is failed
+          - "'cannot be combined with state=absent' in remove_others_absent.msg"
+          - remove_others_result is changed
+          - "'removeothers2' in remove_others_result.removed_repos"
+          - "'alias=\"removeothers1\"' in remove_others_lr.stdout"
+          - "'alias=\"removeothers2\"' not in remove_others_lr.stdout"
+          - remove_others_again is not changed
+          - remove_others_present is changed
+          - remove_others_present.removed_repos == ['removeothers2']
+  always:
+    - name: restore the repository files
+      ansible.builtin.shell: rm -f /etc/zypp/repos.d/*.repo && cp "{{ remote_tmp_dir }}/repos.d.bak/"*.repo /etc/zypp/repos.d/
+      changed_when: true
