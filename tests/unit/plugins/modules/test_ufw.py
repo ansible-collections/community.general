@@ -496,3 +496,75 @@ def test_default_real_mode_changed(patch_ansible_module):
     payload = exc.value.args[0]
     assert payload["changed"] is True
     assert "ufw default allow incoming" in payload["commands"]
+
+
+ufw_status_verbose_inactive = "Status: inactive\n"
+
+ufw_defaults_file = """# /etc/default/ufw
+IPV6=yes
+DEFAULT_INPUT_POLICY="DROP"
+DEFAULT_OUTPUT_POLICY="ACCEPT"
+DEFAULT_FORWARD_POLICY="DROP"
+DEFAULT_APPLICATION_POLICY="SKIP"
+"""
+
+
+def inactive_run_command(*args, **kwarg):
+    cmd = args[0]
+    if cmd == "ufw status verbose":
+        return 0, ufw_status_verbose_inactive, ""
+    if cmd == grep_config_cli:
+        return 0, "", ""
+    if cmd.startswith("ufw default "):
+        return 0, "Default outgoing policy changed to 'reject'\n", ""
+    raise AssertionError(f"unexpected command: {cmd}")
+
+
+@pytest.fixture
+def ufw_defaults(tmp_path):
+    defaults = tmp_path / "ufw"
+    defaults.write_text(ufw_defaults_file)
+    with patch.object(module, "UFW_DEFAULTS_FILE", str(defaults)):
+        yield
+
+
+def run_inactive(args):
+    with set_module_args(args):
+        with patch.object(basic.AnsibleModule, "run_command") as mock_run_command:
+            mock_run_command.side_effect = inactive_run_command
+            with pytest.raises(AnsibleExitJson) as exc:
+                module.main()
+    return exc.value.args[0]
+
+
+def test_read_default_policies(tmp_path):
+    defaults = tmp_path / "ufw"
+    defaults.write_text(ufw_defaults_file)
+    assert module.read_default_policies(str(defaults)) == {
+        "incoming": "deny",
+        "outgoing": "allow",
+        "routed": "deny",
+    }
+    assert module.read_default_policies(str(tmp_path / "missing")) == {}
+
+
+def test_default_inactive_check_mode_not_changed(patch_ansible_module, ufw_defaults):
+    payload = run_inactive({"default": "allow", "direction": "outgoing", "_ansible_check_mode": True})
+    assert payload["changed"] is False
+
+
+def test_default_inactive_check_mode_changed(patch_ansible_module, ufw_defaults):
+    payload = run_inactive({"default": "reject", "direction": "outgoing", "_ansible_check_mode": True})
+    assert payload["changed"] is True
+
+
+def test_default_inactive_real_mode_not_changed(patch_ansible_module, ufw_defaults):
+    payload = run_inactive({"default": "allow", "direction": "outgoing"})
+    assert payload["changed"] is False
+    assert "ufw default allow outgoing" not in payload["commands"]
+
+
+def test_default_inactive_real_mode_changed(patch_ansible_module, ufw_defaults):
+    payload = run_inactive({"default": "reject", "direction": "outgoing"})
+    assert payload["changed"] is True
+    assert "ufw default reject outgoing" in payload["commands"]
