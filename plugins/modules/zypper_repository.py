@@ -59,8 +59,8 @@ options:
     version_added: 14.0.0
   remove_others:
     description:
-      - Remove every other repository after the repository in O(repo) has been added or confirmed.
-      - Repositories that belong to a service are kept, because the service would add them again on its next refresh.
+      - Remove every repository other than the one in O(repo) and the ones that belong to a service,  
+        as the service would add them again on its next refresh.
       - Requires O(state=present).
     type: bool
     default: false
