@@ -52,15 +52,10 @@ options:
     choices:
       - present
       - absent
-  db:
-    description:
-      - The Redis database number to use.
-    type: int
-    default: 0
-    version_added: 14.1.0
 
 extends_documentation_fragment:
   - community.general._redis.documentation
+  - community.general._redis.db
   - community.general._attributes
 
 seealso:

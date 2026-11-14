@@ -63,3 +63,13 @@ notes:
   - Requires the C(redis) Python package on the remote host. You can install it with pip (C(pip install redis)) or with a
     package manager. Information on the library can be found at U(https://github.com/andymccurdy/redis-py).
 """
+
+    DB = r"""
+options:
+  db:
+    description:
+      - The Redis database number to use.
+    type: int
+    default: 0
+    version_added: 14.1.0
+"""
