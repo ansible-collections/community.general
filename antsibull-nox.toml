@@ -358,3 +358,22 @@ remote = [
 ]
 
 ##################################################################################################
+
+# Heavy integration tests:
+# Targets that are too slow or resource-hungry for regular CI, but that can run without credentials or special hardware.
+# Each one has a `heavy/<backend>` alias; targets sharing a backend run in the same session.
+# The session of each backend is tagged `heavy-<backend>`, and only runs in the nox-heavy-<backend> workflow,
+# which must be triggered manually.
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-heavy"
+description = "Meta session for running all heavy integration test sessions."
+tags = ["heavy"]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "heavy/rundeck/" ]
+docker = "ubuntu"
+tags = ["heavy-rundeck"]
+
+##################################################################################################
