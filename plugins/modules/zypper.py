@@ -499,7 +499,6 @@ def get_cmd(m, subcommand):
             "--quiet",
         ]
         if is_refresh:
-            # the self-update check would refresh the metadata before zypper refresh runs
             tu_cmd.append("--no-selfupdate")
         cmd = tu_cmd + ["run"] + cmd
     if m.params["extra_args_precommand"]:
