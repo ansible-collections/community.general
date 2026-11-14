@@ -1,0 +1,2 @@
+bugfixes:
+  - packer - place build options before the template path and include the template path in check-mode validation commands (https://github.com/ansible-collections/community.general/pull/13229).
