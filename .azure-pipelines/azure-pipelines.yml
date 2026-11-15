@@ -293,6 +293,12 @@ stages:
               test: ansible-test-integration-devel-opensuse-leap-16.0-3.13-azp-posix-2
             - name: OpenSuSE Leap 16.0 + py3.13 + group 3
               test: ansible-test-integration-devel-opensuse-leap-16.0-3.13-azp-posix-3
+            - name: OpenSuSE Leap 16.1 + py3.13 + group 1
+              test: ansible-test-integration-devel-opensuse-leap-16.1-3.13-azp-posix-1
+            - name: OpenSuSE Leap 16.1 + py3.13 + group 2
+              test: ansible-test-integration-devel-opensuse-leap-16.1-3.13-azp-posix-2
+            - name: OpenSuSE Leap 16.1 + py3.13 + group 3
+              test: ansible-test-integration-devel-opensuse-leap-16.1-3.13-azp-posix-3
             - name: OpenSuSE Tumbleweed + py3.13 + group 1
               test: ansible-test-integration-devel-opensuse-tumbleweed-3.13-azp-posix-1
             - name: OpenSuSE Tumbleweed + py3.13 + group 2
