@@ -12,7 +12,14 @@
   ansible.builtin.debug:
     msg: "Distribution '{{ ansible_facts.distribution }}', version '{{ ansible_facts.distribution_version }}', OS family '{{ ansible_facts.os_family }}'"
 
-- name: Distribution specific
+- name: Check for an existing docker socket
+  ansible.builtin.stat:
+    path: /var/run/docker.sock
+  register: setup_docker_socket
+
+# ansible-test mounts the docker socket of the host into its containers, so its docker daemon is used instead
+- name: Install and start docker
+  when: not (setup_docker_socket.stat.issock | default(false))
   block:
     - name: Include distribution specific vars
       ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
@@ -29,18 +36,18 @@
           paths:
             - "{{ role_path }}/tasks"
 
-- name: Start docker service
-  become: true
-  ansible.builtin.service:
-    name: docker
-    state: started
-  notify: Stop docker service
+    - name: Start docker service
+      become: true
+      ansible.builtin.service:
+        name: docker
+        state: started
+      notify: Stop docker service
 
-- name: Cheat on the docker socket permissions
-  become: true
-  ansible.builtin.file:
-    path: /var/run/docker.sock
-    mode: "0666"
+    - name: Cheat on the docker socket permissions
+      become: true
+      ansible.builtin.file:
+        path: /var/run/docker.sock
+        mode: "0666"
 
 - name: Install python "requests"
   ansible.builtin.pip:
