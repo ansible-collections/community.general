@@ -621,6 +621,23 @@ ipv6.ignore-auto-routes:                no
 bond.options:                           mode=active-backup,primary=non_existent_primary,xmit_hash_policy=layer3+4
 """
 
+TESTCASE_BOND_NO_MTU_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              bond_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            auto
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+bond.options:                           mode=active-backup,primary=non_existent_primary,xmit_hash_policy=layer3+4
+"""
+
 TESTCASE_BOND_MODE_UNSET_PRESERVE = [
     {
         "type": "bond",
@@ -1958,6 +1975,11 @@ def mocked_bond_connection_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_bond_no_mtu_connection_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BOND_NO_MTU_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
 def mocked_bond_mode_unset_connection_unchanged(mocker):
     mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BOND_MODE_UNSET_OUTPUT, ""))
 
@@ -2475,6 +2497,23 @@ def test_bond_connection_unchanged(mocked_bond_connection_unchanged, capfd):
     results = json.loads(out)
     assert not results.get("failed")
     assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND, indirect=["patch_ansible_module"])
+def test_bond_connection_unchanged_without_mtu(mocked_bond_no_mtu_connection_unchanged, capfd):
+    """
+    Test : Bond connection unchanged when mtu is unset and nmcli does not report 802-3-ethernet.mtu
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert not results["changed"]
+
+    for call in nmcli.Nmcli.execute_command.call_args_list:
+        assert "modify" not in call.args[0]
 
 
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_BOND_MODE_UNSET_PRESERVE, indirect=["patch_ansible_module"])
