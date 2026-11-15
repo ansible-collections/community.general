@@ -1896,7 +1896,7 @@ ipv4.may-fail:                          yes
 ipv6.method:                            auto
 ipv6.ignore-auto-dns:                   no
 ipv6.ignore-auto-routes:                no
-table:                                  10
+vrf.table:                              10
 802-3-ethernet.mtu:                     auto
 """
 
@@ -5891,7 +5891,7 @@ def test_create_vrf_con(mocked_generic_connection_create, capfd):
     assert args[0][6] == "non_existent_nw_device"
 
     args_text = [to_text(x) for x in args[0]]
-    for param in ["ipv4.addresses", "10.10.10.10/24", "ipv4.gateway", "10.10.10.1", "table", "10"]:
+    for param in ["ipv4.addresses", "10.10.10.10/24", "ipv4.gateway", "10.10.10.1", "vrf.table", "10"]:
         assert param in args_text
 
     out, err = capfd.readouterr()
@@ -5919,7 +5919,7 @@ def test_mod_vrf_conn(mocked_generic_connection_modify, capfd):
     assert args[0][3] == "non_existent_nw_device"
 
     args_text = [to_text(x) for x in args[0]]
-    for param in ["ipv4.addresses", "10.10.10.10/24", "ipv4.gateway", "10.10.10.1", "table", "10"]:
+    for param in ["ipv4.addresses", "10.10.10.10/24", "ipv4.gateway", "10.10.10.1", "vrf.table", "10"]:
         assert param in args_text
 
     out, err = capfd.readouterr()
