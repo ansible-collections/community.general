@@ -32,7 +32,11 @@ options:
   state:
     description:
       - Whether the device should exist or not, taking action if the state is different from what is stated.
-      - Using O(state=present) creates connection set to be brought up automatically.
+      - Using O(state=present) creates or modifies the connection, but does not activate it. The only exception is when
+        creating a connection of type V(bond), V(dummy), V(ethernet), V(infiniband), or V(wifi) with O(mtu), O(dns4),
+        or O(dns6) set, or of type V(team) with O(dns4) or O(dns6) set, in which case the module activates the new connection.
+      - With O(autoconnect=true), NetworkManager can activate the connection by itself, provided the device is managed
+        by NetworkManager. Use O(state=up) to activate the connection explicitly.
       - Using O(state=up) and O(state=down) does not modify connection with other parameters. These states have been added
         in community.general 9.5.0.
     type: str
