@@ -8,3 +8,5 @@
     name: "{{ setup_gitlab_container_name }}"
     state: absent
     force_kill: true
+  # Otherwise docker itself is removed by the handlers of setup_docker, which run before this one
+  when: setup_docker_socket.stat.issock | default(false)
