@@ -2571,7 +2571,7 @@ class Nmcli:
         status = self.connection_update("create")
         if status[0] == 0 and self.edit_commands:
             status = self.edit_connection()
-        if self.create_connection_up:
+        if status[0] == 0 and self.create_connection_up:
             status = self.up_connection()
         return status
 
