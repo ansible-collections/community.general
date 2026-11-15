@@ -410,4 +410,10 @@ target = [ "heavy/rundeck/" ]
 docker = "ubuntu"
 tags = ["heavy-rundeck"]
 
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "devel"
+target = [ "heavy/gitlab/" ]
+docker = "ubuntu"
+tags = ["heavy-gitlab"]
+
 ##################################################################################################
