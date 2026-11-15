@@ -196,7 +196,7 @@ EXAMPLES = r"""
 
 - name: Apply a given patch
   community.general.zypper:
-    name: openSUSE-2016-128
+    name: openSUSE-Leap-16.1-32
     state: present
     type: patch
 
@@ -205,9 +205,13 @@ EXAMPLES = r"""
     name: nmap
     state: absent
 
+- name: Import the nginx signing key
+  ansible.builtin.rpm_key:
+    key: https://nginx.org/keys/nginx_signing.key
+
 - name: Install the nginx rpm from a remote repo
   community.general.zypper:
-    name: 'http://nginx.org/packages/sles/12/x86_64/RPMS/nginx-1.8.0-1.sles12.ngx.x86_64.rpm'
+    name: 'https://nginx.org/packages/sles/16/x86_64/RPMS/nginx-1.30.6-1.sles16.ngx.x86_64.rpm'
     state: present
 
 - name: Install local rpm file
