@@ -60,8 +60,6 @@ class FilterModule:
     """Ansible counter jinja2 filters"""
 
     def filters(self):
-        filters = {
+        return {
             "counter": counter,
         }
-
-        return filters
