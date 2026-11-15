@@ -67,7 +67,7 @@ repodatalist:
     url:
       description: The URL of the repository on the internet.
       type: str
-      sample: "http://repo:50000/repo/SUSE/Products/SLE-Product-SLES/15-SP2/x86_64/product"
+      sample: "http://repo:50000/repo/SUSE/Products/SLE-Product-SLES/15-SP7/x86_64/product"
 """
 
 
