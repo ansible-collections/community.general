@@ -1,0 +1,2 @@
+bugfixes:
+  - urpmi - fix installation of packages caused by trying to concatenate a list with a string (https://github.com/ansible-collections/community.general/pull/13231).
