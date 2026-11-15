@@ -1,2 +1,2 @@
 bugfixes:
-  - ini_file - replace the existing values of an option instead of adding a new line when ``exclusive=true`` and ``allow_no_value=true`` (https://github.com/ansible-collections/community.general/issues/6173, https://github.com/ansible-collections/community.general/pull/13244).
+  - ini_file - fix ``exclusive=true`` having no effect when setting a value with ``allow_no_value=true`` (https://github.com/ansible-collections/community.general/issues/6173, https://github.com/ansible-collections/community.general/pull/13244).

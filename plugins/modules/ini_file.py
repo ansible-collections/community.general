@@ -490,6 +490,16 @@ def do_ini(
                 del changed_lines[index]
                 changed = True
                 msg = "option changed"
+    elif state == "present" and exclusive and option and not no_value_requested:
+        # with allow_no_value, when all requested values are in the section:
+        # remove the other active lines of the option, keep commented lines
+        for index in range(len(section_lines) - 1, 0, -1):
+            line_match = match_active_opt(option, section_lines[index]) if not changed_lines[index] else None
+            if line_match:
+                del section_lines[index]
+                del changed_lines[index]
+                changed = True
+                msg = "option changed"
 
     if state == "present":
         # insert missing option line(s) at the end of the section
