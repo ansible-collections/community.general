@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - report the error from ``nmcli`` when creating a connection fails, instead of an unrelated error about an unknown connection (https://github.com/ansible-collections/community.general/issues/10015, https://github.com/ansible-collections/community.general/pull/13264).
