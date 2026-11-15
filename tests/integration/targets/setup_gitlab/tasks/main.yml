@@ -19,8 +19,16 @@
     shm_size: 256M
     detach: true
     timeout: 900  # the image has over 4 GB
+  register: setup_gitlab_container
+  notify: Remove GitLab container
 
-# The published port accepts connections long before GitLab is up, the first start takes several minutes
+# The container may run in the docker daemon of the host, so it is reached through its IP address
+- name: Set GitLab API URL
+  ansible.builtin.set_fact:
+    setup_gitlab_api_url: >-
+      http://{{ (setup_gitlab_container.container.NetworkSettings.Networks | dict2items | first).value.IPAddress }}:{{ setup_gitlab_port }}
+
+# The port accepts connections long before GitLab is up, the first start takes several minutes
 - name: Wait for GitLab to be ready
   ansible.builtin.uri:
     url: "{{ setup_gitlab_api_url }}/-/readiness?all=1"

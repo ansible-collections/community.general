@@ -3,8 +3,7 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Integration tests for the targets with the `heavy/gitlab` alias.
-# The GitLab container is started by setup_docker inside the ansible-test container, which must be privileged.
+# Integration tests for the targets with the `heavy/gitlab` alias
 name: nox-heavy-gitlab
 'on':
   workflow_dispatch:
@@ -14,8 +13,6 @@ permissions:
 
 jobs:
   ansible-test:
-    uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-run.yml@main
+    uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-matrix.yml@main
     with:
-      session-name: Heavy integration tests for GitLab
-      sessions: ansible-test-integration-devel-ubuntu-heavy-gitlab
-      extra-args: --docker-privileged
+      include-tags: heavy-gitlab

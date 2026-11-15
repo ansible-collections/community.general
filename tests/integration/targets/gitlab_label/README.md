@@ -13,11 +13,10 @@ The target has the `heavy/gitlab` alias, so it does not run in the regular CI.
 It runs in the `nox-heavy-gitlab` GitHub workflow, which must be triggered manually, or locally with:
 
 ```sh
-nox -Re ansible-test-integration-devel-ubuntu-heavy-gitlab -- --docker-privileged
+nox -Re ansible-test-integration-devel-ubuntu-heavy-gitlab
 ```
 
-The `ansible-test` container must be privileged for Docker to run inside it.
-Even so, Docker cannot run nested on every system, for example inside rootless podman, due to its storage driver.
+`ansible-test` makes the Docker daemon of the host available inside its container, and GitLab is started there.
 
 To run the tests against an existing GitLab instance, set `gitlab_host` and `gitlab_api_token`
 in `tests/integration/integration_config.yml`. The GitLab container is started nonetheless.
