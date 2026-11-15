@@ -1913,6 +1913,18 @@ def mocked_generic_connection_create(mocker):
 
 
 @pytest.fixture
+def mocked_generic_connection_create_fails(mocker):
+    mocker_set(
+        mocker,
+        execute_return=None,
+        execute_side_effect=(
+            (1, "", "Error: insufficient privileges.\n"),
+            (10, "", "Error: unknown connection 'non_existent_nw_device'.\n"),
+        ),
+    )
+
+
+@pytest.fixture
 def mocked_connection_exists(mocker):
     mocker_set(mocker, connection_exists=True)
 
@@ -3839,6 +3851,25 @@ def test_modify_ethernet_dhcp_to_static(mocked_ethernet_connection_dhcp_to_stati
     results = json.loads(out)
     assert not results.get("failed")
     assert results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_STATIC, indirect=["patch_ansible_module"])
+def test_create_ethernet_static_add_fails(mocked_generic_connection_create_fails, capfd):
+    """
+    Test : Error from adding the connection is reported, and the connection is not brought up
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    args, kwargs = nmcli.Nmcli.execute_command.call_args_list[0]
+    assert args[0][1:3] == ["con", "add"]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert results["failed"]
+    assert results["rc"] == 1
+    assert "insufficient privileges" in results["msg"]
 
 
 @pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_STATIC, indirect=["patch_ansible_module"])
