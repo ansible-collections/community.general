@@ -106,13 +106,16 @@ If you replace `-Re` with `-e`, then the virtual environments will be re-created
 ### Heavy integration tests
 
 Some integration test targets are not part of the regular `azp/posix/N` or `azp/generic/1` CI targets because they are too slow or need too many resources to run in CI.
-Those that can run without credentials or special hardware are also tagged with the `heavy` alias, and should be run every once in a while:
+Those that can run without credentials or special hardware are tagged with a `heavy/<backend>` alias instead, and should be run every once in a while.
+Targets that need the same backend service share the same alias, for example `heavy/rundeck`.
+Each alias has its own session in `antsibull-nox.toml`, and all of them can be run with:
 
 ```.bash
 nox -Re ansible-test-integration-heavy
 ```
 
 Additional options for `ansible-test` can be passed after `--`.
+Each backend also has its own GitHub workflow, `nox-heavy-<backend>`, that must be triggered manually.
 
 ## Run basic sanity, unit or integration tests locally (with ansible-test)
 
