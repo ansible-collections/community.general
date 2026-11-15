@@ -132,6 +132,8 @@ class CallbackModule(CallbackBase):
         if not task.no_log and C.DISPLAY_ARGS_TO_STDOUT:
             args = ", ".join(("{k}={v}" for k, v in task.args.items()))
             args = f" {args}"
+        if self._task_counter > self._task_total:
+            self._task_total = self._task_counter
         self._display.banner(f"TASK {self._task_counter}/{self._task_total} [{task.get_name().strip()}{args}]")
         if self._display.verbosity >= 2:
             path = task.get_path()

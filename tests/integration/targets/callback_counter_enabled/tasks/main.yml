@@ -100,3 +100,58 @@
           - ""
           - "PLAY RECAP *********************************************************************"
           - "testhost                   : ok=1    changed=0    unreachable=0    failed=0    rescued=0    ignored=0   "
+
+- name: Test the task total with included tasks
+  block:
+    - name: Create temporary tasks file
+      ansible.builtin.tempfile:
+        suffix: .yml
+      register: included_tasks_file
+
+    - name: Set temporary tasks file content
+      ansible.builtin.copy:
+        dest: "{{ included_tasks_file.path }}"
+        content: |
+          - name: First included task
+            ansible.builtin.set_fact:
+              counter_test: first
+          - name: Second included task
+            ansible.builtin.set_fact:
+              counter_test: second
+
+    - name: Run tests with included tasks
+      ansible.builtin.include_role:
+        name: callback
+      vars:
+        tests:
+          - name: Task total grows with the task counter for included tasks (regression for issue 4053)
+            environment:
+              ANSIBLE_NOCOLOR: 'true'
+              ANSIBLE_FORCE_COLOR: 'false'
+              ANSIBLE_STDOUT_CALLBACK: community.general.counter_enabled
+            playbook: |
+              - hosts: testhost
+                gather_facts: false
+                tasks:
+                  - name: Include tasks
+                    ansible.builtin.include_tasks: "{{ included_tasks_file.path }}"
+            expected_output:
+              - ""
+              - "PLAY [testhost] ****************************************************************"
+              - ""
+              - "TASK 1/1 [Include tasks] *******************************************************"
+              - ""
+              - "TASK 2/2 [First included task] *************************************************"
+              - "ok: 1/1 [testhost]"
+              - ""
+              - "TASK 3/3 [Second included task] ************************************************"
+              - "ok: 1/1 [testhost]"
+              - ""
+              - "PLAY RECAP *********************************************************************"
+              - "testhost                   : ok=3    changed=0    unreachable=0    failed=0    rescued=0    ignored=0   "
+
+  always:
+    - name: Remove temporary tasks file
+      ansible.builtin.file:
+        path: "{{ included_tasks_file.path }}"
+        state: absent
