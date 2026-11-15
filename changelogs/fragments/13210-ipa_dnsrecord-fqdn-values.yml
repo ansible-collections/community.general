@@ -1,0 +1,2 @@
+minor_changes:
+  - ipa_dnsrecord - add ``fqdn_values`` option to append a trailing dot to host name values (https://github.com/ansible-collections/community.general/issues/3947, https://github.com/ansible-collections/community.general/pull/13210).
