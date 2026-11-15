@@ -1,0 +1,2 @@
+bugfixes:
+  - opkg - fix the failure to install a package with the ``NAME=VERSION`` syntax when ``opkg list-installed`` prints only the name and the version of the package (https://github.com/ansible-collections/community.general/issues/8706, https://github.com/ansible-collections/community.general/pull/13258).
