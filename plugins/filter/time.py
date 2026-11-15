@@ -131,7 +131,7 @@ class FilterModule:
     """Ansible time jinja2 filters"""
 
     def filters(self):
-        filters = {
+        return {
             "to_time_unit": to_time_unit,
             "to_milliseconds": to_milliseconds,
             "to_seconds": to_seconds,
@@ -142,5 +142,3 @@ class FilterModule:
             "to_months": to_months,
             "to_years": to_years,
         }
-
-        return filters
