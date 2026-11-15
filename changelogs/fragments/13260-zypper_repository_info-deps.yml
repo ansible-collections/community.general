@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_repository_info - report a missing ``xml.dom.minidom`` library with the standard message instead of failing with ``NameError`` (https://github.com/ansible-collections/community.general/pull/13260).
