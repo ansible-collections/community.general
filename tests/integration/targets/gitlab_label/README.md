@@ -9,14 +9,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
 This target depends on `setup_gitlab`, which installs Docker (through `setup_docker`) and starts a GitLab CE container.
 GitLab needs about 4 GB of RAM, and its first start takes several minutes.
 
-The target is disabled and destructive, so it must be run explicitly, on a VM:
+The target has the `heavy/gitlab` alias, so it does not run in the regular CI.
+It runs in the `nox-heavy-gitlab` GitHub workflow, which must be triggered manually, or locally with:
 
 ```sh
-ansible-test integration gitlab_label --allow-disabled --allow-destructive
+nox -Re ansible-test-integration-devel-ubuntu-heavy-gitlab -- --docker-privileged
 ```
 
-Docker cannot run nested inside the `ansible-test` containers on every system,
-for example inside rootless podman, due to its storage driver.
+The `ansible-test` container must be privileged for Docker to run inside it.
+Even so, Docker cannot run nested on every system, for example inside rootless podman, due to its storage driver.
 
 To run the tests against an existing GitLab instance, set `gitlab_host` and `gitlab_api_token`
 in `tests/integration/integration_config.yml`. The GitLab container is started nonetheless.
