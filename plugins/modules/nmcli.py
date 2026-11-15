@@ -2219,7 +2219,7 @@ class Nmcli:
         elif self.type == "vrf":
             options.update(
                 {
-                    "table": self.table,
+                    "vrf.table": self.table,
                 }
             )
 
