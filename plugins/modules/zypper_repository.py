@@ -111,18 +111,18 @@ EXAMPLES = r"""
 - name: Add NVIDIA repository for graphics drivers
   community.general.zypper_repository:
     name: nvidia-repo
-    repo: 'ftp://download.nvidia.com/opensuse/12.2'
+    repo: 'https://download.nvidia.com/opensuse/leap/16.1'
     state: present
 
 - name: Remove NVIDIA repository
   community.general.zypper_repository:
     name: nvidia-repo
-    repo: 'ftp://download.nvidia.com/opensuse/12.2'
+    repo: 'https://download.nvidia.com/opensuse/leap/16.1'
     state: absent
 
 - name: Add python development repository
   community.general.zypper_repository:
-    repo: 'http://download.opensuse.org/repositories/devel:/languages:/python/SLE_11_SP3/devel:languages:python.repo'
+    repo: 'https://download.opensuse.org/repositories/devel:/languages:/python/16.1/devel:languages:python.repo'
 
 - name: Refresh all repos
   community.general.zypper_repository:
@@ -131,7 +131,8 @@ EXAMPLES = r"""
 
 - name: Add a repo and add its gpg key
   community.general.zypper_repository:
-    repo: 'http://download.opensuse.org/repositories/systemsmanagement/openSUSE_Leap_42.1/'
+    repo: 'https://download.opensuse.org/repositories/systemsmanagement/16.1/'
+    name: systemsmanagement
     auto_import_keys: true
 
 - name: Force refresh of a repository
