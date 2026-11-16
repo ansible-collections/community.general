@@ -1,0 +1,2 @@
+minor_changes:
+  - xenserver - Set XenAPI transport User-Agent header to identify Ansible requests to XenServer (https://github.com/ansible-collections/community.general/pull/13232).
