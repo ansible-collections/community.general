@@ -252,20 +252,14 @@ def public_ip_payload(compute_api, public_ip):
         return {"dynamic_ip_required": True}
 
     # We check that the IP we want to attach exists, if so its ID is returned
-    response = compute_api.get("ips")
+    response = compute_api.get(f"ips/{public_ip}")
+    if response.status_code == 404:
+        compute_api.module.fail_json(msg=f"Public IP {public_ip} not found")
     if not response.ok:
         msg = f"Error during public IP validation: ({response.status_code}) {response.json}"
         compute_api.module.fail_json(msg=msg)
 
-    ip_list = []
-    try:
-        ip_list = response.json["ips"]
-    except KeyError:
-        compute_api.module.fail_json(msg=f"Error in getting the IP information from: {response.json}")
-
-    lookup = [ip["id"] for ip in ip_list]
-    if public_ip in lookup:
-        return {"public_ip": public_ip}
+    return {"public_ip": public_ip}
 
 
 def create_server(compute_api, server):
@@ -276,9 +270,12 @@ def create_server(compute_api, server):
         "tags": server["tags"],
         "commercial_type": server["commercial_type"],
         "image": server["image"],
-        "dynamic_ip_required": server["dynamic_ip_required"],
+        "dynamic_ip_required": server.get("dynamic_ip_required", False),
         "name": server["name"],
     }
+
+    if "public_ip" in server:
+        data["public_ip"] = server["public_ip"]
 
     if server["project"]:
         data["project"] = server["project"]
