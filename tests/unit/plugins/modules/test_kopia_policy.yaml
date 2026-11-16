@@ -1,0 +1,321 @@
+# Copyright (c) 2026, Dexter Le <dextersydney2001@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+anchors:
+  environ: &env-def {environ_update: {LANGUAGE: C, LC_ALL: C}, check_rc: false}
+  # kopia policy show for the home target, before an override is defined (value inherited).
+  show_home_inherited: &show-home-inherited
+    command: [/testbin/kopia, policy, show, user@hostname:/home/user, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: "Daily snapshots: 7 inherited from (global)"
+    err: ''
+  # kopia policy show for the home target, after an override is defined.
+  show_home_defined: &show-home-defined
+    command: [/testbin/kopia, policy, show, user@hostname:/home/user, --config-file=/etc/kopia/root.config]
+    environ: *env-def
+    rc: 0
+    out: "Daily snapshots: 7 (defined for this target)"
+    err: ''
+
+test_cases:
+  - id: set_retention_policy
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      retention:
+        keep_latest: "10"
+        keep_daily: "7"
+        keep_weekly: "4"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *show-home-inherited
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --keep-latest
+            - "10"
+            - --keep-daily
+            - "7"
+            - --keep-weekly
+            - "4"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *show-home-defined
+
+  - id: set_global_policy_with_compression
+    input:
+      state: set
+      global_policy: true
+      config: /etc/kopia/root.config
+      compression: zstd
+      files:
+        add_ignore:
+          - "*.tmp"
+          - ".cache"
+        ignore_cache_dirs: "true"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/kopia, policy, show, --global, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 0
+          out: "Compression disabled."
+          err: ''
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - --global
+            - --add-ignore
+            - "*.tmp"
+            - --add-ignore
+            - .cache
+            - --ignore-cache-dirs
+            - "true"
+            - --compression
+            - zstd
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/kopia, policy, show, --global, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 0
+          out: "Compressor: zstd"
+          err: ''
+
+  - id: set_scheduling_policy
+    input:
+      state: set
+      target: "user@hostname:/var/www"
+      config: /etc/kopia/root.config
+      scheduling:
+        times:
+          - "02:00"
+          - "14:00"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/kopia, policy, show, user@hostname:/var/www, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 0
+          out: "Scheduled snapshots: None."
+          err: ''
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/var/www
+            - --snapshot-time
+            - "02:00,14:00"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/kopia, policy, show, user@hostname:/var/www, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 0
+          out: "Scheduled snapshots: 02:00 14:00"
+          err: ''
+
+  - id: delete_policy
+    input:
+      state: deleted
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *show-home-defined
+        - command:
+            - /testbin/kopia
+            - policy
+            - delete
+            - user@hostname:/home/user
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *show-home-inherited
+
+  - id: delete_policy_no_such_policy
+    input:
+      state: deleted
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+    output:
+      changed: false
+    mocks:
+      run_command:
+        - *show-home-inherited
+        - command:
+            - /testbin/kopia
+            - policy
+            - delete
+            - user@hostname:/home/user
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 1
+          out: ''
+          err: 'no such policy'
+        - *show-home-inherited
+
+  - id: set_scheduling_interval
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      scheduling:
+        interval: "1h"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *show-home-inherited
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --snapshot-interval
+            - "1h"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *show-home-defined
+
+  - id: set_scheduling_manual
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      scheduling:
+        manual: true
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *show-home-inherited
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --manual
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *show-home-defined
+
+  - id: set_policy_files_remove_ignore
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      files:
+        remove_ignore:
+          - "*.tmp"
+        max_file_size: "100MB"
+        one_file_system: "true"
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *show-home-inherited
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --remove-ignore
+            - "*.tmp"
+            - --max-file-size
+            - 100MB
+            - --one-file-system
+            - "true"
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *show-home-defined
+
+  - id: set_retention_policy_inherit
+    input:
+      state: set
+      target: "user@hostname:/home/user"
+      config: /etc/kopia/root.config
+      retention:
+        keep_daily: inherit
+        keep_weekly: inherit
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - *show-home-defined
+        - command:
+            - /testbin/kopia
+            - policy
+            - set
+            - user@hostname:/home/user
+            - --keep-daily
+            - inherit
+            - --keep-weekly
+            - inherit
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - *show-home-inherited
+
+  - id: delete_global_policy
+    input:
+      state: deleted
+      global_policy: true
+      config: /etc/kopia/root.config
+    output:
+      changed: true
+    mocks:
+      run_command:
+        - command: [/testbin/kopia, policy, show, --global, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 0
+          out: "Daily snapshots: 7 (defined for this target)"
+          err: ''
+        - command:
+            - /testbin/kopia
+            - policy
+            - delete
+            - --global
+            - --config-file=/etc/kopia/root.config
+          environ: *env-def
+          rc: 0
+          out: ''
+          err: ''
+        - command: [/testbin/kopia, policy, show, --global, --config-file=/etc/kopia/root.config]
+          environ: *env-def
+          rc: 0
+          out: "Daily snapshots: 3 (defined for this target)"
+          err: ''
