@@ -1,0 +1,2 @@
+bugfixes:
+  - scaleway_compute - fix failure when ``public_ip`` is set to a flexible IP ID, and attach that IP to the created server (https://github.com/ansible-collections/community.general/issues/11408, https://github.com/ansible-collections/community.general/pull/13261).
