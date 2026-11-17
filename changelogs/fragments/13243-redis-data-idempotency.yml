@@ -1,2 +1,0 @@
-bugfixes:
-  - redis_data - fix the module always reporting a change and rewriting the key, even when the key already has the requested value. As a result, the TTL of such a key is no longer removed when ``keep_ttl`` is not set. ``old_value`` is now always returned as text (https://github.com/ansible-collections/community.general/issues/13243).
