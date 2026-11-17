@@ -253,6 +253,12 @@ def get_service_repo_aliases(module):
     }
 
 
+def without_empty_host(url):
+    "Write a URL with an empty host, like dir:///path, as zypper stores it: dir:/path."
+    scheme, sep, path = url.partition(":///")
+    return f"{scheme}:/{path}" if sep and scheme.isalnum() else url
+
+
 def _repo_changes(module, realrepo, repocmp):
     "Check whether the 2 given repos have different settings."
     if "allow_unsigned_metadata" in repocmp:
@@ -278,7 +284,7 @@ def _repo_changes(module, realrepo, repocmp):
                     rc, stdout, stderr = module.run_command(cmd, check_rc=True)
                     valnew = valnew.replace("$basearch", stdout)
                     valold = valold.replace("$basearch", stdout)
-                valold, valnew = valold.rstrip("/"), valnew.rstrip("/")
+                valold, valnew = without_empty_host(valold).rstrip("/"), without_empty_host(valnew).rstrip("/")
             if valold != valnew:
                 return True
     return False

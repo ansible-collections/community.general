@@ -129,3 +129,23 @@ def test_get_service_repo_aliases_fails_on_bad_xml(addrepo_module):
     with pytest.raises(SystemExit):
         zypper_repository.get_service_repo_aliases(addrepo_module)
     assert "Failed to parse" in addrepo_module.fail_json.call_args[1]["msg"]
+
+
+@pytest.mark.parametrize(
+    "url, stored, expected",
+    [
+        ("dir:///srv/repo", "dir:/srv/repo", False),
+        ("dir:/srv/repo", "dir:/srv/repo", False),
+        ("dir:///srv/repo", "dir:///srv/repo", False),
+        ("file:///srv/repo/", "file:/srv/repo/", False),
+        ("cd:///?devices=/dev/sr0", "cd:/?devices=/dev/sr0", False),
+        ("https://example.com/repo/", "https://example.com/repo/", False),
+        ("dir:///srv/other", "dir:/srv/repo", True),
+    ],
+    ids=["dir-empty-host", "dir", "dir-empty-host-both", "file-empty-host", "cd-empty-host", "https", "dir-other-path"],
+)
+def test_repo_changes_url_empty_host(module, url, stored, expected):
+    realrepo = {"alias": "r", "url": stored}
+    repocmp = {"alias": "r", "url": url}
+
+    assert zypper_repository._repo_changes(module, realrepo, repocmp) is expected
