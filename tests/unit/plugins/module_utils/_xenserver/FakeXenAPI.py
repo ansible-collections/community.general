@@ -8,6 +8,11 @@ from __future__ import annotations
 FAKE_API_VERSION = "1.1"
 
 
+class FakeTransport:
+    def __init__(self):
+        self.user_agent = None
+
+
 class Failure(Exception):
     def __init__(self, details):
         self.details = details
@@ -18,7 +23,7 @@ class Failure(Exception):
 
 class Session:
     def __init__(self, uri, transport=None, encoding=None, verbose=0, allow_none=1, ignore_ssl=False):
-        self.transport = transport
+        self.transport = transport if transport is not None else FakeTransport()
         self._session = None
         self.last_login_method = None
         self.last_login_params = None
@@ -60,6 +65,12 @@ class Session:
             return lambda *params: self._login(name, params)
         elif name == "logout":
             return self._logout
+
+    def __call__(self, name):
+        # Mimics xmlrpc.client.ServerProxy.__call__ to support session("transport")
+        if name == "transport":
+            return self.transport
+        raise AttributeError(f"Session object is not callable for attribute '{name}'")
 
 
 def xapi_local():
