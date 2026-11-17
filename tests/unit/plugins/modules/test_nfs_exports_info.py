@@ -7,8 +7,7 @@ import hashlib
 import pytest
 
 import ansible_collections.community.general.plugins.modules.nfs_exports_info
-import ansible_collections.community.internal_test_tools.tests.unit.compat.mock as mock
-
+from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 
 @pytest.fixture
 def fake_exports_content() -> str:
