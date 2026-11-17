@@ -70,6 +70,15 @@ options:
       - Mutually exclusive with O(uuid).
     type: bool
     default: false
+  resize_compare_whole_blocks:
+    description:
+      - When V(true), check mode predicts growth only if the device can hold at least one more whole filesystem block.
+        A normal run reports a change only if the filesystem capacity grows after resizing.
+      - When V(false), the resize check compares the filesystem and device capacities in bytes.
+      - Applies when growing an existing V(ext2), V(ext3), V(ext4), or V(ext4dev) filesystem with O(resizefs=true).
+    type: bool
+    default: false
+    version_added: 14.1.0
   opts:
     description:
       - List of options to be passed to C(mkfs) command.
@@ -333,7 +342,7 @@ class Ext(Filesystem):
     CHANGE_UUID = "tune2fs"
     CHANGE_UUID_OPTION = "-U"
 
-    def _get_fs_info(self, dev):
+    def get_fs_info(self, dev):
         """Return the filesystem block size and count."""
         cmd = self.module.get_bin_path(self.INFO, required=True)
         dummy, out, dummy = self.module.run_command([cmd, "-l", str(dev)], check_rc=True, environ_update=self.LANG_ENV)
@@ -353,13 +362,16 @@ class Ext(Filesystem):
 
     def get_fs_size(self, dev):
         """Get Block count and Block size and return their product."""
-        block_size, block_count = self._get_fs_info(dev)
+        block_size, block_count = self.get_fs_info(dev)
         return block_size * block_count
 
     def grow(self, dev):
-        """Grow the filesystem and report whether its size actually changed."""
+        """Grow the filesystem using the requested change detection behavior."""
+        if not self.module.params["resize_compare_whole_blocks"]:
+            return super().grow(dev)
+
         try:
-            block_size, block_count = self._get_fs_info(dev)
+            block_size, block_count = self.get_fs_info(dev)
         except ValueError as err:
             self.module.warn(f"unable to process {self.INFO} output '{err}'")
             self.module.fail_json(msg=f"unable to process {self.INFO} output for {dev}")
@@ -730,6 +742,7 @@ def main():
             opts=dict(type="str"),
             force=dict(type="bool", default=False),
             resizefs=dict(type="bool", default=False),
+            resize_compare_whole_blocks=dict(type="bool", default=False),
             uuid=dict(type="str"),
             label=dict(type="str"),
         ),
@@ -794,6 +807,11 @@ def main():
             module.fail_json(changed=False, msg=f"module does not support this filesystem ({fstype}) yet.")
 
         filesystem = klass(module)
+
+        if module.params["resize_compare_whole_blocks"] and (not resizefs or not isinstance(filesystem, Ext)):
+            module.fail_json(
+                msg="resize_compare_whole_blocks requires resizefs=true and an ext2, ext3, ext4, or ext4dev filesystem"
+            )
 
         if uuid and not (filesystem.CHANGE_UUID or filesystem.MKFS_SET_UUID_OPTIONS):
             module.fail_json(

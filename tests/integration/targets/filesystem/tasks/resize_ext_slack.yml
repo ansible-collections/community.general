@@ -17,11 +17,24 @@
         fstype: '{{ ext_slack_fstype }}'
         opts: '-b {{ ext_slack_block_size }}'
 
+    - name: Check default change reporting for trailing bytes
+      community.general.filesystem:
+        dev: '{{ ext_slack_image }}'
+        fstype: '{{ ext_slack_fstype }}'
+        resizefs: true
+      check_mode: '{{ ext_slack_check_mode }}'
+      loop: [true, false]
+      loop_control:
+        loop_var: ext_slack_check_mode
+      register: ext_slack_default
+      failed_when: ext_slack_default is not changed
+
     - name: Check that incomplete trailing blocks do not predict growth
       community.general.filesystem:
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
+        resize_compare_whole_blocks: true
       check_mode: true
       register: ext_slack_preview
 
@@ -30,6 +43,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
+        resize_compare_whole_blocks: true
       register: ext_slack_unchanged
 
     - name: Assert that unusable trailing bytes are ignored
@@ -47,6 +61,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
+        resize_compare_whole_blocks: true
       check_mode: true
       register: ext_slack_growth_preview
 
@@ -55,6 +70,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
+        resize_compare_whole_blocks: true
       register: ext_slack_growth
 
     - name: Repeat growth with incomplete trailing blocks
@@ -62,6 +78,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
+        resize_compare_whole_blocks: true
       register: ext_slack_repeat
 
     - name: Assert growth and idempotence
