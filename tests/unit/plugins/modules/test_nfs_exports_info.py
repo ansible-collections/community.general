@@ -4,9 +4,8 @@
 
 import hashlib
 
-import pytest
-
 import ansible_collections.community.general.plugins.modules.nfs_exports_info
+import pytest
 from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 
 
@@ -47,10 +46,8 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
     patch_target = "builtins.open"
 
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
-        result = (
-            ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(
-                mock_module
-            )
+        result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(
+            mock_module
         )
 
     expected_info = {
@@ -58,9 +55,7 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
             {"ip": "192.168.1.10", "options": ["rw", "sync"]},
             {"ip": "192.168.1.20", "options": ["ro", "sync"]},
         ],
-        "/srv/nfs2": [
-            {"ip": "192.168.1.30", "options": ["rw", "no_root_squash"]}
-        ],
+        "/srv/nfs2": [{"ip": "192.168.1.30", "options": ["rw", "no_root_squash"]}],
     }
 
     expected_digests = calculate_expected_digests(fake_exports_content)
@@ -87,15 +82,9 @@ def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
         )
 
     expected_info = {
-        "192.168.1.10": [
-            {"folder": "/srv/nfs1", "options": ["rw", "sync"]}
-        ],
-        "192.168.1.20": [
-            {"folder": "/srv/nfs1", "options": ["ro", "sync"]}
-        ],
-        "192.168.1.30": [
-            {"folder": "/srv/nfs2", "options": ["rw", "no_root_squash"]}
-        ],
+        "192.168.1.10": [{"folder": "/srv/nfs1", "options": ["rw", "sync"]}],
+        "192.168.1.20": [{"folder": "/srv/nfs1", "options": ["ro", "sync"]}],
+        "192.168.1.30": [{"folder": "/srv/nfs2", "options": ["rw", "no_root_squash"]}],
     }
 
     expected_digests = calculate_expected_digests(fake_exports_content)
