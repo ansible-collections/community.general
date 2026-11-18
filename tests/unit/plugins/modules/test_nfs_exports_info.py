@@ -21,6 +21,7 @@ def fake_exports_content() -> str:
 def calculate_expected_digests(content_string: str) -> dict:
     content_bytes = content_string.encode("utf-8")
     digests = {}
+
     for algo in ["md5", "sha1", "sha256"]:
         try:
             hasher = hashlib.new(algo)
@@ -28,12 +29,16 @@ def calculate_expected_digests(content_string: str) -> dict:
             digests[algo] = hasher.hexdigest()
         except ValueError:
             pass
+
     return digests
 
 
 def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
     mock_module = mock.MagicMock()
-    mock_module.params = {"file_path": "/etc/exports", "output_format": "ips_per_share"}
+    mock_module.params = {
+        "file_path": "/etc/exports",
+        "output_format": "ips_per_share",
+    }
     mock_module.file_exists.return_value = True
     mock_module.warn.return_value = None
     mock_module.fail_json.side_effect = Exception("fail_json called")
@@ -41,24 +46,32 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
     patch_target = "builtins.open"
 
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
-    result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(mock_module)
-    
+        result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(
+            mock_module
+        )
+
     expected_info = {
         "/srv/nfs1": [
             {"ip": "192.168.1.10", "options": ["rw", "sync"]},
             {"ip": "192.168.1.20", "options": ["ro", "sync"]},
         ],
-        "/srv/nfs2": [{"ip": "192.168.1.30", "options": ["rw", "no_root_squash"]}],
+        "/srv/nfs2": [
+            {"ip": "192.168.1.30", "options": ["rw", "no_root_squash"]}
+        ],
     }
 
     expected_digests = calculate_expected_digests(fake_exports_content)
+
     assert result["exports_info"] == expected_info
     assert result["file_digest"] == expected_digests
 
 
 def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
     mock_module = mock.MagicMock()
-    mock_module.params = {"file_path": "/etc/exports", "output_format": "shares_per_ip"}
+    mock_module.params = {
+        "file_path": "/etc/exports",
+        "output_format": "shares_per_ip",
+    }
     mock_module.file_exists.return_value = True
     mock_module.warn.return_value = None
     mock_module.fail_json.side_effect = Exception("fail_json called")
@@ -66,14 +79,23 @@ def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
     patch_target = "builtins.open"
 
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
-    result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(mock_module)
-    
+        result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(
+            mock_module
+        )
+
     expected_info = {
-        "192.168.1.10": [{"folder": "/srv/nfs1", "options": ["rw", "sync"]}],
-        "192.168.1.20": [{"folder": "/srv/nfs1", "options": ["ro", "sync"]}],
-        "192.168.1.30": [{"folder": "/srv/nfs2", "options": ["rw", "no_root_squash"]}],
+        "192.168.1.10": [
+            {"folder": "/srv/nfs1", "options": ["rw", "sync"]}
+        ],
+        "192.168.1.20": [
+            {"folder": "/srv/nfs1", "options": ["ro", "sync"]}
+        ],
+        "192.168.1.30": [
+            {"folder": "/srv/nfs2", "options": ["rw", "no_root_squash"]}
+        ],
     }
 
     expected_digests = calculate_expected_digests(fake_exports_content)
+
     assert result["exports_info"] == expected_info
     assert result["file_digest"] == expected_digests
