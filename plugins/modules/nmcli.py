@@ -422,6 +422,14 @@ options:
     type: str
     choices: [default, default-or-eui64, eui64, stable-privacy]
     version_added: 4.2.0
+  token6:
+    description:
+      - Configure NetworkManager's C(ipv6.token) as an IPv6 address, for example V(::1234).
+      - NetworkManager uses this token for IPv6 Stateless Address Autoconfiguration (SLAAC) address generation when
+        O(addr_gen_mode6=eui64).
+      - Setting this option does not change O(addr_gen_mode6).
+    type: str
+    version_added: 14.1.0
   mtu:
     description:
       - The connection MTU, for example V(9000). This can not be applied when creating the interface and is done once the
@@ -1757,6 +1765,7 @@ EXAMPLES = r"""
 RETURN = r"""#
 """
 
+import ipaddress
 import re
 
 from ansible.module_utils.basic import AnsibleModule
@@ -1844,6 +1853,7 @@ class Nmcli:
         self.method6 = module.params["method6"]
         self.ip_privacy6 = module.params["ip_privacy6"]
         self.addr_gen_mode6 = module.params["addr_gen_mode6"]
+        self.token6 = module.params["token6"]
         self.mtu = module.params["mtu"]
         self.stp = module.params["stp"]
         self.priority = module.params["priority"]
@@ -1981,6 +1991,7 @@ class Nmcli:
                     "ipv6.method": self.ipv6_method,
                     "ipv6.ip6-privacy": self.ip_privacy6,
                     "ipv6.addr-gen-mode": self.addr_gen_mode6,
+                    "ipv6.token": self.token6,
                 }
             )
             # when 'method' is disabled the 'may_fail' no make sense but accepted by nmcli with keeping 'yes'
@@ -2757,6 +2768,14 @@ class Nmcli:
                 # parameter does not exist
                 current_value = None
 
+            if key == "ipv6.token":
+                try:
+                    value = str(ipaddress.IPv6Address(value))
+                    if current_value:
+                        current_value = str(ipaddress.IPv6Address(current_value))
+                except ipaddress.AddressValueError as exc:
+                    raise NmcliModuleError(f"Unable to compare ipv6.token: {exc}") from exc
+
             if isinstance(current_value, list) and isinstance(value, list):
                 # compare values between two lists
                 if key in (
@@ -2917,6 +2936,7 @@ def create_module() -> AnsibleModule:
             method6=dict(type="str", choices=["ignore", "auto", "dhcp", "link-local", "manual", "shared", "disabled"]),
             ip_privacy6=dict(type="str", choices=["disabled", "prefer-public-addr", "prefer-temp-addr", "unknown"]),
             addr_gen_mode6=dict(type="str", choices=["default", "default-or-eui64", "eui64", "stable-privacy"]),
+            token6=dict(type="str", no_log=False),
             # Bond Specific vars
             mode=dict(
                 type="str",
