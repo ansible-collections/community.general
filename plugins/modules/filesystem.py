@@ -70,7 +70,7 @@ options:
       - Mutually exclusive with O(uuid).
     type: bool
     default: false
-  resize_compare_whole_blocks:
+  resize_compare_disk_blocks:
     description:
       - When V(true), check mode predicts growth only if the device can hold at least one more whole filesystem block.
         A normal run reports a change only if the filesystem capacity grows after resizing.
@@ -367,7 +367,7 @@ class Ext(Filesystem):
 
     def grow(self, dev):
         """Grow the filesystem using the requested change detection behavior."""
-        if not self.module.params["resize_compare_whole_blocks"]:
+        if not self.module.params["resize_compare_disk_blocks"]:
             return super().grow(dev)
 
         try:
@@ -808,9 +808,9 @@ def main():
 
         filesystem = klass(module)
 
-        if module.params["resize_compare_whole_blocks"] and (not resizefs or not isinstance(filesystem, Ext)):
+        if module.params["resize_compare_disk_blocks"] and (not resizefs or not isinstance(filesystem, Ext)):
             module.fail_json(
-                msg="resize_compare_whole_blocks requires resizefs=true and an ext2, ext3, ext4, or ext4dev filesystem"
+                msg="resize_compare_disk_blocks requires resizefs=true and an ext2, ext3, ext4, or ext4dev filesystem"
             )
 
         if uuid and not (filesystem.CHANGE_UUID or filesystem.MKFS_SET_UUID_OPTIONS):

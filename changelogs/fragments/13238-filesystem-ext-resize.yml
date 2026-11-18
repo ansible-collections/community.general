@@ -1,2 +1,2 @@
 minor_changes:
-  - filesystem - add the ``resize_compare_whole_blocks`` option to detect growth of ext2, ext3, and ext4 filesystems (https://github.com/ansible-collections/community.general/pull/13238).
+  - filesystem - add the ``resize_compare_disk_blocks`` option to detect growth of ext2, ext3, and ext4 filesystems (https://github.com/ansible-collections/community.general/pull/13238).

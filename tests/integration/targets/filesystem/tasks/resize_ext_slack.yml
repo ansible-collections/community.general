@@ -34,7 +34,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
-        resize_compare_whole_blocks: true
+        resize_compare_disk_blocks: true
       check_mode: true
       register: ext_slack_preview
 
@@ -43,7 +43,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
-        resize_compare_whole_blocks: true
+        resize_compare_disk_blocks: true
       register: ext_slack_unchanged
 
     - name: Assert that unusable trailing bytes are ignored
@@ -61,7 +61,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
-        resize_compare_whole_blocks: true
+        resize_compare_disk_blocks: true
       check_mode: true
       register: ext_slack_growth_preview
 
@@ -70,7 +70,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
-        resize_compare_whole_blocks: true
+        resize_compare_disk_blocks: true
       register: ext_slack_growth
 
     - name: Repeat growth with incomplete trailing blocks
@@ -78,7 +78,7 @@
         dev: '{{ ext_slack_image }}'
         fstype: '{{ ext_slack_fstype }}'
         resizefs: true
-        resize_compare_whole_blocks: true
+        resize_compare_disk_blocks: true
       register: ext_slack_repeat
 
     - name: Assert growth and idempotence
