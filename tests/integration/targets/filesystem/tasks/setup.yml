@@ -30,7 +30,7 @@
   when:
     - ansible_facts.os_family != 'Suse'
     - ansible_facts.system != "FreeBSD"
-    - not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version is version('8', '>='))
+    - not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution != "Fedora")
 
 - name: "Install util-linux-extra"
   ansible.builtin.package:
