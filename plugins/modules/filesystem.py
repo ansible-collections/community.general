@@ -742,7 +742,7 @@ def main():
             opts=dict(type="str"),
             force=dict(type="bool", default=False),
             resizefs=dict(type="bool", default=False),
-            resize_compare_whole_blocks=dict(type="bool", default=False),
+            resize_compare_disk_blocks=dict(type="bool", default=False),
             uuid=dict(type="str"),
             label=dict(type="str"),
         ),
