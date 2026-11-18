@@ -46,9 +46,7 @@ def test_get_exports_ips_per_share(fake_exports_content: str) -> None:
     patch_target = "builtins.open"
 
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
-        result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(
-            mock_module
-        )
+        result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(mock_module)
 
     expected_info = {
         "/srv/nfs1": [
@@ -77,9 +75,7 @@ def test_get_exports_shares_per_ip(fake_exports_content: str) -> None:
     patch_target = "builtins.open"
 
     with mock.patch(patch_target, mock.mock_open(read_data=fake_exports_content)):
-        result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(
-            mock_module
-        )
+        result = ansible_collections.community.general.plugins.modules.nfs_exports_info.get_exports(mock_module)
 
     expected_info = {
         "192.168.1.10": [{"folder": "/srv/nfs1", "options": ["rw", "sync"]}],
