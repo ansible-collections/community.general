@@ -5,10 +5,8 @@
 import hashlib
 
 import pytest
-
-from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
-
 from ansible_collections.community.general.plugins.modules import nfs_exports_info
+from ansible_collections.community.internal_test_tools.tests.unit.compat import mock
 
 
 @pytest.fixture
