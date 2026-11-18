@@ -1460,8 +1460,8 @@ EXAMPLES = r"""
 
     - name: Make a profile usable for all compatible Ethernet interfaces
       community.general.nmcli:
-        ctype: ethernet
-        name: my-eth1
+        type: ethernet
+        conn_name: my-eth1
         ifname: '*'
         state: present
 
@@ -1526,6 +1526,7 @@ EXAMPLES = r"""
         vxlan_id: 16
         vxlan_local: 192.168.1.2
         vxlan_remote: 192.168.1.5
+        state: present
 
     - name: Add VxLan via multicast on a bridge
       community.general.nmcli:
@@ -1537,6 +1538,7 @@ EXAMPLES = r"""
         vxlan_remote: 239.192.0.17
         slave_type: bridge
         master: br0
+        state: present
 
     - name: Add gre
       community.general.nmcli:
@@ -1545,6 +1547,7 @@ EXAMPLES = r"""
         ip_tunnel_dev: eth0
         ip_tunnel_local: 192.168.1.2
         ip_tunnel_remote: 192.168.1.5
+        state: present
 
     - name: Add ipip
       community.general.nmcli:
@@ -1553,6 +1556,7 @@ EXAMPLES = r"""
         ip_tunnel_dev: eth0
         ip_tunnel_local: 192.168.1.2
         ip_tunnel_remote: 192.168.1.5
+        state: present
 
     - name: Add sit
       community.general.nmcli:
@@ -1561,6 +1565,7 @@ EXAMPLES = r"""
         ip_tunnel_dev: eth0
         ip_tunnel_local: 192.168.1.2
         ip_tunnel_remote: 192.168.1.5
+        state: present
 
     - name: Add zone
       community.general.nmcli:
@@ -1719,7 +1724,6 @@ EXAMPLES = r"""
     gw4: '192.168.124.1'
 
 ## Defining ip rules while setting a static IP
-## table 'production' is set with id 200 in this example.
 - name: Set Static ips for interface with ip rules and routes
   community.general.nmcli:
     type: ethernet
@@ -1730,7 +1734,7 @@ EXAMPLES = r"""
     routes4_extended:
       - ip: "0.0.0.0/0"
         next_hop: "192.168.1.1"
-        table: "production"
+        table: 200
     routing_rules4:
       - "priority 0 from 192.168.1.50 table 200"
 
