@@ -305,7 +305,11 @@ def repo_exists(module, repodata, overwrite_multiple):
     for kw in ["alias", "url"]:
         name = repodata[kw]
         for oldr in existing_repos:
-            if repodata[kw] == oldr[kw] and oldr not in repos:
+            if kw == "url" and name:
+                found = without_empty_host(name).rstrip("/") == without_empty_host(oldr["url"]).rstrip("/")
+            else:
+                found = name == oldr[kw]
+            if found and oldr not in repos:
                 repos.append(oldr)
 
     if len(repos) == 0:
@@ -586,7 +590,7 @@ def main():
     elif state == "absent":
         if not exists:
             exit_unchanged()
-        rc, stdout, stderr = remove_repo(module, shortname)
+        rc, stdout, stderr = remove_repo(module, old_repos[0]["alias"])
 
     if rc == 0:
         if state == "present" and remove_others:

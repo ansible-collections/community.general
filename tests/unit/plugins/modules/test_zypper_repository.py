@@ -4,9 +4,11 @@
 
 from __future__ import annotations
 
+import json
 from unittest.mock import MagicMock
 
 import pytest
+from ansible_collections.community.internal_test_tools.tests.unit.plugins.modules.utils import set_module_args
 
 from ansible_collections.community.general.plugins.modules import zypper_repository
 
@@ -149,3 +151,50 @@ def test_repo_changes_url_empty_host(module, url, stored, expected):
     repocmp = {"alias": "r", "url": url}
 
     assert zypper_repository._repo_changes(module, realrepo, repocmp) is expected
+
+
+@pytest.mark.parametrize(
+    "alias, url, stored, found",
+    [
+        (None, "dir:///srv/repo", "dir:/srv/repo", True),
+        ("other", "dir:///srv/repo", "dir:/srv/repo", True),
+        (None, "file:///srv/repo", "file:/srv/repo/", True),
+        (None, "https://example.com/repo", "https://example.com/repo", True),
+        (None, "dir:///srv/other", "dir:/srv/repo", False),
+        ("local", None, "dir:/srv/repo", True),
+    ],
+    ids=["dir-no-alias", "dir-other-alias", "file-trailing-slash", "https", "dir-other-path", "alias-only"],
+)
+def test_repo_exists_by_url(module, mocker, alias, url, stored, found):
+    existing = {"alias": "local", "url": stored}
+    mocker.patch.object(zypper_repository, "_parse_repos", return_value=[existing])
+    repodata = {"alias": alias, "url": url}
+
+    exists, mod, old_repos = zypper_repository.repo_exists(module, repodata, False)
+
+    assert exists is found
+    assert old_repos == ([existing] if found else None)
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        {"repo": "dir:///srv/repo", "state": "absent"},
+        {"name": "other", "repo": "dir:///srv/repo", "state": "absent"},
+        {"name": "local", "state": "absent"},
+    ],
+    ids=["by-url", "other-alias", "by-alias"],
+)
+def test_absent_removes_matched_repo(mocker, capsys, args):
+    mocker.patch.object(zypper_repository, "_parse_repos", return_value=[{"alias": "local", "url": "dir:/srv/repo"}])
+    mocker.patch.object(zypper_repository, "get_zypper_version", return_value=zypper_repository.LooseVersion("1.14.101"))
+    mocker.patch.object(zypper_repository.AnsibleModule, "get_bin_path", return_value="/usr/bin/zypper")
+    run_command = mocker.patch.object(zypper_repository.AnsibleModule, "run_command", return_value=(0, "", ""))
+
+    with set_module_args(args), pytest.raises(SystemExit):
+        zypper_repository.main()
+
+    run_command.assert_called_once_with(
+        ["/usr/bin/zypper", "--quiet", "--non-interactive", "removerepo", "local"], check_rc=True
+    )
+    assert json.loads(capsys.readouterr().out)["changed"] is True
