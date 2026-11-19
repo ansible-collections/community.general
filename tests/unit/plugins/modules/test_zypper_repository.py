@@ -187,7 +187,9 @@ def test_repo_exists_by_url(module, mocker, alias, url, stored, found):
 )
 def test_absent_removes_matched_repo(mocker, capsys, args):
     mocker.patch.object(zypper_repository, "_parse_repos", return_value=[{"alias": "local", "url": "dir:/srv/repo"}])
-    mocker.patch.object(zypper_repository, "get_zypper_version", return_value=zypper_repository.LooseVersion("1.14.101"))
+    mocker.patch.object(
+        zypper_repository, "get_zypper_version", return_value=zypper_repository.LooseVersion("1.14.101")
+    )
     mocker.patch.object(zypper_repository.AnsibleModule, "get_bin_path", return_value="/usr/bin/zypper")
     run_command = mocker.patch.object(zypper_repository.AnsibleModule, "run_command", return_value=(0, "", ""))
 
