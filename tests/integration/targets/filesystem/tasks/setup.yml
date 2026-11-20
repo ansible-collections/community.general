@@ -19,12 +19,9 @@
     name: bcachefs-tools
     state: present
   when:
-    # bcachefs only on Alpine > 3.18 and Arch Linux for now
+    # bcachefs only on Alpine and Arch Linux for now
     # other distributions have too old versions of bcachefs-tools and/or util-linux (blkid for UUID tests)
-    - >-
-      (ansible_facts.distribution == "Alpine" and ansible_facts.distribution_version is version("3.18", ">"))
-      or
-      ansible_facts.distribution == "Archlinux"
+    - ansible_facts.distribution in ["Alpine", "Archlinux"]
 
 - name: "Install btrfs progs"
   ansible.builtin.package:
@@ -33,7 +30,7 @@
   when:
     - ansible_facts.os_family != 'Suse'
     - ansible_facts.system != "FreeBSD"
-    - not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution_major_version is version('8', '>='))
+    - not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution != "Fedora")
 
 - name: "Install util-linux-extra"
   ansible.builtin.package:
@@ -42,7 +39,6 @@
   when:
     - ansible_facts.os_family == 'Debian'
     - not (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_version is version('24.04', '<'))
-    - not (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_version is version('12', '<'))
 
 - name: "Install Alpine specific packages"
   ansible.builtin.package:
@@ -63,13 +59,6 @@
       - btrfsprogs
     state: present
   when: ansible_facts.os_family == 'Suse'
-
-- name: "Install reiserfs utils (Fedora)"
-  ansible.builtin.package:
-    name: reiserfs-utils
-    state: present
-  when:
-    - ansible_facts.distribution == 'Fedora' and (ansible_facts.distribution_major_version | int < 35)
 
 - name: "Install util-linux-systemd (for findmnt) (OpenSuse)"
   ansible.builtin.package:
@@ -105,7 +94,7 @@
   ansible.builtin.package:
     name: gfs2-utils
     state: present
-  when: ansible_facts.os_family in ['Debian', 'Suse', 'Ubuntu'] or ansible_facts.distribution == 'Fedora'
+  when: ansible_facts.os_family in ['Debian', 'Suse'] or ansible_facts.distribution == 'Fedora'
 
 - name: "Install f2fs tools and get version"
   when:
@@ -172,10 +161,6 @@
 
 - name: "Set version-related facts to skip further tasks"
   ansible.builtin.set_fact:
-    # http://e2fsprogs.sourceforge.net/e2fsprogs-release.html#1.43
-    # Mke2fs no longer complains if the user tries to create a file system
-    # using the entire block device.
-    force_creation: "{{ e2fsprogs_version is version('1.43', '<') }}"
     # Earlier versions have a segfault bug
     # Also there's an assertion bug on Ubuntu, Arch Linux, and Debian
     resize_vfat: "{{ fatresize_version|default('0.0') is version('1.0.4', '>=') and ansible_facts.distribution not in ['Ubuntu', 'Archlinux', 'Debian'] }}"
