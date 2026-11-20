@@ -345,7 +345,7 @@ ansible_core = "devel"
 target = [ "azp/posix/vm/" ]
 remote = [
     "alpine/3.24",
-    # "fedora/44",
+    # "fedora/45",
     "ubuntu/26.04",
     "ubuntu/24.04",
 ]
