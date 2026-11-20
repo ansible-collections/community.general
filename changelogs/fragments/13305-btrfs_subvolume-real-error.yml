@@ -1,0 +1,2 @@
+bugfixes:
+  - btrfs_subvolume - report the actual error instead of an ``AttributeError`` when the target filesystem cannot be found or is not mounted (https://github.com/ansible-collections/community.general/issues/7098, https://github.com/ansible-collections/community.general/pull/13305).
