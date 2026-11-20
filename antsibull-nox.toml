@@ -262,7 +262,7 @@ description = "Meta session for running all ansible-test-integration-2.22-* sess
 ansible_core = "2.22"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 docker = [
-    "fedora44",
+    "fedora43",
     "ubuntu2604",
     # "ubuntu2404",
     # "alpine324",
@@ -295,7 +295,7 @@ description = "Meta session for running all ansible-test-integration-devel-* ses
 ansible_core = "devel"
 target = [ "azp/posix/1/", "azp/posix/2/", "azp/posix/3/" ]
 docker = [
-    "fedora45",
+    "fedora43",
     "ubuntu2604",
     "ubuntu2404",
     "alpine324",
