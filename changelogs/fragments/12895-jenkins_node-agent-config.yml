@@ -1,0 +1,2 @@
+minor_changes:
+  - jenkins_node - add support for ``remote_root_dir``, ``description``, ``mode``, ``launcher``, and ``launch_ssh`` options (https://github.com/ansible-collections/community.general/issues/9804, https://github.com/ansible-collections/community.general/pull/12895).
