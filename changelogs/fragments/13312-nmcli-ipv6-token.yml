@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add support for configuring the IPv6 token with ``token6`` (https://github.com/ansible-collections/community.general/pull/13312).

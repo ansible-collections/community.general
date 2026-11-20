@@ -137,6 +137,31 @@ TESTCASE_GENERIC = [
     },
 ]
 
+TESTCASE_GENERIC_TOKEN6 = [
+    {
+        "type": "generic",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "generic_non_existant",
+        "state": "present",
+        "method6": "auto",
+        "addr_gen_mode6": "eui64",
+        "token6": "::AbCd",
+        "_ansible_check_mode": False,
+    },
+]
+
+TESTCASE_GENERIC_TOKEN6_NO_ADDR_GEN_MODE = [
+    {
+        "type": "generic",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "generic_non_existant",
+        "state": "present",
+        "method6": "auto",
+        "token6": "::AbCd",
+        "_ansible_check_mode": False,
+    },
+]
+
 TESTCASE_GENERIC_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              generic_non_existant
@@ -2781,6 +2806,69 @@ def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd
     results = json.loads(out)
     assert not results.get("failed")
     assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_GENERIC_TOKEN6, indirect=["patch_ansible_module"])
+def test_ipv6_token_create(mocked_generic_connection_create, capfd):
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    result = json.loads(out)
+    assert not result.get("failed")
+    assert result["changed"]
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    command = nmcli.Nmcli.execute_command.call_args.args[0]
+    assert command[1:3] == ["con", "add"]
+    assert command[command.index("ipv6.token") + 1] == "::AbCd"
+    assert command[command.index("ipv6.addr-gen-mode") + 1] == "eui64"
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_GENERIC_TOKEN6, indirect=["patch_ansible_module"])
+@pytest.mark.parametrize(("current_token", "changed"), [("--", True), ("::1234", True), ("0:0:0:0:0:0:0:ABCD", False)])
+def test_ipv6_token_existing(mocked_generic_connection_diff_check, capfd, current_token, changed):
+    show_output = TESTCASE_GENERIC_SHOW_OUTPUT + f"ipv6.addr-gen-mode: eui64\nipv6.token: {current_token}\n"
+    nmcli.Nmcli.execute_command.return_value = (0, show_output, "")
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    result = json.loads(out)
+    assert not result.get("failed")
+    assert result["changed"] is changed
+
+    if changed:
+        assert nmcli.Nmcli.execute_command.call_count == 2
+        command = nmcli.Nmcli.execute_command.call_args.args[0]
+        assert command[1:3] == ["con", "modify"]
+        assert command[command.index("ipv6.token") + 1] == "::AbCd"
+    else:
+        assert nmcli.Nmcli.execute_command.call_count == 1
+        assert nmcli.Nmcli.execute_command.call_args.args[0][1:4] == ["--show-secrets", "con", "show"]
+
+
+@pytest.mark.parametrize(
+    "patch_ansible_module", TESTCASE_GENERIC_TOKEN6_NO_ADDR_GEN_MODE, indirect=["patch_ansible_module"]
+)
+def test_ipv6_token_preserves_address_generation_mode(mocked_generic_connection_diff_check, capfd):
+    show_output = TESTCASE_GENERIC_SHOW_OUTPUT + "ipv6.addr-gen-mode: stable-privacy\nipv6.token: ::1234\n"
+    nmcli.Nmcli.execute_command.return_value = (0, show_output, "")
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    result = json.loads(out)
+    assert not result.get("failed")
+    assert result["changed"]
+
+    assert nmcli.Nmcli.execute_command.call_count == 2
+    command = nmcli.Nmcli.execute_command.call_args.args[0]
+    assert command[1:3] == ["con", "modify"]
+    assert command[command.index("ipv6.token") + 1] == "::AbCd"
+    assert "ipv6.addr-gen-mode" not in command
 
 
 @pytest.mark.parametrize(
