@@ -281,12 +281,12 @@ stages:
               test: ansible-test-integration-devel-default-3.13-azp-generic-1
             - name: Generic + py3.15 + generic group 1
               test: ansible-test-integration-devel-default-3.15-azp-generic-1
-            - name: Fedora 44 + group 1
-              test: ansible-test-integration-devel-fedora44-azp-posix-1
-            - name: Fedora 44 + group 2
-              test: ansible-test-integration-devel-fedora44-azp-posix-2
-            - name: Fedora 44 + group 3
-              test: ansible-test-integration-devel-fedora44-azp-posix-3
+            - name: Fedora 45 + group 1
+              test: ansible-test-integration-devel-fedora45-azp-posix-1
+            - name: Fedora 45 + group 2
+              test: ansible-test-integration-devel-fedora45-azp-posix-2
+            - name: Fedora 45 + group 3
+              test: ansible-test-integration-devel-fedora45-azp-posix-3
             - name: OpenSuSE Leap 16.0 + py3.13 + group 1
               test: ansible-test-integration-devel-opensuse-leap-16.0-3.13-azp-posix-1
             - name: OpenSuSE Leap 16.0 + py3.13 + group 2

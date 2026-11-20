@@ -24,6 +24,10 @@
 - ansible.builtin.meta: end_play
   when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '44'
 
+# Temporary disable Fedora 45
+- ansible.builtin.meta: end_play
+  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '45'
+
 - name: Include distribution and Python version specific variables
   ansible.builtin.include_vars: '{{ lookup(''first_found'', params) }}'
   vars:
