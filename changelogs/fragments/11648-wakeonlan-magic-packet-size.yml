@@ -1,0 +1,2 @@
+bugfixes:
+  - wakeonlan - send a standard 102 byte magic packet with 16 repetitions of the MAC address instead of 20, so devices that check the packet length wake up (https://github.com/ansible-collections/community.general/issues/11648, https://github.com/ansible-collections/community.general/pull/13246).
