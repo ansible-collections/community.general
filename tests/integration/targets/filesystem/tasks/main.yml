@@ -52,8 +52,8 @@
     - 'not (ansible_facts.distribution not in ["Alpine", "Archlinux"] and item.0.key == "bcachefs")'
     # TODO: bcachefs on Alpine doesn't seem to work for unknown reasons, debug this!
     - 'not (ansible_facts.distribution in ["Alpine"] and item.0.key == "bcachefs")'
-    # btrfs packages not available on RHEL/CentOS/Fedora
-    - 'not (ansible_facts.os_family == "RedHat" and item.0.key == "btrfs")'
+    # btrfs packages not available on RHEL and derivatives
+    - 'not (ansible_facts.os_family == "RedHat" and ansible_facts.distribution != "Fedora" and item.0.key == "btrfs")'
     # f2fs-tools package not available with RHEL/CentOS on CI
     - 'not (ansible_facts.distribution in ["CentOS", "RedHat"] and item.0.key == "f2fs")'
     # reiserfs not available with RHEL/CentOS/Fedora/Alpine/Arch Liux
