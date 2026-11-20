@@ -94,3 +94,28 @@ class TestHAProxyDrain(ModuleTestCase):
 
         self.assertIsInstance(exc, AnsibleFailJson)
         self.assertIn("not status 'DRAIN'", exc.args[0]["msg"])
+
+    def run_enable(self, status, scur=0):
+        fake = FakeSocket(status, scur)
+        args = {
+            "state": "enabled",
+            "backend": "bk_test",
+            "host": "srv",
+            "socket": "/var/run/haproxy.sock",
+            "drain": True,
+            "wait": True,
+            "wait_retries": 3,
+            "wait_interval": 1,
+            "fail_on_not_found": True,
+        }
+        with set_module_args(args), mock.patch.object(haproxy.HAProxy, "execute", fake):
+            try:
+                haproxy.main()
+            except (AnsibleExitJson, AnsibleFailJson) as exc:
+                return fake, exc
+            raise AssertionError("the module neither succeeded nor failed")
+
+    def test_enabled_server_with_active_sessions_does_not_wait_for_drain(self):
+        fake, exc = self.run_enable("UP", scur=4)
+
+        self.assertIsInstance(exc, AnsibleExitJson)

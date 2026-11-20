@@ -364,7 +364,7 @@ class HAProxy:
             # We can assume there will only be 1 element in state because both svname and pxname are always set when we get here
             # When using track we get a status like this: MAINT (via pxname/svname) so we need to do substring matching
             if status in state[0]["status"]:
-                if not self._drain or state[0]["scur"] == "0":
+                if not self._drain or status != "DRAIN" or state[0]["scur"] == "0":
                     return True
             time.sleep(self.wait_interval)
 
