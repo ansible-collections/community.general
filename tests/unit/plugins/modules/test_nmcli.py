@@ -6119,3 +6119,127 @@ def test_ethernet_connection_route_table_reset(mocked_ethernet_connection_route_
     results = json.loads(out)
     assert not results.get("failed")
     assert results["changed"]
+
+
+TESTCASE_ETHERNET_ROUTES_SRC = [
+    {
+        "type": "ethernet",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "ethernet_non_existant",
+        "ip4": "10.10.10.10/24",
+        "routes4_extended": [{"ip": "192.168.200.0/24", "next_hop": "10.10.10.1", "src": "10.10.10.10"}],
+        "ip6": "2001:db8::10/64",
+        "routes6_extended": [{"ip": "2001:db8:5::/64", "next_hop": "2001:db8::1", "src": "2001:db8::10"}],
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_ETHERNET_ROUTES_SRC_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.routes:                            { ip = 192.168.200.0/24, nh = 10.10.10.1 src=10.10.10.10 }
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            manual
+ipv6.addresses:                         2001:db8::10/64
+ipv6.routes:                            { ip = 2001:db8:5::/64, nh = 2001:db8::1 src=2001:db8::10 }
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+"""
+
+TESTCASE_ETHERNET_ROUTES_NO_SRC_SHOW_OUTPUT = TESTCASE_ETHERNET_ROUTES_SRC_SHOW_OUTPUT.replace(
+    " src=10.10.10.10", ""
+).replace(" src=2001:db8::10", "")
+
+
+@pytest.fixture
+def mocked_ethernet_connection_routes_src_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_ETHERNET_ROUTES_SRC_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
+def mocked_ethernet_connection_routes_no_src(mocker):
+    mocker_set(
+        mocker,
+        connection_exists=True,
+        execute_return=None,
+        execute_side_effect=(
+            (0, TESTCASE_ETHERNET_ROUTES_NO_SRC_SHOW_OUTPUT, ""),
+            (0, "", ""),
+        ),
+    )
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_ROUTES_SRC, indirect=["patch_ansible_module"])
+def test_ethernet_connection_routes_src_create(mocked_generic_connection_create, capfd):
+    """
+    Test : Create ethernet connection with IPv4 and IPv6 routes that set a source address
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, add_kw = arg_list[0]
+
+    assert add_args[0][2] == "add"
+
+    add_args_text = [to_text(x) for x in add_args[0]]
+    idx = add_args_text.index("ipv4.routes")
+    assert add_args_text[idx + 1] == "192.168.200.0/24 10.10.10.1 src=10.10.10.10"
+    idx = add_args_text.index("ipv6.routes")
+    assert add_args_text[idx + 1] == "2001:db8:5::/64 2001:db8::1 src=2001:db8::10"
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_ROUTES_SRC, indirect=["patch_ansible_module"])
+def test_ethernet_connection_routes_src_unchanged(mocked_ethernet_connection_routes_src_unchanged, capfd):
+    """
+    Test : Ethernet connection with IPv4 and IPv6 routes that set a source address unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_ETHERNET_ROUTES_SRC, indirect=["patch_ansible_module"])
+def test_ethernet_connection_routes_src_modify(mocked_ethernet_connection_routes_no_src, capfd):
+    """
+    Test : Add a source address to the IPv4 and IPv6 routes of an existing ethernet connection
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    modify_args, modify_kw = arg_list[1]
+
+    assert modify_args[0][2] == "modify"
+    assert modify_args[0][3] == "non_existent_nw_device"
+
+    modify_args_text = [to_text(x) for x in modify_args[0]]
+    idx = modify_args_text.index("ipv4.routes")
+    assert modify_args_text[idx + 1] == "192.168.200.0/24 10.10.10.1 src=10.10.10.10"
+    idx = modify_args_text.index("ipv6.routes")
+    assert modify_args_text[idx + 1] == "2001:db8:5::/64 2001:db8::1 src=2001:db8::10"
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
