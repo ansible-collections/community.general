@@ -10,39 +10,39 @@
     label: '{{ label }}'
   register: fs_result
 
-- name: "Assert that results are as expected"
+- name: "Assert that results are as expected ({{ fstype }})"
   ansible.builtin.assert:
     that:
       - 'fs_result is changed'
       - 'fs_result is success'
 
-- name: "Get UUID of created filesystem"
+- name: "Get UUID of created filesystem ({{ fstype }})"
   ansible.builtin.shell:  # noqa: command-instead-of-shell
     cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid
 
-- name: "Check that filesystem isn't created if force isn't used"
+- name: "Check that filesystem isn't created if force isn't used ({{ fstype }})"
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
     label: '{{ label }}'
   register: fs2_result
 
-- name: "Get UUID of the filesystem"
+- name: "Get UUID of the filesystem ({{ fstype }})"
   ansible.builtin.shell:  # noqa: command-instead-of-shell
     cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid2
 
-- name: "Assert that filesystem UUID is not changed"
+- name: "Assert that filesystem UUID is not changed ({{ fstype }})"
   ansible.builtin.assert:
     that:
       - 'fs2_result is not changed'
       - 'fs2_result is success'
       - 'uuid.stdout == uuid2.stdout'
 
-- name: "Check that filesystem is recreated if force is used"
+- name: "Check that filesystem is recreated if force is used ({{ fstype }})"
   community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
@@ -50,13 +50,13 @@
     force: true
   register: fs3_result
 
-- name: "Get UUID of the new filesystem"
+- name: "Get UUID of the new filesystem ({{ fstype }})"
   ansible.builtin.shell:  # noqa: command-instead-of-shell
     cmd: "{{ get_uuid_cmd }}"
   changed_when: false
   register: uuid3
 
-- name: "Assert that filesystem UUID is changed"
+- name: "Assert that filesystem UUID is changed ({{ fstype }})"
   # libblkid gets no UUID at all for this fstype on FreeBSD
   when: not (ansible_facts.system == 'FreeBSD' and fstype == 'reiserfs')
   ansible.builtin.assert:
@@ -68,7 +68,7 @@
 
 - when: 'grow|bool and (fstype != "vfat" or resize_vfat)'
   block:
-    - name: "Increase fake device"
+    - name: "Increase fake device ({{ fstype }})"
       community.general.filesize:
         path: '{{ image_file }}'
         size: '{{ fssize | int + 1 }}M'
@@ -83,20 +83,20 @@
         cmd: 'mdconfig -r -u {{ dev }} -s {{ fssize | int + 1 }}M'
       when: fstype == 'ufs'
 
-    - name: "Expand filesystem"
+    - name: "Expand filesystem ({{ fstype }})"
       community.general.filesystem:
         dev: '{{ dev }}'
         fstype: '{{ fstype }}'
         resizefs: true
       register: fs4_result
 
-    - name: "Get UUID of the filesystem"
+    - name: "Get UUID of the filesystem ({{ fstype }})"
       ansible.builtin.shell:  # noqa: command-instead-of-shell
         cmd: "{{ get_uuid_cmd }}"
       changed_when: false
       register: uuid4
 
-    - name: "Assert that filesystem UUID is not changed"
+    - name: "Assert that filesystem UUID is not changed ({{ fstype }})"
       ansible.builtin.assert:
         that:
           - 'fs4_result is changed'
@@ -105,17 +105,16 @@
 
 - when:
     - (grow | bool and (fstype != "vfat" or resize_vfat)) or
-      (fstype == "xfs" and ansible_facts.system == "Linux" and
-      ansible_facts.distribution not in ["CentOS", "Ubuntu"])
+      (fstype == "xfs" and ansible_facts.system == "Linux")
   block:
-    - name: "Check that resizefs does nothing if device size is not changed"
+    - name: "Check that resizefs does nothing if device size is not changed ({{ fstype }})"
       community.general.filesystem:
         dev: '{{ dev }}'
         fstype: '{{ fstype }}'
         resizefs: true
       register: fs5_result
 
-    - name: "Assert that the state did not change"
+    - name: "Assert that the state did not change ({{ fstype }})"
       ansible.builtin.assert:
         that:
           - 'fs5_result is not changed'
