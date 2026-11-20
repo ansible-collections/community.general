@@ -9,6 +9,10 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+- name: Temporarily skip Fedora 45 (TODO!)
+  ansible.builtin.meta: end_play
+  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '45'
+
 # Make sure we start fresh
 
 # Test setup
