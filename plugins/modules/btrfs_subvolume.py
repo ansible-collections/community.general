@@ -277,6 +277,8 @@ class BtrfsSubvolumeModule:
             if self.__filesystem is not None:
                 self.__filesystem.refresh_mountpoints()
 
+        if self.__filesystem is None:
+            return (error, {})
         return (error, self.get_results())
 
     # Identify the targeted filesystem and obtain the current state
