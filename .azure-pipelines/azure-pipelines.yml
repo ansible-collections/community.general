@@ -373,18 +373,6 @@ stages:
           targets:
             - name: Alpine 3.24 + extra VMs
               test: ansible-test-integration-devel-alpine-3.24-azp-posix-vm
-            - name: FreeBSD 14.5 + group 1
-              test: ansible-test-integration-devel-freebsd-14.5-azp-posix-1
-            - name: FreeBSD 14.5 + group 2
-              test: ansible-test-integration-devel-freebsd-14.5-azp-posix-2
-            - name: FreeBSD 14.5 + group 3
-              test: ansible-test-integration-devel-freebsd-14.5-azp-posix-3
-            - name: FreeBSD 15.1 + group 1
-              test: ansible-test-integration-devel-freebsd-15.1-azp-posix-1
-            - name: FreeBSD 15.1 + group 2
-              test: ansible-test-integration-devel-freebsd-15.1-azp-posix-2
-            - name: FreeBSD 15.1 + group 3
-              test: ansible-test-integration-devel-freebsd-15.1-azp-posix-3
             - name: macOS 26.3 + group 1
               test: ansible-test-integration-devel-macos-26.3-azp-posix-1
             - name: macOS 26.3 + group 2
@@ -405,8 +393,6 @@ stages:
               test: ansible-test-integration-devel-rhel-9.8-azp-posix-3
             - name: Ubuntu 24.04 + extra VMs
               test: ansible-test-integration-devel-ubuntu-24.04-azp-posix-vm
-            - name: Ubuntu 26.04 + extra VMs
-              test: ansible-test-integration-devel-ubuntu-26.04-azp-posix-vm
 
   - stage: Summary
     condition: succeededOrFailed()
