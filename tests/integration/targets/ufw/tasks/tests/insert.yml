@@ -1,0 +1,63 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# ufw is reset and inactive here, so "ufw status numbered" lists no rules
+# https://github.com/ansible-collections/community.general/issues/9283
+- name: Insert into the empty ruleset (check mode)
+  community.general.ufw:
+    rule: deny
+    port: 21
+    to_ip: 0.0.0.0
+    insert: 1
+  check_mode: true
+  register: insert_empty_check
+- name: Insert into the empty ruleset
+  community.general.ufw:
+    rule: deny
+    port: 21
+    to_ip: 0.0.0.0
+    insert: 1
+  register: insert_empty
+- name: Insert into the empty ruleset (idempotency)
+  community.general.ufw:
+    rule: deny
+    port: 21
+    to_ip: 0.0.0.0
+    insert: 1
+  register: insert_empty_idem
+- name: Insert before the existing rule while ufw is inactive
+  community.general.ufw:
+    rule: deny
+    port: 20
+    to_ip: 0.0.0.0
+    insert: 1
+- name: Insert after the last rule
+  community.general.ufw:
+    rule: deny
+    port: 22
+    to_ip: 0.0.0.0
+    insert: 99
+  register: insert_after_last
+
+# ## CHECK RESULT ############################
+- name: Enable
+  community.general.ufw:
+    state: enabled
+- name: Get rules
+  ansible.builtin.shell: |
+    ufw status | grep DENY | cut -f 1-2 -d ' ' | grep -E "^0\.0\.0\.0 2[0-2]$"
+  register: ufw_status
+- ansible.builtin.assert:
+    that:
+      - insert_empty_check is changed
+      - insert_empty is changed
+      - insert_empty_idem is not changed
+      - insert_after_last is changed
+      - ufw_status.stdout_lines == expected_stdout
+  vars:
+    expected_stdout:
+      - "0.0.0.0 20"
+      - "0.0.0.0 21"
+      - "0.0.0.0 22"

@@ -1,0 +1,2 @@
+bugfixes:
+  - ufw - add the rule at the end instead of failing when ``insert`` with the default ``insert_relative_to=zero`` is larger than the number of existing rules, for example ``insert=1`` on an empty ruleset (https://github.com/ansible-collections/community.general/issues/9283, https://github.com/ansible-collections/community.general/pull/13237).

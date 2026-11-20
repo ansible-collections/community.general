@@ -61,6 +61,7 @@ options:
     description:
       - Insert the corresponding rule as rule number NUM.
       - Note that ufw numbers rules starting with 1.
+      - If the rule number is larger than the number of existing rules, the rule is added at the end.
       - If O(delete=true) and a value is provided for O(insert), then O(insert) is ignored.
     type: int
   insert_relative_to:
@@ -534,16 +535,20 @@ def main():
             cmd.append([module.boolean(params["delete"]), "delete"])
             if params["insert"] is not None and not params["delete"]:
                 relative_to_cmd = params["insert_relative_to"]
+                (dummy, numbered_state, dummy) = module.run_command([ufw_bin, "status", "numbered"])
+                lines = [
+                    (numbered_line_re.match(line), bool("(v6)" in line or ipv6_regexp.search(line)))
+                    for line in numbered_state.splitlines()
+                ]
+                lines = [(int(matcher.group(1)), ipv6) for (matcher, ipv6) in lines if matcher]
+                last_number = max([no for (no, ipv6) in lines]) if lines else 0
                 if relative_to_cmd == "zero":
                     insert_to = params["insert"]
+                    # "ufw status numbered" lists no rules while ufw is inactive. The rules
+                    # files have at least one tuple per numbered rule (one per protocol for
+                    # an application profile), so use whichever count is larger.
+                    last_number = max(last_number, len(get_current_rules().splitlines()))
                 else:
-                    (dummy, numbered_state, dummy) = module.run_command([ufw_bin, "status", "numbered"])
-                    lines = [
-                        (numbered_line_re.match(line), bool("(v6)" in line or ipv6_regexp.search(line)))
-                        for line in numbered_state.splitlines()
-                    ]
-                    lines = [(int(matcher.group(1)), ipv6) for (matcher, ipv6) in lines if matcher]
-                    last_number = max([no for (no, ipv6) in lines]) if lines else 0
                     has_ipv4 = any(not ipv6 for (no, ipv6) in lines)
                     has_ipv6 = any(ipv6 for (no, ipv6) in lines)
 
@@ -564,10 +569,11 @@ def main():
                         relative_to = last_ipv6 or (last_number + 1)
 
                     insert_to = params["insert"] + relative_to
-                    if insert_to > last_number:
-                        # ufw does not like it when the insert number is larger than the
-                        # maximal rule number for IPv4/IPv6.
-                        insert_to = None
+                if insert_to > last_number:
+                    # As far as I can tell from ufw's source, there's no position for "after
+                    # the last rule": "insert N" puts the rule in front of rule N, and a
+                    # larger N is rejected. Leaving "insert" out makes ufw add it at the end.
+                    insert_to = None
                 cmd.append([insert_to is not None, f"insert {insert_to}"])
             cmd.append([value])
             cmd.append([params["direction"], params["direction"]])
