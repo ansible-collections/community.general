@@ -231,6 +231,12 @@ options:
         description:
           - The Type Of Service.
         type: int
+      src:
+        description:
+          - The preferred source address for traffic sent through this route.
+          - Use the format V(192.0.2.10).
+        type: str
+        version_added: 14.1.0
   route_metric4:
     description:
       - Set metric level of ipv4 routes configured on interface.
@@ -364,6 +370,12 @@ options:
         description:
           - Pretend that the nexthop is directly attached to this link, even if it does not match any interface prefix.
         type: bool
+      src:
+        description:
+          - The preferred source address for traffic sent through this route.
+          - Use the format V(2001:db8::10).
+        type: str
+        version_added: 14.1.0
   route_metric6:
     description:
       - Set metric level of IPv6 routes configured on interface.
@@ -2877,6 +2889,7 @@ def create_module() -> AnsibleModule:
                     cwnd=dict(type="int"),
                     mtu=dict(type="int"),
                     onlink=dict(type="bool"),
+                    src=dict(type="str"),
                 ),
             ),
             route_metric4=dict(type="int"),
@@ -2909,6 +2922,7 @@ def create_module() -> AnsibleModule:
                     cwnd=dict(type="int"),
                     mtu=dict(type="int"),
                     onlink=dict(type="bool"),
+                    src=dict(type="str"),
                 ),
             ),
             route_metric6=dict(type="int"),

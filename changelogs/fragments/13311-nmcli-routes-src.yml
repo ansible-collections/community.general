@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add ``src`` suboption to ``routes4_extended`` and ``routes6_extended`` to set the preferred source address of a route (https://github.com/ansible-collections/community.general/issues/13216, https://github.com/ansible-collections/community.general/pull/13311).
