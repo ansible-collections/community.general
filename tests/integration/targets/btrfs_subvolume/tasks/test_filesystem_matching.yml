@@ -78,3 +78,29 @@
         that:
           - result.filesystem.label == btrfs_subvolume_target_label
   when: false  # TODO don't attempt this if the host already has a pre-existing btrfs filesystem
+
+- name: "Report why the targeted filesystem cannot be used"
+  block:
+    - name: Match a filesystem by a label that does not exist
+      community.general.btrfs_subvolume:
+        name: "/match_missing_label"
+        filesystem_label: "{{ btrfs_subvolume_target_label }}-missing"
+        state: "present"
+      register: missing_label_result
+      ignore_errors: true
+
+    - name: Target the unmounted '{{ btrfs_subvolume_target_label }}' filesystem without automount
+      community.general.btrfs_subvolume:
+        name: "/match_without_automount"
+        filesystem_label: "{{ btrfs_subvolume_target_label }}"
+        state: "present"
+      register: no_automount_result
+      ignore_errors: true
+
+    - name: Validate the module's own error messages are reported
+      ansible.builtin.assert:
+        that:
+          - missing_label_result is failed
+          - "'Found 0 filesystems matching criteria' in missing_label_result.msg"
+          - no_automount_result is failed
+          - "'is not currently mounted and automount=False' in no_automount_result.msg"
