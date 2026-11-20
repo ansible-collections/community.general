@@ -1,0 +1,2 @@
+bugfixes:
+  - gitlab_label - fix labels always being reported as updated with newer GitLab versions (https://github.com/ansible-collections/community.general/pull/13006).

@@ -344,6 +344,8 @@ def native_python_main(this_gitlab, purge, requested_labels, state, module):
         item.pop("description_html")
         item.pop("text_color")
         item.pop("subscribed")
+        # field present only in newer GitLab versions
+        item.pop("archived", None)
         # field present only when it is a project's label
         if "is_project_label" in item:
             item.pop("is_project_label")
