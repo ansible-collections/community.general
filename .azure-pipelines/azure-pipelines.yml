@@ -225,16 +225,8 @@ stages:
           targets:
             - name: Generic + py3.13 + generic group 1
               test: ansible-test-integration-2.22-default-3.13-azp-generic-1
-            - name: Generic + py3.15 + generic group 1
-              test: ansible-test-integration-2.22-default-3.15-azp-generic-1
             - name: Generic + py3.9 + generic group 1
               test: ansible-test-integration-2.22-default-3.9-azp-generic-1
-            - name: Fedora 44 + group 1
-              test: ansible-test-integration-2.22-fedora44-azp-posix-1
-            - name: Fedora 44 + group 2
-              test: ansible-test-integration-2.22-fedora44-azp-posix-2
-            - name: Fedora 44 + group 3
-              test: ansible-test-integration-2.22-fedora44-azp-posix-3
             - name: Ubuntu 26.04 + group 1
               test: ansible-test-integration-2.22-ubuntu2604-azp-posix-1
             - name: Ubuntu 26.04 + group 2
@@ -279,14 +271,6 @@ stages:
               test: ansible-test-integration-devel-default-3.10-azp-generic-1
             - name: Generic + py3.13 + generic group 1
               test: ansible-test-integration-devel-default-3.13-azp-generic-1
-            - name: Generic + py3.15 + generic group 1
-              test: ansible-test-integration-devel-default-3.15-azp-generic-1
-            - name: Fedora 45 + group 1
-              test: ansible-test-integration-devel-fedora45-azp-posix-1
-            - name: Fedora 45 + group 2
-              test: ansible-test-integration-devel-fedora45-azp-posix-2
-            - name: Fedora 45 + group 3
-              test: ansible-test-integration-devel-fedora45-azp-posix-3
             - name: OpenSuSE Leap 16.0 + py3.13 + group 1
               test: ansible-test-integration-devel-opensuse-leap-16.0-3.13-azp-posix-1
             - name: OpenSuSE Leap 16.0 + py3.13 + group 2
@@ -389,18 +373,6 @@ stages:
           targets:
             - name: Alpine 3.24 + extra VMs
               test: ansible-test-integration-devel-alpine-3.24-azp-posix-vm
-            - name: FreeBSD 14.5 + group 1
-              test: ansible-test-integration-devel-freebsd-14.5-azp-posix-1
-            - name: FreeBSD 14.5 + group 2
-              test: ansible-test-integration-devel-freebsd-14.5-azp-posix-2
-            - name: FreeBSD 14.5 + group 3
-              test: ansible-test-integration-devel-freebsd-14.5-azp-posix-3
-            - name: FreeBSD 15.1 + group 1
-              test: ansible-test-integration-devel-freebsd-15.1-azp-posix-1
-            - name: FreeBSD 15.1 + group 2
-              test: ansible-test-integration-devel-freebsd-15.1-azp-posix-2
-            - name: FreeBSD 15.1 + group 3
-              test: ansible-test-integration-devel-freebsd-15.1-azp-posix-3
             - name: macOS 26.3 + group 1
               test: ansible-test-integration-devel-macos-26.3-azp-posix-1
             - name: macOS 26.3 + group 2
