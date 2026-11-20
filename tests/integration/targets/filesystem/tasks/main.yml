@@ -96,3 +96,11 @@
     - 'ansible_facts.system == "FreeBSD"'
     - 'item.0.key in ["xfs", "vfat"]'
   loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"
+
+- name: Test ext resize idempotence with incomplete trailing blocks
+  ansible.builtin.include_tasks: resize_ext_slack.yml
+  loop: "{{ ['ext2', 'ext3', 'ext4'] | product([1024, 4096]) | list }}"
+  vars:
+    ext_slack_fstype: '{{ item[0] }}'
+    ext_slack_block_size: '{{ item[1] }}'
+  when: ansible_facts.system == 'Linux'

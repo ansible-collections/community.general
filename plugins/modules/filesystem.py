@@ -70,6 +70,15 @@ options:
       - Mutually exclusive with O(uuid).
     type: bool
     default: false
+  resize_compare_disk_blocks:
+    description:
+      - When V(true), check mode predicts growth only if the device can hold at least one more whole filesystem block.
+        A normal run reports a change only if the filesystem capacity grows after resizing.
+      - When V(false), the resize check compares the filesystem and device capacities in bytes.
+      - Applies when growing an existing V(ext2), V(ext3), V(ext4), or V(ext4dev) filesystem with O(resizefs=true).
+    type: bool
+    default: false
+    version_added: 14.1.0
   opts:
     description:
       - List of options to be passed to C(mkfs) command.
@@ -333,8 +342,8 @@ class Ext(Filesystem):
     CHANGE_UUID = "tune2fs"
     CHANGE_UUID_OPTION = "-U"
 
-    def get_fs_size(self, dev):
-        """Get Block count and Block size and return their product."""
+    def get_fs_info(self, dev):
+        """Return the filesystem block size and count."""
         cmd = self.module.get_bin_path(self.INFO, required=True)
         dummy, out, dummy = self.module.run_command([cmd, "-l", str(dev)], check_rc=True, environ_update=self.LANG_ENV)
 
@@ -349,7 +358,59 @@ class Ext(Filesystem):
         else:
             raise ValueError(repr(out))
 
+        return block_size, block_count
+
+    def get_fs_size(self, dev):
+        """Get Block count and Block size and return their product."""
+        block_size, block_count = self.get_fs_info(dev)
         return block_size * block_count
+
+    def grow(self, dev):
+        """Grow the filesystem using the requested change detection behavior."""
+        if not self.module.params["resize_compare_disk_blocks"]:
+            return super().grow(dev)
+
+        try:
+            block_size, block_count = self.get_fs_info(dev)
+        except ValueError as err:
+            self.module.warn(f"unable to process {self.INFO} output '{err}'")
+            self.module.fail_json(msg=f"unable to process {self.INFO} output for {dev}")
+
+        fs_size_before = block_size * block_count
+        dev_size = dev.size()
+
+        if self.module.check_mode:
+            will_grow = block_count < dev_size // block_size
+            self.module.exit_json(
+                changed=will_grow,
+                msg=(
+                    f"resizing filesystem {self.fstype} on device {dev}"
+                    if will_grow
+                    else f"{self.fstype} filesystem is using the whole device {dev}"
+                ),
+            )
+        elif fs_size_before >= dev_size:
+            self.module.exit_json(
+                changed=False,
+                msg=f"{self.fstype} filesystem is using the whole device {dev}",
+            )
+
+        out = self.module.run_command(self.grow_cmd(str(dev)), check_rc=True)[1]
+        try:
+            fs_size_after = self.get_fs_size(dev)
+        except ValueError as err:
+            self.module.warn(f"unable to process {self.INFO} output '{err}'")
+            self.module.fail_json(msg=f"unable to process {self.INFO} output for {dev}")
+
+        if fs_size_after < fs_size_before:
+            self.module.fail_json(msg=f"{self.fstype} filesystem shrank while resizing {dev}")
+        if fs_size_after == fs_size_before:
+            self.module.exit_json(
+                changed=False,
+                msg=f"{self.fstype} filesystem has no additional complete blocks available on {dev}",
+            )
+
+        return out
 
 
 class Ext2(Ext):
@@ -681,6 +742,7 @@ def main():
             opts=dict(type="str"),
             force=dict(type="bool", default=False),
             resizefs=dict(type="bool", default=False),
+            resize_compare_disk_blocks=dict(type="bool", default=False),
             uuid=dict(type="str"),
             label=dict(type="str"),
         ),
@@ -745,6 +807,11 @@ def main():
             module.fail_json(changed=False, msg=f"module does not support this filesystem ({fstype}) yet.")
 
         filesystem = klass(module)
+
+        if module.params["resize_compare_disk_blocks"] and (not resizefs or not isinstance(filesystem, Ext)):
+            module.fail_json(
+                msg="resize_compare_disk_blocks requires resizefs=true and an ext2, ext3, ext4, or ext4dev filesystem"
+            )
 
         if uuid and not (filesystem.CHANGE_UUID or filesystem.MKFS_SET_UUID_OPTIONS):
             module.fail_json(
