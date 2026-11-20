@@ -129,6 +129,7 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.text.converters import to_bytes, to_text
 
 from ansible_collections.community.general.plugins.module_utils._redis import (
     RedisAnsible,
@@ -214,8 +215,8 @@ def main():
         result["msg"] = msg
         module.fail_json(**result)
 
-    result["old_value"] = old_value
-    if old_value == value and keepttl is not False and px is None:
+    result["old_value"] = None if old_value is None else to_text(old_value, errors="surrogateescape")
+    if old_value == to_bytes(value) and keepttl is not False and px is None:
         msg = f"Key {key} already has desired value"
         result["msg"] = msg
         result["value"] = value
