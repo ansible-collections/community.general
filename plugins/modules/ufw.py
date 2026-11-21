@@ -32,6 +32,11 @@ attributes:
     support: full
   diff_mode:
     support: none
+installable_requirements:
+  - name: ufw firewall
+    blocks:
+      - system:
+          - ufw
 options:
   state:
     description:
