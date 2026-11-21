@@ -20,6 +20,12 @@ attributes:
   action_group:
     version_added: 11.3.0
 
+options:
+  api_url:
+    description:
+      - Scaleway API URL.
+    default: 'https://api.scaleway.com'
+    aliases: ['base_url']
 extends_documentation_fragment:
   - community.general._scaleway
   - community.general._attributes
@@ -58,7 +64,7 @@ scaleway_organization_info:
     ]
 """
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 
 from ansible_collections.community.general.plugins.module_utils._scaleway import (
     Scaleway,
@@ -73,8 +79,17 @@ def get_organizations(api):
 
 
 def main():
+    argument_spec = scaleway_argument_spec()
+    argument_spec.update(
+        dict(
+            api_url=dict(
+                fallback=(env_fallback, ["SCW_API_URL"]), default="https://api.scaleway.com", aliases=["base_url"]
+            ),
+        )
+    )
+
     module = AnsibleModule(
-        argument_spec=scaleway_argument_spec(),
+        argument_spec=argument_spec,
         supports_check_mode=True,
     )
 
