@@ -1,0 +1,2 @@
+bugfixes:
+  - ini_file - fix ``exclusive=true`` having no effect when setting a value with ``allow_no_value=true`` (https://github.com/ansible-collections/community.general/issues/6173, https://github.com/ansible-collections/community.general/pull/13244).

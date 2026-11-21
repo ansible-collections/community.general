@@ -1,0 +1,260 @@
+---
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+## regression for https://github.com/ansible-collections/community.general/issues/6173
+
+- name: test-exclusive-allow-no-value 1 - create test file
+  ansible.builtin.copy:
+    content: |
+      [test]
+      active = false
+    dest: "{{ output_file }}"
+
+- name: test-exclusive-allow-no-value 1 - change the value of an existing option
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: test
+    option: active
+    value: "true"
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_1
+
+- name: test-exclusive-allow-no-value 1 - change the value of an existing option again
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: test
+    option: active
+    value: "true"
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_1_idem
+
+- name: test-exclusive-allow-no-value 1 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content_exclusive_allow_no_value_1
+
+- name: test-exclusive-allow-no-value 1 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected_exclusive_allow_no_value_1: |
+      [test]
+      active = true
+    content_exclusive_allow_no_value_1: "{{ output_content_exclusive_allow_no_value_1.content | ansible.builtin.b64decode }}"
+
+- name: test-exclusive-allow-no-value 1 - assert the existing line is replaced
+  ansible.builtin.assert:
+    that:
+      - result_exclusive_allow_no_value_1 is changed
+      - result_exclusive_allow_no_value_1.msg == 'option changed'
+      - result_exclusive_allow_no_value_1_idem is not changed
+      - content_exclusive_allow_no_value_1 == expected_exclusive_allow_no_value_1
+
+
+- name: test-exclusive-allow-no-value 2 - create test file
+  ansible.builtin.copy:
+    content: |
+      [drinks]
+      sparkling
+      beverage = coke
+      beverage = pepsi
+    dest: "{{ output_file }}"
+
+- name: test-exclusive-allow-no-value 2 - replace one of the values of an existing option
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    option: beverage
+    values:
+      - coke
+      - water
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_2
+
+- name: test-exclusive-allow-no-value 2 - replace one of the values of an existing option again
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    option: beverage
+    values:
+      - coke
+      - water
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_2_idem
+
+- name: test-exclusive-allow-no-value 2 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content_exclusive_allow_no_value_2
+
+- name: test-exclusive-allow-no-value 2 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected_exclusive_allow_no_value_2: |
+      [drinks]
+      sparkling
+      beverage = coke
+      beverage = water
+    content_exclusive_allow_no_value_2: "{{ output_content_exclusive_allow_no_value_2.content | ansible.builtin.b64decode }}"
+
+- name: test-exclusive-allow-no-value 2 - assert the other value is replaced and the option without value is kept
+  ansible.builtin.assert:
+    that:
+      - result_exclusive_allow_no_value_2 is changed
+      - result_exclusive_allow_no_value_2.msg == 'option changed'
+      - result_exclusive_allow_no_value_2_idem is not changed
+      - content_exclusive_allow_no_value_2 == expected_exclusive_allow_no_value_2
+
+
+- name: test-exclusive-allow-no-value 3 - set a value without an option
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    value: water
+    allow_no_value: true
+  register: result_exclusive_allow_no_value_3
+
+- name: test-exclusive-allow-no-value 3 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content_exclusive_allow_no_value_3
+
+- name: test-exclusive-allow-no-value 3 - assert the section is not changed
+  ansible.builtin.assert:
+    that:
+      - result_exclusive_allow_no_value_3 is not changed
+      - (output_content_exclusive_allow_no_value_3.content | ansible.builtin.b64decode) == expected_exclusive_allow_no_value_2
+
+
+- name: test-exclusive-allow-no-value 4 - set an option without a value
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: drinks
+    option: beverage
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_4
+
+- name: test-exclusive-allow-no-value 4 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content_exclusive_allow_no_value_4
+
+- name: test-exclusive-allow-no-value 4 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected_exclusive_allow_no_value_4: |
+      [drinks]
+      sparkling
+      beverage
+      beverage = water
+    content_exclusive_allow_no_value_4: "{{ output_content_exclusive_allow_no_value_4.content | ansible.builtin.b64decode }}"
+
+- name: test-exclusive-allow-no-value 4 - assert the other line of the option is kept
+  ansible.builtin.assert:
+    that:
+      - result_exclusive_allow_no_value_4 is changed
+      - content_exclusive_allow_no_value_4 == expected_exclusive_allow_no_value_4
+
+
+- name: test-exclusive-allow-no-value 5 - create test file
+  ansible.builtin.copy:
+    content: |
+      [test]
+      active = false
+      active = true
+    dest: "{{ output_file }}"
+
+- name: test-exclusive-allow-no-value 5 - set an option to a value that is already in the section
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: test
+    option: active
+    value: "true"
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_5
+
+- name: test-exclusive-allow-no-value 5 - set an option to a value that is already in the section again
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: test
+    option: active
+    value: "true"
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_5_idem
+
+- name: test-exclusive-allow-no-value 5 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content_exclusive_allow_no_value_5
+
+- name: test-exclusive-allow-no-value 5 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected_exclusive_allow_no_value_5: |
+      [test]
+      active = true
+    content_exclusive_allow_no_value_5: "{{ output_content_exclusive_allow_no_value_5.content | ansible.builtin.b64decode }}"
+
+- name: test-exclusive-allow-no-value 5 - assert the line with the other value is removed
+  ansible.builtin.assert:
+    that:
+      - result_exclusive_allow_no_value_5 is changed
+      - result_exclusive_allow_no_value_5.msg == 'option changed'
+      - result_exclusive_allow_no_value_5_idem is not changed
+      - content_exclusive_allow_no_value_5 == expected_exclusive_allow_no_value_5
+
+
+- name: test-exclusive-allow-no-value 6 - create test file
+  ansible.builtin.copy:
+    content: |
+      [test]
+      #active = false
+      active
+      active = false
+      active = true
+    dest: "{{ output_file }}"
+
+- name: test-exclusive-allow-no-value 6 - set an option that also has a commented line and a line without a value
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: test
+    option: active
+    value: "true"
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_6
+
+- name: test-exclusive-allow-no-value 6 - set an option that also has a commented line and a line without a value again
+  community.general.ini_file:
+    path: "{{ output_file }}"
+    section: test
+    option: active
+    value: "true"
+    allow_no_value: true
+    exclusive: true
+  register: result_exclusive_allow_no_value_6_idem
+
+- name: test-exclusive-allow-no-value 6 - read content from output file
+  ansible.builtin.slurp:
+    src: "{{ output_file }}"
+  register: output_content_exclusive_allow_no_value_6
+
+- name: test-exclusive-allow-no-value 6 - set expected content and get current ini file content
+  ansible.builtin.set_fact:
+    expected_exclusive_allow_no_value_6: |
+      [test]
+      #active = false
+      active = true
+    content_exclusive_allow_no_value_6: "{{ output_content_exclusive_allow_no_value_6.content | ansible.builtin.b64decode }}"
+
+- name: test-exclusive-allow-no-value 6 - assert the commented line is kept and the line without a value is removed
+  ansible.builtin.assert:
+    that:
+      - result_exclusive_allow_no_value_6 is changed
+      - result_exclusive_allow_no_value_6.msg == 'option changed'
+      - result_exclusive_allow_no_value_6_idem is not changed
+      - content_exclusive_allow_no_value_6 == expected_exclusive_allow_no_value_6
