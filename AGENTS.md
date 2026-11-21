@@ -471,6 +471,9 @@ approval before committing or pushing it.
   - Also skip unsupported systems at the start of the tasks, before installing packages or doing any other setup work,
     since the aliases do not cover every environment CI uses (e.g. `skip/alpine` does not skip the Alpine container)
   - Do not add precondition assertions or messages explaining why something is skipped, they only add noise
+- `tests/versions_baseline.yml` lists the minimum version of each OS on which the integration tests run in CI.
+  Compare OS version conditions in tests with it.
+  It is generated: after changing the CI matrix, regenerate it with `nox -e update-versions-baseline` instead of editing it.
 - For modules with larget sets of functions, break the tests into smaller files and use `include_tasks`
 
 ## Use of AI for contributions
