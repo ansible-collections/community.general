@@ -1,0 +1,2 @@
+bugfixes:
+  - ufw - read the current default policies from ``/etc/default/ufw`` when ufw is inactive, so ``default`` reports ``changed`` correctly in check mode and normal mode (https://github.com/ansible-collections/community.general/issues/13242).
