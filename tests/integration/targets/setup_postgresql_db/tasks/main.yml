@@ -8,18 +8,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Exit when Suse because it causes CI problems
-- ansible.builtin.meta: end_play
-  when: ansible_facts.os_family == 'Suse'
-
-# Temporary disable Fedora 44
-- ansible.builtin.meta: end_play
-  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '44'
-
-# Temporary disable Fedora 45
-- ansible.builtin.meta: end_play
-  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '45'
-
 - name: Include distribution and Python version specific variables
   ansible.builtin.include_vars: '{{ lookup(''first_found'', params) }}'
   vars:
@@ -32,11 +20,19 @@
       paths:
         - '{{ role_path }}/vars'
 
-- name: make sure the dbus service is started under systemd
-  ansible.builtin.systemd:
-    name: dbus
-    state: started
+# postgresql-setup needs the system bus, which is not present in all Fedora test images
+- name: Make sure the D-Bus service is installed and started (Fedora)
   when: ansible_facts.service_mgr == 'systemd' and ansible_facts.distribution == 'Fedora'
+  block:
+    - name: Install D-Bus broker (Fedora)
+      ansible.builtin.package:
+        name: dbus-broker
+        state: present
+
+    - name: Start D-Bus broker (Fedora)
+      ansible.builtin.systemd:
+        name: dbus-broker
+        state: started
 
 - name: stop postgresql service
   ansible.builtin.service:
@@ -98,17 +94,6 @@
     creates: /etc/postgresql/{{ pg_ver }}/
   when: ansible_facts.os_family == 'Debian'
 
-- name: Initialize postgres (Suse)
-  ansible.builtin.service:
-    name: postgresql
-    state: stopped
-  when: ansible_facts.os_family == 'Suse'
-
-- name: Pause between stop and start postgresql
-  ansible.builtin.pause:
-    seconds: 5
-  when: ansible_facts.os_family == 'Suse'
-
 - name: Make installable on Arch
   community.general.ini_file:
     path: /usr/lib/systemd/system/postgresql.service
@@ -149,10 +134,11 @@
     group: '{{ pg_group }}'
     mode: '0644'
 
+# Suse initializes the database on its first start, so it must be restarted to load pg_hba.conf
 - name: start postgresql service
   ansible.builtin.service:
     name: "{{ postgresql_service }}"
-    state: started
+    state: "{{ 'restarted' if ansible_facts.os_family == 'Suse' else 'started' }}"
 
 - name: Get PostgreSQL version
   become_user: '{{ pg_user }}'
