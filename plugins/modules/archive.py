@@ -599,7 +599,7 @@ class TarArchive(Archive):
 
     def _get_checksums(self, path):
         LZMAError = lzma.LZMAError
-        compression_errors = (LZMAError, tarfile.ReadError, tarfile.CompressionError)
+        compression_errors = (LZMAError, tarfile.ReadError, tarfile.CompressionError, EOFError)
         if not deps.failed("zstandard"):
             compression_errors += (zstandard.ZstdError,)
 
