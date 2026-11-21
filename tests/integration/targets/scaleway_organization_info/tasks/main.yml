@@ -20,3 +20,5 @@
   ansible.builtin.assert:
     that:
       - organizations is success
+      - organizations.scaleway_organization_info | length > 0
+      - organizations.scaleway_organization_info[0].id is defined
