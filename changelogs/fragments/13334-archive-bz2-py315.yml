@@ -1,0 +1,2 @@
+bugfixes:
+  - archive - fix crash on Python 3.15 when ``format=bz2`` and the destination already exists (https://github.com/ansible-collections/community.general/issues/13319, https://github.com/ansible-collections/community.general/pull/13334).
