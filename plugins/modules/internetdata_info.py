@@ -132,7 +132,7 @@ import typing as t
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
-USER_AGENT = "ansible-internetdata-info-module/0.0.1"
+USER_AGENT = "ansible-community.general.internetdata_info"
 
 
 class InternetDataInfo:
@@ -183,9 +183,7 @@ def main():
     )
 
     internetdata_info = InternetDataInfo(module)
-    internetdata_info_result = {"changed": False}
-    internetdata_info_result.update(internetdata_info.get_ip_data())
-    module.exit_json(**internetdata_info_result)
+    module.exit_json(**internetdata_info.get_ip_data())
 
 
 if __name__ == "__main__":

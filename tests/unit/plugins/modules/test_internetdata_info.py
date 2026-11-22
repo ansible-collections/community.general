@@ -5,9 +5,11 @@
 from __future__ import annotations
 
 import json
-import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
+import pytest
+
+from ansible_collections.community.general.plugins.modules import internetdata_info
 from ansible_collections.community.general.plugins.modules.internetdata_info import InternetDataInfo
 
 INTERNETDATA_DATA = {
@@ -23,59 +25,54 @@ INTERNETDATA_DATA = {
     "abuse": {"email": "network-abuse@google.com"},
 }
 
-FETCH_URL = "ansible_collections.community.general.plugins.modules.internetdata_info.fetch_url"
 
-
-def mock_module(params):
+def make_module(**params):
     module = Mock()
     module.params = {"timeout": 10, "ip": None, "api_key": None, **params}
     module.from_json.side_effect = json.loads
+    module.fail_json.side_effect = SystemExit
     return module
 
 
-def mock_response(status=200):
+@pytest.fixture
+def fetch_url(monkeypatch):
     response = Mock()
     response.read.return_value = json.dumps(INTERNETDATA_DATA)
-    return response, {"status": status}
+    fetch = Mock(return_value=(response, {"status": 200}))
+    monkeypatch.setattr(internetdata_info, "fetch_url", fetch)
+    return fetch
 
 
-class TestInternetDataInfo(unittest.TestCase):
-    def test_get_ip_data_with_ip(self):
-        module = mock_module({"ip": "8.8.8.8"})
-        with patch(FETCH_URL) as mock_fetch_url:
-            mock_fetch_url.return_value = mock_response()
-            result = InternetDataInfo(module).get_ip_data()
+def test_get_ip_data_with_ip(fetch_url):
+    module = make_module(ip="8.8.8.8")
+    result = InternetDataInfo(module).get_ip_data()
 
-            self.assertEqual(result["location"]["country"], "US")
-            self.assertEqual(result["asn"]["asn"], 15169)
-            mock_fetch_url.assert_called_once_with(
-                module, "https://api.internetdata.io/8.8.8.8", headers={"Accept": "application/json"}, timeout=10
-            )
+    assert result["location"]["country"] == "US"
+    assert result["asn"]["asn"] == 15169
+    fetch_url.assert_called_once_with(
+        module, "https://api.internetdata.io/8.8.8.8", headers={"Accept": "application/json"}, timeout=10
+    )
 
-    def test_get_ip_data_of_own_address(self):
-        module = mock_module({})
-        with patch(FETCH_URL) as mock_fetch_url:
-            mock_fetch_url.return_value = mock_response()
-            InternetDataInfo(module).get_ip_data()
 
-            mock_fetch_url.assert_called_once_with(
-                module, "https://api.internetdata.io/myip", headers={"Accept": "application/json"}, timeout=10
-            )
+def test_get_ip_data_of_own_address(fetch_url):
+    module = make_module()
+    InternetDataInfo(module).get_ip_data()
 
-    def test_get_ip_data_with_api_key(self):
-        module = mock_module({"ip": "8.8.8.8", "api_key": "secret"})
-        with patch(FETCH_URL) as mock_fetch_url:
-            mock_fetch_url.return_value = mock_response()
-            InternetDataInfo(module).get_ip_data()
+    fetch_url.assert_called_once_with(
+        module, "https://api.internetdata.io/myip", headers={"Accept": "application/json"}, timeout=10
+    )
 
-            headers = mock_fetch_url.call_args.kwargs["headers"]
-            self.assertEqual(headers["Authorization"], "Bearer secret")
 
-    def test_get_ip_data_fails_on_http_error(self):
-        module = mock_module({"ip": "8.8.8.8"})
-        module.fail_json.side_effect = SystemExit
-        with patch(FETCH_URL) as mock_fetch_url:
-            mock_fetch_url.return_value = mock_response(status=429)
-            with self.assertRaises(SystemExit):
-                InternetDataInfo(module).get_ip_data()
-            self.assertIn("429", module.fail_json.call_args.kwargs["msg"])
+def test_get_ip_data_with_api_key(fetch_url):
+    InternetDataInfo(make_module(ip="8.8.8.8", api_key="secret")).get_ip_data()
+
+    assert fetch_url.call_args.kwargs["headers"]["Authorization"] == "Bearer secret"
+
+
+def test_get_ip_data_fails_on_http_error(fetch_url):
+    fetch_url.return_value = (None, {"status": 429})
+    module = make_module(ip="8.8.8.8")
+
+    with pytest.raises(SystemExit):
+        InternetDataInfo(module).get_ip_data()
+    assert "429" in module.fail_json.call_args.kwargs["msg"]
