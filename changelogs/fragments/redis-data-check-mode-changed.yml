@@ -1,0 +1,2 @@
+bugfixes:
+  - redis_data - report ``changed=true`` in check mode when the module would set or delete the key, and fail in check mode like a real run when ``non_existing`` or ``existing`` prevents setting the key (https://github.com/ansible-collections/community.general/pull/XXXXX).

@@ -190,6 +190,7 @@ def main():
             else:
                 msg = f"Deleted key: {key}"
                 result["msg"] = msg
+                result["changed"] = True
                 module.exit_json(**result)
         try:
             ret = redis.connection.delete(key)
@@ -222,7 +223,14 @@ def main():
         result["value"] = value
         module.exit_json(**result)
     if module.check_mode:
+        if nx and old_value is not None:
+            result["msg"] = f"Could not set key: {key}. Key already present."
+            module.fail_json(**result)
+        if xx and old_value is None:
+            result["msg"] = f"Could not set key: {key}. Key not present."
+            module.fail_json(**result)
         result["msg"] = f"Set key: {key}"
+        result["changed"] = True
         result["value"] = value
         module.exit_json(**result)
     try:
