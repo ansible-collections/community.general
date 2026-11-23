@@ -102,6 +102,8 @@ class TestOpentelemetry(unittest.TestCase):
     def test_skipped_task_without_runner_start(self):
         callback = CallbackModule()
         callback.play_name = "myplay"
+        # keep the collected data so it can be inspected, it is otherwise released once its span is streamed
+        callback.opentelemetry.stream_task_span = MagicMock()
 
         callback.v2_runner_on_skipped(self.my_task_result)
 
@@ -111,6 +113,7 @@ class TestOpentelemetry(unittest.TestCase):
         host_data = task_data.host_data["myhost_uuid"]
         self.assertEqual(host_data.name, "myhost")
         self.assertEqual(host_data.status, "skipped")
+        callback.opentelemetry.stream_task_span.assert_called_once()
 
     @patch("ansible_collections.community.general.plugins.callback.opentelemetry.Status", create=True)
     @patch("ansible_collections.community.general.plugins.callback.opentelemetry.StatusCode", create=True)
@@ -279,6 +282,133 @@ def test_span_event_carries_the_result_of_its_own_host(mocker):
         span = MagicMock()
         opentelemetry.update_span_data(tasks_data["myuuid"], host_data, span, False, True)
         span.add_event.assert_called_once_with(f'{{"msg": "{host_data.name}"}}', attributes={})
+
+
+def test_spans_are_exported_before_the_playbook_finishes(mocker):
+    pytest.importorskip("opentelemetry.sdk.trace.export.in_memory_span_exporter")
+    from opentelemetry.trace.status import Status, StatusCode
+
+    mocker.patch(
+        "ansible_collections.community.general.plugins.callback.opentelemetry.socket.gethostname",
+        return_value="my-host",
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.callback.opentelemetry.socket.gethostbyname",
+        return_value="1.2.3.4",
+    )
+    opentelemetry = OpenTelemetrySource(display=None)
+    opentelemetry.setup_tracing("ansible", "grpc", "spans.json")
+    opentelemetry.start_playbook_span("myplaybook.yml", None)
+
+    task = Task()
+    task.action = "myaction"
+    task.no_log = False
+    task._uuid = "myuuid"
+    task.args = {}
+    task.get_name = MagicMock(return_value="mytask")
+    task.get_path = MagicMock(return_value="/mypath")
+    host = Mock("MockHost")
+    host.name = "myhost"
+    host._uuid = "myhost_uuid"
+    tasks_data = OrderedDict()
+
+    opentelemetry.start_task(tasks_data, False, "myplay", task, host)
+    result = TaskResult(host=host, task=task, return_data={"msg": "done"}, task_fields={"args": {}})
+    host_data = opentelemetry.finish_task(tasks_data, "ok", result, '{"msg": "done"}')
+    opentelemetry.stream_task_span(tasks_data["myuuid"], host_data, False, True)
+
+    finished_spans = opentelemetry.otel_exporter.get_finished_spans()
+    assert [span.name for span in finished_spans] == ["mytask"]
+    assert finished_spans[0].parent.span_id == opentelemetry.parent_span.get_span_context().span_id
+
+    # the include span is emitted once the playbook span is ended
+    include_result = TaskResult(host=None, task=task, return_data={}, task_fields={"args": {}})
+    opentelemetry.finish_task(tasks_data, "included", include_result, "")
+    assert len(opentelemetry.otel_exporter.get_finished_spans()) == 1
+
+    opentelemetry.end_playbook_span(tasks_data, Status(status_code=StatusCode.OK), False, True)
+    finished_spans = opentelemetry.otel_exporter.get_finished_spans()
+    assert [span.name for span in finished_spans] == ["mytask", "mytask", "myplaybook.yml"]
+    assert finished_spans[-1].status.status_code == StatusCode.OK
+
+
+def test_task_result_is_streamed_as_soon_as_it_is_known(mocker):
+    mocker.patch("ansible_collections.community.general.plugins.callback.opentelemetry.OTEL_LIBRARY_IMPORT_ERROR", None)
+    callback = CallbackModule()
+    callback.disable_logs = True
+    callback.opentelemetry = MagicMock()
+
+    task = Task()
+    task.action = "myaction"
+    task.no_log = False
+    task._uuid = "myuuid"
+    task.args = {}
+    host = Mock("MockHost")
+    host.name = "myhost"
+    host._uuid = "myhost_uuid"
+    callback.tasks_data["myuuid"] = TaskData("myuuid", "mytask", "/mypath", "myplay", "myaction", "")
+    result = TaskResult(host=host, task=task, return_data={}, task_fields={"args": {}})
+
+    callback.v2_runner_on_ok(result)
+
+    callback.opentelemetry.finish_task.assert_called_once_with(callback.tasks_data, "ok", result, "")
+    callback.opentelemetry.stream_task_span.assert_called_once_with(
+        callback.tasks_data["myuuid"], callback.opentelemetry.finish_task.return_value, True, False
+    )
+
+
+def test_task_result_is_released_once_its_span_is_streamed(mocker):
+    mocker.patch("ansible_collections.community.general.plugins.callback.opentelemetry.SpanKind", create=True)
+    mocker.patch("ansible_collections.community.general.plugins.callback.opentelemetry.Status", create=True)
+    mocker.patch("ansible_collections.community.general.plugins.callback.opentelemetry.StatusCode", create=True)
+    mocker.patch(
+        "ansible_collections.community.general.plugins.callback.opentelemetry.socket.gethostname",
+        return_value="my-host",
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.callback.opentelemetry.socket.gethostbyname",
+        return_value="1.2.3.4",
+    )
+    opentelemetry = OpenTelemetrySource(display=None)
+    opentelemetry.tracer = MagicMock()
+    opentelemetry.parent_context = MagicMock()
+    task_data = TaskData("myuuid", "mytask", "/mypath", "myplay", "myaction", {})
+    finished_host_data = HostData("myhost_uuid", "myhost", "ok")
+    task_data.add_host(finished_host_data)
+    task_data.add_host(HostData("otherhost_uuid", "otherhost", "started"))
+
+    opentelemetry.stream_task_span(task_data, finished_host_data, False, True)
+
+    assert list(task_data.host_data) == ["otherhost_uuid"]
+    opentelemetry.tracer.start_span.assert_called_once()
+
+
+def test_unfinished_task_is_not_reported_as_success(mocker):
+    mock_status = mocker.patch(
+        "ansible_collections.community.general.plugins.callback.opentelemetry.Status", create=True
+    )
+    mock_status_code = mocker.patch(
+        "ansible_collections.community.general.plugins.callback.opentelemetry.StatusCode", create=True
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.callback.opentelemetry.socket.gethostname",
+        return_value="my-host",
+    )
+    mocker.patch(
+        "ansible_collections.community.general.plugins.callback.opentelemetry.socket.gethostbyname",
+        return_value="1.2.3.4",
+    )
+    opentelemetry = OpenTelemetrySource(display=None)
+    task_data = TaskData("myuuid", "mytask", "/mypath", "myplay", "myaction", {})
+    host_data = HostData("myhost_uuid", "myhost", "started")
+    span = MagicMock()
+
+    opentelemetry.update_span_data(task_data, host_data, span, False, True)
+
+    mock_status.assert_called_with(status_code=mock_status_code.UNSET, description="not finished")
+    span.set_status.assert_called_once_with(mock_status.return_value)
+    assert span.set_attributes.call_args[0][0]["ansible.task.message"] == "not finished"
+    span.end.assert_called_once_with(end_time=None)
 
 
 def generate_test_data(exception=None, msg=None, stderr=None, failed=False):

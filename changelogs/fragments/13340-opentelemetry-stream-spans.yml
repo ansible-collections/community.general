@@ -1,0 +1,2 @@
+minor_changes:
+  - opentelemetry callback plugin - report the span of each task while the playbook runs (https://github.com/ansible-collections/community.general/pull/13340).
