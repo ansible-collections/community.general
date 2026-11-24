@@ -36,7 +36,7 @@ options:
   http_agent:
     description:
       - Set HTTP user agent.
-    default: "ansible-internetdata-info-module/0.0.1"
+    default: "ansible-community.general.internetdata_info"
     type: str
 notes:
   - Lookups without O(api_key) need no account.
