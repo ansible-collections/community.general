@@ -45,6 +45,7 @@ options:
     description:
       - The type of value to write.
       - V(dict) has been added in community.general 12.5.0.
+      - V(dict) and V(array) values may contain nested dictionaries and arrays.
     type: str
     choices: [array, bool, boolean, date, dict, float, int, integer, string]
     default: string
@@ -64,7 +65,7 @@ options:
     description:
       - Defines the write behavior for O(type=dict) values.
       - V(replace) writes the full dictionary, replacing any existing value.
-      - V(add) merges only the specified keys into the existing dictionary, leaving other keys untouched.
+      - V(add) merges only the specified keys into the existing dictionary, descending into nested dictionaries.
     type: str
     choices: [replace, add]
     default: replace
@@ -156,6 +157,7 @@ EXAMPLES = r"""
 
 import json
 import os
+import plistlib
 import re
 import tempfile
 from datetime import datetime
@@ -258,11 +260,11 @@ class OSXDefaults:
         elif data_type == "array":
             if not isinstance(value, list):
                 raise OSXDefaultsException("Invalid value. Expected value to be an array")
-            return value
+            return OSXDefaults._stringify_keys(value)
         elif data_type in ["dict", "dictionary"]:
             if not isinstance(value, dict):
                 raise OSXDefaultsException("Invalid value. Expected value to be a dict")
-            return value
+            return OSXDefaults._stringify_keys(value)
 
         raise OSXDefaultsException(f"Type is not supported: {data_type}")
 
@@ -280,32 +282,36 @@ class OSXDefaults:
         return [self.executable] + self._host_args()
 
     @staticmethod
-    def _dict_value_to_args(key, val):
-        """Returns the [key, -type, value] tokens for a single dict entry when writing"""
-        if isinstance(val, bool):
-            return [key, "-bool", "TRUE" if val else "FALSE"]
-        elif isinstance(val, int):
-            return [key, "-int", str(val)]
-        elif isinstance(val, float):
-            return [key, "-float", str(val)]
-        else:
-            return [key, "-string", str(val)]
-
-    @staticmethod
-    def _convert_defaults_str_to_list(value):
-        """Converts array output from defaults to an list"""
-        # Split output of defaults. Every line contains a value
-        value = value.splitlines()
-
-        # Remove first and last item, those are not actual values
-        value.pop(0)
-        value.pop(-1)
-
-        # Remove spaces at beginning and comma (,) at the end, unquote and unescape double quotes
-        strip_re = re.compile('^ *"?|"?,? *$')
-        value = [strip_re.sub("", x.replace('\\"', '"')) for x in value]
+    def _stringify_keys(value):
+        """Returns the value with every dictionary key turned into a string, as plists require"""
+        if isinstance(value, dict):
+            return {str(key): OSXDefaults._stringify_keys(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [OSXDefaults._stringify_keys(item) for item in value]
 
         return value
+
+    @staticmethod
+    def _deep_merge(base, update):
+        """Returns base with update merged in, descending into dictionaries that exist on both sides"""
+        result = dict(base)
+        for key, value in update.items():
+            if isinstance(value, dict) and isinstance(result.get(key), dict):
+                result[key] = OSXDefaults._deep_merge(result[key], value)
+            else:
+                result[key] = value
+
+        return result
+
+    @staticmethod
+    def _has_nested_value(value):
+        """Whether the value contains dictionaries or arrays that need plist serialization"""
+        if isinstance(value, dict):
+            return True
+        if isinstance(value, list):
+            return any(isinstance(item, (dict, list)) for item in value)
+
+        return False
 
     # /tools -------------------------------------------------------------- }}}
 
@@ -336,12 +342,9 @@ class OSXDefaults:
         if rc != 0:
             raise OSXDefaultsException(f"An error occurred while reading key value from defaults: {err}")
 
-        # Convert string to list when type is array
-        if data_type == "array":
-            out = self._convert_defaults_str_to_list(out)
-        elif data_type == "dictionary":
-            # Export domain plist to a temp file and use plutil -extract for type-preserving JSON conversion.
-            # Reading via 'defaults read' loses boolean type info (booleans appear as 1/0 in old-style plist text).
+        # Arrays and dictionaries go through plutil so nested values, and the
+        # difference between booleans and 1/0, survive the read.
+        if data_type in ("array", "dictionary"):
             tmp_fd, tmp_path = tempfile.mkstemp(suffix=".plist")
             os.close(tmp_fd)
             try:
@@ -363,17 +366,17 @@ class OSXDefaults:
 
     def write(self):
         """Writes value to this domain & key to defaults"""
-        if self.type == "dict":
-            effective_type = "dict-add" if (self.dict_mode == "add" and self.current_value is not None) else "dict"
-            tokens = []
-            for k, v in self.value.items():
-                tokens.extend(self._dict_value_to_args(str(k), v))
+        if self.type == "dict" or (self.type == "array" and self._has_nested_value(self.value)):
+            if self.array_add:
+                raise OSXDefaultsException("array_add does not support nested values")
+            value = plistlib.dumps(self.value).decode("utf-8")
             rc, out, err = self.module.run_command(
-                self._base_command() + ["write", self.domain, self.key, f"-{effective_type}"] + tokens,
+                self._base_command() + ["write", self.domain, self.key, value],
                 expand_user_and_vars=False,
             )
             if rc != 0:
                 raise OSXDefaultsException(f"An error occurred while writing value to defaults: {err}")
+
             return
 
         # We need to convert some values so the defaults commandline understands it
@@ -433,6 +436,10 @@ class OSXDefaults:
             self.delete()
             return True
 
+        # dict_mode=add writes the existing dictionary with our keys merged in
+        if self.type == "dict" and self.dict_mode == "add":
+            self.value = self._deep_merge(self.current_value or {}, self.value)
+
         # Check if there is a type mismatch, e.g. given type does not match the type in defaults
         if self.check_type:
             value_type = type(self.value)
@@ -440,25 +447,19 @@ class OSXDefaults:
                 raise OSXDefaultsException(f"Type mismatch. Type in defaults: {type(self.current_value).__name__}")
 
         # Current value matches the given value. Nothing need to be done. Arrays need extra care
-        if (
-            self.type == "array"
-            and self.current_value is not None
-            and not self.array_add
-            and set(self.current_value) == set(self.value)
-        ):
-            return False
+        if self.type == "array" and self.current_value is not None and not self.array_add:
+            try:
+                same = set(self.current_value) == set(self.value)
+            except TypeError:
+                # Nested values cannot be put in a set
+                same = self.current_value == self.value
+            if same:
+                return False
         elif (
             self.type == "array"
             and self.current_value is not None
             and self.array_add
             and len(list(set(self.value) - set(self.current_value))) == 0
-        ):
-            return False
-        elif (
-            self.type == "dict"
-            and self.current_value is not None
-            and self.dict_mode == "add"
-            and all(self.current_value.get(k) == v for k, v in self.value.items())
         ):
             return False
         elif self.current_value == self.value:
