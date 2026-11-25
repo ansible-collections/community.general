@@ -259,6 +259,7 @@ def test_redis_set_key_check_mode_delete_nx(capfd, mocker):
             "_ansible_check_mode": True,
         }
     ):
+        redis_set = mocker.patch("redis.Redis.set")
         mocker.patch("redis.Redis.get", return_value=None)
         with pytest.raises(SystemExit):
             redis_data.main()
@@ -268,6 +269,8 @@ def test_redis_set_key_check_mode_delete_nx(capfd, mocker):
     assert json.loads(out)["msg"] == "Set key: foo"
     assert json.loads(out)["value"] == "baz"
     assert json.loads(out)["old_value"] is None
+    assert json.loads(out)["changed"]
+    redis_set.assert_not_called()
 
 
 def test_redis_set_key_check_mode_delete(capfd, mocker):
@@ -281,6 +284,7 @@ def test_redis_set_key_check_mode_delete(capfd, mocker):
             "_ansible_check_mode": True,
         }
     ):
+        redis_set = mocker.patch("redis.Redis.set")
         mocker.patch("redis.Redis.get", return_value=b"bar")
         with pytest.raises(SystemExit):
             redis_data.main()
@@ -290,6 +294,8 @@ def test_redis_set_key_check_mode_delete(capfd, mocker):
     assert json.loads(out)["msg"] == "Set key: foo"
     assert json.loads(out)["value"] == "baz"
     assert json.loads(out)["old_value"] == "bar"
+    assert json.loads(out)["changed"]
+    redis_set.assert_not_called()
 
 
 def test_redis_set_key_check_mode(capfd, mocker):
@@ -303,6 +309,7 @@ def test_redis_set_key_check_mode(capfd, mocker):
             "_ansible_check_mode": True,
         }
     ):
+        redis_set = mocker.patch("redis.Redis.set")
         mocker.patch("redis.Redis.get", return_value=b"bar")
         with pytest.raises(SystemExit):
             redis_data.main()
@@ -312,6 +319,83 @@ def test_redis_set_key_check_mode(capfd, mocker):
     assert json.loads(out)["msg"] == "Set key: foo"
     assert json.loads(out)["value"] == "baz"
     assert json.loads(out)["old_value"] == "bar"
+    assert json.loads(out)["changed"]
+    redis_set.assert_not_called()
+
+
+def test_redis_delete_key_check_mode(capfd, mocker):
+    with set_module_args(
+        {
+            "login_host": "localhost",
+            "login_password": "secret",
+            "key": "foo",
+            "state": "absent",
+            "_ansible_check_mode": True,
+        }
+    ):
+        mocker.patch("redis.Redis.get", return_value=b"bar")
+        redis_delete = mocker.patch("redis.Redis.delete")
+        with pytest.raises(SystemExit):
+            redis_data.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)["msg"] == "Deleted key: foo"
+    assert json.loads(out)["changed"]
+    redis_delete.assert_not_called()
+
+
+def test_redis_delete_key_check_mode_not_present(capfd, mocker):
+    with set_module_args(
+        {
+            "login_host": "localhost",
+            "login_password": "secret",
+            "key": "foo",
+            "state": "absent",
+            "_ansible_check_mode": True,
+        }
+    ):
+        mocker.patch("redis.Redis.get", return_value=None)
+        redis_delete = mocker.patch("redis.Redis.delete")
+        with pytest.raises(SystemExit):
+            redis_data.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)["msg"] == "Key: foo not present"
+    assert not json.loads(out)["changed"]
+    redis_delete.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "extra_args, old_value, expected_msg",
+    [
+        ({"non_existing": True}, b"bar", "Could not set key: foo. Key already present."),
+        ({"existing": True}, None, "Could not set key: foo. Key not present."),
+    ],
+)
+def test_redis_set_key_check_mode_nx_xx_fail(capfd, mocker, extra_args, old_value, expected_msg):
+    with set_module_args(
+        {
+            "login_host": "localhost",
+            "login_password": "secret",
+            "key": "foo",
+            "value": "baz",
+            "_ansible_check_mode": True,
+            **extra_args,
+        }
+    ):
+        redis_set = mocker.patch("redis.Redis.set")
+        mocker.patch("redis.Redis.get", return_value=old_value)
+        with pytest.raises(SystemExit):
+            redis_data.main()
+    out, err = capfd.readouterr()
+    print(out)
+    assert not err
+    assert json.loads(out)["failed"]
+    assert json.loads(out)["msg"] == expected_msg
+    assert not json.loads(out)["changed"]
+    redis_set.assert_not_called()
 
 
 @pytest.mark.parametrize("db_args, expected_db", [({}, 0), ({"db": 1}, 1)])
