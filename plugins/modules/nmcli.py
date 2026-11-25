@@ -1217,375 +1217,188 @@ options:
 """
 
 EXAMPLES = r"""
-# These examples are using the following inventory:
-#
-# ## Directory layout:
-#
-# |_/inventory/cloud-hosts
-# |           /group_vars/openstack-stage.yml
-# |           /host_vars/controller-01.openstack.host.com
-# |           /host_vars/controller-02.openstack.host.com
-# |_/playbook/library/nmcli.py
-# |          /playbook-add.yml
-# |          /playbook-del.yml
-# ```
-#
-# ## inventory examples
-# ### groups_vars
-# ```yml
-# ---
-# #devops_os_define_network
-# storage_gw: "192.0.2.254"
-# external_gw: "198.51.100.254"
-# tenant_gw: "203.0.113.254"
-#
-# #Team vars
-# nmcli_team:
-#   - conn_name: tenant
-#     ip4: '{{ tenant_ip }}'
-#     gw4: '{{ tenant_gw }}'
-#   - conn_name: external
-#     ip4: '{{ external_ip }}'
-#     gw4: '{{ external_gw }}'
-#   - conn_name: storage
-#     ip4: '{{ storage_ip }}'
-#     gw4: '{{ storage_gw }}'
-# nmcli_team_slave:
-#   - conn_name: em1
-#     ifname: em1
-#     master: tenant
-#   - conn_name: em2
-#     ifname: em2
-#     master: tenant
-#   - conn_name: p2p1
-#     ifname: p2p1
-#     master: storage
-#   - conn_name: p2p2
-#     ifname: p2p2
-#     master: external
-#
-# #bond vars
-# nmcli_bond:
-#   - conn_name: tenant
-#     ip4: '{{ tenant_ip }}'
-#     gw4: ''
-#     mode: balance-rr
-#   - conn_name: external
-#     ip4: '{{ external_ip }}'
-#     gw4: ''
-#     mode: balance-rr
-#   - conn_name: storage
-#     ip4: '{{ storage_ip }}'
-#     gw4: '{{ storage_gw }}'
-#     mode: balance-rr
-# nmcli_bond_slave:
-#   - conn_name: em1
-#     ifname: em1
-#     master: tenant
-#   - conn_name: em2
-#     ifname: em2
-#     master: tenant
-#   - conn_name: p2p1
-#     ifname: p2p1
-#     master: storage
-#   - conn_name: p2p2
-#     ifname: p2p2
-#     master: external
-#
-# #ethernet vars
-# nmcli_ethernet:
-#   - conn_name: em1
-#     ifname: em1
-#     ip4:
-#       - '{{ tenant_ip }}'
-#       - '{{ second_tenant_ip }}'
-#     gw4: '{{ tenant_gw }}'
-#   - conn_name: em2
-#     ifname: em2
-#     ip4: '{{ tenant_ip1 }}'
-#     gw4: '{{ tenant_gw }}'
-#   - conn_name: p2p1
-#     ifname: p2p1
-#     ip4: '{{ storage_ip }}'
-#     gw4: '{{ storage_gw }}'
-#   - conn_name: p2p2
-#     ifname: p2p2
-#     ip4: '{{ external_ip }}'
-#     gw4: '{{ external_gw }}'
-# ```
-#
-# ### host_vars
-# ```yml
-# ---
-# storage_ip: "192.0.2.91/23"
-# external_ip: "198.51.100.23/21"
-# tenant_ip: "203.0.113.77/23"
-# second_tenant_ip: "204.0.113.77/23"
-# ```
+- name: Add an Ethernet connection with a static IPv4 address
+  community.general.nmcli:
+    conn_name: my-eth1
+    ifname: eth1
+    type: ethernet
+    ip4: 192.0.2.100/24
+    gw4: 192.0.2.1
+    state: present
 
+- name: Add an Ethernet connection with static IPv4 and IPv6 addresses
+  community.general.nmcli:
+    conn_name: my-eth1
+    ifname: eth1
+    type: ethernet
+    ip4: 192.0.2.100/24
+    gw4: 192.0.2.1
+    ip6: 2001:db8::cafe
+    gw6: 2001:db8::1
+    state: present
 
-## playbook-add.yml example
+- name: Add two IPv4 DNS server addresses
+  community.general.nmcli:
+    conn_name: my-eth1
+    type: ethernet
+    dns4:
+      - 192.0.2.53
+      - 198.51.100.53
+    state: present
 
-- hosts: openstack-stage
-  remote_user: root
-  tasks:
+- name: Make a profile usable for all compatible Ethernet interfaces
+  community.general.nmcli:
+    conn_name: my-eth1
+    type: ethernet
+    ifname: '*'
+    state: present
 
-    - name: Install needed network manager libs
-      ansible.builtin.package:
-        name:
-          - NetworkManager-libnm
-          - nm-connection-editor
-          - libsemanage-python
-          - policycoreutils-python
-        state: present
+- name: Change the MTU
+  community.general.nmcli:
+    conn_name: my-eth1
+    mtu: 9000
+    type: ethernet
+    state: present
 
-##### Working with all cloud nodes - Teaming
-    - name: Try nmcli add team - conn_name only & ip4 gw4
-      community.general.nmcli:
-        type: team
-        conn_name: '{{ item.conn_name }}'
-        ip4: '{{ item.ip4 }}'
-        gw4: '{{ item.gw4 }}'
-        state: present
-      with_items:
-        - '{{ nmcli_team }}'
+- name: Change the MTU and reload the connection
+  community.general.nmcli:
+    conn_name: my-eth1
+    mtu: 1500
+    type: ethernet
+    state: present
+    conn_reload: true
 
-    - name: Try nmcli add teams-slave
-      community.general.nmcli:
-        type: team-slave
-        conn_name: '{{ item.conn_name }}'
-        ifname: '{{ item.ifname }}'
-        master: '{{ item.master }}'
-        state: present
-      with_items:
-        - '{{ nmcli_team_slave }}'
+- name: Disable a connection
+  community.general.nmcli:
+    conn_name: my-eth1
+    state: down
 
-##### Working with all cloud nodes - Bonding
-    - name: Try nmcli add bond - conn_name only & ip4 gw4 mode
-      community.general.nmcli:
-        type: bond
-        conn_name: '{{ item.conn_name }}'
-        ip4: '{{ item.ip4 }}'
-        gw4: '{{ item.gw4 }}'
-        mode: '{{ item.mode }}'
-        state: present
-      with_items:
-        - '{{ nmcli_bond }}'
+- name: Reload and enable a connection
+  community.general.nmcli:
+    conn_name: my-eth1
+    state: up
+    conn_reload: true
 
-    - name: Try nmcli add bond-slave
-      community.general.nmcli:
-        type: bond-slave
-        conn_name: '{{ item.conn_name }}'
-        ifname: '{{ item.ifname }}'
-        master: '{{ item.master }}'
-        state: present
-      with_items:
-        - '{{ nmcli_bond_slave }}'
+- name: Add a second IPv4 address
+  community.general.nmcli:
+    conn_name: my-eth1
+    ifname: eth1
+    type: ethernet
+    ip4:
+      - 192.0.2.100/24
+      - 198.51.100.100/24
+    state: present
 
-##### Working with all cloud nodes - Ethernet
-    - name: Try nmcli add Ethernet - conn_name only & ip4 gw4
-      community.general.nmcli:
-        type: ethernet
-        conn_name: '{{ item.conn_name }}'
-        ip4: '{{ item.ip4 }}'
-        gw4: '{{ item.gw4 }}'
-        state: present
-      with_items:
-        - '{{ nmcli_ethernet }}'
+- name: Add a second IPv6 address
+  community.general.nmcli:
+    conn_name: my-eth1
+    ifname: eth1
+    type: ethernet
+    ip6:
+      - 2001:db8::cafe
+      - 2001:db8:1::cafe
+    state: present
 
-## playbook-del.yml example
-- hosts: openstack-stage
-  remote_user: root
-  tasks:
+- name: Disable IPv6 and remove the existing IPv6 addresses
+  community.general.nmcli:
+    conn_name: my-eth1
+    type: ethernet
+    method6: disabled
+    ip6: []
+    state: present
 
-    - name: Try nmcli del team - multiple
-      community.general.nmcli:
-        conn_name: '{{ item.conn_name }}'
-        state: absent
-      with_items:
-        - conn_name: em1
-        - conn_name: em2
-        - conn_name: p1p1
-        - conn_name: p1p2
-        - conn_name: p2p1
-        - conn_name: p2p2
-        - conn_name: tenant
-        - conn_name: storage
-        - conn_name: external
-        - conn_name: team-em1
-        - conn_name: team-em2
-        - conn_name: team-p1p1
-        - conn_name: team-p1p2
-        - conn_name: team-p2p1
-        - conn_name: team-p2p2
+- name: Set the firewall zone of a connection
+  community.general.nmcli:
+    type: ethernet
+    conn_name: my-eth1
+    zone: external
+    state: present
 
-    - name: Add an Ethernet connection with static IP configuration
-      community.general.nmcli:
-        conn_name: my-eth1
-        ifname: eth1
-        type: ethernet
-        ip4: 192.0.2.100/24
-        gw4: 192.0.2.1
-        state: present
+- name: Add a team connection with a static IPv4 address
+  community.general.nmcli:
+    conn_name: my-team1
+    ifname: my-team1
+    type: team
+    ip4: 203.0.113.10/24
+    gw4: 203.0.113.1
+    state: present
+    autoconnect: true
 
-    - name: Add an Team connection with static IP configuration
-      community.general.nmcli:
-        conn_name: my-team1
-        ifname: my-team1
-        type: team
-        ip4: 192.0.2.100/24
-        gw4: 192.0.2.1
-        state: present
-        autoconnect: true
+- name: Add eth2 to the team
+  community.general.nmcli:
+    conn_name: my-team1-eth2
+    ifname: eth2
+    type: team-slave
+    master: my-team1
+    state: present
 
-    - name: Optionally, at the same time specify IPv6 addresses for the device
-      community.general.nmcli:
-        conn_name: my-eth1
-        ifname: eth1
-        type: ethernet
-        ip4: 192.0.2.100/24
-        gw4: 192.0.2.1
-        ip6: 2001:db8::cafe
-        gw6: 2001:db8::1
-        state: present
+- name: Add a bond connection in balance-rr mode
+  community.general.nmcli:
+    conn_name: my-bond1
+    ifname: my-bond1
+    type: bond
+    mode: balance-rr
+    ip4: 198.51.100.10/24
+    gw4: 198.51.100.1
+    state: present
 
-    - name: Add two IPv4 DNS server addresses
-      community.general.nmcli:
-        conn_name: my-eth1
-        type: ethernet
-        dns4:
-          - 192.0.2.53
-          - 198.51.100.53
-        state: present
+- name: Add eth3 to the bond
+  community.general.nmcli:
+    conn_name: my-bond1-eth3
+    ifname: eth3
+    type: bond-slave
+    master: my-bond1
+    state: present
 
-    - name: Make a profile usable for all compatible Ethernet interfaces
-      community.general.nmcli:
-        ctype: ethernet
-        name: my-eth1
-        ifname: '*'
-        state: present
+- name: Add a VXLAN connection
+  community.general.nmcli:
+    type: vxlan
+    conn_name: vxlan_test1
+    vxlan_id: 16
+    vxlan_local: 192.168.1.2
+    vxlan_remote: 192.168.1.5
+    state: present
 
-    - name: Change the property of a setting e.g. MTU
-      community.general.nmcli:
-        conn_name: my-eth1
-        mtu: 9000
-        type: ethernet
-        state: present
+- name: Add a multicast VXLAN connection attached to a bridge
+  community.general.nmcli:
+    type: vxlan
+    conn_name: vxlan_test2
+    vxlan_id: 17
+    vxlan_parent: eth1
+    vxlan_local: 192.168.1.2
+    vxlan_remote: 239.192.0.17
+    slave_type: bridge
+    master: br0
+    state: present
 
-    - name: Change the property of a setting e.g. MTU and reload connection
-      community.general.nmcli:
-        conn_name: my-eth1
-        mtu: 1500
-        type: ethernet
-        state: present
-        conn_reload: true
+- name: Add a GRE tunnel
+  community.general.nmcli:
+    type: gre
+    conn_name: gre_test1
+    ip_tunnel_dev: eth0
+    ip_tunnel_local: 192.168.1.2
+    ip_tunnel_remote: 192.168.1.5
+    state: present
 
-    - name: Disable connection
-      community.general.nmcli:
-        conn_name: my-eth1
-        state: down
+- name: Add an IPIP tunnel
+  community.general.nmcli:
+    type: ipip
+    conn_name: ipip_test1
+    ip_tunnel_dev: eth0
+    ip_tunnel_local: 192.168.1.2
+    ip_tunnel_remote: 192.168.1.5
+    state: present
 
-    - name: Reload and enable connection
-      community.general.nmcli:
-        conn_name: my-eth1
-        state: up
-        conn_reload: true
+- name: Add a SIT tunnel
+  community.general.nmcli:
+    type: sit
+    conn_name: sit_test1
+    ip_tunnel_dev: eth0
+    ip_tunnel_local: 192.168.1.2
+    ip_tunnel_remote: 192.168.1.5
+    state: present
 
-    - name: Add second ip4 address
-      community.general.nmcli:
-        conn_name: my-eth1
-        ifname: eth1
-        type: ethernet
-        ip4:
-          - 192.0.2.100/24
-          - 192.0.3.100/24
-        state: present
-
-    - name: Add second ip6 address
-      community.general.nmcli:
-        conn_name: my-eth1
-        ifname: eth1
-        type: ethernet
-        ip6:
-          - 2001:db8::cafe
-          - 2002:db8::cafe
-        state: present
-
-    - name: Disable IPv6 and remove the existing IPv6 addresses
-      community.general.nmcli:
-        conn_name: my-eth1
-        type: ethernet
-        method6: disabled
-        ip6: []
-        state: present
-
-    - name: Add VxLan
-      community.general.nmcli:
-        type: vxlan
-        conn_name: vxlan_test1
-        vxlan_id: 16
-        vxlan_local: 192.168.1.2
-        vxlan_remote: 192.168.1.5
-
-    - name: Add VxLan via multicast on a bridge
-      community.general.nmcli:
-        type: vxlan
-        conn_name: vxlan_test2
-        vxlan_id: 17
-        vxlan_parent: eth1
-        vxlan_local: 192.168.1.2
-        vxlan_remote: 239.192.0.17
-        slave_type: bridge
-        master: br0
-
-    - name: Add gre
-      community.general.nmcli:
-        type: gre
-        conn_name: gre_test1
-        ip_tunnel_dev: eth0
-        ip_tunnel_local: 192.168.1.2
-        ip_tunnel_remote: 192.168.1.5
-
-    - name: Add ipip
-      community.general.nmcli:
-        type: ipip
-        conn_name: ipip_test1
-        ip_tunnel_dev: eth0
-        ip_tunnel_local: 192.168.1.2
-        ip_tunnel_remote: 192.168.1.5
-
-    - name: Add sit
-      community.general.nmcli:
-        type: sit
-        conn_name: sit_test1
-        ip_tunnel_dev: eth0
-        ip_tunnel_local: 192.168.1.2
-        ip_tunnel_remote: 192.168.1.5
-
-    - name: Add zone
-      community.general.nmcli:
-        type: ethernet
-        conn_name: my-eth1
-        zone: external
-        state: present
-
-# nmcli exits with status 0 if it succeeds and exits with a status greater
-# than zero when there is a failure. The following list of status codes may be
-# returned:
-#
-#     - 0 Success - indicates the operation succeeded
-#     - 1 Unknown or unspecified error
-#     - 2 Invalid user input, wrong nmcli invocation
-#     - 3 Timeout expired (see --wait option)
-#     - 4 Connection activation failed
-#     - 5 Connection deactivation failed
-#     - 6 Disconnecting device failed
-#     - 7 Connection deletion failed
-#     - 8 NetworkManager is not running
-#     - 9 nmcli and NetworkManager versions mismatch
-#     - 10 Connection, device, or access point does not exist.
-
-- name: Create the wifi connection
+- name: Add a Wi-Fi connection with WPA-PSK
   community.general.nmcli:
     type: wifi
     conn_name: Brittany
@@ -1597,7 +1410,7 @@ EXAMPLES = r"""
     autoconnect: true
     state: present
 
-- name: Create a hidden AP mode wifi connection
+- name: Add a hidden Wi-Fi access point
   community.general.nmcli:
     type: wifi
     conn_name: ChocoMaster
@@ -1609,7 +1422,7 @@ EXAMPLES = r"""
     autoconnect: true
     state: present
 
-- name: Create a gsm connection
+- name: Add a GSM connection
   community.general.nmcli:
     type: gsm
     conn_name: my-gsm-provider
@@ -1622,7 +1435,7 @@ EXAMPLES = r"""
     autoconnect: true
     state: present
 
-- name: Create a macvlan connection
+- name: Add a MACVLAN connection
   community.general.nmcli:
     type: macvlan
     conn_name: my-macvlan-connection
@@ -1633,7 +1446,7 @@ EXAMPLES = r"""
     autoconnect: true
     state: present
 
-- name: Create a wireguard connection
+- name: Add a WireGuard connection
   community.general.nmcli:
     type: wireguard
     conn_name: my-wg-provider
@@ -1644,9 +1457,7 @@ EXAMPLES = r"""
     autoconnect: true
     state: present
 
-- name: >-
-    Create a VPN L2TP connection for ansible_user to connect on vpn.example.com
-    authenticating with user 'brittany' and pre-shared key as 'Brittany123'
+- name: Add an L2TP VPN connection for user brittany with a pre-shared key
   community.general.nmcli:
     type: vpn
     conn_name: my-vpn-connection
@@ -1661,16 +1472,7 @@ EXAMPLES = r"""
     autoconnect: false
     state: present
 
-## Creating bond attached to bridge example
-- name: Create bond attached to bridge
-  community.general.nmcli:
-    type: bond
-    conn_name: bond0
-    slave_type: bridge
-    master: br0
-    state: present
-
-- name: Create master bridge
+- name: Add a bridge without IP addresses
   community.general.nmcli:
     type: bridge
     conn_name: br0
@@ -1678,14 +1480,15 @@ EXAMPLES = r"""
     method6: disabled
     state: present
 
-## Creating vlan connection attached to bridge
-- name: Create master bridge
+- name: Attach a bond to the bridge
   community.general.nmcli:
-    type: bridge
-    conn_name: br0
+    type: bond
+    conn_name: bond0
+    slave_type: bridge
+    master: br0
     state: present
 
-- name: Create VLAN 5
+- name: Attach VLAN 5 on eth0 to the bridge
   community.general.nmcli:
     type: vlan
     conn_name: eth0.5
@@ -1695,8 +1498,7 @@ EXAMPLES = r"""
     vlanid: 5
     state: present
 
-## Creating VRF and adding VLAN interface to it
-- name: Create VRF
+- name: Add a VRF that uses routing table 10
   community.general.nmcli:
     type: vrf
     ifname: vrf10
@@ -1706,36 +1508,33 @@ EXAMPLES = r"""
     method4: disabled
     method6: disabled
 
-- name: Create VLAN interface inside VRF
+- name: Add VLAN 124 on eth0 to the VRF
   community.general.nmcli:
-    conn_name: "eth0.124"
+    conn_name: eth0.124
     type: vlan
-    vlanid: "124"
-    vlandev: "eth0"
-    master: "vrf10"
+    vlanid: 124
+    vlandev: eth0
+    master: vrf10
     slave_type: vrf
-    state: "present"
-    ip4: '192.168.124.50'
-    gw4: '192.168.124.1'
+    state: present
+    ip4: 192.168.124.50
+    gw4: 192.168.124.1
 
-## Defining ip rules while setting a static IP
-## table 'production' is set with id 200 in this example.
-- name: Set Static ips for interface with ip rules and routes
+- name: Set a static IPv4 address with a default route and a rule in table 200
   community.general.nmcli:
     type: ethernet
-    conn_name: 'eth0'
-    ip4: '192.168.1.50'
-    gw4: '192.168.1.1'
+    conn_name: eth0
+    ip4: 192.168.1.50
+    gw4: 192.168.1.1
     state: present
     routes4_extended:
-      - ip: "0.0.0.0/0"
-        next_hop: "192.168.1.1"
-        table: "production"
+      - ip: 0.0.0.0/0
+        next_hop: 192.168.1.1
+        table: 200
     routing_rules4:
-      - "priority 0 from 192.168.1.50 table 200"
+      - priority 0 from 192.168.1.50 table 200
 
-## Putting all routes of a second interface, including its default route, into table 100
-- name: Use routing table 100 for eth1
+- name: Put all routes of eth1, including its default route, in table 100
   community.general.nmcli:
     type: ethernet
     conn_name: eth1
@@ -1744,18 +1543,17 @@ EXAMPLES = r"""
     gw4: 192.168.2.1
     route_table4: 100
     routing_rules4:
-      - "priority 100 from 192.168.2.10 table 100"
+      - priority 100 from 192.168.2.10 table 100
     state: present
 
-## Creating an OVS bridge and attaching a port
-- name: Create OVS Bridge
+- name: Add an OVS bridge
   community.general.nmcli:
     conn_name: ovs-br-conn
     ifname: ovs-br
     type: ovs-bridge
     state: present
 
-- name: Create OVS Port for OVS Bridge Interface
+- name: Add a port to the OVS bridge
   community.general.nmcli:
     conn_name: ovs-br-interface-port-conn
     ifname: ovs-br-interface-port
@@ -1763,8 +1561,7 @@ EXAMPLES = r"""
     type: ovs-port
     state: present
 
-## Adding an ethernet interface to an OVS bridge port
-- name: Add Ethernet Interface to OVS Port
+- name: Add eno1 to the OVS port
   community.general.nmcli:
     conn_name: eno1
     ifname: eno1
@@ -1772,6 +1569,17 @@ EXAMPLES = r"""
     slave_type: ovs-port
     type: ethernet
     state: present
+
+- name: Remove several connections
+  community.general.nmcli:
+    conn_name: "{{ item }}"
+    state: absent
+  loop:
+    - my-eth1
+    - my-team1
+    - my-team1-eth2
+    - my-bond1
+    - my-bond1-eth3
 """
 
 RETURN = r"""#
