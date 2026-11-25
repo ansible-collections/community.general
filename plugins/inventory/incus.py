@@ -14,6 +14,7 @@ requirements:
   - Incus CLI (C(incus))
 description:
   - Get inventory hosts from the Incus container and virtual-machine manager.
+  - Uses a configuration file as an inventory source, its filename must end in C(incus.yml) or C(incus.yaml).
 options:
   plugin:
     description:
