@@ -11,6 +11,7 @@ module: scaleway_organization_info
 short_description: Gather information about the Scaleway organizations available
 description:
   - Gather information about the Scaleway organizations available.
+  - The organizations are determined from the projects that the API token can access.
 author:
   - "Yanis Guenane (@Spredzy)"
   - "Remy Leone (@remyleone)"
@@ -23,7 +24,7 @@ options:
   api_url:
     description:
       - Scaleway API URL.
-    default: 'https://account.scaleway.com'
+    default: 'https://api.scaleway.com'
     aliases: ['base_url']
 extends_documentation_fragment:
   - community.general._scaleway
@@ -43,32 +44,22 @@ EXAMPLES = r"""
 
 RETURN = r"""
 scaleway_organization_info:
-  description: Response from Scaleway API.
+  description:
+    - List of the organizations of the projects that the API token can access.
+    - Earlier versions of this module used a legacy Scaleway API that is no longer available.
+      The organization details that API returned, such as address, currency, and users, cannot be obtained anymore.
   returned: success
   type: list
   elements: dict
+  contains:
+    id:
+      description: ID of the organization.
+      type: str
+      sample: 3f709602-5e6c-4619-b80c-e8432ferewtr
   sample:
     [
       {
-        "address_city_name": "Paris",
-        "address_country_code": "FR",
-        "address_line1": "42 Rue de l'univers",
-        "address_line2": null,
-        "address_postal_code": "75042",
-        "address_subdivision_code": "FR-75",
-        "creation_date": "2018-08-06T13:43:28.508575+00:00",
-        "currency": "EUR",
-        "customer_class": "individual",
-        "id": "3f709602-5e6c-4619-b80c-e8432ferewtr",
-        "locale": "fr_FR",
-        "modification_date": "2018-08-06T14:56:41.401685+00:00",
-        "name": "James Bond",
-        "support_id": "694324",
-        "support_level": "basic",
-        "support_pin": "9324",
-        "users": [],
-        "vat_number": null,
-        "warnings": []
+        "id": "3f709602-5e6c-4619-b80c-e8432ferewtr"
       }
     ]
 """
@@ -77,15 +68,14 @@ from ansible.module_utils.basic import AnsibleModule, env_fallback
 
 from ansible_collections.community.general.plugins.module_utils._scaleway import (
     Scaleway,
-    ScalewayException,
     scaleway_argument_spec,
 )
 
 
-class ScalewayOrganizationInfo(Scaleway):
-    def __init__(self, module):
-        super().__init__(module)
-        self.name = "organizations"
+def get_organizations(api):
+    projects = api.fetch_all_resources("projects")
+    organization_ids = dict.fromkeys(project["organization_id"] for project in projects)
+    return [{"id": organization_id} for organization_id in organization_ids]
 
 
 def main():
@@ -93,7 +83,7 @@ def main():
     argument_spec.update(
         dict(
             api_url=dict(
-                fallback=(env_fallback, ["SCW_API_URL"]), default="https://account.scaleway.com", aliases=["base_url"]
+                fallback=(env_fallback, ["SCW_API_URL"]), default="https://api.scaleway.com", aliases=["base_url"]
             ),
         )
     )
@@ -103,10 +93,10 @@ def main():
         supports_check_mode=True,
     )
 
-    try:
-        module.exit_json(scaleway_organization_info=ScalewayOrganizationInfo(module).get_resources())
-    except ScalewayException as exc:
-        module.fail_json(msg=exc.message)
+    api = Scaleway(module)
+    api.api_path = "account/v3/projects"
+
+    module.exit_json(scaleway_organization_info=get_organizations(api))
 
 
 if __name__ == "__main__":
