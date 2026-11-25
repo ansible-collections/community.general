@@ -590,7 +590,8 @@ def main():
     elif state == "absent":
         if not exists:
             exit_unchanged()
-        rc, stdout, stderr = remove_repo(module, old_repos[0]["alias"])
+        for oldrepo in old_repos:
+            rc, stdout, stderr = remove_repo(module, oldrepo["alias"])
 
     if rc == 0:
         if state == "present" and remove_others:

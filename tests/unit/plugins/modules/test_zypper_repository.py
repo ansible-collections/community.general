@@ -200,3 +200,23 @@ def test_absent_removes_matched_repo(mocker, capsys, args):
         ["/usr/bin/zypper", "--quiet", "--non-interactive", "removerepo", "local"], check_rc=True
     )
     assert json.loads(capsys.readouterr().out)["changed"] is True
+
+
+def test_absent_removes_all_matched_repos_with_overwrite_multiple(mocker, capsys):
+    existing = [{"alias": "local", "url": "dir:/srv/repo"}, {"alias": "other", "url": "dir:/srv/repo"}]
+    mocker.patch.object(zypper_repository, "_parse_repos", return_value=existing)
+    mocker.patch.object(
+        zypper_repository, "get_zypper_version", return_value=zypper_repository.LooseVersion("1.14.101")
+    )
+    mocker.patch.object(zypper_repository.AnsibleModule, "get_bin_path", return_value="/usr/bin/zypper")
+    run_command = mocker.patch.object(zypper_repository.AnsibleModule, "run_command", return_value=(0, "", ""))
+    args = {"name": "local", "repo": "dir:///srv/repo", "state": "absent", "overwrite_multiple": True}
+
+    with set_module_args(args), pytest.raises(SystemExit):
+        zypper_repository.main()
+
+    assert run_command.call_args_list == [
+        mocker.call(["/usr/bin/zypper", "--quiet", "--non-interactive", "removerepo", "local"], check_rc=True),
+        mocker.call(["/usr/bin/zypper", "--quiet", "--non-interactive", "removerepo", "other"], check_rc=True),
+    ]
+    assert json.loads(capsys.readouterr().out)["changed"] is True
