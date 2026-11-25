@@ -1,0 +1,30 @@
+---
+# Copyright (c) 2026, Travis Beale (@travisbeale)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Exercise Nix with an isolated user environment
+  # Keep the fixture profiles isolated with Nix's use-xdg-base-directories setting.
+  when: >-
+    (ansible_facts.distribution == 'Debian' and ansible_facts.distribution_major_version | int >= 13) or
+    (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_version is version('24.04', '>='))
+  block:
+    - name: Install Nix
+      ansible.builtin.apt:
+        name: nix-bin
+        install_recommends: false
+        state: present
+
+    - name: Create temporary directory
+      ansible.builtin.tempfile:
+        state: directory
+      register: nix_tmp
+
+    - name: Exercise packages and channels
+      ansible.builtin.include_tasks: exercise.yml
+  always:
+    - name: Remove temporary directory
+      ansible.builtin.file:
+        path: "{{ nix_tmp.path }}"
+        state: absent
+      when: nix_tmp.path is defined

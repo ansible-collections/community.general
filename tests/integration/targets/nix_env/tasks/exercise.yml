@@ -1,0 +1,197 @@
+---
+# Copyright (c) 2026, Travis Beale (@travisbeale)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Run Nix operations
+  environment:
+    HOME: "{{ nix_tmp.path }}"
+    XDG_STATE_HOME: "{{ nix_tmp.path }}/state"
+    NIX_REMOTE: local
+    NIX_CONFIG: |
+      use-xdg-base-directories = true
+      sandbox = false
+      build-users-group =
+      substituters =
+  block:
+    - name: Create fixture channel directory
+      ansible.builtin.file:
+        path: "{{ nix_tmp.path }}/fixture"
+        state: directory
+        mode: '0700'
+
+    - name: Create package with a distinct attribute and package name
+      ansible.builtin.copy:
+        dest: "{{ nix_tmp.path }}/fixture/default.nix"
+        mode: '0600'
+        content: |
+          { sample = derivation {
+              name = "cg-nix-package-1.0";
+              system = builtins.currentSystem;
+              builder = "/bin/sh";
+              args = [ "-c" "/bin/mkdir -p $out/bin && echo 1 > $out/bin/sample" ];
+          }; }
+
+    - name: Archive the channel
+      ansible.builtin.command:
+        argv: [tar, -cJf, channel-unstable.tar.xz, fixture]
+        chdir: "{{ nix_tmp.path }}"
+
+    - name: Preview channel subscription
+      community.general.nix_channel:
+        name: fixture
+        url: "file://{{ nix_tmp.path }}/channel-unstable.tar.xz"
+      check_mode: true
+      register: preview_channel
+
+    - name: Subscribe and fetch channel
+      community.general.nix_channel:
+        name: fixture
+        url: "file://{{ nix_tmp.path }}/channel-unstable.tar.xz"
+        update: true
+      register: subscribe_channel
+
+    - name: Repeat subscription
+      community.general.nix_channel:
+        name: fixture
+        url: "file://{{ nix_tmp.path }}/channel-unstable.tar.xz"
+      register: repeat_channel
+
+    - name: Refresh all channels
+      community.general.nix_channel:
+        update: true
+      register: refresh_channel
+
+    - name: Preview installation
+      community.general.nix_env:
+        name: fixture.sample
+        state: present
+      check_mode: true
+      register: preview_install
+
+    - name: Install fixture
+      community.general.nix_env:
+        name: fixture.sample
+        state: present
+      register: install_package
+
+    - name: Repeat installation
+      community.general.nix_env:
+        name: fixture.sample
+        state: present
+      register: repeat_install
+
+    - name: Check latest build
+      community.general.nix_env:
+        name: fixture.sample
+        state: latest
+      register: latest_package
+
+    - name: Publish a newer version of the fixture
+      ansible.builtin.replace:
+        path: "{{ nix_tmp.path }}/fixture/default.nix"
+        regexp: cg-nix-package-1[.]0
+        replace: cg-nix-package-2.0
+
+    - name: Package the updated channel at a new URL
+      ansible.builtin.command:
+        argv: [tar, -cJf, next.tar.xz, fixture]
+        chdir: "{{ nix_tmp.path }}"
+
+    - name: Switch the subscribed channel to the new URL and refresh it
+      community.general.nix_channel:
+        name: fixture
+        url: "file://{{ nix_tmp.path }}/next.tar.xz"
+        update: true
+      register: switch_channel
+
+    - name: Keep an installed version when present is requested
+      community.general.nix_env:
+        name: fixture.sample
+      register: keep_package
+
+    - name: Preview upgrading the package
+      community.general.nix_env:
+        name: fixture.sample
+        state: latest
+      check_mode: true
+      register: preview_upgrade
+
+    - name: Upgrade the package
+      community.general.nix_env:
+        name: fixture.sample
+        state: latest
+      register: upgrade_package
+
+    - name: Repeat the upgrade
+      community.general.nix_env:
+        name: fixture.sample
+        state: latest
+      register: repeat_upgrade
+
+    - name: Remove package
+      community.general.nix_env:
+        name: cg-nix-package
+        state: absent
+      register: remove_package
+
+    - name: Repeat removal
+      community.general.nix_env:
+        name: cg-nix-package
+        state: absent
+      register: repeat_remove
+
+    - name: Report an unknown channel when refreshing by name
+      community.general.nix_channel:
+        name: [fixture, missing-channel]
+        update: true
+      register: missing_channel
+      ignore_errors: true
+
+    - name: Subscribe with the name derived from the URL
+      community.general.nix_channel:
+        url: "file://{{ nix_tmp.path }}/next.tar.xz"
+      register: derive_name
+
+    - name: Remove the derived channel by name
+      community.general.nix_channel:
+        name: next.tar.xz
+        state: absent
+      register: remove_derived
+
+    - name: Remove channel
+      community.general.nix_channel:
+        name: fixture
+        state: absent
+      register: remove_channel
+
+    - name: Repeat channel removal
+      community.general.nix_channel:
+        name: fixture
+        state: absent
+      register: repeat_remove_channel
+
+    - name: Verify package and channel results
+      ansible.builtin.assert:
+        that:
+          - preview_channel is changed
+          - subscribe_channel is changed
+          - repeat_channel is not changed
+          - refresh_channel is not changed
+          - preview_install is changed
+          - install_package is changed
+          - repeat_install is not changed
+          - latest_package is not changed
+          - missing_channel is failed
+          - "'Unknown channel: missing-channel' in missing_channel.msg"
+          - derive_name is changed
+          - remove_derived is changed
+          - switch_channel is changed
+          - keep_package is not changed
+          - preview_upgrade is changed
+          - upgrade_package is changed
+          - repeat_upgrade is not changed
+          - remove_package is changed
+          - repeat_remove is not changed
+          - remove_channel is changed
+          - repeat_remove_channel is not changed

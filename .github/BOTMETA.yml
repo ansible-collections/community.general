@@ -1092,6 +1092,10 @@ files:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
     labels: solaris
     maintainers: $team_solaris SmithX10
+  $modules/nix_channel.py:
+    maintainers: travisbeale
+  $modules/nix_env.py:
+    maintainers: travisbeale
   $modules/nmcli.py:
     maintainers: alcamie101
   $modules/nomad_:
