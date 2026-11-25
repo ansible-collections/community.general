@@ -5,4 +5,9 @@
 
 - ansible.builtin.include_tasks: setup.yml
 - ansible.builtin.include_tasks: test.yml
+  vars:
+    # sample: node-v8.2.0-linux-x64.tar.xz
+    node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
 - ansible.builtin.include_tasks: no_bin_links.yml
+  vars:
+    node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
