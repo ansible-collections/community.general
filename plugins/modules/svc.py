@@ -145,13 +145,7 @@ class Svc:
         self.svc_full = f"{self.service_dir}/{self.name}"
         self.src_full = f"{self.service_src}/{self.name}"
 
-        self.enabled = os.path.lexists(self.svc_full)
-        if self.enabled:
-            self.downed = os.path.lexists(f"{self.svc_full}/down")
-            self.get_status()
-        else:
-            self.downed = os.path.lexists(f"{self.src_full}/down")
-            self.state = "stopped"
+        self.get_status()
 
     def enable(self):
         if os.path.exists(self.src_full):
@@ -174,6 +168,14 @@ class Svc:
             self.execute_command([self.svc_cmd, "-dx", src_log])
 
     def get_status(self):
+        self.enabled = os.path.lexists(self.svc_full)
+        if not self.enabled:
+            # svstat only prints an error for a service directory that does not exist
+            self.downed = os.path.lexists(f"{self.src_full}/down")
+            self.state = "stopped"
+            return
+
+        self.downed = os.path.lexists(f"{self.svc_full}/down")
         rc, out, err = self.execute_command([self.svstat_cmd, self.svc_full])
 
         if err is not None and err:
@@ -263,7 +265,6 @@ def main():
 
     svc = Svc(module)
     changed = False
-    dummy_orig_state = svc.report()  # TODO - is this not needed?
 
     if enabled is not None and enabled != svc.enabled:
         changed = True
