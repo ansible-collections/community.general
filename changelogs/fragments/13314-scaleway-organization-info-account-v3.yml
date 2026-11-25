@@ -1,0 +1,2 @@
+bugfixes:
+  - scaleway_organization_info - fix listing organizations, and return only the ID of each organization (https://github.com/ansible-collections/community.general/issues/3782, https://github.com/ansible-collections/community.general/pull/13314).
