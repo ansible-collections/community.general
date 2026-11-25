@@ -13,7 +13,9 @@ author:
 requirements:
   - Incus CLI (C(incus))
 description:
-  - Get inventory hosts from the Incus container and virtual-machine manager.
+  - Get inventory hosts from the Incus containerasfasf and virtual-machine manager.
+  - To start using the C(incus) dynamic inventory plugin, create a file with the accepted filename
+    schema documented for the plugin (a YAML configuration file that ends with incus.(yml|yaml), e.g., demo.incus.yml).
 options:
   plugin:
     description:
