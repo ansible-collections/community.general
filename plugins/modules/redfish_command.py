@@ -32,6 +32,8 @@ options:
     required: true
     description:
       - List of commands to execute on OOB controller.
+      - The command V(VirtualMediaEjectAll) ejects the media from every VirtualMedia slot that has an image inserted,
+        and does not use O(virtual_media). It has been added in community.general 14.1.0.
     type: list
     elements: str
   baseuri:
@@ -706,6 +708,15 @@ EXAMPLES = r"""
       image_url: 'http://example.com/images/SomeLinux-current.iso'
     resource_id: BMC
 
+- name: Eject all Virtual Media
+  community.general.redfish_command:
+    category: Manager
+    command: VirtualMediaEjectAll
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    resource_id: BMC
+
 - name: Restart manager power gracefully
   community.general.redfish_command:
     category: Manager
@@ -830,6 +841,7 @@ CATEGORY_COMMANDS_ALL = {
         "IndicatorLedBlink",
         "VirtualMediaInsert",
         "VirtualMediaEject",
+        "VirtualMediaEjectAll",
         "VerifyBiosAttributes",
     ],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
@@ -851,6 +863,7 @@ CATEGORY_COMMANDS_ALL = {
         "VirtualMediaInsert",
         "ResetToDefaults",
         "VirtualMediaEject",
+        "VirtualMediaEjectAll",
         "PowerOn",
         "PowerForceOff",
         "PowerForceRestart",
@@ -1076,6 +1089,8 @@ def main():
                 result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == "VirtualMediaEject":
                 result = rf_utils.virtual_media_eject(virtual_media, category)
+            elif command == "VirtualMediaEjectAll":
+                result = rf_utils.virtual_media_eject_all(category)
             elif command == "VerifyBiosAttributes":
                 result = rf_utils.verify_bios_attributes(bios_attributes)
 
@@ -1129,6 +1144,8 @@ def main():
                 result = rf_utils.virtual_media_insert(virtual_media, category)
             elif command == "VirtualMediaEject":
                 result = rf_utils.virtual_media_eject(virtual_media, category)
+            elif command == "VirtualMediaEjectAll":
+                result = rf_utils.virtual_media_eject_all(category)
             elif command == "ResetToDefaults":
                 result = rf_utils.manager_reset_to_defaults(module.params["reset_to_defaults_mode"])
 

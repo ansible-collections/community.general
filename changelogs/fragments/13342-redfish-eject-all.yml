@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_command - add ``VirtualMediaEjectAll`` command to eject all inserted virtual media (https://github.com/ansible-collections/community.general/issues/3042, https://github.com/ansible-collections/community.general/pull/13342).
