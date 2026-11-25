@@ -158,7 +158,6 @@ EXAMPLES = r"""
 import json
 import os
 import plistlib
-import re
 import tempfile
 from datetime import datetime
 
