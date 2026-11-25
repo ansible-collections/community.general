@@ -1,0 +1,20 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Install nodejs and npm via apk
+  community.general.apk:
+    name:
+      - sqlite-libs
+      - nodejs
+      - npm
+    state: latest
+    update_cache: true
+
+- ansible.builtin.include_tasks: test.yml
+  vars:
+    node_path: /usr/bin
+- ansible.builtin.include_tasks: no_bin_links.yml
+  vars:
+    node_path: /usr/bin
