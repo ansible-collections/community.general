@@ -8,26 +8,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Exit when Suse because it causes CI problems
-- ansible.builtin.meta: end_play
-  when: ansible_facts.os_family == 'Suse'
-
-# To avoid hangings on service start/stop postgres during CI runs:
-- ansible.builtin.meta: end_play
-  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
-
-# Temporary disable Fedora 34
-- ansible.builtin.meta: end_play
-  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '34'
-
-# Temporary disable Fedora 44
-- ansible.builtin.meta: end_play
-  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '44'
-
-# Temporary disable Fedora 45
-- ansible.builtin.meta: end_play
-  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '45'
-
 - name: Include distribution and Python version specific variables
   ansible.builtin.include_vars: '{{ lookup(''first_found'', params) }}'
   vars:
@@ -40,17 +20,19 @@
       paths:
         - '{{ role_path }}/vars'
 
-- name: make sure the dbus service is started under systemd
-  ansible.builtin.systemd:
-    name: dbus
-    state: started
+# postgresql-setup needs the system bus, which is not present in all Fedora test images
+- name: Make sure the D-Bus service is installed and started (Fedora)
   when: ansible_facts.service_mgr == 'systemd' and ansible_facts.distribution == 'Fedora'
+  block:
+    - name: Install D-Bus broker (Fedora)
+      ansible.builtin.package:
+        name: dbus-broker
+        state: present
 
-- name: Kill all postgres processes
-  ansible.builtin.command: 'pkill -u {{ pg_user }}'
-  become: true
-  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
-  ignore_errors: true
+    - name: Start D-Bus broker (Fedora)
+      ansible.builtin.systemd:
+        name: dbus-broker
+        state: started
 
 - name: stop postgresql service
   ansible.builtin.service:
@@ -64,13 +46,6 @@
     state: absent
   ignore_errors: true
   when: ansible_facts.os_family == "RedHat" or ansible_facts.os_family == "Suse"
-
-- name: remove old db (FreeBSD)
-  ansible.builtin.file:
-    path: '{{ pg_dir }}'
-    state: absent
-  ignore_errors: true
-  when: ansible_facts.os_family == "FreeBSD"
 
 - name: remove old db config and files (debian)
   ansible.builtin.file:
@@ -92,17 +67,9 @@
   loop_control:
     loop_var: postgresql_package_item
 
-- name: initialize postgres (FreeBSD)
-  ansible.builtin.command: /usr/local/etc/rc.d/postgresql oneinitdb
-  when: ansible_facts.os_family == "FreeBSD"
-
 - name: Initialize postgres (RedHat systemd)
   ansible.builtin.command: postgresql-setup initdb
   when: ansible_facts.os_family == "RedHat" and ansible_facts.service_mgr == "systemd"
-
-- name: Initialize postgres (RedHat sysv)
-  ansible.builtin.command: /sbin/service postgresql initdb
-  when: ansible_facts.os_family == "RedHat" and ansible_facts.service_mgr != "systemd"
 
 - name: Fix postgres user (Archlinux)
   ansible.builtin.user:
@@ -126,17 +93,6 @@
   args:
     creates: /etc/postgresql/{{ pg_ver }}/
   when: ansible_facts.os_family == 'Debian'
-
-- name: Initialize postgres (Suse)
-  ansible.builtin.service:
-    name: postgresql
-    state: stopped
-  when: ansible_facts.os_family == 'Suse'
-
-- name: Pause between stop and start postgresql
-  ansible.builtin.pause:
-    seconds: 5
-  when: ansible_facts.os_family == 'Suse'
 
 - name: Make installable on Arch
   community.general.ini_file:
@@ -178,118 +134,11 @@
     group: '{{ pg_group }}'
     mode: '0644'
 
-- name: Generate locales (Debian)
-  community.general.locale_gen:
-    name: '{{ item }}'
-    state: present
-  with_items:
-    - pt_BR
-    - es_ES
-  when: ansible_facts.os_family == 'Debian'
-
-- block:
-    - name: Install langpacks (RHEL8)
-      ansible.builtin.dnf:
-        name:
-          - glibc-langpack-es
-          - glibc-langpack-pt
-          - glibc-all-langpacks
-        state: present
-      when: ansible_facts.distribution_major_version is version('8', '>=')
-
-    - name: Check if locales need to be generated (RedHat)
-      ansible.builtin.shell: localedef --list-archive | grep -a -q '^{{ locale }}$'
-      register: locale_present
-      ignore_errors: true
-      with_items:
-        - es_ES
-        - pt_BR
-      loop_control:
-        loop_var: locale
-
-    - name: Reinstall internationalization files
-      ansible.builtin.shell: yum -y reinstall glibc-common || yum -y install glibc-common
-      when: locale_present is failed
-
-    - name: Generate locale (RedHat)
-      ansible.builtin.command: localedef -f ISO-8859-1 -i {{ item.locale }} {{ item.locale }}
-      when: item is failed
-      with_items: '{{ locale_present.results }}'
-  when: ansible_facts.os_family == 'RedHat' and ansible_facts.distribution != 'Fedora'
-
-- name: Install glibc langpacks (Fedora >= 24)
-  ansible.builtin.package:
-    name: '{{ item }}'
-    state: latest
-  with_items:
-    - glibc-langpack-es
-    - glibc-langpack-pt
-  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version is version('24', '>=')
-
-- name: enable postgresql service (FreeBSD)
-  ansible.builtin.lineinfile:
-    path: /etc/rc.conf
-    line: postgresql_enable="YES"
-  when: ansible_facts.os_family == "FreeBSD"
-
+# Suse initializes the database on its first start, so it must be restarted to load pg_hba.conf
 - name: start postgresql service
   ansible.builtin.service:
     name: "{{ postgresql_service }}"
-    state: started
-
-- name: Pause between start and stop
-  ansible.builtin.pause:
-    seconds: 5
-
-- name: Kill all postgres processes
-  ansible.builtin.command: 'pkill -u {{ pg_user }}'
-  become: true
-  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
-  ignore_errors: true
-  register: terminate
-
-- name: Stop postgresql service
-  ansible.builtin.service:
-    name: "{{ postgresql_service }}"
-    state: stopped
-  when: terminate is not succeeded
-
-- name: Pause between stop and start
-  ansible.builtin.pause:
-    seconds: 5
-
-- name: Start postgresql service
-  ansible.builtin.service:
-    name: "{{ postgresql_service }}"
-    state: started
-
-- name: copy control file for dummy ext
-  ansible.builtin.copy:
-    src: dummy.control
-    dest: /usr/share/postgresql/{{ pg_ver }}/extension/dummy.control
-    mode: '0444'
-  when: ansible_facts.os_family == 'Debian'
-
-- name: copy version files for dummy ext
-  ansible.builtin.copy:
-    src: '{{ item }}'
-    dest: /usr/share/postgresql/{{ pg_ver }}/extension/{{ item }}
-    mode: '0444'
-  with_items:
-    - dummy--1.0.sql
-    - dummy--2.0.sql
-    - dummy--3.0.sql
-  when: ansible_facts.os_family == 'Debian'
-
-- name: add update paths
-  ansible.builtin.file:
-    path: /usr/share/postgresql/{{ pg_ver }}/extension/{{ item }}
-    mode: '0444'
-    state: touch
-  with_items:
-    - dummy--1.0--2.0.sql
-    - dummy--2.0--3.0.sql
-  when: ansible_facts.os_family == 'Debian'
+    state: "{{ 'restarted' if ansible_facts.os_family == 'Suse' else 'started' }}"
 
 - name: Get PostgreSQL version
   become_user: '{{ pg_user }}'
