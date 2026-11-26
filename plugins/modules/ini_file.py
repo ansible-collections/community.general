@@ -466,9 +466,8 @@ def do_ini(
                     option_no_value_present = True
                     break
 
-    if state == "present" and exclusive and (not allow_no_value or (option and values)):
+    if state == "present" and exclusive and (not allow_no_value or (option and not no_value_requested)):
         # override option with no value to option with value
-        # (with allow_no_value, only if a requested value is not in the section yet)
         if len(values) > 0:
             for index, line in enumerate(section_lines):
                 line_match = match_function(option, line) if not changed_lines[index] else None
@@ -486,16 +485,6 @@ def do_ini(
             line_match = match_function(option, section_lines[index]) if not changed_lines[index] else None
             # skip comment-only lines (no "=") — only remove active or commented config lines
             if line_match and not (line_match.group("comment") and not line_match.group("sep")):
-                del section_lines[index]
-                del changed_lines[index]
-                changed = True
-                msg = "option changed"
-    elif state == "present" and exclusive and option and not no_value_requested:
-        # with allow_no_value, when all requested values are in the section:
-        # remove the other active lines of the option, keep commented lines
-        for index in range(len(section_lines) - 1, 0, -1):
-            line_match = match_active_opt(option, section_lines[index]) if not changed_lines[index] else None
-            if line_match:
                 del section_lines[index]
                 del changed_lines[index]
                 changed = True
