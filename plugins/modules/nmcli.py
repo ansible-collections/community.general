@@ -1877,7 +1877,6 @@ class Nmcli:
                     "bridge.forward-delay": self.forwarddelay,
                     "bridge.hello-time": self.hellotime,
                     "bridge.max-age": self.maxage,
-                    "bridge.priority": self.priority,
                     "bridge.stp": self.stp,
                 }
             )
