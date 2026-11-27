@@ -77,6 +77,12 @@ def update_azp_config(session: nox.Session) -> None:
         session.error(f"Execution failed with status code {result}")
 
 
+@nox.session(name="update-versions-baseline", python=False)
+def update_versions_baseline(session: nox.Session) -> None:
+    args = ["--check"] if IN_CI else []
+    session.run(sys.executable, "tests/utils/update_versions_baseline.py", *args)
+
+
 # Allow to run the noxfile with `python noxfile.py`, `pipx run noxfile.py`, or similar.
 # Requires nox >= 2025.02.09
 if __name__ == "__main__":

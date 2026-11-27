@@ -1,0 +1,39 @@
+---
+# Copyright (c) 2026, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: Check versions baseline
+'on':
+  push:
+    branches:
+      - main
+      - stable-*
+    paths:
+      - .azure-pipelines/azure-pipelines.yml
+      - .github/workflows/nox.yml
+      - .github/workflows/versions-baseline.yml
+      - antsibull-nox.toml
+      - noxfile.py
+      - tests/utils/update_versions_baseline.py
+      - tests/versions_baseline.yml
+  pull_request:
+    paths:
+      - .azure-pipelines/azure-pipelines.yml
+      - .github/workflows/nox.yml
+      - .github/workflows/versions-baseline.yml
+      - antsibull-nox.toml
+      - noxfile.py
+      - tests/utils/update_versions_baseline.py
+      - tests/versions_baseline.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nox:
+    uses: ansible-community/antsibull-nox/.github/workflows/reusable-nox-run.yml@main
+    with:
+      session-name: Check versions baseline
+      sessions: update-versions-baseline
