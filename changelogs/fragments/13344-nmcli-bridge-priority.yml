@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - fix idempotency for bridge connections with STP disabled (https://github.com/ansible-collections/community.general/issues/3216, https://github.com/ansible-collections/community.general/pull/13344).
