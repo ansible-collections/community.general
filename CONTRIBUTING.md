@@ -117,6 +117,18 @@ nox -Re ansible-test-integration-heavy
 Additional options for `ansible-test` can be passed after `--`.
 Each backend also has its own GitHub workflow, `nox-heavy-<backend>`, that must be triggered manually.
 
+### Versions baseline
+
+The file `tests/versions_baseline.yml` lists, for each OS, the minimum version on which the integration tests run in CI.
+OS versions older than those are not tested.
+
+The file is generated from the CI configuration, so do not edit it by hand.
+After changing the CI matrix in `antsibull-nox.toml`, regenerate it with:
+
+```.bash
+nox -e update-versions-baseline
+```
+
 ## Run basic sanity, unit or integration tests locally (with ansible-test)
 
 Instead of using antsibull-nox, you can also run sanity and unit tests with ansible-test directly.
