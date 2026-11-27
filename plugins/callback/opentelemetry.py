@@ -13,8 +13,8 @@ version_added: 3.7.0
 description:
   - This callback creates distributed traces for each Ansible task with OpenTelemetry.
   - The span of each task on each host is reported as soon as its result is known, instead of being kept until the
-    end of the playbook. The traces are therefore available while the playbook runs, and the spans reported so far
-    are not lost when the playbook is interrupted or stopped before it finishes.
+    end of the playbook, so the traces are available while the playbook runs. Includes are the exception, and their
+    spans are reported at the end of the playbook.
   - You can configure the OpenTelemetry exporter and SDK with environment variables.
   - See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
   - See
@@ -90,6 +90,7 @@ options:
     type: str
     description:
       - It stores the exported spans in the given file.
+      - The spans are written to the file at the end of the playbook.
     env:
       - name: ANSIBLE_OPENTELEMETRY_STORE_SPANS_IN_FILE
     ini:
