@@ -478,7 +478,7 @@ def get_diff(module, diff_output):
         tf_before_state = {"resource": item["address"], "change": item["change"]["before"]}
         tf_after_state = {"resource": item["address"], "change": item["change"]["after"]}
 
-        if item_change["actions"] == ["update"] or item_change["actions"] == ["delete", "create"]:
+        if item_change["actions"] in (["update"], ["delete", "create"], ["create", "delete"]):
             diff_before.append(tf_before_state)
             diff_after.append(tf_after_state)
             changed = True

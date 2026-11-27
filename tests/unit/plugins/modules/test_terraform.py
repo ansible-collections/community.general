@@ -87,3 +87,46 @@ def test_main_resolves_relative_project_path(tmp_path, monkeypatch):
             terraform.main()
 
     assert seen["project_path"] == os.path.join(os.getcwd(), "project")
+
+
+@pytest.mark.parametrize(
+    "actions, changed, before, after",
+    [
+        (["no-op"], False, [], []),
+        (["read"], False, [], []),
+        (["create"], True, [], [{"resource": "null_resource.r", "change": {"id": "new"}}]),
+        (["delete"], True, [{"resource": "null_resource.r", "change": {"id": "old"}}], []),
+        (
+            ["update"],
+            True,
+            [{"resource": "null_resource.r", "change": {"id": "old"}}],
+            [{"resource": "null_resource.r", "change": {"id": "new"}}],
+        ),
+        (
+            ["delete", "create"],
+            True,
+            [{"resource": "null_resource.r", "change": {"id": "old"}}],
+            [{"resource": "null_resource.r", "change": {"id": "new"}}],
+        ),
+        (
+            ["create", "delete"],
+            True,
+            [{"resource": "null_resource.r", "change": {"id": "old"}}],
+            [{"resource": "null_resource.r", "change": {"id": "new"}}],
+        ),
+    ],
+)
+def test_get_diff_actions(actions, changed, before, after):
+    plan = {
+        "resource_changes": [
+            {
+                "address": "null_resource.r",
+                "change": {"actions": actions, "before": {"id": "old"}, "after": {"id": "new"}},
+            }
+        ]
+    }
+
+    result_changed, result_diff = terraform.get_diff(FakeModule(), json.dumps(plan))
+
+    assert result_changed is changed
+    assert result_diff == {"before": {"data": before}, "after": {"data": after}}
