@@ -68,3 +68,6 @@
 
 - name: Test state_file
   ansible.builtin.include_tasks: state_file.yml
+
+- name: Test check_mode
+  ansible.builtin.include_tasks: check_mode.yml
