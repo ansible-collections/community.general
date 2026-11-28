@@ -826,6 +826,39 @@ bridge.priority:                        128
 bridge.forward-delay:                   15
 """
 
+TESTCASE_BRIDGE_NO_STP = [
+    {
+        "type": "bridge",
+        "conn_name": "non_existent_nw_device",
+        "ifname": "br0_non_existant",
+        "method4": "disabled",
+        "method6": "ignore",
+        "stp": False,
+        "state": "present",
+        "_ansible_check_mode": False,
+    }
+]
+
+TESTCASE_BRIDGE_NO_STP_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              br0_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            disabled
+ipv4.ignore-auto-dns:                   no
+ipv4.ignore-auto-routes:                no
+ipv4.never-default:                     no
+ipv4.may-fail:                          yes
+ipv6.method:                            ignore
+ipv6.ignore-auto-dns:                   no
+ipv6.ignore-auto-routes:                no
+bridge.stp:                             no
+bridge.max-age:                         20
+bridge.ageing-time:                     300
+bridge.hello-time:                      2
+bridge.priority:                        32768
+bridge.forward-delay:                   15
+"""
+
 TESTCASE_BRIDGE_SLAVE = [
     {
         "type": "bridge-slave",
@@ -2025,6 +2058,11 @@ def mocked_bridge_connection_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_bridge_no_stp_connection_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BRIDGE_NO_STP_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
 def mocked_bridge_slave_unchanged(mocker):
     mocker_set(mocker, connection_exists=True, execute_return=(0, TESTCASE_BRIDGE_SLAVE_SHOW_OUTPUT, ""))
 
@@ -3127,6 +3165,40 @@ def test_mod_bridge(mocked_generic_connection_modify, capfd):
 def test_bridge_connection_unchanged(mocked_bridge_connection_unchanged, capfd):
     """
     Test : Bridge connection unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert not results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BRIDGE_NO_STP, indirect=["patch_ansible_module"])
+def test_create_bridge_no_stp(mocked_generic_connection_create, capfd):
+    """
+    Test if Bridge without STP is created without setting priority
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    args, kwargs = nmcli.Nmcli.execute_command.call_args_list[0]
+    args_text = [to_text(x) for x in args[0]]
+    assert "bridge.stp" in args_text
+    assert "bridge.priority" not in args_text
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get("failed")
+    assert results["changed"]
+
+
+@pytest.mark.parametrize("patch_ansible_module", TESTCASE_BRIDGE_NO_STP, indirect=["patch_ansible_module"])
+def test_bridge_no_stp_connection_unchanged(mocked_bridge_no_stp_connection_unchanged, capfd):
+    """
+    Test : Bridge connection without STP unchanged
     """
     with pytest.raises(SystemExit):
         nmcli.main()
