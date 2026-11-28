@@ -1,0 +1,72 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Create terraform project directory (check_mode)
+  ansible.builtin.file:
+    path: "{{ terraform_project_dir }}/check_mode"
+    state: directory
+    mode: "0755"
+
+- name: Copy terraform files to work space (check_mode)
+  ansible.builtin.copy:
+    src: check_mode/main.tf
+    dest: "{{ terraform_project_dir }}/check_mode/main.tf"
+    mode: "0644"
+
+- name: Create the resources (check_mode)
+  community.general.terraform:
+    project_path: "{{ terraform_project_dir }}/check_mode"
+    binary_path: "{{ terraform_binary_path }}"
+    force_init: true
+    variables:
+      trigger: first
+    state: present
+
+- name: Replace the resources in check mode
+  community.general.terraform:
+    project_path: "{{ terraform_project_dir }}/check_mode"
+    binary_path: "{{ terraform_binary_path }}"
+    variables:
+      trigger: second
+    state: present
+  check_mode: true
+  register: check_mode_replace
+
+- name: Plan the resources with the original values in check mode
+  community.general.terraform:
+    project_path: "{{ terraform_project_dir }}/check_mode"
+    binary_path: "{{ terraform_binary_path }}"
+    variables:
+      trigger: first
+    state: present
+  check_mode: true
+  register: check_mode_unchanged
+
+- name: Destroy the resources in check mode
+  community.general.terraform:
+    project_path: "{{ terraform_project_dir }}/check_mode"
+    binary_path: "{{ terraform_binary_path }}"
+    variables:
+      trigger: first
+    state: absent
+  check_mode: true
+  register: check_mode_absent
+
+- name: List the resources after the check mode runs
+  ansible.builtin.command: "{{ terraform_binary_path }} state list"
+  args:
+    chdir: "{{ terraform_project_dir }}/check_mode"
+  register: check_mode_state_list
+  changed_when: false
+
+- ansible.builtin.assert:
+    that:
+      - check_mode_replace is changed
+      - check_mode_replace.diff.before.data | map(attribute='resource') | sort == ['null_resource.create_before_destroy', 'null_resource.replaced']
+      - check_mode_replace.diff.after.data | map(attribute='resource') | sort == ['null_resource.create_before_destroy', 'null_resource.replaced']
+      - "'Plan: 2 to add, 0 to change, 2 to destroy.' in check_mode_replace.stdout"
+      - check_mode_unchanged is not changed
+      - check_mode_absent is changed
+      - check_mode_state_list.stdout_lines | sort == ['null_resource.create_before_destroy', 'null_resource.replaced']

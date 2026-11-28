@@ -1,0 +1,2 @@
+bugfixes:
+  - terraform - report replacements of resources with ``create_before_destroy`` as changes in check and diff mode (https://github.com/ansible-collections/community.general/pull/13343).
