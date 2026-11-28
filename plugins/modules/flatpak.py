@@ -66,6 +66,19 @@ options:
       - This option is recommended instead of passing a URL in O(name); passing URLs in O(name) will be deprecated in the future.
     type: str
     version_added: "12.6.0"
+  from_file:
+    description:
+      - Path to a local C(.flatpakref) or C(.flatpak) (bundle) file to install from.
+      - The type of the file is determined by its extension. Files with the extension C(.flatpakref) are installed with
+        C(flatpak install --from), files with the extension C(.flatpak) are installed with C(flatpak install --bundle).
+        Files with any other extension make the module fail.
+      - When this option is set, O(name) must contain exactly one entry specifying the reverse DNS application ID of the
+        flatpak (for example V(com.onepassword.OnePassword)). This is used to check whether the flatpak is already installed.
+      - O(name) cannot contain URLs when this option is set.
+      - When O(state=latest) and the flatpak is already installed, it is updated from the remote it was installed from,
+        not from the file. Flatpaks installed from a bundle can only be updated if the bundle references a repository.
+    type: path
+    version_added: "14.1.0"
   no_dependencies:
     description:
       - If installing runtime dependencies should be omitted or not.
@@ -103,6 +116,12 @@ EXAMPLES = r"""
     from_url: https://git.gnome.org/browse/gnome-apps-nightly/plain/gedit.flatpakref
     state: present
     no_dependencies: true
+
+- name: Install a flatpak from a local bundle file
+  community.general.flatpak:
+    name: com.example.App
+    from_file: /tmp/com.example.App.flatpak
+    state: present
 
 - name: Install the gedit package from flathub for current user
   community.general.flatpak:
@@ -184,6 +203,7 @@ command:
   sample: "/usr/bin/flatpak install --user --nontinteractive flathub org.gnome.Calculator"
 """
 
+from pathlib import PurePath
 from re import match
 from urllib.parse import urlparse
 
@@ -192,9 +212,10 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils._version import LooseVersion
 
 OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE = "Unknown option --columns=application"
+FROM_FILE_INSTALL_OPTIONS = {".flatpakref": "--from", ".flatpak": "--bundle"}
 
 
-def install_flat(module, binary, remote, names, method, no_dependencies, from_url=None):
+def install_flat(module, binary, remote, names, method, no_dependencies, from_url=None, from_file=None):
     """Add new flatpaks."""
     global result  # pylint: disable=global-variable-not-assigned
     uri_names = []
@@ -214,6 +235,10 @@ def install_flat(module, binary, remote, names, method, no_dependencies, from_ur
         base_command += ["--no-deps"]
     if from_url:
         command = base_command + ["--from", from_url]
+        _flatpak_command(module, module.check_mode, command)
+    elif from_file:
+        install_option = FROM_FILE_INSTALL_OPTIONS[PurePath(from_file).suffix]
+        command = base_command + [install_option, from_file]
         _flatpak_command(module, module.check_mode, command)
     else:
         if uri_names:
@@ -369,17 +394,20 @@ def main():
         argument_spec=dict(
             name=dict(type="list", elements="str", required=True),
             from_url=dict(type="str"),
+            from_file=dict(type="path"),
             remote=dict(type="str", default="flathub"),
             method=dict(type="str", default="system", choices=["user", "system"]),
             state=dict(type="str", default="present", choices=["absent", "present", "latest"]),
             no_dependencies=dict(type="bool", default=False),
             executable=dict(type="path", default="flatpak"),
         ),
+        mutually_exclusive=[("from_url", "from_file")],
         supports_check_mode=True,
     )
 
     name = module.params["name"]
     from_url = module.params["from_url"]
+    from_file = module.params["from_file"]
     state = module.params["state"]
     remote = module.params["remote"]
     no_dependencies = module.params["no_dependencies"]
@@ -402,6 +430,15 @@ def main():
             module.fail_json(msg="The 'name' and 'from_url' parameters cannot both contain URLs.", **result)
         if len(name) != 1:
             module.fail_json(msg="When 'from_url' is used, 'name' must contain exactly one entry.", **result)
+    if from_file is not None:
+        if PurePath(from_file).suffix not in FROM_FILE_INSTALL_OPTIONS:
+            module.fail_json(
+                msg="The 'from_file' parameter must be a path to a .flatpakref or .flatpak file.", **result
+            )
+        if url_names:
+            module.fail_json(msg="The 'name' parameter cannot contain URLs when 'from_file' is used.", **result)
+        if len(name) != 1:
+            module.fail_json(msg="When 'from_file' is used, 'name' must contain exactly one entry.", **result)
     module.run_command_environ_update = dict(LANGUAGE="C", LC_ALL="C")
 
     installed, not_installed = flatpak_exists(module, binary, name, method)
@@ -411,7 +448,7 @@ def main():
         if state == "latest" and installed:
             update_flat(module, binary, installed, method, no_dependencies)
         if state in ("present", "latest") and not_installed:
-            install_flat(module, binary, remote, not_installed, method, no_dependencies, from_url)
+            install_flat(module, binary, remote, not_installed, method, no_dependencies, from_url, from_file)
 
     module.exit_json(**result)
 
