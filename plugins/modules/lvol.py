@@ -80,6 +80,7 @@ options:
     elements: str
     description:
       - List of physical volumes (for example V(/dev/sda, /dev/sdb)).
+      - It is not used when shrinking the logical volume, because C(lvreduce) does not accept physical volumes.
   thinpool:
     type: str
     description:
@@ -315,9 +316,9 @@ def _run_resize(module, is_extend, lvextend, lvreduce, size_opt, size_value, res
         with lvextend(f"test resizefs {size_key} lv pvs") as ctx:
             return ctx.run(test=module.check_mode, resizefs=resizefs, **{size_key: size_value}, lv=[lv_name], pvs=pvs)
     else:
-        with lvreduce(f"test force resizefs {size_key} lv pvs") as ctx:
+        with lvreduce(f"test force resizefs {size_key} lv") as ctx:
             return ctx.run(
-                test=module.check_mode, force=True, resizefs=resizefs, **{size_key: size_value}, lv=[lv_name], pvs=pvs
+                test=module.check_mode, force=True, resizefs=resizefs, **{size_key: size_value}, lv=[lv_name]
             )
 
 
