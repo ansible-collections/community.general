@@ -38,7 +38,8 @@ options:
   value:
     description:
       - Desired state of the selected attribute.
-      - Either a string, or to unset a value, the Python V(None) keyword (YAML Equivalent, V(null)).
+      - This is a string.
+      - To remove an attribute or an element, use O(state=absent) with an O(xpath) selecting it.
       - Elements default to no value (but present).
       - Attributes default to an empty string.
     type: raw
