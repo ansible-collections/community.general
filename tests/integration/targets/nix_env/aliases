@@ -1,0 +1,13 @@
+# Copyright (c) 2026, Travis Beale (@travisbeale)
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+azp/posix/1
+needs/root
+destructive
+skip/macos
+skip/freebsd
+skip/alpine
+skip/rhel
+skip/ubuntu22.04  # The fixture uses Nix XDG profile isolation.
+nix_channel
