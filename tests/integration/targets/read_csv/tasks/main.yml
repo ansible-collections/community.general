@@ -84,6 +84,36 @@
       - users_nonunique.dict.jeroen.gid == '500'
 
 
+# Create CSV file with escaped delimiters
+- name: Create CSV file with escaped delimiters
+  ansible.builtin.copy:
+    content: |
+      name:uid:gid:gecos
+      dag:500:500:Dag Wieërs\: maintainer
+    dest: "{{ remote_tmp_dir }}/users_escaped.csv"
+
+- name: Read users from CSV file with escaped delimiters using escapechar
+  community.general.read_csv:
+    path: "{{ remote_tmp_dir }}/users_escaped.csv"
+    delimiter: ':'
+    escapechar: '\'
+  register: users_escaped
+
+- name: Read users from CSV file with escaped delimiters without escapechar
+  community.general.read_csv:
+    path: "{{ remote_tmp_dir }}/users_escaped.csv"
+    delimiter: ':'
+  register: users_escaped_without_escapechar
+
+- ansible.builtin.assert:
+    that:
+      - users_escaped.list.0.name == 'dag'
+      - 'users_escaped.list.0.gecos == "Dag Wieërs: maintainer"'
+      - users_escaped.list.0.uid == '500'
+      - users_escaped.list.0.gid == '500'
+      - 'users_escaped_without_escapechar.list.0.gecos == "Dag Wieërs\\"'
+
+
 # Read a CSV file using an non-existing dialect
 - name: Read users from CSV file and return a dictionary
   community.general.read_csv:
