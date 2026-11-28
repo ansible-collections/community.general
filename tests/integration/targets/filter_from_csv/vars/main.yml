@@ -18,6 +18,13 @@ valid_pipe_separated: |
   id|name|role
   1|foo|bar
   2|bar|baz
+valid_colon_separated_escaped: |
+  id:name:time
+  1:foo:12\:41\:52
+expected_escaped_result:
+  - id: '1'
+    name: foo
+    time: '12:41:52'
 invalid_comma_separated: |
   id,name,role
   1,foo,bar

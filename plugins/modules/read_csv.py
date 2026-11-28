@@ -67,6 +67,14 @@ options:
       - When using this parameter, you change the default value used by O(dialect).
       - The default value depends on the dialect used.
     type: bool
+  escapechar:
+    description:
+      - A one-character string that removes any special meaning from the character following it, for example to use the
+        delimiter inside a field.
+      - When using this parameter, you change the default value used by O(dialect).
+      - The default value depends on the dialect used.
+    type: str
+    version_added: 14.1.0
 seealso:
   - plugin: ansible.builtin.csvfile
     plugin_type: lookup
@@ -113,6 +121,20 @@ EXAMPLES = r"""
     fieldnames: name,uid,gid
     delimiter: ';'
   register: users
+  delegate_to: localhost
+
+# Example CSV file with colon delimiter and escaped colons in a field
+#
+#   name:time
+#   foo:12\:41\:52
+
+# Read a CSV file with escaped delimiters
+- name: Read times from CSV file and return a list
+  community.general.read_csv:
+    path: times.csv
+    delimiter: ':'
+    escapechar: '\'
+  register: times
   delegate_to: localhost
 """
 
@@ -165,6 +187,7 @@ def main():
             delimiter=dict(type="str"),
             skipinitialspace=dict(type="bool"),
             strict=dict(type="bool"),
+            escapechar=dict(type="str"),
         ),
         supports_check_mode=True,
     )
@@ -179,6 +202,7 @@ def main():
         "delimiter": module.params["delimiter"],
         "skipinitialspace": module.params["skipinitialspace"],
         "strict": module.params["strict"],
+        "escapechar": module.params["escapechar"],
     }
 
     try:

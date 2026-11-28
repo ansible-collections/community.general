@@ -47,6 +47,14 @@ options:
       - When using this parameter, you change the default value used by O(dialect).
       - The default value depends on the dialect used.
     type: bool
+  escapechar:
+    description:
+      - A one-character string that removes any special meaning from the character following it, for example to use the
+        delimiter inside a field.
+      - When using this parameter, you change the default value used by O(dialect).
+      - The default value depends on the dialect used.
+    type: str
+    version_added: 14.1.0
 """
 
 EXAMPLES = r"""
@@ -68,6 +76,20 @@ EXAMPLES = r"""
   #     "Column 1": "bar",
   #     "Value": "42",
   #   }
+
+- name: Parse CSV data that escapes the delimiter with a backslash
+  ansible.builtin.debug:
+    msg: >-
+      {{ csv_data | community.general.from_csv(delimiter=':', escapechar='\\') }}
+  vars:
+    csv_data: |
+      name:time
+      foo:12\:41\:52
+  # Produces the following list of dictionaries:
+  #   {
+  #     "name": "foo",
+  #     "time": "12:41:52",
+  #   }
 """
 
 RETURN = r"""
@@ -88,11 +110,17 @@ from ansible_collections.community.general.plugins.module_utils._csv import (
 )
 
 
-def from_csv(data, dialect="excel", fieldnames=None, delimiter=None, skipinitialspace=None, strict=None):
+def from_csv(
+    data, dialect="excel", fieldnames=None, delimiter=None, skipinitialspace=None, strict=None, escapechar=None
+):
+    if escapechar is not None and not isinstance(escapechar, str):
+        raise AnsibleFilterError(f"from_csv's escapechar parameter must be a string, got {type(escapechar)}")
+
     dialect_params = {
         "delimiter": delimiter,
         "skipinitialspace": skipinitialspace,
         "strict": strict,
+        "escapechar": escapechar,
     }
 
     try:
