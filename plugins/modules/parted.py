@@ -244,6 +244,10 @@ from fractions import Fraction
 
 from ansible.module_utils.basic import AnsibleModule
 
+# Set in main()
+module: AnsibleModule
+parted_exec: str
+
 # Reference prefixes (International System of Units and IEC)
 units_si = ["B", "KB", "MB", "GB", "TB"]
 units_iec = ["KiB", "MiB", "GiB", "TiB"]
@@ -256,10 +260,11 @@ def canonical_unit(unit):
     return _parted_units_lower.get(unit.lower(), unit)
 
 
-def parse_unit(size_str, unit=""):
+def parse_unit(size_str: str, unit: str = "") -> tuple[float | dict[str, int], str]:
     """
     Parses a string containing a size or boundary information
     """
+    size: float | dict[str, int]
     matches = re.search(r"^(-?[\d.]+) *([\w%]+)?$", size_str)
     if matches is None:
         # "<cylinder>,<head>,<sector>" format
@@ -436,14 +441,14 @@ def convert_to_bytes(size_str, unit):
     return int(output)
 
 
-def get_end_location(part_end, unit, disk_length, sector_size):
+def get_end_location(part_end: str, unit: str, disk_length: int, sector_size: int) -> tuple[int, int] | None:
     """
     Interprets part_end the way parted does. Returns the end sector, and how many
     sectors parted may move it away from there to fit the partition. Returns None
     when part_end is expressed in cylinders or in CHS.
     """
     size, end_unit = parse_unit(part_end, unit)
-    if end_unit in ["cyl", "chs"]:
+    if isinstance(size, dict) or end_unit in ["cyl", "chs"]:
         return None
 
     if end_unit == "%":
@@ -473,7 +478,7 @@ def get_end_location(part_end, unit, disk_length, sector_size):
     return end_sector, radius
 
 
-def get_partition_sectors(device, number):
+def get_partition_sectors(device: str, number: int) -> tuple[int, int, int, int]:
     """
     Returns, in sectors, the disk length, the logical sector size, the end of
     the partition, and the furthest the partition can be extended to, that is,
@@ -492,13 +497,13 @@ def get_partition_sectors(device, number):
         )
 
     lines = [line.rstrip(";").split(":") for line in out.splitlines() if line.strip() != ""]
-    disk_length = int(parse_unit(lines[1][1])[0])
+    disk_length = int(lines[1][1].rstrip("s"))
     sector_size = int(lines[1][3])
 
     free = []
     parts = {}
     for row in lines[2:]:
-        begin, end = int(parse_unit(row[1])[0]), int(parse_unit(row[2])[0])
+        begin, end = int(row[1].rstrip("s")), int(row[2].rstrip("s"))
         if row[-1] == "free":
             free.append((begin, end))
         else:
