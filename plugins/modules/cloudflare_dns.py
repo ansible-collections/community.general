@@ -166,6 +166,7 @@ options:
     description:
       - The record value.
       - Required for O(state=present).
+      - For a null MX record (RFC 7505), use O(type=MX) with O(value=.) and O(priority=0).
     type: str
     aliases: [content]
   weight:
@@ -504,7 +505,9 @@ class CloudflareAPI:
             self.record = self.zone
 
         if (self.type in ["CNAME", "NS", "MX", "SRV"]) and (self.value is not None):
-            self.value = self.value.rstrip(".").lower()
+            # a null MX record (RFC 7505) has the value "."
+            if not (self.type == "MX" and self.value == "."):
+                self.value = self.value.rstrip(".").lower()
 
         if (self.type == "AAAA") and (self.value is not None):
             self.value = self.value.lower()

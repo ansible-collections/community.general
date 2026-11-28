@@ -1,0 +1,2 @@
+bugfixes:
+  - cloudflare_dns - fix creating and removing null MX records (https://github.com/ansible-collections/community.general/issues/4143, https://github.com/ansible-collections/community.general/pull/13389).
