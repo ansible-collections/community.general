@@ -12,6 +12,9 @@ short_description: Create distributed traces with OpenTelemetry
 version_added: 3.7.0
 description:
   - This callback creates distributed traces for each Ansible task with OpenTelemetry.
+  - The span of each task on each host is reported as soon as its result is known, instead of being kept until the
+    end of the playbook, so the traces are available while the playbook runs. Includes are the exception, and their
+    spans are reported at the end of the playbook.
   - You can configure the OpenTelemetry exporter and SDK with environment variables.
   - See U(https://opentelemetry-python.readthedocs.io/en/latest/exporter/otlp/otlp.html).
   - See
@@ -87,6 +90,7 @@ options:
     type: str
     description:
       - It stores the exported spans in the given file.
+      - The spans are written to the file at the end of the playbook.
     env:
       - name: ANSIBLE_OPENTELEMETRY_STORE_SPANS_IN_FILE
     ini:
@@ -135,6 +139,7 @@ import getpass
 import json
 import os
 import socket
+import typing as t
 import uuid
 from collections import OrderedDict
 from os.path import basename
@@ -146,6 +151,11 @@ from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.plugins.callback import CallbackBase
 
 from ansible_collections.community.general.plugins.module_utils._secrets import mask_secret_values, mask_secrets
+
+if t.TYPE_CHECKING:  # pragma: no cover
+    from opentelemetry.context import Context
+    from opentelemetry.sdk.trace.export import SpanExporter
+    from opentelemetry.trace import Span, Tracer
 
 OTEL_LIBRARY_IMPORT_ERROR: ImportError | None
 try:
@@ -224,6 +234,12 @@ class OpenTelemetrySource:
             self.ip_address = None
         self.user = getpass.getuser()
 
+        self.tracer: Tracer | None = None
+        self.tracer_provider: TracerProvider | None = None
+        self.parent_span: Span | None = None
+        self.parent_context: Context | None = None
+        self.otel_exporter: SpanExporter | None = None
+
         self._display = display
 
     def traceparent_context(self, traceparent: bool):
@@ -253,7 +269,7 @@ class OpenTelemetrySource:
         tasks_data[uuid] = TaskData(uuid, name, path, play_name, action, args)
         tasks_data[uuid].add_host(HostData(host._uuid, host.name, "started"))
 
-    def finish_task(self, tasks_data: dict[str, TaskData], status: str, result, dump) -> None:
+    def finish_task(self, tasks_data: dict[str, TaskData], status: str, result, dump) -> HostData:
         """record the results of a task for a single host"""
 
         task_uuid = result._task._uuid
@@ -267,67 +283,100 @@ class OpenTelemetrySource:
 
         task = tasks_data[task_uuid]
 
-        task.add_host(HostData(host_uuid, host_name, status, result, dump))
+        host_data = HostData(host_uuid, host_name, status, result, dump)
+        task.add_host(host_data)
+        return task.host_data[host_uuid]
 
-    def generate_distributed_traces(
-        self,
-        otel_service_name: str,
-        ansible_playbook: str,
-        tasks_data: dict[str, TaskData],
-        status: Status,
-        traceparent: bool,
-        disable_logs: bool,
-        disable_attributes_in_logs: bool,
-        otel_exporter_otlp_traces_protocol: str,
-        store_spans_in_file: str | None,
-    ) -> InMemorySpanExporter | GRPCOTLPSpanExporter | HTTPOTLPSpanExporter:
-        """generate distributed traces from the collected TaskData and HostData"""
+    def setup_tracing(
+        self, otel_service_name: str, otel_exporter_otlp_traces_protocol: str, store_spans_in_file: str | None
+    ) -> None:
+        """configure the exporter and the tracer provider"""
 
-        tasks = []
-        parent_start_time = None
-        for task in tasks_data.values():
-            if parent_start_time is None:
-                parent_start_time = task.start
-            tasks.append(task)
+        if self.tracer is not None:
+            return
 
-        trace.set_tracer_provider(TracerProvider(resource=Resource.create({SERVICE_NAME: otel_service_name})))
+        # the provider of the plugin is kept apart from the global one, so the spans of the plugin are sent to its
+        # own exporter even when another component has already configured tracing in this process
+        self.tracer_provider = TracerProvider(resource=Resource.create({SERVICE_NAME: otel_service_name}))
 
-        otel_exporter = None
         if store_spans_in_file:
-            otel_exporter = InMemorySpanExporter()
-            processor = SimpleSpanProcessor(otel_exporter)
+            self.otel_exporter = InMemorySpanExporter()
+            processor = SimpleSpanProcessor(self.otel_exporter)
         else:
             if otel_exporter_otlp_traces_protocol == "grpc":
-                otel_exporter = GRPCOTLPSpanExporter()
+                self.otel_exporter = GRPCOTLPSpanExporter()
             else:
-                otel_exporter = HTTPOTLPSpanExporter()
-            processor = BatchSpanProcessor(otel_exporter)
+                self.otel_exporter = HTTPOTLPSpanExporter()
+            processor = BatchSpanProcessor(self.otel_exporter)
 
-        trace.get_tracer_provider().add_span_processor(processor)
+        self.tracer_provider.add_span_processor(processor)
 
-        tracer = trace.get_tracer(__name__)
+        self.tracer = self.tracer_provider.get_tracer(__name__)
 
-        with tracer.start_as_current_span(
+    def start_playbook_span(self, ansible_playbook: str, traceparent: bool) -> None:
+        """start the span that represents the whole playbook and keep it open"""
+
+        if self.tracer is None:
+            return
+
+        self.parent_span = self.tracer.start_span(
             ansible_playbook,
             context=self.traceparent_context(traceparent),
-            start_time=parent_start_time,
+            start_time=time_ns(),
             kind=SpanKind.SERVER,
-        ) as parent:
-            parent.set_status(status)
-            # Populate trace metadata attributes
-            parent.set_attribute("ansible.version", ansible_version)
-            parent.set_attribute("ansible.session", self.session)
-            parent.set_attribute("ansible.host.name", self.host)
-            if self.ip_address is not None:
-                parent.set_attribute("ansible.host.ip", self.ip_address)
-            parent.set_attribute("ansible.host.user", self.user)
-            for task in tasks:
-                for host_data in task.host_data.values():
-                    start = host_data.start or task.start
-                    with tracer.start_as_current_span(task.name, start_time=start, end_on_exit=False) as span:
-                        self.update_span_data(task, host_data, span, disable_logs, disable_attributes_in_logs)
+        )
+        self.parent_context = trace.set_span_in_context(self.parent_span)
 
-        return otel_exporter
+        # Populate trace metadata attributes
+        self.parent_span.set_attribute("ansible.version", ansible_version)
+        self.parent_span.set_attribute("ansible.session", self.session)
+        self.parent_span.set_attribute("ansible.host.name", self.host)
+        if self.ip_address is not None:
+            self.parent_span.set_attribute("ansible.host.ip", self.ip_address)
+        self.parent_span.set_attribute("ansible.host.user", self.user)
+
+    def emit_span(
+        self, task_data: TaskData, host_data: HostData, disable_logs: bool, disable_attributes_in_logs: bool
+    ) -> None:
+        """create, populate and end the span for a task and host"""
+
+        if self.tracer is None or self.parent_context is None:
+            return
+
+        span = self.tracer.start_span(
+            task_data.name,
+            context=self.parent_context,
+            start_time=host_data.start or task_data.start,
+            kind=SpanKind.INTERNAL,
+        )
+        self.update_span_data(task_data, host_data, span, disable_logs, disable_attributes_in_logs)
+
+    def stream_task_span(
+        self, task_data: TaskData, host_data: HostData, disable_logs: bool, disable_attributes_in_logs: bool
+    ) -> None:
+        """emit the span of a host as soon as its task result is known"""
+
+        self.emit_span(task_data, host_data, disable_logs, disable_attributes_in_logs)
+        # the result is not needed anymore, release it instead of keeping it for the whole run
+        task_data.host_data.pop(host_data.uuid, None)
+
+    def end_playbook_span(
+        self, tasks_data: dict[str, TaskData], status: Status, disable_logs: bool, disable_attributes_in_logs: bool
+    ) -> None:
+        """emit the spans that were not streamed yet, then close the playbook span"""
+
+        if self.tracer is None or self.tracer_provider is None or self.parent_span is None:
+            return
+
+        for task in tasks_data.values():
+            for host_data in task.host_data.values():
+                self.emit_span(task, host_data, disable_logs, disable_attributes_in_logs)
+            task.host_data.clear()
+
+        self.parent_span.set_status(status)
+        self.parent_span.end()
+        self.parent_span = None
+        self.tracer_provider.force_flush()
 
     def update_span_data(
         self, task_data: TaskData, host_data: HostData, span, disable_logs: bool, disable_attributes_in_logs: bool
@@ -365,6 +414,10 @@ class OpenTelemetrySource:
                 status = Status(status_code=StatusCode.UNSET)
             elif host_data.status == "ignored":
                 status = Status(status_code=StatusCode.UNSET)
+            elif host_data.status == "started":
+                # the result of this task was never received
+                message = "not finished"
+                status = Status(status_code=StatusCode.UNSET, description=message)
 
         span.set_status(status)
 
@@ -569,12 +622,32 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_start(self, playbook):
         self.ansible_playbook = basename(playbook._file_name)
+        self.opentelemetry.setup_tracing(
+            self.otel_service_name, self.otel_exporter_otlp_traces_protocol, self.store_spans_in_file
+        )
+        self.opentelemetry.start_playbook_span(self.ansible_playbook, self.traceparent)
+
+    def write_spans_to_file(self) -> None:
+        if not self.store_spans_in_file or self.opentelemetry.otel_exporter is None:
+            return
+        spans = [json.loads(span.to_json()) for span in self.opentelemetry.otel_exporter.get_finished_spans()]
+        with open(self.store_spans_in_file, "w", encoding="utf-8") as output:
+            json.dump({"spans": spans}, output, indent=4)
 
     def v2_playbook_on_play_start(self, play):
         self.play_name = play.get_name()
 
     def v2_runner_on_start(self, host, task):
         self.opentelemetry.start_task(self.tasks_data, self.hide_task_arguments, self.play_name, task, host)
+
+    def record_task_result(self, status: str, result) -> None:
+        """record the result of a task and stream its span right away"""
+
+        task_data = self.tasks_data[result._task._uuid]
+        host_data = self.opentelemetry.finish_task(
+            self.tasks_data, status, result, self.dump_results(task_data, result)
+        )
+        self.opentelemetry.stream_task_span(task_data, host_data, self.disable_logs, self.disable_attributes_in_logs)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         if ignore_errors:
@@ -583,14 +656,10 @@ class CallbackModule(CallbackBase):
             status = "failed"
             self.errors += 1
 
-        self.opentelemetry.finish_task(
-            self.tasks_data, status, result, self.dump_results(self.tasks_data[result._task._uuid], result)
-        )
+        self.record_task_result(status, result)
 
     def v2_runner_on_ok(self, result):
-        self.opentelemetry.finish_task(
-            self.tasks_data, "ok", result, self.dump_results(self.tasks_data[result._task._uuid], result)
-        )
+        self.record_task_result("ok", result)
 
     def v2_runner_on_skipped(self, result):
         if result._task._uuid not in self.tasks_data:
@@ -598,17 +667,14 @@ class CallbackModule(CallbackBase):
             self.opentelemetry.start_task(
                 self.tasks_data, self.hide_task_arguments, self.play_name, result._task, result._host
             )
-        self.opentelemetry.finish_task(
-            self.tasks_data, "skipped", result, self.dump_results(self.tasks_data[result._task._uuid], result)
-        )
+        self.record_task_result("skipped", result)
 
     def v2_runner_on_unreachable(self, result):
         self.errors += 1
-        self.opentelemetry.finish_task(
-            self.tasks_data, "failed", result, self.dump_results(self.tasks_data[result._task._uuid], result)
-        )
+        self.record_task_result("failed", result)
 
     def v2_playbook_on_include(self, included_file):
+        # includes are only known once the whole playbook has been parsed, their spans are emitted at the end
         self.opentelemetry.finish_task(self.tasks_data, "included", included_file, "")
 
     def v2_playbook_on_stats(self, stats):
@@ -616,22 +682,10 @@ class CallbackModule(CallbackBase):
             status = Status(status_code=StatusCode.OK)
         else:
             status = Status(status_code=StatusCode.ERROR)
-        otel_exporter = self.opentelemetry.generate_distributed_traces(
-            self.otel_service_name,
-            self.ansible_playbook,
-            self.tasks_data,
-            status,
-            self.traceparent,
-            self.disable_logs,
-            self.disable_attributes_in_logs,
-            self.otel_exporter_otlp_traces_protocol,
-            self.store_spans_in_file,
+        self.opentelemetry.end_playbook_span(
+            self.tasks_data, status, self.disable_logs, self.disable_attributes_in_logs
         )
-
-        if self.store_spans_in_file:
-            spans = [json.loads(span.to_json()) for span in otel_exporter.get_finished_spans()]
-            with open(self.store_spans_in_file, "w", encoding="utf-8") as output:
-                json.dump({"spans": spans}, output, indent=4)
+        self.write_spans_to_file()
 
     def v2_runner_on_async_failed(self, result, **kwargs):
         self.errors += 1
