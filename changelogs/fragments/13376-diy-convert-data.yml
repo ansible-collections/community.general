@@ -1,0 +1,2 @@
+bugfixes:
+  - diy callback plugin - no longer emits a deprecation warning about ``convert_data`` with ansible-core 2.19 and later (https://github.com/ansible-collections/community.general/issues/10544, https://github.com/ansible-collections/community.general/pull/13376).
