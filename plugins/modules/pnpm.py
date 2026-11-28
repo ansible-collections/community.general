@@ -20,7 +20,10 @@ extends_documentation_fragment:
   - community.general._attributes
 attributes:
   check_mode:
-    support: full
+    support: partial
+    details:
+      - When O(name) is not provided and O(state=present), check mode only reports a change if a package declared
+        in C(package.json) is not installed. Changes to the versions of installed packages are not detected.
   diff_mode:
     support: none
 options:
@@ -240,6 +243,9 @@ class Pnpm:
 
         data = data[0]
 
+        if self.name is None:
+            return self.missing_from_package_json(data)
+
         for typedep in [
             "dependencies",
             "devDependencies",
@@ -263,6 +269,49 @@ class Pnpm:
                 break
 
         return True
+
+    def missing_from_package_json(self, data):
+        try:
+            with open(os.path.join(self.path, "package.json")) as f:
+                package_json = json.load(f)
+        except (OSError, ValueError) as e:
+            self.module.fail_json(msg=f"Failed to read package.json with error {e}")
+
+        if self.production:
+            typedeps = ["dependencies", "optionalDependencies"]
+        elif self.dev:
+            typedeps = ["devDependencies"]
+        else:
+            typedeps = ["dependencies", "devDependencies", "optionalDependencies"]
+
+        if self.no_optional and "optionalDependencies" in typedeps:
+            typedeps.remove("optionalDependencies")
+
+        declared = set()
+        for typedep in typedeps:
+            declared.update(package_json.get(typedep, {}))
+
+        installed = set()
+        for typedep in [
+            "dependencies",
+            "devDependencies",
+            "optionalDependencies",
+            "unsavedDependencies",
+        ]:
+            installed.update(data.get(typedep, {}))
+
+        return not declared.issubset(installed)
+
+    def current_state(self):
+        lockfile = os.path.join(self.path, "pnpm-lock.yaml")
+        if not os.path.isfile(lockfile):
+            return None
+
+        with open(lockfile) as f:
+            lockfile_content = f.read()
+
+        out, _err = self._exec(["list", "--json"], True, False)
+        return lockfile_content, out
 
     def install(self):
         if self.alias_name_ver is not None:
@@ -409,7 +458,11 @@ def main():
     out = ""
     err = ""
     if state == "present":
-        if pnpm.missing():
+        if name is None and not module.check_mode:
+            before = pnpm.current_state()
+            out, err = pnpm.install()
+            changed = pnpm.current_state() != before
+        elif pnpm.missing():
             changed = True
             out, err = pnpm.install()
     elif state == "latest":
