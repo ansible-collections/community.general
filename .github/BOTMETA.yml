@@ -884,6 +884,8 @@ files:
   $modules/interfaces_file.py:
     labels: interfaces_file
     maintainers: obourdon hryamzik
+  $modules/internetdata_info.py:
+    maintainers: UmanShahzad
   $modules/ip2location_info.py:
     maintainers: ip2location
   $modules/ip_netns.py:
