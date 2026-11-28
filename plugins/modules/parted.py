@@ -240,8 +240,13 @@ EXAMPLES = r"""
 import math
 import os
 import re
+from fractions import Fraction
 
 from ansible.module_utils.basic import AnsibleModule
+
+# Set in main()
+module: AnsibleModule
+parted_exec: str
 
 # Reference prefixes (International System of Units and IEC)
 units_si = ["B", "KB", "MB", "GB", "TB"]
@@ -255,10 +260,11 @@ def canonical_unit(unit):
     return _parted_units_lower.get(unit.lower(), unit)
 
 
-def parse_unit(size_str, unit=""):
+def parse_unit(size_str: str, unit: str = "") -> tuple[float | dict[str, int], str]:
     """
     Parses a string containing a size or boundary information
     """
+    size: float | dict[str, int]
     matches = re.search(r"^(-?[\d.]+) *([\w%]+)?$", size_str)
     if matches is None:
         # "<cylinder>,<head>,<sector>" format
@@ -433,6 +439,80 @@ def convert_to_bytes(size_str, unit):
 
     output = size * multiplier
     return int(output)
+
+
+def get_end_location(part_end: str, unit: str, disk_length: int, sector_size: int) -> tuple[int, int] | None:
+    """
+    Interprets part_end the way parted does. Returns the end sector, and how many
+    sectors parted may move it away from there to fit the partition. Returns None
+    when part_end is expressed in cylinders or in CHS.
+    """
+    size, end_unit = parse_unit(part_end, unit)
+    if isinstance(size, dict) or end_unit in ["cyl", "chs"]:
+        return None
+
+    if end_unit == "%":
+        unit_size = disk_length * sector_size // 100
+    elif end_unit == "s":
+        unit_size = sector_size
+    elif end_unit in units_iec:
+        unit_size = 1024 ** (units_iec.index(end_unit) + 1)
+    elif end_unit in units_si:
+        unit_size = 1000 ** units_si.index(end_unit)
+    else:
+        # compact is interpreted as megabytes
+        unit_size = 1000 ** units_si.index("MB")
+
+    end_sector = int(Fraction(str(size)) * unit_size / sector_size)
+    if size < 0:
+        end_sector += disk_length
+    # parted makes partitions end right before boundaries given in IEC units
+    if end_unit in units_iec:
+        end_sector -= 1
+
+    # parted takes locations given in units that are not a power of 2 as approximate
+    if unit_size & (unit_size - 1) == 0:
+        radius = 0
+    else:
+        radius = max(-(-unit_size // sector_size) // 2 - 1, 0)
+    return end_sector, radius
+
+
+def get_partition_sectors(device: str, number: int) -> tuple[int, int, int, int]:
+    """
+    Returns, in sectors, the disk length, the logical sector size, the end of
+    the partition, and the furthest the partition can be extended to, that is,
+    the end of the free space right after it, within any partition containing it.
+    """
+    global module, parted_exec  # pylint: disable=global-variable-not-assigned
+
+    command = [parted_exec, "-s", "-m", device, "--", "unit", "s", "print", "free"]
+    rc, out, err = module.run_command(command)
+    if rc != 0:
+        module.fail_json(
+            msg=f"Error while getting device information with parted script: '{' '.join(command)}'",
+            rc=rc,
+            out=out,
+            err=err,
+        )
+
+    lines = [line.rstrip(";").split(":") for line in out.splitlines() if line.strip() != ""]
+    disk_length = int(lines[1][1].rstrip("s"))
+    sector_size = int(lines[1][3])
+
+    free = []
+    parts = {}
+    for row in lines[2:]:
+        begin, end = int(row[1].rstrip("s")), int(row[2].rstrip("s"))
+        if row[-1] == "free":
+            free.append((begin, end))
+        else:
+            parts[int(row[0])] = (begin, end)
+
+    part_begin, part_end = parts.pop(number)
+    max_ends = [end for begin, end in free if begin == part_end + 1]
+    max_ends += [end for begin, end in parts.values() if begin <= part_begin and end >= part_end]
+    return disk_length, sector_size, part_end, min(max_ends, default=part_end)
 
 
 def get_unlabeled_device_info(device, unit, unit_preserve_case):
@@ -727,17 +807,23 @@ def main():
         # If partition exists, try to resize
         if resize and part_exists(current_parts, "num", number):
             # Ensure new end is different to current
-            partition = [p for p in current_parts if p["num"] == number][0]
-            current_part_end = convert_to_bytes(partition["end"], unit)
+            disk_length, sector_size, current_end, max_end = get_partition_sectors(device, number)
+            # Without a unit command, parted interprets a part_end without unit in its default unit (compact)
+            script_unit = unit if script else "compact"
+            end_location = get_end_location(part_end, script_unit, disk_length, sector_size)
+            if end_location is not None:
+                desired_end, radius = end_location
+                # parted moves the end within the radius to fit the partition, and fails if that is not enough
+                resize_needed = desired_end - radius > max_end or min(desired_end, max_end) != current_end
+            else:
+                partition = [p for p in current_parts if p["num"] == number][0]
+                current_part_end = convert_to_bytes(partition["end"], unit)
 
-            size, parsed_unit = parse_unit(part_end, unit)
-            if parsed_unit == "%":
-                size = int((int(current_device["generic"]["size"]) * size) / 100)
-                parsed_unit = unit
+                size, parsed_unit = parse_unit(part_end, unit)
+                desired_part_end = convert_to_bytes(size, parsed_unit)
+                resize_needed = current_part_end != desired_part_end
 
-            desired_part_end = convert_to_bytes(size, parsed_unit)
-
-            if current_part_end != desired_part_end:
+            if resize_needed:
                 script += ["resizepart", str(number), part_end]
 
         # Execute the script and update the data structure.

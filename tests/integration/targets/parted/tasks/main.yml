@@ -121,3 +121,64 @@
   ansible.builtin.assert:
     that:
       - info_roundtrip.disk.unit == info_preserve_true.disk.unit
+
+- name: Create GPT partition on half of the disk
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    label: gpt
+    number: 1
+    state: present
+    part_end: "50%"
+
+- name: Resize GPT partition to the end of the disk
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    label: gpt
+    number: 1
+    state: present
+    unit: KiB
+    part_end: "100%"
+    resize: true
+  register: resize_gpt
+
+- name: Resize GPT partition to the end of the disk (idempotency)
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    label: gpt
+    number: 1
+    state: present
+    unit: KiB
+    part_end: "100%"
+    resize: true
+  register: resize_gpt_again
+
+- name: Resize GPT partition to the end of the disk (idempotency, check mode)
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    label: gpt
+    number: 1
+    state: present
+    unit: KiB
+    part_end: "100%"
+    resize: true
+  check_mode: true
+  register: resize_gpt_check
+
+- name: Resize GPT partition to the end of the disk (idempotency, unit s)
+  community.general.parted:
+    device: "{{ losetup_name.stdout }}"
+    label: gpt
+    number: 1
+    state: present
+    unit: s
+    part_end: "100%"
+    resize: true
+  register: resize_gpt_sectors
+
+- name: Assert GPT resize results
+  ansible.builtin.assert:
+    that:
+      - resize_gpt is changed
+      - resize_gpt_again is not changed
+      - resize_gpt_check is not changed
+      - resize_gpt_sectors is not changed

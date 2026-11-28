@@ -1,0 +1,2 @@
+bugfixes:
+  - parted - fix idempotency when resizing partitions with ``resize=true`` (https://github.com/ansible-collections/community.general/issues/3236, https://github.com/ansible-collections/community.general/pull/13345).
