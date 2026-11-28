@@ -40,7 +40,7 @@ options:
     type: str
   password:
     description:
-      - Path to a file containing the password, or V(none), V(-) or unset if the password should be entered at boot.
+      - Path to a file containing the password, or V(-) or unset if the password should be entered at boot.
     type: path
   opts:
     description:
