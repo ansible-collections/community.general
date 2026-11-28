@@ -321,6 +321,113 @@
       - from_url_non_http_result is not changed
     msg: "from_url with non-http URL shall fail"
 
+# state=present with from_file
+
+- name: Test addition with from_file flatpakref - {{ method }}
+  community.general.flatpak:
+    name: com.dummy.App1
+    from_file: /tmp/flatpak/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: from_file_ref_addition_result
+
+- name: Test idempotency of addition with from_file flatpakref - {{ method }}
+  community.general.flatpak:
+    name: com.dummy.App1
+    from_file: /tmp/flatpak/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_from_file_ref_addition_result
+
+- name: Verify addition with from_file flatpakref test results - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - from_file_ref_addition_result is changed
+      - "'--from /tmp/flatpak/repo/com.dummy.App1.flatpakref' in from_file_ref_addition_result.command"
+      - double_from_file_ref_addition_result is not changed
+
+- name: Cleanup after state=present with from_file flatpakref test - {{ method }}
+  community.general.flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+- name: Test addition with from_file bundle - {{ method }}
+  community.general.flatpak:
+    name: com.dummy.App1
+    from_file: /tmp/flatpak/com.dummy.App1.flatpak
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: from_file_bundle_addition_result
+
+- name: Test idempotency of addition with from_file bundle - {{ method }}
+  community.general.flatpak:
+    name: com.dummy.App1
+    from_file: /tmp/flatpak/com.dummy.App1.flatpak
+    state: present
+    method: "{{ method }}"
+    no_dependencies: true
+  register: double_from_file_bundle_addition_result
+
+- name: Verify addition with from_file bundle test results - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - from_file_bundle_addition_result is changed
+      - "'--bundle /tmp/flatpak/com.dummy.App1.flatpak' in from_file_bundle_addition_result.command"
+      - double_from_file_bundle_addition_result is not changed
+
+- name: Cleanup after state=present with from_file bundle test - {{ method }}
+  community.general.flatpak:
+    name: com.dummy.App1
+    state: absent
+    method: "{{ method }}"
+    no_dependencies: true
+
+# from_file validation failures
+
+- name: Test from_file with unsupported extension fails - {{ method }}
+  community.general.flatpak:
+    name: com.dummy.App1
+    from_file: /tmp/flatpak/repo/dummy-repo.flatpakrepo
+    state: present
+    method: "{{ method }}"
+  register: from_file_extension_result
+  ignore_errors: true
+
+- name: Test from_file with URL in name fails - {{ method }}
+  community.general.flatpak:
+    name: http://127.0.0.1:8000/repo/com.dummy.App1.flatpakref
+    from_file: /tmp/flatpak/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+  register: from_file_url_name_result
+  ignore_errors: true
+
+- name: Test from_file with multiple names fails - {{ method }}
+  community.general.flatpak:
+    name:
+      - com.dummy.App1
+      - com.dummy.App2
+    from_file: /tmp/flatpak/repo/com.dummy.App1.flatpakref
+    state: present
+    method: "{{ method }}"
+  register: from_file_multi_name_result
+  ignore_errors: true
+
+- name: Verify from_file validation failures - {{ method }}
+  ansible.builtin.assert:
+    that:
+      - from_file_extension_result is failed
+      - "'must be a path to a .flatpakref or .flatpak file' in from_file_extension_result.msg"
+      - from_file_url_name_result is failed
+      - "'cannot contain URLs' in from_file_url_name_result.msg"
+      - from_file_multi_name_result is failed
+      - "'must contain exactly one entry' in from_file_multi_name_result.msg"
+
 # state=present with list of packages
 
 - name: Test addition with list - {{ method }}

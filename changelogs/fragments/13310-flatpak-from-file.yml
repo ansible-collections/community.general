@@ -1,0 +1,2 @@
+minor_changes:
+  - flatpak - add ``from_file`` option to install flatpaks from local ``.flatpakref`` or bundle files (https://github.com/ansible-collections/community.general/issues/13307, https://github.com/ansible-collections/community.general/pull/13310).

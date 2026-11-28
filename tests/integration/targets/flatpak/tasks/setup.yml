@@ -30,6 +30,11 @@
     flatpakrepo_url: /tmp/flatpak/repo/dummy-repo.flatpakrepo
     method: system
 
+- name: Build flatpak bundle for testing from_file
+  ansible.builtin.command:
+    cmd: flatpak build-bundle /tmp/flatpak/repo /tmp/flatpak/com.dummy.App1.flatpak com.dummy.App1 stable
+    creates: /tmp/flatpak/com.dummy.App1.flatpak
+
 - name: Remove (if necessary) flatpak for testing check mode on absent flatpak
   community.general.flatpak:
     name:

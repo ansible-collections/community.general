@@ -118,6 +118,23 @@
         Adding an absent flatpak with from_url a second time shall still mark module execution
         as changed in check mode
 
+# state=present with from_file on absent flatpak
+
+- name: Test addition of absent flatpak with from_file (check mode)
+  community.general.flatpak:
+    name: com.dummy.App1
+    from_file: /tmp/flatpak/com.dummy.App1.flatpak
+    state: present
+    no_dependencies: true
+  register: from_file_addition_result
+  check_mode: true
+
+- name: Verify addition of absent flatpak with from_file test result (check mode)
+  ansible.builtin.assert:
+    that:
+      - from_file_addition_result is changed
+    msg: "Adding an absent flatpak with from_file shall mark module execution as changed"
+
 # state=present with url on absent flatpak
 
 - name: Test addition of absent flatpak with url (check mode)
@@ -281,6 +298,23 @@
     that:
       - from_url_addition_present_result is not changed
     msg: "Adding a present flatpak with from_url shall mark module execution as not changed"
+
+# state=present with from_file on present flatpak
+
+- name: Test addition with from_file of present flatpak (check mode)
+  community.general.flatpak:
+    name: com.dummy.App2
+    from_file: /tmp/flatpak/repo/com.dummy.App2.flatpakref
+    state: present
+    no_dependencies: true
+  register: from_file_addition_present_result
+  check_mode: true
+
+- name: Verify addition with from_file of present flatpak test result (check mode)
+  ansible.builtin.assert:
+    that:
+      - from_file_addition_present_result is not changed
+    msg: "Adding a present flatpak with from_file shall mark module execution as not changed"
 
 # state=present with url on present flatpak
 
