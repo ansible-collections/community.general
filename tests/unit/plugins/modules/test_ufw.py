@@ -36,6 +36,15 @@ ufw_status_verbose_with_port_7000 = (
     "7000/tcp (v6)              ALLOW IN    Anywhere (v6)\n"
 )
 
+ufw_status_numbered_with_port_7000 = """Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 7000/tcp                   ALLOW IN    Anywhere
+[ 2] 7000/tcp (v6)              ALLOW IN    Anywhere (v6)
+
+"""
+
 user_rules_with_port_7000 = """### tuple ### allow tcp 7000 0.0.0.0/0 any 0.0.0.0/0 in
 ### tuple ### allow tcp 7000 ::/0 any ::/0 in
 """
@@ -68,6 +77,7 @@ grep_config_cli += "/var/lib/ufw/user.rules /var/lib/ufw/user6.rules"
 
 dry_mode_cmd_with_port_700 = {
     "ufw status verbose": ufw_status_verbose_with_port_7000,
+    "ufw status numbered": ufw_status_numbered_with_port_7000,
     "ufw --version": ufw_version_35,
     "ufw --dry-run allow from any to any port 7000 proto tcp": skippg_adding_existing_rules,
     "ufw --dry-run insert 1 allow from any to any port 7000 proto tcp": skippg_adding_existing_rules,
@@ -101,22 +111,36 @@ dry_mode_cmd_with_ipv6 = {
 
 dry_mode_cmd_nothing = {
     "ufw status verbose": ufw_status_verbose_nothing,
+    "ufw status numbered": "Status: inactive\n",
     "ufw --version": ufw_version_35,
     grep_config_cli: "",
     "ufw --dry-run allow from any to :: port 23": "### tuple ### allow any 23 :: any ::/0 in",
+    "ufw --dry-run allow from any to any port 22 proto tcp": "### tuple ### allow tcp 22 0.0.0.0/0 any 0.0.0.0/0 in\n"
+    "### tuple ### allow tcp 22 ::/0 any ::/0 in\n",
 }
 
 
+def cmd_key(cmd):
+    # "ufw status numbered" is run as a list, the other commands as strings
+    return " ".join(cmd) if isinstance(cmd, list) else cmd
+
+
 def do_nothing_func_nothing(*args, **kwarg):
-    return 0, dry_mode_cmd_nothing[args[0]], ""
+    return 0, dry_mode_cmd_nothing[cmd_key(args[0])], ""
 
 
 def do_nothing_func_ipv6(*args, **kwarg):
-    return 0, dry_mode_cmd_with_ipv6[args[0]], ""
+    return 0, dry_mode_cmd_with_ipv6[cmd_key(args[0])], ""
 
 
 def do_nothing_func_port_7000(*args, **kwarg):
-    return 0, dry_mode_cmd_with_port_700[args[0]], ""
+    return 0, dry_mode_cmd_with_port_700[cmd_key(args[0])], ""
+
+
+def do_nothing_func_port_7000_rules_files_not_found(*args, **kwarg):
+    if args[0] == grep_config_cli:
+        return 2, "", "grep: /etc/ufw/user.rules: No such file or directory\n"
+    return do_nothing_func_port_7000(*args, **kwarg)
 
 
 def get_bin_path(self, arg, required=False):
@@ -190,6 +214,37 @@ class TestUFW(unittest.TestCase):
         ):
             result = self.__getResult(do_nothing_func_port_7000)
         self.assertFalse(result.exception.args[0]["changed"])
+        self.assertIn(
+            "ufw --dry-run insert 1 allow from any to any port 7000 proto tcp", result.exception.args[0]["commands"]
+        )
+
+    def test_check_mode_insert_after_last_rule(self):
+        # two rules exist, ufw would reject "insert 3"
+        with set_module_args(
+            {"insert": "3", "rule": "allow", "proto": "tcp", "port": "7000", "_ansible_check_mode": True}
+        ):
+            result = self.__getResult(do_nothing_func_port_7000)
+        self.assertFalse(result.exception.args[0]["changed"])
+        self.assertIn("ufw --dry-run allow from any to any port 7000 proto tcp", result.exception.args[0]["commands"])
+
+    def test_check_mode_insert_rules_files_not_found(self):
+        # "ufw status numbered" still shows the two rules
+        with set_module_args(
+            {"insert": "1", "rule": "allow", "proto": "tcp", "port": "7000", "_ansible_check_mode": True}
+        ):
+            result = self.__getResult(do_nothing_func_port_7000_rules_files_not_found)
+        self.assertIn(
+            "ufw --dry-run insert 1 allow from any to any port 7000 proto tcp", result.exception.args[0]["commands"]
+        )
+
+    def test_check_mode_insert_into_empty_ruleset(self):
+        # https://github.com/ansible-collections/community.general/issues/9283
+        with set_module_args(
+            {"insert": "1", "rule": "allow", "proto": "tcp", "port": "22", "_ansible_check_mode": True}
+        ):
+            result = self.__getResult(do_nothing_func_nothing)
+        self.assertTrue(result.exception.args[0]["changed"])
+        self.assertIn("ufw --dry-run allow from any to any port 22 proto tcp", result.exception.args[0]["commands"])
 
     def test_check_mode_add_detailed_route(self):
         with set_module_args(
