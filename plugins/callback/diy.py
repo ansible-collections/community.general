@@ -854,7 +854,9 @@ class CallbackModule(Default):
 
     def _template(self, loader, template, variables):
         _templar = Templar(loader=loader, variables=variables)
-        return _templar.template(template, preserve_trailing_newlines=True, convert_data=False, escape_backslashes=True)
+        # ansible-core 2.19 deprecated convert_data and added evaluate_expression()
+        kwargs = {} if hasattr(_templar, "evaluate_expression") else {"convert_data": False}
+        return _templar.template(template, preserve_trailing_newlines=True, escape_backslashes=True, **kwargs)
 
     def _output(self, spec, stderr=False):
         _msg = to_text(spec["msg"])
