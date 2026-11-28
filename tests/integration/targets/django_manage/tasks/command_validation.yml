@@ -1,0 +1,71 @@
+# Copyright (c) 2026, Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Register the test Django app
+  ansible.builtin.lineinfile:
+    path: "{{ django_project_path }}/test_django_manage_1/settings.py"
+    insertafter: '^INSTALLED_APPS = \['
+    line: '    "app1",'
+
+- name: Create the custom management commands directory
+  ansible.builtin.file:
+    path: "{{ django_project_path }}/app1/management/commands"
+    state: directory
+    mode: '0755'
+
+- name: Install the custom management command
+  ansible.builtin.copy:
+    src: probe.py
+    dest: "{{ django_project_path }}/app1/management/commands/probe.py"
+    mode: '0644'
+
+- name: Pass a quoted argument directly to a custom command
+  community.general.django_manage:
+    project_path: "{{ django_project_path }}"
+    virtualenv: "{{ tmp_django_root.path }}/venv"
+    command: probe --database="test db"
+  register: django_custom_command
+
+- name: Check that Django received the quoted value as a single argument
+  ansible.builtin.assert:
+    that:
+      - django_custom_command.out | trim == 'test db'
+
+- name: Reject invalid management command arguments
+  community.general.django_manage:
+    project_path: "{{ django_project_path }}"
+    virtualenv: "{{ tmp_django_root.path }}/venv"
+    command: "{{ validation_case.command }}"
+    database: "{{ validation_case.database | default(omit) }}"
+  loop:
+    - command: probe
+      database: default
+      error: database param is incompatible with command=probe
+    - command: test
+      database: default
+      error: database param is incompatible with command=test
+    - command: loaddata
+      error: fixtures param is required for command=loaddata
+    - command: ''
+      error: command must not be empty
+    - command: '   '
+      error: command must not be empty
+    - command: '""'
+      error: command must not be empty
+    - command: 'probe "'
+      error: 'Unable to parse command: No closing quotation'
+  loop_control:
+    loop_var: validation_case
+  ignore_errors: true
+  register: django_invalid_commands
+
+- name: Check management command validation errors
+  ansible.builtin.assert:
+    that:
+      - validation_result is failed
+      - validation_result.validation_case.error in validation_result.msg
+  loop: "{{ django_invalid_commands.results }}"
+  loop_control:
+    loop_var: validation_result
+    label: "{{ validation_result.validation_case.command | ansible.builtin.to_json }}"

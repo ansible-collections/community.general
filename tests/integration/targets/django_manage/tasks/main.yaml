@@ -33,7 +33,7 @@
 
 - name: Create app
   ansible.builtin.command:
-    chdir: "{{ tmp_django_root.path }}/startproj"
+    chdir: "{{ tmp_django_root.path }}/startproj/test_django_manage_1"
     cmd: "{{ tmp_django_root.path }}/venv/bin/django-admin startapp app1"
 
 - name: Make manage.py executable
@@ -80,3 +80,8 @@
   ansible.builtin.assert:
     that:
       - "'ValueError: DJANGO_ANSIBLE_RAISE=blah' in env_raise.msg"
+
+- name: Test command validation
+  ansible.builtin.include_tasks: command_validation.yml
+  vars:
+    django_project_path: "{{ tmp_django_root.path }}/startproj/test_django_manage_1"
