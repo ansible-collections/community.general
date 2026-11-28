@@ -31,8 +31,9 @@ options:
       - V(loaddata) - Searches for and loads the contents of the named O(fixtures) into the database.
       - V(migrate) - Synchronizes the database state with models and migrations.
       - V(test) - Runs tests for all installed apps.
-      - Custom commands can be entered, but they fail unless they are known to Django. Custom commands that may prompt for
-        user input should be run with the C(--noinput) flag.
+      - Custom commands can be entered, but they fail unless they are known to Django. Pass their command-specific arguments
+        in O(command), for example C(my_command --database=default). Custom commands that may prompt for user input should be
+        run with the C(--noinput) flag.
       - Support for the values V(cleanup), V(syncdb), V(validate) was removed in community.general 9.0.0. See note about supported
         versions of Django.
     type: str
@@ -295,14 +296,21 @@ def main():
         ),
     )
 
-    command_split = shlex.split(module.params["command"])
+    try:
+        command_split = shlex.split(module.params["command"])
+    except ValueError as exc:
+        module.fail_json(msg=f"Unable to parse command: {exc}")
+    if not command_split or not command_split[0].strip():
+        module.fail_json(msg="command must not be empty")
+
     command_bin = command_split[0]
     project_path = module.params["project_path"]
     virtualenv = module.params["virtualenv"]
 
+    allowed_params = command_allowed_param_map.get(command_bin, ())
     for param in specific_params:
         value = module.params[param]
-        if value and param not in command_allowed_param_map[command_bin]:
+        if value and param not in allowed_params:
             module.fail_json(msg=f"{param} param is incompatible with command={command_bin}")
 
     for param in command_required_param_map.get(command_bin, ()):
