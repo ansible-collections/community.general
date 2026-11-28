@@ -1,0 +1,2 @@
+bugfixes:
+  - zypper_repository - recognize an existing repository by a URL with an empty host or a different trailing slash, and with ``state=absent`` remove every repository found instead of the given name (https://github.com/ansible-collections/community.general/pull/13304).
