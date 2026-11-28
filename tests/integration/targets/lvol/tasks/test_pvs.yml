@@ -62,3 +62,31 @@
     that:
       - css_pvs_create_testlv2_result is success
       - css_pvs_create_testlv2_result is not changed
+
+- name: Shrink logical volume (testlv2) with pvs set
+  community.general.lvol:
+    vg: testvg2
+    lv: testlv2
+    size: 20m
+    pvs:
+      - "{{ loop_device3 }}"
+      - "{{ loop_device4 }}"
+    force: true
+  register: shrink_pvs_testlv2_result
+
+- name: Shrink logical volume (testlv2) with pvs set again
+  community.general.lvol:
+    vg: testvg2
+    lv: testlv2
+    size: 20m
+    pvs:
+      - "{{ loop_device3 }}"
+      - "{{ loop_device4 }}"
+    force: true
+  register: shrink_pvs_testlv2_again_result
+
+- name: Assert logical volume (testlv2) shrunk with pvs set, and idempotency on second execution
+  ansible.builtin.assert:
+    that:
+      - shrink_pvs_testlv2_result is changed
+      - shrink_pvs_testlv2_again_result is not changed
