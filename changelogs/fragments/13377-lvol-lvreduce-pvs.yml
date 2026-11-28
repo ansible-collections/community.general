@@ -1,0 +1,2 @@
+bugfixes:
+  - lvol - fix shrinking a logical volume when ``pvs`` is set (https://github.com/ansible-collections/community.general/issues/3320, https://github.com/ansible-collections/community.general/pull/13377).
