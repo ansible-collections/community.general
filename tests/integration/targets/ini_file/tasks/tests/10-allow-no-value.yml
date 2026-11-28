@@ -61,14 +61,13 @@
 
       [multilib]
       Include = /etc/pacman.d/mirrorlist
-      #Include = /etc/pacman.d/other
     content_allow_no_value_1: "{{ output_content_allow_no_value_1.content | b64decode }}"
 
-- name: test-allow-no-value 1 - assert existing values are kept and only the option without value is changed
+- name: test-allow-no-value 1 - assert existing values are kept and the commented line is removed
   ansible.builtin.assert:
     that:
       - result_allow_no_value_1.results[0] is not changed
-      - result_allow_no_value_1.results[1] is not changed
+      - result_allow_no_value_1.results[1] is changed
       - result_allow_no_value_1.results[2] is changed
       - result_allow_no_value_1_idem is not changed
       - content_allow_no_value_1 == expected_allow_no_value_1

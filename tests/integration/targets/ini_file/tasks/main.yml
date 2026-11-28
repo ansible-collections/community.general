@@ -68,3 +68,11 @@
 
     - name: include tasks to test allow_no_value with existing values
       ansible.builtin.include_tasks: tests/10-allow-no-value.yml
+
+    - name: reset output file
+      ansible.builtin.file:
+        path: "{{ output_file }}"
+        state: absent
+
+    - name: include tasks to test exclusive with allow_no_value
+      ansible.builtin.include_tasks: tests/11-exclusive-allow-no-value.yml

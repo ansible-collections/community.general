@@ -466,8 +466,8 @@ def do_ini(
                     option_no_value_present = True
                     break
 
-    if state == "present" and exclusive and not allow_no_value:
-        # override option with no value to option with value if not allow_no_value
+    if state == "present" and exclusive and (not allow_no_value or (option and not no_value_requested)):
+        # override option with no value to option with value
         if len(values) > 0:
             for index, line in enumerate(section_lines):
                 line_match = match_function(option, line) if not changed_lines[index] else None
