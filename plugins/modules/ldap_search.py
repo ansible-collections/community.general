@@ -34,8 +34,13 @@ options:
     type: str
     description:
       - The LDAP scope to use.
-      - V(subordinate) requires the LDAPv3 subordinate feature extension.
-      - V(children) is equivalent to a "subtree" scope.
+      - V(base) returns only the entry named by O(dn). This is the default, so searching for the entries below O(dn) needs
+        another scope.
+      - V(onelevel) returns the entries directly below O(dn), but not O(dn) itself.
+      - V(subordinate) returns all entries below O(dn) at any depth, but not O(dn) itself. It requires the LDAPv3 subordinate
+        feature extension. OpenLDAP's C(ldapsearch) calls this scope C(children).
+      - V(children) returns O(dn) and all entries below it at any depth. OpenLDAP's C(ldapsearch) calls this scope C(sub),
+        and RFC 4511 calls it C(wholeSubtree).
   filter:
     default: '(objectClass=*)'
     type: str
@@ -78,6 +83,7 @@ EXAMPLES = r"""
 - name: Return all entries within the 'groups' organizational unit.
   community.general.ldap_search:
     dn: "ou=groups,dc=example,dc=com"
+    scope: "children"
   register: ldap_groups
 
 - name: Return GIDs for all groups
