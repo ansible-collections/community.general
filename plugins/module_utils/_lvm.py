@@ -486,11 +486,10 @@ def lvreduce_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
     """
     Runner for C(lvreduce). Used by: community.general.lvol.
 
-    Suggested args order: test force resizefs size_L lv pvs
+    Suggested args order: test force resizefs size_L lv
     (use size_l instead of size_L when sizing by extents or percentage)
 
-    Note: C(lv) must appear before C(pvs) in the args_order string.
-    C(pvs) matches the O(pvs) module parameter in community.general.lvol.
+    C(lvreduce) does not accept physical volumes, so there is no C(pvs) argument.
     """
     return CmdRunner(
         module,
@@ -502,7 +501,6 @@ def lvreduce_runner(module: AnsibleModule, **kwargs) -> CmdRunner:
             size_L=cmd_runner_fmt.as_opt_val("-L"),
             size_l=cmd_runner_fmt.as_opt_val("-l"),
             lv=cmd_runner_fmt.as_list(),
-            pvs=cmd_runner_fmt.as_list(),
         ),
         **kwargs,
     )
