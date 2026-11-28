@@ -40,8 +40,7 @@ options:
     type: str
   password:
     description:
-      - Encryption password, the path to a file containing the password, or V(-) or unset if the password should be entered
-        at boot.
+      - Path to a file containing the password, or V(none), V(-) or unset if the password should be entered at boot.
     type: path
   opts:
     description:
@@ -94,7 +93,7 @@ def main():
             name=dict(type="str", required=True),
             state=dict(type="str", required=True, choices=["absent", "opts_absent", "opts_present", "present"]),
             backing_device=dict(type="str"),
-            password=dict(type="path"),
+            password=dict(type="path", no_log=False),
             opts=dict(type="str"),
             path=dict(type="path", default="/etc/crypttab"),
         ),
