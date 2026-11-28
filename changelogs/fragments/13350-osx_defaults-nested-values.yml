@@ -1,0 +1,2 @@
+bugfixes:
+  - osx_defaults - write nested dictionaries and arrays of dictionaries as property list values instead of their Python string representation, and merge ``dict_mode=add`` values recursively (https://github.com/ansible-collections/community.general/issues/13350).
