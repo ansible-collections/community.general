@@ -192,6 +192,16 @@ class IPAClient:
             return result
         return None
 
+    @staticmethod
+    def _decode_json_rpc_value(value):
+        # FreeIPA's JSON-RPC API encodes datetime values as {"__datetime__": "YYYYmmddHHMMSSZ"},
+        # while modules send them as plain strings in that same format.
+        if isinstance(value, dict) and list(value.keys()) == ["__datetime__"]:
+            return value["__datetime__"]
+        if isinstance(value, list):
+            return [IPAClient._decode_json_rpc_value(item) for item in value]
+        return value
+
     def get_diff(self, ipa_data, module_data):
         result = []
         for key in module_data.keys():
@@ -200,7 +210,7 @@ class IPAClient:
                 default = []
             else:
                 default = None
-            ipa_value = ipa_data.get(key, default)
+            ipa_value = self._decode_json_rpc_value(ipa_data.get(key, default))
             if isinstance(ipa_value, list) and not isinstance(mod_value, list):
                 mod_value = [mod_value]
             if isinstance(ipa_value, list) and isinstance(mod_value, list):

@@ -252,3 +252,29 @@ def test_create_with_password_sets_expiration_after_add(capfd, post_json):
         },
         {"method": "user_mod", "name": "pinky", "item": {"krbpasswordexpiration": "20300101000000Z"}},
     ]
+
+
+def test_expiration_returned_as_json_rpc_datetime_is_unchanged(capfd, post_json):
+    result = run_module(
+        capfd,
+        post_json,
+        {"state": "present", "krbpasswordexpiration": "20380119031407"},
+        ipa_user_entry(krbpasswordexpiration=[{"__datetime__": "20380119031407Z"}]),
+    )
+
+    assert result["changed"] is False
+    assert write_calls(post_json) == []
+
+
+def test_expiration_returned_as_json_rpc_datetime_is_updated_when_different(capfd, post_json):
+    result = run_module(
+        capfd,
+        post_json,
+        {"state": "present", "krbpasswordexpiration": "20380119031407"},
+        ipa_user_entry(krbpasswordexpiration=[{"__datetime__": "20300101000000Z"}]),
+    )
+
+    assert result["changed"] is True
+    assert write_calls(post_json) == [
+        {"method": "user_mod", "name": "pinky", "item": {"krbpasswordexpiration": "20380119031407Z"}},
+    ]
