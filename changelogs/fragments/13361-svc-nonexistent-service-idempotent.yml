@@ -1,0 +1,2 @@
+bugfixes:
+  - svc - no longer report a change and run ``svc -d`` on every run when ``state=stopped`` is requested for a service whose service directory does not exist (https://github.com/ansible-collections/community.general/pull/13361).

@@ -1,0 +1,16 @@
+# Copyright (c) Ansible project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+---
+test_cases:
+  - id: stop_nonexistent_service
+    input:
+      name: doesnotexist
+      service_dir: /nonexistent/service
+      service_src: /nonexistent/etc/service
+      state: stopped
+    output:
+      changed: false
+    mocks:
+      run_command: []
