@@ -291,6 +291,35 @@ from operator import itemgetter
 
 from ansible.module_utils.basic import AnsibleModule
 
+UFW_DEFAULTS_FILE = "/etc/default/ufw"
+
+
+def read_default_policies(path):
+    """
+    Read the default policies from ufw's defaults file.
+
+    ``ufw status verbose`` only prints the ``Default:`` line while ufw is active,
+    but ufw always keeps the policies in this file.
+    """
+    keys = {
+        "DEFAULT_INPUT_POLICY": "incoming",
+        "DEFAULT_OUTPUT_POLICY": "outgoing",
+        "DEFAULT_FORWARD_POLICY": "routed",
+    }
+    policies = {"DROP": "deny", "ACCEPT": "allow", "REJECT": "reject"}
+    result = {}
+    try:
+        with open(path) as f:
+            for line in f:
+                key, sep, value = line.strip().partition("=")
+                if sep and key in keys:
+                    policy = policies.get(value.strip().strip("'\"").upper())
+                    if policy:
+                        result[keys[key]] = policy
+    except OSError:
+        pass
+    return result
+
 
 def compile_ipv4_regexp():
     r = r"((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}"
@@ -510,13 +539,14 @@ def main():
                 v = current_default_values[params["direction"] or "incoming"]
                 already_set = v in (value, "disabled")
             else:
-                already_set = False
+                # ufw only prints the default policies while it is active
+                current_default_values = read_default_policies(UFW_DEFAULTS_FILE)
+                already_set = current_default_values.get(params["direction"] or "incoming") == value
 
-            if module.check_mode:
-                if not already_set:
-                    changed = True
-            elif not already_set:
-                execute(cmd + [[command], [value], [params["direction"]]])
+            if not already_set:
+                changed = True
+                if not module.check_mode:
+                    execute(cmd + [[command], [value], [params["direction"]]])
 
         elif command == "rule":
             if params["direction"] not in ["in", "out", None]:
