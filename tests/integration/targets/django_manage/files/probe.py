@@ -2,7 +2,8 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from django.core.management.base import BaseCommand
+# Django is installed in the integration test virtualenv.
+from django.core.management.base import BaseCommand  # type: ignore[import-not-found]
 
 
 class Command(BaseCommand):
